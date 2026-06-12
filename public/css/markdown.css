@@ -1,0 +1,194 @@
+/* =========================================================================
+   MARKDOWN - CIRA PRO ADAPTED
+   ========================================================================== */
+
+.chat-message-markdown {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.6 !important;
+    color: inherit !important;
+}
+
+/* Headings */
+.chat-message-markdown h1, 
+.chat-message-markdown h2, 
+.chat-message-markdown h3,
+.chat-message-markdown h4,
+.chat-message-markdown h5,
+.chat-message-markdown h6 {
+    margin: 1rem 0 0.5rem 0 !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    color: inherit !important;
+}
+
+.chat-message-markdown h1 {
+    font-size: 1.5rem !important;
+}
+
+.chat-message-markdown h2 {
+    font-size: 1.3rem !important;
+}
+
+.chat-message-markdown h3 {
+    font-size: 1.1rem !important;
+}
+
+.chat-message-markdown h4,
+.chat-message-markdown h5,
+.chat-message-markdown h6 {
+    font-size: 1rem !important;
+}
+
+/* Paragraphs */
+.chat-message-markdown p {
+    margin: 0.5rem 0 !important;
+    color: inherit !important;
+}
+
+.chat-message-markdown p:first-child {
+    margin-top: 0 !important;
+}
+
+.chat-message-markdown p:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Links */
+.chat-message-markdown a {
+    color: var(--cira-blue-main) !important;
+    text-decoration: underline !important;
+    cursor: pointer !important;
+    transition: opacity 0.2s ease !important;
+}
+
+.chat-message-markdown a:hover {
+    opacity: 0.8 !important;
+}
+
+.chat-message-from-user a {
+    color: #ffffff !important;
+    text-decoration: underline !important;
+}
+
+/* Blockquotes */
+.chat-message-markdown blockquote {
+    border-left: 0.3rem solid var(--cira-blue-main) !important;
+    padding-left: 1rem !important;
+    margin: 1rem 0 !important;
+    color: inherit !important;
+    opacity: 0.9 !important;
+}
+
+/* Lists */
+.chat-message-markdown ul,
+.chat-message-markdown ol {
+    margin: 0.5rem 0 !important;
+    padding-left: 1.5rem !important;
+    color: inherit !important;
+}
+
+.chat-message-markdown li {
+    margin: 0.25rem 0 !important;
+    line-height: 1.5 !important;
+    color: inherit !important;
+}
+
+.chat-message-markdown ul {
+    list-style-type: disc !important;
+}
+
+.chat-message-markdown ol {
+    list-style-type: decimal !important;
+}
+
+/* Code blocks */
+.chat-message-markdown pre {
+    background: #f6f8fa !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    overflow-x: auto !important;
+    margin: 0.5rem 0 !important;
+    border: 1px solid #e1e4e8 !important;
+}
+
+.chat-message-markdown code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+    font-size: 0.9em !important;
+    color: inherit !important;
+}
+
+/* Inline code */
+.chat-message-markdown p code,
+.chat-message-markdown li code {
+    background: rgba(175, 184, 193, 0.2) !important;
+    padding: 0.2em 0.4em !important;
+    border-radius: 4px !important;
+    font-size: 0.85em !important;
+}
+
+.chat-message-from-user code {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Tables */
+.chat-message-markdown table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 1rem 0 !important;
+    font-size: 0.9em !important;
+}
+
+.chat-message-markdown th,
+.chat-message-markdown td {
+    border: 1px solid #e1e4e8 !important;
+    padding: 8px 12px !important;
+    text-align: left !important;
+    color: inherit !important;
+}
+
+.chat-message-markdown th {
+    background: #f6f8fa !important;
+    font-weight: 600 !important;
+}
+
+/* Horizontal rule */
+.chat-message-markdown hr {
+    border: none !important;
+    border-top: 1px solid #e1e4e8 !important;
+    margin: 1.5rem 0 !important;
+}
+
+/* Strong and emphasis */
+.chat-message-markdown strong,
+.chat-message-markdown b {
+    font-weight: 700 !important;
+    color: inherit !important;
+}
+
+.chat-message-markdown em,
+.chat-message-markdown i {
+    font-style: italic !important;
+    color: inherit !important;
+}
+
+/* Images */
+.chat-message-markdown img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 8px !important;
+    margin: 0.5rem 0 !important;
+}
+
+/* Task lists */
+.chat-message-markdown input[type="checkbox"] {
+    margin-right: 0.5rem !important;
+}
+
+/* Nested lists */
+.chat-message-markdown ul ul,
+.chat-message-markdown ol ul,
+.chat-message-markdown ul ol,
+.chat-message-markdown ol ol {
+    margin: 0.25rem 0 !important;
+}

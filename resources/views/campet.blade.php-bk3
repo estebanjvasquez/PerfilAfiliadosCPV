@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Camara Petrolera de Venezuela</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Khand&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../resources/views/style.css" />
+  </head>
+  <body>
+    <main>
+      <picture class="logo">
+        <img
+          src="../public/images/Campet-Logo44.png"
+          alt="Logo de la Camara Petrolera de Venezuela"
+        />
+      </picture>
+      <article class="articulo-principal">
+        <div class="even-columns">
+          <figure class="articulo-imagen">
+            <img
+              src="../public/images/Perfil-Afiliados.png"
+              alt="Perfil de Afiliados a la Camara Petrolera de Venezuela"
+            />
+          </figure>
+          <div class="articulo-contenido">
+            <div class="vertical-line" aria-hidden="true"></div>
+            <p>
+              Incorpórate al grupo de empresas que participan en el Catálogo de los Afiliados de la CPV, presentando tu Perfil, sumando valor para tu crecimiento,  facilitando la exposición de la oferta de tus bienes y servicios a clientes, potenciales financistas y aliados estratégicos para identificar oportunidades para la generación de negocios. Para formar parte haz clic aquí
+            </p>
+            <a class="link-btn" href="https://camarapetrolera.app/admin/login"
+              >pulse para acceder a su perfil</a
+            >
+          </div>
+        </div>
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+[10-Dec-2022 18:11:47 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/EditArea.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/EditArea.php on line 9
+[10-Dec-2022 23:35:12 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/CreateArea.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/CreateArea.php on line 9
+[11-Dec-2022 04:02:33 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/CreateArea.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/CreateArea.php on line 9
+[11-Dec-2022 12:10:29 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/ListAreas.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/ListAreas.php on line 9
+[11-Dec-2022 18:09:28 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/ListAreas.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/ListAreas.php on line 9
+[13-Dec-2022 00:58:30 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/EditArea.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AreaResource/Pages/EditArea.php on line 9

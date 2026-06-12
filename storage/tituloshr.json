@@ -1,0 +1,42 @@
+{
+"personal" : [
+        {
+            "0": "Bachilleres",
+            "1": "Técnicos",
+            "2": "Ingenieros",
+            "3": "Administrativo",
+            "4": "Gerencial",
+            "5": "Directivo"
+        }
+    ],
+"maquinaria" : [
+        {
+            "0": "Equipos de medición, levantamiento (survey)",
+            "1": "Equipos marino-costeros; fluviales o costa afuera",
+            "2": "Movimiento de tierra y construcción",
+            "3": "Equipos menores de construcción",
+            "4": "Fabricación metalmecánica / electromecánica / electrónica",
+            "5": "Montaje eléctrico/mecánico",
+            "6": "Máquinas herramientas / Metalmecánica",
+            "7": "Almacenamiento y transporte",
+            "8": "Servicios a pozos e instalaciones petroleras"
+        }
+    ],
+"instalaciones" : [
+        {
+            "0": "Oficinas",
+            "1": "Talleres",
+            "2": "Manufactura/fabrica industrial",
+            "3": "Almacenes y Depósitos",
+            "4": "Laboratorios",
+            "5": "Facilidades Marinas, Muelles, etc.",
+            "6": "Otros"
+        }
+    ],
+"inventario" : [
+        {
+            "0": "Materia Prima",
+            "1": "Producto terminado"
+        }
+    ]
+}

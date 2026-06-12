@@ -1,0 +1,32 @@
+[23-Nov-2022 03:27:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/sistegnet/public_html/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Kernel.php on line 7
+[02-Dec-2022 05:42:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/sistegnet/public_html/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Kernel.php on line 7
+[02-Dec-2022 05:42:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/sistegnet/public_html/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Kernel.php on line 7
+[02-Dec-2022 19:17:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/sistegnet/public_html/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Kernel.php on line 7
+[09-Dec-2022 02:40:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/sistegnet/public_html/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Kernel.php on line 7
+[10-Dec-2022 18:47:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/sistegnet/public_html/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Kernel.php on line 7
+[11-Dec-2022 15:17:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/sistegnet/public_html/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Kernel.php on line 7
+[14-Dec-2022 15:12:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/sistegnet/public_html/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Kernel.php on line 7

@@ -1,0 +1,28 @@
+[11-Dec-2022 00:33:01 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/ManagementResource.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/ManagementResource.php on line 21
+[11-Dec-2022 21:44:02 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/InfraSectorResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/InfraSectorResource.php on line 18
+[12-Dec-2022 00:27:49 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/AssetResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/AssetResource.php on line 19
+[12-Dec-2022 03:38:30 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/InfraSystemResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/InfraSystemResource.php on line 18
+[13-Dec-2022 13:14:36 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/InfraTypeResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/InfraTypeResource.php on line 18
+[14-Dec-2022 15:16:08 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/ServiceResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/ServiceResource.php on line 19
+[15-Dec-2022 18:45:33 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/CountryResource.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/respaldo antes corregis vistas/CountryResource.php on line 17

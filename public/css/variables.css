@@ -1,0 +1,68 @@
+/* =========================================================================
+   CIRA PRO VARIABLES
+   ========================================================================== */
+
+:root {
+    /* CIRA Brand Colors */
+    --cira-blue-main: #004a87;    
+    --cira-blue-btn: #9dbcd4;     
+    --cira-bg-header: #e9f1f8;
+    --cira-orange: #f58220;
+    
+    /* Window Dimensions */
+    --chat--window--width: 420px;      
+    --chat--window--height: 85vh;
+    --chat--window--bottom: 20px;
+    --chat--window--right: 20px;
+    --chat--window--z-index: 999999;
+    
+    /* Toggle Button */
+    --chat--toggle--size: 60px;
+    --chat--toggle--background: var(--cira-blue-main);
+    
+    /* Typography */
+    --chat--font-family: 'Segoe UI', Roboto, sans-serif;
+    
+    /* Header */
+    --chat--header--padding: 50px 20px 20px 20px;
+    --chat--header--background: var(--cira-bg-header);
+    --chat--header--color: var(--cira-blue-main);
+    --chat--header--height: 190px;
+    
+    /* Body */
+    --chat--body--background: #ffffff;
+    --chat--body--padding: 40px 20px 20px 20px;
+    
+    /* Footer */
+    --chat--footer--background: #ffffff;
+    --chat--footer--padding: 15px;
+    
+    /* Input */
+    --chat--input--background: #f0f4f8;
+    --chat--input--border: #e1e8ed;
+    --chat--input--padding: 12px 15px;
+    --chat--input--border-radius: 20px;
+    
+    /* Messages */
+    --chat--message--padding: 12px 16px;
+    --chat--message--border-radius: 18px;
+    --chat--message--bot--background: #f9fafb;
+    --chat--message--bot--color: #000000;
+    --chat--message--user--background: var(--cira-blue-main);
+    --chat--message--user--color: #ffffff;
+    
+    /* Colors */
+    --chat--color--primary: var(--cira-blue-main);
+    --chat--color--secondary: #6b7280;
+    --chat--color--typing: #d1d5db;
+    --chat--color-light-shade-100: #f0f0f0;
+    
+    /* Files */
+    --chat--files-spacing: 10px 15px;
+    
+    /* Cards */
+    --chat--card--background: #f9fafb;
+    --chat--card--border: #edf2f7;
+    --chat--card--padding: 12px 14px;
+    --chat--card--border-radius: 12px;
+}

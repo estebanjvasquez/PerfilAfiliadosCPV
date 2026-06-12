@@ -1,0 +1,120 @@
+[23-Nov-2022 15:53:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Middleware\TrustProxies" not found in /home/sistegnet/public_html/app/Http/Middleware/TrustProxies.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrustProxies.php on line 8
+[25-Nov-2022 15:29:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Cookie\Middleware\EncryptCookies" not found in /home/sistegnet/public_html/app/Http/Middleware/EncryptCookies.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/EncryptCookies.php on line 7
+[25-Nov-2022 18:38:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Auth\Middleware\Authenticate" not found in /home/sistegnet/public_html/app/Http/Middleware/Authenticate.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/Authenticate.php on line 7
+[25-Nov-2022 23:45:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\VerifyCsrfToken" not found in /home/sistegnet/public_html/app/Http/Middleware/VerifyCsrfToken.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/VerifyCsrfToken.php on line 7
+[05-Dec-2022 02:50:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Auth\Middleware\Authenticate" not found in /home/sistegnet/public_html/app/Http/Middleware/Authenticate.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/Authenticate.php on line 7
+[05-Dec-2022 03:02:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Cookie\Middleware\EncryptCookies" not found in /home/sistegnet/public_html/app/Http/Middleware/EncryptCookies.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/EncryptCookies.php on line 7
+[05-Dec-2022 03:30:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance" not found in /home/sistegnet/public_html/app/Http/Middleware/PreventRequestsDuringMaintenance.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/PreventRequestsDuringMaintenance.php on line 7
+[05-Dec-2022 06:03:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\TrimStrings" not found in /home/sistegnet/public_html/app/Http/Middleware/TrimStrings.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrimStrings.php on line 7
+[05-Dec-2022 07:43:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Middleware\TrustHosts" not found in /home/sistegnet/public_html/app/Http/Middleware/TrustHosts.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrustHosts.php on line 7
+[06-Dec-2022 07:52:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance" not found in /home/sistegnet/public_html/app/Http/Middleware/PreventRequestsDuringMaintenance.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/PreventRequestsDuringMaintenance.php on line 7
+[07-Dec-2022 07:50:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Middleware\TrustProxies" not found in /home/sistegnet/public_html/app/Http/Middleware/TrustProxies.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrustProxies.php on line 8
+[09-Dec-2022 02:37:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Middleware\TrustHosts" not found in /home/sistegnet/public_html/app/Http/Middleware/TrustHosts.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrustHosts.php on line 7
+[09-Dec-2022 02:38:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Cookie\Middleware\EncryptCookies" not found in /home/sistegnet/public_html/app/Http/Middleware/EncryptCookies.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/EncryptCookies.php on line 7
+[09-Dec-2022 23:42:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance" not found in /home/sistegnet/public_html/app/Http/Middleware/PreventRequestsDuringMaintenance.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/PreventRequestsDuringMaintenance.php on line 7
+[10-Dec-2022 18:34:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance" not found in /home/sistegnet/public_html/app/Http/Middleware/PreventRequestsDuringMaintenance.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/PreventRequestsDuringMaintenance.php on line 7
+[10-Dec-2022 21:41:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Middleware\TrustHosts" not found in /home/sistegnet/public_html/app/Http/Middleware/TrustHosts.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrustHosts.php on line 7
+[10-Dec-2022 22:26:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\VerifyCsrfToken" not found in /home/sistegnet/public_html/app/Http/Middleware/VerifyCsrfToken.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/VerifyCsrfToken.php on line 7
+[11-Dec-2022 00:01:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Middleware\TrustProxies" not found in /home/sistegnet/public_html/app/Http/Middleware/TrustProxies.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrustProxies.php on line 8
+[11-Dec-2022 04:46:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Auth\Middleware\Authenticate" not found in /home/sistegnet/public_html/app/Http/Middleware/Authenticate.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/Authenticate.php on line 7
+[11-Dec-2022 11:57:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Auth\Middleware\Authenticate" not found in /home/sistegnet/public_html/app/Http/Middleware/Authenticate.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/Authenticate.php on line 7
+[11-Dec-2022 13:58:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\VerifyCsrfToken" not found in /home/sistegnet/public_html/app/Http/Middleware/VerifyCsrfToken.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/VerifyCsrfToken.php on line 7
+[11-Dec-2022 15:40:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Middleware\TrustHosts" not found in /home/sistegnet/public_html/app/Http/Middleware/TrustHosts.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrustHosts.php on line 7
+[11-Dec-2022 18:45:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\TrimStrings" not found in /home/sistegnet/public_html/app/Http/Middleware/TrimStrings.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrimStrings.php on line 7
+[12-Dec-2022 00:13:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Cookie\Middleware\EncryptCookies" not found in /home/sistegnet/public_html/app/Http/Middleware/EncryptCookies.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/EncryptCookies.php on line 7
+[12-Dec-2022 02:22:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Cookie\Middleware\EncryptCookies" not found in /home/sistegnet/public_html/app/Http/Middleware/EncryptCookies.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/EncryptCookies.php on line 7
+[12-Dec-2022 03:24:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\TrimStrings" not found in /home/sistegnet/public_html/app/Http/Middleware/TrimStrings.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrimStrings.php on line 7
+[12-Dec-2022 03:29:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance" not found in /home/sistegnet/public_html/app/Http/Middleware/PreventRequestsDuringMaintenance.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/PreventRequestsDuringMaintenance.php on line 7
+[13-Dec-2022 08:19:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Middleware\TrustProxies" not found in /home/sistegnet/public_html/app/Http/Middleware/TrustProxies.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrustProxies.php on line 8
+[14-Dec-2022 15:09:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Middleware\TrustProxies" not found in /home/sistegnet/public_html/app/Http/Middleware/TrustProxies.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrustProxies.php on line 8
+[14-Dec-2022 15:11:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Middleware\TrustHosts" not found in /home/sistegnet/public_html/app/Http/Middleware/TrustHosts.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Middleware/TrustHosts.php on line 7

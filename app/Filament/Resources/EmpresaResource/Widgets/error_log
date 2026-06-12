@@ -1,0 +1,8 @@
+[10-Dec-2022 23:14:09 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Widgets\StatsOverviewWidget" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Widgets/StatsOverview.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Widgets/StatsOverview.php on line 9
+[12-Dec-2022 00:29:13 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Widgets\StatsOverviewWidget" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Widgets/StatsOverview.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Widgets/StatsOverview.php on line 9

@@ -1,0 +1,36 @@
+[09-Dec-2022 03:07:50 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/SustainabilityView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/SustainabilityView.php on line 11
+[09-Dec-2022 03:09:50 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/ManagementView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/ManagementView.php on line 11
+[09-Dec-2022 03:11:40 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/GenCatalog.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/GenCatalog.php on line 26
+[09-Dec-2022 03:14:29 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/ExperienceView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/ExperienceView.php on line 11
+[09-Dec-2022 03:16:43 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/ClientsView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/ClientsView.php on line 11
+[10-Dec-2022 00:04:02 UTC] PHP Fatal error:  Uncaught Error: Class "JeffGreco13\FilamentBreezy\Http\Livewire\Auth\Login" not found in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/Login.php:28
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/Login.php on line 28
+[13-Dec-2022 03:48:18 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/GenCatalog.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/GenCatalog.php on line 26
+[14-Dec-2022 16:00:23 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/GenCapacity.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/GenCapacity.php on line 11
+[15-Dec-2022 19:06:20 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/ManagementView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/respaldo antes corregir vistas/ManagementView.php on line 11

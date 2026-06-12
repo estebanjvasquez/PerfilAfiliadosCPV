@@ -1,0 +1,44 @@
+[10-Dec-2022 21:12:00 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ShieldSettings.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ShieldSettings.php on line 20
+[11-Dec-2022 01:15:48 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ListRoles.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ListRoles.php on line 9
+[11-Dec-2022 03:02:37 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/EditRole.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/EditRole.php on line 12
+[11-Dec-2022 03:12:39 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/CreateRole.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/CreateRole.php on line 12
+[11-Dec-2022 03:34:58 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/CreateRole.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/CreateRole.php on line 12
+[11-Dec-2022 08:01:06 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ShieldSettings.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ShieldSettings.php on line 20
+[11-Dec-2022 09:33:58 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/EditRole.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/EditRole.php on line 12
+[11-Dec-2022 13:26:07 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ViewRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ViewRole.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ViewRole.php on line 8
+[12-Dec-2022 01:23:36 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ViewRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ViewRole.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ViewRole.php on line 8
+[12-Dec-2022 03:06:39 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ListRoles.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ListRoles.php on line 9
+[15-Dec-2022 18:46:53 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ListRoles.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/Shield/RoleResource/Pages/ListRoles.php on line 9

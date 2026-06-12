@@ -1,0 +1,775 @@
+[03-Nov-2022 19:26:40 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[03-Nov-2022 19:26:40 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[03-Nov-2022 19:26:40 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[03-Nov-2022 19:26:50 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[03-Nov-2022 19:26:50 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[03-Nov-2022 19:26:50 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[09-Nov-2022 19:57:03 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[09-Nov-2022 19:57:03 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[09-Nov-2022 19:57:03 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[09-Nov-2022 19:57:04 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[09-Nov-2022 19:57:04 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[09-Nov-2022 19:57:04 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[09-Nov-2022 19:57:17 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[09-Nov-2022 19:57:17 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[09-Nov-2022 19:57:17 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[09-Nov-2022 19:57:17 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[09-Nov-2022 19:57:17 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[09-Nov-2022 19:57:17 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[14-Nov-2022 12:45:42 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[14-Nov-2022 12:45:42 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[14-Nov-2022 12:45:42 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[20-Nov-2022 17:54:13 UTC] PHP Fatal error:  Uncaught RuntimeException: A facade root has not been set. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:335
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php(18): Illuminate\Support\Facades\Facade::__callStatic('replaceNamespac...', Array)
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(631): Illuminate\Foundation\Exceptions\RegisterErrorViewPaths->__invoke()
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(612): Illuminate\Foundation\Exceptions\Handler->registerErrorViewPaths()
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(543): Illuminate\Foundation\Exceptions\Handler->renderHttpException(Object(Symfony\Component\HttpKernel\Exception\HttpException))
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(449): Illuminate\Foundation\Exceptions\Handler->prepareResponse(Object(Illuminate\Http\Request), Object(Symfony\Component\HttpKernel\Exception\HttpException))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse(Object(Illuminate\Http\Request), Object(Symfony\Component\Finder\Exception\DirectoryNotFoundException))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(493): Illuminate\Foundation\Exceptions\Handler->render(Object(Illuminate\Http\Request), Object(Symfony\Component\Finder\Exception\DirectoryNotFoundException))
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(138): Illuminate\Foundation\Http\Kernel->renderException(Object(Illuminate\Http\Request), Object(Symfony\Component\Finder\Exception\DirectoryNotFoundException))
+#8 /home/sistegnet/public_html/public/index.php(52): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 335
+[29-Nov-2022 18:55:43 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:55:43 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:55:43 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:56:15 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:56:15 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:56:15 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:56:50 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:56:50 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:56:50 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:57:16 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:57:16 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:57:16 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:57:42 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:57:42 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:57:42 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:58:07 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:07 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:07 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:58:27 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:27 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:27 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:58:31 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:31 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:31 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:58:35 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:36 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:36 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:58:36 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:36 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:36 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:58:41 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:41 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:41 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:58:43 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:43 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:43 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:58:51 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:51 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:58:51 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:59:03 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:59:03 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:59:03 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:59:25 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:59:25 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:59:25 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 18:59:50 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:59:50 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 18:59:50 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 19:00:13 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 19:00:13 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 19:00:13 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 19:00:46 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 19:00:46 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 19:00:46 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[29-Nov-2022 19:01:14 UTC] PHP Warning:  include(/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php): Failed to open stream: No such file or directory in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 19:01:14 UTC] PHP Warning:  include(): Failed opening '/home/sistegnet/public_html/vendor/composer/../../app/Http/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/sistegnet/public_html/vendor/composer/ClassLoader.php on line 571
+[29-Nov-2022 19:01:14 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Http\Kernel" does not exist in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:875
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(875): ReflectionClass->__construct('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Http\Kernel] does not exist. in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php:877
+Stack trace:
+#0 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build('App\\Http\\Kernel')
+#1 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('App\\Http\\Kernel', Array, false)
+#2 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Http\\Kernel', Array, false)
+#3 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(871): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(756): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php(692): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/sistegnet/public_html/public/index.php(49): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/sistegnet/public_html/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 877
+[21-Nov-2024 18:28:45 UTC] PHP Fatal error:  Allowed memory size of 268435456 bytes exhausted (tried to allocate 20480 bytes) in /home/campetapp/public_html/vendor/mpdf/mpdf/src/Mpdf.php on line 19444
+[21-Nov-2024 18:28:45 UTC] PHP Fatal error:  Allowed memory size of 268435456 bytes exhausted (tried to allocate 32768 bytes) in /home/campetapp/public_html/vendor/symfony/error-handler/Error/FatalError.php on line 1
+[21-Nov-2024 18:29:09 UTC] PHP Fatal error:  Allowed memory size of 268435456 bytes exhausted (tried to allocate 20480 bytes) in /home/campetapp/public_html/vendor/mpdf/mpdf/src/Mpdf.php on line 19442
+[21-Nov-2024 18:29:09 UTC] PHP Fatal error:  Allowed memory size of 268435456 bytes exhausted (tried to allocate 20480 bytes) in /home/campetapp/public_html/vendor/symfony/error-handler/Error/FatalError.php on line 14
+[21-Nov-2024 18:29:28 UTC] PHP Fatal error:  Allowed memory size of 268435456 bytes exhausted (tried to allocate 20480 bytes) in /home/campetapp/public_html/vendor/mpdf/mpdf/src/Mpdf.php on line 19442
+[21-Nov-2024 18:29:28 UTC] PHP Fatal error:  Allowed memory size of 268435456 bytes exhausted (tried to allocate 20480 bytes) in /home/campetapp/public_html/vendor/symfony/error-handler/Error/FatalError.php on line 14
+[23-Jan-2025 16:54:38 UTC] PHP Fatal error:  Out of memory (allocated 27262976) (tried to allocate 8192 bytes) in /home/campetapp/public_html/vendor/symfony/finder/Iterator/RecursiveDirectoryIterator.php on line 70
+[16-Jul-2025 08:02:44 UTC] PHP Fatal error:  Out of memory (allocated 29360128) (tried to allocate 8192 bytes) in /home/campetapp/public_html/vendor/symfony/finder/Iterator/RecursiveDirectoryIterator.php on line 70

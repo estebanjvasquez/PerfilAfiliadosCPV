@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>CIRA — Cómo funciona</title>
+
+  <!-- Preload de recursos críticos -->
+  <link rel="preload" href="assets/css/kiosk.css"      as="style">
+  <link rel="preload" href="assets/img/campet-logo.png" as="image">
+
+  <!-- Prefetch de la siguiente página más probable -->
+  <link rel="prefetch" href="bot.html">
+  <link rel="prefetch" href="assets/js/chat-widget-kiosk.js">
+
+  <link rel="stylesheet" href="assets/css/kiosk.css">
+</head>
+<body class="page-ayuda">
+
+  <!-- ── Barra de navegación ─────────────────────────────────── -->
+  <nav class="kiosk-nav" role="navigation" aria-label="Navegación de ayuda">
+    <div class="nav-logo">
+      <img
+        src="assets/img/campet-logo.png"
+        alt="Cámara Petrolera de Venezuela"
+        class="logo-img"
+        decoding="async"
+      >
+    </div>
+
+    <div class="nav-actions">
+      <a href="bot.html"   class="btn btn-primary btn-nav" aria-label="Ir al asistente CIRA">
+        <span class="btn-icon" aria-hidden="true">&#128172;</span>
+        <span class="btn-label">Usar CIRA</span>
+      </a>
+      <a href="index.html" class="btn btn-nav" aria-label="Volver a la pantalla de inicio">
+        <span class="btn-icon" aria-hidden="true">&#8962;</span>
+        <span class="btn-label">Inicio</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Contenido de ayuda ─────────────────────────────────── -->
+  <main class="ayuda-main" role="main">
+
+    <div class="ayuda-header">
+      <h1 class="ayuda-title">¿Cómo funciona CIRA AI?</h1>
+      <p class="ayuda-subtitle">
+        <strong>CIRA AI</strong> es el motor de búsqueda de la
+        <strong>Cámara Petrolera de Venezuela</strong>, diseñado para transformar
+        la manera en que clientes, socios y aliados interactúan con nuestra
+        base de datos de capacidades nacionales.
+      </p>
+    </div>
+
+    <div class="ayuda-grid" role="list">
+
+      <!-- Tarjeta 1: Alcance -->
+      <div class="ayuda-card" role="listitem">
+        <span class="ayuda-card-icon" aria-hidden="true">&#128269;</span>
+        <h2 class="ayuda-card-title">Alcance de CIRA AI</h2>
+        <p class="ayuda-card-text">
+          Acceso en tiempo real al <strong>Perfil de Afiliados</strong>.
+          Más de <strong>250 empresas</strong> afiliadas a la Cámara Petrolera
+          dentro de la Cadena de Valor de los Hidrocarburos.
+        </p>
+        <ul class="ayuda-card-list" aria-label="Información disponible">
+          <li>Identificación por nombre comercial y RIF</li>
+          <li>Clasificación por <strong>sector</strong>: Ingeniería y Servicios Integrados, Servicios a Pozos, Operadores, Fabricantes, Suplidores, Construcción y Montaje, Servicios Técnicos y Tecnológicos, Servicios Asociados</li>
+          <li>Clasificación por <strong>tipo de servicio</strong> dentro de cada sector</li>
+          <li>Localización por ciudad</li>
+          <li>Contacto: enlaces a sitios web oficiales</li>
+        </ul>
+      </div>
+
+      <!-- Tarjeta 2: Cómo consultar -->
+      <div class="ayuda-card" role="listitem">
+        <span class="ayuda-card-icon" aria-hidden="true">&#128172;</span>
+        <h2 class="ayuda-card-title">Cómo hacer una consulta</h2>
+        <p class="ayuda-card-text">
+          Sé específico. Incluye palabras clave como sector, servicio,
+          ubicación o nombre de empresa. Evita preguntas muy amplias.
+        </p>
+        <ul class="ayuda-card-list" aria-label="Ejemplos de consultas">
+          <li>"Necesito empresas del sector Ingeniería en Anzoátegui"</li>
+          <li>"¿Qué afiliados ofrecen servicios de Mantenimiento de Tanques?"</li>
+          <li>"Dame el RIF y la página web de [Nombre de la Empresa]"</li>
+          <li>"¿Cuáles son las empresas de Fabricación del Capítulo Zulia?"</li>
+        </ul>
+        <p class="ayuda-card-text ayuda-card-text--gap">
+          CIRA responderá con la información disponible en el sistema.
+        </p>
+      </div>
+
+      <!-- Tarjeta 3: Restricciones -->
+      <div class="ayuda-card" role="listitem">
+        <span class="ayuda-card-icon" aria-hidden="true">&#9889;</span>
+        <h2 class="ayuda-card-title">Restricciones importantes</h2>
+        <ul class="ayuda-card-list" aria-label="Límites del asistente">
+          <li>Solo responde con información del <strong>Perfil de Afiliados</strong></li>
+          <li>No genera opiniones, análisis ni recomendaciones</li>
+          <li>No proporciona datos no registrados en el sistema</li>
+          <li>La información depende del nivel de actualización del perfil de cada empresa</li>
+          <li>No descarga ni adjunta archivos</li>
+          <li>No suministra teléfonos personales, correos privados ni datos financieros sensibles</li>
+        </ul>
+      </div>
+
+      <!-- Tarjeta 4: Funcionamiento -->
+      <div class="ayuda-card" role="listitem">
+        <span class="ayuda-card-icon" aria-hidden="true">&#127981;</span>
+        <h2 class="ayuda-card-title">Funcionamiento del chat</h2>
+        <p class="ayuda-card-text">
+          <strong>"Si tu Perfil está completo, CIRA AI te encontrará."</strong>
+          Solo utiliza la información cargada por la propia empresa en su perfil.
+        </p>
+        <ul class="ayuda-card-list" aria-label="Cómo funciona">
+          <li>Procesa tu consulta en tiempo real</li>
+          <li>Busca coincidencias dentro del Perfil de Afiliados</li>
+          <li>Muestra resultados organizados según la información disponible</li>
+          <li>Puedes realizar varias consultas seguidas para refinar tu búsqueda</li>
+        </ul>
+      </div>
+
+      <!-- Tarjeta ancha: Contacto -->
+      <div class="ayuda-card ayuda-card--wide" role="listitem" aria-label="Contacto">
+        <span class="ayuda-card-icon" aria-hidden="true">&#128231;</span>
+        <div class="ayuda-card-body">
+          <h2 class="ayuda-card-title">¿No encontraste lo que buscabas?</h2>
+          <p class="ayuda-card-text">
+            Si CIRA no puede responderte, contáctanos directamente:
+          </p>
+          <span class="ayuda-contact-email">perfilafiliados@camarapetrolera.org</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="ayuda-actions" role="navigation" aria-label="Acciones de navegación">
+      <a href="bot.html"   class="btn btn-primary  btn-cta"     role="button" aria-label="Ir al asistente CIRA AI">
+        <span class="btn-icon" aria-hidden="true">&#128172;</span>
+        Comenzar a usar CIRA AI
+      </a>
+      <a href="index.html" class="btn btn-secondary btn-cta-sec" role="button" aria-label="Volver al inicio">
+        <span class="btn-icon" aria-hidden="true">&#8962;</span>
+        Volver al inicio
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Scripts defer — no bloquean el render -->
+  <script src="assets/js/idle-manager.js" defer></script>
+  <script src="assets/js/kiosk.js"        defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      IdleManager.init({
+        timeout:   120000,
+        warningAt:  20000,
+        onIdle: function () {
+          fetch('index.html', { method: 'HEAD', cache: 'no-store' })
+            .then(function (r) { if (r.ok) window.location.href = 'index.html'; })
+            .catch(function () { /* servidor no disponible — el idle volverá a disparar */ });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

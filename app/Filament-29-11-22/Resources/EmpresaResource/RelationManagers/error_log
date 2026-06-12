@@ -1,0 +1,4 @@
+[23-Nov-2022 16:30:58 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\RelationManagers\RelationManager" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ChambersRelationManager.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ChambersRelationManager.php on line 15

@@ -1,0 +1,572 @@
+[04-Dec-2022 23:09:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraRegion.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraRegion.php on line 10
+[05-Dec-2022 00:30:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraRegion.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraRegion.php on line 10
+[05-Dec-2022 01:15:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sector.php on line 8
+[05-Dec-2022 01:52:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Asset.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Asset.php on line 10
+[05-Dec-2022 02:43:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Experience.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Experience.php on line 10
+[05-Dec-2022 07:40:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Management.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Management.php on line 10
+[05-Dec-2022 08:40:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Asset.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Asset.php on line 10
+[05-Dec-2022 09:26:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraFacility.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraFacility.php on line 8
+[06-Dec-2022 01:26:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/FinanceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/FinanceViewModel.php on line 8
+[06-Dec-2022 01:26:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/FinanceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/FinanceViewModel.php on line 8
+[06-Dec-2022 01:26:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 01:26:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Chamber.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Chamber.php on line 8
+[06-Dec-2022 01:27:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/infraregion_infrasystem.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/infraregion_infrasystem.php on line 8
+[06-Dec-2022 01:27:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 01:27:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Chamber.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Chamber.php on line 8
+[06-Dec-2022 01:27:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Chamber.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Chamber.php on line 8
+[06-Dec-2022 01:27:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/infraregion_infrasystem.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/infraregion_infrasystem.php on line 8
+[06-Dec-2022 01:29:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 01:29:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 01:30:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 01:50:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 01:57:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 02:09:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 02:24:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 02:40:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 02:55:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 05:38:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/FinanceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/FinanceViewModel.php on line 8
+[06-Dec-2022 07:35:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sustainability.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sustainability.php on line 10
+[06-Dec-2022 07:37:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ManagementView.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ManagementView.php on line 8
+[06-Dec-2022 07:39:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraSector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraSector.php on line 8
+[06-Dec-2022 07:41:16 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/GenCatalog.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/GenCatalog.php on line 9
+[06-Dec-2022 07:43:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/FinanceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/FinanceViewModel.php on line 8
+[06-Dec-2022 07:44:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[06-Dec-2022 07:46:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Experience.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Experience.php on line 10
+[06-Dec-2022 21:58:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/empresa_sector_service.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/empresa_sector_service.php on line 8
+[06-Dec-2022 22:02:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraType.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraType.php on line 8
+[06-Dec-2022 22:03:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/City.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/City.php on line 9
+[07-Dec-2022 00:13:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/State.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/State.php on line 8
+[07-Dec-2022 07:47:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/SustainabilityViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/SustainabilityViewModel.php on line 8
+[07-Dec-2022 07:49:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Contact.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Contact.php on line 8
+[07-Dec-2022 11:04:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Management.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Management.php on line 10
+[07-Dec-2022 11:06:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Area.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Area.php on line 10
+[08-Dec-2022 00:44:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraRegion.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraRegion.php on line 10
+[08-Dec-2022 08:31:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Service.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Service.php on line 8
+[08-Dec-2022 08:50:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Asset.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Asset.php on line 10
+[08-Dec-2022 08:51:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Asset.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Asset.php on line 10
+[08-Dec-2022 08:52:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sustainability.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sustainability.php on line 10
+[08-Dec-2022 08:53:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/FinanceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/FinanceViewModel.php on line 8
+[08-Dec-2022 08:59:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sustainability.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sustainability.php on line 10
+[08-Dec-2022 08:59:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/GenCapacity.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/GenCapacity.php on line 8
+[08-Dec-2022 09:12:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Area.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Area.php on line 10
+[08-Dec-2022 09:15:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Presence.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Presence.php on line 10
+[08-Dec-2022 09:15:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Auth\User" not found in /home/sistegnet/public_html/app/Models/User.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/User.php on line 14
+[08-Dec-2022 09:22:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Customer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Customer.php on line 8
+[08-Dec-2022 09:29:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/City.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/City.php on line 9
+[08-Dec-2022 09:33:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraRegion.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraRegion.php on line 10
+[08-Dec-2022 10:32:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraType.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraType.php on line 8
+[08-Dec-2022 10:32:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Country.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Country.php on line 9
+[08-Dec-2022 10:35:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sustainability.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sustainability.php on line 10
+[08-Dec-2022 23:25:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/chamber_empresa.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/chamber_empresa.php on line 8
+[09-Dec-2022 02:18:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sector.php on line 8
+[09-Dec-2022 02:21:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Presence.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Presence.php on line 10
+[09-Dec-2022 23:35:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/GenCapacity.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/GenCapacity.php on line 8
+[09-Dec-2022 23:36:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Empresa.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Empresa.php on line 16
+[10-Dec-2022 01:55:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/FinanceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/FinanceViewModel.php on line 8
+[10-Dec-2022 07:32:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ManagementView.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ManagementView.php on line 8
+[10-Dec-2022 07:33:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Chamber.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Chamber.php on line 8
+[10-Dec-2022 13:27:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ClientsViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ClientsViewModel.php on line 8
+[10-Dec-2022 15:58:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[10-Dec-2022 18:15:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Asset.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Asset.php on line 10
+[10-Dec-2022 18:53:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sector.php on line 8
+[10-Dec-2022 20:01:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/empresa_sector_service.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/empresa_sector_service.php on line 8
+[10-Dec-2022 20:08:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sustainability.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sustainability.php on line 10
+[10-Dec-2022 20:09:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/contact_empresa.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/contact_empresa.php on line 8
+[10-Dec-2022 20:33:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/contact_empresa.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/contact_empresa.php on line 8
+[10-Dec-2022 20:52:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Service.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Service.php on line 8
+[10-Dec-2022 20:55:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraSector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraSector.php on line 8
+[10-Dec-2022 22:14:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Experience.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Experience.php on line 10
+[10-Dec-2022 23:25:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/empresa_sector_service.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/empresa_sector_service.php on line 8
+[10-Dec-2022 23:30:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Asset.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Asset.php on line 10
+[11-Dec-2022 00:16:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraFacility.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraFacility.php on line 8
+[11-Dec-2022 00:39:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraSystem.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraSystem.php on line 8
+[11-Dec-2022 01:04:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Service.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Service.php on line 8
+[11-Dec-2022 03:28:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Area.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Area.php on line 10
+[11-Dec-2022 03:39:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sector.php on line 8
+[11-Dec-2022 04:46:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Presence.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Presence.php on line 10
+[11-Dec-2022 04:50:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Management.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Management.php on line 10
+[11-Dec-2022 05:33:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Presence.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Presence.php on line 10
+[11-Dec-2022 06:42:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraSector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraSector.php on line 8
+[11-Dec-2022 07:09:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/SustainabilityViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/SustainabilityViewModel.php on line 8
+[11-Dec-2022 09:33:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Experience.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Experience.php on line 10
+[11-Dec-2022 10:11:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/empresa_user.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/empresa_user.php on line 8
+[11-Dec-2022 10:39:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraType.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraType.php on line 8
+[11-Dec-2022 13:19:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraSystem.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraSystem.php on line 8
+[11-Dec-2022 13:32:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraRegion.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraRegion.php on line 11
+[11-Dec-2022 15:08:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/State.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/State.php on line 8
+[11-Dec-2022 15:12:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Auth\User" not found in /home/sistegnet/public_html/app/Models/User.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/User.php on line 14
+[11-Dec-2022 16:19:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Customer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Customer.php on line 8
+[11-Dec-2022 17:34:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Contact.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Contact.php on line 8
+[11-Dec-2022 18:11:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sustainability.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sustainability.php on line 10
+[11-Dec-2022 18:30:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Management.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Management.php on line 10
+[11-Dec-2022 18:30:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/State.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/State.php on line 8
+[11-Dec-2022 19:25:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Customer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Customer.php on line 8
+[11-Dec-2022 20:30:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraType.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraType.php on line 8
+[11-Dec-2022 20:31:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/empresa_user.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/empresa_user.php on line 8
+[11-Dec-2022 20:46:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraRegion.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraRegion.php on line 11
+[11-Dec-2022 21:07:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Area.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Area.php on line 10
+[11-Dec-2022 21:38:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/GenCatalog.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/GenCatalog.php on line 9
+[11-Dec-2022 22:32:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/City.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/City.php on line 9
+[12-Dec-2022 01:14:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Country.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Country.php on line 9
+[12-Dec-2022 02:38:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Empresa.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Empresa.php on line 16
+[12-Dec-2022 02:44:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraFacility.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraFacility.php on line 8
+[12-Dec-2022 02:46:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Auth\User" not found in /home/sistegnet/public_html/app/Models/User.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/User.php on line 14
+[12-Dec-2022 03:28:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Experience.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Experience.php on line 10
+[12-Dec-2022 14:17:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraRegion.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraRegion.php on line 11
+[12-Dec-2022 15:21:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraFacility.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraFacility.php on line 8
+[12-Dec-2022 21:12:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Empresa.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Empresa.php on line 16
+[13-Dec-2022 03:31:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/infraregion_infrasystem.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/infraregion_infrasystem.php on line 10
+[13-Dec-2022 03:32:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/chamber_empresa.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/chamber_empresa.php on line 8
+[13-Dec-2022 05:08:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Contact.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Contact.php on line 8
+[13-Dec-2022 07:11:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Experience.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Experience.php on line 10
+[13-Dec-2022 10:22:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Country.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Country.php on line 9
+[13-Dec-2022 18:27:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/chamber_empresa.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/chamber_empresa.php on line 8
+[13-Dec-2022 23:48:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/SustainabilityViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/SustainabilityViewModel.php on line 8
+[14-Dec-2022 00:20:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/GenCapacity.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/GenCapacity.php on line 8
+[14-Dec-2022 01:01:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ManagementView.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ManagementView.php on line 8
+[14-Dec-2022 03:08:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/chamber_empresa.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/chamber_empresa.php on line 8
+[14-Dec-2022 03:17:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Empresa.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Empresa.php on line 16
+[14-Dec-2022 04:45:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Chamber.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Chamber.php on line 8
+[14-Dec-2022 06:51:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[14-Dec-2022 07:47:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ClientsViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ClientsViewModel.php on line 8
+[14-Dec-2022 13:44:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraSector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraSector.php on line 8
+[14-Dec-2022 14:54:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Sector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Sector.php on line 8
+[14-Dec-2022 18:28:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/infraregion_infrasystem.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/infraregion_infrasystem.php on line 10
+[14-Dec-2022 19:07:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/FinanceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/FinanceViewModel.php on line 8
+[15-Dec-2022 05:16:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ExperienceViewModel.php on line 8
+[15-Dec-2022 08:35:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ManagementView.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ManagementView.php on line 8
+[15-Dec-2022 12:04:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/GenCapacity.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/GenCapacity.php on line 8
+[15-Dec-2022 14:26:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/GenCapacity.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/GenCapacity.php on line 8
+[15-Dec-2022 17:36:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/empresa_user.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/empresa_user.php on line 8
+[15-Dec-2022 18:12:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/InfraType.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/InfraType.php on line 8
+[15-Dec-2022 18:24:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/Customer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/Customer.php on line 8
+[15-Dec-2022 18:26:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/sistegnet/public_html/app/Models/ClientsViewModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Models/ClientsViewModel.php on line 8

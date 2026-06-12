@@ -1,0 +1,36 @@
+[25-Nov-2022 18:44:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/sistegnet/public_html/app/Exceptions/Handler.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Exceptions/Handler.php on line 16
+[28-Nov-2022 07:57:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/sistegnet/public_html/app/Exceptions/Handler.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Exceptions/Handler.php on line 16
+[02-Dec-2022 19:16:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/sistegnet/public_html/app/Exceptions/Handler.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Exceptions/Handler.php on line 16
+[05-Dec-2022 04:03:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/sistegnet/public_html/app/Exceptions/Handler.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Exceptions/Handler.php on line 16
+[08-Dec-2022 10:44:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/sistegnet/public_html/app/Exceptions/Handler.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Exceptions/Handler.php on line 16
+[11-Dec-2022 00:35:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/sistegnet/public_html/app/Exceptions/Handler.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Exceptions/Handler.php on line 16
+[11-Dec-2022 17:26:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/sistegnet/public_html/app/Exceptions/Handler.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Exceptions/Handler.php on line 16
+[11-Dec-2022 19:01:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/sistegnet/public_html/app/Exceptions/Handler.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Exceptions/Handler.php on line 16
+[12-Dec-2022 03:56:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/sistegnet/public_html/app/Exceptions/Handler.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Exceptions/Handler.php on line 16

@@ -1,0 +1,28 @@
+[10-Dec-2022 17:52:53 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/ListEmpresas.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/ListEmpresas.php on line 20
+[11-Dec-2022 00:26:52 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/CreateEmpresa.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/CreateEmpresa.php on line 15
+[11-Dec-2022 03:55:26 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/CreateEmpresa.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/CreateEmpresa.php on line 15
+[11-Dec-2022 13:53:13 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/ListEmpresas.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/ListEmpresas.php on line 20
+[11-Dec-2022 15:47:36 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/EditEmpresa.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/EditEmpresa.php on line 23
+[12-Dec-2022 02:45:22 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/EditEmpresa.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/EditEmpresa.php on line 23
+[15-Dec-2022 19:01:53 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/CreateEmpresa.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/Pages/CreateEmpresa.php on line 15

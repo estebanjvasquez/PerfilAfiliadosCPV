@@ -1,0 +1,324 @@
+[26-Oct-2022 01:57:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[26-Oct-2022 13:10:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[28-Oct-2022 11:29:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[30-Oct-2022 23:20:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[31-Oct-2022 05:25:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[01-Nov-2022 12:49:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[02-Nov-2022 12:25:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[06-Nov-2022 23:17:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[07-Nov-2022 20:23:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[08-Nov-2022 10:56:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[09-Nov-2022 14:27:44 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[12-Nov-2022 12:40:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[12-Nov-2022 16:39:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[13-Nov-2022 19:26:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[13-Nov-2022 19:26:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[13-Nov-2022 19:27:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[13-Nov-2022 19:28:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[15-Nov-2022 23:56:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[17-Nov-2022 21:49:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[18-Nov-2022 05:32:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[18-Nov-2022 23:11:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[19-Nov-2022 12:51:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[19-Nov-2022 12:52:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[19-Nov-2022 12:52:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[20-Nov-2022 08:24:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[21-Nov-2022 15:49:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[22-Nov-2022 05:31:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[22-Nov-2022 05:33:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[22-Nov-2022 05:33:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[25-Nov-2022 12:40:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[25-Nov-2022 18:45:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[25-Nov-2022 18:45:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[27-Nov-2022 17:10:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[27-Nov-2022 18:22:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[27-Nov-2022 18:22:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[27-Nov-2022 18:23:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[28-Nov-2022 06:09:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[28-Nov-2022 07:55:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[28-Nov-2022 07:56:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[28-Nov-2022 07:57:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[28-Nov-2022 07:57:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[02-Dec-2022 05:42:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[02-Dec-2022 05:42:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[02-Dec-2022 05:42:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[02-Dec-2022 19:15:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[02-Dec-2022 19:16:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[02-Dec-2022 19:16:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[02-Dec-2022 19:16:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[04-Dec-2022 08:38:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[04-Dec-2022 16:11:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[04-Dec-2022 23:04:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[05-Dec-2022 05:10:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[05-Dec-2022 06:47:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[05-Dec-2022 08:56:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[05-Dec-2022 16:25:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[06-Dec-2022 02:12:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[07-Dec-2022 18:36:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[08-Dec-2022 00:14:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[08-Dec-2022 10:01:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[08-Dec-2022 10:03:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[09-Dec-2022 05:59:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[09-Dec-2022 05:59:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[09-Dec-2022 06:10:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[09-Dec-2022 20:02:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[09-Dec-2022 20:10:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[09-Dec-2022 20:12:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[10-Dec-2022 05:07:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[11-Dec-2022 01:52:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[12-Dec-2022 02:30:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[12-Dec-2022 02:40:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[12-Dec-2022 16:34:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/api.php on line 17
+[12-Dec-2022 16:35:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[13-Dec-2022 00:01:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/sistegnet/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/console.php on line 17
+[13-Dec-2022 06:43:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[13-Dec-2022 06:46:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/sistegnet/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/channels.php on line 16
+[14-Dec-2022 06:59:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/sistegnet/public_html/routes/web.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/routes/web.php on line 20
+[10-Jan-2025 23:36:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/campetapp/public_html/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/campetapp/public_html/routes/api.php on line 17
+[10-Jan-2025 23:36:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home/campetapp/public_html/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/campetapp/public_html/routes/channels.php on line 16
+[10-Jan-2025 23:36:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home/campetapp/public_html/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/campetapp/public_html/routes/console.php on line 17
+[10-Jan-2025 23:36:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/campetapp/public_html/routes/web-bk.php:27
+Stack trace:
+#0 {main}
+  thrown in /home/campetapp/public_html/routes/web-bk.php on line 27
+[10-Jan-2025 23:36:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/campetapp/public_html/routes/web.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/campetapp/public_html/routes/web.php on line 34

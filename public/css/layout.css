@@ -1,0 +1,175 @@
+/* =========================================================================
+   LAYOUT - CIRA PRO ADAPTED
+   ========================================================================== */
+
+/* Main wrapper positioning */
+.chat-window-wrapper {
+    position: fixed !important;
+    bottom: var(--chat--window--bottom) !important;
+    right: var(--chat--window--right) !important;
+    left: auto !important;
+    z-index: var(--chat--window--z-index) !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Chat window container */
+.chat-window {
+    width: var(--chat--window--width) !important;
+    height: var(--chat--window--height) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: white !important;
+    border-radius: 25px !important;
+    overflow: hidden !important;
+    box-shadow: -10px 10px 30px rgba(0,0,0,0.1) !important;
+    border: none !important;
+}
+
+/* Main layout structure */
+.chat-layout {
+    width: 100% !important;
+    height: 100% !important;
+    font-family: var(--chat--font-family) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important; /* Critical for proper scrolling */
+}
+
+/* ============= HEADER ============= */
+.chat-header {
+    flex-shrink: 0 !important; /* Don't compress */
+    flex-grow: 0 !important; /* Don't expand */
+    background: var(--chat--header--background) !important;
+    height: var(--chat--header--height) !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: var(--chat--header--padding) !important;
+    z-index: 5 !important;
+}
+
+/* "48 años" label */
+.chat-header::before {
+    content: "48 años"; 
+    position: absolute; 
+    top: 20px; 
+    left: 25px;
+    font-size: 18px; 
+    font-weight: 900; 
+    color: var(--cira-blue-main);
+}
+
+/* Avatar circle */
+.chat-header::after {
+    content: "";
+    width: 100px; 
+    height: 100px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/4140/4140047.png'); 
+    background-size: cover;
+    border-radius: 50%; 
+    border: 4px solid white;
+    position: absolute; 
+    top: 40px; 
+    z-index: 5;
+}
+
+/* Hide default header content */
+.chat-header h1 { 
+    visibility: hidden !important; 
+    position: relative !important;
+}
+
+/* Custom greeting */
+.chat-header h1::after {
+    content: "¡Hola, soy CIRA!";
+    visibility: visible !important;
+    position: absolute; 
+    top: 100px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center; 
+    color: var(--chat--header--color) !important;
+    font-size: 1.6rem !important; 
+    font-weight: 700 !important;
+    white-space: nowrap;
+}
+
+.chat-header p { 
+    display: none !important; 
+}
+
+/* ============= BODY (SCROLLABLE AREA) ============= */
+.chat-body {
+    flex: 1 1 auto !important; /* Allows grow and shrink - CRITICAL */
+    min-height: 0 !important; /* CRITICAL for flex scroll to work */
+    overflow-y: auto !important; /* Enable vertical scrolling */
+    overflow-x: hidden !important;
+    background: var(--chat--body--background) !important;
+    padding: var(--chat--body--padding) !important;
+    margin-top: -20px !important; /* Overlap with header */
+    border-radius: 30px 30px 0 0 !important;
+    z-index: 10 !important;
+    position: relative !important;
+}
+
+/* Scrollbar styling */
+.chat-body::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.chat-body::-webkit-scrollbar-track {
+    background: #f1f1f1 !important;
+    border-radius: 10px !important;
+}
+
+.chat-body::-webkit-scrollbar-thumb {
+    background: #d1d5db !important;
+    border-radius: 10px !important;
+}
+
+.chat-body::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af !important;
+}
+
+/* ============= FOOTER (FIXED INPUT AREA) ============= */
+.chat-footer {
+    flex-shrink: 0 !important; /* Don't compress - CRITICAL */
+    flex-grow: 0 !important; /* Don't expand */
+    background: var(--chat--footer--background) !important;
+    padding: var(--chat--footer--padding) !important;
+    border-top: 1px solid var(--chat--color-light-shade-100) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    z-index: 20 !important; /* Above chat-body */
+}
+
+/* Security tip */
+.chat-footer::after {
+    content: "Tip de seguridad: Mantén tus claves seguras cambiándolas con frecuencia.";
+    display: block !important;
+    text-align: center !important;
+    font-size: 11px !important;
+    color: var(--cira-orange) !important;
+    padding-top: 12px !important;
+    font-weight: 600 !important;
+}
+
+/* Hide default elements */
+.chat-get-started, 
+.chat-get-started-footer, 
+.chat-powered-by { 
+    display: none !important; 
+    visibility: hidden !important;
+    height: 0 !important;
+}
+
+/* Empty container centering */
+.empty-container { 
+    display: flex !important; 
+    justify-content: center !important; 
+    align-items: center !important; 
+}

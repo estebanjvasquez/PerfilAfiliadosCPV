@@ -1,0 +1,320 @@
+[02-Dec-2022 18:00:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_12_145310_create_sustainabilities_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_12_145310_create_sustainabilities_table.php on line 7
+[02-Dec-2022 18:08:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_26_150338_create_sectors_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_26_150338_create_sectors_table.php on line 7
+[02-Dec-2022 18:13:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_13_231159_create_permission_tables.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_13_231159_create_permission_tables.php on line 8
+[02-Dec-2022 19:15:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2014_10_12_000000_create_users_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2014_10_12_000000_create_users_table.php on line 7
+[02-Dec-2022 19:16:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2014_10_12_100000_create_password_resets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2014_10_12_100000_create_password_resets_table.php on line 7
+[02-Dec-2022 19:16:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_16_204943_create_presences_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_16_204943_create_presences_table.php on line 7
+[02-Dec-2022 19:17:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_26_150408_create_services_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_26_150408_create_services_table.php on line 7
+[02-Dec-2022 19:17:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_26_150338_create_sectors_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_26_150338_create_sectors_table.php on line 7
+[02-Dec-2022 19:17:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_03_154019_create_assets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_03_154019_create_assets_table.php on line 7
+[04-Dec-2022 16:23:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2014_10_12_100000_create_password_resets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2014_10_12_100000_create_password_resets_table.php on line 7
+[04-Dec-2022 16:39:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_26_150338_create_sectors_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_26_150338_create_sectors_table.php on line 7
+[04-Dec-2022 18:53:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_16_204943_create_presences_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_16_204943_create_presences_table.php on line 7
+[04-Dec-2022 22:13:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_26_150408_create_services_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_26_150408_create_services_table.php on line 7
+[05-Dec-2022 06:09:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2014_10_12_000000_create_users_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2014_10_12_000000_create_users_table.php on line 7
+[05-Dec-2022 09:43:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_03_154019_create_assets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_03_154019_create_assets_table.php on line 7
+[06-Dec-2022 03:58:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_11_17_222702_create_chamber_empresa_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_11_17_222702_create_chamber_empresa_table.php on line 7
+[06-Dec-2022 03:59:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_11_16_204956_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_11_16_204956_create_experience_view.php on line 8
+[06-Dec-2022 04:01:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_11_13_181946_create_clients_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_11_13_181946_create_clients_view.php on line 8
+[06-Dec-2022 04:02:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_09_06_153218_create_infrasectors_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_09_06_153218_create_infrasectors_table.php on line 7
+[06-Dec-2022 04:06:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_09_01_154856_create_infratypes_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_09_01_154856_create_infratypes_table.php on line 7
+[06-Dec-2022 04:07:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_03_154019_create_assets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_03_154019_create_assets_table.php on line 7
+[06-Dec-2022 04:10:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_27_215545_create_empresa_sector_service_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_27_215545_create_empresa_sector_service_table.php on line 7
+[06-Dec-2022 04:11:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_25_213756_create_contact_empresa_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_25_213756_create_contact_empresa_table.php on line 7
+[06-Dec-2022 04:12:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_05_01_225251_create_countries_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_05_01_225251_create_countries_table.php on line 7
+[06-Dec-2022 04:14:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2019_08_19_000000_create_failed_jobs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2019_08_19_000000_create_failed_jobs_table.php on line 7
+[07-Dec-2022 05:51:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_09_01_182509_create_infrasystems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_09_01_182509_create_infrasystems_table.php on line 7
+[07-Dec-2022 07:39:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_05_30_225501_create_customers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_05_30_225501_create_customers_table.php on line 7
+[07-Dec-2022 09:57:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_11_10_200304_create_sustainability_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_11_10_200304_create_sustainability_view.php on line 8
+[07-Dec-2022 23:59:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_09_01_182509_create_infrasystems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_09_01_182509_create_infrasystems_table.php on line 7
+[08-Dec-2022 00:26:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_26_150408_create_services_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_26_150408_create_services_table.php on line 7
+[08-Dec-2022 22:13:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_11_17_222317_create_chambers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_11_17_222317_create_chambers_table.php on line 7
+[08-Dec-2022 22:27:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_01_222538_create_infraregion_infrasystem_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_01_222538_create_infraregion_infrasystem_table.php on line 7
+[08-Dec-2022 22:27:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php on line 8
+[08-Dec-2022 22:27:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_01_222538_create_infraregion_infrasystem_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_01_222538_create_infraregion_infrasystem_table.php on line 7
+[08-Dec-2022 22:28:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php on line 8
+[08-Dec-2022 22:28:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_01_222538_create_infraregion_infrasystem_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_01_222538_create_infraregion_infrasystem_table.php on line 7
+[08-Dec-2022 22:28:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php on line 8
+[08-Dec-2022 22:31:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php on line 8
+[08-Dec-2022 22:53:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php on line 8
+[08-Dec-2022 22:59:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php on line 8
+[08-Dec-2022 23:09:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php on line 8
+[08-Dec-2022 23:28:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php on line 8
+[08-Dec-2022 23:44:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php on line 8
+[09-Dec-2022 00:01:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_03_003734_create_experience_view.php on line 8
+[09-Dec-2022 00:52:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_09_01_184733_create_infraregions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_09_01_184733_create_infraregions_table.php on line 7
+[09-Dec-2022 00:56:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_16_204943_create_presences_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_16_204943_create_presences_table.php on line 7
+[09-Dec-2022 01:00:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_07_28_181005_create_states_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_07_28_181005_create_states_table.php on line 7
+[09-Dec-2022 01:06:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_28_144255_create_empresa_user_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_28_144255_create_empresa_user_table.php on line 7
+[09-Dec-2022 01:10:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_24_212129_create_contacts_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_24_212129_create_contacts_table.php on line 7
+[09-Dec-2022 01:12:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2019_12_14_000001_create_personal_access_tokens_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2019_12_14_000001_create_personal_access_tokens_table.php on line 7
+[09-Dec-2022 01:16:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2014_10_12_100000_create_password_resets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2014_10_12_100000_create_password_resets_table.php on line 7
+[09-Dec-2022 20:02:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_13_231159_create_permission_tables.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_13_231159_create_permission_tables.php on line 8
+[09-Dec-2022 20:02:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_07_28_181005_create_states_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_07_28_181005_create_states_table.php on line 7
+[09-Dec-2022 20:08:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_12_145310_create_sustainabilities_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_12_145310_create_sustainabilities_table.php on line 7
+[09-Dec-2022 20:08:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_26_150338_create_sectors_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_26_150338_create_sectors_table.php on line 7
+[09-Dec-2022 20:10:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_25_213756_create_contact_empresa_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_25_213756_create_contact_empresa_table.php on line 7
+[09-Dec-2022 20:12:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_15_005221_create_areas_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_15_005221_create_areas_table.php on line 7
+[09-Dec-2022 23:09:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_12_145310_create_sustainabilities_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_12_145310_create_sustainabilities_table.php on line 7
+[10-Dec-2022 11:17:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_12_01_222538_create_infraregion_infrasystem_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_12_01_222538_create_infraregion_infrasystem_table.php on line 7
+[10-Dec-2022 11:19:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_11_06_185050_create_capacity_view.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_11_06_185050_create_capacity_view.php on line 9
+[11-Dec-2022 20:53:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_10_19_213831_create_catalogo_view.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_10_19_213831_create_catalogo_view.php on line 10
+[11-Dec-2022 21:21:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_05_01_225251_create_countries_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_05_01_225251_create_countries_table.php on line 7
+[12-Dec-2022 03:30:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_27_215545_create_empresa_sector_service_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_27_215545_create_empresa_sector_service_table.php on line 7
+[12-Dec-2022 15:13:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_13_231159_create_permission_tables.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_13_231159_create_permission_tables.php on line 8
+[12-Dec-2022 16:34:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_25_213756_create_contact_empresa_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_25_213756_create_contact_empresa_table.php on line 7
+[12-Dec-2022 16:34:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_07_28_181005_create_states_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_07_28_181005_create_states_table.php on line 7
+[12-Dec-2022 16:35:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_13_231159_create_permission_tables.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_13_231159_create_permission_tables.php on line 8
+[12-Dec-2022 16:35:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_12_145310_create_sustainabilities_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_12_145310_create_sustainabilities_table.php on line 7
+[12-Dec-2022 16:35:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_26_150338_create_sectors_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_26_150338_create_sectors_table.php on line 7
+[13-Dec-2022 13:03:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_11_10_211023_create_finance_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_11_10_211023_create_finance_view.php on line 8
+[14-Dec-2022 08:43:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_06_24_212129_create_contacts_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_06_24_212129_create_contacts_table.php on line 7
+[14-Dec-2022 14:31:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_09_01_154856_create_infratypes_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_09_01_154856_create_infratypes_table.php on line 7
+[14-Dec-2022 14:33:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_26_200657_create_experiences_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_26_200657_create_experiences_table.php on line 7
+[14-Dec-2022 14:35:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_05_31_223828_create_empresas_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_05_31_223828_create_empresas_table.php on line 7
+[14-Dec-2022 14:36:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_05_30_225501_create_customers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_05_30_225501_create_customers_table.php on line 7
+[14-Dec-2022 14:38:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2014_10_12_100000_create_password_resets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2014_10_12_100000_create_password_resets_table.php on line 7
+[14-Dec-2022 19:34:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_11_13_181946_create_clients_view.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_11_13_181946_create_clients_view.php on line 8
+[15-Dec-2022 17:54:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_09_01_184733_create_infraregions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_09_01_184733_create_infraregions_table.php on line 7
+[15-Dec-2022 17:55:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2022_08_12_145310_create_sustainabilities_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2022_08_12_145310_create_sustainabilities_table.php on line 7
+[15-Dec-2022 17:58:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/sistegnet/public_html/database/migrations/2019_08_19_000000_create_failed_jobs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/database/migrations/2019_08_19_000000_create_failed_jobs_table.php on line 7

@@ -1,0 +1,25 @@
+[15-Dec-2022 22:25:08 UTC] PHP Warning:  require(/home/campetapp/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/campetapp/public_html/index.php on line 34
+[15-Dec-2022 22:25:08 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/campetapp/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/campetapp/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/campetapp/public_html/index.php on line 34
+[15-Dec-2022 22:25:20 UTC] PHP Warning:  require(/home/campetapp/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/campetapp/public_html/index.php on line 34
+[15-Dec-2022 22:25:20 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/campetapp/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/campetapp/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/campetapp/public_html/index.php on line 34
+[15-Dec-2022 22:31:47 UTC] PHP Warning:  require(/home/campetapp/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/campetapp/public_html/index.php on line 34
+[15-Dec-2022 22:31:47 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/campetapp/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/campetapp/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/campetapp/public_html/index.php on line 34
+[15-Dec-2022 22:31:50 UTC] PHP Warning:  require(/home/campetapp/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/campetapp/public_html/index.php on line 34
+[15-Dec-2022 22:31:50 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/campetapp/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/campetapp/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/campetapp/public_html/index.php on line 34
+[15-Dec-2022 22:31:54 UTC] PHP Warning:  require(/home/campetapp/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/campetapp/public_html/index.php on line 34
+[15-Dec-2022 22:31:54 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/campetapp/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php81/root/usr/share/pear') in /home/campetapp/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/campetapp/public_html/index.php on line 34

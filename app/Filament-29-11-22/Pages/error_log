@@ -1,0 +1,92 @@
+[23-Nov-2022 01:24:03 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/GenCatalog.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/GenCatalog.php on line 26
+[23-Nov-2022 01:54:56 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/SustainabilityView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/SustainabilityView.php on line 11
+[23-Nov-2022 04:08:31 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/SustainabilityView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/SustainabilityView.php on line 11
+[23-Nov-2022 04:32:36 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/GenCatalog.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/GenCatalog.php on line 26
+[23-Nov-2022 19:55:40 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php on line 11
+[23-Nov-2022 20:08:04 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/ManagementView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/ManagementView.php on line 11
+[24-Nov-2022 01:43:56 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/GenCapacity.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/GenCapacity.php on line 11
+[24-Nov-2022 02:20:53 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/ExperienceView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/ExperienceView.php on line 11
+[24-Nov-2022 04:17:23 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/ManagementView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/ManagementView.php on line 11
+[24-Nov-2022 05:10:55 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/ClientsView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/ClientsView.php on line 11
+[24-Nov-2022 16:59:08 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/Settings.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/Settings.php on line 8
+[25-Nov-2022 11:08:52 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/ManagementView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/ManagementView.php on line 11
+[25-Nov-2022 12:15:12 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/GenCapacity.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/GenCapacity.php on line 11
+[25-Nov-2022 18:49:12 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php on line 11
+[25-Nov-2022 18:49:30 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php on line 11
+[25-Nov-2022 18:50:01 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php on line 11
+[26-Nov-2022 15:47:14 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/GenCatalog.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/GenCatalog.php on line 26
+[27-Nov-2022 09:31:13 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/SustainabilityView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/SustainabilityView.php on line 11
+[27-Nov-2022 14:06:49 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/GenCatalog.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/GenCatalog.php on line 26
+[27-Nov-2022 16:54:24 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/GenCatalog.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/GenCatalog.php on line 26
+[27-Nov-2022 20:45:23 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php on line 11
+[28-Nov-2022 00:52:32 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/GenCapacity.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/GenCapacity.php on line 11
+[29-Nov-2022 05:13:21 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Pages\Page" not found in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Pages/FinanceView.php on line 11

@@ -1,0 +1,24 @@
+[10-Dec-2022 20:52:13 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/EditSector.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/EditSector.php on line 9
+[11-Dec-2022 00:25:01 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/ListSectors.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/ListSectors.php on line 8
+[11-Dec-2022 11:07:44 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/CreateSector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/CreateSector.php on line 8
+[11-Dec-2022 11:54:17 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/ListSectors.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/ListSectors.php on line 8
+[11-Dec-2022 16:56:46 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/EditSector.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/EditSector.php on line 9
+[11-Dec-2022 20:06:05 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/CreateSector.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/SectorResource/Pages/CreateSector.php on line 8

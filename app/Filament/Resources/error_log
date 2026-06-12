@@ -1,0 +1,284 @@
+[02-Dec-2022 19:16:06 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSectorResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSectorResource.php on line 18
+[02-Dec-2022 19:16:07 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php:37
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php on line 37
+[02-Dec-2022 19:16:13 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php on line 15
+[02-Dec-2022 19:17:05 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource.php on line 16
+[02-Dec-2022 19:17:27 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php on line 19
+[04-Dec-2022 09:45:10 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSectorResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSectorResource.php on line 18
+[04-Dec-2022 21:49:29 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource.php on line 16
+[05-Dec-2022 02:59:08 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php on line 19
+[05-Dec-2022 10:54:53 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php on line 15
+[05-Dec-2022 14:44:55 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php:37
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php on line 37
+[08-Dec-2022 00:48:34 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/PresenceResource.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/PresenceResource.php on line 30
+[08-Dec-2022 00:50:17 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php on line 18
+[08-Dec-2022 00:51:39 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php:37
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php on line 37
+[08-Dec-2022 00:54:55 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php on line 15
+[08-Dec-2022 00:55:14 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/CountryResource.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CountryResource.php on line 17
+[08-Dec-2022 09:29:31 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php on line 19
+[09-Dec-2022 02:48:03 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/SectorResource.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/SectorResource.php on line 16
+[09-Dec-2022 20:02:36 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php:37
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php on line 37
+[09-Dec-2022 20:08:28 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php on line 18
+[09-Dec-2022 20:10:34 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ManagementResource.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ManagementResource.php on line 21
+[09-Dec-2022 20:10:36 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ExperienceResource.php:28
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ExperienceResource.php on line 28
+[09-Dec-2022 23:24:57 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php on line 15
+[09-Dec-2022 23:49:44 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource.php on line 19
+[09-Dec-2022 23:52:27 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ExperienceResource.php:28
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ExperienceResource.php on line 28
+[09-Dec-2022 23:53:27 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ChamberResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ChamberResource.php on line 19
+[09-Dec-2022 23:56:42 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/AssetResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AssetResource.php on line 19
+[10-Dec-2022 17:44:05 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSectorResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSectorResource.php on line 18
+[10-Dec-2022 18:41:53 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/PresenceResource.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/PresenceResource.php on line 30
+[10-Dec-2022 22:29:11 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraRegionResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraRegionResource.php on line 18
+[10-Dec-2022 23:23:41 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ExperienceResource.php:28
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ExperienceResource.php on line 28
+[11-Dec-2022 00:03:37 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/SectorResource.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/SectorResource.php on line 16
+[11-Dec-2022 00:42:46 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ExperienceResource.php:28
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ExperienceResource.php on line 28
+[11-Dec-2022 00:53:07 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/CountryResource.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CountryResource.php on line 17
+[11-Dec-2022 02:29:15 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php on line 18
+[11-Dec-2022 02:34:14 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php on line 18
+[11-Dec-2022 02:35:26 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php:37
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php on line 37
+[11-Dec-2022 04:23:54 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php:37
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php on line 37
+[11-Dec-2022 06:42:31 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraTypeResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraTypeResource.php on line 18
+[11-Dec-2022 09:43:32 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php on line 19
+[11-Dec-2022 10:21:49 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/PresenceResource.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/PresenceResource.php on line 30
+[11-Dec-2022 13:14:26 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource.php on line 19
+[11-Dec-2022 14:50:43 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php on line 19
+[11-Dec-2022 15:07:15 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraRegionResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraRegionResource.php on line 18
+[11-Dec-2022 15:15:34 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource.php on line 19
+[11-Dec-2022 16:05:27 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ServiceResource.php on line 19
+[11-Dec-2022 17:22:06 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraTypeResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraTypeResource.php on line 18
+[11-Dec-2022 17:26:21 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php on line 15
+[11-Dec-2022 18:48:46 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/AssetResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AssetResource.php on line 19
+[11-Dec-2022 20:12:14 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/AssetResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AssetResource.php on line 19
+[11-Dec-2022 20:16:35 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/SectorResource.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/SectorResource.php on line 16
+[11-Dec-2022 22:41:30 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSectorResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSectorResource.php on line 18
+[11-Dec-2022 23:39:17 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/AreaResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AreaResource.php on line 19
+[12-Dec-2022 00:14:27 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ManagementResource.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ManagementResource.php on line 21
+[12-Dec-2022 00:29:11 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ManagementResource.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ManagementResource.php on line 21
+[12-Dec-2022 01:16:34 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/AreaResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AreaResource.php on line 19
+[12-Dec-2022 03:37:51 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource.php on line 15
+[12-Dec-2022 03:41:15 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraTypeResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraTypeResource.php on line 18
+[12-Dec-2022 06:48:59 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/CountryResource.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CountryResource.php on line 17
+[12-Dec-2022 15:29:59 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/AreaResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/AreaResource.php on line 19
+[12-Dec-2022 16:34:19 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ManagementResource.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ManagementResource.php on line 21
+[12-Dec-2022 16:34:23 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ExperienceResource.php:28
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ExperienceResource.php on line 28
+[12-Dec-2022 16:34:37 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php:37
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php on line 37
+[12-Dec-2022 16:35:16 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php on line 18
+[12-Dec-2022 19:43:50 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ManagementResource.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ManagementResource.php on line 21
+[12-Dec-2022 21:32:10 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php:37
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource.php on line 37
+[13-Dec-2022 03:38:48 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/PresenceResource.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/PresenceResource.php on line 30
+[13-Dec-2022 03:39:59 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSectorResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSectorResource.php on line 18
+[14-Dec-2022 09:05:03 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/ChamberResource.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/ChamberResource.php on line 19
+[14-Dec-2022 15:35:04 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource.php on line 18
+[14-Dec-2022 15:36:25 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraRegionResource.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraRegionResource.php on line 18
+[14-Dec-2022 15:53:48 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Resource" not found in /home/sistegnet/public_html/app/Filament/Resources/CountryResource.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CountryResource.php on line 17

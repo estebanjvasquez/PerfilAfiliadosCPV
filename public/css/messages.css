@@ -1,0 +1,183 @@
+/* =========================================================================
+   MESSAGES - CIRA PRO ADAPTED
+   ========================================================================== */
+
+/* Base message styling */
+.chat-message {
+    max-width: 85% !important;
+    padding: var(--chat--message--padding) !important;
+    border-radius: var(--chat--message--border-radius) !important;
+    position: relative !important;
+    margin-bottom: 12px !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* Bot messages */
+.chat-message.chat-message-from-bot {
+    background-color: var(--chat--message--bot--background) !important;
+    color: var(--chat--message--bot--color) !important;
+    border-bottom-left-radius: 4px !important;
+    margin-right: auto !important;
+    border: 1px solid #edf2f7 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
+}
+
+/* User messages */
+.chat-message.chat-message-from-user {
+    background-color: var(--chat--message--user--background) !important;
+    color: var(--chat--message--user--color) !important;
+    border-bottom-right-radius: 4px !important;
+    margin-left: auto !important;
+    box-shadow: 0 2px 8px rgba(0,74,135,0.2) !important;
+}
+
+/* Force text color */
+.chat-message, 
+.chat-message p, 
+.chat-message span,
+.chat-message div {
+    color: inherit !important;
+}
+
+.chat-message-from-bot,
+.chat-message-from-bot p,
+.chat-message-from-bot span,
+.chat-message-from-bot div {
+    color: var(--chat--message--bot--color) !important;
+}
+
+.chat-message-from-user,
+.chat-message-from-user p,
+.chat-message-from-user span,
+.chat-message-from-user div {
+    color: var(--chat--message--user--color) !important;
+}
+
+/* ============= TYPING ANIMATION ============= */
+.chat-message-typing {
+    display: flex !important;
+    gap: 6px !important;
+    padding: 16px !important;
+}
+
+.chat-message-typing-circle {
+    background-color: var(--chat--color--typing) !important;
+    border-radius: 50% !important;
+    width: 10px !important;
+    height: 10px !important;
+    animation: chat-message-typing-animation-scaling 0.8s infinite !important;
+}
+
+.chat-message-typing-circle:nth-child(2) {
+    animation-delay: 0.2s !important;
+}
+
+.chat-message-typing-circle:nth-child(3) {
+    animation-delay: 0.4s !important;
+}
+
+@keyframes chat-message-typing-animation-scaling {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* ============= CARD COMPONENTS ============= */
+.chat-card {
+    background: var(--chat--card--background) !important;
+    border-radius: var(--chat--card--border-radius) !important;
+    padding: var(--chat--card--padding) !important;
+    margin: 10px 0 !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
+    border: 1px solid var(--chat--card--border) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.chat-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    margin-bottom: 8px !important;
+    gap: 10px !important;
+}
+
+.chat-row:last-child {
+    margin-bottom: 0 !important;
+}
+
+.chat-label {
+    font-weight: 600 !important;
+    color: var(--cira-blue-main) !important;
+    font-size: 0.9rem !important;
+    flex-shrink: 0 !important;
+}
+
+.chat-value {
+    color: #000000 !important;
+    text-align: right !important;
+    font-size: 0.9rem !important;
+    flex: 1 !important;
+    word-break: break-word !important;
+}
+
+/* ============= LISTS ============= */
+.chat-list {
+    padding-left: 18px !important;
+    margin: 10px 0 !important;
+    list-style-type: disc !important;
+    color: #000000 !important;
+}
+
+.chat-list li {
+    margin-bottom: 6px !important;
+    line-height: 1.4 !important;
+    color: #000000 !important;
+}
+
+.chat-list li:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Ordered lists */
+.chat-list-ordered {
+    padding-left: 18px !important;
+    margin: 10px 0 !important;
+    list-style-type: decimal !important;
+    color: #000000 !important;
+}
+
+.chat-list-ordered li {
+    margin-bottom: 6px !important;
+    line-height: 1.4 !important;
+    color: #000000 !important;
+}
+
+/* ============= MESSAGE GROUPS ============= */
+.chat-messages-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+/* Timestamp */
+.chat-message-timestamp {
+    font-size: 11px !important;
+    color: #9ca3af !important;
+    margin-top: 4px !important;
+    display: block !important;
+}
+
+/* Avatar (if needed) */
+.chat-message-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    margin-right: 8px !important;
+}

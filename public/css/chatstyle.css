@@ -1,0 +1,213 @@
+/* =========================================================================
+   CIRA PRO CHAT STYLES - MAIN IMPORT FILE
+   ========================================================================== */
+
+/* Import all component stylesheets */
+@import "./variables.css";
+@import "./base-code.css";
+@import "./layout.css";
+@import "./messages.css";
+@import "./input.css";
+@import "./markdown.css";
+@import "./components.css";
+@import "./utilities.css";
+
+/* =========================================================================
+   GLOBAL RESETS AND BASE STYLES
+   ========================================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+/* Ensure proper inheritance */
+.chat-window,
+.chat-window * {
+    box-sizing: border-box !important;
+}
+
+/* Remove any default margins/paddings that might interfere */
+.chat-window ul,
+.chat-window ol,
+.chat-window p,
+.chat-window h1,
+.chat-window h2,
+.chat-window h3,
+.chat-window h4,
+.chat-window h5,
+.chat-window h6 {
+    margin: 0;
+    padding: 0;
+}
+
+/* Apply proper list styling */
+.chat-window ul,
+.chat-window ol {
+    list-style-position: inside;
+}
+
+/* Smooth scrolling */
+.chat-body {
+    scroll-behavior: smooth;
+}
+
+/* Prevent text selection on UI elements */
+.chat-header,
+.chat-footer,
+.chat-window-toggle,
+button {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Allow text selection in messages */
+.chat-message,
+.chat-message * {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
+
+/* Remove default button styles */
+button {
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+/* Remove default textarea styles */
+textarea {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* Focus outline for accessibility */
+button:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--cira-blue-main);
+    outline-offset: 2px;
+}
+
+/* Hide focus outline for mouse users */
+button:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* =========================================================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    :root {
+        --chat--window--width: 100vw;
+        --chat--window--height: 100vh;
+    }
+    
+    .chat-window-wrapper {
+        bottom: 0 !important;
+        right: 0 !important;
+        left: 0 !important;
+        top: 0 !important;
+    }
+    
+    .chat-window {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+    }
+    
+    .chat-header {
+        height: 160px !important;
+        padding-top: 40px !important;
+    }
+    
+    .chat-header::before {
+        font-size: 16px !important;
+        top: 15px !important;
+        left: 20px !important;
+    }
+    
+    .chat-header::after {
+        width: 80px !important;
+        height: 80px !important;
+        top: 35px !important;
+    }
+    
+    .chat-header h1::after {
+        font-size: 1.4rem !important;
+        top: 120px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-message {
+        max-width: 90% !important;
+    }
+    
+    .chat-input-send-button {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+    }
+}
+
+/* =========================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ========================================================================== */
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .chat-message-from-bot {
+        border: 2px solid #000000 !important;
+    }
+    
+    .chat-message-from-user {
+        border: 2px solid #ffffff !important;
+    }
+    
+    .chat-inputs textarea {
+        border: 2px solid var(--cira-blue-main) !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .chat-window-toggle,
+    .chat-header,
+    .chat-footer,
+    .chat-input-send-button,
+    .chat-input-file-button {
+        display: none !important;
+    }
+    
+    .chat-window {
+        box-shadow: none !important;
+        border: 1px solid #000000 !important;
+    }
+    
+    .chat-body {
+        overflow: visible !important;
+        height: auto !important;
+    }
+}

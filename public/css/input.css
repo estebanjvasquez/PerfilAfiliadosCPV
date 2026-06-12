@@ -1,0 +1,117 @@
+/* =========================================================================
+   INPUT - CIRA PRO ADAPTED
+   ========================================================================== */
+
+/* Input container */
+.chat-inputs {
+    display: flex !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+}
+
+/* Textarea styling */
+.chat-inputs textarea {
+    background: var(--chat--input--background) !important;
+    border: 1px solid var(--chat--input--border) !important;
+    border-radius: var(--chat--input--border-radius) !important;
+    padding: var(--chat--input--padding) !important;
+    color: #000000 !important;
+    flex: 1 !important;
+    width: 100% !important;
+    min-height: 45px !important;
+    max-height: 100px !important;
+    font-family: var(--chat--font-family) !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    resize: none !important;
+    outline: none !important;
+}
+
+.chat-inputs textarea::placeholder {
+    color: #9ca3af !important;
+}
+
+.chat-inputs textarea:focus {
+    border-color: var(--cira-blue-main) !important;
+    box-shadow: 0 0 0 2px rgba(0, 74, 135, 0.1) !important;
+}
+
+/* Send button */
+.chat-input-send-button {
+    background: var(--cira-blue-main) !important;
+    color: white !important;
+    width: 45px !important;
+    height: 45px !important;
+    min-width: 45px !important;
+    min-height: 45px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-shadow: 0 2px 8px rgba(0,74,135,0.2) !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease, transform 0.1s ease !important;
+    border: none !important;
+}
+
+.chat-input-send-button:hover {
+    background: #003d6e !important;
+    transform: scale(1.05) !important;
+}
+
+.chat-input-send-button:active {
+    transform: scale(0.95) !important;
+}
+
+/* File button */
+.chat-input-file-button {
+    cursor: pointer !important;
+    background: transparent !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: var(--chat--color--secondary) !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    transition: background 0.2s ease !important;
+}
+
+.chat-input-file-button:hover {
+    background: #f3f4f6 !important;
+}
+
+/* File attachments display */
+.chat-files {
+    display: flex !important;
+    gap: 0.5rem !important;
+    padding: var(--chat--files-spacing) !important;
+    flex-wrap: wrap !important;
+}
+
+.chat-file-item {
+    background: #f3f4f6 !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 13px !important;
+    color: #374151 !important;
+}
+
+.chat-file-item button {
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #6b7280 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.chat-file-item button:hover {
+    color: #ef4444 !important;
+}

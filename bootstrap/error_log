@@ -1,0 +1,44 @@
+[13-Nov-2022 19:26:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14
+[19-Nov-2022 12:50:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14
+[22-Nov-2022 05:32:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14
+[25-Nov-2022 18:44:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14
+[25-Nov-2022 18:45:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14
+[28-Nov-2022 07:55:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14
+[28-Nov-2022 07:56:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14
+[02-Dec-2022 19:16:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14
+[02-Dec-2022 19:17:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14
+[04-Dec-2022 10:27:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14
+[04-Dec-2022 14:24:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/sistegnet/public_html/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/bootstrap/app.php on line 14

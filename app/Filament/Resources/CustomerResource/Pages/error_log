@@ -1,0 +1,28 @@
+[11-Dec-2022 11:26:36 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/EditCustomer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/EditCustomer.php on line 8
+[11-Dec-2022 13:04:53 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/ListCustomers.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/ListCustomers.php on line 8
+[11-Dec-2022 13:33:53 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/EditCustomer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/EditCustomer.php on line 8
+[11-Dec-2022 19:14:39 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/ListCustomers.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/ListCustomers.php on line 8
+[11-Dec-2022 20:15:09 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/CreateCustomer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/CreateCustomer.php on line 8
+[12-Dec-2022 01:02:40 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/CreateCustomer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/CreateCustomer.php on line 8
+[14-Dec-2022 15:43:25 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/ListCustomers.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/CustomerResource/Pages/ListCustomers.php on line 8

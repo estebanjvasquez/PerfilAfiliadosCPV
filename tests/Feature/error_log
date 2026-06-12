@@ -1,0 +1,40 @@
+[04-Jul-2022 19:10:43 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/sistegnet/public_html/tests/Feature/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Feature/ExampleTest.php on line 8
+[16-Aug-2022 21:08:13 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/sistegnet/public_html/tests/Feature/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Feature/ExampleTest.php on line 8
+[06-Oct-2022 21:21:27 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/sistegnet/public_html/tests/Feature/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Feature/ExampleTest.php on line 8
+[11-Oct-2022 21:10:25 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/sistegnet/public_html/tests/Feature/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Feature/ExampleTest.php on line 8
+[11-Oct-2022 21:10:29 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/sistegnet/public_html/tests/Feature/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Feature/ExampleTest.php on line 8
+[12-Oct-2022 20:28:09 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/sistegnet/public_html/tests/Feature/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Feature/ExampleTest.php on line 8
+[14-Oct-2022 07:10:57 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/sistegnet/public_html/tests/Feature/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Feature/ExampleTest.php on line 8
+[16-Oct-2022 14:47:46 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/sistegnet/public_html/tests/Feature/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Feature/ExampleTest.php on line 8
+[05-Dec-2022 09:31:15 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/sistegnet/public_html/tests/Feature/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Feature/ExampleTest.php on line 8
+[12-Dec-2022 23:36:19 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/sistegnet/public_html/tests/Feature/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Feature/ExampleTest.php on line 8

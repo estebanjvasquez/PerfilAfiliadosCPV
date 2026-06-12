@@ -1,0 +1,209 @@
+/* =========================================================================
+   CODE HIGHLIGHTING - CIRA PRO ADAPTED
+   ========================================================================== */
+
+/* Light Theme (Default) */
+.hljs { 
+    color: #24292e !important; 
+    background: #f6f8fa !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    overflow-x: auto !important;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+    font-size: 0.9em !important;
+    line-height: 1.5 !important;
+}
+
+/* Keywords */
+.hljs-keyword, 
+.hljs-selector-tag, 
+.hljs-literal, 
+.hljs-section, 
+.hljs-link,
+.hljs-type { 
+    color: #d73a49 !important; 
+    font-weight: 600 !important;
+}
+
+/* Strings */
+.hljs-string,
+.hljs-title,
+.hljs-name,
+.hljs-meta-string { 
+    color: #032f62 !important; 
+}
+
+/* Comments */
+.hljs-comment,
+.hljs-quote { 
+    color: #6a737d !important; 
+    font-style: italic !important;
+}
+
+/* Numbers */
+.hljs-number,
+.hljs-meta,
+.hljs-built_in,
+.hljs-builtin-name { 
+    color: #005cc5 !important; 
+}
+
+/* Functions */
+.hljs-function,
+.hljs-title.function_ {
+    color: #6f42c1 !important;
+}
+
+/* Variables */
+.hljs-variable,
+.hljs-attr {
+    color: #e36209 !important;
+}
+
+/* Operators */
+.hljs-operator,
+.hljs-punctuation {
+    color: #24292e !important;
+}
+
+/* Tags (HTML/XML) */
+.hljs-tag {
+    color: #22863a !important;
+}
+
+/* Attributes */
+.hljs-attribute {
+    color: #6f42c1 !important;
+}
+
+/* Regular expressions */
+.hljs-regexp {
+    color: #032f62 !important;
+}
+
+/* Symbols */
+.hljs-symbol,
+.hljs-bullet {
+    color: #005cc5 !important;
+}
+
+/* Dark Theme Support */
+body[data-theme="dark"] .hljs {
+    color: #adbac7 !important;
+    background: #22272e !important;
+}
+
+body[data-theme="dark"] .hljs-keyword, 
+body[data-theme="dark"] .hljs-selector-tag, 
+body[data-theme="dark"] .hljs-literal,
+body[data-theme="dark"] .hljs-type {
+    color: #f47067 !important;
+}
+
+body[data-theme="dark"] .hljs-string,
+body[data-theme="dark"] .hljs-title,
+body[data-theme="dark"] .hljs-name {
+    color: #96d0ff !important;
+}
+
+body[data-theme="dark"] .hljs-comment,
+body[data-theme="dark"] .hljs-quote {
+    color: #768390 !important;
+}
+
+body[data-theme="dark"] .hljs-number,
+body[data-theme="dark"] .hljs-built_in {
+    color: #6cb6ff !important;
+}
+
+body[data-theme="dark"] .hljs-function {
+    color: #dcbdfb !important;
+}
+
+body[data-theme="dark"] .hljs-variable,
+body[data-theme="dark"] .hljs-attr {
+    color: #f69d50 !important;
+}
+
+/* Auto dark mode based on system preference */
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme]) .hljs { 
+        color: #adbac7 !important; 
+        background: #22272e !important; 
+    }
+    
+    body:not([data-theme]) .hljs-keyword, 
+    body:not([data-theme]) .hljs-selector-tag, 
+    body:not([data-theme]) .hljs-literal,
+    body:not([data-theme]) .hljs-type {
+        color: #f47067 !important;
+    }
+    
+    body:not([data-theme]) .hljs-string,
+    body:not([data-theme]) .hljs-title,
+    body:not([data-theme]) .hljs-name {
+        color: #96d0ff !important;
+    }
+    
+    body:not([data-theme]) .hljs-comment,
+    body:not([data-theme]) .hljs-quote {
+        color: #768390 !important;
+    }
+    
+    body:not([data-theme]) .hljs-number,
+    body:not([data-theme]) .hljs-built_in {
+        color: #6cb6ff !important;
+    }
+    
+    body:not([data-theme]) .hljs-function {
+        color: #dcbdfb !important;
+    }
+    
+    body:not([data-theme]) .hljs-variable,
+    body:not([data-theme]) .hljs-attr {
+        color: #f69d50 !important;
+    }
+}
+
+/* Code block wrapper */
+.chat-message-markdown pre {
+    background: #f6f8fa !important;
+    border: 1px solid #e1e4e8 !important;
+    margin: 0.5rem 0 !important;
+}
+
+body[data-theme="dark"] .chat-message-markdown pre {
+    background: #22272e !important;
+    border: 1px solid #373e47 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme]) .chat-message-markdown pre {
+        background: #22272e !important;
+        border: 1px solid #373e47 !important;
+    }
+}
+
+/* Inline code */
+.chat-message-markdown code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+}
+
+/* Scrollbar for code blocks */
+.hljs::-webkit-scrollbar {
+    height: 8px !important;
+}
+
+.hljs::-webkit-scrollbar-track {
+    background: #f1f1f1 !important;
+    border-radius: 4px !important;
+}
+
+.hljs::-webkit-scrollbar-thumb {
+    background: #c1c1c1 !important;
+    border-radius: 4px !important;
+}
+
+.hljs::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8 !important;
+}

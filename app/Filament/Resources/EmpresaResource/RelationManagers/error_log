@@ -1,0 +1,36 @@
+[10-Dec-2022 19:51:29 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\RelationManagers\BelongsToManyRelationManager" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ServicesRelationManager.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ServicesRelationManager.php on line 20
+[10-Dec-2022 21:08:25 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\RelationManagers\RelationManager" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/SustainabilitiesRelationManager.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/SustainabilitiesRelationManager.php on line 14
+[10-Dec-2022 22:29:56 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\RelationManagers\RelationManager" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/SustainabilitiesRelationManager.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/SustainabilitiesRelationManager.php on line 14
+[11-Dec-2022 01:15:43 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\RelationManagers\BelongsToManyRelationManager" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ContactsRelationManager.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ContactsRelationManager.php on line 15
+[11-Dec-2022 22:10:15 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\RelationManagers\BelongsToManyRelationManager" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ServicesRelationManager.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ServicesRelationManager.php on line 20
+[12-Dec-2022 02:37:05 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\RelationManagers\BelongsToManyRelationManager" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/UsersRelationManager.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/UsersRelationManager.php on line 13
+[12-Dec-2022 22:40:25 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\RelationManagers\BelongsToManyRelationManager" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ContactsRelationManager.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ContactsRelationManager.php on line 15
+[13-Dec-2022 09:57:09 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\RelationManagers\BelongsToManyRelationManager" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/UsersRelationManager.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/UsersRelationManager.php on line 13
+[13-Dec-2022 23:59:36 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\RelationManagers\RelationManager" not found in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ChambersRelationManager.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/EmpresaResource/RelationManagers/ChambersRelationManager.php on line 15

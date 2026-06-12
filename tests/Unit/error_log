@@ -1,0 +1,24 @@
+[07-Jul-2022 23:51:22 UTC] PHP Fatal error:  Uncaught Error: Class "PHPUnit\Framework\TestCase" not found in /home/sistegnet/public_html/tests/Unit/ExampleTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Unit/ExampleTest.php on line 7
+[08-Jul-2022 23:52:12 UTC] PHP Fatal error:  Uncaught Error: Class "PHPUnit\Framework\TestCase" not found in /home/sistegnet/public_html/tests/Unit/ExampleTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Unit/ExampleTest.php on line 7
+[16-Aug-2022 21:08:13 UTC] PHP Fatal error:  Uncaught Error: Class "PHPUnit\Framework\TestCase" not found in /home/sistegnet/public_html/tests/Unit/ExampleTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Unit/ExampleTest.php on line 7
+[10-Oct-2022 23:02:46 UTC] PHP Fatal error:  Uncaught Error: Class "PHPUnit\Framework\TestCase" not found in /home/sistegnet/public_html/tests/Unit/ExampleTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Unit/ExampleTest.php on line 7
+[12-Oct-2022 06:01:34 UTC] PHP Fatal error:  Uncaught Error: Class "PHPUnit\Framework\TestCase" not found in /home/sistegnet/public_html/tests/Unit/ExampleTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Unit/ExampleTest.php on line 7
+[07-Dec-2022 18:17:20 UTC] PHP Fatal error:  Uncaught Error: Class "PHPUnit\Framework\TestCase" not found in /home/sistegnet/public_html/tests/Unit/ExampleTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/tests/Unit/ExampleTest.php on line 7

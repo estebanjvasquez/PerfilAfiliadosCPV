@@ -1,0 +1,24 @@
+[10-Dec-2022 23:30:17 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ManageRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/ManageInfraSystems.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/ManageInfraSystems.php on line 9
+[11-Dec-2022 08:41:12 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ManageRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/ManageInfraSystems.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/ManageInfraSystems.php on line 9
+[14-Dec-2022 03:08:25 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/ListInfraSystems.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/ListInfraSystems.php on line 9
+[14-Dec-2022 11:01:08 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\EditRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/EditInfraSystem.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/EditInfraSystem.php on line 9
+[14-Dec-2022 22:55:35 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\CreateRecord" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/CreateInfraSystem.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/CreateInfraSystem.php on line 9
+[15-Dec-2022 18:56:04 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ListRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/ListInfraSystems.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraSystemResource/Pages/ListInfraSystems.php on line 9

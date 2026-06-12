@@ -1,0 +1,40 @@
+[24-Nov-2022 07:21:04 UTC] PHP Fatal error:  Uncaught Error: Class "Rappasoft\LaravelLivewireTables\DataTableComponent" not found in /home/sistegnet/public_html/app/Http/Livewire/CatalogTable.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Livewire/CatalogTable.php on line 9
+[26-Nov-2022 21:01:33 UTC] PHP Fatal error:  Uncaught Error: Class "Livewire\Component" not found in /home/sistegnet/public_html/app/Http/Livewire/Form.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Livewire/Form.php on line 10
+[01-Dec-2022 00:27:34 UTC] PHP Fatal error:  Uncaught Error: Class "Rappasoft\LaravelLivewireTables\DataTableComponent" not found in /home/sistegnet/public_html/app/Http/Livewire/CatalogTable.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Livewire/CatalogTable.php on line 9
+[10-Dec-2022 00:45:12 UTC] PHP Fatal error:  Uncaught Error: Class "Rappasoft\LaravelLivewireTables\DataTableComponent" not found in /home/sistegnet/public_html/app/Http/Livewire/CatalogTable.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Livewire/CatalogTable.php on line 9
+[10-Dec-2022 20:15:42 UTC] PHP Fatal error:  Uncaught Error: Class "Livewire\Component" not found in /home/sistegnet/public_html/app/Http/Livewire/Customer.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Livewire/Customer.php on line 7
+[10-Dec-2022 22:58:53 UTC] PHP Fatal error:  Uncaught Error: Class "Livewire\Component" not found in /home/sistegnet/public_html/app/Http/Livewire/Form.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Livewire/Form.php on line 10
+[10-Dec-2022 23:38:44 UTC] PHP Fatal error:  Uncaught Error: Class "Livewire\Component" not found in /home/sistegnet/public_html/app/Http/Livewire/Empresa.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Livewire/Empresa.php on line 7
+[11-Dec-2022 00:58:29 UTC] PHP Fatal error:  Uncaught Error: Class "Livewire\Component" not found in /home/sistegnet/public_html/app/Http/Livewire/Empresa.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Livewire/Empresa.php on line 7
+[11-Dec-2022 11:22:05 UTC] PHP Fatal error:  Uncaught Error: Class "Livewire\Component" not found in /home/sistegnet/public_html/app/Http/Livewire/Form.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Livewire/Form.php on line 10
+[11-Dec-2022 20:34:11 UTC] PHP Fatal error:  Uncaught Error: Class "Livewire\Component" not found in /home/sistegnet/public_html/app/Http/Livewire/Customer.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Http/Livewire/Customer.php on line 7

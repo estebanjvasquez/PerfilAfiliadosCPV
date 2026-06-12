@@ -1,0 +1,8 @@
+[11-Dec-2022 15:07:24 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ManageRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource/Pages/ManageInfraFacilities.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource/Pages/ManageInfraFacilities.php on line 9
+[11-Dec-2022 15:35:12 UTC] PHP Fatal error:  Uncaught Error: Class "Filament\Resources\Pages\ManageRecords" not found in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource/Pages/ManageInfraFacilities.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/sistegnet/public_html/app/Filament/Resources/InfraFacilityResource/Pages/ManageInfraFacilities.php on line 9
