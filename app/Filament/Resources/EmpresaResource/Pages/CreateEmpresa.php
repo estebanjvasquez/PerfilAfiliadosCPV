@@ -5,6 +5,7 @@ namespace App\Filament\Resources\EmpresaResource\Pages;
 use Filament\Forms;
 use App\Filament\Resources\EmpresaResource;
 use App\Models\City;
+use App\Models\Sector;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Fieldset;
@@ -68,6 +69,22 @@ class CreateEmpresa extends CreateRecord
                 ]),
             Wizard\Step::make('3 - Operaciones')
                 ->schema([
+                    Fieldset::make('Sectores de Actividad Económica (máximo 2)')->schema([
+                        Select::make('sector_principal_id')
+                            ->label('Sector Principal')
+                            ->options(Sector::orderBy('name')->pluck('name', 'id'))
+                            ->placeholder('Por favor seleccione una opción')
+                            ->reactive()
+                            ->required(),
+                        Select::make('sector_secundario_id')
+                            ->label('Sector Secundario (opcional)')
+                            ->options(fn (callable $get) => Sector::orderBy('name')
+                                ->where('id', '<>', $get('sector_principal_id'))
+                                ->pluck('name', 'id'))
+                            ->placeholder('Por favor seleccione una opción')
+                            ->different('sector_principal_id')
+                            ->helperText('Solo podrá asociar servicios de los sectores aquí seleccionados.'),
+                    ])->columns(2),
                     Fieldset::make('Operaciones en Venezuela')->schema([
                         Forms\Components\Select::make('billing_id')
                             ->options([

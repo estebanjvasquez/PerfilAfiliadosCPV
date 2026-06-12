@@ -36,11 +36,13 @@ class Presence extends Model
             $empresa = $item->empresa_id;
 
             DB::update(
-                'update presences 
+                'update presences
                 set presences.user_id = ?
                 where empresa_id = ?',
                 [$user, $empresa]
             );
+
+            EmpresaModuleStatus::setStatus($empresa, EmpresaModuleStatus::MODULE_PRESENCIA, false);
             /* $user = strval(Auth::User()->id);
 
             DB::update(

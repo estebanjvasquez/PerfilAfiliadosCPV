@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\EmpresaModuleStatus;
+use App\Filament\Support\NoAplicaAction;
 use App\Filament\Resources\AssetResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\AssetResource\RelationManagers;
@@ -52,6 +54,9 @@ class AssetResource extends Resource
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                NoAplicaAction::make(EmpresaModuleStatus::MODULE_RECURSOS),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

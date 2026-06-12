@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\infraregion_infrasystem;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Models\EmpresaModuleStatus;
+use App\Filament\Support\NoAplicaAction;
 use App\Filament\Resources\ExperienceResource\Pages;
 use App\Filament\Resources\ExperienceResource\RelationManagers;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
@@ -218,6 +220,9 @@ class ExperienceResource extends Resource
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                NoAplicaAction::make(EmpresaModuleStatus::MODULE_EXPERIENCIAS),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

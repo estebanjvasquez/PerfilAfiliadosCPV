@@ -3,6 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Models\Empresa;
+use App\Models\EmpresaModuleStatus;
+use App\Filament\Support\NoAplicaAction;
 use App\Filament\Resources\ManagementResource\Pages;
 use App\Filament\Resources\ManagementResource\RelationManagers;
 use App\Models\Management;
@@ -227,6 +229,9 @@ class ManagementResource extends Resource
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                NoAplicaAction::make(EmpresaModuleStatus::MODULE_GESTION),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

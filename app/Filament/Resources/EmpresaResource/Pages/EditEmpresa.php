@@ -9,7 +9,9 @@ use App\Filament\Resources\EmpresaResource;
 use App\Models\Country;
 use Closure;
 use App\Models\City;
+use App\Models\Sector;
 //use App\Models\State;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Forms\Components\TextInput\Mask;
 use Filament\Forms\Components\Fieldset;
@@ -31,6 +33,36 @@ class EditEmpresa extends EditRecord
         return [];
     }
 
+    /**
+     * Las empresas solo pueden operar en 2 sectores (principal y secundario).
+     * Si la empresa tiene servicios asociados a sectores fuera de los 2 elegidos,
+     * se bloquea el guardado hasta que desvincule esos servicios o ajuste sus sectores.
+     */
+    protected function beforeSave(): void
+    {
+        $data = $this->form->getState();
+
+        $allowed = array_map('intval', array_filter([
+            $data['sector_principal_id'] ?? null,
+            $data['sector_secundario_id'] ?? null,
+        ]));
+
+        $outside = array_diff($this->record->distinctSectorIds(), $allowed);
+
+        if (count($outside) > 0) {
+            $names = Sector::whereIn('id', $outside)->pluck('name')->implode(', ');
+
+            Notification::make()
+                ->danger()
+                ->title('Su empresa tiene servicios en más de 2 sectores')
+                ->body("Solo se permiten un Sector Principal y uno Secundario. En la pestaña \"Sectores y Servicios\" desvincule los servicios de: {$names}; o ajuste sus sectores seleccionados.")
+                ->persistent()
+                ->send();
+
+            $this->halt();
+        }
+    }
+
     protected function getSteps(): array
     {
         $ciudades = City::get();
@@ -42,6 +74,19 @@ class EditEmpresa extends EditRecord
 
             Forms\Components\Wizard\Step::make('1- Datos Generales')
                 ->schema([
+                    Forms\Components\Placeholder::make('completitud')
+                        ->label('Completitud del Perfil')
+                        ->content(function ($record) {
+                            if (!$record) {
+                                return '';
+                            }
+
+                            $data = $record->completionData();
+                            $pendientes = collect($data)->filter(fn ($completo) => !$completo)->keys()->implode(', ');
+
+                            return $record->completionPercentage() . '% completado'
+                                . ($pendientes !== '' ? ' — Pendiente: ' . $pendientes : '');
+                        })->columnSpan(3),
                     Forms\Components\TextInput::make('rif')->required()->disabled()
                         ->afterStateUpdated(function ($component, $state, $set) {
                             return $set($component, mb_strtoupper($state));
@@ -94,6 +139,22 @@ class EditEmpresa extends EditRecord
                 ]),
             Forms\Components\Wizard\Step::make('3 - Operaciones')
                 ->schema([
+                    Fieldset::make('Sectores de Actividad Económica (máximo 2)')->schema([
+                        Select::make('sector_principal_id')
+                            ->label('Sector Principal')
+                            ->options(Sector::orderBy('name')->pluck('name', 'id'))
+                            ->placeholder('Por favor seleccione una opción')
+                            ->reactive()
+                            ->required(),
+                        Select::make('sector_secundario_id')
+                            ->label('Sector Secundario (opcional)')
+                            ->options(fn (callable $get) => Sector::orderBy('name')
+                                ->where('id', '<>', $get('sector_principal_id'))
+                                ->pluck('name', 'id'))
+                            ->placeholder('Por favor seleccione una opción')
+                            ->different('sector_principal_id')
+                            ->helperText('Solo podrá asociar servicios de los sectores aquí seleccionados.'),
+                    ])->columns(2),
                     Fieldset::make('Operaciones en Venezuela')->schema([
                         Forms\Components\Select::make('billing_id')
                             ->options([

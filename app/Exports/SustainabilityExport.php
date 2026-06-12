@@ -18,17 +18,30 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
-class SustainabilityExport implements FromQuery, ShouldAutoSize, WithHeadings, WithEvents, WithDrawings, WithColumnWidths
+class SustainabilityExport implements FromCollection, ShouldAutoSize, WithHeadings, WithEvents, WithDrawings, WithColumnWidths
 {
     /**
      * @return \Illuminate\Support\Collection
      */
     use Exportable;
+    use \App\Exports\Concerns\AppendsNoAplicaRows;
 
-    public function query()
+    public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
-        return SustainabilityViewModel::query();
+        $rows = SustainabilityViewModel::query()->get();
+
+        // Las empresas que declararon "No Aplica" muestran esa marca en las áreas
+        return $this->appendNoAplicaRows(
+            $rows,
+            \App\Models\EmpresaModuleStatus::MODULE_SOSTENIBILIDAD,
+            11,
+            function ($row) {
+                foreach (['Maximizacion', 'Creacion', 'Energias', 'Funcionalidad', 'Participacion', 'Fomento', 'Reorientacion', 'Desarrollo'] as $attr) {
+                    $row->setAttribute($attr, 'NO APLICA');
+                }
+            }
+        );
     }
 
     //PARA AGREGAR IMAGEN DE LOGO.......................................

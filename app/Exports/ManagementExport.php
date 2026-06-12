@@ -18,17 +18,30 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
-class ManagementExport implements FromQuery, ShouldAutoSize, WithHeadings, WithEvents, WithDrawings, WithColumnWidths
+class ManagementExport implements FromCollection, ShouldAutoSize, WithHeadings, WithEvents, WithDrawings, WithColumnWidths
 {
     /**
      * @return \Illuminate\Support\Collection
      */
     use Exportable;
+    use \App\Exports\Concerns\AppendsNoAplicaRows;
 
-    public function query()
+    public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
-        return ManagementView::query();
+        $rows = ManagementView::query()->get();
+
+        // Las empresas que declararon "No Aplica" muestran esa marca en las columnas de sistemas
+        return $this->appendNoAplicaRows(
+            $rows,
+            \App\Models\EmpresaModuleStatus::MODULE_GESTION,
+            9,
+            function ($row) {
+                foreach (['Calidad', 'Ambiente', 'Seguridad', 'Gestion', 'Credibilidad', 'Informacion'] as $attr) {
+                    $row->setAttribute($attr, 'NO APLICA');
+                }
+            }
+        );
     }
 
     public function drawings()

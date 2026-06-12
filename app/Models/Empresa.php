@@ -44,6 +44,8 @@ class Empresa extends Model
         'property_id',
         'origin_id',
         'customers_country',
+        'sector_principal_id',
+        'sector_secundario_id',
 
 
     ];
@@ -173,5 +175,82 @@ class Empresa extends Model
     public function sustainabilities()
     {
         return $this->hasMany(Sustainability::class);
+    }
+
+    public function sectorPrincipal()
+    {
+        return $this->belongsTo(Sector::class, 'sector_principal_id');
+    }
+
+    public function sectorSecundario()
+    {
+        return $this->belongsTo(Sector::class, 'sector_secundario_id');
+    }
+
+    public function moduleStatuses()
+    {
+        return $this->hasMany(EmpresaModuleStatus::class);
+    }
+
+    /**
+     * Ids de los sectores permitidos para la empresa (principal y secundario).
+     */
+    public function allowedSectorIds(): array
+    {
+        return array_map('intval', array_values(array_filter([
+            $this->sector_principal_id,
+            $this->sector_secundario_id,
+        ])));
+    }
+
+    /**
+     * Ids de los sectores distintos derivados de los servicios ya asociados.
+     */
+    public function distinctSectorIds(): array
+    {
+        return DB::table('empresa_sector_service')
+            ->join('services', 'services.id', '=', 'empresa_sector_service.service_id')
+            ->where('empresa_sector_service.empresa_id', $this->id)
+            ->distinct()
+            ->pluck('services.sectors_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+
+    public function isModuleNoAplica(string $module): bool
+    {
+        return EmpresaModuleStatus::isNoAplica($this->id, $module);
+    }
+
+    /**
+     * Estado de completitud por módulo del perfil.
+     * Un módulo cuenta como completo si tiene datos o si fue marcado "No Aplica".
+     */
+    public function completionData(): array
+    {
+        $naFlags = EmpresaModuleStatus::flagsFor($this->id);
+
+        return [
+            'Datos Generales' => true,
+            'Sectores y Servicios' => $this->services()->count() > 0,
+            'Contactos' => $this->contacts()->count() > 0,
+            EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_RECURSOS] =>
+                $this->assets()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_RECURSOS],
+            EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_GESTION] =>
+                $this->management()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_GESTION],
+            EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_PRESENCIA] =>
+                $this->presence()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_PRESENCIA],
+            EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_EXPERIENCIAS] =>
+                $this->experiences()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_EXPERIENCIAS],
+            EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD] =>
+                $this->sustainabilities()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD],
+        ];
+    }
+
+    public function completionPercentage(): int
+    {
+        $data = $this->completionData();
+
+        return (int) round(100 * count(array_filter($data)) / count($data));
     }
 }

@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
 use App\Models\Area;
+use App\Models\EmpresaModuleStatus;
 use App\Models\Sustainability;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
@@ -91,6 +93,33 @@ class SustainabilitiesRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
+
+                Tables\Actions\Action::make('no_aplica')
+                    ->label('No Aplica')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('warning')
+                    ->modalHeading('No Aplica — Enfoque de Sostenibilidad')
+                    ->modalButton('Guardar')
+                    ->form([
+                        Forms\Components\Toggle::make('no_aplica')
+                            ->label('"Enfoque de Sostenibilidad" No Aplica para esta empresa')
+                            ->helperText('Si lo activa, este módulo contará como completado en el perfil. Si luego carga datos en el módulo, la marca se elimina automáticamente.')
+                            ->default(true),
+                    ])
+                    ->action(function (array $data, RelationManager $livewire) {
+                        EmpresaModuleStatus::setStatus(
+                            (int) $livewire->ownerRecord->id,
+                            EmpresaModuleStatus::MODULE_SOSTENIBILIDAD,
+                            (bool) $data['no_aplica']
+                        );
+
+                        Notification::make()
+                            ->success()
+                            ->title($data['no_aplica']
+                                ? '"Enfoque de Sostenibilidad" marcado como No Aplica'
+                                : 'Se eliminó la marca No Aplica de "Enfoque de Sostenibilidad"')
+                            ->send();
+                    }),
 
             ])
             ->actions([

@@ -37,11 +37,13 @@ class Experience extends Model
             $empresa = $item->empresa_id;
 
             DB::update(
-                'update experiences 
+                'update experiences
                 set experiences.user_id = ?
                 where empresa_id = ?',
                 [$user, $empresa]
             );
+
+            EmpresaModuleStatus::setStatus($empresa, EmpresaModuleStatus::MODULE_EXPERIENCIAS, false);
         });
     }
 

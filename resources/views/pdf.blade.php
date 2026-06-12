@@ -17,6 +17,9 @@
     $datos_chambers = App\Filament\Pages\JoinViews::index_chambers($record->id)->data_chambers;
     $datos_sec_ser = App\Filament\Pages\JoinViews::index_sec_ser($record->id)->data_sec_ser;
 
+    // Flags de módulos declarados "No Aplica" por la empresa
+    $na_flags = App\Models\EmpresaModuleStatus::flagsFor($record->id);
+
     ?>
 
     <head>
@@ -536,7 +539,11 @@
                 @else
                 <tr>
                     <td colspan="4">
+                        @if ($na_flags['sostenibilidad'])
+                        <p><b>NO APLICA — Declarado por la empresa</b></p>
+                        @else
                         <p><b>No existe información</b></p>
+                        @endif
                     </td>
                 </tr>
                 @endif
@@ -627,7 +634,11 @@
                 @else
                 <tr>
                     <td colspan="4">
+                        @if ($na_flags['recursos'])
+                        <p><b>NO APLICA — Declarado por la empresa</b></p>
+                        @else
                         <p><b>No existe información</b></p>
+                        @endif
                     </td>
                 </tr>
                 @endif
@@ -693,7 +704,11 @@
                 @else
                 <tr>
                     <td colspan="4">
+                        @if ($na_flags['recursos'])
+                        <p><b>NO APLICA — Declarado por la empresa</b></p>
+                        @else
                         <p><b>No existe información</b></p>
+                        @endif
                     </td>
                 </tr>
                 @endif
@@ -776,7 +791,11 @@
                 @else
                 <tr>
                     <td colspan="4">
+                        @if ($na_flags['recursos'])
+                        <p><b>NO APLICA — Declarado por la empresa</b></p>
+                        @else
                         <p><b>No existe información</b></p>
+                        @endif
                     </td>
                 </tr>
                 @endif
@@ -816,7 +835,11 @@
                 @else
                 <tr>
                     <td colspan="6">
+                        @if ($na_flags['recursos'])
+                        <p><b>NO APLICA — Declarado por la empresa</b></p>
+                        @else
                         <p><b>No existe información</b></p>
+                        @endif
                     </td>
                 </tr>
                 @endif
@@ -927,7 +950,11 @@
                     @else
                     <tr>
                         <td colspan="3">
+                            @if ($na_flags['experiencias'])
+                            <p><b>NO APLICA — Declarado por la empresa</b></p>
+                            @else
                             <p><b>No existe información</b></p>
+                            @endif
                         </td>
                     </tr>
 
@@ -1020,7 +1047,11 @@
                 @else
                 <tr>
                     <td colspan="4">
+                        @if ($na_flags['presencia'])
+                        <p><b>NO APLICA — Declarado por la empresa</b></p>
+                        @else
                         <p><b>No existe información</b></p>
+                        @endif
                     </td>
                 </tr>
                 @endif
@@ -1039,6 +1070,13 @@
                     <h2 class="titulo2 gris-oscuro">Sistemas de Gestión</h2>
                 </td>
             </tr>
+            @if ($na_flags['gestion'])
+            <tr>
+                <td colspan="3">
+                    <p><b>NO APLICA — Declarado por la empresa</b></p>
+                </td>
+            </tr>
+            @else
             <!-- PRIMERA FILA....................................................................... -->
             <tr>
                 <td style="padding: 0px; border: solid #bbbbbb">
@@ -1168,6 +1206,7 @@
                 </td>
 
             </tr>
+            @endif
         </table>
         <!--<div class="page-break"></div>-->
 

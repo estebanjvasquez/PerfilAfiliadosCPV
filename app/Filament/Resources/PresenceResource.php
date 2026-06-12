@@ -21,6 +21,8 @@ use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\EmpresaModuleStatus;
+use App\Filament\Support\NoAplicaAction;
 use App\Filament\Resources\PresenceResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PresenceResource\RelationManagers;
@@ -75,6 +77,9 @@ class PresenceResource extends Resource
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                NoAplicaAction::make(EmpresaModuleStatus::MODULE_PRESENCIA),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
