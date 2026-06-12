@@ -1,0 +1,21 @@
+---
+deployment:
+  targets:
+    production:
+      domain: campetapp.com
+      path: /home/campetapp/repositories/cambios
+      branch: main
+      username: campetapp
+
+tasks:
+  post_deployment:
+    - export COMPOSER_ALLOW_SUPERUSER=1
+    - export PATH=/opt/cpanel/ea-php81/root/usr/bin:$PATH
+    - cd /home/campetapp/repositories/cambios
+    - composer install --no-dev --prefer-dist --optimize-autoloader
+    - php artisan migrate --force
+    - php artisan config:cache
+    - php artisan route:cache
+    - php artisan view:cache
+    - chmod -R 755 storage bootstrap/cache
+    - chown -R campetapp:campetapp .
