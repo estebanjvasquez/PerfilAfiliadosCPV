@@ -14,13 +14,14 @@ class CreateClientsView extends Migration
      */
     public function up()
     {
+        DB::statement("DROP VIEW IF EXISTS ClientsView");
         DB::statement("CREATE VIEW ClientsView AS
-            SELECT 
-                id, 
+            SELECT
+                id,
                 name,
                 Sector,
-                REPLACE(rec->>'$.customer_name', 'null', '') cliente,
-                (SELECT countries.country_name FROM countries WHERE countries.id = rec->>'$.country_id') pais
+                REPLACE(json_unquote(json_extract(rec, '\$.customer_name')), 'null', '') cliente,
+                (SELECT countries.country_name FROM countries WHERE countries.id = json_unquote(json_extract(rec, '\$.country_id'))) pais
             FROM (
                 SELECT 
                     t.id, 
