@@ -17,7 +17,7 @@ class CreateResourceView extends Migration
         DB::statement("CREATE VIEW ResourceView AS
         SELECT	
             a.empresa_id as id,
-            empresas.name,
+            max(empresas.name) as name,
             SUM(CASE WHEN e.employee_type = 0 THEN e.junior_q ELSE 0 END) AS Bachilleres_Junior,
             SUM(CASE WHEN e.employee_type = 0 THEN e.medium_q ELSE 0 END) AS Bachilleres_Medium,
             SUM(CASE WHEN e.employee_type = 0 THEN e.senior_q ELSE 0 END) AS Bachilleres_Senior,

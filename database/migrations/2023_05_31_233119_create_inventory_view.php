@@ -17,7 +17,7 @@ class CreateInventoryView extends Migration
         DB::statement("CREATE VIEW InventoryView AS
         SELECT	
             a.empresa_id as id,
-            empresas.name,
+            max(empresas.name) as name,
             MAX(CASE WHEN e.inventory_name = 0 THEN (CASE WHEN e.inventory_q = 1 THEN '1 - 10' WHEN e.inventory_q = 2 THEN '11 - 50' WHEN e.inventory_q = 3 THEN '51 - 100' ELSE '> 100' END) ELSE ' ' END) AS Materia_q,
             MAX(CASE WHEN e.inventory_name = 0 THEN (CASE WHEN e.inventory_est = 1 THEN '< 100.000 USD' WHEN e.inventory_est = 2 THEN '100.001 - 1.000.000 USD' WHEN e.inventory_est = 3 THEN '1.000.001 - 10.000.000 USD' ELSE '> 10.000.000 USD' END) ELSE ' ' END) AS Materia_est,
             MAX(CASE WHEN e.inventory_name = 0 THEN e.inventory_unit ELSE ' ' END) AS Materia_unit,
