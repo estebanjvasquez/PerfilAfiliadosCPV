@@ -1,0 +1,35 @@
+---
+deployment:
+  targets:
+    production:
+      domain: campetapp.com
+      path: /home/campetapp/repositories/cambios
+      branch: feature/captcha-turnstile
+      username: campetapp
+
+tasks:
+  post_deployment:
+    # Configurar variables de entorno
+    - export COMPOSER_ALLOW_SUPERUSER=1
+    - export PATH=/opt/cpanel/ea-php81/root/usr/bin:$PATH
+    - cd /home/campetapp/repositories/cambios
+
+    # Sincronizar SOLO el archivo del visor de contraseña a public_html
+    - rsync -avz \
+        --exclude='*' \
+        --include='app/Filament/Pages/Login.php' \
+        --include='app/Filament/Pages/' \
+        --include='app/Filament/' \
+        --include='app/' \
+        /home/campetapp/repositories/cambios/ \
+        /home/campetapp/public_html/
+
+    # Limpiar caché de vistas (cambios en Filament)
+    - php artisan view:clear
+
+    # Optimizar configuración
+    - php artisan config:cache
+
+    # Configurar permisos en app
+    - chmod -R 755 /home/campetapp/public_html/app
+    - chown -R campetapp:campetapp /home/campetapp/public_html/app/Filament/Pages
