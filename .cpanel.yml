@@ -7,7 +7,6 @@ deployment:
       branch: feature/captcha-turnstile
       username: campetapp
 
-tasks:
   post_deployment:
     # 1. Configurar variables de entorno
     - export DEPLOYPATH=/home/campetapp/public_html
