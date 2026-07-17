@@ -6,36 +6,20 @@ deployment:
       path: /home/campetapp/public_html
       branch: feature/captcha-turnstile
       username: campetapp
-
   post_deployment:
-    # 1. Configurar variables de entorno
     - export DEPLOYPATH=/home/campetapp/public_html
     - export COMPOSER_ALLOW_SUPERUSER=1
     - export PATH=/opt/cpanel/ea-php81/root/usr/bin:$PATH
-
-    # 2. Verificar directorio app/Filament/Pages/ existe
     - mkdir -p $DEPLOYPATH/app/Filament/Pages
-
-    # 3. Copiar SOLO el archivo Login.php (sin afectar otros archivos)
     - cp -f ./app/Filament/Pages/Login.php $DEPLOYPATH/app/Filament/Pages/Login.php
-
-    # 4. Restaurar permisos SEGUROS (solo el archivo, no el directorio)
     - chmod 644 $DEPLOYPATH/app/Filament/Pages/Login.php
     - chown campetapp:campetapp $DEPLOYPATH/app/Filament/Pages/Login.php
-
-    # 5. Restaurar permisos de directorios (si están dañados)
     - chmod 755 $DEPLOYPATH
     - chmod 755 $DEPLOYPATH/app
     - chmod 755 $DEPLOYPATH/app/Filament
     - chmod 755 $DEPLOYPATH/app/Filament/Pages
     - chmod 755 $DEPLOYPATH/public
     - chmod 644 $DEPLOYPATH/.htaccess
-
-    # 6. Limpiar caché de vistas de Laravel/Filament
     - php $DEPLOYPATH/artisan view:clear
-
-    # 7. Optimizar configuración
     - php $DEPLOYPATH/artisan config:cache
-
-    # 8. Verificar que el sitio responde
     - ls -la $DEPLOYPATH/.htaccess
