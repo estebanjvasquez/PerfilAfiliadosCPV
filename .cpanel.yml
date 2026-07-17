@@ -1,19 +1,42 @@
 ---
 deployment:
-  tasks:
-    # 1. Definir variables y path de destino
+  targets:
+    production:
+      domain: campetapp.com
+      path: /home/campetapp/public_html
+      branch: feature/captcha-turnstile
+      username: campetapp
+
+tasks:
+  post_deployment:
+    # 1. Configurar variables de entorno
     - export DEPLOYPATH=/home/campetapp/public_html
     - export COMPOSER_ALLOW_SUPERUSER=1
     - export PATH=/opt/cpanel/ea-php81/root/usr/bin:$PATH
 
-    # 2. Sincronizar SOLO el archivo del visor de contraseña (Login.php)
-    - rsync -avz --exclude='*' --include='app/Filament/Pages/Login.php' --include='app/Filament/Pages/' --include='app/Filament/' --include='app/' . $DEPLOYPATH/
+    # 2. Verificar directorio app/Filament/Pages/ existe
+    - mkdir -p $DEPLOYPATH/app/Filament/Pages
 
-    # 3. Limpiar caché de vistas de Laravel/Filament
+    # 3. Copiar SOLO el archivo Login.php (sin afectar otros archivos)
+    - cp -f ./app/Filament/Pages/Login.php $DEPLOYPATH/app/Filament/Pages/Login.php
+
+    # 4. Restaurar permisos SEGUROS (solo el archivo, no el directorio)
+    - chmod 644 $DEPLOYPATH/app/Filament/Pages/Login.php
+    - chown campetapp:campetapp $DEPLOYPATH/app/Filament/Pages/Login.php
+
+    # 5. Restaurar permisos de directorios (si están dañados)
+    - chmod 755 $DEPLOYPATH
+    - chmod 755 $DEPLOYPATH/app
+    - chmod 755 $DEPLOYPATH/app/Filament
+    - chmod 755 $DEPLOYPATH/app/Filament/Pages
+    - chmod 755 $DEPLOYPATH/public
+    - chmod 644 $DEPLOYPATH/.htaccess
+
+    # 6. Limpiar caché de vistas de Laravel/Filament
     - php $DEPLOYPATH/artisan view:clear
 
-    # 4. Optimizar configuración
+    # 7. Optimizar configuración
     - php $DEPLOYPATH/artisan config:cache
 
-    # 5. Configurar permisos seguros (chmod sí está permitido para tu propio usuario)
-    - chmod -R 755 $DEPLOYPATH/app
+    # 8. Verificar que el sitio responde
+    - ls -la $DEPLOYPATH/.htaccess
