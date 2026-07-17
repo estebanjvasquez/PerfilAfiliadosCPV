@@ -1,34 +1,19 @@
 ---
 deployment:
-  targets:
-    production:
-      domain: campetapp.com
-      path: /home/campetapp/public_html
-      branch: feature/captcha-turnstile
-      username: campetapp
-
-tasks:
-  post_deployment:
-    # Configurar variables de entorno
+  tasks:
+    # 1. Definir variables y path de destino
+    - export DEPLOYPATH=/home/campetapp/public_html
     - export COMPOSER_ALLOW_SUPERUSER=1
     - export PATH=/opt/cpanel/ea-php81/root/usr/bin:$PATH
-    - cd /home/campetapp/public_html
 
-    # Sincronizar SOLO el archivo del visor de contraseña (Login.php)
-    - rsync -avz \
-        --exclude='*' \
-        --include='app/Filament/Pages/Login.php' \
-        --include='app/Filament/Pages/' \
-        --include='app/Filament/' \
-        --include='app/' \
-        . /home/campetapp/public_html/
+    # 2. Sincronizar SOLO el archivo del visor de contraseña (Login.php)
+    - rsync -avz --exclude='*' --include='app/Filament/Pages/Login.php' --include='app/Filament/Pages/' --include='app/Filament/' --include='app/' . $DEPLOYPATH/
 
-    # Limpiar caché de vistas (cambios en Filament)
-    - php artisan view:clear
+    # 3. Limpiar caché de vistas de Laravel/Filament
+    - php $DEPLOYPATH/artisan view:clear
 
-    # Optimizar configuración
-    - php artisan config:cache
+    # 4. Optimizar configuración
+    - php $DEPLOYPATH/artisan config:cache
 
-    # Configurar permisos en app
-    - chmod -R 755 /home/campetapp/public_html/app
-    - chown -R campetapp:campetapp /home/campetapp/public_html/app/Filament/Pages
+    # 5. Configurar permisos seguros (chmod sí está permitido para tu propio usuario)
+    - chmod -R 755 $DEPLOYPATH/app
