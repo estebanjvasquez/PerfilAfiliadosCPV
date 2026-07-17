@@ -14,6 +14,7 @@ class CreateManagementDetView extends Migration
      */
     public function up()
     {
+        DB::statement("DROP VIEW IF EXISTS ManagementDetView");
         DB::statement("CREATE VIEW ManagementDetView AS
         SELECT	
             a.empresa_id as id,

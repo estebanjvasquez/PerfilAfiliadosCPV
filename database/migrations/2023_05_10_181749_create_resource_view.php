@@ -14,6 +14,7 @@ class CreateResourceView extends Migration
      */
     public function up()
     {
+        DB::statement("DROP VIEW IF EXISTS ResourceView");
         DB::statement("CREATE VIEW ResourceView AS
         SELECT	
             a.empresa_id as id,

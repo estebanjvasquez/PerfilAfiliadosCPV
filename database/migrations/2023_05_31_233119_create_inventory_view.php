@@ -14,6 +14,7 @@ class CreateInventoryView extends Migration
      */
     public function up()
     {
+        DB::statement("DROP VIEW IF EXISTS InventoryView");
         DB::statement("CREATE VIEW InventoryView AS
         SELECT	
             a.empresa_id as id,
