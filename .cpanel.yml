@@ -1,0 +1,25 @@
+---
+deployment:
+  targets:
+    production:
+      domain: campetapp.com
+      path: /home/campetapp/public_html
+      branch: feature/captcha-turnstile
+      username: campetapp
+  post_deployment:
+    - export DEPLOYPATH=/home/campetapp/public_html
+    - export COMPOSER_ALLOW_SUPERUSER=1
+    - export PATH=/opt/cpanel/ea-php81/root/usr/bin:$PATH
+    - mkdir -p $DEPLOYPATH/app/Filament/Pages
+    - cp -f ./app/Filament/Pages/Login.php $DEPLOYPATH/app/Filament/Pages/Login.php
+    - chmod 644 $DEPLOYPATH/app/Filament/Pages/Login.php
+    - chown campetapp:campetapp $DEPLOYPATH/app/Filament/Pages/Login.php
+    - chmod 755 $DEPLOYPATH
+    - chmod 755 $DEPLOYPATH/app
+    - chmod 755 $DEPLOYPATH/app/Filament
+    - chmod 755 $DEPLOYPATH/app/Filament/Pages
+    - chmod 755 $DEPLOYPATH/public
+    - chmod 644 $DEPLOYPATH/.htaccess
+    - php $DEPLOYPATH/artisan view:clear
+    - php $DEPLOYPATH/artisan config:cache
+    - ls -la $DEPLOYPATH/.htaccess
