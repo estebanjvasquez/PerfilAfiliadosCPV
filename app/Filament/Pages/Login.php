@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Auth;
+namespace App\Filament\Pages;
 
 //AGREGADOS PARA HACER FUNCIONAR EL PLUGIN PASSWORD REVEAL...................
 use JeffGreco13\FilamentBreezy\Http\Livewire\Auth\Login as BreezyLogin;
@@ -86,11 +86,12 @@ class Login extends BreezyLogin
                 ->autocomplete(),
             Password::make('password')
                 ->label(__('filament::login.fields.password.label'))
-                ->autocomplete('new_password')
+                ->autocomplete('current-password')
                 ->required()
                 ->revealable(true)
                 ->showIcon('heroicon-o-eye')
-                ->hideIcon('heroicon-o-eye-off'),
+                ->hideIcon('heroicon-o-eye-off')
+                ->helperText('Haz clic en el icono del ojo para ver tu contraseña'),
             Forms\Components\Checkbox::make('remember')
                 ->label(__('filament::login.fields.remember.label')),
         ];
