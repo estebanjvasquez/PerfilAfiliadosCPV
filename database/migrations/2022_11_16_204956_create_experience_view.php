@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateExperienceView extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -14,19 +14,20 @@ class CreateExperienceView extends Migration
      */
     public function up()
     {
+        DB::statement("DROP VIEW IF EXISTS ExperienceView");
         DB::statement("CREATE VIEW ExperienceView AS
-            SELECT 
-                empresa_id as id, 
+            SELECT
+                empresa_id as id,
                 (select empresas.name from empresas where id = empresa_id) as name,
                 sectores,
                 servicios,
-                (select infrasectors.sector_name from infrasectors where id = rec->>'$.data.infrasectors_id') as sectorind,
-                (select infratypes.type_name from infratypes where id = rec->>'$.data.infratypes_id') as tipoind,
-                (select infrasystems.system_name from infrasystems where id = rec->>'$.data.infrasystems_id') as systemind,
-                (select infraregions.region_name from infraregions where id = rec->>'$.data.infraregions_id') as regionind,
-                (select infrafacilities.facility_name from infrafacilities where id = rec->>'$.data.infrafacilities_id') as facilityind,
-                rec->>'$.data.exp_year' ano
-                                                
+                (select infrasectors.sector_name from infrasectors where id = json_unquote(json_extract(rec, '\$.data.infrasectors_id'))) as sectorind,
+                (select infratypes.type_name from infratypes where id = json_unquote(json_extract(rec, '\$.data.infratypes_id'))) as tipoind,
+                (select infrasystems.system_name from infrasystems where id = json_unquote(json_extract(rec, '\$.data.infrasystems_id'))) as systemind,
+                (select infraregions.region_name from infraregions where id = json_unquote(json_extract(rec, '\$.data.infraregions_id'))) as regionind,
+                (select infrafacilities.facility_name from infrafacilities where id = json_unquote(json_extract(rec, '\$.data.infrafacilities_id'))) as facilityind,
+                json_unquote(json_extract(rec, '\$.data.exp_year')) ano
+
             FROM (
                 SELECT t.empresa_id, 
                 (SELECT GROUP_CONCAT(DISTINCT sectors.name SEPARATOR ', ') as sectores from empresas 
