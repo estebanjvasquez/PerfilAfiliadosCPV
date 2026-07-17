@@ -4,7 +4,7 @@ deployment:
     - export DEPLOYPATH=/home/campetapp/public_html
     - export COMPOSER_ALLOW_SUPERUSER=1
     - export PATH=/opt/cpanel/ea-php82/root/usr/bin:/home/campetapp/bin:$PATH
-    - /bin/cp -R * $DEPLOYPATH
+    - rsync -rc --no-perms --no-owner --no-group --exclude='/.*' ./ $DEPLOYPATH/
     - cd $DEPLOYPATH
     - composer install --no-dev --prefer-dist --optimize-autoloader
     - php artisan config:clear
