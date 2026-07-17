@@ -14,6 +14,7 @@ class CreateFacilityView extends Migration
      */
     public function up()
     {
+        DB::statement("DROP VIEW IF EXISTS FacilityView");
         DB::statement("CREATE VIEW FacilityView AS
         SELECT	
             a.empresa_id as id,

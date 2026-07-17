@@ -14,6 +14,7 @@ class CreateMachineryView extends Migration
      */
     public function up()
     {
+        DB::statement("DROP VIEW IF EXISTS MachineryView");
         DB::statement("CREATE VIEW MachineryView AS
 SELECT	
             a.empresa_id as id,
