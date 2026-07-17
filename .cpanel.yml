@@ -6,16 +6,45 @@ deployment:
       path: /home/campetapp/repositories/cambios
       branch: main
       username: campetapp
+      exclude:
+        - node_modules
+        - vendor
+        - storage/logs
+        - storage/app/public
+        - .env.example
+        - README.md
+        - .git
+        - .gitignore
 
 tasks:
   post_deployment:
     - export COMPOSER_ALLOW_SUPERUSER=1
     - export PATH=/opt/cpanel/ea-php81/root/usr/bin:$PATH
     - cd /home/campetapp/repositories/cambios
+
+    # Sync solo archivos modificados a public_html usando rsync
+    - rsync -avz --delete
+        --exclude='node_modules'
+        --exclude='storage/logs'
+        --exclude='storage/app/public'
+        --exclude='.env'
+        --exclude='.git'
+        --exclude='bootstrap/cache'
+        --exclude='public/hot'
+        /home/campetapp/repositories/cambios/
+        /home/campetapp/public_html/
+
+    # Instalar dependencias
     - composer install --no-dev --prefer-dist --optimize-autoloader
+
+    # Ejecutar migraciones
     - php artisan migrate --force
+
+    # Optimizar caché
     - php artisan config:cache
     - php artisan route:cache
     - php artisan view:cache
-    - chmod -R 755 storage bootstrap/cache
-    - chown -R campetapp:campetapp .
+
+    # Configurar permisos
+    - chmod -R 755 /home/campetapp/public_html/storage /home/campetapp/public_html/bootstrap/cache
+    - chown -R campetapp:campetapp /home/campetapp/public_html
