@@ -1,15 +1,9 @@
 ---
 deployment:
-  targets:
-    production:
-      domain: campetapp.com
-      path: /home/campetapp/public_html
-      branch: main
-      username: campetapp
-  post_deployment:
-    - export DEPLOYPATH=/home/campetapp/public_html
+  tasks:
     - export COMPOSER_ALLOW_SUPERUSER=1
-    - export PATH=/opt/cpanel/ea-php82/root/usr/bin:$PATH
+    - export PATH=/opt/cpanel/ea-php82/root/usr/bin:/home/campetapp/bin:$PATH
+    - /bin/cp -R * $DEPLOYPATH
     - cd $DEPLOYPATH
     - composer install --no-dev --prefer-dist --optimize-autoloader
     - php artisan config:clear
