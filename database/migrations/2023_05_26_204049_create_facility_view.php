@@ -17,7 +17,7 @@ class CreateFacilityView extends Migration
         DB::statement("CREATE VIEW FacilityView AS
         SELECT	
             a.empresa_id as id,
-            empresas.name,
+            max(empresas.name) as name,
             MAX(CASE WHEN e.facility_type = 0 THEN e.facility_q ELSE ' ' END) AS Oficinas_q,
             MAX(CASE WHEN e.facility_type = 0 THEN e.facility_surf ELSE ' ' END) AS Oficinas_surf,
             MAX(CASE WHEN e.facility_type = 0 THEN (CASE WHEN e.facility_own = 1 THEN 'Propia' WHEN e.facility_own = 2 THEN 'Alquilada' WHEN e.facility_own = 3 THEN 'Ambas' ELSE '> 100' END) ELSE ' ' END) AS Oficinas_own,

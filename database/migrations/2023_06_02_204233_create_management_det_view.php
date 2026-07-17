@@ -17,7 +17,7 @@ class CreateManagementDetView extends Migration
         DB::statement("CREATE VIEW ManagementDetView AS
         SELECT	
             a.empresa_id as id,
-            empresas.name,
+            max(empresas.name) as name,
             max(CASE WHEN iso9001 = 0 THEN 'NO' ELSE 'SÍ' END) as iso9001,
             max(CASE WHEN iso17025 = 0 THEN 'NO' ELSE 'SÍ' END) as iso17025,
             MAX(CASE WHEN quality_otros = 0 THEN 'NO' ELSE TRIM('\"]' FROM (TRIM('[\"' FROM (quality_data ->> '$[*].quality_otros_name')))) END) AS QUALITY_OTROS,

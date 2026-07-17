@@ -17,7 +17,7 @@ class CreateMachineryView extends Migration
         DB::statement("CREATE VIEW MachineryView AS
 SELECT	
             a.empresa_id as id,
-            empresas.name,
+            max(empresas.name) as name,
             MAX(CASE WHEN e.machinery_name = 0 THEN (CASE WHEN e.machinery_qid = 1 THEN '1 - 10' WHEN e.machinery_qid = 2 THEN '11 - 50' WHEN e.machinery_qid = 3 THEN '51 - 100' ELSE '> 100' END) ELSE ' ' END) AS Equip_med_lev_qua,
             MAX(CASE WHEN e.machinery_name = 0 THEN (CASE WHEN e.machinery_est = 1 THEN '< 100.000 USD' WHEN e.machinery_est = 2 THEN '100.001 - 1.000.000 USD' WHEN e.machinery_est = 3 THEN '1.000.001 - 10.000.000 USD' ELSE '> 10.000.001 USD' END) ELSE ' ' END) AS Equip_med_lev_est,
             MAX(CASE WHEN e.machinery_name = 1 THEN (CASE WHEN e.machinery_qid = 1 THEN '1 - 10' WHEN e.machinery_qid = 2 THEN '11 - 50' WHEN e.machinery_qid = 3 THEN '51 - 100' ELSE '> 100' END) ELSE ' ' END) AS Equip_mar_flu_qua,
