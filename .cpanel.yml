@@ -1,6 +1,7 @@
 ---
 deployment:
   tasks:
+    - export DEPLOYPATH=/home/campetapp/public_html
     - export COMPOSER_ALLOW_SUPERUSER=1
     - export PATH=/opt/cpanel/ea-php82/root/usr/bin:/home/campetapp/bin:$PATH
     - /bin/cp -R * $DEPLOYPATH
