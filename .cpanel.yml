@@ -8,8 +8,10 @@ deployment:
       username: campetapp
   post_deployment:
     - export DEPLOYPATH=/home/campetapp/public_html
+    - export COMPOSER_ALLOW_SUPERUSER=1
     - export PATH=/opt/cpanel/ea-php82/root/usr/bin:$PATH
     - cd $DEPLOYPATH
+    - composer install --no-dev --prefer-dist --optimize-autoloader
     - php artisan config:clear
     - php artisan view:clear
     - php artisan cache:clear
