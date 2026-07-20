@@ -120,6 +120,13 @@ main {
   font-size: 1rem;
 }
 
+.cta-group {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .link-btn {
   position: relative;
   text-decoration: none;
@@ -131,8 +138,13 @@ main {
   border-radius: 0 2rem 2rem 0;
 }
 
+.link-btn--outline {
+  background-color: transparent;
+  border-color: var(--text-clr);
+}
+
 @media (min-width: 660px) {
-  .link-btn::before {
+  .cta-group::before {
     content: "";
     position: absolute;
     left: -2px;
@@ -166,6 +178,10 @@ main {
 
   .link-btn {
     border-radius: 2rem;
+  }
+
+  .cta-group {
+    justify-content: center;
   }
 
   .even-columns {

@@ -53,9 +53,16 @@
               estratégicos para identificar oportunidades para la generación de
               negocios. Para formar parte haz clic aquí
             </p>
-            <a class="link-btn" href="https://camarapetrolera.app/admin/login"
-              >Pulse para acceder a su perfil</a
-            >
+            <div class="cta-group">
+              <a class="link-btn" href="https://camarapetrolera.app/admin/login"
+                >Pulse para acceder a su perfil</a
+              >
+              <a
+                class="link-btn link-btn--outline"
+                href="https://camarapetrolera.app/admin/register"
+                >Regístrate aquí</a
+              >
+            </div>
           </div>
         </div>
       </article>
