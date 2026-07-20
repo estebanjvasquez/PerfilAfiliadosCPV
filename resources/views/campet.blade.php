@@ -26,7 +26,7 @@
       rel="stylesheet"
     />
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../public/css/style.css" />
+    <link rel="stylesheet" href="../public/css/style.css?v=2" />
   </head>
   <body>
     <main>
