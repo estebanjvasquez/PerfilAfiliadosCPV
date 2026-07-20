@@ -26,7 +26,7 @@
       rel="stylesheet"
     />
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../public/css/style.css?v=2" />
+    <link rel="stylesheet" href="../public/css/style.css?v=3" />
   </head>
   <body>
     <main>
@@ -58,7 +58,7 @@
                 >Pulse para acceder a su perfil</a
               >
               <a
-                class="link-btn link-btn--outline"
+                class="link-btn"
                 href="https://camarapetrolera.app/admin/register"
                 >Regístrate aquí</a
               >
