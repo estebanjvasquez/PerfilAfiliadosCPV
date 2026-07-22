@@ -7,6 +7,7 @@ use App\Models\EmpresaModuleStatus;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,6 +18,10 @@ use Illuminate\Support\Facades\Auth;
  */
 class NoAplicaAction
 {
+    /**
+     * Para recursos de nivel superior (no anclados a una empresa concreta),
+     * donde el usuario puede tener varias empresas: incluye selector de Empresa.
+     */
     public static function make(string $module): Action
     {
         $label = EmpresaModuleStatus::MODULES[$module];
@@ -42,6 +47,38 @@ class NoAplicaAction
             ])
             ->action(function (array $data) use ($module, $label) {
                 EmpresaModuleStatus::setStatus((int) $data['empresa_id'], $module, (bool) $data['no_aplica']);
+
+                Notification::make()
+                    ->success()
+                    ->title($data['no_aplica']
+                        ? "\"{$label}\" marcado como No Aplica"
+                        : "Se eliminó la marca No Aplica de \"{$label}\"")
+                    ->send();
+            });
+    }
+
+    /**
+     * Para RelationManagers ya anclados a una empresa concreta (via ownerRecord):
+     * no pide seleccionar empresa, evita marcar la empresa equivocada por error.
+     */
+    public static function forOwner(string $module): Action
+    {
+        $label = EmpresaModuleStatus::MODULES[$module];
+
+        return Action::make('no_aplica')
+            ->label('No Aplica')
+            ->icon('heroicon-o-x-circle')
+            ->color('warning')
+            ->modalHeading("No Aplica — {$label}")
+            ->modalButton('Guardar')
+            ->form([
+                Toggle::make('no_aplica')
+                    ->label("\"{$label}\" No Aplica para esta empresa")
+                    ->helperText('Si lo activa, este módulo contará como completado en el perfil. Si luego carga datos en el módulo, la marca se elimina automáticamente.')
+                    ->default(true),
+            ])
+            ->action(function (array $data, RelationManager $livewire) use ($module, $label) {
+                EmpresaModuleStatus::setStatus((int) $livewire->ownerRecord->id, $module, (bool) $data['no_aplica']);
 
                 Notification::make()
                     ->success()

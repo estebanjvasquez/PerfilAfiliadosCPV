@@ -1,50 +1,15 @@
 ---
 deployment:
-  targets:
-    production:
-      domain: campetapp.com
-      path: /home/campetapp/repositories/cambios
-      branch: main
-      username: campetapp
-      exclude:
-        - node_modules
-        - vendor
-        - storage/logs
-        - storage/app/public
-        - .env.example
-        - README.md
-        - .git
-        - .gitignore
-
-tasks:
-  post_deployment:
+  tasks:
+    - export DEPLOYPATH=/home/campetapp/public_html
     - export COMPOSER_ALLOW_SUPERUSER=1
-    - export PATH=/opt/cpanel/ea-php81/root/usr/bin:$PATH
-    - cd /home/campetapp/repositories/cambios
-
-    # Sync solo archivos modificados a public_html usando rsync
-    - rsync -avz --delete
-        --exclude='node_modules'
-        --exclude='storage/logs'
-        --exclude='storage/app/public'
-        --exclude='.env'
-        --exclude='.git'
-        --exclude='bootstrap/cache'
-        --exclude='public/hot'
-        /home/campetapp/repositories/cambios/
-        /home/campetapp/public_html/
-
-    # Instalar dependencias
+    - export PATH=/opt/cpanel/ea-php82/root/usr/bin:/home/campetapp/bin:$PATH
+    - rsync -rc --no-perms --no-owner --no-group --exclude='/.*' ./ $DEPLOYPATH/
+    - cd $DEPLOYPATH
     - composer install --no-dev --prefer-dist --optimize-autoloader
-
-    # Ejecutar migraciones
+    - php artisan config:clear
+    - php artisan view:clear
+    - php artisan cache:clear
     - php artisan migrate --force
-
-    # Optimizar caché
     - php artisan config:cache
-    - php artisan route:cache
     - php artisan view:cache
-
-    # Configurar permisos
-    - chmod -R 755 /home/campetapp/public_html/storage /home/campetapp/public_html/bootstrap/cache
-    - chown -R campetapp:campetapp /home/campetapp/public_html
