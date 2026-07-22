@@ -1,8 +1,10 @@
 # Resumen de Desarrollos — CPV Perfil de Afiliados
 
-**Fecha:** 13 de Julio de 2026
+**Fecha:** 13 de Julio de 2026 (corregido 22 de Julio de 2026 — ver nota abajo)
 **Tarifa aplicada:** **USD $5 / hora**
-**Estado general:** 2 desarrollos independientes, ambos en espera de aprobación del cliente.
+**Estado general:** Desarrollo A aprobado por el cliente (22 jul 2026). Desarrollo B sigue en espera.
+
+> **Corrección (22 jul 2026):** el Desarrollo A tenía un ítem "Bug crítico" (2-3h) que, tras verificación técnica contra el código de Filament instalado, resultó ser un falso positivo — no existe tal bug y no requiere ese trabajo. En su lugar se identificó un conflicto real no facturado antes: `.cpanel.yml` quedó desactualizado respecto a los fixes de despliegue hechos en `main` (~0.5h para reconciliar). Las cifras de este documento fueron ajustadas.
 
 ---
 
@@ -10,9 +12,9 @@
 
 | # | Desarrollo | Estado | Horas | Costo ($5/h) |
 |---|-----------|--------|-------|--------------|
-| **A** | Límite de 2 Sectores + "No Aplica" + % Completitud (wizards) | 90 % implementado | 56.5 – 79 h | **$283 – $395** |
+| **A** | Límite de 2 Sectores + "No Aplica" + % Completitud (wizards) | Aprobado, funcional | 54.75 – 76.5 h | **$273.75 – $382.50** |
 | **B** | CAPTCHA anti-bots (Cloudflare Turnstile) en Registro y Login | No iniciado | 11.5 – 13.5 h | **$58 – $68** |
-| | **TOTAL** | | **68 – 92.5 h** | **$340 – $463** |
+| | **TOTAL** | | **66.25 – 90 h** | **$331.75 – $450.50** |
 
 > Son desarrollos **independientes**: se pueden aprobar, implementar y desplegar por separado.
 
@@ -21,7 +23,7 @@
 # DESARROLLO A — Límite de Sectores, "No Aplica" y % de Completitud
 
 **Rama:** `feature/limite-sectores-no-aplica` (commit `cbc1e37`)
-**Estado:** ✅ 90 % implementado — pendiente 1 bug crítico + QA + despliegue
+**Estado:** ✅ Aprobado por el cliente (22 jul 2026) — implementación funcional; pendiente refactor menor + reconciliar `.cpanel.yml` + QA + despliegue
 **Documentos de referencia:** `ESTIMADO_IMPLEMENTACION.md`, `ESTADO_ANALISIS_JUNIO_2026.md`, `PROXIMO_PASOS.md`, `SNAPSHOT_SISTEMA_JUNIO_2026.md`
 
 ## Características
@@ -31,7 +33,7 @@
 - Cambios en **los 2 wizards** de empresa (Crear y Editar), paso "3 – Operaciones".
 - **Validación al guardar:** bloquea si la empresa tiene servicios fuera de sus 2 sectores, con notificación clara indicando qué desvincular.
 - **Validación en `ServicesRelationManager`:** impide adjuntar servicios de sectores no permitidos, en tiempo real.
-- Impacto: las **~30 empresas legadas** con 3-4 sectores quedarán bloqueadas al editar hasta que ajusten (requiere comunicación al afiliado).
+- Impacto: verificado contra el dump real de producción (`campetapp_campet202212.sql`, 22 jul 2026): **34 empresas legadas** tienen servicios en más de 2 sectores distintos (15 con 3, 15 con 4, 1 con 5, 1 con 6, 1 con 8) y quedarán bloqueadas al editar hasta que ajusten (requiere comunicación al afiliado).
 
 ### 2. Botón "No Aplica" por módulo
 - La empresa declara explícitamente que un módulo **no aplica** a su actividad; cuenta como "completo" sin obligar a llenar datos falsos.
@@ -76,25 +78,27 @@
 
 ### A.2 — Trabajo pendiente (para cerrar y desplegar)
 
+> Se retiró el ítem "Bug crítico" de `CreateEmpresa`: verificación técnica (22 jul 2026) confirmó que no existe tal bug — `CreateRecord` no dispara el hook `beforeSave` y el escenario que se quería prevenir no puede ocurrir al crear una empresa (no hay paso de Servicios en ese wizard). Se agregó en su lugar la reconciliación real y necesaria de `.cpanel.yml`.
+
 | Fase | Descripción | Horas |
 |---|---|---|
-| **1 — Bug crítico** | `CreateEmpresa` no tiene `beforeSave()`: una empresa nueva puede guardarse con servicios en >2 sectores. Código de corrección ya redactado. | 2 – 3 |
-| **2 — Refactor** | `SustainabilitiesRelationManager` tiene el botón "No Aplica" duplicado a mano; migrar a `NoAplicaAction`. | 0.5 – 1 |
+| **1 — Refactor** | `SustainabilitiesRelationManager` tiene el botón "No Aplica" duplicado a mano; migrar a `NoAplicaAction`. | 0.5 – 1 |
+| **2 — Reconciliar `.cpanel.yml`** | La versión de esta rama quedó desactualizada frente a los fixes de despliegue hechos en `main`; conservar la de `main` al integrar. | 0.25 – 0.5 |
 | **3 — Testing** | 22 casos de prueba en staging (sectores, "No Aplica", completitud, PDF, exports). | 2 – 4 |
 | **4 — Despliegue** | Migración + deploy a producción + verificación post-despliegue. | 1 – 2 |
-| **Subtotal pendiente** | | **5.5 – 10 h** |
+| **Subtotal pendiente** | | **3.75 – 7.5 h** |
 
-**Costo a $5/h: $27.50 – $50**
+**Costo a $5/h: $18.75 – $37.50**
 
 ### Total Desarrollo A
 
 | | Horas | Costo ($5/h) |
 |---|---|---|
 | Ejecutado | 51 – 69 h | $255 – $345 |
-| Pendiente | 5.5 – 10 h | $28 – $50 |
-| **TOTAL A** | **56.5 – 79 h** | **$283 – $395** |
+| Pendiente | 3.75 – 7.5 h | $18.75 – $37.50 |
+| **TOTAL A** | **54.75 – 76.5 h** | **$273.75 – $382.50** |
 
-*Punto medio: ~68 h → **~$340***
+*Punto medio: ~65.6 h → **~$328***
 
 ---
 
@@ -184,20 +188,22 @@ El sitio en producción sufrió un **ataque de registro masivo por bots** en `/a
 | Criterio | **A — Sectores / Wizard / "No Aplica"** | **B — CAPTCHA Anti-bots** |
 |---|---|---|
 | **Naturaleza** | Mejora funcional del producto | Corrección de seguridad (incidente activo) |
-| **Estado** | 90 % implementado | No iniciado |
+| **Estado** | ✅ Aprobado por el cliente, funcional | Ver nota* |
 | **Urgencia** | Media — mejora calidad del dato | 🔴 **Alta** — el ataque está ocurriendo y arriesga el correo corporativo |
-| **Horas totales** | 56.5 – 79 h | 11.5 – 13.5 h |
-| **Costo a $5/h** | **$283 – $395** | **$58 – $68** |
-| **Horas pendientes** | 5.5 – 10 h ($28 – $50) | 11.5 – 13.5 h ($58 – $68) |
+| **Horas totales** | 54.75 – 76.5 h | 11.5 – 13.5 h |
+| **Costo a $5/h** | **$273.75 – $382.50** | **$58 – $68** |
+| **Horas pendientes** | 3.75 – 7.5 h ($18.75 – $37.50) | 11.5 – 13.5 h ($58 – $68) |
 | **Riesgo técnico** | Bajo (migraciones reversibles) | Bajo (cambios aislados en auth) |
 | **Costo recurrente** | $0 | ~$2.50/mes (opcional) |
 
+*\* El estado "No iniciado" de B en este documento (13 jul 2026) puede estar desactualizado: el historial de `main` ya incluye commits de Cloudflare Turnstile en registro/login (rama `feature/captcha-turnstile`). Verificar el estado real de ese desarrollo por separado antes de usar estas cifras.*
+
 ## Recomendación de priorización
 
-1. **Desarrollo B (CAPTCHA) primero** — es el más barato ($58 – $68), el más rápido (~2 días de trabajo) y ataca un problema **activo** que amenaza con inhabilitar el correo institucional de la Cámara. Incluye además el cierre de una **fuga de datos crítica** (ruta `xls`) que hoy permite descargar toda la base de afiliados sin autenticación.
-2. **Desarrollo A (cierre)** — quedan sólo 5.5 – 10 h ($28 – $50) para cerrar el bug crítico, hacer QA y desplegar el 90 % ya construido. Es la forma más eficiente de capitalizar el trabajo ya invertido.
+1. **Verificar primero el estado real de Desarrollo B** — este documento lo marca "no iniciado", pero `main` ya tiene commits de Turnstile aplicados; las cifras de B aquí podrían ya no aplicar.
+2. **Desarrollo A (cierre)** — quedan sólo 3.75 – 7.5 h ($18.75 – $37.50) para el refactor menor, reconciliar `.cpanel.yml`, hacer QA y desplegar la funcionalidad ya aprobada y construida. Es la forma más eficiente de capitalizar el trabajo ya invertido.
 
-**Inversión total para dejar ambos desarrollos en producción (sólo lo pendiente): 17 – 23.5 h → $85 – $118.**
+**Inversión total pendiente para Desarrollo A: 3.75 – 7.5 h → $18.75 – $37.50** (cifras de B pendientes de verificar, ver nota arriba).
 **Inversión total incluyendo el trabajo ya ejecutado del Desarrollo A: 68 – 92.5 h → $340 – $463.**
 
 ---

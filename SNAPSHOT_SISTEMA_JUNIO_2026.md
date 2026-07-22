@@ -1,7 +1,7 @@
 # Snapshot del Sistema - Junio 2026
-**Fecha de captura:** 23 de Junio de 2026, 18:30 UTC  
+**Fecha de captura:** 23 de Junio de 2026, 18:30 UTC (corregido 22 de Julio de 2026)  
 **Rama actual:** `feature/limite-sectores-no-aplica`  
-**Status:** Congelado para aprobación del cliente
+**Status:** ✅ Aprobado por el cliente — ver correcciones marcadas "22 jul 2026" abajo
 
 ---
 
@@ -51,7 +51,7 @@ app/
 │   │   ├── PresenceResource.php ........................ ✅ NoAplicaAction
 │   │   └── EmpresaResource/
 │   │       ├── Pages/
-│   │       │   ├── CreateEmpresa.php ................. ⚠️ SIN validación beforeSave
+│   │       │   ├── CreateEmpresa.php ................. ✅ No requiere validación (ver nota 22 jul 2026)
 │   │       │   └── EditEmpresa.php ................... ✅ CON validación beforeSave
 │   │       └── RelationManagers/
 │   │           ├── ServicesRelationManager.php ....... ✅ Validación de sectores
@@ -137,15 +137,16 @@ ALTER TABLE empresas ADD FOREIGN KEY (sector_secundario_id) REFERENCES sectors(i
 - [x] SNAPSHOT_SISTEMA_JUNIO_2026.md
 
 ### BUGS CONOCIDOS
-- [ ] ⚠️ CreateEmpresa NO tiene `beforeSave()` — CRÍTICO (será fijo en fase 1)
-- [ ] ⚠️ SustainabilitiesRelationManager tiene código duplicado — MENOR (será fijo en fase 2)
+- [x] ~~CreateEmpresa NO tiene `beforeSave()` — CRÍTICO~~ **DESCARTADO (22 jul 2026):** verificado que `CreateRecord` no dispara ese hook y que el escenario no puede ocurrir en Create (no hay paso de Servicios). No requiere cambio. Ver `ESTADO_ANALISIS_JUNIO_2026.md`.
+- [ ] ⚠️ SustainabilitiesRelationManager tiene código duplicado — MENOR (Fase 1 de `PROXIMO_PASOS.md` v2.0)
+- [ ] ⚠️ `.cpanel.yml` desactualizado respecto a `main` — detectado 22 jul 2026, resolver conservando la versión de `main` al integrar (Fase 2 de `PROXIMO_PASOS.md` v2.0)
 
 ### Testing
 - [ ] No ejecutado en staging (pendiente)
 - [ ] No ejecutado en producción
 
 ### Despliegue
-- [ ] Pendiente aprobación del cliente
+- [x] Aprobado por el cliente (22 jul 2026)
 - [ ] Pendiente planeación de fecha
 
 ---
@@ -284,15 +285,17 @@ git branch -v | grep feature/limite-sectores-no-aplica
 
 ## 📝 Notas Adicionales
 
-1. **No hacer push directo a main** — Todo trabajo está en feature branch
+1. **No hacer push directo a main** — Todo trabajo está en feature branch, excepto la reconciliación de `.cpanel.yml` al momento del merge
 2. **Migraciones son reversibles** — Cualquier momento puede hacerse rollback
-3. **Cliente debe revisar** — Los archivos ESTADO_ANALISIS_JUNIO_2026.md contienen decisiones de diseño importantes
-4. **30 empresas legadas se afectarán** — Será necesario comunicarles sobre el bloqueo al editar
+3. **Cliente ya aprobó** (22 jul 2026) — Los archivos ESTADO_ANALISIS_JUNIO_2026.md y PROXIMO_PASOS.md ya reflejan esa aprobación
+4. **34 empresas legadas se afectarán** — Verificado contra el dump real de producción (`campetapp_campet202212.sql`, 22 jul 2026), no 30 como se estimaba. Será necesario comunicarles sobre el bloqueo al editar.
 5. **PDF genera correctamente** — Testeado parcialmente, validación completa en fase de QA
+6. **`.cpanel.yml` de esta rama está desactualizado** — no usar; conservar el de `main` al integrar
 
 ---
 
-**Documento preparado por:** Claude Haiku 4.5  
-**Versión:** 1.0  
+**Documento preparado originalmente por:** Claude Haiku 4.5 (23 jun 2026)  
+**Corregido por:** Claude Sonnet 5 (22 jul 2026)  
+**Versión:** 1.1 (corregida)  
 **Fecha:** 23 de Junio de 2026  
 **Estado:** CONGELADO - Pendiente aprobación del cliente

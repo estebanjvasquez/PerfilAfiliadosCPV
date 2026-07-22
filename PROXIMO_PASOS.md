@@ -1,14 +1,16 @@
 # Próximos Pasos - Implementación de Cambios
-**Versión:** 1.0  
-**Última actualización:** 23 de Junio de 2026  
-**Estado:** Pendiente aprobación del cliente  
-**Tiempo estimado para implementar:** 4.5 - 7.5 horas
+**Versión:** 2.0 (corregida)  
+**Última actualización:** 22 de Julio de 2026  
+**Estado:** ✅ Aprobado por el cliente  
+**Tiempo estimado para implementar:** 3 - 5.25 horas
+
+> **Cambios respecto a v1.0:** se eliminó la antigua "Fase 1" (agregar `beforeSave()` a `CreateEmpresa`). Verificación técnica contra el código de Filament instalado confirmó que ese hook **no existe** en `CreateRecord` (solo en `EditRecord`) y que, además, el escenario que pretendía prevenir no puede ocurrir en el wizard de creación (no tiene paso de "Servicios" — ver `ESTADO_ANALISIS_JUNIO_2026.md`, sección "Corrección de análisis previo"). Se agregó una fase nueva para reconciliar `.cpanel.yml`, que sí es un conflicto real detectado el 22 jul 2026.
 
 ---
 
 ## 📋 Pre-requisitos
 
-- ✅ Cliente ha aprobado el diseño y funcionalidad
+- ✅ Cliente ha aprobado el diseño y funcionalidad (confirmado 22 jul 2026)
 - ✅ Rama `feature/limite-sectores-no-aplica` está actualizada
 - ✅ Acceso a servidor de staging para testing
 - ✅ Acceso a producción para despliegue (si aplica)
@@ -17,72 +19,18 @@
 
 ## 🚀 FASES DE IMPLEMENTACIÓN
 
-### FASE 1: Fijar Bug Crítico (2-3 horas)
-
-**Objetivo:** Agregar validación `beforeSave()` a CreateEmpresa  
-**Archivo:** `app/Filament/Resources/EmpresaResource/Pages/CreateEmpresa.php`
-
-#### Paso 1.1: Agregar imports necesarios
-Al inicio de CreateEmpresa, agregar:
-```php
-use Filament\Notifications\Notification;
-use App\Models\Sector;
-```
-
-#### Paso 1.2: Agregar método `beforeSave()`
-Antes de `protected function getSteps()`, insertar:
-
-```php
-/**
- * Las empresas solo pueden operar en 2 sectores (principal y secundario).
- * Si la empresa tiene servicios asociados a sectores fuera de los 2 elegidos,
- * se bloquea el guardado hasta que desvincule esos servicios o ajuste sus sectores.
- */
-protected function beforeSave(): void
-{
-    $data = $this->form->getState();
-
-    $allowed = array_map('intval', array_filter([
-        $data['sector_principal_id'] ?? null,
-        $data['sector_secundario_id'] ?? null,
-    ]));
-
-    $outside = array_diff($this->record->distinctSectorIds(), $allowed);
-
-    if (count($outside) > 0) {
-        $names = Sector::whereIn('id', $outside)->pluck('name')->implode(', ');
-
-        Notification::make()
-            ->danger()
-            ->title('Su empresa tiene servicios en más de 2 sectores')
-            ->body("Solo se permiten un Sector Principal y uno Secundario. En la pestaña \"Sectores y Servicios\" desvincule los servicios de: {$names}; o ajuste sus sectores seleccionados.")
-            ->persistent()
-            ->send();
-
-        $this->halt();
-    }
-}
-```
-
-#### Paso 1.3: Verificación
-```bash
-php -l app/Filament/Resources/EmpresaResource/Pages/CreateEmpresa.php
-```
-
----
-
-### FASE 2: Refactorizar Sustainability (0.5-1 hora)
+### FASE 1: Refactorizar Sustainability (0.5-1 hora)
 
 **Objetivo:** Usar NoAplicaAction en lugar de código hardcodeado  
 **Archivo:** `app/Filament/Resources/EmpresaResource/RelationManagers/SustainabilitiesRelationManager.php`
 
-#### Paso 2.1: Agregar import
+#### Paso 1.1: Agregar import
 Al inicio del archivo:
 ```php
 use App\Filament\Support\NoAplicaAction;
 ```
 
-#### Paso 2.2: Reemplazar headerActions
+#### Paso 1.2: Reemplazar headerActions
 **Buscar (líneas ~94-122):**
 ```php
 ->headerActions([
@@ -126,10 +74,28 @@ use App\Filament\Support\NoAplicaAction;
 ])
 ```
 
-#### Paso 2.3: Verificación
+#### Paso 1.3: Verificación
 ```bash
 php -l app/Filament/Resources/EmpresaResource/RelationManagers/SustainabilitiesRelationManager.php
 ```
+
+---
+
+### FASE 2: Reconciliar `.cpanel.yml` (15-30 min)
+
+**Objetivo:** Evitar que el merge de esta rama pise la configuración de despliegue vigente en `main`.
+
+**Contexto:** desde que se creó esta rama, `main` corrigió varias veces `.cpanel.yml` en producción (esquema real `deployment.tasks`, `DEPLOYPATH` explícito, PHP 8.2, orden correcto de `composer install`). La versión de `.cpanel.yml` en esta rama es anterior a esos fixes y está desactualizada/rota.
+
+**Acción al integrar (merge o rebase de esta rama sobre `main` actualizado):**
+```bash
+# Al resolver el merge, quedarse con la versión de main para este archivo:
+git checkout --ours .cpanel.yml   # si estás mergeando main hacia la rama
+# o, si haces el merge/PR al revés (rama hacia main), simplemente no incluir
+# los cambios de .cpanel.yml de esta rama en el PR.
+```
+
+No se requiere ningún cambio funcional en este archivo por parte de esta feature: la limitación de sectores y "No Aplica" no necesitan tocar el despliegue.
 
 ---
 
@@ -342,26 +308,26 @@ mysql -u user -p database < backup_antes_cambios_YYYYMMDD_HHMMSS.sql
 
 | Fase | Tiempo | Crítico |
 |------|--------|---------|
-| Fase 1: Bug CreateEmpresa | 2-3h | 🔴 SÍ |
-| Fase 2: Refactor Sustainability | 0.5-1h | 🟡 NO |
+| Fase 1: Refactor Sustainability | 0.5-1h | 🟡 NO |
+| Fase 2: Reconciliar `.cpanel.yml` | 0.25-0.5h | 🔴 SÍ |
 | Fase 3: Testing | 2-4h | 🔴 SÍ |
 | Fase 4: Despliegue | 1-2h | 🔴 SÍ |
-| **TOTAL** | **5.5-10h** | - |
+| **TOTAL** | **3.75-7.5h** | - |
 
-**Punto medio:** ~7.5 horas
+**Punto medio:** ~5.6 horas
 
 ---
 
 ## 📝 Notas Importantes
 
-1. **No hacer cambios en main** — Todo trabajo en `feature/limite-sectores-no-aplica`
+1. **No hacer cambios en main** — Todo trabajo en `feature/limite-sectores-no-aplica`, excepto la reconciliación de `.cpanel.yml` al momento del merge (Fase 2)
 2. **Las migraciones son reversibles** — Rollback siempre disponible
-3. **30 empresas legadas se bloquearán** — Al editar, deben ajustar sus sectores
+3. **34 empresas legadas se bloquearán** — Verificado contra el dump real de producción (`campetapp_campet202212.sql`, 22 jul 2026): 34 empresas tienen servicios en más de 2 sectores distintos (15 con 3, 15 con 4, 1 con 5, 1 con 6, 1 con 8). Deberán ajustar sus sectores o desvincular servicios al editar su perfil.
 4. **Testing es obligatorio** — No saltar fase de QA
-5. **Comunicar al cliente sobre empresas legadas** — Darles instrucciones en caso de bloqueo
+5. **Comunicar al cliente sobre empresas legadas** — Darles instrucciones en caso de bloqueo (usar la lista real de 34 empresas para la comunicación, no la estimación anterior de "~30")
 
 ---
 
-**Documento preparado por:** Claude Haiku 4.5  
-**Versión:** 1.0 - Pendiente aprobación  
-**Próxima revisión:** Cuando cliente apruebe
+**Documento preparado originalmente por:** Claude Haiku 4.5 (23 jun 2026)  
+**Corregido por:** Claude Sonnet 5 (22 jul 2026), tras verificación técnica y validación contra datos reales  
+**Versión:** 2.0 - Aprobado, listo para ejecutar

@@ -1,7 +1,7 @@
 # Estimado de Implementación
 ## Limitar Sectores a 2 + Botón "No Aplica" + % de Completitud
 
-**Fecha:** 12 de Junio de 2026  
+**Fecha:** 12 de Junio de 2026 (cifra de empresas afectadas verificada el 22 de julio de 2026 contra `campetapp_campet202212.sql`)  
 **Estado:** ✅ COMPLETADO  
 **Rama:** `feature/limite-sectores-no-aplica`  
 
@@ -23,7 +23,7 @@ Se implementaron dos mejoras estratégicas al perfil de empresa para garantizar 
 |----------|-------------|-------|---------------|
 | **Base de Datos** | Crear tabla `empresa_module_status` para guardar flags "No Aplica" por módulo y agregar columnas `sector_principal_id` + `sector_secundario_id` a empresas. Incluye migraciones reversibles. | 2-3 | Setup simple: 1 tabla nueva, 2 columnas, relaciones. |
 | **Modelos & Helpers** | Crear modelo `EmpresaModuleStatus` con métodos reutilizables. Extender modelo `Empresa` con: cálculo de % completitud, validación de sectores permitidos, helpers para datos de módulos. Agregar hooks automáticos en 5 modelos (Asset, Management, Presence, Experience, Sustainability) para limpiar "No Aplica" al cargar datos reales. | 8-10 | Lógica del negocio: sincronización automática entre datos reales y flags. Helpers complejos para distinguir cuándo un módulo está completo vs. incompleto. |
-| **UI: Sectores** | Reemplazar selects simples por **Sector Principal (obligatorio)** + **Sector Secundario (distinto, opcional)** en crear/editar empresa (2 wizards). Agregar validación al guardar que bloquea si la empresa tiene servicios fuera de sus 2 sectores (obliga a las 30 empresas legadas con 3-4 sectores a ajustarse). | 10-14 | Cambios en 2 wizards + validación compleja en `beforeSave()`. Las 30 empresas existentes con >2 sectores deben editarse — no se auto-corrigen, se bloquea el guardado con mensaje claro. |
+| **UI: Sectores** | Reemplazar selects simples por **Sector Principal (obligatorio)** + **Sector Secundario (distinto, opcional)** en crear/editar empresa (2 wizards). Agregar validación al guardar que bloquea si la empresa tiene servicios fuera de sus 2 sectores (obliga a las 34 empresas legadas con 3-4 sectores a ajustarse). | 10-14 | Cambios en 2 wizards + validación compleja en `beforeSave()`. Las 34 empresas existentes con >2 sectores deben editarse — no se auto-corrigen, se bloquea el guardado con mensaje claro. |
 | **UI: Botón "No Aplica"** | Agregar acción modal "No Aplica" en 5 módulos (Recursos, Gestión, Presencia, Experiencia, Sostenibilidad). Clase reutilizable `NoAplicaAction` para consistencia. Cada modal permite seleccionar empresa y marcar/desmarcar el flag. | 10-12 | 5 recursos distintos, 1 relation manager. Creación de clase reutilizable para no repetir código. Modal con selector dinámico de empresa. |
 | **Completitud Visual** | Mostrar **% de Perfil** en la tabla de Empresas (columna nueva). Mostrar **desglose de módulos pendientes** en el formulario de edición (placeholder con lista: "Pendiente: Recursos, Presencia..."). Lógica: 8 módulos, completo = datos presentes **o** No Aplica. | 6-8 | Cálculo de porcentaje + renderizado condicional en 2 lugares. Lógica de "completo" más sutil (no solo datos llenos). |
 | **PDF por Empresa** | Actualizar blade `pdf.blade.php` para mostrar **"NO APLICA — Declarado por la empresa"** en secciones marcadas, en vez de "No existe información". Cargar flags desde BD por empresa. Cambios en 6 secciones (Sostenibilidad, Recursos todos sus subseccioness, Experiencia, Presencia, Gestión). | 6-8 | Blade tiene lógica anidada compleja; cada sección tiene `@if ($na_flags['modulo'])`. Flags se cargan una sola vez al inicio del blade. |
@@ -69,7 +69,7 @@ Se implementaron dos mejoras estratégicas al perfil de empresa para garantizar 
 ### Pasos Siguientes
 
 1. **Migrar en Staging**: `php artisan migrate` (agrega 2 columnas + tabla nueva).
-2. **Probar en Local**: Las 30 empresas con >2 sectores — al editar, se bloquearán hasta que ajusten.
+2. **Probar en Local**: Las 34 empresas con >2 sectores — al editar, se bloquearán hasta que ajusten.
 3. **Liberar a los Afiliados**: Ven el % de perfil, pueden marcar "No Aplica", y la Cámara ve todo sin NULL vacíos.
 
 ---

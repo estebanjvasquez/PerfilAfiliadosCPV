@@ -1,6 +1,6 @@
 # 📖 LEE ESTO PRIMERO - Guía de Documentación
-**Versión:** 1.0  
-**Fecha:** 23 de Junio de 2026
+**Versión:** 2.0 (corregida)  
+**Fecha:** 23 de Junio de 2026 (corregida 22 de Julio de 2026)
 
 ---
 
@@ -11,7 +11,7 @@ Se realizó un **análisis exhaustivo** de la implementación de:
 - ✅ **Botón "No Aplica"** por módulo del perfil
 - ✅ **% de Completitud** del perfil de empresa
 
-**Status:** 90% implementado, **1 bug crítico** identificado, pendiente aprobación del cliente.
+**Status:** Implementación funcional y completa. Aprobado por el cliente (22 jul 2026). El "1 bug crítico" que mencionaba la v1.0 de este documento resultó ser un falso positivo tras verificación técnica — no requiere corrección. Queda 1 mejora menor real + reconciliar `.cpanel.yml` con `main` + QA.
 
 ---
 
@@ -21,7 +21,7 @@ Se realizó un **análisis exhaustivo** de la implementación de:
 1. 👉 **Leer primero:** `ESTADO_ANALISIS_JUNIO_2026.md`
    - Resumen ejecutivo (arriba)
    - Sección "Lo que está 100% implementado"
-   - Sección "Bugs críticos" (solo 1, será corregido)
+   - Sección "Corrección de análisis previo" (por qué ya no hay bug crítico)
    - Sección "Para el cliente"
 
 2. **Luego:** `PROXIMO_PASOS.md`
@@ -35,12 +35,12 @@ Se realizó un **análisis exhaustivo** de la implementación de:
 ### Si eres DESARROLLADOR que retomará el trabajo:
 1. 👉 **Leer primero:** `ESTADO_ANALISIS_JUNIO_2026.md`
    - Sección "Infraestructura Base" (qué está hecho)
-   - Sección "Bugs críticos" (qué necesita fix)
+   - Sección "Corrección de análisis previo" (por qué CreateEmpresa no necesita cambios, y el conflicto real en `.cpanel.yml`)
    - Sección "Para el desarrollador"
 
 2. **Luego:** `PROXIMO_PASOS.md`
    - Seguir fase por fase
-   - Copiar código de FASE 1 directamente
+   - Copiar código de FASE 1 (refactor de Sustainability) directamente
 
 3. **Durante ejecución:** `SNAPSHOT_SISTEMA_JUNIO_2026.md`
    - Usar como referencia de archivos modificados
@@ -61,22 +61,26 @@ Se realizó un **análisis exhaustivo** de la implementación de:
 ## 🚀 Flujo de Trabajo
 
 ```
-HOY (23 Junio 2026)
-└── Análisis completado
-    └── Documentos de análisis creados ← TE ESTÁS AQUÍ
+23 JUNIO 2026
+└── Análisis completado (contenía un falso positivo, corregido después)
+    └── Documentos de análisis creados
         ├── ESTADO_ANALISIS_JUNIO_2026.md
         ├── PROXIMO_PASOS.md
         └── SNAPSHOT_SISTEMA_JUNIO_2026.md
 
-CUANDO CLIENTE APRUEBE (Próximas semanas)
-└── Retomar trabajo
+22 JULIO 2026 ← TE ESTÁS AQUÍ
+├── Cliente aprobó
+├── Documentación corregida (bug de CreateEmpresa descartado; .cpanel.yml identificado como conflicto real)
+└── Verificado contra dump real de producción: 34 empresas con >2 sectores
+
+AHORA: Retomar trabajo
     └── Leer PROXIMO_PASOS.md FASE por FASE
-        ├── FASE 1: Fijar bug (2-3h)
-        ├── FASE 2: Refactorizar (0.5-1h)
+        ├── FASE 1: Refactorizar Sustainability (0.5-1h)
+        ├── FASE 2: Reconciliar .cpanel.yml (0.25-0.5h)
         ├── FASE 3: Testing en staging (2-4h)
         └── FASE 4: Despliegue a producción (1-2h)
 
-TOTAL TIEMPO: 5.5 - 10 horas
+TOTAL TIEMPO: 3.75 - 7.5 horas
 
 DESPUÉS DEL DESPLIEGUE
 └── Sistema en producción con 2 sectores + "No Aplica" ✅
@@ -97,7 +101,7 @@ DESPUÉS DEL DESPLIEGUE
 
 ## ✅ Lo Que Está LISTO Ahora
 
-**90% de la funcionalidad está implementada:**
+**La funcionalidad está completa e implementada:**
 
 ✅ Limitación a 2 sectores (estructura BD)  
 ✅ Selectores en wizards (Create + Edit)  
@@ -110,28 +114,26 @@ DESPUÉS DEL DESPLIEGUE
 
 ---
 
-## 🔴 Lo Que Falta (1 Bug Crítico)
+## 🟡 Lo Que Falta (sin bugs críticos)
 
-**1 problema identificado:**
+Tras la corrección del 22 jul 2026, no queda ningún bug crítico. Pendiente real:
 
-❌ **CreateEmpresa SIN validación** (2-3h para fijar)
-- EditEmpresa valida, CreateEmpresa NO
-- Se agregará en FASE 1 de PROXIMO_PASOS.md
+🟡 **Refactor menor de `SustainabilitiesRelationManager`** (0.5-1h) — código duplicado que ya tiene una clase reutilizable (`NoAplicaAction`) para reemplazarlo.
+🔴 **Reconciliar `.cpanel.yml` con `main`** (0.25-0.5h) — conflicto real de integración: la versión de esta rama quedó desactualizada respecto a los fixes de despliegue que se hicieron en `main`. Ver FASE 2 de `PROXIMO_PASOS.md`.
 
 ---
 
 ## 🎬 PRÓXIMOS PASOS
 
-### Ahora (Hoy):
-1. ✅ Lee `ESTADO_ANALISIS_JUNIO_2026.md` → 15 min
-2. ✅ Revisa `PROXIMO_PASOS.md` → 10 min
-3. ✅ Presenta al cliente para aprobación
+### Ya completado:
+1. ✅ Cliente aprobó (22 jul 2026)
+2. ✅ Verificado contra datos reales de producción (34 empresas afectadas)
 
-### Cuando cliente apruebe:
-4. Sigue `PROXIMO_PASOS.md` FASE por FASE
-5. Implementa cambios (4.5-7.5 horas total)
-6. Testing en staging (FASE 3)
-7. Despliegue (FASE 4)
+### Ahora:
+3. Sigue `PROXIMO_PASOS.md` FASE por FASE (v2.0)
+4. Implementa cambios (3.75-7.5 horas total)
+5. Testing en staging (FASE 3)
+6. Despliegue (FASE 4)
 
 ---
 
@@ -141,16 +143,16 @@ DESPUÉS DEL DESPLIEGUE
 **R:** Lee `PROXIMO_PASOS.md` sección "Pre-requisitos" + "Checklist Final"
 
 ### P: ¿Cuánto tiempo toma todo?
-**R:** 5.5 - 10 horas total (punto medio ~7.5h)
+**R:** 3.75 - 7.5 horas total (punto medio ~5.6h)
 
 ### P: ¿Qué pasa si algo falla?
 **R:** Las migraciones son reversibles. Ve "Rollback" en `PROXIMO_PASOS.md` FASE 4
 
 ### P: ¿Necesito cambiar código de otros módulos?
-**R:** NO. Los cambios están contenidos en PerfilAfiliadosCPV
+**R:** NO. Los cambios funcionales están contenidos en PerfilAfiliadosCPV. La única excepción es `.cpanel.yml`, donde hay que conservar la versión de `main` (no es un cambio de código, es una decisión de integración).
 
 ### P: ¿Se afectan empresas existentes?
-**R:** SÍ. Las 30 empresas con >2 sectores se bloquearán al editar hasta que ajusten. Se debe comunicar.
+**R:** SÍ. Verificado contra el dump real de producción (22 jul 2026): **34 empresas** tienen servicios en más de 2 sectores distintos y se bloquearán al editar hasta que ajusten. Se debe comunicar.
 
 ### P: ¿Hay riesgo?
 **R:** Bajo. Cambios localizados, migraciones reversibles, testing antes de despliegue.
@@ -159,22 +161,22 @@ DESPUÉS DEL DESPLIEGUE
 
 ## 🎯 Resumen de Documentos
 
-### ESTADO_ANALISIS_JUNIO_2026.md (615 líneas)
+### ESTADO_ANALISIS_JUNIO_2026.md
 ```
 ├── Resumen Ejecutivo
 ├── ✅ Lo que está 100% implementado
-├── 🔴 Bugs críticos (código a copiar-pegar)
+├── ✅ Corrección de análisis previo (bug descartado + conflicto .cpanel.yml real)
 ├── 🟡 Mejoras menores
 ├── Verificación completada (tabla)
 ├── Archivos modificados (30 archivos)
 └── Para el cliente + Para el desarrollador
 ```
 
-### PROXIMO_PASOS.md (450+ líneas)
+### PROXIMO_PASOS.md (v2.0)
 ```
 ├── Pre-requisitos
-├── FASE 1: Fijar bug (código listo para copiar)
-├── FASE 2: Refactorizar
+├── FASE 1: Refactorizar Sustainability (código listo para copiar)
+├── FASE 2: Reconciliar .cpanel.yml con main
 ├── FASE 3: Testing (22 casos de prueba)
 ├── FASE 4: Despliegue (pasos por pasos)
 ├── Rollback si algo falla
@@ -213,13 +215,13 @@ Si hay preguntas después de leer estos documentos:
 
 **Solo necesitas:**
 1. Leer ESTADO_ANALISIS_JUNIO_2026.md
-2. Presentar al cliente
-3. Cuando apruebe: seguir PROXIMO_PASOS.md paso por paso
+2. Cliente ya aprobó (22 jul 2026)
+3. Seguir PROXIMO_PASOS.md paso por paso
 
 ---
 
-**Documento preparado por:** Claude Haiku 4.5  
-**Fecha:** 23 de Junio de 2026  
-**Estado:** Listo para compartir con cliente
+**Documento preparado originalmente por:** Claude Haiku 4.5 (23 jun 2026)  
+**Corregido por:** Claude Sonnet 5 (22 jul 2026)  
+**Estado:** Aprobado por el cliente — listo para ejecutar
 
 👇 **COMIENZA AQUÍ:** Lee `ESTADO_ANALISIS_JUNIO_2026.md`
