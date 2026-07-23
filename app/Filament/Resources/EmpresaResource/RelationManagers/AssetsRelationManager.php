@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
 use App\Filament\Support\NoAplicaAction;
+use App\Models\Asset;
 use App\Models\EmpresaModuleStatus;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -64,9 +65,15 @@ class AssetsRelationManager extends RelationManager
     {
         return Tables\Columns\TextColumn::make($field)
             ->label($label)
+            // Importante: getState() de Filament convierte automaticamente cualquier
+            // array en string via implode() ANTES de que formatStateUsing() se ejecute
+            // (rompe con "Array to string conversion" si el array tiene sub-arrays).
+            // Por eso se pasa el $record completo (no un array) y se extrae el campo
+            // JSON manualmente dentro de formatStateUsing().
+            ->getStateUsing(fn (?Asset $record) => $record)
             ->formatStateUsing(fn ($state) => new HtmlString(
                 view('filament.tables.columns.repeater-summary', [
-                    'items' => $state ?? [],
+                    'items' => $state?->{$field} ?? [],
                     'columns' => $columns,
                     'optionsMap' => $optionsMap,
                 ])->render()
