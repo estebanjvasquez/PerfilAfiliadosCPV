@@ -23,6 +23,7 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class ExperiencesRelationManager extends RelationManager
 {
@@ -148,22 +149,36 @@ class ExperiencesRelationManager extends RelationManager
     }
 
     /**
+     * IMPORTANTE: el componente Builder de Filament (usado por el formulario
+     * original) guarda cada bloque envuelto asi, con clave UUID:
+     *   ["uuid-x" => ["type" => "Experiencia Relevante", "data" => [...campos reales...]]]
+     * No es un array plano de campos por indice numerico. Todo el manejo de
+     * exp_year debe respetar esta estructura para leer/escribir los datos reales.
+     */
+    protected static function blockType(): string
+    {
+        return 'Experiencia Relevante';
+    }
+
+    /**
      * Convierte una entrada del arreglo exp_year en un modelo Experience
      * NO PERSISTIDO (exists = false), solo para que Filament pueda mostrarla
      * como una fila real de la tabla y operar sobre ella via acciones.
      * Nunca se guarda directamente: las acciones editar/eliminar siempre
      * reescriben el arreglo completo en el registro real (saveEntry/deleteEntry).
      */
-    protected function buildRow(int $index, array $entryData, ?Experience $parent): Experience
+    protected function buildRow(string $key, array $entry, ?Experience $parent): Experience
     {
+        $data = $entry['data'] ?? $entry;
+
         $row = new Experience();
         $row->exists = false;
-        $row->id = $index;
+        $row->id = $key;
         $row->empresa_id = $this->ownerRecord->id;
         $row->created_at = $parent?->created_at;
         $row->updated_at = $parent?->updated_at;
-        $row->setAttribute('row_year', $entryData['exp_year'] ?? null);
-        $row->setAttribute('row_data', $entryData);
+        $row->setAttribute('row_year', $data['exp_year'] ?? null);
+        $row->setAttribute('row_data', $data);
 
         return $row;
     }
@@ -174,8 +189,7 @@ class ExperiencesRelationManager extends RelationManager
         $entries = $parent?->exp_year ?? [];
 
         $rows = collect($entries)
-            ->values()
-            ->map(fn ($entry, $index) => $this->buildRow($index, $entry, $parent))
+            ->map(fn ($entry, $key) => $this->buildRow((string) $key, $entry, $parent))
             ->sortByDesc('row_year')
             ->values();
 
@@ -191,7 +205,7 @@ class ExperiencesRelationManager extends RelationManager
         return $this->getTableRecords()->first(fn (Experience $row) => (string) $row->getKey() === (string) $key);
     }
 
-    protected static function saveEntry(RelationManager $livewire, array $data, ?int $index): void
+    protected static function saveEntry(RelationManager $livewire, array $data, ?string $key): void
     {
         $experience = $livewire->ownerRecord->experiences()->first();
 
@@ -200,17 +214,17 @@ class ExperiencesRelationManager extends RelationManager
         }
 
         $entries = $experience->exp_year ?? [];
+        $key ??= (string) Str::uuid();
 
-        if ($index === null) {
-            $entries[] = $data;
-        } else {
-            $entries[$index] = $data;
-        }
+        $entries[$key] = [
+            'type' => static::blockType(),
+            'data' => $data,
+        ];
 
-        $experience->update(['exp_year' => array_values($entries)]);
+        $experience->update(['exp_year' => $entries]);
     }
 
-    protected static function deleteEntry(RelationManager $livewire, int $index): void
+    protected static function deleteEntry(RelationManager $livewire, string $key): void
     {
         $experience = $livewire->ownerRecord->experiences()->first();
 
@@ -219,9 +233,9 @@ class ExperiencesRelationManager extends RelationManager
         }
 
         $entries = $experience->exp_year ?? [];
-        unset($entries[$index]);
+        unset($entries[$key]);
 
-        $experience->update(['exp_year' => array_values($entries)]);
+        $experience->update(['exp_year' => $entries]);
     }
 
     public static function table(Table $table): Table
@@ -251,14 +265,14 @@ class ExperiencesRelationManager extends RelationManager
                     ->modalWidth('7xl')
                     ->form(static::fields())
                     ->mountUsing(fn (ComponentContainer $form, Experience $record) => $form->fill($record->row_data ?? []))
-                    ->action(fn (array $data, Experience $record, RelationManager $livewire) => static::saveEntry($livewire, $data, (int) $record->getKey())),
+                    ->action(fn (array $data, Experience $record, RelationManager $livewire) => static::saveEntry($livewire, $data, (string) $record->getKey())),
 
                 Action::make('eliminar')
                     ->label('Eliminar')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->action(fn (Experience $record, RelationManager $livewire) => static::deleteEntry($livewire, (int) $record->getKey())),
+                    ->action(fn (Experience $record, RelationManager $livewire) => static::deleteEntry($livewire, (string) $record->getKey())),
             ])
             ->bulkActions([]);
     }
