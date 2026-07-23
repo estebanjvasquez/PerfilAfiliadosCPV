@@ -30,10 +30,11 @@ class AssetsRelationManager extends RelationManager
     public static function form(Form $form): Form
     {
         $titles = json_decode(file_get_contents(storage_path() . '/tituloshr.json'), true);
-        $employees = $titles['personal'];
-        $machinery = $titles['maquinaria'];
-        $facilities = $titles['instalaciones'];
-        $inventory = $titles['inventario'];
+        // tituloshr.json envuelve cada lista en un array adicional: {"personal": [[...opciones...]]}
+        $employees = $titles['personal'][0] ?? [];
+        $machinery = $titles['maquinaria'][0] ?? [];
+        $facilities = $titles['instalaciones'][0] ?? [];
+        $inventory = $titles['inventario'][0] ?? [];
 
         return $form
             ->schema([
