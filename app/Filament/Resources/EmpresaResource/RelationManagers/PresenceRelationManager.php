@@ -56,7 +56,7 @@ class PresenceRelationManager extends RelationManager
                                         TextInput::make('employees_q')->label('Empleados (n)')->numeric()->minValue(0)
                                             ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(0)->minValue(0)->thousandsSeparator(',')),
                                         Checkbox::make('status')->label('Activa?')->inline(false),
-                                    ])->columns(4)->orderable(false)->label('Datos de Oficinas')
+                                    ])->columns(2)->orderable(false)->label('Datos de Oficinas')
                             ])->hidden(fn (callable $get) => $get('has_offices') === false),
                         ]),
                     Wizard\Step::make('¿Tiene experiencia desarrollando proyectos en otros países?')
@@ -94,7 +94,7 @@ class PresenceRelationManager extends RelationManager
                                             ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(0)->minValue(0)),
                                         TextInput::make('main_clients')->label('Principales clientes')
                                             ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
-                                    ])->columns(6)->orderable(false)->label('Datos de Experiencia')
+                                    ])->columns(3)->orderable(false)->label('Datos de Experiencia')
                             ])->hidden(fn (callable $get) => $get('has_experience') === false),
                         ]),
                 ]),
@@ -110,12 +110,12 @@ class PresenceRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->modalWidth('6xl')
+                    ->modalWidth('7xl')
                     ->visible(fn (RelationManager $livewire) => ! $livewire->ownerRecord->presence()->exists()),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_PRESENCIA),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->modalWidth('6xl'),
+                Tables\Actions\EditAction::make()->modalWidth('7xl'),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
