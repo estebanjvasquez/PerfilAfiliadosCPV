@@ -4,18 +4,14 @@ namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
 use App\Filament\Support\NoAplicaAction;
 use App\Models\EmpresaModuleStatus;
-use Closure;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Wizard;
-use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Support\Str;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\HtmlString;
 
 class AssetsRelationManager extends RelationManager
 {
@@ -27,131 +23,188 @@ class AssetsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Recursos en Venezuela';
 
-    public static function form(Form $form): Form
+    protected static array $qtyOptions = [
+        '1' => '1 - 10',
+        '2' => '11 - 50',
+        '3' => '51 - 100',
+        '4' => '> 100',
+    ];
+
+    protected static array $valueOptions = [
+        '1' => '< 100.000 USD',
+        '2' => '100.001 - 1.000.000 USD',
+        '3' => '1.000.001 - 10.000.000 USD',
+        '4' => '> 10.000.001 USD',
+    ];
+
+    protected static function titles(): array
     {
         $titles = json_decode(file_get_contents(storage_path() . '/tituloshr.json'), true);
-        // tituloshr.json envuelve cada lista en un array adicional: {"personal": [[...opciones...]]}
-        $employees = $titles['personal'][0] ?? [];
-        $machinery = $titles['maquinaria'][0] ?? [];
-        $facilities = $titles['instalaciones'][0] ?? [];
-        $inventory = $titles['inventario'][0] ?? [];
 
-        return $form
-            ->schema([
-                Wizard::make([
-                    Wizard\Step::make('1 - Recursos Humanos')
-                        ->schema([
-                            Repeater::make('employee')
-                                ->schema([
-                                    Select::make('employee_type')->required()
-                                        ->label('Tipo de Recurso')
-                                        ->options($employees),
-                                    TextInput::make('junior_q')->required()->numeric()->minValue(0)
-                                        ->default(0)->reactive()->label('Junior')
-                                        ->afterStateUpdated(function (Closure $set, $get) {
-                                            if ($get('junior_q') === '') {
-                                                $set('junior_q', 0);
-                                            }
-                                            $set('tfila', Str::slug($get('medium_q') + $get('junior_q') + $get('senior_q')));
-                                        }),
-                                    TextInput::make('medium_q')->required()->numeric()->minValue(0)
-                                        ->default(0)->reactive()->label('Medium')
-                                        ->afterStateUpdated(function (Closure $set, $get) {
-                                            if ($get('medium_q') === '') {
-                                                $set('medium_q', 0);
-                                            }
-                                            $set('tfila', Str::slug($get('medium_q') + $get('junior_q') + $get('senior_q')));
-                                        }),
-                                    TextInput::make('senior_q')->required()->numeric()->minValue(0)
-                                        ->default(0)->reactive()->label('Senior')
-                                        ->afterStateUpdated(function (Closure $set, $get) {
-                                            if ($get('senior_q') === '') {
-                                                $set('senior_q', 0);
-                                            }
-                                            $set('tfila', Str::slug($get('medium_q') + $get('junior_q') + $get('senior_q')));
-                                        }),
-                                    TextInput::make('tfila')->label('Total')->numeric()->disabled()->default(0),
-                                ])->columns(5)->orderable(false)->reactive()->label('Recursos Humanos'),
+        return [
+            'employee' => $titles['personal'][0] ?? [],
+            'machinery' => $titles['maquinaria'][0] ?? [],
+            'facility' => $titles['instalaciones'][0] ?? [],
+            'inventory' => $titles['inventario'][0] ?? [],
+        ];
+    }
 
-                            Fieldset::make('Totales')
-                                ->schema([
-                                    Placeholder::make('total_junior')->label('Total Junior')
-                                        ->content(fn (Closure $get) => collect($get('employee'))->pluck('junior_q')->map(fn ($v) => $v === '' ? 0 : $v)->sum()),
-                                    Placeholder::make('total_medium')->label('Total Medium')
-                                        ->content(fn (Closure $get) => collect($get('employee'))->pluck('medium_q')->map(fn ($v) => $v === '' ? 0 : $v)->sum()),
-                                    Placeholder::make('total_senior')->label('Total Senior')
-                                        ->content(fn (Closure $get) => collect($get('employee'))->pluck('senior_q')->map(fn ($v) => $v === '' ? 0 : $v)->sum()),
-                                    Placeholder::make('total_general')->label('Total General')
-                                        ->content(fn (Closure $get) => collect($get('employee'))->pluck('tfila')->map(fn ($v) => $v === '' ? 0 : $v)->sum()),
-                                ])->columns(4),
-                        ]),
+    protected static function saveField(RelationManager $livewire, string $field, $value): void
+    {
+        $asset = $livewire->ownerRecord->assets()->first();
 
-                    Wizard\Step::make('2 - Maquinaria y Equipos Propios')
-                        ->schema([
-                            Repeater::make('machinery')
-                                ->schema([
-                                    Select::make('machinery_name')->required()->label('Equipo')->options($machinery),
-                                    Select::make('machinery_qid')
-                                        ->options(['1' => '1 - 10', '2' => '11 - 50', '3' => '51 - 100', '4' => '> 100'])
-                                        ->label('Cantidad (n)')->placeholder('Por favor seleccione una opción')->required(),
-                                    Select::make('machinery_est')
-                                        ->options(['1' => '< 100.000 USD', '2' => '100.001 - 1.000.000 USD', '3' => '1.000.001 - 10.000.000 USD', '4' => '> 10.000.001 USD'])
-                                        ->label('Valor Estimado')->placeholder('Por favor seleccione una opción')->required(),
-                                ])->columns(3)->orderable(false)->label('Maquinaria y Equipos'),
-                        ]),
+        if (! $asset) {
+            $asset = $livewire->ownerRecord->assets()->create([]);
+        }
 
-                    Wizard\Step::make('3 - Instalaciones')
-                        ->schema([
-                            Repeater::make('facility')
-                                ->schema([
-                                    Select::make('facility_type')->required()->label('Tipo de Instalación')->options($facilities),
-                                    TextInput::make('facility_q')->required()->label('Cantidad')->numeric()->minValue(0),
-                                    TextInput::make('facility_surf')->required()->label('Sup (mt2)')->numeric()->minValue(0)
-                                        ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(2)->minValue(0)->thousandsSeparator('.')),
-                                    Select::make('facility_own')
-                                        ->options(['1' => 'Propia', '2' => 'Alquilada', '3' => 'Ambas'])
-                                        ->label('Tipo de Propiedad')->placeholder('Por favor seleccione una opción')->required(),
-                                ])->columns(4)->orderable(false)->label('Instalaciones'),
-                        ]),
+        $asset->update([$field => $value]);
+    }
 
-                    Wizard\Step::make('4 - Inventario')
-                        ->schema([
-                            Repeater::make('inventory')
-                                ->schema([
-                                    Select::make('inventory_name')->required()->label('Tipo de Inventario')->options($inventory),
-                                    Select::make('inventory_q')
-                                        ->options(['1' => '1 - 10', '2' => '11 - 50', '3' => '51 - 100', '4' => '> 100'])
-                                        ->label('Cantidad (n)')->placeholder('Por favor seleccione una opción')->required(),
-                                    TextInput::make('inventory_unit')->required()->label('Unidad')
-                                        ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
-                                    Select::make('inventory_est')
-                                        ->options(['1' => '< 100.000 USD', '2' => '100.001 - 1.000.000 USD', '3' => '1.000.001 - 10.000.000 USD', '4' => '> 10.000.001 USD'])
-                                        ->label('Valor actual Estimado')->placeholder('Por favor seleccione una opción')->required(),
-                                ])->columns(4)->orderable(false)->label('Inventario'),
-                        ]),
-                ]),
-            ]);
+    protected static function summaryColumn(string $field, string $label, array $columns, array $optionsMap = []): Tables\Columns\TextColumn
+    {
+        return Tables\Columns\TextColumn::make($field)
+            ->label($label)
+            ->formatStateUsing(fn ($state) => new HtmlString(
+                view('filament.tables.columns.repeater-summary', [
+                    'items' => $state ?? [],
+                    'columns' => $columns,
+                    'optionsMap' => $optionsMap,
+                ])->render()
+            ));
     }
 
     public static function table(Table $table): Table
     {
+        $titles = static::titles();
+
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')->label('Registrado el')->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')->label('Última actualización')->dateTime(),
+                static::summaryColumn('employee', 'Recursos Humanos', [
+                    'employee_type' => 'Tipo de Recurso',
+                    'junior_q' => 'Junior',
+                    'medium_q' => 'Medium',
+                    'senior_q' => 'Senior',
+                ], [
+                    'employee_type' => $titles['employee'],
+                ]),
+                static::summaryColumn('machinery', 'Maquinaria y Equipos', [
+                    'machinery_name' => 'Equipo',
+                    'machinery_qid' => 'Cantidad',
+                    'machinery_est' => 'Valor Estimado',
+                ], [
+                    'machinery_name' => $titles['machinery'],
+                    'machinery_qid' => static::$qtyOptions,
+                    'machinery_est' => static::$valueOptions,
+                ]),
+                static::summaryColumn('facility', 'Instalaciones', [
+                    'facility_type' => 'Tipo de Instalación',
+                    'facility_q' => 'Cantidad',
+                    'facility_surf' => 'Sup (m²)',
+                    'facility_own' => 'Propiedad',
+                ], [
+                    'facility_type' => $titles['facility'],
+                    'facility_own' => ['1' => 'Propia', '2' => 'Alquilada', '3' => 'Ambas'],
+                ]),
+                static::summaryColumn('inventory', 'Inventario', [
+                    'inventory_name' => 'Tipo de Inventario',
+                    'inventory_q' => 'Cantidad',
+                    'inventory_unit' => 'Unidad',
+                    'inventory_est' => 'Valor Estimado',
+                ], [
+                    'inventory_name' => $titles['inventory'],
+                    'inventory_q' => static::$qtyOptions,
+                    'inventory_est' => static::$valueOptions,
+                ]),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
-                    ->modalWidth('5xl')
-                    ->visible(fn (RelationManager $livewire) => ! $livewire->ownerRecord->assets()->exists()),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_RECURSOS),
+
+                Action::make('recursos_humanos')
+                    ->label('Recursos Humanos')
+                    ->icon('heroicon-o-user-group')
+                    ->modalHeading('Agregar / Editar Recursos Humanos')
+                    ->modalWidth('4xl')
+                    ->form([
+                        Repeater::make('employee')
+                            ->label('Recursos Humanos')
+                            ->default(fn (RelationManager $livewire) => $livewire->ownerRecord->assets()->first()?->employee ?? [])
+                            ->schema([
+                                Select::make('employee_type')->required()->label('Tipo de Recurso')->options($titles['employee']),
+                                TextInput::make('junior_q')->required()->numeric()->minValue(0)->default(0)->label('Junior'),
+                                TextInput::make('medium_q')->required()->numeric()->minValue(0)->default(0)->label('Medium'),
+                                TextInput::make('senior_q')->required()->numeric()->minValue(0)->default(0)->label('Senior'),
+                            ])
+                            ->columns(4)
+                            ->orderable(false)
+                            ->createItemButtonLabel('Agregar otro tipo de Recurso Humano'),
+                    ])
+                    ->action(fn (array $data, RelationManager $livewire) => static::saveField($livewire, 'employee', $data['employee'])),
+
+                Action::make('maquinaria')
+                    ->label('Maquinaria y Equipos')
+                    ->icon('heroicon-o-cog')
+                    ->modalHeading('Agregar / Editar Maquinaria y Equipos Propios')
+                    ->modalWidth('4xl')
+                    ->form([
+                        Repeater::make('machinery')
+                            ->label('Maquinaria y Equipos')
+                            ->default(fn (RelationManager $livewire) => $livewire->ownerRecord->assets()->first()?->machinery ?? [])
+                            ->schema([
+                                Select::make('machinery_name')->required()->label('Equipo')->options($titles['machinery']),
+                                Select::make('machinery_qid')->options(static::$qtyOptions)->label('Cantidad (n)')->placeholder('Por favor seleccione una opción')->required(),
+                                Select::make('machinery_est')->options(static::$valueOptions)->label('Valor Estimado')->placeholder('Por favor seleccione una opción')->required(),
+                            ])
+                            ->columns(3)
+                            ->orderable(false)
+                            ->createItemButtonLabel('Agregar otro equipo'),
+                    ])
+                    ->action(fn (array $data, RelationManager $livewire) => static::saveField($livewire, 'machinery', $data['machinery'])),
+
+                Action::make('instalaciones')
+                    ->label('Instalaciones')
+                    ->icon('heroicon-o-office-building')
+                    ->modalHeading('Agregar / Editar Instalaciones')
+                    ->modalWidth('4xl')
+                    ->form([
+                        Repeater::make('facility')
+                            ->label('Instalaciones')
+                            ->default(fn (RelationManager $livewire) => $livewire->ownerRecord->assets()->first()?->facility ?? [])
+                            ->schema([
+                                Select::make('facility_type')->required()->label('Tipo de Instalación')->options($titles['facility']),
+                                TextInput::make('facility_q')->required()->label('Cantidad')->numeric()->minValue(0),
+                                TextInput::make('facility_surf')->required()->label('Sup (mt2)')->numeric()->minValue(0)
+                                    ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(2)->minValue(0)->thousandsSeparator('.')),
+                                Select::make('facility_own')->options(['1' => 'Propia', '2' => 'Alquilada', '3' => 'Ambas'])->label('Tipo de Propiedad')->placeholder('Por favor seleccione una opción')->required(),
+                            ])
+                            ->columns(4)
+                            ->orderable(false)
+                            ->createItemButtonLabel('Agregar otra instalación'),
+                    ])
+                    ->action(fn (array $data, RelationManager $livewire) => static::saveField($livewire, 'facility', $data['facility'])),
+
+                Action::make('inventario')
+                    ->label('Inventario')
+                    ->icon('heroicon-o-archive')
+                    ->modalHeading('Agregar / Editar Inventario')
+                    ->modalWidth('4xl')
+                    ->form([
+                        Repeater::make('inventory')
+                            ->label('Inventario')
+                            ->default(fn (RelationManager $livewire) => $livewire->ownerRecord->assets()->first()?->inventory ?? [])
+                            ->schema([
+                                Select::make('inventory_name')->required()->label('Tipo de Inventario')->options($titles['inventory']),
+                                Select::make('inventory_q')->options(static::$qtyOptions)->label('Cantidad (n)')->placeholder('Por favor seleccione una opción')->required(),
+                                TextInput::make('inventory_unit')->required()->label('Unidad')
+                                    ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
+                                Select::make('inventory_est')->options(static::$valueOptions)->label('Valor actual Estimado')->placeholder('Por favor seleccione una opción')->required(),
+                            ])
+                            ->columns(4)
+                            ->orderable(false)
+                            ->createItemButtonLabel('Agregar otro ítem de inventario'),
+                    ])
+                    ->action(fn (array $data, RelationManager $livewire) => static::saveField($livewire, 'inventory', $data['inventory'])),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make()->modalWidth('5xl'),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                //
-            ]);
+            ->actions([])
+            ->bulkActions([]);
     }
 }

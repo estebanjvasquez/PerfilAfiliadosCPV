@@ -4,12 +4,18 @@ namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
 use App\Filament\Support\NoAplicaAction;
 use App\Models\EmpresaModuleStatus;
-use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Resources\Form;
+use App\Models\Management;
+use Filament\Forms\ComponentContainer;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Arr;
+use Illuminate\Support\HtmlString;
 
 class ManagementRelationManager extends RelationManager
 {
@@ -21,188 +27,214 @@ class ManagementRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Sistemas de Gestión';
 
-    public static function form(Form $form): Form
+    protected static function saveFields(RelationManager $livewire, array $data): void
     {
-        return $form
-            ->schema([
-                Forms\Components\Card::make()
-                    ->schema([
-                        Forms\Components\Placeholder::make('')
-                            ->content('Su Empresa tiene implementado alguno de los siguientes Sistemas de Gestión?'),
-                    ]),
+        $management = $livewire->ownerRecord->management()->first();
 
-                Forms\Components\Card::make()
-                    ->schema([
-                        Forms\Components\Section::make('Calidad')
-                            ->schema([
-                                Forms\Components\Checkbox::make('iso9001'),
-                                Forms\Components\Checkbox::make('iso17025'),
-                                Forms\Components\Toggle::make('quality_otros')
-                                    ->label('Otros (Especifíque)')
-                                    ->reactive()
-                                    ->afterStateUpdated(fn (callable $set) => $set('quality', false)),
-                                Forms\Components\Repeater::make('quality_data')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('quality_otros_name')
-                                            ->label('Calidad: otros')
-                                            ->required()->afterStateUpdated(function ($component, $state, $set) {
-                                                return $set($component, mb_strtoupper($state));
-                                            }),
-                                    ])
-                                    ->orderable(false)
-                                    ->disableLabel()
-                                    ->hidden(fn (callable $get) => $get('quality_otros') === false),
-                            ]),
-                    ])->columnSpan(['lg' => 1]),
+        if (! $management) {
+            $management = $livewire->ownerRecord->management()->create([]);
+        }
 
-                Forms\Components\Card::make()
-                    ->schema([
-                        Forms\Components\Section::make('Ambiente')
-                            ->schema([
-                                Forms\Components\Checkbox::make('iso14001')->label('ISO 14001:2015 Sistemas de Gestión Ambiental'),
-                                Forms\Components\Checkbox::make('iso50001')->label('ISO 50001:2018 Sistemas de Gestión de la Energía.'),
-                                Forms\Components\Toggle::make('environment_otros')
-                                    ->label('Otros (Especifíque)')
-                                    ->reactive()
-                                    ->afterStateUpdated(fn (callable $set) => $set('environment', false)),
-                                Forms\Components\Repeater::make('environment_data')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('environment_otros_name')
-                                            ->label('Ambiente: otros')
-                                            ->required()->afterStateUpdated(function ($component, $state, $set) {
-                                                return $set($component, mb_strtoupper($state));
-                                            }),
-                                    ])
-                                    ->orderable(false)
-                                    ->disableLabel()
-                                    ->hidden(fn (callable $get) => $get('environment_otros') === false),
-                            ]),
-                    ])->columnSpan(['lg' => 1]),
+        $management->update($data);
+    }
 
-                Forms\Components\Card::make()
-                    ->schema([
-                        Forms\Components\Section::make('Credibilidad y Transparencia')
-                            ->schema([
-                                Forms\Components\Checkbox::make('dun')->label('Dun & Bradstreet.'),
-                                Forms\Components\Checkbox::make('iso37001')->label('ISO 37001:2016 Sistemas de Gestión Antisoborno.'),
-                                Forms\Components\Toggle::make('credibility_otros')
-                                    ->label('Otros (Especifíque)')
-                                    ->reactive()
-                                    ->afterStateUpdated(fn (callable $set) => $set('credibility', false)),
-                                Forms\Components\Repeater::make('credibility_data')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('credibility_otros_name')
-                                            ->label('Credibilidad: otros')
-                                            ->required()->afterStateUpdated(function ($component, $state, $set) {
-                                                return $set($component, mb_strtoupper($state));
-                                            }),
-                                    ])
-                                    ->orderable(false)
-                                    ->disableLabel()
-                                    ->hidden(fn (callable $get) => $get('credibility_otros') === false),
-                            ]),
-                    ])->columnSpan(['lg' => 1]),
+    protected static function fillSection(RelationManager $livewire, array $fields): array
+    {
+        $management = $livewire->ownerRecord->management()->first();
 
-                Forms\Components\Card::make()
-                    ->schema([
-                        Forms\Components\Section::make('Seguridad')
-                            ->schema([
-                                Forms\Components\Checkbox::make('iso45001')->label('ISO 45001:2018 Seguridad y Salud en el Trabajo.'),
-                                Forms\Components\Checkbox::make('ovid')->label('COVID.'),
-                                Forms\Components\Toggle::make('security_otros')
-                                    ->label('Otros (Especifíque)')
-                                    ->reactive()
-                                    ->afterStateUpdated(fn (callable $set) => $set('security', false)),
-                                Forms\Components\Repeater::make('security_data')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('security_otros_name')
-                                            ->label('Seguridad: otros')
-                                            ->required()->afterStateUpdated(function ($component, $state, $set) {
-                                                return $set($component, mb_strtoupper($state));
-                                            }),
-                                    ])
-                                    ->orderable(false)
-                                    ->disableLabel()
-                                    ->hidden(fn (callable $get) => $get('security_otros') === false),
-                            ]),
-                    ])->columnSpan(['lg' => 1]),
+        return $management ? Arr::only($management->attributesToArray(), $fields) : [];
+    }
 
-                Forms\Components\Card::make()
-                    ->schema([
-                        Forms\Components\Section::make('Gestión de Proyectos')
-                            ->schema([
-                                Forms\Components\Checkbox::make('pmi')->label('Project Management Professional (PMI).'),
-                                Forms\Components\Toggle::make('pmi_otros')
-                                    ->label('Otros (Especifíque)')
-                                    ->reactive()
-                                    ->afterStateUpdated(fn (callable $set) => $set('projects', false)),
-                                Grid::make(1)
-                                    ->schema([
-                                        Forms\Components\Repeater::make('pmi_data')
-                                            ->schema([
-                                                Forms\Components\TextInput::make('pmi_otros_name')
-                                                    ->label('PMI: otros')
-                                                    ->required()->afterStateUpdated(function ($component, $state, $set) {
-                                                        return $set($component, mb_strtoupper($state));
-                                                    }),
-                                                Forms\Components\TextInput::make('pmi_otros_q')
-                                                    ->label('PMI: otros')
-                                                    ->numeric()
-                                                    ->default(0)
-                                                    ->required(),
-                                            ])
-                                            ->columns(2)
-                                            ->orderable(false)
-                                            ->disableLabel()
-                                            ->hidden(fn (callable $get) => $get('pmi_otros') === false),
-                                    ]),
-                            ]),
-                    ])->columnSpan(['lg' => 1]),
+    protected static function otrosName(?array $data, string $field): array
+    {
+        return collect($data)->pluck($field)->filter()->values()->all();
+    }
 
-                Forms\Components\Card::make()
-                    ->schema([
-                        Forms\Components\Section::make('Seguridad de la Información')
-                            ->schema([
-                                Forms\Components\Checkbox::make('iso27001')->label('Sistemas de Gestión de la Seguridad de la Información.'),
-                                Forms\Components\Toggle::make('info_otros')
-                                    ->label('Otros (Especifíque)')
-                                    ->reactive()
-                                    ->afterStateUpdated(fn (callable $set) => $set('information', false)),
-                                Forms\Components\Repeater::make('info_data')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('info_otros_name')
-                                            ->label('Info Seguridad: otros')
-                                            ->required()->afterStateUpdated(function ($component, $state, $set) {
-                                                return $set($component, mb_strtoupper($state));
-                                            }),
-                                    ])
-                                    ->orderable(false)
-                                    ->disableLabel()
-                                    ->hidden(fn (callable $get) => $get('info_otros') === false),
-                            ]),
-                    ])->columnSpan(['lg' => 1]),
-            ])->columns(3);
+    protected static function summaryColumn(string $name, string $label, array $checks, string $otrosField): Tables\Columns\TextColumn
+    {
+        return Tables\Columns\TextColumn::make($name)
+            ->label($label)
+            ->getStateUsing(fn (?Management $record) => $record)
+            ->formatStateUsing(function ($state) use ($checks, $otrosField) {
+                $checked = [];
+                foreach ($checks as $field => $checkLabel) {
+                    $checked[$checkLabel] = $state ? (bool) $state->{$field} : false;
+                }
+
+                $extra = $state ? static::otrosName($state->{$otrosField}, str_replace('_data', '_otros_name', $otrosField)) : [];
+
+                return new HtmlString(
+                    view('filament.tables.columns.checklist-summary', [
+                        'checks' => $checked,
+                        'extra' => $extra,
+                    ])->render()
+                );
+            });
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')->label('Registrado el')->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')->label('Última actualización')->dateTime(),
+                static::summaryColumn('calidad', 'Calidad', [
+                    'iso9001' => 'ISO 9001',
+                    'iso17025' => 'ISO 17025',
+                ], 'quality_data'),
+                static::summaryColumn('ambiente', 'Ambiente', [
+                    'iso14001' => 'ISO 14001:2015',
+                    'iso50001' => 'ISO 50001:2018',
+                ], 'environment_data'),
+                static::summaryColumn('credibilidad', 'Credibilidad y Transparencia', [
+                    'dun' => 'Dun & Bradstreet',
+                    'iso37001' => 'ISO 37001:2016',
+                ], 'credibility_data'),
+                static::summaryColumn('seguridad', 'Seguridad', [
+                    'iso45001' => 'ISO 45001:2018',
+                    'ovid' => 'COVID',
+                ], 'security_data'),
+                static::summaryColumn('proyectos', 'Gestión de Proyectos', [
+                    'pmi' => 'PMI',
+                ], 'pmi_data'),
+                static::summaryColumn('seguridad_info', 'Seguridad de la Información', [
+                    'iso27001' => 'ISO 27001',
+                ], 'info_data'),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
-                    ->modalWidth('5xl')
-                    ->visible(fn (RelationManager $livewire) => ! $livewire->ownerRecord->management()->exists()),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_GESTION),
+
+                Action::make('calidad')
+                    ->label('Calidad')
+                    ->icon('heroicon-o-badge-check')
+                    ->modalHeading('Agregar / Editar: Calidad')
+                    ->form([
+                        Checkbox::make('iso9001'),
+                        Checkbox::make('iso17025'),
+                        Toggle::make('quality_otros')->label('Otros (Especifíque)')->reactive(),
+                        Repeater::make('quality_data')
+                            ->schema([
+                                TextInput::make('quality_otros_name')->label('Calidad: otros')->required()
+                                    ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
+                            ])
+                            ->orderable(false)
+                            ->disableLabel()
+                            ->hidden(fn (callable $get) => $get('quality_otros') === false),
+                    ])
+                    ->mountUsing(fn (ComponentContainer $form, RelationManager $livewire) => $form->fill(
+                        static::fillSection($livewire, ['iso9001', 'iso17025', 'quality_otros', 'quality_data'])
+                    ))
+                    ->action(fn (array $data, RelationManager $livewire) => static::saveFields($livewire, $data)),
+
+                Action::make('ambiente')
+                    ->label('Ambiente')
+                    ->icon('heroicon-o-badge-check')
+                    ->modalHeading('Agregar / Editar: Ambiente')
+                    ->form([
+                        Checkbox::make('iso14001')->label('ISO 14001:2015 Sistemas de Gestión Ambiental'),
+                        Checkbox::make('iso50001')->label('ISO 50001:2018 Sistemas de Gestión de la Energía.'),
+                        Toggle::make('environment_otros')->label('Otros (Especifíque)')->reactive(),
+                        Repeater::make('environment_data')
+                            ->schema([
+                                TextInput::make('environment_otros_name')->label('Ambiente: otros')->required()
+                                    ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
+                            ])
+                            ->orderable(false)
+                            ->disableLabel()
+                            ->hidden(fn (callable $get) => $get('environment_otros') === false),
+                    ])
+                    ->mountUsing(fn (ComponentContainer $form, RelationManager $livewire) => $form->fill(
+                        static::fillSection($livewire, ['iso14001', 'iso50001', 'environment_otros', 'environment_data'])
+                    ))
+                    ->action(fn (array $data, RelationManager $livewire) => static::saveFields($livewire, $data)),
+
+                Action::make('credibilidad')
+                    ->label('Credibilidad y Transparencia')
+                    ->icon('heroicon-o-badge-check')
+                    ->modalHeading('Agregar / Editar: Credibilidad y Transparencia')
+                    ->form([
+                        Checkbox::make('dun')->label('Dun & Bradstreet.'),
+                        Checkbox::make('iso37001')->label('ISO 37001:2016 Sistemas de Gestión Antisoborno.'),
+                        Toggle::make('credibility_otros')->label('Otros (Especifíque)')->reactive(),
+                        Repeater::make('credibility_data')
+                            ->schema([
+                                TextInput::make('credibility_otros_name')->label('Credibilidad: otros')->required()
+                                    ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
+                            ])
+                            ->orderable(false)
+                            ->disableLabel()
+                            ->hidden(fn (callable $get) => $get('credibility_otros') === false),
+                    ])
+                    ->mountUsing(fn (ComponentContainer $form, RelationManager $livewire) => $form->fill(
+                        static::fillSection($livewire, ['dun', 'iso37001', 'credibility_otros', 'credibility_data'])
+                    ))
+                    ->action(fn (array $data, RelationManager $livewire) => static::saveFields($livewire, $data)),
+
+                Action::make('seguridad')
+                    ->label('Seguridad')
+                    ->icon('heroicon-o-badge-check')
+                    ->modalHeading('Agregar / Editar: Seguridad')
+                    ->form([
+                        Checkbox::make('iso45001')->label('ISO 45001:2018 Seguridad y Salud en el Trabajo.'),
+                        Checkbox::make('ovid')->label('COVID.'),
+                        Toggle::make('security_otros')->label('Otros (Especifíque)')->reactive(),
+                        Repeater::make('security_data')
+                            ->schema([
+                                TextInput::make('security_otros_name')->label('Seguridad: otros')->required()
+                                    ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
+                            ])
+                            ->orderable(false)
+                            ->disableLabel()
+                            ->hidden(fn (callable $get) => $get('security_otros') === false),
+                    ])
+                    ->mountUsing(fn (ComponentContainer $form, RelationManager $livewire) => $form->fill(
+                        static::fillSection($livewire, ['iso45001', 'ovid', 'security_otros', 'security_data'])
+                    ))
+                    ->action(fn (array $data, RelationManager $livewire) => static::saveFields($livewire, $data)),
+
+                Action::make('proyectos')
+                    ->label('Gestión de Proyectos')
+                    ->icon('heroicon-o-badge-check')
+                    ->modalHeading('Agregar / Editar: Gestión de Proyectos')
+                    ->form([
+                        Checkbox::make('pmi')->label('Project Management Professional (PMI).'),
+                        Toggle::make('pmi_otros')->label('Otros (Especifíque)')->reactive(),
+                        Repeater::make('pmi_data')
+                            ->schema([
+                                TextInput::make('pmi_otros_name')->label('PMI: otros')->required()
+                                    ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
+                                TextInput::make('pmi_otros_q')->label('PMI: otros')->numeric()->default(0)->required(),
+                            ])
+                            ->columns(2)
+                            ->orderable(false)
+                            ->disableLabel()
+                            ->hidden(fn (callable $get) => $get('pmi_otros') === false),
+                    ])
+                    ->mountUsing(fn (ComponentContainer $form, RelationManager $livewire) => $form->fill(
+                        static::fillSection($livewire, ['pmi', 'pmi_otros', 'pmi_data'])
+                    ))
+                    ->action(fn (array $data, RelationManager $livewire) => static::saveFields($livewire, $data)),
+
+                Action::make('seguridad_info')
+                    ->label('Seguridad de la Información')
+                    ->icon('heroicon-o-badge-check')
+                    ->modalHeading('Agregar / Editar: Seguridad de la Información')
+                    ->form([
+                        Checkbox::make('iso27001')->label('Sistemas de Gestión de la Seguridad de la Información.'),
+                        Toggle::make('info_otros')->label('Otros (Especifíque)')->reactive(),
+                        Repeater::make('info_data')
+                            ->schema([
+                                TextInput::make('info_otros_name')->label('Info Seguridad: otros')->required()
+                                    ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
+                            ])
+                            ->orderable(false)
+                            ->disableLabel()
+                            ->hidden(fn (callable $get) => $get('info_otros') === false),
+                    ])
+                    ->mountUsing(fn (ComponentContainer $form, RelationManager $livewire) => $form->fill(
+                        static::fillSection($livewire, ['iso27001', 'info_otros', 'info_data'])
+                    ))
+                    ->action(fn (array $data, RelationManager $livewire) => static::saveFields($livewire, $data)),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make()->modalWidth('5xl'),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                //
-            ]);
+            ->actions([])
+            ->bulkActions([]);
     }
 }

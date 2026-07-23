@@ -4,6 +4,7 @@ namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
 use App\Filament\Support\NoAplicaAction;
 use App\Models\EmpresaModuleStatus;
+use App\Models\Experience;
 use App\Models\InfraRegion;
 use App\Models\InfraSector;
 use App\Models\InfraSystem;
@@ -15,6 +16,7 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\HtmlString;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 
 class ExperiencesRelationManager extends RelationManager
@@ -154,8 +156,31 @@ class ExperiencesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')->label('Registrado el')->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')->label('Última actualización')->dateTime(),
+                Tables\Columns\TextColumn::make('exp_year')
+                    ->label('Experiencias por Año')
+                    ->getStateUsing(fn (?Experience $record) => $record)
+                    ->formatStateUsing(function ($state) {
+                        $rows = collect($state?->exp_year ?? [])
+                            ->map(fn ($item) => [
+                                'exp_year' => $item['exp_year'] ?? '-',
+                                'registrado' => $state->created_at?->format('d/m/Y H:i'),
+                                'actualizado' => $state->updated_at?->format('d/m/Y H:i'),
+                            ])
+                            ->sortByDesc('exp_year')
+                            ->values()
+                            ->all();
+
+                        return new HtmlString(
+                            view('filament.tables.columns.repeater-summary', [
+                                'items' => $rows,
+                                'columns' => [
+                                    'exp_year' => 'Año',
+                                    'registrado' => 'Registrado',
+                                    'actualizado' => 'Actualización',
+                                ],
+                            ])->render()
+                        );
+                    }),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
