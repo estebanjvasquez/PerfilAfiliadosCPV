@@ -11,7 +11,7 @@ use App\Models\InfraSystem;
 use App\Models\InfraType;
 use App\Models\Sector;
 use App\Models\Service;
-use Filament\Forms\Components\Checkbox;
+use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Select;
@@ -21,8 +21,8 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
-use Illuminate\Support\HtmlString;
-use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 
 class ExperiencesRelationManager extends RelationManager
 {
@@ -147,9 +147,48 @@ class ExperiencesRelationManager extends RelationManager
         ];
     }
 
-    protected static function entries(RelationManager $livewire): array
+    /**
+     * Convierte una entrada del arreglo exp_year en un modelo Experience
+     * NO PERSISTIDO (exists = false), solo para que Filament pueda mostrarla
+     * como una fila real de la tabla y operar sobre ella via acciones.
+     * Nunca se guarda directamente: las acciones editar/eliminar siempre
+     * reescriben el arreglo completo en el registro real (saveEntry/deleteEntry).
+     */
+    protected function buildRow(int $index, array $entryData, ?Experience $parent): Experience
     {
-        return $livewire->ownerRecord->experiences()->first()?->exp_year ?? [];
+        $row = new Experience();
+        $row->exists = false;
+        $row->id = $index;
+        $row->empresa_id = $this->ownerRecord->id;
+        $row->created_at = $parent?->created_at;
+        $row->updated_at = $parent?->updated_at;
+        $row->setAttribute('row_year', $entryData['exp_year'] ?? null);
+        $row->setAttribute('row_data', $entryData);
+
+        return $row;
+    }
+
+    public function getTableRecords(): EloquentCollection
+    {
+        $parent = $this->ownerRecord->experiences()->first();
+        $entries = $parent?->exp_year ?? [];
+
+        $rows = collect($entries)
+            ->values()
+            ->map(fn ($entry, $index) => $this->buildRow($index, $entry, $parent))
+            ->sortByDesc('row_year')
+            ->values();
+
+        return new EloquentCollection($rows->all());
+    }
+
+    protected function resolveTableRecord(?string $key): ?Model
+    {
+        if ($key === null) {
+            return null;
+        }
+
+        return $this->getTableRecords()->first(fn (Experience $row) => (string) $row->getKey() === (string) $key);
     }
 
     protected static function saveEntry(RelationManager $livewire, array $data, ?int $index): void
@@ -189,31 +228,9 @@ class ExperiencesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('exp_year')
-                    ->label('Experiencias por Año')
-                    ->getStateUsing(fn (?Experience $record) => $record)
-                    ->formatStateUsing(function ($state) {
-                        $rows = collect($state?->exp_year ?? [])
-                            ->map(fn ($item) => [
-                                'exp_year' => $item['exp_year'] ?? '-',
-                                'registrado' => $state->created_at?->format('d/m/Y H:i'),
-                                'actualizado' => $state->updated_at?->format('d/m/Y H:i'),
-                            ])
-                            ->sortByDesc('exp_year')
-                            ->values()
-                            ->all();
-
-                        return new HtmlString(
-                            view('filament.tables.columns.repeater-summary', [
-                                'items' => $rows,
-                                'columns' => [
-                                    'exp_year' => 'Año',
-                                    'registrado' => 'Registrado',
-                                    'actualizado' => 'Actualización',
-                                ],
-                            ])->render()
-                        );
-                    }),
+                Tables\Columns\TextColumn::make('row_year')->label('Año')->sortable(),
+                Tables\Columns\TextColumn::make('created_at')->label('Registrado')->dateTime('d/m/Y H:i'),
+                Tables\Columns\TextColumn::make('updated_at')->label('Actualización')->dateTime('d/m/Y H:i'),
             ])
             ->headerActions([
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_EXPERIENCIAS),
@@ -225,51 +242,24 @@ class ExperiencesRelationManager extends RelationManager
                     ->modalWidth('7xl')
                     ->form(static::fields())
                     ->action(fn (array $data, RelationManager $livewire) => static::saveEntry($livewire, $data, null)),
-
-                Action::make('editar_experiencia')
-                    ->label('Editar / Eliminar Experiencia')
-                    ->icon('heroicon-o-pencil')
-                    ->modalHeading('Editar / Eliminar Experiencia')
-                    ->modalWidth('7xl')
-                    ->visible(fn (RelationManager $livewire) => count(static::entries($livewire)) > 0)
-                    ->form(function (RelationManager $livewire) {
-                        $entries = static::entries($livewire);
-
-                        return [
-                            Select::make('_selected_index')
-                                ->label('Seleccione la experiencia a editar')
-                                ->options(collect($entries)->mapWithKeys(
-                                    fn ($entry, $index) => [$index => 'Año ' . ($entry['exp_year'] ?? '-')]
-                                ))
-                                ->reactive()
-                                ->required()
-                                ->afterStateUpdated(function ($state, callable $set) use ($entries) {
-                                    $entry = $entries[$state] ?? [];
-                                    foreach ($entry as $field => $value) {
-                                        $set($field, $value);
-                                    }
-                                }),
-                            Checkbox::make('_eliminar')
-                                ->label('Eliminar esta experiencia (en vez de guardar cambios)'),
-                            ...static::fields(),
-                        ];
-                    })
-                    ->action(function (array $data, RelationManager $livewire) {
-                        $index = (int) $data['_selected_index'];
-
-                        if ($data['_eliminar'] ?? false) {
-                            static::deleteEntry($livewire, $index);
-                            return;
-                        }
-
-                        unset($data['_selected_index'], $data['_eliminar']);
-                        static::saveEntry($livewire, $data, $index);
-                    }),
             ])
-            ->actions([])
-            ->bulkActions([
-                FilamentExportBulkAction::make('export')
-                    ->additionalColumnsAddButtonLabel('Add Column'),
-            ]);
+            ->actions([
+                Action::make('editar')
+                    ->label('Editar')
+                    ->icon('heroicon-o-pencil')
+                    ->modalHeading('Editar Experiencia')
+                    ->modalWidth('7xl')
+                    ->form(static::fields())
+                    ->mountUsing(fn (ComponentContainer $form, Experience $record) => $form->fill($record->row_data ?? []))
+                    ->action(fn (array $data, Experience $record, RelationManager $livewire) => static::saveEntry($livewire, $data, (int) $record->getKey())),
+
+                Action::make('eliminar')
+                    ->label('Eliminar')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(fn (Experience $record, RelationManager $livewire) => static::deleteEntry($livewire, (int) $record->getKey())),
+            ])
+            ->bulkActions([]);
     }
 }
