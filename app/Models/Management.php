@@ -84,11 +84,13 @@ class Management extends Model
             $empresa = $item->empresa_id;
 
             DB::update(
-                'update management 
+                'update management
                 set management.user_id = ?
                 where empresa_id = ?',
                 [$user, $empresa]
             );
+
+            EmpresaModuleStatus::setStatus($empresa, EmpresaModuleStatus::MODULE_GESTION, false);
             /* $user = strval(Auth::User()->id);
 
             DB::update(

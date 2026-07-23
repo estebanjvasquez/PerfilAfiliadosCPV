@@ -49,11 +49,13 @@ class Asset extends Model
             );  */
 
             DB::update(
-                'update assets 
+                'update assets
                 set assets.user_id = ?
                 where empresa_id = ?',
                 [$user, $empresa]
             );
+
+            EmpresaModuleStatus::setStatus($empresa, EmpresaModuleStatus::MODULE_RECURSOS, false);
 
             //Log::info('Created event call: ' . $item);
         });

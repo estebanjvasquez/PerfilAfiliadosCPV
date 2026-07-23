@@ -76,8 +76,19 @@ class EmpresaResource extends Resource
                 Forms\Components\TextInput::make('facebook_profile'),
                 Forms\Components\TextInput::make('youtube_profile'),
                 Forms\Components\TextInput::make('otros_profile'),
-                Select::make('sectors_id')->relationship('sector', 'name')->placeholder('Seleccione un Sector'),
-                Select::make('services_id')->relationship('service', 'name')->placeholder('Seleccione un Servicio'),
+                Select::make('sector_principal_id')
+                    ->label('Sector Principal')
+                    ->options(Sector::orderBy('name')->pluck('name', 'id'))
+                    ->placeholder('Seleccione el Sector Principal')
+                    ->reactive()
+                    ->required(),
+                Select::make('sector_secundario_id')
+                    ->label('Sector Secundario (opcional)')
+                    ->options(fn (callable $get) => Sector::orderBy('name')
+                        ->where('id', '<>', $get('sector_principal_id'))
+                        ->pluck('name', 'id'))
+                    ->placeholder('Seleccione el Sector Secundario')
+                    ->different('sector_principal_id'),
 
                 Select::make('billing_id')
                     ->options([
@@ -153,7 +164,11 @@ class EmpresaResource extends Resource
                 Tables\Columns\TextColumn::make('ano_fund')->label('Año de Fundación'),
                 Tables\Columns\TextColumn::make('city.city_name')->label('Ciudad'),
                 Tables\Columns\TextColumn::make('city.countries.country_name')->label('País'),
+                Tables\Columns\TextColumn::make('sectorPrincipal.name')->label('Sector Principal'),
                 Tables\Columns\TextColumn::make('services.name')->label('Servicios'),
+                Tables\Columns\TextColumn::make('completitud')
+                    ->label('% Perfil')
+                    ->getStateUsing(fn (Empresa $record): string => $record->completionPercentage() . ' %'),
 
             ])
             ->actions([
@@ -250,6 +265,10 @@ class EmpresaResource extends Resource
             RelationManagers\ContactsRelationManager::class,
             RelationManagers\UsersRelationManager::class,
             RelationManagers\ServicesRelationManager::class,
+            RelationManagers\AssetsRelationManager::class,
+            RelationManagers\ManagementRelationManager::class,
+            RelationManagers\ExperiencesRelationManager::class,
+            RelationManagers\PresenceRelationManager::class,
             RelationManagers\SustainabilitiesRelationManager::class,
         ];
     }

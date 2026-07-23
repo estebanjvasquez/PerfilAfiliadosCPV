@@ -27,11 +27,13 @@ class Sustainability extends Model
             $empresa = $item->empresa_id;
 
             DB::update(
-                'update sustainabilities 
+                'update sustainabilities
                 set sustainabilities.user_id = ?
                 where empresa_id = ?',
                 [$user, $empresa]
             );
+
+            EmpresaModuleStatus::setStatus($empresa, EmpresaModuleStatus::MODULE_SOSTENIBILIDAD, false);
             /* $user = strval(Auth::User()->id);
             DB::update(
                 'update sustainabilities 

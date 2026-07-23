@@ -1,28 +1,19 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
-use App\Models\Empresa;
-use App\Filament\Resources\ManagementResource\Pages;
-use App\Filament\Resources\ManagementResource\RelationManagers;
-use App\Models\Management;
+use App\Filament\Support\NoAplicaAction;
+use App\Models\EmpresaModuleStatus;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Resources\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use PhpParser\Node\Stmt\Label;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\HtmlString;
 
-class ManagementResource extends Resource
+class ManagementRelationManager extends RelationManager
 {
-    protected static ?string $model = Management::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-badge-check';
+    protected static string $relationship = 'management';
 
     public static ?string $label = 'Sistemas de Gestión';
 
@@ -30,36 +21,15 @@ class ManagementResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Sistemas de Gestión';
 
-    protected static ?int $navigationSort = 4;
-
     public static function form(Form $form): Form
     {
-        $vemp = 'management';
-
-        $emps = Empresa::get();
-        foreach ($emps as $key => $valuemp) {
-        }
-
         return $form
-
             ->schema([
                 Forms\Components\Card::make()
                     ->schema([
                         Forms\Components\Placeholder::make('')
                             ->content('Su Empresa tiene implementado alguno de los siguientes Sistemas de Gestión?'),
                     ]),
-
-
-                Forms\Components\Select::make('empresa_id')->relationship('empresa', 'name')
-                    ->disabled()
-                    ->columnSpan(3)
-                    ->visibleOn('edit'),
-
-                Forms\Components\Select::make('empresa_id') //->relationship('empresa', 'name')
-                    ->options($valuemp->getEmpresaUser($vemp)->pluck('name', 'id'))->required()
-                    ->columnSpan(3)
-                    ->visibleOn('create'),
-
 
                 Forms\Components\Card::make()
                     ->schema([
@@ -214,42 +184,25 @@ class ManagementResource extends Resource
             ])->columns(3);
     }
 
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->whereRelation('user', 'users.id', '=', Auth::User()->id);
-    }
-
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('empresa.name'),
+                Tables\Columns\TextColumn::make('created_at')->label('Registrado el')->dateTime(),
+                Tables\Columns\TextColumn::make('updated_at')->label('Última actualización')->dateTime(),
             ])
-            ->filters([
-                //
+            ->headerActions([
+                Tables\Actions\CreateAction::make()
+                    ->modalWidth('5xl')
+                    ->visible(fn (RelationManager $livewire) => ! $livewire->ownerRecord->management()->exists()),
+                NoAplicaAction::make(EmpresaModuleStatus::MODULE_GESTION),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+                Tables\Actions\EditAction::make()->modalWidth('5xl'),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                //Tables\Actions\DeleteBulkAction::make(),
+                //
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListManagement::route('/'),
-            'create' => Pages\CreateManagement::route('/create'),
-            'edit' => Pages\EditManagement::route('/{record}/edit'),
-        ];
     }
 }

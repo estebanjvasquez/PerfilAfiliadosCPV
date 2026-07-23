@@ -13,6 +13,7 @@ use Illuminate\Console\Application;
 use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Actions\AttachAction;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Resources\RelationManagers\BelongsToManyRelationManager;
@@ -74,7 +75,24 @@ class ServicesRelationManager extends BelongsToManyRelationManager
                     Forms\Components\Select::make('sectors_id')
                         ->relationship('sectors', 'name')
                         ->label('Sectores')
-                        ->options(Sector::all()->pluck('name', 'id')->toArray())
+                        ->options(function (BelongsToManyRelationManager $livewire) {
+                            $empresa = $livewire->ownerRecord;
+                            $allowed = $empresa->allowedSectorIds();
+
+                            // Solo se permiten el Sector Principal y el Secundario de la empresa
+                            if (count($allowed) > 0) {
+                                return Sector::whereIn('id', $allowed)->pluck('name', 'id')->toArray();
+                            }
+
+                            // Empresas que aún no definen sus sectores: se limitan a los ya usados si llegaron a 2
+                            $current = $empresa->distinctSectorIds();
+                            if (count($current) >= 2) {
+                                return Sector::whereIn('id', $current)->pluck('name', 'id')->toArray();
+                            }
+
+                            return Sector::all()->pluck('name', 'id')->toArray();
+                        })
+                        ->helperText('Limitado al Sector Principal y Secundario definidos en los datos de la empresa (máximo 2 sectores).')
                         ->reactive()
                         ->afterStateUpdated(fn (callable $set) => $set('services.id', null)),
 
@@ -93,7 +111,41 @@ class ServicesRelationManager extends BelongsToManyRelationManager
                         ->searchable(false)
                         ->hidden(fn (callable $get) => $get('sectors_id') === null),
 
-                ]),
+                ])->before(function (AttachAction $action, array $data, BelongsToManyRelationManager $livewire) {
+                    $empresa = $livewire->ownerRecord;
+                    $service = Service::find($data['recordId'] ?? null);
+                    $sectorId = $service ? (int) $service->sectors_id : null;
+
+                    $allowed = $empresa->allowedSectorIds();
+
+                    if (count($allowed) > 0) {
+                        if (!in_array($sectorId, $allowed, true)) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Sector no permitido')
+                                ->body('Solo puede asociar servicios de su Sector Principal o Secundario. Si necesita cambiar de sectores, edite los datos de la empresa.')
+                                ->persistent()
+                                ->send();
+
+                            $action->cancel();
+                        }
+
+                        return;
+                    }
+
+                    // Empresa sin sectores definidos: no puede superar 2 sectores distintos
+                    $current = $empresa->distinctSectorIds();
+                    if (!in_array($sectorId, $current, true) && count($current) >= 2) {
+                        Notification::make()
+                            ->danger()
+                            ->title('Máximo 2 sectores por empresa')
+                            ->body('Su empresa ya tiene servicios en 2 sectores. Defina su Sector Principal y Secundario en los datos de la empresa, o desvincule servicios de otros sectores.')
+                            ->persistent()
+                            ->send();
+
+                        $action->cancel();
+                    }
+                }),
 
             ])
             ->actions([

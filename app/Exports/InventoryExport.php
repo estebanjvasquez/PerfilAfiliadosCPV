@@ -18,17 +18,21 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
-class InventoryExport implements FromQuery, ShouldAutoSize, WithHeadings, WithEvents, WithDrawings, WithColumnWidths
+class InventoryExport implements FromCollection, ShouldAutoSize, WithHeadings, WithEvents, WithDrawings, WithColumnWidths
 {
     /**
      * @return \Illuminate\Support\Collection
      */
     use Exportable;
+    use \App\Exports\Concerns\AppendsNoAplicaRows;
 
-    public function query()
+    public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
-        return InventoryView::query();
+        $rows = InventoryView::query()->get();
+
+        // La vista omite a las empresas sin recursos cargados: se agregan las "No Aplica"
+        return $this->appendNoAplicaRows($rows, \App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 8);
     }
 
     //PARA AGREGAR IMAGEN DE LOGO.......................................

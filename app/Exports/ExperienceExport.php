@@ -18,17 +18,21 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
-class ExperienceExport implements FromQuery, ShouldAutoSize, WithHeadings, WithEvents, WithDrawings, WithColumnWidths
+class ExperienceExport implements FromCollection, ShouldAutoSize, WithHeadings, WithEvents, WithDrawings, WithColumnWidths
 {
     /**
      * @return \Illuminate\Support\Collection
      */
     use Exportable;
+    use \App\Exports\Concerns\AppendsNoAplicaRows;
 
-    public function query()
+    public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
-        return ExperienceViewModel::query();
+        $rows = ExperienceViewModel::query()->get();
+
+        // La vista omite a las empresas sin experiencias: se agregan las "No Aplica"
+        return $this->appendNoAplicaRows($rows, \App\Models\EmpresaModuleStatus::MODULE_EXPERIENCIAS, 14);
     }
 
     public function drawings()
