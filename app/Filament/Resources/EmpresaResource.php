@@ -265,6 +265,10 @@ class EmpresaResource extends Resource
             RelationManagers\ContactsRelationManager::class,
             RelationManagers\UsersRelationManager::class,
             RelationManagers\ServicesRelationManager::class,
+            RelationManagers\AssetsRelationManager::class,
+            RelationManagers\ManagementRelationManager::class,
+            RelationManagers\ExperiencesRelationManager::class,
+            RelationManagers\PresenceRelationManager::class,
             RelationManagers\SustainabilitiesRelationManager::class,
         ];
     }

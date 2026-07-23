@@ -93,7 +93,7 @@ class SustainabilitiesRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
-                NoAplicaAction::forOwner(EmpresaModuleStatus::MODULE_SOSTENIBILIDAD),
+                NoAplicaAction::make(EmpresaModuleStatus::MODULE_SOSTENIBILIDAD),
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make(),

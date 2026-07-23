@@ -1,37 +1,25 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Sector;
-use App\Models\Empresa;
-use App\Models\Service;
-use App\Models\InfraType;
-use App\Models\Experience;
+use App\Filament\Support\NoAplicaAction;
+use App\Models\EmpresaModuleStatus;
 use App\Models\InfraRegion;
 use App\Models\InfraSector;
 use App\Models\InfraSystem;
+use App\Models\InfraType;
+use App\Models\Sector;
+use App\Models\Service;
+use Filament\Forms;
 use Filament\Resources\Form;
-use App\Models\InfraFacility;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
-use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use App\Models\infraregion_infrasystem;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Models\EmpresaModuleStatus;
-use App\Filament\Support\NoAplicaAction;
-use App\Filament\Resources\ExperienceResource\Pages;
-use App\Filament\Resources\ExperienceResource\RelationManagers;
+use Filament\Tables;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 
-class ExperienceResource extends Resource
+class ExperiencesRelationManager extends RelationManager
 {
-    protected static ?string $model = Experience::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-document-search';
+    protected static string $relationship = 'experiences';
 
     public static ?string $label = 'Experiencia Relevante';
 
@@ -39,36 +27,10 @@ class ExperienceResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Experiencia Relevante';
 
-    protected static ?int $navigationSort = 3;
-
     public static function form(Form $form): Form
     {
-        $vemp = 'experiences';
-
-        $emps = Empresa::get();
-        foreach ($emps as $key => $valuemp) {
-        }
-
         return $form
             ->schema([
-
-                Forms\Components\Select::make('empresa_id')->relationship('empresa', 'name')
-                    ->disabled()
-                    ->columnSpan(3)
-                    ->visibleOn('edit'),
-
-                Forms\Components\Select::make('empresa_id') //->relationship('empresa', 'name')
-
-                    ->options($valuemp->getEmpresaUser($vemp)->pluck('name', 'id'))->required()
-                    /* ->options(function ($valuemp, $vemp) {
-                        if (!$valuemp) {
-                            return [];
-                        } else return $valuemp->getEmpresaUser($vemp)->pluck('name', 'id'); */
-                    ->required()
-                    ->columnSpan(3)
-                    ->visibleOn('create'),
-
-
                 Forms\Components\Builder::make('exp_year')
                     ->blocks([
 
@@ -95,28 +57,24 @@ class ExperienceResource extends Resource
                                                 $isector = InfraSector::find($get('infrasectors_id'));
                                                 if (!$isector) {
                                                     return [];
-                                                    //return InfraType::all()->pluck('type_name', 'id')
                                                 }
                                                 return $isector->infratypes->pluck('type_name', 'id');
                                             })
                                             ->reactive()
                                             ->afterStateUpdated(fn (callable $set) => $set('infrasystems_id', null)),
 
-                                        // **************************************************************************************************
                                         Forms\Components\Select::make('infrasystems_id')
                                             ->label('Sistema')
                                             ->options(function (callable $get) {
                                                 $itype = InfraType::find($get('infratypes_id'));
                                                 if (!$itype) {
                                                     return [];
-                                                    //return InfraSystem::all()->pluck('system_name', 'id');
                                                 }
                                                 return $itype->infrasystems->pluck('system_name', 'id');
                                             })
                                             ->reactive()
                                             ->afterStateUpdated(fn (callable $set) => $set('infraregions_id', null)),
 
-                                        // **************************************************************************************************
                                         Forms\Components\Select::make('infraregions_id')
                                             ->label('Región o Distrito')
                                             ->options(function (callable $get) {
@@ -130,17 +88,13 @@ class ExperienceResource extends Resource
                                             ->reactive()
                                             ->afterStateUpdated(fn (callable $set) => $set('infrafacilities_id', null)),
 
-                                        // *************************************************************************************************
                                         Forms\Components\Select::make('infrafacilities_id')
                                             ->label('Instalación')
                                             ->options(function (callable $get) {
                                                 $iregsys = InfraRegion::find($get('infraregions_id'));
-                                                //dd($iregsys);
                                                 if (!$iregsys) {
                                                     return [];
                                                 }
-                                                //return [$iregsys->id];
-                                                //return [$iregsys->getFacility($iregsys->id, $get('infrasystems_id'))->count()];
                                                 return $iregsys->getFacility($iregsys->id, $get('infrasystems_id'))->pluck('facility_name', 'id');
                                             }),
 
@@ -168,21 +122,10 @@ class ExperienceResource extends Resource
 
                                     Forms\Components\Fieldset::make('clasificacion')->schema([
                                         Forms\Components\Select::make('sectors_id')
-                                            //->relationship('sectors', 'name')
                                             ->label('Sector')
                                             ->options(Sector::all()->pluck('name', 'id')->toArray())
                                             ->reactive()
                                             ->afterStateUpdated(fn (callable $set) => $set('services_id', null)),
-
-                                        /* Forms\Components\Select::make('services_id')
-                                            ->label('Servicios')
-                                            ->options(function (callable $get) {
-                                                $sector = Sector::find($get('sectors_id'));
-                                                if (!$sector) {
-                                                    return Service::all()->pluck('name', 'id');
-                                                }
-                                                return $sector->services->pluck('name', 'id');
-                                            }),*/
 
                                         Forms\Components\Select::make('services_id')
                                             ->label('Servicios')
@@ -207,47 +150,26 @@ class ExperienceResource extends Resource
             ])->columns(1);
     }
 
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->whereRelation('user', 'users.id', '=', Auth::User()->id);
-    }
-
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('empresa.name'),
-            ])
-            ->filters([
-                //
+                Tables\Columns\TextColumn::make('created_at')->label('Registrado el')->dateTime(),
+                Tables\Columns\TextColumn::make('updated_at')->label('Última actualización')->dateTime(),
             ])
             ->headerActions([
+                Tables\Actions\CreateAction::make()
+                    ->modalWidth('7xl')
+                    ->visible(fn (RelationManager $livewire) => ! $livewire->ownerRecord->experiences()->exists()),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_EXPERIENCIAS),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+                Tables\Actions\EditAction::make()->modalWidth('7xl'),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                //Tables\Actions\DeleteBulkAction::make(),
                 FilamentExportBulkAction::make('export')
                     ->additionalColumnsAddButtonLabel('Add Column'),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListExperiences::route('/'),
-            'create' => Pages\CreateExperience::route('/create'),
-            'edit' => Pages\EditExperience::route('/{record}/edit'),
-        ];
     }
 }

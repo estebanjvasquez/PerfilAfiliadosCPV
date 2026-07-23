@@ -6,6 +6,8 @@
 
 > **Corrección (22 jul 2026):** una revisión posterior encontró que el "bug crítico" descrito abajo en la versión original de este documento **no es real** (ver sección "Corrección de análisis previo"). Se mantiene el histórico tachado por trazabilidad, pero no debe implementarse tal como estaba escrito.
 
+> **Cambio de arquitectura (22 jul 2026):** durante QA en staging se detectó que "No Aplica" no era visible para 4 de los 5 módulos al editar una empresa, porque **Recursos en Venezuela, Sistemas de Gestión, Experiencia Relevante y Presencia Internacional vivían como menús independientes en el sidebar** (filtrados por usuario logueado, con selector de empresa), no como pestañas dentro de "Editar Empresa" — a diferencia de Sostenibilidad, que sí era una pestaña. Se decidió, con aprobación del cliente, migrar los 4 a pestañas dentro de Empresa (ver sección "Migración de 4 módulos a pestañas de Empresa" más abajo). Esto es un cambio de arquitectura real sobre módulos que ya funcionaban en producción — no un simple ajuste de esta feature.
+
 ---
 
 ## 📊 Resumen Ejecutivo
@@ -91,6 +93,41 @@ El análisis original (23 jun 2026) afirmaba que `CreateEmpresa.php` necesitaba 
 `.cpanel.yml` es el único archivo modificado tanto en esta rama como en `main` desde que divergieron. Desde la creación de esta rama, `main` corrigió varias veces el despliegue en producción (esquema real `deployment.tasks` en vez de `targets/post_deployment`, `DEPLOYPATH` explícito, PHP 8.2 en vez de 8.1, orden correcto de `composer install`). La versión de `.cpanel.yml` de esta rama es la **versión anterior, obsoleta**, previa a esos fixes.
 
 **Decisión (confirmada con el cliente/dueño del proyecto, 22 jul 2026):** al integrar esta rama, se conserva el `.cpanel.yml` de `main` como fuente de verdad. Esta rama no debe aportar cambios a ese archivo.
+
+---
+
+## 🏗️ Migración de 4 módulos a pestañas de Empresa (22 jul 2026)
+
+### Problema encontrado en QA
+
+Al editar una empresa, el botón "No Aplica" solo era visible para **Sostenibilidad** (pestaña `SustainabilitiesRelationManager`). Los otros 4 módulos — **Recursos en Venezuela** (`AssetResource`), **Sistemas de Gestión** (`ManagementResource`), **Experiencia Relevante** (`ExperienceResource`), **Presencia Internacional** (`PresenceResource`) — eran **Resources de Filament independientes en el menú lateral**, filtrados por `Auth::User()->id` (no por la empresa que se está editando), con un selector de empresa propio. Esta arquitectura ya existía **antes** de esta rama (el commit original `cbc1e37` solo les agregó el botón "No Aplica" tal cual estaban).
+
+### Decisión
+
+Convertir los 4 en `RelationManager`s dentro de `EmpresaResource` (mismo patrón que Sostenibilidad), eliminando los Resources standalone del sidebar.
+
+### Detalle técnico relevante
+
+- **`AssetResource` y `PresenceResource` tenían el formulario real vacío** en el propio Resource — la lógica vivía en `Pages/CreateAsset.php`, `EditAsset.php`, `CreatePresence.php`, `EditPresence.php` (multi-step Wizard vía el trait `HasWizard` de página). Se migró usando el componente `Forms\Components\Wizard::make([...])`, que sí es válido dentro del formulario modal de un RelationManager (confirmado contra `vendor/filament/forms/src/Components/Wizard.php`).
+- **`ManagementResource` y `ExperienceResource`** tenían el formulario completo directamente en el Resource (Cards/Sections/Repeaters y, en Experience, un `Builder` con selects en cascada de infraestructura) — se portó tal cual, solo quitando el selector de empresa.
+- **Regla de negocio "un registro por empresa"**: antes se enforced ocultando del dropdown de creación las empresas que ya tenían un registro (helper `Empresa::getEmpresaUser()`). Como ahora el RelationManager ya está anclado a una sola empresa, se reemplazó por ocultar el botón "Crear" si `$livewire->ownerRecord->{relacion}()->exists()`.
+- **`Presence` es relación `hasOne`** en el modelo (a diferencia de las otras, que son `hasMany` pero de facto limitadas a 1 registro por empresa). Filament's `RelationManager` no distingue el tipo de relación al construir el query, así que funciona igual.
+- Los modales de Create/Edit se abren con `->modalWidth()` ampliado (5xl-7xl según el módulo) para dar espacio a los wizards y repeaters, ya que antes eran páginas completas.
+- Se limpiaron 24 archivos muertos (los 4 `*Resource.php` + sus carpetas `Pages/`, incluyendo basura tipo `Pages-bk/` y `error_log` que habían quedado ahí).
+- `NoAplicaAction` se simplificó a un solo método `make()` (ya no hace falta la variante con selector de empresa, porque los 5 módulos ahora están anclados a `ownerRecord`).
+
+### Qué probar en QA (además de lo ya listado)
+
+- [ ] Al editar una empresa, las 5 pestañas (Recursos, Gestión, Experiencia, Presencia, Sostenibilidad) muestran el botón "No Aplica" sin pedir seleccionar empresa.
+- [ ] El botón "Crear" desaparece una vez que la empresa ya tiene un registro en Recursos/Gestión/Experiencia/Presencia (no debe poder haber 2).
+- [ ] Los wizards de Recursos y Presencia funcionan igual dentro del modal (pasos, repeaters, cálculos de totales) que antes en la página completa.
+- [ ] El formulario de Experiencia (selects en cascada de infraestructura + Builder de años) funciona igual en el modal.
+- [ ] Datos de empresas ya existentes (creados cuando estos eran Resources independientes) se siguen viendo y editando correctamente desde la nueva pestaña.
+- [ ] El menú lateral ya no muestra "Recursos en Venezuela", "Sistemas de Gestión", "Experiencia Relevante" ni "Presencia Internacional" como entradas propias.
+
+### Riesgo
+
+**Medio** — a diferencia del resto de esta rama (cambios localizados y de bajo riesgo), esto toca 4 módulos con lógica de formulario compleja que ya estaban en producción. Se preservó la lógica de negocio existente lo más fielmente posible, pero **requiere QA manual completo de los 4 módulos**, no solo de la parte nueva (límite de sectores / No Aplica).
 
 ---
 
