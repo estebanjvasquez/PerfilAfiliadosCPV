@@ -14,6 +14,9 @@ class CertificacionesWidget extends BarChartWidget
 {
     protected static ?string $heading = 'Penetración de Certificaciones y Estándares';
 
+    // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
+    protected static ?string $pollingInterval = null;
+
     protected static ?array $options = [
         'indexAxis' => 'y',
         'plugins' => ['legend' => ['display' => false]],

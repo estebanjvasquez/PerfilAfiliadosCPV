@@ -9,6 +9,9 @@ class DiversificacionWidget extends DoughnutChartWidget
 {
     protected static ?string $heading = 'Índice de Diversificación Sectorial';
 
+    // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
+    protected static ?string $pollingInterval = null;
+
     protected function getData(): array
     {
         $buckets = GerenciaMetrics::diversificacionSectorial(GerenciaMetrics::filtersFromRequest());

@@ -9,6 +9,9 @@ class TopSectoresWidget extends BarChartWidget
 {
     protected static ?string $heading = 'Top 10 Sectores de Afiliados';
 
+    // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
+    protected static ?string $pollingInterval = null;
+
     protected static ?array $options = [
         'indexAxis' => 'y',
         'plugins' => ['legend' => ['display' => false]],

@@ -8,6 +8,15 @@ use Filament\Widgets\StatsOverviewWidget\Card;
 
 class ResumenStatsWidget extends BaseWidget
 {
+    /**
+     * El polling por defecto de Filament (5s) re-renderiza el widget via
+     * una peticion AJAX de Livewire que NO lleva el querystring de la
+     * pagina original, asi que GerenciaMetrics::filtersFromRequest() leeria
+     * los filtros vacios y pisaria lo que el usuario acaba de aplicar.
+     * Este dashboard se filtra por recarga de pagina (GET), no en vivo.
+     */
+    protected static ?string $pollingInterval = null;
+
     protected function getCards(): array
     {
         $data = GerenciaMetrics::resumen(GerenciaMetrics::filtersFromRequest());

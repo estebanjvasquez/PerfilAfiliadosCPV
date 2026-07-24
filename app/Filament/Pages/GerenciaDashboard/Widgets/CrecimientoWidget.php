@@ -9,6 +9,9 @@ class CrecimientoWidget extends LineChartWidget
 {
     protected static ?string $heading = 'Crecimiento de Afiliación (últimos 12 meses)';
 
+    // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
+    protected static ?string $pollingInterval = null;
+
     protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array

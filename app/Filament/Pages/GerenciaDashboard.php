@@ -63,7 +63,14 @@ class GerenciaDashboard extends Page
         return GerenciaMetrics::filtersFromRequest();
     }
 
-    protected function getHeaderWidgets(): array
+    /**
+     * Widgets como "footer" (no "header") a proposito: en
+     * vendor/filament/filament/resources/views/components/page.blade.php el orden de
+     * renderizado es header (titulo+acciones) -> header-widgets -> {{ $slot }} -> footer-widgets.
+     * La barra de filtros vive en el $slot (gerencia-dashboard.blade.php), y debe quedar
+     * debajo del boton "Descargar PDF" (que esta en el header) pero encima de los graficos.
+     */
+    protected function getFooterWidgets(): array
     {
         return [
             ResumenStatsWidget::class,
@@ -85,7 +92,7 @@ class GerenciaDashboard extends Page
         ];
     }
 
-    protected function getHeaderWidgetsColumns(): int | array
+    protected function getFooterWidgetsColumns(): int | array
     {
         return ['default' => 1, 'md' => 2, 'xl' => 3];
     }

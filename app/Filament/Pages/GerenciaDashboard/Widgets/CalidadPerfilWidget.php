@@ -9,6 +9,9 @@ class CalidadPerfilWidget extends DoughnutChartWidget
 {
     protected static ?string $heading = 'Segmentación por Calidad de Perfil';
 
+    // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
+    protected static ?string $pollingInterval = null;
+
     protected function getData(): array
     {
         $buckets = GerenciaMetrics::calidadPerfil(GerenciaMetrics::filtersFromRequest());

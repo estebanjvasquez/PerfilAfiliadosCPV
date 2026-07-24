@@ -9,6 +9,9 @@ class RecursosRadarWidget extends RadarChartWidget
 {
     protected static ?string $heading = 'Cobertura de Recursos Industriales';
 
+    // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
+    protected static ?string $pollingInterval = null;
+
     protected function getData(): array
     {
         $data = GerenciaMetrics::coberturaRecursos(GerenciaMetrics::filtersFromRequest());

@@ -9,6 +9,9 @@ class FacturacionWidget extends BarChartWidget
 {
     protected static ?string $heading = 'Estratificación Financiera';
 
+    // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
+    protected static ?string $pollingInterval = null;
+
     protected static ?array $options = [
         'plugins' => ['legend' => ['display' => false]],
     ];

@@ -9,6 +9,9 @@ class NoAplicaWidget extends BarChartWidget
 {
     protected static ?string $heading = 'Tasa de "No Aplica" por Módulo';
 
+    // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
+    protected static ?string $pollingInterval = null;
+
     protected function getData(): array
     {
         $data = GerenciaMetrics::noAplicaPorModulo(GerenciaMetrics::filtersFromRequest());

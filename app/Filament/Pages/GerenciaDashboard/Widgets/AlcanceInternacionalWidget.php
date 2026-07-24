@@ -9,6 +9,9 @@ class AlcanceInternacionalWidget extends DoughnutChartWidget
 {
     protected static ?string $heading = 'Alcance Internacional';
 
+    // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
+    protected static ?string $pollingInterval = null;
+
     protected function getData(): array
     {
         $buckets = GerenciaMetrics::alcanceInternacional(GerenciaMetrics::filtersFromRequest());
