@@ -3,9 +3,11 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
+use App\Models\City;
 use App\Models\User;
 use Filament\Tables;
 use App\Models\Sector;
+use App\Models\Country;
 use App\Models\Empresa;
 use Barryvdh\DomPDF\PDF;
 use App\Models\empresa_user;
@@ -25,14 +27,15 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Select;
 use Illuminate\Support\Facades\Blade;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Filament\Forms\Components\MultiSelect;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Filament\Forms\Components\BelongsToSelect;
@@ -108,11 +111,13 @@ class EmpresaResource extends Resource
                     ])->required(),
 
                 Select::make('status_id')
+                    ->label('Estatus actual')
                     ->options([
                         '1' => 'Activa',
                         '0' => 'Inactiva',
-                    ]) //->required(),
-                ,
+                    ])
+                    ->default('1')
+                    ->required(),
                 Select::make('property_id')
                     ->options([
                         '1' => 'Privado',
@@ -208,73 +213,121 @@ class EmpresaResource extends Resource
                     ->openUrlInNewTab(), */
 
 
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->before(function (DeleteAction $action, $record) {
-                        if ($record->assets->count() > 0) {
-                            Notification::make()
-                                ->danger()
-                                ->title('Éste registro tiene Recursos asociados!')
-                                ->body('Si desea eliminarlo debe eliminar primero los registros asociados.')
-                                ->send(5);
-                            $action->cancel();
-                        } else if ($record->experiences->count() > 0) {
-                            Notification::make()
-                                ->danger()
-                                ->title('Éste registro tiene Experiencias asociadas!')
-                                ->body('Si desea eliminarlo debe eliminar primero los registros asociados.')
-                                ->send(5);
-                            $action->cancel();
-                        } else if ($record->contacts->count() > 0) {
-                            Notification::make()
-                                ->danger()
-                                ->title('Éste registro tiene Contactos asociados!')
-                                ->body('Si desea eliminarlo debe desvincular primero los registros asociados.')
-                                ->send(5);
-                            $action->cancel();
-                        } else if ($record->services->count() > 0) {
-                            Notification::make()
-                                ->danger()
-                                ->title('Éste registro tiene Servicios asociados!')
-                                ->body('Si desea eliminarlo debe desvincular primero los registros asociados.')
-                                ->send(5);
-                            $action->cancel();
-                        } else if ($record->management->count() > 0) {
-                            Notification::make()
-                                ->danger()
-                                ->title('Éste registro tiene Sistemas de Gestión asociados!')
-                                ->body('Si desea eliminarlo debe eliminar primero los registros asociados.')
-                                ->send(5);
-                            $action->cancel();
-                        } else if ($record->presence) {
-                            Notification::make()
-                                ->danger()
-                                ->title('Éste registro tiene Presencia Internacional asociada!')
-                                ->body('Si desea eliminarlo debe eliminar primero los registros asociados.')
-                                ->send(5);
-                            $action->cancel();
-                        } else if ($record->sustainabilities->count() > 0) {
-                            //dd($record->sustainabilities);
-                            Notification::make()
-                                ->danger()
-                                ->title('Éste registro tiene Enfoques de Sostenibilidad asociados!')
-                                ->body('Si desea eliminarlo debe eliminar primero los registros asociados.')
-                                ->send(5);
-                            $action->cancel();
-                        } else if ($record->users->count() > 0) {
-                            $idempresa = $record->id;
-                            DB::delete('delete from empresa_user where empresa_id = ?', [$idempresa]);
-                        }
-                    })
-
             ])
 
             ->bulkActions([
-                FilamentExportBulkAction::make('export')
+                BulkAction::make('editar')
+                    ->label('Editar')
+                    ->icon('heroicon-o-pencil')
+                    ->color('primary')
+                    ->visible(fn (Collection $records): bool => $records->count() === 1)
+                    ->action(function (Collection $records, $action) {
+                        if ($records->count() !== 1) {
+                            Notification::make()
+                                ->warning()
+                                ->title('Seleccione una única empresa para editar')
+                                ->send();
+
+                            return;
+                        }
+
+                        $action->redirect(static::getUrl('edit', ['record' => $records->first()]));
+                    }),
+
+                BulkAction::make('activar')
+                    ->label('Activar')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn (): bool => Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                    ->requiresConfirmation()
+                    ->modalHeading('Activar empresas seleccionadas')
+                    ->action(function (Collection $records) {
+                        $records->each->update(['status_id' => 1]);
+
+                        Notification::make()->success()->title('Empresas activadas')->send();
+                    })
+                    ->deselectRecordsAfterCompletion(),
+
+                BulkAction::make('desactivar')
+                    ->label('Desactivar')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('warning')
+                    ->visible(fn (): bool => Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                    ->requiresConfirmation()
+                    ->modalHeading('Desactivar empresas seleccionadas')
+                    ->action(function (Collection $records) {
+                        $records->each->update(['status_id' => 0]);
+
+                        Notification::make()->success()->title('Empresas desactivadas')->send();
+                    })
+                    ->deselectRecordsAfterCompletion(),
+
+                BulkAction::make('borrar')
+                    ->label('Eliminar')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->visible(fn (): bool => Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                    ->requiresConfirmation()
+                    ->modalHeading('Eliminar empresas seleccionadas')
+                    ->modalSubheading('Esta acción eliminará permanentemente las empresas seleccionadas y TODOS sus datos asociados (Recursos, Sistemas de Gestión, Experiencias, Presencia Internacional, Enfoque de Sostenibilidad, Contactos). Esta acción no se puede deshacer.')
+                    ->modalButtonLabel('Eliminar definitivamente')
+                    ->form([
+                        Forms\Components\TextInput::make('confirmacion')
+                            ->label('Para confirmar, escriba BORRAR')
+                            ->placeholder('BORRAR')
+                            ->required()
+                            ->rules(['required', 'in:BORRAR']),
+                    ])
+                    ->action(function (Collection $records) {
+                        try {
+                            foreach ($records as $record) {
+                                $record->deleteWithDependencies();
+                            }
+
+                            Notification::make()->success()->title('Empresas eliminadas correctamente')->send();
+                        } catch (\Throwable $e) {
+                            report($e);
+
+                            Notification::make()
+                                ->danger()
+                                ->title('No se pudieron eliminar todas las empresas')
+                                ->body('Ocurrió un error inesperado. Revise el log del servidor.')
+                                ->send();
+                        }
+                    })
+                    ->deselectRecordsAfterCompletion(),
+
+                FilamentExportBulkAction::make('export'),
             ])
 
             ->filters([
                 TernaryFilter::make('status_id')->label('Activo'),
+
+                SelectFilter::make('country')
+                    ->label('País')
+                    ->searchable()
+                    ->options(fn () => Country::orderBy('country_name')->pluck('country_name', 'id'))
+                    ->query(fn (Builder $query, array $data) => filled($data['value'] ?? null)
+                        ? $query->whereHas('city', fn (Builder $q) => $q->where('country_id', $data['value']))
+                        : $query),
+
+                SelectFilter::make('city_id')
+                    ->label('Ciudad')
+                    ->searchable()
+                    ->options(fn () => City::orderBy('city_name')->pluck('city_name', 'id')),
+
+                Filter::make('sector')
+                    ->label('Sector')
+                    ->form([
+                        Select::make('sector_id')
+                            ->label('Sector')
+                            ->options(fn () => Sector::orderBy('name')->pluck('name', 'id')),
+                    ])
+                    ->query(fn (Builder $query, array $data) => filled($data['sector_id'] ?? null)
+                        ? $query->where(fn (Builder $q) => $q
+                            ->where('sector_principal_id', $data['sector_id'])
+                            ->orWhere('sector_secundario_id', $data['sector_id']))
+                        : $query),
             ]);
     }
 

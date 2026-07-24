@@ -348,4 +348,37 @@ class Empresa extends Model
     {
         return (int) round(collect($this->moduleBreakdown())->avg('percentage'));
     }
+
+    /**
+     * Borra la empresa y todo lo que depende exclusivamente de ella. Las FK de
+     * assets/management/experiences/presences/sustainabilities/contact_empresa/
+     * chamber_empresa/empresa_sector_service/empresa_user no tienen
+     * cascadeOnDelete (ver migraciones), asi que MySQL bloquea el borrado si no
+     * se limpian antes. Los registros hasMany/hasOne son exclusivos de la
+     * empresa y se borran; las relaciones belongsToMany a catalogos
+     * compartidos (Chamber, Service/Sector, User) solo se desvinculan
+     * (detach), nunca se borran esas entidades. Contact no es un catalogo
+     * real compartido, asi que se desvincula y luego se borran los que
+     * quedaron sin ninguna empresa asociada.
+     */
+    public function deleteWithDependencies(): void
+    {
+        DB::transaction(function () {
+            $this->assets()->delete();
+            $this->management()->delete();
+            $this->experiences()->delete();
+            $this->presence()->delete();
+            $this->sustainabilities()->delete();
+
+            $contactIds = $this->contacts()->pluck('contacts.id')->all();
+            $this->contacts()->detach();
+            Contact::whereIn('id', $contactIds)->whereDoesntHave('empresas')->delete();
+
+            $this->chambers()->detach();
+            $this->services()->detach(); // limpia empresa_sector_service (cubre tambien sectors())
+            $this->users()->detach();
+
+            $this->delete(); // empresa_module_status cae solo via FK cascadeOnDelete
+        });
+    }
 }
