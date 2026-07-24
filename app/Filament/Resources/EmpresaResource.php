@@ -170,7 +170,15 @@ class EmpresaResource extends Resource
                 Tables\Columns\TextColumn::make('city.city_name')->label('Ciudad'),
                 Tables\Columns\TextColumn::make('city.countries.country_name')
                     ->label('País')
-                    ->wrap(),
+                    ->formatStateUsing(function (?string $state): ?string {
+                        if (blank($state)) {
+                            return $state;
+                        }
+
+                        // "VEN – Venezuela (Bolivarian Republic of)" -> "VEN"
+                        return preg_match('/^[A-Za-z]{2,4}/', $state, $matches) ? $matches[0] : $state;
+                    })
+                    ->tooltip(fn (Empresa $record): ?string => $record->city?->countries?->country_name),
                 Tables\Columns\TextColumn::make('sectorPrincipal.name')->label('Sector Principal'),
                 Tables\Columns\TextColumn::make('services.name')
                     ->label('Servicios')
