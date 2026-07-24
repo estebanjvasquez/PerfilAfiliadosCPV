@@ -91,7 +91,13 @@ class AssetsRelationManager extends RelationManager
             $subType
         );
 
-        static::saveField($livewire, $field, $data[$field]);
+        // Filament omite del $data dehidratado cualquier campo dentro de un
+        // Group oculto (ver HasState::dehydrateState en el core de Filament) —
+        // cuando "No Aplica" está activo el Repeater ni siquiera aparece en
+        // $data, así que no se toca el dato ya guardado en BD.
+        if (array_key_exists($field, $data)) {
+            static::saveField($livewire, $field, $data[$field]);
+        }
     }
 
     protected static function summaryColumn(string $field, string $subType, string $label, array $columns, array $optionsMap = []): Tables\Columns\TextColumn
