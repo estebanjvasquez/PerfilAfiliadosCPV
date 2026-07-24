@@ -31,6 +31,7 @@ use Filament\Tables\Columns\ViewColumn;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\MultiSelect;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
@@ -161,11 +162,21 @@ class EmpresaResource extends Resource
 
 
                 Tables\Columns\TextColumn::make('name')->label('Nombre de la Empresa'),
+                Tables\Columns\IconColumn::make('status_id')
+                    ->label('Activo')
+                    ->boolean()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('ano_fund')->label('Año de Fundación'),
                 Tables\Columns\TextColumn::make('city.city_name')->label('Ciudad'),
-                Tables\Columns\TextColumn::make('city.countries.country_name')->label('País'),
+                Tables\Columns\TextColumn::make('city.countries.country_name')
+                    ->label('País')
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('sectorPrincipal.name')->label('Sector Principal'),
-                Tables\Columns\TextColumn::make('services.name')->label('Servicios'),
+                Tables\Columns\TextColumn::make('services.name')
+                    ->label('Servicios')
+                    ->limit(40)
+                    ->tooltip(fn (Empresa $record): ?string => $record->services->pluck('name')->join(', ') ?: null)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('completitud')
                     ->label('% Perfil')
                     ->getStateUsing(fn (Empresa $record): string => $record->completionPercentage() . ' %'),
@@ -254,7 +265,9 @@ class EmpresaResource extends Resource
                 FilamentExportBulkAction::make('export')
             ])
 
-            ->filters([]);
+            ->filters([
+                TernaryFilter::make('status_id')->label('Activo'),
+            ]);
     }
 
 
