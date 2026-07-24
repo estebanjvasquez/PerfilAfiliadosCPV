@@ -14,3 +14,4 @@ yarn-error.log
 /.vscode
 *.sql
 task.md
+implementation_plan.md
