@@ -223,34 +223,129 @@ class Empresa extends Model
     }
 
     /**
+     * Estado (completo/incompleto) de cada tipo de Recursos: tiene datos cargados
+     * en el Asset, o fue marcado "No Aplica" a nivel de ese tipo individual.
+     */
+    public function recursosSubTypeStatus(): array
+    {
+        $asset = $this->assets()->first();
+        $naFlags = EmpresaModuleStatus::subTypeFlagsFor($this->id, EmpresaModuleStatus::MODULE_RECURSOS);
+
+        return [
+            'employee' => ! empty($asset?->employee) || $naFlags['employee'],
+            'machinery' => ! empty($asset?->machinery) || $naFlags['machinery'],
+            'facility' => ! empty($asset?->facility) || $naFlags['facility'],
+            'inventory' => ! empty($asset?->inventory) || $naFlags['inventory'],
+        ];
+    }
+
+    /**
+     * Estado (completo/incompleto) de cada sección de Sistemas de Gestión: tiene
+     * al menos una certificación marcada o "Otros" activado, o fue marcada
+     * "No Aplica" a nivel de esa sección individual.
+     */
+    public function gestionSubTypeStatus(): array
+    {
+        $management = $this->management()->first();
+        $naFlags = EmpresaModuleStatus::subTypeFlagsFor($this->id, EmpresaModuleStatus::MODULE_GESTION);
+
+        return [
+            'calidad' => (bool) ($management?->iso9001 || $management?->iso17025 || $management?->quality_otros) || $naFlags['calidad'],
+            'ambiente' => (bool) ($management?->iso14001 || $management?->iso50001 || $management?->environment_otros) || $naFlags['ambiente'],
+            'credibilidad' => (bool) ($management?->dun || $management?->iso37001 || $management?->credibility_otros) || $naFlags['credibilidad'],
+            'seguridad' => (bool) ($management?->iso45001 || $management?->ovid || $management?->security_otros) || $naFlags['seguridad'],
+            'proyectos' => (bool) ($management?->pmi || $management?->pmi_otros) || $naFlags['proyectos'],
+            'seguridad_info' => (bool) ($management?->iso27001 || $management?->info_otros) || $naFlags['seguridad_info'],
+        ];
+    }
+
+    /**
+     * % de completitud de un módulo con sub-tipos (Recursos/Gestión): 100% si el
+     * módulo entero está en "No Aplica" (independiente de los sub-tipos), si no,
+     * la fracción de sub-tipos completos.
+     */
+    private function subTypeModulePercentage(bool $wholeModuleNoAplica, array $subTypeStatus): int
+    {
+        if ($wholeModuleNoAplica) {
+            return 100;
+        }
+
+        if (empty($subTypeStatus)) {
+            return 100;
+        }
+
+        return (int) round(100 * count(array_filter($subTypeStatus)) / count($subTypeStatus));
+    }
+
+    /**
+     * Detalle de completitud del perfil, un renglón por módulo/sección. Fuente
+     * única de verdad para completionData()/completionPercentage() y para el
+     * reporte/vista de completitud de administradores.
+     */
+    public function moduleBreakdown(): array
+    {
+        $naFlags = EmpresaModuleStatus::flagsFor($this->id);
+
+        $recursosDetail = $this->recursosSubTypeStatus();
+        $gestionDetail = $this->gestionSubTypeStatus();
+
+        return [
+            'datos_generales' => [
+                'label' => 'Datos Generales',
+                'percentage' => 100,
+                'detail' => null,
+            ],
+            'sectores' => [
+                'label' => 'Sectores y Servicios',
+                'percentage' => $this->services()->count() > 0 ? 100 : 0,
+                'detail' => null,
+            ],
+            'contactos' => [
+                'label' => 'Contactos',
+                'percentage' => $this->contacts()->count() > 0 ? 100 : 0,
+                'detail' => null,
+            ],
+            EmpresaModuleStatus::MODULE_RECURSOS => [
+                'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_RECURSOS],
+                'percentage' => $this->subTypeModulePercentage($naFlags[EmpresaModuleStatus::MODULE_RECURSOS], $recursosDetail),
+                'detail' => $recursosDetail,
+            ],
+            EmpresaModuleStatus::MODULE_GESTION => [
+                'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_GESTION],
+                'percentage' => $this->subTypeModulePercentage($naFlags[EmpresaModuleStatus::MODULE_GESTION], $gestionDetail),
+                'detail' => $gestionDetail,
+            ],
+            EmpresaModuleStatus::MODULE_PRESENCIA => [
+                'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_PRESENCIA],
+                'percentage' => ($this->presence()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_PRESENCIA]) ? 100 : 0,
+                'detail' => null,
+            ],
+            EmpresaModuleStatus::MODULE_EXPERIENCIAS => [
+                'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_EXPERIENCIAS],
+                'percentage' => ($this->experiences()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_EXPERIENCIAS]) ? 100 : 0,
+                'detail' => null,
+            ],
+            EmpresaModuleStatus::MODULE_SOSTENIBILIDAD => [
+                'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD],
+                'percentage' => ($this->sustainabilities()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD]) ? 100 : 0,
+                'detail' => null,
+            ],
+        ];
+    }
+
+    /**
      * Estado de completitud por módulo del perfil.
      * Un módulo cuenta como completo si tiene datos o si fue marcado "No Aplica".
      */
     public function completionData(): array
     {
-        $naFlags = EmpresaModuleStatus::flagsFor($this->id);
-
-        return [
-            'Datos Generales' => true,
-            'Sectores y Servicios' => $this->services()->count() > 0,
-            'Contactos' => $this->contacts()->count() > 0,
-            EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_RECURSOS] =>
-                $this->assets()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_RECURSOS],
-            EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_GESTION] =>
-                $this->management()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_GESTION],
-            EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_PRESENCIA] =>
-                $this->presence()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_PRESENCIA],
-            EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_EXPERIENCIAS] =>
-                $this->experiences()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_EXPERIENCIAS],
-            EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD] =>
-                $this->sustainabilities()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD],
-        ];
+        return collect($this->moduleBreakdown())
+            ->mapWithKeys(fn (array $info) => [$info['label'] => $info['percentage'] >= 100])
+            ->all();
     }
 
     public function completionPercentage(): int
     {
-        $data = $this->completionData();
-
-        return (int) round(100 * count(array_filter($data)) / count($data));
+        return (int) round(collect($this->moduleBreakdown())->avg('percentage'));
     }
 }
