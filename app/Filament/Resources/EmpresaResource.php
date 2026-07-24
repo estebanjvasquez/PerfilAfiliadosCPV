@@ -220,7 +220,7 @@ class EmpresaResource extends Resource
                     ->label('Editar')
                     ->icon('heroicon-o-pencil')
                     ->color('primary')
-                    ->visible(fn (Collection $records): bool => $records->count() === 1)
+                    ->visible(fn (?Collection $records): bool => $records instanceof Collection && $records->count() === 1)
                     ->action(function (Collection $records, $action) {
                         if ($records->count() !== 1) {
                             Notification::make()
