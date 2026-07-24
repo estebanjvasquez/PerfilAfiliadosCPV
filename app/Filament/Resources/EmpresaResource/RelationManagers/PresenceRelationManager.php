@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
+use App\Filament\Support\CompletionBadge;
 use App\Filament\Support\NoAplicaAction;
 use App\Models\Country;
 use App\Models\EmpresaModuleStatus;
@@ -112,6 +113,7 @@ class PresenceRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make()
                     ->modalWidth('7xl')
                     ->visible(fn (RelationManager $livewire) => ! $livewire->ownerRecord->presence()->exists()),
+                CompletionBadge::make(EmpresaModuleStatus::MODULE_PRESENCIA),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_PRESENCIA),
             ])
             ->actions([

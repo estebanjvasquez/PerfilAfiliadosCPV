@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
+use App\Filament\Support\CompletionBadge;
 use App\Filament\Support\NoAplicaAction;
 use App\Models\EmpresaModuleStatus;
 use App\Models\Management;
@@ -137,6 +138,7 @@ class ManagementRelationManager extends RelationManager
                 ], 'info_data'),
             ])
             ->headerActions([
+                CompletionBadge::make(EmpresaModuleStatus::MODULE_GESTION),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_GESTION),
 
                 Action::make('calidad')

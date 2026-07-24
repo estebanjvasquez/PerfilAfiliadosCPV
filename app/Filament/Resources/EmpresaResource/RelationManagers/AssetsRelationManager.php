@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
+use App\Filament\Support\CompletionBadge;
 use App\Filament\Support\NoAplicaAction;
 use App\Models\Asset;
 use App\Models\EmpresaModuleStatus;
@@ -168,6 +169,7 @@ class AssetsRelationManager extends RelationManager
                 ]),
             ])
             ->headerActions([
+                CompletionBadge::make(EmpresaModuleStatus::MODULE_RECURSOS),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_RECURSOS),
 
                 Action::make('recursos_humanos')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
+use App\Filament\Support\CompletionBadge;
 use App\Filament\Support\NoAplicaAction;
 use App\Models\Area;
 use App\Models\EmpresaModuleStatus;
@@ -93,6 +94,7 @@ class SustainabilitiesRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
+                CompletionBadge::make(EmpresaModuleStatus::MODULE_SOSTENIBILIDAD),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_SOSTENIBILIDAD),
             ])
             ->actions([

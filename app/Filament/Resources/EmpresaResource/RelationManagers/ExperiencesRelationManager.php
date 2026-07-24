@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
+use App\Filament\Support\CompletionBadge;
 use App\Filament\Support\NoAplicaAction;
 use App\Models\EmpresaModuleStatus;
 use App\Models\Experience;
@@ -247,6 +248,7 @@ class ExperiencesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('updated_at')->label('Actualización')->dateTime('d/m/Y H:i'),
             ])
             ->headerActions([
+                CompletionBadge::make(EmpresaModuleStatus::MODULE_EXPERIENCIAS),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_EXPERIENCIAS),
 
                 Action::make('agregar_experiencia')
