@@ -56,6 +56,15 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
         return $this->breakdownCache[$empresa->id] ??= $empresa->moduleBreakdown();
     }
 
+    /**
+     * Misma formula que Empresa::completionPercentage(), pero reutilizando el
+     * breakdown ya memoizado en breakdownFor() en vez de recalcularlo.
+     */
+    protected function totalPercentageFor(Empresa $empresa): int
+    {
+        return (int) round(collect($this->breakdownFor($empresa))->avg('percentage'));
+    }
+
     private static function percentageColor(int $percentage): string
     {
         return match (true) {
@@ -80,9 +89,9 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
 
             Tables\Columns\TextColumn::make('completion_total')
                 ->label('% Total')
-                ->getStateUsing(fn (Empresa $record) => $record->completionPercentage())
+                ->getStateUsing(fn (Empresa $record) => $this->totalPercentageFor($record))
                 ->formatStateUsing(fn ($state) => "{$state}%")
-                ->color(fn ($state) => static::percentageColor((int) $state))
+                ->color(fn (Empresa $record) => static::percentageColor($this->totalPercentageFor($record)))
                 ->weight('bold'),
         ];
 
@@ -91,7 +100,7 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
                 ->label($label)
                 ->getStateUsing(fn (Empresa $record) => $this->breakdownFor($record)[$key]['percentage'])
                 ->formatStateUsing(fn ($state) => "{$state}%")
-                ->color(fn ($state) => static::percentageColor((int) $state));
+                ->color(fn (Empresa $record) => static::percentageColor($this->breakdownFor($record)[$key]['percentage']));
         }
 
         return $columns;
