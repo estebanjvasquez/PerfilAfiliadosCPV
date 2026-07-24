@@ -3,8 +3,10 @@
 namespace App\Filament\Pages;
 
 use App\Exports\CompletionExport;
+use App\Filament\Resources\EmpresaResource;
 use App\Models\Empresa;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Closure;
 use Filament\Pages\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Tables;
@@ -77,6 +79,11 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
     protected function getTableQuery(): Builder
     {
         return Empresa::query();
+    }
+
+    protected function getTableRecordUrlUsing(): ?Closure
+    {
+        return fn (Empresa $record) => EmpresaResource::getUrl('edit', ['record' => $record]);
     }
 
     protected function getTableColumns(): array
