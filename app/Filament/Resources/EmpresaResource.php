@@ -270,7 +270,7 @@ class EmpresaResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Eliminar empresas seleccionadas')
                     ->modalSubheading('Esta acción eliminará permanentemente las empresas seleccionadas y TODOS sus datos asociados (Recursos, Sistemas de Gestión, Experiencias, Presencia Internacional, Enfoque de Sostenibilidad, Contactos). Esta acción no se puede deshacer.')
-                    ->modalButtonLabel('Eliminar definitivamente')
+                    ->modalButton('Eliminar definitivamente')
                     ->form([
                         Forms\Components\TextInput::make('confirmacion')
                             ->label('Para confirmar, escriba BORRAR')
