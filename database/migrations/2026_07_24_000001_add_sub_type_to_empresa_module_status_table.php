@@ -19,6 +19,13 @@ return new class extends Migration
      * pero la migracion no se marca como completada, y el siguiente
      * `php artisan migrate` la vuelve a intentar desde el principio.
      *
+     * Importante: `empresa_id` tiene una foreign key, e InnoDB reutiliza
+     * como indice de soporte de esa FK cualquier indice existente cuya
+     * columna izquierda sea empresa_id (aqui, el unique key viejo). Por eso
+     * el nuevo unique se crea ANTES de borrar el viejo — si se borra primero,
+     * la FK se queda sin indice de soporte y MySQL rechaza el DROP con el
+     * error 1553.
+     *
      * @return void
      */
     public function up()
@@ -29,15 +36,15 @@ return new class extends Migration
             });
         }
 
-        if ($this->indexExists(self::OLD_UNIQUE)) {
-            Schema::table('empresa_module_status', function (Blueprint $table) {
-                $table->dropUnique(self::OLD_UNIQUE);
-            });
-        }
-
         if (! $this->indexExists(self::NEW_UNIQUE)) {
             Schema::table('empresa_module_status', function (Blueprint $table) {
                 $table->unique(['empresa_id', 'module', 'sub_type'], self::NEW_UNIQUE);
+            });
+        }
+
+        if ($this->indexExists(self::OLD_UNIQUE)) {
+            Schema::table('empresa_module_status', function (Blueprint $table) {
+                $table->dropUnique(self::OLD_UNIQUE);
             });
         }
     }
@@ -49,15 +56,15 @@ return new class extends Migration
      */
     public function down()
     {
-        if ($this->indexExists(self::NEW_UNIQUE)) {
-            Schema::table('empresa_module_status', function (Blueprint $table) {
-                $table->dropUnique(self::NEW_UNIQUE);
-            });
-        }
-
         if (! $this->indexExists(self::OLD_UNIQUE)) {
             Schema::table('empresa_module_status', function (Blueprint $table) {
                 $table->unique(['empresa_id', 'module'], self::OLD_UNIQUE);
+            });
+        }
+
+        if ($this->indexExists(self::NEW_UNIQUE)) {
+            Schema::table('empresa_module_status', function (Blueprint $table) {
+                $table->dropUnique(self::NEW_UNIQUE);
             });
         }
 
