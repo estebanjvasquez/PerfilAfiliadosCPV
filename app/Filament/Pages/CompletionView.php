@@ -30,7 +30,7 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
 
     protected static string $view = 'filament.pages.completion-view';
 
-    protected static ?int $navigationSort = 0;
+    protected static ?int $navigationSort = -1;
 
     /**
      * Etiquetas cortas de columna para cada renglon de Empresa::moduleBreakdown(),

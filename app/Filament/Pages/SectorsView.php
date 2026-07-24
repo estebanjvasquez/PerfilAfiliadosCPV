@@ -2,13 +2,16 @@
 
 namespace App\Filament\Pages;
 
+use App\Exports\SectorsExport;
 use App\Filament\Resources\EmpresaResource;
 use App\Models\Empresa;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Closure;
+use Filament\Pages\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Reporte para que el administrador detecte de un vistazo dos problemas de
@@ -35,7 +38,7 @@ class SectorsView extends Page implements Tables\Contracts\HasTable
 
     protected static string $view = 'filament.pages.sectors-view';
 
-    protected static ?int $navigationSort = 14;
+    protected static ?int $navigationSort = 0;
 
     private const SECTORS_COUNT_SUBQUERY = '(
         select count(distinct s.sectors_id)
@@ -97,5 +100,25 @@ class SectorsView extends Page implements Tables\Contracts\HasTable
                 ->toggle()
                 ->query(fn (Builder $query) => $query->whereRaw(self::SECTORS_COUNT_SUBQUERY . ' > 2')),
         ];
+    }
+
+    protected function getActions(): array
+    {
+        return [
+            Action::make('Excel')->action('exportSectorsXls'),
+            Action::make('Pdf')->action('exportSectorsPdf'),
+        ];
+    }
+
+    public function exportSectorsXls()
+    {
+        return Excel::download(new SectorsExport, 'sectores.xlsx');
+    }
+
+    public function exportSectorsPdf()
+    {
+        $export = new SectorsExport;
+
+        return Excel::download($export, 'sectores.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }
