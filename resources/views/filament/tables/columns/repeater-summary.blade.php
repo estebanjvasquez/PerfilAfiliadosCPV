@@ -2,6 +2,7 @@
     $rows = $items ?? [];
     $columns = $columns ?? [];
     $optionsMap = $optionsMap ?? [];
+    $noAplica = $noAplica ?? false;
 
     $resolve = function ($key, $value) use ($optionsMap) {
         if ($value === null || $value === '') {
@@ -16,7 +17,9 @@
     };
 @endphp
 
-@if (empty($rows))
+@if ($noAplica)
+    <span class="text-sm text-warning-600 font-medium">No Aplica</span>
+@elseif (empty($rows))
     <span class="text-sm text-gray-400">Sin registros</span>
 @else
     <table class="filament-tables-repeater-summary text-sm w-full">
