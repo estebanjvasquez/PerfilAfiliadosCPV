@@ -43,6 +43,22 @@ class GerenciaDashboard extends Page
 
     protected static string $view = 'filament.pages.gerencia-dashboard';
 
+    /**
+     * Filtros capturados al montar la pagina (carga completa del navegador,
+     * con el querystring real). Livewire persiste las propiedades publicas
+     * entre requests del mismo componente, asi que exportPdf() puede leerlos
+     * de aqui en vez de request()->query() — esa accion corre via una
+     * peticion Livewire aislada (igual que el polling de los widgets, ver
+     * notas en los widgets de este mismo directorio) que no lleva el
+     * querystring de la pagina original.
+     */
+    public array $filters = [];
+
+    public function mount(): void
+    {
+        $this->filters = GerenciaMetrics::filtersFromRequest();
+    }
+
     public function getSectores()
     {
         return Sector::orderBy('name')->pluck('name', 'id');
@@ -60,7 +76,7 @@ class GerenciaDashboard extends Page
 
     public function getFiltros(): array
     {
-        return GerenciaMetrics::filtersFromRequest();
+        return $this->filters;
     }
 
     /**
@@ -100,15 +116,17 @@ class GerenciaDashboard extends Page
     protected function getActions(): array
     {
         return [
-            Action::make('Descargar PDF')->action('exportPdf'),
+            Action::make('pdf')
+                ->label('Descargar PDF')
+                ->action('exportPdf'),
         ];
     }
 
     public function exportPdf()
     {
-        $filters = GerenciaMetrics::filtersFromRequest();
+        $filters = $this->filters;
 
-        return Pdf::loadView('pdf.gerencia-dashboard', [
+        $pdf = Pdf::loadView('pdf.gerencia-dashboard', [
             'resumen' => GerenciaMetrics::resumen($filters),
             'calidadPerfil' => GerenciaMetrics::calidadPerfil($filters),
             'noAplica' => GerenciaMetrics::noAplicaPorModulo($filters),
@@ -124,6 +142,18 @@ class GerenciaDashboard extends Page
             'crecimiento' => GerenciaMetrics::crecimientoAfiliacion($filters),
             'geografia' => GerenciaMetrics::distribucionGeografica($filters),
             'camaras' => GerenciaMetrics::distribucionCamaras($filters),
-        ])->download('tablero-gerencial-' . now()->format('Y-m-d') . '.pdf');
+        ]);
+
+        // Barryvdh\DomPDF::download() devuelve un Illuminate\Http\Response
+        // generico. Livewire solo dispara la descarga en el navegador si el
+        // valor devuelto por la accion es un BinaryFileResponse o un
+        // StreamedResponse (ver Livewire\Features\SupportFileDownloads::
+        // valueIsntAFileResponse()) — con cualquier otro tipo lo descarta en
+        // silencio, sin error visible. response()->streamDownload() sí
+        // devuelve un StreamedResponse.
+        return response()->streamDownload(
+            fn () => print $pdf->output(),
+            'tablero-gerencial-' . now()->format('Y-m-d') . '.pdf'
+        );
     }
 }
