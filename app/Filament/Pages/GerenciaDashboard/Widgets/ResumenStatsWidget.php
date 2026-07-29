@@ -22,24 +22,24 @@ class ResumenStatsWidget extends BaseWidget
         $data = GerenciaMetrics::resumen(GerenciaMetrics::filtersFromRequest());
 
         return [
-            Card::make('Empresas Activas', $data['total_empresas'])
+            Card::make('Empresas activas', $data['total_empresas'])
                 ->icon('heroicon-o-office-building')
                 ->color('primary'),
 
-            Card::make('% Completitud Promedio', $data['completitud_promedio'] . '%')
+            Card::make('% Completado promedio', $data['completitud_promedio'] . '%')
                 ->icon('heroicon-o-chart-pie')
                 ->color($this->colorFor($data['completitud_promedio'])),
 
-            Card::make('Frescura del Dato', $data['frescura_dato'] . '%')
+            Card::make('Frescura del dato', $data['frescura_dato'] . '%')
                 ->description('Actualizado en los últimos 12 meses')
                 ->icon('heroicon-o-clock')
                 ->color($this->colorFor($data['frescura_dato'])),
 
-            Card::make('Sedes con Infraestructura', $data['sedes'])
+            Card::make('Sedes con infraestructura', $data['sedes'])
                 ->icon('heroicon-o-office-building')
                 ->color('primary'),
 
-            Card::make('Historial de Proyectos', $data['proyectos'])
+            Card::make('Historial de proyectos', $data['proyectos'])
                 ->description('Total de experiencias registradas')
                 ->icon('heroicon-o-briefcase')
                 ->color('primary'),

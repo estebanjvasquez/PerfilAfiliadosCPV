@@ -7,7 +7,7 @@ use Filament\Widgets\RadarChartWidget;
 
 class RecursosRadarWidget extends RadarChartWidget
 {
-    protected static ?string $heading = 'Cobertura de Recursos Industriales';
+    protected static ?string $heading = 'Cobertura de recursos industriales';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

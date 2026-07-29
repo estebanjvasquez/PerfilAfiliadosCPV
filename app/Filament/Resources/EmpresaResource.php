@@ -81,17 +81,17 @@ class EmpresaResource extends Resource
                 Forms\Components\TextInput::make('youtube_profile'),
                 Forms\Components\TextInput::make('otros_profile'),
                 Select::make('sector_principal_id')
-                    ->label('Sector Principal')
+                    ->label('Sector principal')
                     ->options(Sector::orderBy('name')->pluck('name', 'id'))
-                    ->placeholder('Seleccione el Sector Principal')
+                    ->placeholder('Seleccione el sector principal')
                     ->reactive()
                     ->required(),
                 Select::make('sector_secundario_id')
-                    ->label('Sector Secundario (opcional)')
+                    ->label('Sector secundario (opcional)')
                     ->options(fn (callable $get) => Sector::orderBy('name')
                         ->where('id', '<>', $get('sector_principal_id'))
                         ->pluck('name', 'id'))
-                    ->placeholder('Seleccione el Sector Secundario')
+                    ->placeholder('Seleccione el sector secundario')
                     ->different('sector_principal_id'),
 
                 Select::make('billing_id')
@@ -166,12 +166,12 @@ class EmpresaResource extends Resource
                 //->url(fn (Empresa $record): string => route('filament.pages.join-views', $record)), RUTA PARA REPORTE HTML........
 
 
-                Tables\Columns\TextColumn::make('name')->label('Nombre de la Empresa'),
+                Tables\Columns\TextColumn::make('name')->label('Nombre de la empresa'),
                 Tables\Columns\IconColumn::make('status_id')
                     ->label('Activo')
                     ->boolean()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('ano_fund')->label('Año de Fundación'),
+                Tables\Columns\TextColumn::make('ano_fund')->label('Año de fundación'),
                 Tables\Columns\TextColumn::make('city.city_name')->label('Ciudad'),
                 Tables\Columns\TextColumn::make('city.countries.country_name')
                     ->label('País')
@@ -184,7 +184,7 @@ class EmpresaResource extends Resource
                         return preg_match('/^[A-Za-z]{2,4}/', $state, $matches) ? $matches[0] : $state;
                     })
                     ->tooltip(fn (Empresa $record): ?string => $record->city?->countries?->country_name),
-                Tables\Columns\TextColumn::make('sectorPrincipal.name')->label('Sector Principal'),
+                Tables\Columns\TextColumn::make('sectorPrincipal.name')->label('Sector principal'),
                 Tables\Columns\TextColumn::make('services.name')
                     ->label('Servicios')
                     ->limit(40)
@@ -269,7 +269,7 @@ class EmpresaResource extends Resource
                     ->visible(fn (): bool => Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
                     ->requiresConfirmation()
                     ->modalHeading('Eliminar empresas seleccionadas')
-                    ->modalSubheading('Esta acción eliminará permanentemente las empresas seleccionadas y TODOS sus datos asociados (Recursos, Sistemas de Gestión, Experiencias, Presencia Internacional, Enfoque de Sostenibilidad, Contactos). Esta acción no se puede deshacer.')
+                    ->modalSubheading('Esta acción eliminará permanentemente las empresas seleccionadas y TODOS sus datos asociados (Recursos, Sistemas de gestión, Experiencias, Presencia internacional, Enfoque de sostenibilidad, Contactos). Esta acción no se puede deshacer.')
                     ->modalButton('Eliminar definitivamente')
                     ->form([
                         Forms\Components\TextInput::make('confirmacion')

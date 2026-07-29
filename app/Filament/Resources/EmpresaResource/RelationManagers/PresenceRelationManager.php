@@ -24,11 +24,11 @@ class PresenceRelationManager extends RelationManager
 {
     protected static string $relationship = 'presence';
 
-    public static ?string $label = 'Presencia Internacional';
+    public static ?string $label = 'Presencia internacional';
 
-    public static ?string $navigationLabel = 'Presencia Internacional';
+    public static ?string $navigationLabel = 'Presencia internacional';
 
-    protected static ?string $pluralModelLabel = 'Presencia Internacional';
+    protected static ?string $pluralModelLabel = 'Presencia internacional';
 
     public static function form(Form $form): Form
     {
@@ -42,7 +42,7 @@ class PresenceRelationManager extends RelationManager
                             Card::make()
                                 ->schema([
                                     Toggle::make('has_offices')
-                                        ->label('Tiene Oficinas o Sucursales Fuera de Venezuela')
+                                        ->label('Tiene oficinas o sucursales fuera de Venezuela')
                                         ->reactive()
                                         ->afterStateUpdated(fn (callable $set) => $set('office', false)),
                                 ]),
@@ -57,7 +57,7 @@ class PresenceRelationManager extends RelationManager
                                         TextInput::make('employees_q')->label('Empleados (n)')->numeric()->minValue(0)
                                             ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(0)->minValue(0)->thousandsSeparator(',')),
                                         Checkbox::make('status')->label('Activa?')->inline(false),
-                                    ])->columns(2)->orderable(false)->label('Datos de Oficinas')
+                                    ])->columns(2)->orderable(false)->label('Datos de oficinas')
                             ])->hidden(fn (callable $get) => $get('has_offices') === false),
                         ]),
                     Wizard\Step::make('¿Tiene experiencia desarrollando proyectos en otros países?')
@@ -65,7 +65,7 @@ class PresenceRelationManager extends RelationManager
                             Card::make()
                                 ->schema([
                                     Toggle::make('has_experience')
-                                        ->label('Tiene Experiencia Desarrollando Proyectos Fuera de Venezuela')
+                                        ->label('Tiene experiencia desarrollando proyectos fuera de Venezuela')
                                         ->reactive()
                                         ->afterStateUpdated(fn (callable $set) => $set('experience', false)),
                                 ]),
@@ -74,13 +74,13 @@ class PresenceRelationManager extends RelationManager
                                     ->schema([
                                         Select::make('expcountry_id')
                                             ->options($countries->pluck('country_name', 'id'))->label('País'),
-                                        TextInput::make('projects_q')->label('Nro. de Proyectos')
+                                        TextInput::make('projects_q')->label('Nro. de proyectos')
                                             ->numeric()->minValue(0)
                                             ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(0)->minValue(0)),
                                         Select::make('role')
                                             ->options([
                                                 '1' => 'Subcontratista',
-                                                '2' => 'Contratista Principal',
+                                                '2' => 'Contratista principal',
                                                 '3' => 'Ambos',
                                             ])->required()->label('Rol'),
                                         Select::make('executed_q')
@@ -89,13 +89,13 @@ class PresenceRelationManager extends RelationManager
                                                 '2' => '100.001 - 1.000.000 USD',
                                                 '3' => '1.000.001 - 10.000.000 USD',
                                                 '4' => '> 10.000.001 USD'
-                                            ])->required()->label('Monto Total Ejecutado'),
+                                            ])->required()->label('Monto total ejecutado'),
                                         TextInput::make('expemployees_q')->label('Empleados (n)')
                                             ->numeric()->minValue(0)
                                             ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(0)->minValue(0)),
                                         TextInput::make('main_clients')->label('Principales clientes')
                                             ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
-                                    ])->columns(3)->orderable(false)->label('Datos de Experiencia')
+                                    ])->columns(3)->orderable(false)->label('Datos de experiencia')
                             ])->hidden(fn (callable $get) => $get('has_experience') === false),
                         ]),
                 ]),
@@ -106,8 +106,8 @@ class PresenceRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\BooleanColumn::make('has_offices')->label('Tiene Presencia Internacional'),
-                Tables\Columns\BooleanColumn::make('has_experience')->label('Tiene Experiencia Internacional'),
+                Tables\Columns\BooleanColumn::make('has_offices')->label('Tiene presencia internacional'),
+                Tables\Columns\BooleanColumn::make('has_experience')->label('Tiene experiencia internacional'),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()

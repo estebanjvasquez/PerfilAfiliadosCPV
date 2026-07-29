@@ -19,26 +19,26 @@
     </style>
 </head>
 <body>
-    <h1>Tablero de Métricas Gerenciales</h1>
+    <h1>Tablero de métricas gerenciales</h1>
     <p class="subtitle">Cámara Petrolera de Venezuela — generado el {{ now()->format('d/m/Y H:i') }}</p>
 
     <div class="kpi-row">
-        <div class="kpi"><div class="value">{{ $resumen['total_empresas'] }}</div><div class="label">Empresas Activas</div></div>
-        <div class="kpi"><div class="value">{{ $resumen['completitud_promedio'] }}%</div><div class="label">Completitud Promedio</div></div>
-        <div class="kpi"><div class="value">{{ $resumen['frescura_dato'] }}%</div><div class="label">Frescura del Dato</div></div>
-        <div class="kpi"><div class="value">{{ $resumen['sedes'] }}</div><div class="label">Sedes c/ Infraestructura</div></div>
-        <div class="kpi"><div class="value">{{ $resumen['proyectos'] }}</div><div class="label">Historial de Proyectos</div></div>
+        <div class="kpi"><div class="value">{{ $resumen['total_empresas'] }}</div><div class="label">Empresas activas</div></div>
+        <div class="kpi"><div class="value">{{ $resumen['completitud_promedio'] }}%</div><div class="label">Completado promedio</div></div>
+        <div class="kpi"><div class="value">{{ $resumen['frescura_dato'] }}%</div><div class="label">Frescura del dato</div></div>
+        <div class="kpi"><div class="value">{{ $resumen['sedes'] }}</div><div class="label">Sedes c/ infraestructura</div></div>
+        <div class="kpi"><div class="value">{{ $resumen['proyectos'] }}</div><div class="label">Historial de proyectos</div></div>
     </div>
 
-    <h2>Segmentación por Calidad de Perfil</h2>
+    <h2>Segmentación por calidad de perfil</h2>
     <table>
         <tr>@foreach ($calidadPerfil as $label => $count)<th>{{ $label }}</th>@endforeach</tr>
         <tr>@foreach ($calidadPerfil as $count)<td>{{ $count }}</td>@endforeach</tr>
     </table>
 
-    <h2>Tasa de "No Aplica" por Módulo</h2>
+    <h2>Tasa de "No Aplica" por módulo</h2>
     <table>
-        <tr><th>Módulo</th><th>NA Completo</th><th>NA Parcial</th></tr>
+        <tr><th>Módulo</th><th>NA completo</th><th>NA parcial</th></tr>
         @foreach ($noAplica['labels'] as $i => $label)
             <tr><td>{{ $label }}</td><td>{{ $noAplica['completo'][$i] }}</td><td>{{ $noAplica['parcial'][$i] }}</td></tr>
         @endforeach
@@ -46,7 +46,7 @@
 
     <div class="two-col">
         <div class="col">
-            <h2>Top Sectores de Afiliados</h2>
+            <h2>Top sectores de afiliados</h2>
             <table>
                 <tr><th>Sector</th><th>Empresas</th></tr>
                 @foreach ($topSectores['labels'] as $i => $label)
@@ -55,7 +55,7 @@
             </table>
         </div>
         <div class="col">
-            <h2>Cobertura de Servicios Técnicos</h2>
+            <h2>Cobertura de servicios técnicos</h2>
             <table>
                 <tr><th>Servicio</th><th>Empresas</th></tr>
                 @foreach ($coberturaServicios['labels'] as $i => $label)
@@ -65,7 +65,7 @@
         </div>
     </div>
 
-    <h2>Índice de Diversificación Sectorial</h2>
+    <h2>Índice de diversificación sectorial</h2>
     <table>
         <tr>@foreach ($diversificacion as $label => $count)<th>{{ $label }}</th>@endforeach</tr>
         <tr>@foreach ($diversificacion as $count)<td>{{ $count }}</td>@endforeach</tr>
@@ -73,14 +73,14 @@
 
     <div class="two-col">
         <div class="col">
-            <h2>Generación de Empleo Directo</h2>
+            <h2>Generación de empleo directo</h2>
             <table>
                 <tr>@foreach ($empleo['labels'] as $label)<th>{{ $label }}</th>@endforeach</tr>
                 <tr>@foreach ($empleo['values'] as $value)<td>{{ $value }}</td>@endforeach</tr>
             </table>
         </div>
         <div class="col">
-            <h2>Estratificación Financiera</h2>
+            <h2>Estratificación financiera</h2>
             <table>
                 <tr>@foreach ($facturacion['labels'] as $label)<th>{{ $label }}</th>@endforeach</tr>
                 <tr>@foreach ($facturacion['values'] as $value)<td>{{ $value }}</td>@endforeach</tr>
@@ -88,7 +88,7 @@
         </div>
     </div>
 
-    <h2>Composición de Capital</h2>
+    <h2>Composición de capital</h2>
     <table>
         <tr><th>Origen: Nacional</th><th>Origen: Internacional</th><th>Propiedad: Privado</th><th>Propiedad: Público</th></tr>
         <tr>
@@ -99,27 +99,27 @@
         </tr>
     </table>
 
-    <h2>Cobertura de Recursos Industriales</h2>
+    <h2>Cobertura de recursos industriales</h2>
     <table>
         <tr>@foreach ($coberturaRecursos['labels'] as $label)<th>{{ $label }}</th>@endforeach</tr>
         <tr>@foreach ($coberturaRecursos['values'] as $value)<td>{{ $value }}%</td>@endforeach</tr>
     </table>
 
-    <h2>Penetración de Certificaciones y Estándares</h2>
+    <h2>Penetración de certificaciones y estándares</h2>
     <table>
-        <tr><th>Estándar</th><th>% de Adopción</th></tr>
+        <tr><th>Estándar</th><th>% de adopción</th></tr>
         @foreach ($certificaciones as $label => $percentage)
             <tr><td>{{ $label }}</td><td>{{ $percentage }}%</td></tr>
         @endforeach
     </table>
 
-    <h2>Alcance Internacional</h2>
+    <h2>Alcance internacional</h2>
     <table>
         <tr>@foreach ($alcanceInternacional as $label => $count)<th>{{ $label }}</th>@endforeach</tr>
         <tr>@foreach ($alcanceInternacional as $count)<td>{{ $count }}</td>@endforeach</tr>
     </table>
 
-    <h2>Crecimiento de Afiliación (últimos 12 meses)</h2>
+    <h2>Crecimiento de afiliación (últimos 12 meses)</h2>
     <table>
         <tr>@foreach ($crecimiento['labels'] as $label)<th>{{ $label }}</th>@endforeach</tr>
         <tr>@foreach ($crecimiento['values'] as $value)<td>{{ $value }}</td>@endforeach</tr>
@@ -127,7 +127,7 @@
 
     <div class="two-col">
         <div class="col">
-            <h2>Distribución Geográfica</h2>
+            <h2>Distribución geográfica</h2>
             <table>
                 <tr><th>Estado</th><th>Empresas</th></tr>
                 @foreach ($geografia['labels'] as $i => $label)
@@ -136,7 +136,7 @@
             </table>
         </div>
         <div class="col">
-            <h2>Distribución por Cámara / Capítulo</h2>
+            <h2>Distribución por cámara / capítulo</h2>
             <table>
                 <tr><th>Cámara</th><th>Empresas</th></tr>
                 @foreach ($camaras['labels'] as $i => $label)

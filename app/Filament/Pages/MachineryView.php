@@ -12,9 +12,9 @@ class MachineryView extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Detalle de Maquinaria y Equipos';
+    protected static ?string $navigationLabel = 'Detalle de maquinaria y equipos';
 
-    protected static ?string $title = 'Detalle de Maquinaria y Equipos';
+    protected static ?string $title = 'Detalle de maquinaria y equipos';
 
     protected static ?string $slug = 'machinery-view';
 

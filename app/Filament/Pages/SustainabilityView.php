@@ -12,9 +12,9 @@ class SustainabilityView extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Sistemas de Sostenibilidad';
+    protected static ?string $navigationLabel = 'Sistemas de sostenibilidad';
 
-    protected static ?string $title = 'Sistemas de Sostenibilidad';
+    protected static ?string $title = 'Sistemas de sostenibilidad';
 
     protected static ?string $slug = 'sustainability-view';
 

@@ -28,9 +28,9 @@ class SectorsView extends Page implements Tables\Contracts\HasTable
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
-    protected static ?string $navigationLabel = 'Sectores por Empresa';
+    protected static ?string $navigationLabel = 'Sectores por empresa';
 
-    protected static ?string $title = 'Sectores por Empresa';
+    protected static ?string $title = 'Sectores por empresa';
 
     protected static ?string $slug = 'sectors-view';
 
@@ -69,17 +69,17 @@ class SectorsView extends Page implements Tables\Contracts\HasTable
                 ->sortable(),
 
             Tables\Columns\TextColumn::make('sectorPrincipal.name')
-                ->label('Sector Principal')
+                ->label('Sector principal')
                 ->default('Sin configurar')
                 ->color(fn (Empresa $record) => $record->sector_principal_id ? null : 'danger'),
 
             Tables\Columns\TextColumn::make('sectorSecundario.name')
-                ->label('Sector Secundario')
+                ->label('Sector secundario')
                 ->default('Sin configurar')
                 ->color(fn (Empresa $record) => $record->sector_secundario_id ? null : 'danger'),
 
             Tables\Columns\TextColumn::make('sectors_count')
-                ->label('Cantidad de Sectores')
+                ->label('Cantidad de sectores')
                 ->sortable()
                 ->color(fn (Empresa $record) => ((int) $record->sectors_count) > 2 ? 'danger' : 'success'),
         ];

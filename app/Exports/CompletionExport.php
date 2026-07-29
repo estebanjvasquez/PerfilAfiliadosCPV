@@ -27,7 +27,12 @@ class CompletionExport implements FromCollection, ShouldAutoSize, WithHeadings, 
             $breakdown = $empresa->moduleBreakdown();
 
             return array_merge(
-                [$empresa->id, $empresa->name, $empresa->completionPercentage()],
+                [
+                    $empresa->id,
+                    $empresa->name,
+                    $empresa->principalUser()?->name ?? 'Sin usuario asignado',
+                    $empresa->completionPercentage(),
+                ],
                 array_column($breakdown, 'percentage')
             );
         });
@@ -38,9 +43,10 @@ class CompletionExport implements FromCollection, ShouldAutoSize, WithHeadings, 
         return [
             'ID',
             'Nombre',
+            'Usuario principal',
             '% Total',
-            'Datos Generales',
-            'Sectores y Servicios',
+            'Datos generales',
+            'Sectores y servicios',
             'Contactos',
             EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_RECURSOS],
             EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_GESTION],

@@ -303,7 +303,7 @@ $datos_pres = App\Filament\Pages\JoinViews::index_pres($record[0])->data_pres;
                         <div class="card" style="display: inline-block; font-size: 12px;">
                             <table>
                                 <tr>
-                                    <th style="border: none; padding: 0px">Magnitud del Contrato</th>
+                                    <th style="border: none; padding: 0px">Magnitud del contrato</th>
                                     <th style="border: none; padding: 0px" colspan="3">{{ $row->magnitud }}</th>
                                 </tr>
                                 <tr>
@@ -326,7 +326,7 @@ $datos_pres = App\Filament\Pages\JoinViews::index_pres($record[0])->data_pres;
                         <div class="card" style="display: inline-block; font-size: 12px;">
                             <table>
                                 <tr>
-                                    <th style="border: none; padding: 4px" colspan="4">Descripción del Trabajo Realizado:</th>
+                                    <th style="border: none; padding: 4px" colspan="4">Descripción del trabajo realizado:</th>
                                 </tr>
 
                                 <tr>

@@ -13,9 +13,9 @@ class ExperienceView extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Experiencia Relevante';
+    protected static ?string $navigationLabel = 'Experiencia relevante';
 
-    protected static ?string $title = 'Experiencia Relevante';
+    protected static ?string $title = 'Experiencia relevante';
 
     protected static ?string $slug = 'experience-view';
 

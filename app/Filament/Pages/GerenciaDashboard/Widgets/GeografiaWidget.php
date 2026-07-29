@@ -7,7 +7,7 @@ use Filament\Widgets\BarChartWidget;
 
 class GeografiaWidget extends BarChartWidget
 {
-    protected static ?string $heading = 'Distribución Geográfica (Top 10 Estados)';
+    protected static ?string $heading = 'Distribución geográfica (Top 10 estados)';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

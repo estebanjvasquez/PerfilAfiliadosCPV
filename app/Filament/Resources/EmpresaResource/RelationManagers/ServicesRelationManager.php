@@ -26,11 +26,11 @@ class ServicesRelationManager extends BelongsToManyRelationManager
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static ?string $label = 'Sectores y Servicios';
+    public static ?string $label = 'Sectores y servicios';
 
-    public static ?string $navigationLabel = 'Sectores y Servicios';
+    public static ?string $navigationLabel = 'Sectores y servicios';
 
-    protected static ?string $pluralModelLabel = 'Sectores y Servicios';
+    protected static ?string $pluralModelLabel = 'Sectores y servicios';
 
     protected function canEdit(Model $record): bool
     {
@@ -92,7 +92,7 @@ class ServicesRelationManager extends BelongsToManyRelationManager
 
                             return Sector::all()->pluck('name', 'id')->toArray();
                         })
-                        ->helperText('Limitado al Sector Principal y Secundario definidos en los datos de la empresa (máximo 2 sectores).')
+                        ->helperText('Limitado al sector principal y secundario definidos en los datos de la empresa (máximo 2 sectores).')
                         ->reactive()
                         ->afterStateUpdated(fn (callable $set) => $set('services.id', null)),
 
@@ -123,7 +123,7 @@ class ServicesRelationManager extends BelongsToManyRelationManager
                             Notification::make()
                                 ->danger()
                                 ->title('Sector no permitido')
-                                ->body('Solo puede asociar servicios de su Sector Principal o Secundario. Si necesita cambiar de sectores, edite los datos de la empresa.')
+                                ->body('Solo puede asociar servicios de su sector principal o secundario. Si necesita cambiar de sectores, edite los datos de la empresa.')
                                 ->persistent()
                                 ->send();
 
@@ -139,7 +139,7 @@ class ServicesRelationManager extends BelongsToManyRelationManager
                         Notification::make()
                             ->danger()
                             ->title('Máximo 2 sectores por empresa')
-                            ->body('Su empresa ya tiene servicios en 2 sectores. Defina su Sector Principal y Secundario en los datos de la empresa, o desvincule servicios de otros sectores.')
+                            ->body('Su empresa ya tiene servicios en 2 sectores. Defina su sector principal y secundario en los datos de la empresa, o desvincule servicios de otros sectores.')
                             ->persistent()
                             ->send();
 

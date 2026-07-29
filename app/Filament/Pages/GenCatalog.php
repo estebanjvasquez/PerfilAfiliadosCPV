@@ -27,9 +27,9 @@ class GenCatalog extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Catalogo General CPV';
+    protected static ?string $navigationLabel = 'Catalogo general CPV';
 
-    protected static ?string $title = 'Catálogo General CPV';
+    protected static ?string $title = 'Catálogo general CPV';
 
     protected static ?string $slug = 'gen-catalog';
 

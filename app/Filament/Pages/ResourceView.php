@@ -14,7 +14,7 @@ class ResourceView extends Page
 
     protected static ?string $navigationLabel = 'Detalle de RR.HH.';
 
-    protected static ?string $title = 'Detalle de Recursos Humanos';
+    protected static ?string $title = 'Detalle de recursos humanos';
 
     protected static ?string $slug = 'resource-view';
 

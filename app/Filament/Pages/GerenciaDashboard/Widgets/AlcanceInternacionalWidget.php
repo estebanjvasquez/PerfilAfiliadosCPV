@@ -7,7 +7,7 @@ use Filament\Widgets\DoughnutChartWidget;
 
 class AlcanceInternacionalWidget extends DoughnutChartWidget
 {
-    protected static ?string $heading = 'Alcance Internacional';
+    protected static ?string $heading = 'Alcance internacional';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

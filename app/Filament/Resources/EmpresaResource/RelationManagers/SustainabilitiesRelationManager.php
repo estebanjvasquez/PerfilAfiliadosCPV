@@ -20,11 +20,11 @@ class SustainabilitiesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'sust_title';
 
-    public static ?string $label = 'Enfoque de Sostenibilidad';
+    public static ?string $label = 'Enfoque de sostenibilidad';
 
-    public static ?string $navigationLabel = 'Enfoque de Sostenibilidad';
+    public static ?string $navigationLabel = 'Enfoque de sostenibilidad';
 
-    protected static ?string $pluralModelLabel = 'Enfoques de Sostenibilidad';
+    protected static ?string $pluralModelLabel = 'Enfoques de sostenibilidad';
 
     public static function form(Form $form): Form
     {

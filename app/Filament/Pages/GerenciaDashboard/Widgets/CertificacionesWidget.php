@@ -12,7 +12,7 @@ use Filament\Widgets\BarChartWidget;
  */
 class CertificacionesWidget extends BarChartWidget
 {
-    protected static ?string $heading = 'Penetración de Certificaciones y Estándares';
+    protected static ?string $heading = 'Penetración de certificaciones y estándares';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

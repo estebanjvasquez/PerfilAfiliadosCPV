@@ -20,10 +20,10 @@ class EmpresaModuleStatus extends Model
 
     public const MODULES = [
         self::MODULE_RECURSOS => 'Recursos en Venezuela',
-        self::MODULE_GESTION => 'Sistemas de Gestión',
-        self::MODULE_PRESENCIA => 'Presencia Internacional',
-        self::MODULE_EXPERIENCIAS => 'Experiencia Relevante',
-        self::MODULE_SOSTENIBILIDAD => 'Enfoque de Sostenibilidad',
+        self::MODULE_GESTION => 'Sistemas de gestión',
+        self::MODULE_PRESENCIA => 'Presencia internacional',
+        self::MODULE_EXPERIENCIAS => 'Experiencia relevante',
+        self::MODULE_SOSTENIBILIDAD => 'Enfoque de sostenibilidad',
     ];
 
     /**
@@ -38,18 +38,18 @@ class EmpresaModuleStatus extends Model
      */
     public const SUB_TYPES = [
         self::MODULE_RECURSOS => [
-            'employee' => 'Recursos Humanos',
-            'machinery' => 'Maquinaria y Equipos',
+            'employee' => 'Recursos humanos',
+            'machinery' => 'Maquinaria y equipos',
             'facility' => 'Instalaciones',
             'inventory' => 'Inventario',
         ],
         self::MODULE_GESTION => [
             'calidad' => 'Calidad',
             'ambiente' => 'Ambiente',
-            'credibilidad' => 'Credibilidad y Transparencia',
+            'credibilidad' => 'Credibilidad y transparencia',
             'seguridad' => 'Seguridad',
-            'proyectos' => 'Gestión de Proyectos',
-            'seguridad_info' => 'Seguridad de la Información',
+            'proyectos' => 'Gestión de proyectos',
+            'seguridad_info' => 'Seguridad de la información',
         ],
     ];
 

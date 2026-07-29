@@ -7,7 +7,7 @@ use Filament\Widgets\BarChartWidget;
 
 class EmpleoWidget extends BarChartWidget
 {
-    protected static ?string $heading = 'Generación de Empleo Directo';
+    protected static ?string $heading = 'Generación de empleo directo';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

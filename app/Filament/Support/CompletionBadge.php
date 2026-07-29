@@ -17,7 +17,7 @@ class CompletionBadge
     public static function make(string $module): Action
     {
         return Action::make('completitud')
-            ->label(fn (RelationManager $livewire) => 'Completitud: ' . static::percentage($livewire, $module) . '%')
+            ->label(fn (RelationManager $livewire) => 'Completado: ' . static::percentage($livewire, $module) . '%')
             ->icon('heroicon-o-chart-pie')
             ->color(fn (RelationManager $livewire) => static::color(static::percentage($livewire, $module)))
             ->disabled();

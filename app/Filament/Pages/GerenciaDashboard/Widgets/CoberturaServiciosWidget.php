@@ -7,7 +7,7 @@ use Filament\Widgets\BarChartWidget;
 
 class CoberturaServiciosWidget extends BarChartWidget
 {
-    protected static ?string $heading = 'Cobertura de Servicios Técnicos (Top 10)';
+    protected static ?string $heading = 'Cobertura de servicios técnicos (Top 10)';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

@@ -28,19 +28,19 @@ class CreateEmpresa extends CreateRecord
         }
 
         return [
-            Wizard\Step::make('1 - Datos Generales')
+            Wizard\Step::make('1 - Datos generales')
                 ->schema([
                     Forms\Components\TextInput::make('rif')->required()->unique()
                         ->placeholder('X-XXXXXXXX')
                         ->afterStateUpdated(function ($component, $state, $set) {
                             return $set($component, mb_strtoupper($state));
                         }),
-                    Forms\Components\TextInput::make('name')->required()->label('Nombre de la Empresa')
+                    Forms\Components\TextInput::make('name')->required()->label('Nombre de la empresa')
                         ->afterStateUpdated(function ($component, $state, $set) {
                             return $set($component, mb_strtoupper($state));
                         }),
                     Forms\Components\TextInput::make('ano_fund')->numeric()->minValue(1901)->maxValue(2150)
-                        ->label('Año de Fundación')->placeholder('aaaa'),
+                        ->label('Año de fundación')->placeholder('aaaa'),
                     Fieldset::make('Dirección')->schema([
                         Forms\Components\TextInput::make('phone')->tel()->label('Tefléfono')
                             ->placeholder('+(XX)XXXXXXX'),
@@ -55,9 +55,9 @@ class CreateEmpresa extends CreateRecord
 
                     ])->columns(3),
                 ])->columns(3),
-            Wizard\Step::make('2 - Datos de Contacto')
+            Wizard\Step::make('2 - Datos de contacto')
                 ->schema([
-                    Fieldset::make('Redes Sociales')->schema([
+                    Fieldset::make('Redes sociales')->schema([
                         Forms\Components\TextInput::make('website')->mask(fn (Mask $mask) => $mask->pattern('http://**********************************')),
                         Forms\Components\TextInput::make('linkedin_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************')),
                         Forms\Components\TextInput::make('twitter_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************')),
@@ -69,15 +69,15 @@ class CreateEmpresa extends CreateRecord
                 ]),
             Wizard\Step::make('3 - Operaciones')
                 ->schema([
-                    Fieldset::make('Sectores de Actividad Económica (máximo 2)')->schema([
+                    Fieldset::make('Sectores de actividad económica (máximo 2)')->schema([
                         Select::make('sector_principal_id')
-                            ->label('Sector Principal')
+                            ->label('Sector principal')
                             ->options(Sector::orderBy('name')->pluck('name', 'id'))
                             ->placeholder('Por favor seleccione una opción')
                             ->reactive()
                             ->required(),
                         Select::make('sector_secundario_id')
-                            ->label('Sector Secundario (opcional)')
+                            ->label('Sector secundario (opcional)')
                             ->options(fn (callable $get) => Sector::orderBy('name')
                                 ->where('id', '<>', $get('sector_principal_id'))
                                 ->pluck('name', 'id'))
@@ -108,9 +108,11 @@ class CreateEmpresa extends CreateRecord
                             ->options([
                                 '1' => 'Activa',
                                 '0' => 'Inactiva',
-                            ])->label('Estatus actual')->placeholder('Por favor seleccione una opción'),
+                            ])->label('Estatus actual')
+                            ->default('1')
+                            ->required(),
                     ])->columns(3),
-                    Fieldset::make('Capital de la Empresa')->schema([
+                    Fieldset::make('Capital de la empresa')->schema([
                         Forms\Components\Select::make('property_id')
                             ->options([
                                 '1' => 'Privado',
@@ -129,7 +131,7 @@ class CreateEmpresa extends CreateRecord
 
                     Repeater::make('customers_country')
                         ->schema([
-                            Forms\Components\TextInput::make('customer_name')->label('Nombre del Cliente')
+                            Forms\Components\TextInput::make('customer_name')->label('Nombre del cliente')
                                 ->afterStateUpdated(function ($component, $state, $set) {
                                     return $set($component, mb_strtoupper($state));
                                 }),

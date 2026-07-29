@@ -12,9 +12,9 @@ class ManagementView extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Sistemas de Gestión';
+    protected static ?string $navigationLabel = 'Sistemas de gestión';
 
-    protected static ?string $title = 'Sistemas de Gestión';
+    protected static ?string $title = 'Sistemas de gestión';
 
     protected static ?string $slug = 'management-view';
 

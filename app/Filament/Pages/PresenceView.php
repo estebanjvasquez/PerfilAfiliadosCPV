@@ -12,9 +12,9 @@ class PresenceView extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Presencia Internacional';
+    protected static ?string $navigationLabel = 'Presencia internacional';
 
-    protected static ?string $title = 'Presencia Internacional';
+    protected static ?string $title = 'Presencia internacional';
 
     protected static ?string $slug = 'presence-view';
 

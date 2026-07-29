@@ -7,7 +7,7 @@ use Filament\Widgets\DoughnutChartWidget;
 
 class CalidadPerfilWidget extends DoughnutChartWidget
 {
-    protected static ?string $heading = 'Segmentación por Calidad de Perfil';
+    protected static ?string $heading = 'Segmentación por calidad de perfil';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

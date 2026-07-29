@@ -12,9 +12,9 @@ class FacilityView extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Detalle de Instalaciones';
+    protected static ?string $navigationLabel = 'Detalle de instalaciones';
 
-    protected static ?string $title = 'Detalle de Instalaciones';
+    protected static ?string $title = 'Detalle de instalaciones';
 
     protected static ?string $slug = 'facility-view';
 

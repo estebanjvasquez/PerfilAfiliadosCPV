@@ -30,11 +30,11 @@ class ExperiencesRelationManager extends RelationManager
 {
     protected static string $relationship = 'experiences';
 
-    public static ?string $label = 'Experiencia Relevante';
+    public static ?string $label = 'Experiencia relevante';
 
-    public static ?string $navigationLabel = 'Experiencia Relevante';
+    public static ?string $navigationLabel = 'Experiencia relevante';
 
-    protected static ?string $pluralModelLabel = 'Experiencia Relevante';
+    protected static ?string $pluralModelLabel = 'Experiencia relevante';
 
     /**
      * Campos de una experiencia individual (un "año" de experiencia).
@@ -83,7 +83,7 @@ class ExperiencesRelationManager extends RelationManager
                         ->afterStateUpdated(fn (callable $set) => $set('infraregions_id', null)),
 
                     Select::make('infraregions_id')
-                        ->label('Región o Distrito')
+                        ->label('Región o distrito')
                         ->options(function (callable $get) {
                             $isystem = InfraSystem::find($get('infrasystems_id'));
                             if (! $isystem) {
@@ -103,7 +103,7 @@ class ExperiencesRelationManager extends RelationManager
                             }
                             return $iregsys->getFacility($iregsys->id, $get('infrasystems_id'))->pluck('facility_name', 'id');
                         }),
-                ])->columns(1)->label('Infraestructura en la que Trabajó'),
+                ])->columns(1)->label('Infraestructura en la que trabajó'),
             ])->columns(1)->columnSpan(2),
 
             Group::make([
@@ -113,12 +113,12 @@ class ExperiencesRelationManager extends RelationManager
                         '2' => '100.001 - 1.000.000 USD',
                         '3' => '1.000.001 - 10.000.000 USD',
                         '4' => '> 10.000.001 USD',
-                    ])->label('Orden de Magnitud del Contrato')
+                    ])->label('Orden de magnitud del contrato')
                     ->placeholder('Por favor seleccione una opción'),
 
                 Fieldset::make('clasificacion')->schema([
-                    TextInput::make('prof_tech')->label('Prof. y Técnicos')->numeric()->minValue(0),
-                    TextInput::make('manpower')->label('Mano de Obra Directa')->numeric()->minValue(0),
+                    TextInput::make('prof_tech')->label('Prof. y técnicos')->numeric()->minValue(0),
+                    TextInput::make('manpower')->label('Mano de obra directa')->numeric()->minValue(0),
                 ])->columns(2)->label('Esfuerzo H-H'),
 
                 Fieldset::make('clasificacion')->schema([
@@ -138,12 +138,12 @@ class ExperiencesRelationManager extends RelationManager
                             }
                             return $sector->services->pluck('name', 'id');
                         }),
-                ])->columns(1)->label('Clasificación del Tipo de Trabajo Realizado'),
+                ])->columns(1)->label('Clasificación del tipo de trabajo realizado'),
             ])->columns(1)->columnSpan(2),
 
             Group::make([
                 Textarea::make('Descripcion')
-                    ->label('Breve Descripción del Trabajo Realizado')
+                    ->label('Breve descripción del trabajo realizado')
                     ->rows(10),
             ])->columns(1)->columnSpan(2),
         ];
@@ -252,9 +252,9 @@ class ExperiencesRelationManager extends RelationManager
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_EXPERIENCIAS),
 
                 Action::make('agregar_experiencia')
-                    ->label('Agregar Experiencia')
+                    ->label('Agregar experiencia')
                     ->icon('heroicon-o-plus-circle')
-                    ->modalHeading('Agregar Experiencia')
+                    ->modalHeading('Agregar experiencia')
                     ->modalWidth('7xl')
                     ->form(static::fields())
                     ->action(fn (array $data, RelationManager $livewire) => static::saveEntry($livewire, $data, null)),
@@ -263,7 +263,7 @@ class ExperiencesRelationManager extends RelationManager
                 Action::make('editar')
                     ->label('Editar')
                     ->icon('heroicon-o-pencil')
-                    ->modalHeading('Editar Experiencia')
+                    ->modalHeading('Editar experiencia')
                     ->modalWidth('7xl')
                     ->form(static::fields())
                     ->mountUsing(fn (ComponentContainer $form, Experience $record) => $form->fill($record->row_data ?? []))

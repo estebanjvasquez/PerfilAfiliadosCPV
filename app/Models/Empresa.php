@@ -141,6 +141,21 @@ class Empresa extends Model
         //    ->wherePivot('user_id', $user_id);
     }
 
+    /**
+     * Usuario principal de la empresa: el usuario vinculado mas antiguo
+     * (primer empresa_user.created_at) que no tenga el rol super_admin.
+     * No hay una columna "is_primary" en empresa_user, asi que se infiere
+     * por antiguedad de vinculacion, que en la practica coincide con quien
+     * creo la empresa (ver Empresa::boot()).
+     */
+    public function principalUser(): ?User
+    {
+        return $this->users()
+            ->whereDoesntHave('roles', fn ($query) => $query->where('name', config('filament-shield.super_admin.role_name')))
+            ->orderBy('empresa_user.created_at')
+            ->first();
+    }
+
     public function sectors()
     {
         return $this->belongsToMany(Sector::class, 'empresa_sector_service');

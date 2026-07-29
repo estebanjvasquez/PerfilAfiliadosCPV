@@ -7,7 +7,7 @@ use Filament\Widgets\BarChartWidget;
 
 class NoAplicaWidget extends BarChartWidget
 {
-    protected static ?string $heading = 'Tasa de "No Aplica" por Módulo';
+    protected static ?string $heading = 'Tasa de "No Aplica" por módulo';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

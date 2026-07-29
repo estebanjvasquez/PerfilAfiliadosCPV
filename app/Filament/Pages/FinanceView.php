@@ -12,9 +12,9 @@ class FinanceView extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Capacidad Financiera';
+    protected static ?string $navigationLabel = 'Capacidad financiera';
 
-    protected static ?string $title = 'Capacidad Financiera';
+    protected static ?string $title = 'Capacidad financiera';
 
     protected static ?string $slug = 'finance-view';
 

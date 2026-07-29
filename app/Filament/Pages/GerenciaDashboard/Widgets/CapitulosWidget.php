@@ -7,7 +7,7 @@ use Filament\Widgets\BarChartWidget;
 
 class CapitulosWidget extends BarChartWidget
 {
-    protected static ?string $heading = 'Distribución por Cámara / Capítulo';
+    protected static ?string $heading = 'Distribución por cámara / capítulo';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

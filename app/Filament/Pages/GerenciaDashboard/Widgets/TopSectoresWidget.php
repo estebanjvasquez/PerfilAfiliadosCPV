@@ -7,7 +7,7 @@ use Filament\Widgets\BarChartWidget;
 
 class TopSectoresWidget extends BarChartWidget
 {
-    protected static ?string $heading = 'Top 10 Sectores de Afiliados';
+    protected static ?string $heading = 'Top 10 sectores de afiliados';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

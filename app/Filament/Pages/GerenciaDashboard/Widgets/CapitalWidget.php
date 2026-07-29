@@ -14,7 +14,7 @@ use Filament\Widgets\BarChartWidget;
  */
 class CapitalWidget extends BarChartWidget
 {
-    protected static ?string $heading = 'Composición de Capital';
+    protected static ?string $heading = 'Composición de capital';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

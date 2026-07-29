@@ -12,9 +12,9 @@ class ClientsView extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Experiencia - Clientes';
+    protected static ?string $navigationLabel = 'Experiencia - clientes';
 
-    protected static ?string $title = 'Experiencia - Clientes';
+    protected static ?string $title = 'Experiencia - clientes';
 
     protected static ?string $slug = 'clients-view';
 

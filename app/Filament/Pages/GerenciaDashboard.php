@@ -33,9 +33,9 @@ class GerenciaDashboard extends Page
 
     protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-line';
 
-    protected static ?string $navigationLabel = 'Tablero Gerencial';
+    protected static ?string $navigationLabel = 'Tablero gerencial';
 
-    protected static ?string $title = 'Tablero de Métricas Gerenciales';
+    protected static ?string $title = 'Tablero de métricas gerenciales';
 
     protected static ?string $slug = 'gerencia-dashboard';
 

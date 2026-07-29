@@ -7,7 +7,7 @@ use Filament\Widgets\BarChartWidget;
 
 class FacturacionWidget extends BarChartWidget
 {
-    protected static ?string $heading = 'Estratificación Financiera';
+    protected static ?string $heading = 'Estratificación financiera';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

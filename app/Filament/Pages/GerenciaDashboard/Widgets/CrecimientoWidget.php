@@ -7,7 +7,7 @@ use Filament\Widgets\LineChartWidget;
 
 class CrecimientoWidget extends LineChartWidget
 {
-    protected static ?string $heading = 'Crecimiento de Afiliación (últimos 12 meses)';
+    protected static ?string $heading = 'Crecimiento de afiliación (últimos 12 meses)';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;

@@ -32,7 +32,7 @@ class SectorsExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
 
     public function headings(): array
     {
-        return ['ID', 'Nombre', 'Sector Principal', 'Sector Secundario', 'Cantidad de Sectores'];
+        return ['ID', 'Nombre', 'Sector principal', 'Sector secundario', 'Cantidad de sectores'];
     }
 
     public function registerEvents(): array

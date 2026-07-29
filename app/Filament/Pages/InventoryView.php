@@ -12,9 +12,9 @@ class InventoryView extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Detalle de Inventario';
+    protected static ?string $navigationLabel = 'Detalle de inventario';
 
-    protected static ?string $title = 'Detalle de Inventario';
+    protected static ?string $title = 'Detalle de inventario';
 
     protected static ?string $slug = 'inventory-view';
 

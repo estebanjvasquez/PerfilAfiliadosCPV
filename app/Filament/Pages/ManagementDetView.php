@@ -12,9 +12,9 @@ class ManagementDetView extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Detalle de Sistema de Gestión';
+    protected static ?string $navigationLabel = 'Detalle de sistema de gestión';
 
-    protected static ?string $title = 'Detalle de Sistema de Gestión';
+    protected static ?string $title = 'Detalle de sistema de gestión';
 
     protected static ?string $slug = 'management-det-view';
 

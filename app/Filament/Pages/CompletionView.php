@@ -20,9 +20,9 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
 
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static ?string $navigationLabel = 'Completitud de Perfiles';
+    protected static ?string $navigationLabel = 'Estatus de perfiles';
 
-    protected static ?string $title = 'Completitud de Perfiles por Empresa';
+    protected static ?string $title = 'Estatus de perfiles por empresa';
 
     protected static ?string $slug = 'completion-view';
 
@@ -94,6 +94,15 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
                 ->searchable()
                 ->sortable(),
 
+            Tables\Columns\TextColumn::make('principal_user')
+                ->label('Usuario principal')
+                ->getStateUsing(fn (Empresa $record) => $record->principalUser()?->name)
+                ->default('Sin usuario asignado')
+                ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereHas(
+                    'users',
+                    fn (Builder $q) => $q->where('name', 'like', "%{$search}%")
+                )),
+
             Tables\Columns\TextColumn::make('completion_total')
                 ->label('% Total')
                 ->getStateUsing(fn (Empresa $record) => $this->totalPercentageFor($record))
@@ -123,13 +132,13 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
 
     public function exportCompletionXls()
     {
-        return Excel::download(new CompletionExport, 'completitud.xlsx');
+        return Excel::download(new CompletionExport, 'estatus-perfiles.xlsx');
     }
 
     public function exportCompletionPdf()
     {
         $export = new CompletionExport;
 
-        return Excel::download($export, 'completitud.pdf', \Maatwebsite\Excel\Excel::MPDF);
+        return Excel::download($export, 'estatus-perfiles.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }

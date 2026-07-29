@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class EmpresasEstancadasWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Empresas Estancadas (ordenadas por antigüedad de actualización)';
+    protected static ?string $heading = 'Empresas estancadas (ordenadas por antigüedad de actualización)';
 
     protected int | string | array $columnSpan = 'full';
 
@@ -41,12 +41,12 @@ class EmpresasEstancadasWidget extends BaseWidget
                 ->searchable(),
 
             Tables\Columns\TextColumn::make('updated_at')
-                ->label('Última Actualización')
+                ->label('Última actualización')
                 ->dateTime('d/m/Y')
                 ->sortable(),
 
             Tables\Columns\TextColumn::make('completion')
-                ->label('% Completitud')
+                ->label('% Completado')
                 ->getStateUsing(fn (Empresa $record) => $record->completionPercentage())
                 ->formatStateUsing(fn ($state) => "{$state}%")
                 ->color(fn (Empresa $record) => $record->completionPercentage() < 50 ? 'danger' : 'warning'),

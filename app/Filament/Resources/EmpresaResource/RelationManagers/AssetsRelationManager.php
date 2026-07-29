@@ -131,25 +131,25 @@ class AssetsRelationManager extends RelationManager
 
         return $table
             ->columns([
-                static::summaryColumn('employee', 'employee', 'Recursos Humanos', [
-                    'employee_type' => 'Tipo de Recurso',
+                static::summaryColumn('employee', 'employee', 'Recursos humanos', [
+                    'employee_type' => 'Tipo de recurso',
                     'junior_q' => 'Junior',
                     'medium_q' => 'Medium',
                     'senior_q' => 'Senior',
                 ], [
                     'employee_type' => $titles['employee'],
                 ]),
-                static::summaryColumn('machinery', 'machinery', 'Maquinaria y Equipos', [
+                static::summaryColumn('machinery', 'machinery', 'Maquinaria y equipos', [
                     'machinery_name' => 'Equipo',
                     'machinery_qid' => 'Cantidad',
-                    'machinery_est' => 'Valor Estimado',
+                    'machinery_est' => 'Valor estimado',
                 ], [
                     'machinery_name' => $titles['machinery'],
                     'machinery_qid' => static::$qtyOptions,
                     'machinery_est' => static::$valueOptions,
                 ]),
                 static::summaryColumn('facility', 'facility', 'Instalaciones', [
-                    'facility_type' => 'Tipo de Instalación',
+                    'facility_type' => 'Tipo de instalación',
                     'facility_q' => 'Cantidad',
                     'facility_surf' => 'Sup (m²)',
                     'facility_own' => 'Propiedad',
@@ -158,10 +158,10 @@ class AssetsRelationManager extends RelationManager
                     'facility_own' => ['1' => 'Propia', '2' => 'Alquilada', '3' => 'Ambas'],
                 ]),
                 static::summaryColumn('inventory', 'inventory', 'Inventario', [
-                    'inventory_name' => 'Tipo de Inventario',
+                    'inventory_name' => 'Tipo de inventario',
                     'inventory_q' => 'Cantidad',
                     'inventory_unit' => 'Unidad',
-                    'inventory_est' => 'Valor Estimado',
+                    'inventory_est' => 'Valor estimado',
                 ], [
                     'inventory_name' => $titles['inventory'],
                     'inventory_q' => static::$qtyOptions,
@@ -173,44 +173,44 @@ class AssetsRelationManager extends RelationManager
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_RECURSOS),
 
                 Action::make('recursos_humanos')
-                    ->label('Recursos Humanos')
+                    ->label('Recursos humanos')
                     ->icon('heroicon-o-user-group')
-                    ->modalHeading('Agregar / Editar Recursos Humanos')
+                    ->modalHeading('Agregar / editar recursos humanos')
                     ->modalWidth('4xl')
                     ->form([
                         static::noAplicaToggle('employee'),
                         Group::make([
                             Repeater::make('employee')
-                                ->label('Recursos Humanos')
+                                ->label('Recursos humanos')
                                 ->default(fn (RelationManager $livewire) => $livewire->ownerRecord->assets()->first()?->employee ?? [])
                                 ->schema([
-                                    Select::make('employee_type')->required()->label('Tipo de Recurso')->options($titles['employee']),
+                                    Select::make('employee_type')->required()->label('Tipo de recurso')->options($titles['employee']),
                                     TextInput::make('junior_q')->required()->numeric()->minValue(0)->default(0)->label('Junior'),
                                     TextInput::make('medium_q')->required()->numeric()->minValue(0)->default(0)->label('Medium'),
                                     TextInput::make('senior_q')->required()->numeric()->minValue(0)->default(0)->label('Senior'),
                                 ])
                                 ->columns(4)
                                 ->orderable(false)
-                                ->createItemButtonLabel('Agregar otro tipo de Recurso Humano'),
+                                ->createItemButtonLabel('Agregar otro tipo de recurso humano'),
                         ])->hidden(fn (callable $get) => (bool) $get('no_aplica')),
                     ])
                     ->action(fn (array $data, RelationManager $livewire) => static::saveFieldWithNoAplica($livewire, 'employee', 'employee', $data)),
 
                 Action::make('maquinaria')
-                    ->label('Maquinaria y Equipos')
+                    ->label('Maquinaria y equipos')
                     ->icon('heroicon-o-cog')
-                    ->modalHeading('Agregar / Editar Maquinaria y Equipos Propios')
+                    ->modalHeading('Agregar / editar maquinaria y equipos propios')
                     ->modalWidth('4xl')
                     ->form([
                         static::noAplicaToggle('machinery'),
                         Group::make([
                             Repeater::make('machinery')
-                                ->label('Maquinaria y Equipos')
+                                ->label('Maquinaria y equipos')
                                 ->default(fn (RelationManager $livewire) => $livewire->ownerRecord->assets()->first()?->machinery ?? [])
                                 ->schema([
                                     Select::make('machinery_name')->required()->label('Equipo')->options($titles['machinery']),
                                     Select::make('machinery_qid')->options(static::$qtyOptions)->label('Cantidad (n)')->placeholder('Por favor seleccione una opción')->required(),
-                                    Select::make('machinery_est')->options(static::$valueOptions)->label('Valor Estimado')->placeholder('Por favor seleccione una opción')->required(),
+                                    Select::make('machinery_est')->options(static::$valueOptions)->label('Valor estimado')->placeholder('Por favor seleccione una opción')->required(),
                                 ])
                                 ->columns(3)
                                 ->orderable(false)
@@ -222,7 +222,7 @@ class AssetsRelationManager extends RelationManager
                 Action::make('instalaciones')
                     ->label('Instalaciones')
                     ->icon('heroicon-o-office-building')
-                    ->modalHeading('Agregar / Editar Instalaciones')
+                    ->modalHeading('Agregar / editar instalaciones')
                     ->modalWidth('4xl')
                     ->form([
                         static::noAplicaToggle('facility'),
@@ -231,7 +231,7 @@ class AssetsRelationManager extends RelationManager
                                 ->label('Instalaciones')
                                 ->default(fn (RelationManager $livewire) => $livewire->ownerRecord->assets()->first()?->facility ?? [])
                                 ->schema([
-                                    Select::make('facility_type')->required()->label('Tipo de Instalación')->options($titles['facility']),
+                                    Select::make('facility_type')->required()->label('Tipo de instalación')->options($titles['facility']),
                                     TextInput::make('facility_q')->required()->label('Cantidad')->numeric()->minValue(0),
                                     TextInput::make('facility_surf')->required()->label('Sup (mt2)')->numeric()->minValue(0)
                                         ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(2)->minValue(0)->thousandsSeparator('.')),
@@ -247,7 +247,7 @@ class AssetsRelationManager extends RelationManager
                 Action::make('inventario')
                     ->label('Inventario')
                     ->icon('heroicon-o-archive')
-                    ->modalHeading('Agregar / Editar Inventario')
+                    ->modalHeading('Agregar / editar inventario')
                     ->modalWidth('4xl')
                     ->form([
                         static::noAplicaToggle('inventory'),
@@ -256,11 +256,11 @@ class AssetsRelationManager extends RelationManager
                                 ->label('Inventario')
                                 ->default(fn (RelationManager $livewire) => $livewire->ownerRecord->assets()->first()?->inventory ?? [])
                                 ->schema([
-                                    Select::make('inventory_name')->required()->label('Tipo de Inventario')->options($titles['inventory']),
+                                    Select::make('inventory_name')->required()->label('Tipo de inventario')->options($titles['inventory']),
                                     Select::make('inventory_q')->options(static::$qtyOptions)->label('Cantidad (n)')->placeholder('Por favor seleccione una opción')->required(),
                                     TextInput::make('inventory_unit')->required()->label('Unidad')
                                         ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
-                                    Select::make('inventory_est')->options(static::$valueOptions)->label('Valor actual Estimado')->placeholder('Por favor seleccione una opción')->required(),
+                                    Select::make('inventory_est')->options(static::$valueOptions)->label('Valor actual estimado')->placeholder('Por favor seleccione una opción')->required(),
                                 ])
                                 ->columns(4)
                                 ->orderable(false)

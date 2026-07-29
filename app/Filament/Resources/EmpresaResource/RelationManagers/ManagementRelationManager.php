@@ -23,11 +23,11 @@ class ManagementRelationManager extends RelationManager
 {
     protected static string $relationship = 'management';
 
-    public static ?string $label = 'Sistemas de Gestión';
+    public static ?string $label = 'Sistemas de gestión';
 
-    public static ?string $navigationLabel = 'Sistemas de Gestión';
+    public static ?string $navigationLabel = 'Sistemas de gestión';
 
-    protected static ?string $pluralModelLabel = 'Sistemas de Gestión';
+    protected static ?string $pluralModelLabel = 'Sistemas de gestión';
 
     protected static function saveFields(RelationManager $livewire, array $data): void
     {
@@ -122,7 +122,7 @@ class ManagementRelationManager extends RelationManager
                     'iso14001' => 'ISO 14001:2015',
                     'iso50001' => 'ISO 50001:2018',
                 ], 'environment_data'),
-                static::summaryColumn('credibilidad', 'credibilidad', 'Credibilidad y Transparencia', [
+                static::summaryColumn('credibilidad', 'credibilidad', 'Credibilidad y transparencia', [
                     'dun' => 'Dun & Bradstreet',
                     'iso37001' => 'ISO 37001:2016',
                 ], 'credibility_data'),
@@ -130,10 +130,10 @@ class ManagementRelationManager extends RelationManager
                     'iso45001' => 'ISO 45001:2018',
                     'ovid' => 'COVID',
                 ], 'security_data'),
-                static::summaryColumn('proyectos', 'proyectos', 'Gestión de Proyectos', [
+                static::summaryColumn('proyectos', 'proyectos', 'Gestión de proyectos', [
                     'pmi' => 'PMI',
                 ], 'pmi_data'),
-                static::summaryColumn('seguridad_info', 'seguridad_info', 'Seguridad de la Información', [
+                static::summaryColumn('seguridad_info', 'seguridad_info', 'Seguridad de la información', [
                     'iso27001' => 'ISO 27001',
                 ], 'info_data'),
             ])
@@ -144,13 +144,13 @@ class ManagementRelationManager extends RelationManager
                 Action::make('calidad')
                     ->label('Calidad')
                     ->icon('heroicon-o-badge-check')
-                    ->modalHeading('Agregar / Editar: Calidad')
+                    ->modalHeading('Agregar / editar: calidad')
                     ->form([
                         static::noAplicaToggle('calidad'),
                         Group::make([
                             Checkbox::make('iso9001'),
                             Checkbox::make('iso17025'),
-                            Toggle::make('quality_otros')->label('Otros (Especifíque)')->reactive(),
+                            Toggle::make('quality_otros')->label('Otros (especifíque)')->reactive(),
                             Repeater::make('quality_data')
                                 ->schema([
                                     TextInput::make('quality_otros_name')->label('Calidad: otros')->required()
@@ -170,13 +170,13 @@ class ManagementRelationManager extends RelationManager
                 Action::make('ambiente')
                     ->label('Ambiente')
                     ->icon('heroicon-o-badge-check')
-                    ->modalHeading('Agregar / Editar: Ambiente')
+                    ->modalHeading('Agregar / editar: ambiente')
                     ->form([
                         static::noAplicaToggle('ambiente'),
                         Group::make([
-                            Checkbox::make('iso14001')->label('ISO 14001:2015 Sistemas de Gestión Ambiental'),
-                            Checkbox::make('iso50001')->label('ISO 50001:2018 Sistemas de Gestión de la Energía.'),
-                            Toggle::make('environment_otros')->label('Otros (Especifíque)')->reactive(),
+                            Checkbox::make('iso14001')->label('ISO 14001:2015 sistemas de gestión ambiental'),
+                            Checkbox::make('iso50001')->label('ISO 50001:2018 sistemas de gestión de la energía.'),
+                            Toggle::make('environment_otros')->label('Otros (especifíque)')->reactive(),
                             Repeater::make('environment_data')
                                 ->schema([
                                     TextInput::make('environment_otros_name')->label('Ambiente: otros')->required()
@@ -194,15 +194,15 @@ class ManagementRelationManager extends RelationManager
                     ->action(fn (array $data, RelationManager $livewire) => static::saveFieldsWithNoAplica($livewire, 'ambiente', $data)),
 
                 Action::make('credibilidad')
-                    ->label('Credibilidad y Transparencia')
+                    ->label('Credibilidad y transparencia')
                     ->icon('heroicon-o-badge-check')
-                    ->modalHeading('Agregar / Editar: Credibilidad y Transparencia')
+                    ->modalHeading('Agregar / editar: credibilidad y transparencia')
                     ->form([
                         static::noAplicaToggle('credibilidad'),
                         Group::make([
                             Checkbox::make('dun')->label('Dun & Bradstreet.'),
-                            Checkbox::make('iso37001')->label('ISO 37001:2016 Sistemas de Gestión Antisoborno.'),
-                            Toggle::make('credibility_otros')->label('Otros (Especifíque)')->reactive(),
+                            Checkbox::make('iso37001')->label('ISO 37001:2016 sistemas de gestión antisoborno.'),
+                            Toggle::make('credibility_otros')->label('Otros (especifíque)')->reactive(),
                             Repeater::make('credibility_data')
                                 ->schema([
                                     TextInput::make('credibility_otros_name')->label('Credibilidad: otros')->required()
@@ -222,13 +222,13 @@ class ManagementRelationManager extends RelationManager
                 Action::make('seguridad')
                     ->label('Seguridad')
                     ->icon('heroicon-o-badge-check')
-                    ->modalHeading('Agregar / Editar: Seguridad')
+                    ->modalHeading('Agregar / editar: seguridad')
                     ->form([
                         static::noAplicaToggle('seguridad'),
                         Group::make([
-                            Checkbox::make('iso45001')->label('ISO 45001:2018 Seguridad y Salud en el Trabajo.'),
+                            Checkbox::make('iso45001')->label('ISO 45001:2018 seguridad y salud en el trabajo.'),
                             Checkbox::make('ovid')->label('COVID.'),
-                            Toggle::make('security_otros')->label('Otros (Especifíque)')->reactive(),
+                            Toggle::make('security_otros')->label('Otros (especifíque)')->reactive(),
                             Repeater::make('security_data')
                                 ->schema([
                                     TextInput::make('security_otros_name')->label('Seguridad: otros')->required()
@@ -246,14 +246,14 @@ class ManagementRelationManager extends RelationManager
                     ->action(fn (array $data, RelationManager $livewire) => static::saveFieldsWithNoAplica($livewire, 'seguridad', $data)),
 
                 Action::make('proyectos')
-                    ->label('Gestión de Proyectos')
+                    ->label('Gestión de proyectos')
                     ->icon('heroicon-o-badge-check')
-                    ->modalHeading('Agregar / Editar: Gestión de Proyectos')
+                    ->modalHeading('Agregar / editar: gestión de proyectos')
                     ->form([
                         static::noAplicaToggle('proyectos'),
                         Group::make([
                             Checkbox::make('pmi')->label('Project Management Professional (PMI).'),
-                            Toggle::make('pmi_otros')->label('Otros (Especifíque)')->reactive(),
+                            Toggle::make('pmi_otros')->label('Otros (especifíque)')->reactive(),
                             Repeater::make('pmi_data')
                                 ->schema([
                                     TextInput::make('pmi_otros_name')->label('PMI: otros')->required()
@@ -273,17 +273,17 @@ class ManagementRelationManager extends RelationManager
                     ->action(fn (array $data, RelationManager $livewire) => static::saveFieldsWithNoAplica($livewire, 'proyectos', $data)),
 
                 Action::make('seguridad_info')
-                    ->label('Seguridad de la Información')
+                    ->label('Seguridad de la información')
                     ->icon('heroicon-o-badge-check')
-                    ->modalHeading('Agregar / Editar: Seguridad de la Información')
+                    ->modalHeading('Agregar / editar: seguridad de la información')
                     ->form([
                         static::noAplicaToggle('seguridad_info'),
                         Group::make([
-                            Checkbox::make('iso27001')->label('Sistemas de Gestión de la Seguridad de la Información.'),
-                            Toggle::make('info_otros')->label('Otros (Especifíque)')->reactive(),
+                            Checkbox::make('iso27001')->label('Sistemas de gestión de la seguridad de la información.'),
+                            Toggle::make('info_otros')->label('Otros (especifíque)')->reactive(),
                             Repeater::make('info_data')
                                 ->schema([
-                                    TextInput::make('info_otros_name')->label('Info Seguridad: otros')->required()
+                                    TextInput::make('info_otros_name')->label('Info seguridad: otros')->required()
                                         ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
                                 ])
                                 ->orderable(false)

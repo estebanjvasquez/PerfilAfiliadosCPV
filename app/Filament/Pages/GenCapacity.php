@@ -12,9 +12,9 @@ class GenCapacity extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Capacidad Técnica General';
+    protected static ?string $navigationLabel = 'Capacidad técnica general';
 
-    protected static ?string $title = 'Capacidad Técnica General';
+    protected static ?string $title = 'Capacidad técnica general';
 
     protected static ?string $slug = 'gen-capacity';
 

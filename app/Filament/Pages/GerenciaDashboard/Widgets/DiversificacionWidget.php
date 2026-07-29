@@ -7,7 +7,7 @@ use Filament\Widgets\DoughnutChartWidget;
 
 class DiversificacionWidget extends DoughnutChartWidget
 {
-    protected static ?string $heading = 'Índice de Diversificación Sectorial';
+    protected static ?string $heading = 'Índice de diversificación sectorial';
 
     // Polling desactivado: pisa el filtrado por GET, ver ResumenStatsWidget.
     protected static ?string $pollingInterval = null;
