@@ -144,6 +144,20 @@ class GerenciaDashboard extends Page
             'camaras' => GerenciaMetrics::distribucionCamaras($filters),
         ]);
 
+        // render() hay que llamarlo explicitamente antes de tocar el canvas
+        // (output() lo hace internamente, pero recien despues no se puede
+        // agregar el pie de pagina).
+        $pdf->render();
+
+        $pdf->getDomPDF()->getCanvas()->page_text(
+            300,
+            770,
+            'Página {PAGE_NUM} de {PAGE_COUNT} — Impreso el ' . now()->format('d/m/Y H:i'),
+            null,
+            8,
+            [0.42, 0.45, 0.5]
+        );
+
         // Barryvdh\DomPDF::download() devuelve un Illuminate\Http\Response
         // generico. Livewire solo dispara la descarga en el navegador si el
         // valor devuelto por la accion es un BinaryFileResponse o un
