@@ -34,7 +34,7 @@
 
         .section { page-break-inside: avoid; }
         .chart { text-align: center; }
-        .chart svg { width: 100%; height: auto; display: block; }
+        .chart img { width: 100%; height: auto; display: block; }
 
         .glossary-item { page-break-inside: avoid; margin-bottom: 9px; }
         .glossary-title { font-size: 11px; font-weight: bold; color: #111827; }
@@ -249,7 +249,7 @@
 
     <div class="section">
         <h2>Distribución por cámara / capítulo</h2>
-        <div class="chart">{!! \App\Filament\Support\PdfCharts::horizontalBar($camaras['labels'], $camaras['values'], '#d946ef', 500, 20, 42) !!}</div>
+        <div class="chart">{!! \App\Filament\Support\PdfCharts::horizontalBar($camaras['labels'], $camaras['values'], '#d946ef', 500, 20, 30, 230) !!}</div>
         <table class="data">
             <tr><th>Cámara</th><th>Empresas</th></tr>
             @foreach ($camaras['labels'] as $i => $label)
