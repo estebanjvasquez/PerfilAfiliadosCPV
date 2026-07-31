@@ -20,6 +20,7 @@ use Filament\Forms\Components\BelongsToSelect;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Repeater;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class EditEmpresa extends EditRecord
@@ -145,7 +146,11 @@ class EditEmpresa extends EditRecord
                             ->options(Sector::orderBy('name')->pluck('name', 'id'))
                             ->placeholder('Por favor seleccione una opción')
                             ->reactive()
-                            ->required(),
+                            ->required()
+                            ->disabled(fn (): bool => ! (Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false))
+                            ->helperText(fn (): ?string => (Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                                ? null
+                                : 'Este dato lo define la Cámara Petrolera al registrar tu empresa. Si no estás de acuerdo, contacta a la CPV para solicitar el cambio.'),
                         Select::make('sector_secundario_id')
                             ->label('Sector secundario (opcional)')
                             ->options(fn (callable $get) => Sector::orderBy('name')
