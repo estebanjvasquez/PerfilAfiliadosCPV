@@ -31,9 +31,12 @@ class CreateEmpresa extends CreateRecord
             Wizard\Step::make('1 - Datos generales')
                 ->schema([
                     Forms\Components\TextInput::make('rif')->required()->unique()
-                        ->placeholder('X-XXXXXXXX')
+                        ->maxLength(10)
+                        ->regex('/^[VEJPG]\d{9}$/i')
+                        ->placeholder('X123456789')
+                        ->helperText('Formato: letra (V/E/J/P/G) seguida de 9 dígitos, sin guiones ni espacios.')
                         ->afterStateUpdated(function ($component, $state, $set) {
-                            return $set($component, mb_strtoupper($state));
+                            return $set($component, mb_strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $state)));
                         }),
                     Forms\Components\TextInput::make('name')->required()->label('Nombre de la empresa')
                         ->afterStateUpdated(function ($component, $state, $set) {
@@ -43,7 +46,8 @@ class CreateEmpresa extends CreateRecord
                         ->label('Año de fundación')->placeholder('aaaa'),
                     Fieldset::make('Dirección')->schema([
                         Forms\Components\TextInput::make('phone')->tel()->label('Tefléfono')
-                            ->placeholder('+(XX)XXXXXXX'),
+                            ->mask(fn (Mask $mask) => $mask->pattern('+58-000-0000000'))
+                            ->placeholder('+58-XXX-XXXXXXX'),
                         Forms\Components\TextInput::make('street')->maxLength(100)->label('Dirección')
                             ->afterStateUpdated(function ($component, $state, $set) {
                                 return $set($component, mb_strtoupper($state));

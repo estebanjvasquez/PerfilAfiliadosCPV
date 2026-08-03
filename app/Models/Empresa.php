@@ -54,6 +54,11 @@ class Empresa extends Model
         //---
     ];
 
+    public function setRifAttribute($value): void
+    {
+        $this->attributes['rif'] = mb_strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', (string) $value));
+    }
+
     public function getEmpresaUser($vemp)
     {
         $user = strval(Auth::User()->id);

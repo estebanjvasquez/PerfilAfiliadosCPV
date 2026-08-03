@@ -46,7 +46,12 @@
       "Bash(cd \"c:\\\\Users\\\\EstebanVasquez\\\\OneDrive - MSFT\\\\Documents\\\\GitHub\\\\CampetApp\\\\PerfilAfiliadosCPV\" 2>/dev/null *)",
       "Bash(php -l \"c:\\\\Users\\\\EstebanVasquez\\\\OneDrive - MSFT\\\\Documents\\\\GitHub\\\\CampetApp\\\\PerfilAfiliadosCPV\\\\app\\\\Filament\\\\Resources\\\\EmpresaResource\\\\Pages\\\\EditEmpresa.php\")",
       "Bash(php -l \"c:\\\\Users\\\\EstebanVasquez\\\\OneDrive - MSFT\\\\Documents\\\\GitHub\\\\CampetApp\\\\PerfilAfiliadosCPV\\\\resources\\\\views\\\\vendor\\\\forms\\\\components\\\\wizard.blade.php\")",
-      "Bash(php -r *)"
+      "Bash(php -r *)",
+      "Bash(ls -la \"/c/Users/EstebanVasquez/.claude/plans/\" 2>/dev/null | grep -iE \"golden-splashing-nova|noble-wondering-metcalfe\")",
+      "Read(//c/Users/EstebanVasquez/.claude/plans//**)",
+      "Bash(xargs grep -l \"mask\")",
+      "Bash(powershell -Command \"\\(Get-Item task.md\\).LastWriteTime\")",
+      "Bash(xargs grep -l \"IMask\\\\|imask\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\EstebanVasquez\\OneDrive - MSFT\\Documents\\GitHub\\CampetApp\\PerfilAfiliadosCPV\\.claude",

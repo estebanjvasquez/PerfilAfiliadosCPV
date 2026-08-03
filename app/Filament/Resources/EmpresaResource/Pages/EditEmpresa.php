@@ -103,7 +103,9 @@ class EditEmpresa extends EditRecord
                     //Forms\Components\TextInput::make('ano_fund')->placeholder('AAAA'),
 
                     Fieldset::make('Dirección')->schema([
-                        Forms\Components\TextInput::make('phone')->tel()->label('Teléfono'),
+                        Forms\Components\TextInput::make('phone')->tel()->label('Teléfono')
+                            ->mask(fn (Mask $mask) => $mask->pattern('+58-000-0000000'))
+                            ->placeholder('+58-XXX-XXXXXXX'),
                         Forms\Components\TextInput::make('street')->maxLength(100)->label('Dirección')
                             ->afterStateUpdated(function ($component, $state, $set) {
                                 return $set($component, mb_strtoupper($state));
