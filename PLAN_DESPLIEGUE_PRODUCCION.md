@@ -28,7 +28,9 @@ de diferencia, 3 migraciones nuevas), en distintos grados de QA:
 | Sector Principal solo editable por CPV (reunión 30 jul, punto 1) | ✅ | 🟡 Sin confirmación explícita (probar con usuario no-admin y con `super_admin`) |
 | Normalización de textos + reporte "Estatus de Perfiles" | ✅ | 🟡 Sin confirmación explícita |
 | Máscaras de Teléfono/RIF (2026-08-03/04) | ✅ | 🔴 En curso — se reportó que la máscara "no funciona", pendiente confirmar si es porque el entorno de pruebas no tenía el `git pull` del commit `a9f3855`, o si hay un bug real |
-| Fase 5 — "No Aplica" granular en reportes (2026-08-04) | ✅ implementada, **sin commitear/pushear todavía** | 🔴 Sin QA — ver `task.md` 1.13, falta probar contra el XAMPP del cliente |
+| Fase 5 — "No Aplica" granular en reportes (2026-08-04) | ✅ commiteada y pusheada (`a542fe7`) | 🔴 Sin QA — ver `task.md` 1.13, falta probar contra el XAMPP del cliente |
+| Layout del PDF "Reporte por Empresa" — saltos de página + Experiencia Relevante (ver `task.md` 1.14) | ✅ commiteada y pusheada | 🔴 Sin QA visual (ver limitación de entorno en 1.14) |
+| Bug de valores asumidos en `NULL` — Facturación y 4 vistas más (ver `task.md` 1.15) | ✅ commiteada y pusheada (incluye nueva migración) | 🔴 Sin QA — falta aplicar en servidor de test y confirmar |
 | 6 puntos restantes de la reunión del 30 de julio | ❌ No implementado | — (fuera de alcance de este despliegue) |
 
 **Recomendación:** antes de fijar fecha de despliegue, cerrar la lista de QA de la tabla de arriba

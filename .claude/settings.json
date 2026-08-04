@@ -71,7 +71,16 @@
       "Bash(php -l app/Filament/Pages/ManagementView.php)",
       "Bash(php -l app/Exports/ManagementDetExport.php)",
       "Bash(php -l app/Filament/Pages/ManagementDetView.php)",
-      "Bash(php -l app/Exports/JoinViewExport.php)"
+      "Bash(php -l app/Exports/JoinViewExport.php)",
+      "Bash(php \"C:/Users/ESTEBA~1/AppData/Local/Temp/claude/c--Proyectos-Github-CampetApp-PerfilAfiliadosCPV/273d8b29-3ba9-4bd3-a086-ea95a0ecc38f/scratchpad/pdf_layout_smoke_test.php\")",
+      "Bash(php -l resources/views/pdf.blade.php)",
+      "Bash(php \"C:/Users/ESTEBA~1/AppData/Local/Temp/claude/c--Proyectos-Github-CampetApp-PerfilAfiliadosCPV/273d8b29-3ba9-4bd3-a086-ea95a0ecc38f/scratchpad/pdf_real_blade_test.php\")",
+      "Bash(php \"C:/Users/ESTEBA~1/AppData/Local/Temp/claude/c--Proyectos-Github-CampetApp-PerfilAfiliadosCPV/273d8b29-3ba9-4bd3-a086-ea95a0ecc38f/scratchpad/pdf_real_blade_test2.php\")",
+      "Bash(sed -i -e 's/^$datos_rec = \\\\['\\\\''Bachilleres'\\\\'', '\\\\''Tecnicos'\\\\'', '\\\\''Ingenieros'\\\\'', '\\\\''Administrativo'\\\\'', '\\\\''Gerencial'\\\\'', '\\\\''Directivo'\\\\''\\\\];/$datos_rec = [['\\\\''Bachilleres'\\\\'', '\\\\''Tecnicos'\\\\'', '\\\\''Ingenieros'\\\\'', '\\\\''Administrativo'\\\\'', '\\\\''Gerencial'\\\\'', '\\\\''Directivo'\\\\'']];/' -e 's/^$datos_maq = \\\\['\\\\''Equipos de medicion'\\\\''.*$/$datos_maq = [['\\\\''Equipos de medicion'\\\\'', '\\\\''Equipos marino-costeros'\\\\'', '\\\\''Movimiento de tierra'\\\\'', '\\\\''Equipos menores'\\\\'', '\\\\''Fabricacion metalmecanica'\\\\'', '\\\\''Montaje electrico'\\\\'', '\\\\''Maquinas herramientas'\\\\'', '\\\\''Almacenamiento'\\\\'', '\\\\''Servicios a pozos'\\\\'']];/' -e 's/^$datos_ins = \\\\['\\\\''Oficinas'\\\\''.*$/$datos_ins = [['\\\\''Oficinas'\\\\'', '\\\\''Talleres'\\\\'', '\\\\''Manufactura'\\\\'', '\\\\''Almacenes'\\\\'', '\\\\''Laboratorios'\\\\'', '\\\\''Marinas'\\\\'', '\\\\''Otros'\\\\'']];/' -e 's/^$datos_inv = \\\\['\\\\''Materia Prima'\\\\'', '\\\\''Producto Terminado'\\\\''\\\\];/$datos_inv = [['\\\\''Materia Prima'\\\\'', '\\\\''Producto Terminado'\\\\'']];/' pdf_real_blade_test2.php)",
+      "Bash(grep -n '^$datos_rec = \\\\|^$datos_maq = \\\\|^$datos_ins = \\\\|^$datos_inv = ' pdf_real_blade_test2.php)",
+      "Bash(rm \"c:/Proyectos/Github/CampetApp/PerfilAfiliadosCPV/resources/views/pdf_layout_smoketest_tmp.blade.php\")",
+      "Bash(rm -f \"c:/Proyectos/Github/CampetApp/PerfilAfiliadosCPV/storage/framework/views/\"*.php)",
+      "Bash(php -l database/migrations/2026_08_04_000001_fix_null_bucket_defaults_in_report_views.php)"
     ],
     "additionalDirectories": [
       "c:\\Users\\EstebanVasquez\\OneDrive - MSFT\\Documents\\GitHub\\CampetApp\\PerfilAfiliadosCPV\\.claude",

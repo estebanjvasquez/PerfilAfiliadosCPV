@@ -256,6 +256,25 @@
             .page-break {
                 page-break-after: always;
             }
+
+            .experiencias-grid {
+                margin-top: 5px;
+            }
+
+            .experiencia-card {
+                float: left;
+                width: 47%;
+                margin: 0 1.5% 12px 1.5%;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 6px;
+                font-size: 12px;
+                page-break-inside: avoid;
+            }
+
+            .exp-grupo {
+                margin-bottom: 4px;
+            }
         </style>
 
     </head>
@@ -357,7 +376,6 @@
                 </tr>
             </table>
         </div>
-        <div class="page-break"></div>
 
         <!-- CLIENTES............................................................. -->
         <div class="row amarillo" style="margin-bottom: 10px;">
@@ -392,7 +410,6 @@
 
             </table>
         </div>
-        <div class="page-break"></div>
         <!-- FIN DE CLIENTES.......................................................... -->
 
         <!-- CAMARAS............................................................. -->
@@ -423,7 +440,6 @@
                     @endif
             </table>
         </div>
-        <div class="page-break"></div>
         <!-- FIN DE CAMARAS.......................................................... -->
 
         <!-- SECTORES Y SERVICIOS.................................................... -->
@@ -475,7 +491,6 @@
             </table>
         </div>
         </div>
-        <div class="page-break"></div>
         <!-- FIN DE SECTORES Y SERVICIOS ..............................................................-->
 
         <!-- ENFOQUE A SOSTENIBILIDAD......................................................................-->
@@ -549,7 +564,6 @@
                 @endif
             </table>
         </div>
-        <div class="page-break"></div>
 
         <!-- FIN DE ENFOQUE A SOSTENIBILIDAD............................................. -->
 
@@ -713,7 +727,6 @@
                 </tr>
                 @endif
             </table>
-            <div class="page-break"></div>
 
             <!-- INSTALACIONES ...........-->
             <div class="row amarillo" style="margin-bottom: 10px;">
@@ -846,7 +859,6 @@
             </table>
 
 
-            <div class="page-break"></div>
             <!-- FIN DE RECURSOS EN VENEZUELA..............................................................-->
 
             <!-- EXPERIENCIA RELEVANTE.....................................................................-->
@@ -856,120 +868,67 @@
                 </div>
             </div>
 
+            <h2 class="titulo2 gris-oscuro">Experiencia Relevante</h2>
+
+            @if (sizeof($datos_exp) > 0)
+            <div class="row experiencias-grid">
+                @foreach ($datos_exp as $row)
+                <div class="experiencia-card">
+                    <div class="gris-oscuro" style="font-size: 13.5px; padding: 3px;">
+                        <b>{{ $row->ano }}</b>
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Sector:</strong> {{ $row->sectorind }}
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Tipo:</strong> {{ $row->tipoind }}
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Sistema:</strong> {{ $row->systemind }}
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Región:</strong> {{ $row->regionind }}
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Instalación:</strong> {{ $row->facilityind }}
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Orden de Magnitud del Contrato:</strong> {{ $row->magnitud }}
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Esfuerzo H-H — Profesionales y Técnicos:</strong> {{ $row->prof_tech }}
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Esfuerzo H-H — Mano de Obra directa:</strong> {{ $row->manpower }}
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Clasificación del Trabajo — Sector:</strong> {{ $row->exp_sector }}
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Clasificación del Trabajo — Servicios:</strong> {{ $row->exp_service }}
+                    </div>
+                    <div class="exp-grupo">
+                        <strong>Breve descripción del Trabajo realizado:</strong><br>
+                        {{ str_replace('null', ' ', $row->descripcion) }}
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            @else
             <table>
                 <tr>
-                    <td colspan="3" style="padding: 0px; border: none">
-                        <h2 class="titulo2 gris-oscuro">Experiencia Relevante</h2>
+                    <td colspan="3">
+                        @if ($na_flags['experiencias'])
+                        <p><b>NO APLICA — Declarado por la empresa</b></p>
+                        @else
+                        <p><b>No existe información</b></p>
+                        @endif
                     </td>
                 </tr>
-
-                @if (sizeof($datos_exp) > 0)
-                @foreach ($datos_exp as $row)
-
-                <tr class="noBorder">
-                    <td style="vertical-align: top;">
-                        <fieldset class=" fill-height-or-more" style="margin-top: 0;">
-                            <div class="gris-oscuro" style="font-size: 13.5px;">
-                                <b>{{ $row->ano }}</b>
-                            </div>
-                            <div>
-                                <strong>Sector:</strong><br>
-                                {{ $row->sectorind }} <br>
-                            </div>
-                            <div>
-                                <strong>Tipo:</strong><br>
-                                {{ $row->tipoind }} <br>
-                            </div>
-                            <div>
-                                <strong>Sistema:</strong><br>
-                                {{ $row->systemind }} <br>
-                            </div>
-                            <div>
-                                <strong>Región:</strong><br>
-                                {{ $row->regionind }} <br>
-                            </div>
-                            <div>
-                                <strong>Instalación:</strong>
-                                {{ $row->facilityind }} <br>
-                            </div>
-                        </fieldset>
-
-                    </td>
-
-                    <td style="vertical-align: top;">
-                        <fieldset class="fill-height-or-more">
-                            <div class="gris-oscuro" style="font-size: 12.5px; ">
-                                <b>Orden de Magnitud del Contrato</b>
-                            </div>
-                            <div>
-                                <b>{{ $row->magnitud }}</b>
-                            </div>
-                            <div>
-                                <strong>Esfuerzo H-H:</strong>
-                            </div>
-                            <div>
-                                <strong>Profesionales y Técnicos:</strong><br>
-                                {{ $row->prof_tech }}
-                            </div>
-                            <div>
-                                <strong>Mano de Obra directa:</strong><br>
-                                {{ $row->manpower }}
-                            </div>
-                            <div>
-                                <b>Clasificación del Trabajo Realizado</b><br>
-                            </div>
-                            <div>
-                                <strong>Sector:</strong><br>
-                                {{ $row->exp_sector }}
-                            </div>
-                            <div>
-                                <strong>Servicios:</strong><br>
-                                {{ $row->exp_service }}
-                            </div>
-                        </fieldset>
-                    </td>
-
-                    <td style="vertical-align: top;">
-                        <fieldset class=" fill-height-or-more">
-                            <div class="gris-oscuro" style="font-size: 12.5px"><b>Breve descripción del Trabajo realizado</b>
-
-                            </div>
-                            <div>
-                                {{ str_replace('null', ' ', $row->descripcion) }}
-                            </div>
-
-                        </fieldset>
-                    </td>
-
-
-                </tr>
-                <TH COLSPAN=3>
-                    <hr>
-                    @endforeach
-
-                    @else
-                    <tr>
-                        <td colspan="3">
-                            @if ($na_flags['experiencias'])
-                            <p><b>NO APLICA — Declarado por la empresa</b></p>
-                            @else
-                            <p><b>No existe información</b></p>
-                            @endif
-                        </td>
-                    </tr>
-
-
-                    @endif
-
-
             </table>
-            <!--</div>-->
+            @endif
         </div>
 
-        </td>
-
-        </table>
-        <div class="page-break"></div>
         <!-- PRESENCIA INTERNACIONAL.....................................................................--->
         <div class="row amarillo" style="margin-bottom: 10px;">
             <div class="column2">
@@ -1057,7 +1016,6 @@
                 @endif
             </table>
         </div>
-        <div class="page-break"></div>
         <!-- SISTEAS DE GESTIÓN..............................................................................-->
         <div class="row amarillo" style="margin-bottom: 10px;">
             <div class="column2">
