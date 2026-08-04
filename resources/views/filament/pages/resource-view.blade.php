@@ -29,6 +29,7 @@
                                         <TH class="border px-6 py-2 text-sm text-gray-500">DIRECTIVOS MEDIUM</TH>
                                         <TH class="border px-6 py-2 text-sm text-gray-500">DIRECTIVOS SENIOR</TH>
                                         <TH class="border px-6 py-2 text-sm text-gray-500">TOTAL</TH>
+                                        <TH class="border px-6 py-2 text-sm text-gray-500">ESTADO</TH>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -55,6 +56,7 @@
                                         <td class="border px-3 py-4 text-sm"> {{ $resources->Directivos_Medium}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $resources->Directivos_Senior}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $resources->Total}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ isset($noAplicaIds[$resources->id]) ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : '' }} </td>
                                     </tr>
                                     @endforeach
                                 </tbody>

@@ -28,6 +28,15 @@ class InventoryView extends Page
 
     public $inventory;
 
+    protected function getViewData(): array
+    {
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 'inventory');
+
+        return [
+            'noAplicaIds' => array_flip($naIds),
+        ];
+    }
+
     protected function getActions(): array
     {
         return [
@@ -45,7 +54,7 @@ class InventoryView extends Page
     public function exportAllInventoryPdf()
     {
         //return Excel::download(new FinanceExport, 'finance.pdf');
-        $export = new InventoryExport;
+        $export = new InventoryExport(isPdf: true);
         return Excel::download($export, 'inventory-detail.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }

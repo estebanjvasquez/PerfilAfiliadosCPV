@@ -38,7 +38,7 @@
                                     <tr class="even:bg-amber-100 odd:bg-blue-100">
                                         <td class="border px-3 py-4 text-sm nowrap"> {{ $presence->id }} </td>
                                         <td class="border px-3 py-4 text-sm nowrap"> {{ $presence->name}} </td>
-                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $presence->hasOfficesNo}} </td>
+                                        <td class="border px-3 py-4 text-sm nowrap"> {{ isset($noAplicaIds[$presence->id]) ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : $presence->hasOfficesNo}} </td>
                                         <td class="border px-3 py-4 text-sm nowrap"> {{ $presence->hasOfficesYes}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $presence->pais}} </td>
                                         <td class="border px-3 py-4 text-sm nowrap"> {{ $presence->mts}} </td>

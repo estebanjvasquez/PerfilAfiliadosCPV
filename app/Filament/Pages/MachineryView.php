@@ -28,6 +28,15 @@ class MachineryView extends Page
 
     public $machinery;
 
+    protected function getViewData(): array
+    {
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 'machinery');
+
+        return [
+            'noAplicaIds' => array_flip($naIds),
+        ];
+    }
+
     protected function getActions(): array
     {
         return [
@@ -45,7 +54,7 @@ class MachineryView extends Page
     public function exportAllMachineryPdf()
     {
         //return Excel::download(new FinanceExport, 'finance.pdf');
-        $export = new MachineryExport;
+        $export = new MachineryExport(isPdf: true);
         return Excel::download($export, 'machinery-detail.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }

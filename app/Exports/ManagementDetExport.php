@@ -26,13 +26,69 @@ class ManagementDetExport implements FromCollection, ShouldAutoSize, WithHeading
     use Exportable;
     use \App\Exports\Concerns\AppendsNoAplicaRows;
 
+    /**
+     * Columna del reporte => sub_type correspondiente en EmpresaModuleStatus::SUB_TYPES[MODULE_GESTION].
+     */
+    protected const COLUMN_SUB_TYPES = [
+        'iso9001' => 'calidad',
+        'iso17025' => 'calidad',
+        'QUALITY_OTROS' => 'calidad',
+        'iso14001' => 'ambiente',
+        'iso50001' => 'ambiente',
+        'ENVIRONMENT_OTROS' => 'ambiente',
+        'dun' => 'credibilidad',
+        'iso37001' => 'credibilidad',
+        'CREDIBILITY_OTROS' => 'credibilidad',
+        'iso45001' => 'seguridad',
+        'ovid' => 'seguridad',
+        'SECURITY_OTROS' => 'seguridad',
+        'pmi' => 'proyectos',
+        'PMI_OTROS' => 'proyectos',
+        'iso27001' => 'seguridad_info',
+        'INFO_OTROS' => 'seguridad_info',
+    ];
+
+    public function __construct(protected bool $isPdf = false)
+    {
+    }
+
     public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
         $rows = ManagementDetView::query()->get();
 
-        // La vista omite a las empresas sin sistemas de gestión: se agregan las "No Aplica"
-        return $this->appendNoAplicaRows($rows, \App\Models\EmpresaModuleStatus::MODULE_GESTION, 18);
+        $marker = $this->isPdf
+            ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO
+            : \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_CORTO;
+
+        $wholeModuleIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_GESTION);
+        $subTypesByEmpresa = \App\Models\EmpresaModuleStatus::where('module', \App\Models\EmpresaModuleStatus::MODULE_GESTION)
+            ->where('sub_type', '!=', \App\Models\EmpresaModuleStatus::SUB_TYPE_WHOLE)
+            ->where('no_aplica', true)
+            ->get()
+            ->groupBy('empresa_id')
+            ->map(fn ($group) => $group->pluck('sub_type')->all());
+
+        // La vista omite a las empresas sin ningún sistema de gestión cargado: se agregan las
+        // "No Aplica" (a nivel módulo completo). Para las empresas SÍ presentes, cada columna ISO
+        // se marca de forma independiente según su sub-tipo específico.
+        return $this->appendNoAplicaRows(
+            $rows,
+            $wholeModuleIds,
+            18,
+            $marker,
+            2,
+            function ($row) use ($wholeModuleIds, $subTypesByEmpresa, $marker) {
+                $isWholeModuleNA = in_array($row->id, $wholeModuleIds);
+                $rowSubTypes = $subTypesByEmpresa->get($row->id, []);
+
+                foreach (self::COLUMN_SUB_TYPES as $attr => $subType) {
+                    if ($isWholeModuleNA || in_array($subType, $rowSubTypes)) {
+                        $row->setAttribute($attr, $marker);
+                    }
+                }
+            }
+        );
     }
 
     //PARA AGREGAR IMAGEN DE LOGO.......................................

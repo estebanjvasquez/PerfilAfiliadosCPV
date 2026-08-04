@@ -28,6 +28,15 @@ class SustainabilityView extends Page
 
     public $sustainabilities;
 
+    protected function getViewData(): array
+    {
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_SOSTENIBILIDAD);
+
+        return [
+            'noAplicaIds' => array_flip($naIds),
+        ];
+    }
+
     protected function getActions(): array
     {
         return [
@@ -44,7 +53,7 @@ class SustainabilityView extends Page
 
     public function exportAllSustainabilityPdf()
     {
-        $export = new SustainabilityExport;
+        $export = new SustainabilityExport(isPdf: true);
         return Excel::download($export, 'sustainability.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }

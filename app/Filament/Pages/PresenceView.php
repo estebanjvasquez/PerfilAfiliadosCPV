@@ -28,6 +28,15 @@ class PresenceView extends Page
 
     public $presence;
 
+    protected function getViewData(): array
+    {
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_PRESENCIA);
+
+        return [
+            'noAplicaIds' => array_flip($naIds),
+        ];
+    }
+
     protected function getActions(): array
     {
         return [
@@ -45,7 +54,7 @@ class PresenceView extends Page
     public function exportAllPresencePdf()
     {
         //return Excel::download(new FinanceExport, 'finance.pdf');
-        $export = new PresenceExport;
+        $export = new PresenceExport(isPdf: true);
         return Excel::download($export, 'presence-detail.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }

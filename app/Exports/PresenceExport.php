@@ -26,13 +26,32 @@ class PresenceExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     use Exportable;
     use \App\Exports\Concerns\AppendsNoAplicaRows;
 
+    public function __construct(protected bool $isPdf = false)
+    {
+    }
+
     public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
         $rows = PresenceViewModel::query()->get();
 
+        $marker = $this->isPdf
+            ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO
+            : \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_CORTO;
+
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_PRESENCIA);
+
         // La vista omite a las empresas sin presencia registrada: se agregan las "No Aplica"
-        return $this->appendNoAplicaRows($rows, \App\Models\EmpresaModuleStatus::MODULE_PRESENCIA, 16);
+        return $this->appendNoAplicaRows(
+            $rows,
+            $naIds,
+            16,
+            $marker,
+            2,
+            function ($row) use ($marker) {
+                $row->setAttribute('hasOfficesNo', $marker);
+            }
+        );
     }
 
     //PARA AGREGAR IMAGEN DE LOGO.......................................

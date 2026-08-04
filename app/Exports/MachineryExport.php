@@ -26,13 +26,29 @@ class MachineryExport implements FromCollection, ShouldAutoSize, WithHeadings, W
     use Exportable;
     use \App\Exports\Concerns\AppendsNoAplicaRows;
 
+    public function __construct(protected bool $isPdf = false)
+    {
+    }
+
     public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
         $rows = MachineryView::query()->get();
 
+        $marker = $this->isPdf
+            ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO
+            : \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_CORTO;
+
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 'machinery');
+
+        $rows->each(function ($row) use ($naIds, $marker) {
+            if (in_array($row->id, $naIds)) {
+                $row->setAttribute('Estado', $marker);
+            }
+        });
+
         // La vista omite a las empresas sin recursos cargados: se agregan las "No Aplica"
-        return $this->appendNoAplicaRows($rows, \App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 20);
+        return $this->appendNoAplicaRows($rows, $naIds, 21, $marker, 20);
     }
 
     //PARA AGREGAR IMAGEN DE LOGO.......................................
@@ -67,9 +83,9 @@ class MachineryExport implements FromCollection, ShouldAutoSize, WithHeadings, W
     public function headings(): array
     {
         return [
-            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-            ["", "", "Equipos de medición, levantamiento (survey)", "", "Equipos marino-costeros fluviales o costa afuera", "", "Movimiento de tierra y construcción", "", "Equipos menores de construcción", "", "Fabricación metalmecánica / electromecánica / electrónica", "", "Montaje eléctrico/mecánico", "", "Máquinas herramientas / Metalmecánica", "", "Almacenamiento y transporte", "", "Servicios a pozos e instalaciones petroleras"],
-            ["ID", "NOMBRE", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["", "", "Equipos de medición, levantamiento (survey)", "", "Equipos marino-costeros fluviales o costa afuera", "", "Movimiento de tierra y construcción", "", "Equipos menores de construcción", "", "Fabricación metalmecánica / electromecánica / electrónica", "", "Montaje eléctrico/mecánico", "", "Máquinas herramientas / Metalmecánica", "", "Almacenamiento y transporte", "", "Servicios a pozos e instalaciones petroleras", "", ""],
+            ["ID", "NOMBRE", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "CANTIDAD", "VALOR ESTIMADO", "ESTADO"],
         ];
     }
 
@@ -90,8 +106,8 @@ class MachineryExport implements FromCollection, ShouldAutoSize, WithHeadings, W
             },
 
             AfterSheet::class => function (AfterSheet $event) {
-                $cellRange = 'A2:T2'; // FIRST HEADERS
-                $cellRange2 = 'A3:T3'; // SECOND HEADERS
+                $cellRange = 'A2:U2'; // FIRST HEADERS
+                $cellRange2 = 'A3:U3'; // SECOND HEADERS
                 $event->sheet->getDelegate()->getStyle($cellRange)->getFont()->setSize(12);
                 $event->sheet->getDelegate()->getStyle($cellRange)->getFill()->applyFromArray(['fillType' => 'solid', 'rotation' => 0, 'color' => ['rgb' => 'C9C9C9'],]);
 

@@ -27,6 +27,15 @@ class EmpresaModuleStatus extends Model
     ];
 
     /**
+     * Textos de referencia para reportes cuando el afiliado marcó "No Aplica" (módulo completo
+     * o sub-tipo individual). El largo es para pantalla/Pdf; el corto es para Excel, pensado
+     * para poder filtrar/ordenar por él en una hoja de cálculo.
+     */
+    public const NO_APLICA_LABEL_LARGO = 'Marcado no aplica por el afiliado';
+
+    public const NO_APLICA_LABEL_CORTO = 'NA/afiliado';
+
+    /**
      * Sentinel de sub_type que representa "módulo completo" (comportamiento histórico,
      * previo a la granularidad por tipo). No confundir con null: se usa '' porque MySQL
      * no garantiza unicidad entre múltiples NULL en una unique key compuesta.
@@ -140,5 +149,34 @@ class EmpresaModuleStatus extends Model
             ->where('empresa_module_status.module', $module)
             ->where('empresa_module_status.sub_type', self::SUB_TYPE_WHOLE)
             ->where('empresa_module_status.no_aplica', true);
+    }
+
+    /**
+     * IDs de empresa que deben mostrar el marcador "No Aplica" en un reporte puntual: las que
+     * marcaron el módulo COMPLETO como No Aplica, más (si se pasa un sub-tipo específico
+     * distinto de SUB_TYPE_WHOLE) las que marcaron ESE sub-tipo individualmente — el módulo
+     * completo siempre gana sobre los sub-tipos (misma regla que Empresa::moduleBreakdown()).
+     * Pensado para reportes: cada export/página de un sub-tipo (ej. InventoryExport → 'inventory')
+     * llama esto una vez para saber qué empresas marcar, sin duplicar la query en cada lugar.
+     */
+    public static function noAplicaIdsFor(string $module, string $subType = self::SUB_TYPE_WHOLE): array
+    {
+        $ids = static::where('module', $module)
+            ->where('sub_type', self::SUB_TYPE_WHOLE)
+            ->where('no_aplica', true)
+            ->pluck('empresa_id')
+            ->all();
+
+        if ($subType !== self::SUB_TYPE_WHOLE) {
+            $subTypeIds = static::where('module', $module)
+                ->where('sub_type', $subType)
+                ->where('no_aplica', true)
+                ->pluck('empresa_id')
+                ->all();
+
+            $ids = array_values(array_unique(array_merge($ids, $subTypeIds)));
+        }
+
+        return $ids;
     }
 }

@@ -26,19 +26,57 @@ class ManagementExport implements FromCollection, ShouldAutoSize, WithHeadings, 
     use Exportable;
     use \App\Exports\Concerns\AppendsNoAplicaRows;
 
+    /**
+     * Columna del reporte => sub_type correspondiente en EmpresaModuleStatus::SUB_TYPES[MODULE_GESTION].
+     */
+    protected const COLUMN_SUB_TYPES = [
+        'Calidad' => 'calidad',
+        'Ambiente' => 'ambiente',
+        'Seguridad' => 'seguridad',
+        'Gestion' => 'proyectos',
+        'Credibilidad' => 'credibilidad',
+        'Informacion' => 'seguridad_info',
+    ];
+
+    public function __construct(protected bool $isPdf = false)
+    {
+    }
+
     public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
         $rows = ManagementView::query()->get();
 
-        // Las empresas que declararon "No Aplica" muestran esa marca en las columnas de sistemas
+        $marker = $this->isPdf
+            ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO
+            : \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_CORTO;
+
+        // Módulo completo (para la fila faltante) y, en batch, todos los sub-tipos de gestión
+        // marcados No Aplica por empresa (evita 1 query por fila/columna).
+        $wholeModuleIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_GESTION);
+        $subTypesByEmpresa = \App\Models\EmpresaModuleStatus::where('module', \App\Models\EmpresaModuleStatus::MODULE_GESTION)
+            ->where('sub_type', '!=', \App\Models\EmpresaModuleStatus::SUB_TYPE_WHOLE)
+            ->where('no_aplica', true)
+            ->get()
+            ->groupBy('empresa_id')
+            ->map(fn ($group) => $group->pluck('sub_type')->all());
+
+        // Cada columna se marca de forma independiente: si el módulo completo está en No
+        // Aplica, se marcan las 6; si solo un sub-tipo puntual lo está, se marca solo esa columna.
         return $this->appendNoAplicaRows(
             $rows,
-            \App\Models\EmpresaModuleStatus::MODULE_GESTION,
+            $wholeModuleIds,
             9,
-            function ($row) {
-                foreach (['Calidad', 'Ambiente', 'Seguridad', 'Gestion', 'Credibilidad', 'Informacion'] as $attr) {
-                    $row->setAttribute($attr, 'NO APLICA');
+            $marker,
+            2,
+            function ($row) use ($wholeModuleIds, $subTypesByEmpresa, $marker) {
+                $isWholeModuleNA = in_array($row->id, $wholeModuleIds);
+                $rowSubTypes = $subTypesByEmpresa->get($row->id, []);
+
+                foreach (self::COLUMN_SUB_TYPES as $attr => $subType) {
+                    if ($isWholeModuleNA || in_array($subType, $rowSubTypes)) {
+                        $row->setAttribute($attr, $marker);
+                    }
                 }
             }
         );

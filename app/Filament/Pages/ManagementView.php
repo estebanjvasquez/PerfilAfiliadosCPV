@@ -28,6 +28,22 @@ class ManagementView extends Page
 
     public $managements;
 
+    protected function getViewData(): array
+    {
+        $wholeModuleIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_GESTION);
+        $subTypesByEmpresa = \App\Models\EmpresaModuleStatus::where('module', \App\Models\EmpresaModuleStatus::MODULE_GESTION)
+            ->where('sub_type', '!=', \App\Models\EmpresaModuleStatus::SUB_TYPE_WHOLE)
+            ->where('no_aplica', true)
+            ->get()
+            ->groupBy('empresa_id')
+            ->map(fn ($group) => $group->pluck('sub_type')->all());
+
+        return [
+            'noAplicaWholeIds' => array_flip($wholeModuleIds),
+            'noAplicaSubTypesByEmpresa' => $subTypesByEmpresa,
+        ];
+    }
+
     protected function getActions(): array
     {
         return [
@@ -45,7 +61,7 @@ class ManagementView extends Page
     public function exportAllManagementPdf()
     {
 
-        $export = new ManagementExport;
+        $export = new ManagementExport(isPdf: true);
         return Excel::download($export, 'management.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }

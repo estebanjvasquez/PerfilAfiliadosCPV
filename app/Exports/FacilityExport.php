@@ -26,13 +26,29 @@ class FacilityExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     use Exportable;
     use \App\Exports\Concerns\AppendsNoAplicaRows;
 
+    public function __construct(protected bool $isPdf = false)
+    {
+    }
+
     public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
         $rows = FacilityView::query()->get();
 
+        $marker = $this->isPdf
+            ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO
+            : \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_CORTO;
+
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 'facility');
+
+        $rows->each(function ($row) use ($naIds, $marker) {
+            if (in_array($row->id, $naIds)) {
+                $row->setAttribute('Estado', $marker);
+            }
+        });
+
         // La vista omite a las empresas sin recursos cargados: se agregan las "No Aplica"
-        return $this->appendNoAplicaRows($rows, \App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 23);
+        return $this->appendNoAplicaRows($rows, $naIds, 24, $marker, 23);
     }
 
     //PARA AGREGAR IMAGEN DE LOGO.......................................
@@ -68,9 +84,9 @@ class FacilityExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     public function headings(): array
     {
         return [
-            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-            ["", "", "Oficinas", "", "", "Talleres", "", "", "Manufactura /fabrica industrial", "", "", "Almacenes y depósitos", "", "", "Laboratorios", "", "", "Facilidades marinas, muelles, etc", "", "", "Otros", "", ""],
-            ["ID", "NOMBRE", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO",],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["", "", "Oficinas", "", "", "Talleres", "", "", "Manufactura /fabrica industrial", "", "", "Almacenes y depósitos", "", "", "Laboratorios", "", "", "Facilidades marinas, muelles, etc", "", "", "Otros", "", "", ""],
+            ["ID", "NOMBRE", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "CANTIDAD", "MTS²", "TIPO", "ESTADO"],
         ];
     }
 
@@ -91,8 +107,8 @@ class FacilityExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
             },
 
             AfterSheet::class => function (AfterSheet $event) {
-                $cellRange = 'A2:W2'; // FIRST HEADERS
-                $cellRange2 = 'A3:W3'; // SECOND HEADERS
+                $cellRange = 'A2:X2'; // FIRST HEADERS
+                $cellRange2 = 'A3:X3'; // SECOND HEADERS
                 $event->sheet->getDelegate()->getStyle($cellRange)->getFont()->setSize(12);
                 $event->sheet->getDelegate()->getStyle($cellRange)->getFill()->applyFromArray(['fillType' => 'solid', 'rotation' => 0, 'color' => ['rgb' => 'C9C9C9'],]);
 

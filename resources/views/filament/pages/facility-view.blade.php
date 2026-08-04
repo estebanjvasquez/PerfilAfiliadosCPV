@@ -16,6 +16,7 @@
                                         <TH colspan="3" class="border px-6 py-2 text-sm text-gray-500">Laboratorios</TH>
                                         <TH colspan="3" class="border px-6 py-2 text-sm text-gray-500">Facilidades marinas, muelles, etc</TH>
                                         <TH colspan="3" class="border px-6 py-2 text-sm text-gray-500">Otros</TH>
+                                        <th class="border px-3 py-2 text-sm text-gray-500"></th>
                                     </tr>
                                     <tr class="bg-indigo-400">
                                         <th class="border px-3 py-2 text-sm text-gray-500">ID</th>
@@ -41,6 +42,7 @@
                                         <th class="border px-6 py-2 text-sm text-gray-500">CANTIDAD</th>
                                         <TH class="border px-6 py-2 text-sm text-gray-500">Mts²</TH>
                                         <th class="border px-6 py-2 text-sm text-gray-500">PROPIEDAD</th>
+                                        <th class="border px-6 py-2 text-sm text-gray-500">ESTADO</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -69,6 +71,7 @@
                                         <td class="border px-3 py-4 text-sm"> {{ $facility->Otros_q}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $facility->Otros_surf}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $facility->Otros_own}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ isset($noAplicaIds[$facility->id]) ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : '' }} </td>
                                     </tr>
                                     @endforeach
                                 </tbody>

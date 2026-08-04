@@ -11,6 +11,7 @@
                                         <th colspan="2" class="border px-3 py-2 text-sm text-gray-500"></th>
                                         <th colspan="3" class="border px-6 py-2 text-sm text-gray-500">Materia Prima</th>
                                         <th colspan="3" class="border px-6 py-2 text-sm text-gray-500">Producto Terminado</th>
+                                        <th class="border px-3 py-2 text-sm text-gray-500"></th>
                                     </tr>
                                     <tr class="bg-indigo-400">
                                         <th class="border px-3 py-2 text-sm text-gray-500">ID</th>
@@ -21,6 +22,7 @@
                                         <th class="border px-6 py-2 text-sm text-gray-500">CANTIDAD</th>
                                         <TH class="border px-6 py-2 text-sm text-gray-500">VALOR ESTIMADO</TH>
                                         <th class="border px-6 py-2 text-sm text-gray-500">UNIDAD</th>
+                                        <th class="border px-6 py-2 text-sm text-gray-500">ESTADO</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -34,6 +36,7 @@
                                         <td class="border px-3 py-4 text-sm"> {{ $inventory->Producto_q}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $inventory->Producto_est}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $inventory->Producto_unit}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ isset($noAplicaIds[$inventory->id]) ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : '' }} </td>
                                     </tr>
                                     @endforeach
                                 </tbody>

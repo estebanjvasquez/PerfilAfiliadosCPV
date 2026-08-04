@@ -26,19 +26,31 @@ class SustainabilityExport implements FromCollection, ShouldAutoSize, WithHeadin
     use Exportable;
     use \App\Exports\Concerns\AppendsNoAplicaRows;
 
+    public function __construct(protected bool $isPdf = false)
+    {
+    }
+
     public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
         $rows = SustainabilityViewModel::query()->get();
 
+        $marker = $this->isPdf
+            ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO
+            : \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_CORTO;
+
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_SOSTENIBILIDAD);
+
         // Las empresas que declararon "No Aplica" muestran esa marca en las áreas
         return $this->appendNoAplicaRows(
             $rows,
-            \App\Models\EmpresaModuleStatus::MODULE_SOSTENIBILIDAD,
+            $naIds,
             11,
-            function ($row) {
+            $marker,
+            2,
+            function ($row) use ($marker) {
                 foreach (['Maximizacion', 'Creacion', 'Energias', 'Funcionalidad', 'Participacion', 'Fomento', 'Reorientacion', 'Desarrollo'] as $attr) {
-                    $row->setAttribute($attr, 'NO APLICA');
+                    $row->setAttribute($attr, $marker);
                 }
             }
         );

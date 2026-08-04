@@ -40,7 +40,7 @@
                                     <tr class="even:bg-amber-100 odd:bg-blue-100">
                                         <td class="border px-3 py-4 text-sm nowrap"> {{ $experiences->id }} </td>
                                         <td class="border px-3 py-4 text-sm nowrap"> {{ $experiences->name}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $experiences->sectorind}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ isset($noAplicaIds[$experiences->id]) ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : $experiences->sectorind}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $experiences->tipoind}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $experiences->systemind}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $experiences->regionind}} </td>

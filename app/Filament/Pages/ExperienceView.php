@@ -29,6 +29,15 @@ class ExperienceView extends Page
 
     public $experiences;
 
+    protected function getViewData(): array
+    {
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_EXPERIENCIAS);
+
+        return [
+            'noAplicaIds' => array_flip($naIds),
+        ];
+    }
+
     protected function getActions(): array
     {
         return [
@@ -46,7 +55,7 @@ class ExperienceView extends Page
     {
 
         //return Excel::download(new ExperienceExport, 'experiencia.pdf');
-        $export = new ExperienceExport();
+        $export = new ExperienceExport(isPdf: true);
         return Excel::download($export, 'experience.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }

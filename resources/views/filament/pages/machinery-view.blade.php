@@ -18,6 +18,7 @@
                                         <TH colspan="2" class="border px-6 py-2 text-sm text-gray-500">Máquinas herramientas / Metalmecánica</TH>
                                         <TH colspan="2" class="border px-6 py-2 text-sm text-gray-500">Almacenamiento y transporte</TH>
                                         <TH colspan="2" class="border px-6 py-2 text-sm text-gray-500">Servicios a pozos e instalaciones petroleras</TH>
+                                        <th class="border px-3 py-2 text-sm text-gray-500"></th>
                                     </tr>
                                     <tr class="bg-indigo-400">
                                         <th class="border px-3 py-2 text-sm text-gray-500">ID</th>
@@ -40,6 +41,7 @@
                                         <TH class="border px-6 py-2 text-sm text-gray-500">VALOR ESTIMADO</TH>
                                         <th class="border px-6 py-2 text-sm text-gray-500">CANTIDAD</th>
                                         <TH class="border px-6 py-2 text-sm text-gray-500">VALOR ESTIMADO</TH>
+                                        <TH class="border px-6 py-2 text-sm text-gray-500">ESTADO</TH>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -65,6 +67,7 @@
                                         <td class="border px-3 py-4 text-sm"> {{ $machinery->Almac_trans_est}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $machinery->Serv_poz_inst_qua}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $machinery->Serv_poz_inst_est}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ isset($noAplicaIds[$machinery->id]) ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : '' }} </td>
                                     </tr>
                                     @endforeach
                                 </tbody>

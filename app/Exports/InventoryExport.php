@@ -26,13 +26,29 @@ class InventoryExport implements FromCollection, ShouldAutoSize, WithHeadings, W
     use Exportable;
     use \App\Exports\Concerns\AppendsNoAplicaRows;
 
+    public function __construct(protected bool $isPdf = false)
+    {
+    }
+
     public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
         $rows = InventoryView::query()->get();
 
+        $marker = $this->isPdf
+            ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO
+            : \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_CORTO;
+
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 'inventory');
+
+        $rows->each(function ($row) use ($naIds, $marker) {
+            if (in_array($row->id, $naIds)) {
+                $row->setAttribute('Estado', $marker);
+            }
+        });
+
         // La vista omite a las empresas sin recursos cargados: se agregan las "No Aplica"
-        return $this->appendNoAplicaRows($rows, \App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 8);
+        return $this->appendNoAplicaRows($rows, $naIds, 9, $marker, 8);
     }
 
     //PARA AGREGAR IMAGEN DE LOGO.......................................
@@ -65,9 +81,9 @@ class InventoryExport implements FromCollection, ShouldAutoSize, WithHeadings, W
     public function headings(): array
     {
         return [
-            ["", "", "", "", "", "", "", ""],
-            ["", "", "Materia Prima", "", "", "Producto Terminado", "", ""],
-            ["ID", "NOMBRE", "CANTIDAD", "VALOR ESTIMADO", "UNIDAD", "CANTIDAD", "VALOR ESTIMADO", "UNIDAD"],
+            ["", "", "", "", "", "", "", "", ""],
+            ["", "", "Materia Prima", "", "", "Producto Terminado", "", "", ""],
+            ["ID", "NOMBRE", "CANTIDAD", "VALOR ESTIMADO", "UNIDAD", "CANTIDAD", "VALOR ESTIMADO", "UNIDAD", "ESTADO"],
         ];
     }
 
@@ -88,8 +104,8 @@ class InventoryExport implements FromCollection, ShouldAutoSize, WithHeadings, W
             },
 
             AfterSheet::class => function (AfterSheet $event) {
-                $cellRange = 'A2:H2'; // FIRST HEADERS
-                $cellRange2 = 'A3:H3'; // SECOND HEADERS
+                $cellRange = 'A2:I2'; // FIRST HEADERS
+                $cellRange2 = 'A3:I3'; // SECOND HEADERS
                 $event->sheet->getDelegate()->getStyle($cellRange)->getFont()->setSize(12);
                 $event->sheet->getDelegate()->getStyle($cellRange)->getFill()->applyFromArray(['fillType' => 'solid', 'rotation' => 0, 'color' => ['rgb' => 'C9C9C9'],]);
 

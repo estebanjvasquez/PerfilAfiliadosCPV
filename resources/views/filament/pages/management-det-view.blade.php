@@ -40,25 +40,32 @@
                                 </thead>
                                 <tbody>
                                     @foreach (App\Models\ManagementDetView::get() as $managementdet)
+                                    @php
+                                        $esModuloCompleto = isset($noAplicaWholeIds[$managementdet->id]);
+                                        $subTiposNA = $noAplicaSubTypesByEmpresa->get($managementdet->id, []);
+                                        $marca = fn (string $subType, $valor) => ($esModuloCompleto || in_array($subType, $subTiposNA))
+                                            ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO
+                                            : $valor;
+                                    @endphp
                                     <tr class="even:bg-amber-100 odd:bg-blue-100">
                                         <td class="border px-3 py-4 text-sm nowrap"> {{ $managementdet->id}} </td>
                                         <td class="border px-3 py-4 text-sm"> {{ $managementdet->name}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->iso9001}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->iso17025}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->QUALITY_OTROS}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->iso14001}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->iso50001}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->ENVIRONMENT_OTROS}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->dun}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->iso37001}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->CREDIBILITY_OTROS}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->iso45001}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->ovid}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->SECURITY_OTROS}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->pmi}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->PMI_OTROS}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->iso27001}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $managementdet->INFO_OTROS}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('calidad', $managementdet->iso9001)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('calidad', $managementdet->iso17025)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('calidad', $managementdet->QUALITY_OTROS)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('ambiente', $managementdet->iso14001)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('ambiente', $managementdet->iso50001)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('ambiente', $managementdet->ENVIRONMENT_OTROS)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('credibilidad', $managementdet->dun)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('credibilidad', $managementdet->iso37001)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('credibilidad', $managementdet->CREDIBILITY_OTROS)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('seguridad', $managementdet->iso45001)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('seguridad', $managementdet->ovid)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('seguridad', $managementdet->SECURITY_OTROS)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('proyectos', $managementdet->pmi)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('proyectos', $managementdet->PMI_OTROS)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('seguridad_info', $managementdet->iso27001)}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $marca('seguridad_info', $managementdet->INFO_OTROS)}} </td>
                                     </tr>
                                     @endforeach
                                 </tbody>

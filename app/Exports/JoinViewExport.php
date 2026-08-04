@@ -23,6 +23,29 @@ class JoinViewExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
      * @return \Illuminate\Support\Collection
      */
 
+    /**
+     * Columna del reporte => sub_type correspondiente en EmpresaModuleStatus::SUB_TYPES[MODULE_GESTION]
+     * (mismas columnas ISO que ManagementDetExport, ver ese archivo para la fuente de la vista).
+     */
+    protected const COLUMN_SUB_TYPES = [
+        'iso9001' => 'calidad',
+        'iso17025' => 'calidad',
+        'quality_otros' => 'calidad',
+        'iso14001' => 'ambiente',
+        'iso50001' => 'ambiente',
+        'environment_otros' => 'ambiente',
+        'dun' => 'credibilidad',
+        'iso37001' => 'credibilidad',
+        'credibility_otros' => 'credibilidad',
+        'iso45001' => 'seguridad',
+        'ovid' => 'seguridad',
+        'security_otros' => 'seguridad',
+        'pmi' => 'proyectos',
+        'pmi_otros' => 'proyectos',
+        'iso27001' => 'seguridad_info',
+        'info_otros' => 'seguridad_info',
+    ];
+
     public function drawings()
     {
         $drawing = new Drawing();
@@ -131,6 +154,22 @@ class JoinViewExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
                 'ManagementDetView.INFO_OTROS as info_otros',
 
             ]);
+
+        $empresaId = is_array($record) ? ($record[0] ?? null) : $record;
+
+        if ($empresaId !== null && $data->isNotEmpty()) {
+            $isWholeModuleNA = \App\Models\EmpresaModuleStatus::isNoAplica($empresaId, \App\Models\EmpresaModuleStatus::MODULE_GESTION);
+            $subTypes = \App\Models\EmpresaModuleStatus::subTypeFlagsFor($empresaId, \App\Models\EmpresaModuleStatus::MODULE_GESTION);
+
+            $data->each(function ($row) use ($isWholeModuleNA, $subTypes) {
+                foreach (self::COLUMN_SUB_TYPES as $attr => $subType) {
+                    if ($isWholeModuleNA || ($subTypes[$subType] ?? false)) {
+                        $row->setAttribute($attr, \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_CORTO);
+                    }
+                }
+            });
+        }
+
         return $data;
     }
 }

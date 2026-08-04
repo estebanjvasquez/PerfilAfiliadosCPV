@@ -28,6 +28,15 @@ class ResourceView extends Page
 
     public $resources;
 
+    protected function getViewData(): array
+    {
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 'employee');
+
+        return [
+            'noAplicaIds' => array_flip($naIds),
+        ];
+    }
+
     protected function getActions(): array
     {
         return [
@@ -45,7 +54,7 @@ class ResourceView extends Page
     public function exportAllResourcesPdf()
     {
         //return Excel::download(new FinanceExport, 'finance.pdf');
-        $export = new ResourceExport;
+        $export = new ResourceExport(isPdf: true);
         return Excel::download($export, 'resources.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }

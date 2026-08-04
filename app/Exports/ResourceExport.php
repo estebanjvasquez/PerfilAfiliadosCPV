@@ -28,13 +28,33 @@ class ResourceExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     use Exportable;
     use \App\Exports\Concerns\AppendsNoAplicaRows;
 
+    public function __construct(protected bool $isPdf = false)
+    {
+    }
+
     public function collection()
     {
         //return GenCatalog::query()->where('empresa_user.user_id', Auth::User()->id);
         $rows = ResourceView::query()->get();
 
+        $marker = $this->isPdf
+            ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO
+            : \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_CORTO;
+
+        // 'employee' = sub-tipo "Recursos Humanos", el que cubre este reporte puntual
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 'employee');
+
+        // Empresas presentes en la vista (con datos reales) que igual están marcadas No Aplica:
+        // se deja intacta la data numérica y solo se anota en la columna "Estado" dedicada, para
+        // no romper el tipo numérico de las columnas de conteo (ver PLAN_DESPLIEGUE... Fase 5).
+        $rows->each(function ($row) use ($naIds, $marker) {
+            if (in_array($row->id, $naIds)) {
+                $row->setAttribute('Estado', $marker);
+            }
+        });
+
         // La vista omite a las empresas sin recursos cargados: se agregan las "No Aplica"
-        return $this->appendNoAplicaRows($rows, \App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 21);
+        return $this->appendNoAplicaRows($rows, $naIds, 22, $marker, 21);
     }
 
     //PARA AGREGAR IMAGEN DE LOGO.......................................
@@ -60,8 +80,8 @@ class ResourceExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     public function headings(): array
     {
         return [
-            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-            ["ID", "NOMBRE", "BACHILLERES JUNIOR", "BACHILLERES MEDIUM", "BACHILLERES SENIOR", "TÉCNICOS JUNIOR", "TÉCNICOS MEDIUM", "TÉCNICOS SENIOR", "INGENIEROS JUNIOR", "INGENIEROS MEDIUM", "INGENIEROS SENIOR", "ADMINISTRATIVOS JUNIOR", "ADMINISTRATIVOS MEDIUM", "ADMINISTRATIVOS SENIOR", "GERENTES JUNIOR", "GERENTES MEDIUM", "GERENTES SENIOR", "DIRECTIVOS JUNIOR", "DIRECTIVOS MEDIUM", "DIRECTIVOS SENIOR", "TOTAL"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["ID", "NOMBRE", "BACHILLERES JUNIOR", "BACHILLERES MEDIUM", "BACHILLERES SENIOR", "TÉCNICOS JUNIOR", "TÉCNICOS MEDIUM", "TÉCNICOS SENIOR", "INGENIEROS JUNIOR", "INGENIEROS MEDIUM", "INGENIEROS SENIOR", "ADMINISTRATIVOS JUNIOR", "ADMINISTRATIVOS MEDIUM", "ADMINISTRATIVOS SENIOR", "GERENTES JUNIOR", "GERENTES MEDIUM", "GERENTES SENIOR", "DIRECTIVOS JUNIOR", "DIRECTIVOS MEDIUM", "DIRECTIVOS SENIOR", "TOTAL", "ESTADO"],
         ];
     }
 
@@ -82,7 +102,7 @@ class ResourceExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
             },
 
             AfterSheet::class => function (AfterSheet $event) {
-                $cellRange = 'A2:U2'; // All headers
+                $cellRange = 'A2:V2'; // All headers
                 $event->sheet->getDelegate()->getStyle($cellRange)->getFont()->setSize(14);
                 $event->sheet->getDelegate()->getStyle($cellRange)->getFill()->applyFromArray(['fillType' => 'solid', 'rotation' => 0, 'color' => ['rgb' => 'D9D9D9'],]);
                 $event->sheet->getDelegate()->getRowDimension('1')->setRowHeight(40);

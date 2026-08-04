@@ -28,6 +28,22 @@ class ManagementDetView extends Page
 
     public $managementdet;
 
+    protected function getViewData(): array
+    {
+        $wholeModuleIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_GESTION);
+        $subTypesByEmpresa = \App\Models\EmpresaModuleStatus::where('module', \App\Models\EmpresaModuleStatus::MODULE_GESTION)
+            ->where('sub_type', '!=', \App\Models\EmpresaModuleStatus::SUB_TYPE_WHOLE)
+            ->where('no_aplica', true)
+            ->get()
+            ->groupBy('empresa_id')
+            ->map(fn ($group) => $group->pluck('sub_type')->all());
+
+        return [
+            'noAplicaWholeIds' => array_flip($wholeModuleIds),
+            'noAplicaSubTypesByEmpresa' => $subTypesByEmpresa,
+        ];
+    }
+
     protected function getActions(): array
     {
         return [
@@ -45,7 +61,7 @@ class ManagementDetView extends Page
     public function exportAllManagementDetPdf()
     {
         //return Excel::download(new FinanceExport, 'finance.pdf');
-        $export = new ManagementDetExport;
+        $export = new ManagementDetExport(isPdf: true);
         return Excel::download($export, 'management-det-detail.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }

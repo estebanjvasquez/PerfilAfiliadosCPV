@@ -28,6 +28,15 @@ class FacilityView extends Page
 
     public $facility;
 
+    protected function getViewData(): array
+    {
+        $naIds = \App\Models\EmpresaModuleStatus::noAplicaIdsFor(\App\Models\EmpresaModuleStatus::MODULE_RECURSOS, 'facility');
+
+        return [
+            'noAplicaIds' => array_flip($naIds),
+        ];
+    }
+
     protected function getActions(): array
     {
         return [
@@ -45,7 +54,7 @@ class FacilityView extends Page
     public function exportAllFacilityPdf()
     {
         //return Excel::download(new FinanceExport, 'finance.pdf');
-        $export = new FacilityExport;
+        $export = new FacilityExport(isPdf: true);
         return Excel::download($export, 'facility-detail.pdf', \Maatwebsite\Excel\Excel::MPDF);
     }
 }

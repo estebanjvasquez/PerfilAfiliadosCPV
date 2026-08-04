@@ -25,18 +25,19 @@
                                 </thead>
                                 <tbody>
                                     @foreach (App\Models\SustainabilityViewModel::get() as $sustainabilities)
+                                    @php $esNoAplica = isset($noAplicaIds[$sustainabilities->id]); @endphp
                                     <tr class="even:bg-amber-100 odd:bg-blue-100">
                                         <td class="border px-3 py-4 text-sm nowrap"> {{ $sustainabilities->id }} </td>
                                         <td class="border px-3 py-4 text-sm nowrap"> {{ $sustainabilities->name}} </td>
                                         <td class="border px-3 py-4 text-sm nowrap"> {{ $sustainabilities->Sector}} </td>
-                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $sustainabilities->Maximizacion}} </td>
-                                        <td class="border px-3 py-4 text-sm"> {{ $sustainabilities->Creacion}} </td>
-                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $sustainabilities->Energias}} </td>
-                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $sustainabilities->Funcionalidad}} </td>
-                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $sustainabilities->Participacion}} </td>
-                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $sustainabilities->Fomento}} </td>
-                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $sustainabilities->Reorientacion}} </td>
-                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $sustainabilities->Desarrollo}} </td>
+                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $esNoAplica ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : $sustainabilities->Maximizacion}} </td>
+                                        <td class="border px-3 py-4 text-sm"> {{ $esNoAplica ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : $sustainabilities->Creacion}} </td>
+                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $esNoAplica ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : $sustainabilities->Energias}} </td>
+                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $esNoAplica ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : $sustainabilities->Funcionalidad}} </td>
+                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $esNoAplica ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : $sustainabilities->Participacion}} </td>
+                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $esNoAplica ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : $sustainabilities->Fomento}} </td>
+                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $esNoAplica ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : $sustainabilities->Reorientacion}} </td>
+                                        <td class="border px-3 py-4 text-sm nowrap"> {{ $esNoAplica ? \App\Models\EmpresaModuleStatus::NO_APLICA_LABEL_LARGO : $sustainabilities->Desarrollo}} </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
