@@ -26,6 +26,8 @@ class SustainabilitiesRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Enfoques de sostenibilidad';
 
+    protected static ?string $title = 'Enfoques de sostenibilidad';
+
     public static function form(Form $form): Form
     {
         $varea = Area::get();

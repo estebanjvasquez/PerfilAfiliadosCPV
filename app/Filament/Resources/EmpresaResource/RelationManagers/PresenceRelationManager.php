@@ -30,6 +30,8 @@ class PresenceRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Presencia internacional';
 
+    protected static ?string $title = 'Presencia internacional';
+
     public static function form(Form $form): Form
     {
         $countries = (new Country())->getCountry();

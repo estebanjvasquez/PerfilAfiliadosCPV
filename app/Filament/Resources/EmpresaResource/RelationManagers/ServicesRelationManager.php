@@ -32,6 +32,8 @@ class ServicesRelationManager extends BelongsToManyRelationManager
 
     protected static ?string $pluralModelLabel = 'Sectores y servicios';
 
+    protected static ?string $title = 'Sectores y servicios';
+
     protected function canEdit(Model $record): bool
     {
         return false;

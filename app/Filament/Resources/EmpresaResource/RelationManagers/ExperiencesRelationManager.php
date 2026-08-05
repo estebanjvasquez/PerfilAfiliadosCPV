@@ -36,6 +36,8 @@ class ExperiencesRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Experiencia relevante';
 
+    protected static ?string $title = 'Experiencia relevante';
+
     /**
      * Campos de una experiencia individual (un "año" de experiencia).
      * Se usan tanto para agregar una nueva como para editar una existente.

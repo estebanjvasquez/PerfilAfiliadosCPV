@@ -27,6 +27,8 @@ class AssetsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Recursos en Venezuela';
 
+    protected static ?string $title = 'Recursos en Venezuela';
+
     protected static array $qtyOptions = [
         '1' => '1 - 10',
         '2' => '11 - 50',

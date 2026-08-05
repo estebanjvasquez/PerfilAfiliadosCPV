@@ -29,6 +29,8 @@ class ManagementRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Sistemas de gestión';
 
+    protected static ?string $title = 'Sistemas de gestión';
+
     protected static function saveFields(RelationManager $livewire, array $data): void
     {
         $management = $livewire->ownerRecord->management()->first();
