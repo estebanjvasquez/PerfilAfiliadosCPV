@@ -262,9 +262,8 @@
             }
 
             .experiencia-card {
-                float: left;
-                width: 47%;
-                margin: 0 1.5% 12px 1.5%;
+                width: 100%;
+                margin: 0 0 10px 0;
                 border: 1px solid #ccc;
                 border-radius: 4px;
                 padding: 6px;
@@ -274,6 +273,15 @@
 
             .exp-grupo {
                 margin-bottom: 4px;
+            }
+
+            /* Evita que un encabezado de sección quede huérfano al final de una página,
+               separado del contenido que le sigue (dompdf no reubica el bloque completo,
+               solo respeta que no se corte justo después del encabezado). */
+            .amarillo,
+            h2.titulo2,
+            .gris-oscuro {
+                page-break-after: avoid;
             }
         </style>
 
@@ -871,7 +879,7 @@
             <h2 class="titulo2 gris-oscuro">Experiencia Relevante</h2>
 
             @if (sizeof($datos_exp) > 0)
-            <div class="row experiencias-grid">
+            <div class="experiencias-grid">
                 @foreach ($datos_exp as $row)
                 <div class="experiencia-card">
                     <div class="gris-oscuro" style="font-size: 13.5px; padding: 3px;">
