@@ -239,7 +239,15 @@
 
 
             @page {
-                margin: 50px;
+                margin: 150px 50px 50px 50px;
+            }
+
+            .page-header {
+                position: fixed;
+                left: 0px;
+                right: 0px;
+                top: -140px;
+                height: 110px;
             }
 
             @font-face {
@@ -289,16 +297,17 @@
 
     <body>
 
-        <div class="row amarillo" style="margin-bottom: 10px;">
-
-            <div class="column1">
-                <img src="{{ $app_path = public_path('images'); }}/Campet-Logo.png" style="width:20%"></img>
-            </div>
-            <div class="column2">
-                <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:60%;"></img>
-            </div>
-            <div style="width:100%">
-                <h3>REPORTE POR EMPRESA DE LOS DATOS REGISTRADOS</h3>
+        <div class="page-header">
+            <div class="row amarillo">
+                <div class="column1">
+                    <img src="{{ $app_path = public_path('images'); }}/Campet-Logo.png" style="width:20%"></img>
+                </div>
+                <div class="column2">
+                    <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:60%;"></img>
+                </div>
+                <div style="width:100%">
+                    <h3>REPORTE POR EMPRESA DE LOS DATOS REGISTRADOS</h3>
+                </div>
             </div>
         </div>
         <h2 class="titulo2 gris-oscuro">Datos Generales</h2>
@@ -386,11 +395,6 @@
         </div>
 
         <!-- CLIENTES............................................................. -->
-        <div class="row amarillo" style="margin-bottom: 10px;">
-            <div class="column2">
-                <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:50%; "></img>
-            </div>
-        </div>
         <h2 class="titulo2 gris-oscuro">Clientes</h2>
         <div style="overflow-x:auto; font-size: 13px; margin: 0px;">
             <table>
@@ -421,11 +425,6 @@
         <!-- FIN DE CLIENTES.......................................................... -->
 
         <!-- CAMARAS............................................................. -->
-        <div class="row amarillo" style="margin-bottom: 10px;">
-            <div class="column2">
-                <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:50%; "></img>
-            </div>
-        </div>
         <h2 class="titulo2 gris-oscuro">Cámaras</h2>
         <div style="overflow-x:auto; font-size: 13px; margin: 0px;">
             <table>
@@ -451,11 +450,6 @@
         <!-- FIN DE CAMARAS.......................................................... -->
 
         <!-- SECTORES Y SERVICIOS.................................................... -->
-        <div class="row amarillo" style="margin-bottom: 10px;">
-            <div class="column2">
-                <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:50%; "></img>
-            </div>
-        </div>
         <div style="font-size: 13px;">
             <table>
                 <tr>
@@ -502,11 +496,6 @@
         <!-- FIN DE SECTORES Y SERVICIOS ..............................................................-->
 
         <!-- ENFOQUE A SOSTENIBILIDAD......................................................................-->
-        <div class="row amarillo" style="margin-bottom: 10px;">
-            <div class="column2">
-                <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:50%; "></img>
-            </div>
-        </div>
         <div style="font-size: 13px;">
             <table>
                 <tr>
@@ -576,11 +565,6 @@
         <!-- FIN DE ENFOQUE A SOSTENIBILIDAD............................................. -->
 
         <!-- RECURSOS EN VENEZUELA..............................................................-->
-        <div class="row amarillo" style="margin-bottom: 10px;">
-            <div class="column2">
-                <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:50%; "></img>
-            </div>
-        </div>
         <div style="font-size: 13px; border: none;">
             <table>
                 <tr>
@@ -737,11 +721,6 @@
             </table>
 
             <!-- INSTALACIONES ...........-->
-            <div class="row amarillo" style="margin-bottom: 10px;">
-                <div class="column2">
-                    <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:50%; "></img>
-                </div>
-            </div>
             <table>
                 <tr>
                     <td colspan="5" style="padding: 0px; border: none">
@@ -870,12 +849,6 @@
             <!-- FIN DE RECURSOS EN VENEZUELA..............................................................-->
 
             <!-- EXPERIENCIA RELEVANTE.....................................................................-->
-            <div class="row amarillo" style="margin-bottom: 10px;">
-                <div class="column2">
-                    <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:50%; "></img>
-                </div>
-            </div>
-
             <h2 class="titulo2 gris-oscuro">Experiencia Relevante</h2>
 
             @if (sizeof($datos_exp) > 0)
@@ -938,11 +911,6 @@
         </div>
 
         <!-- PRESENCIA INTERNACIONAL.....................................................................--->
-        <div class="row amarillo" style="margin-bottom: 10px;">
-            <div class="column2">
-                <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:50%; "></img>
-            </div>
-        </div>
         <div style="font-size: 13px; border: none;">
             <table>
                 <tr>
@@ -1025,11 +993,6 @@
             </table>
         </div>
         <!-- SISTEAS DE GESTIÓN..............................................................................-->
-        <div class="row amarillo" style="margin-bottom: 10px;">
-            <div class="column2">
-                <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:50%; "></img>
-            </div>
-        </div>
         <table>
             <tr>
                 <td colspan="3" style="padding: 0px; border: none">
