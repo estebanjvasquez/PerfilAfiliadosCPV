@@ -23,24 +23,21 @@ de diferencia, 3 migraciones nuevas), en distintos grados de QA:
 |---|---|---|
 | Fase 1 — Rediseño de pestañas (Recursos/Gestión/Experiencia/Presencia) | ✅ | ✅ **Aprobada** |
 | Fase 2 — "No Aplica" por tipo + % completitud + reportes Completitud/Sectores | ✅ | ✅ **Aprobada** (2026-08-04: Presencia Internacional, Experiencia Relevante y "% Perfil" confirmados por el cliente — QA 100% cerrado) |
-| Fase 3 — Tablero de Métricas Gerenciales | ✅ | 🟡 El cliente confirmó que **se veía bien visualmente**, pero eso fue *antes* de las 3 rondas de fixes del PDF (el render pasó de SVG a GD) — el PDF actual en `staging` **todavía no lo vio el cliente** |
-| Fase 4 — Acciones masivas + filtros en Empresas | ✅ | 🔴 Sin QA todavía (roles, modal "BORRAR", filtros combinados) |
-| Sector Principal solo editable por CPV (reunión 30 jul, punto 1) | ✅ | 🟡 Sin confirmación explícita (probar con usuario no-admin y con `super_admin`) |
-| Normalización de textos + reporte "Estatus de Perfiles" | ✅ | 🟡 Sin confirmación explícita |
-| Máscaras de Teléfono/RIF (2026-08-03/04) | ✅ | 🔴 En curso — se reportó que la máscara "no funciona", pendiente confirmar si es porque el entorno de pruebas no tenía el `git pull` del commit `a9f3855`, o si hay un bug real |
-| Fase 5 — "No Aplica" granular en reportes (2026-08-04) | ✅ commiteada y pusheada (`a542fe7`) | 🔴 Sin QA — ver `task.md` 1.13, falta probar contra el XAMPP del cliente |
-| Layout del PDF "Reporte por Empresa" — saltos de página + Experiencia Relevante (ver `task.md` 1.14) | ✅ commiteada y pusheada | 🔴 Sin QA visual (ver limitación de entorno en 1.14) |
-| Bug de valores asumidos en `NULL` — Facturación y 4 vistas más (ver `task.md` 1.15) | ✅ commiteada y pusheada (incluye nueva migración) | 🔴 Sin QA — falta aplicar en servidor de test y confirmar |
+| Fase 3 — Tablero de Métricas Gerenciales | ✅ | ✅ **Confirmado** (2026-08-10) |
+| Fase 4 — Acciones masivas + filtros en Empresas | ✅ | ✅ **Confirmado** (2026-08-10) — filtros (País/Ciudad/Sector) y botones disponibles para `super_admin` confirmados. Botón masivo "Editar" no aparece para usuario regular con 1 sola seleccionada — investigado, sin causa encontrada en el código; **decisión del cliente: no bloqueante**, el usuario regular ya puede editar haciendo clic directo sobre la fila de la empresa |
+| Sector Principal solo editable por CPV (reunión 30 jul, punto 1) | ✅ | ✅ **Confirmado por el cliente** (2026-08-10) |
+| Normalización de textos + reporte "Estatus de Perfiles" | ✅ | ✅ **Confirmado en staging** (2026-08-10) — normalización de textos y columna "Usuario principal" ambas confirmadas |
+| Máscaras de Teléfono/RIF (2026-08-03/04) | ✅ | ✅ **Confirmado** (2026-08-10) — máscara de Teléfono funcionando en staging (era el `git pull` faltante, no un bug real); SQL de normalización de RIF y `UPDATE` de `status_id` (B.1) ambos aplicados en producción |
+| Fase 5 — "No Aplica" granular en reportes (2026-08-04) | ✅ commiteada y pusheada (`a542fe7`) | ✅ **Confirmado** (2026-08-10) — evidencia en captura de reporte, empresa con varios módulos marcados "No Aplica" mostrando el texto correcto de forma consistente |
+| Layout del PDF "Reporte por Empresa" — saltos de página + Experiencia Relevante (ver `task.md` 1.14) | ✅ commiteada y pusheada | 🟡 Mejoró (2026-08-10: "funciona mejor"), **se espera confirmación final** del cliente antes de cerrar el ítem |
+| Bug de valores asumidos en `NULL` — Facturación y 4 vistas más (ver `task.md` 1.15) | ✅ commiteada y pusheada (incluye nueva migración) | ✅ **Confirmado en las 5 vistas** (2026-08-10): Facturación, Experiencia, Maquinaria, Inventario e Instalaciones — campos sin llenar muestran blanco en vez del rango más alto |
 | 6 puntos restantes de la reunión del 30 de julio | ❌ No implementado | — (fuera de alcance de este despliegue) |
 
-**Recomendación:** antes de fijar fecha de despliegue, cerrar la lista de QA de la tabla de arriba
-con el cliente **ítem por ítem** (no un "se ve bien" informal) — es un despliegue grande y
-acumulado, con cambios de datos manuales de por medio (ver abajo), así que conviene tratarlo como
-un solo paquete revisado a conciencia, no ir empujando fixes sueltos a producción. En particular:
-1. Resolver primero el reporte de la máscara de teléfono (¿era el `git pull` faltante, o un bug
-   real?) — bloquea el ítem más reciente de QA.
-2. Pedir al cliente que confirme explícitamente los puntos 🟡/🔴 de la tabla.
-3. Recién ahí, agendar una ventana de despliegue siguiendo este documento.
+**Estado al 2026-08-10: todas las Fases (1-5) y todos los ítems de datos/máscaras quedaron
+confirmados.** Queda un solo ítem 🟡 en la tabla — el layout del PDF "Reporte por Empresa"
+("funciona mejor", pendiente de confirmación final — no es una Fase, es el fix puntual de
+`task.md` 1.16). Con ese último punto cerrado, la tabla completa queda en ✅ y se puede coordinar
+la ventana de despliegue siguiendo el resto de este documento (pre-requisitos, backup, pasos 1-6).
 
 ---
 
@@ -109,7 +106,9 @@ UPDATE empresas SET status_id = 1 WHERE status_id IS NULL;
 ```
 
 Seguro — no toca ninguna fila que ya tenga `0` explícito, solo las que están en `NULL`.
-**Ya se corrió en el XAMPP de pruebas y quedó confirmado por el usuario.**
+**Ya se corrió en el XAMPP de pruebas y quedó confirmado por el usuario.** **Actualización
+2026-08-10: también se corrió ya en la base de datos de producción**, junto con el de B.2 (mismo
+adelanto respecto al orden documentado en el [Paso 5](#paso-5--correr-los-2-sql-manuales-de-la-sección-b) — seguro por el mismo motivo, no depende de ninguna migración nueva).
 
 #### B.2 — Normalizar RIF sin guiones/símbolos
 
@@ -143,7 +142,16 @@ SET rif = UPPER(REPLACE(REPLACE(REPLACE(TRIM(rif), '-', ''), ' ', ''), '.', ''))
 WHERE rif <> UPPER(REPLACE(REPLACE(REPLACE(TRIM(rif), '-', ''), ' ', ''), '.', ''));
 ```
 
-**Ya se corrió en el XAMPP de pruebas y quedó confirmado por el usuario.**
+**Ya se corrió en el XAMPP de pruebas y quedó confirmado por el usuario.** **Actualización
+2026-08-10: también se corrió ya en la base de datos de producción** (junto con el `UPDATE` de
+`status_id` de B.1), adelantado respecto al orden documentado en el
+[Paso 5](#paso-5--correr-los-2-sql-manuales-de-la-sección-b) (que lo ubica *después* del
+merge/deploy de código) — es seguro haberlo adelantado porque ninguno de los dos `UPDATE` depende
+de ninguna columna ni migración nueva, solo normalizan datos ya existentes. **Los 2 SQL manuales
+de la sección B quedan resueltos** — el Paso 5 durante la ventana de despliegue pasa a ser
+verificación, no ejecución. Al llegar al cutover, igual conviene re-correr el chequeo de
+colisiones del Paso 1 por si se cargó alguna empresa nueva con RIF sin normalizar entre el
+2026-08-10 y la fecha real del despliegue.
 
 #### B.3 — Límite de 2 sectores por empresa + Sector Principal/Secundario
 
@@ -162,12 +170,12 @@ sectores — comunicarlo al cliente como parte de la ventana de despliegue.
 
 - [ ] **Aprobación explícita del cliente** sobre todos los ítems 🟡/🔴 de la tabla de
   [Fase del proyecto](#fase-del-proyecto--qué-falta-antes-de-fijar-fecha).
-- [ ] **Extensión GD habilitada en el PHP de producción** (`ea-php82` según `.cpanel.yml`) — es
-  requisito para que los 14 gráficos del PDF del Tablero Gerencial se vean (si falta, el PDF se
-  genera igual pero con placeholders de texto en vez de gráficos, sin error visible). Verificar
-  **antes** del deploy vía cPanel → "MultiPHP INI Editor" → pestaña de extensiones, o
-  `php -m | grep gd` por SSH si hay acceso. Ver `task.md` punto 8 para el detalle técnico completo
-  (por qué se necesita GD y no alcanza con SVG, dompdf 2.0.1 no soporta `<svg>`).
+- [x] **Extensión GD habilitada en el PHP de producción** — **confirmado (2026-08-10)** vía WHM
+  (Software → Module Manager): `php82-php-gd`, `php83-php-gd`, `php84-php-gd` y `php85-php-gd`
+  aparecen los 4 como `Installed`, incluyendo `ea-php82` (la versión que usa `.cpanel.yml`). Sin
+  riesgo de que los 14 gráficos del PDF del Tablero Gerencial caigan a placeholders de texto. Ver
+  `task.md` punto 8 para el detalle técnico de por qué hace falta GD (dompdf 2.0.1 no soporta
+  `<svg>`).
 - [ ] Acceso confirmado a phpMyAdmin (o SSH+mysql) de producción, para el backup y los 2 SQL
   manuales de la sección anterior.
 - [ ] Ventana de mantenimiento acordada con el cliente (aunque el deploy en sí es rápido, conviene
@@ -233,25 +241,45 @@ php artisan view:cache
 Revisar el log de deploy de cPanel al terminar — confirmar que las 8 tareas corrieron sin error
 (en particular `composer install` y `migrate --force`).
 
-### Paso 5 — Correr los 2 SQL manuales de la sección B
+### Paso 5 — Verificar los 2 SQL manuales de la sección B
 
-**En este orden, en phpMyAdmin de producción, uno a la vez:**
-1. Sección B.1 (`status_id`) — un solo `UPDATE`, directo.
-2. Sección B.2 (RIF) — Paso 1 (chequeo) → Paso 2 (preview) → Paso 3 (`UPDATE`), **solo si el
-   chequeo de colisiones del Paso 1 no devolvió filas**.
+**Ya se corrieron ambos en producción el 2026-08-10, adelantados a este paso** (ver B.1/B.2) — este
+paso pasa de "ejecutar" a "verificar que sigan aplicados":
+1. Sección B.1 (`status_id`) — confirmar `SELECT COUNT(*) FROM empresas WHERE status_id IS NULL;`
+   devuelve 0.
+2. Sección B.2 (RIF) — re-correr el chequeo de colisiones del Paso 1 (por si se cargó alguna
+   empresa nueva con RIF sin normalizar entre el 08-10 y la fecha real del despliegue) y confirmar
+   `SELECT * FROM empresas WHERE rif REGEXP '[^A-Za-z0-9]';` devuelve 0 filas.
 
-### Paso 6 — Registrar el permiso del Tablero Gerencial en Filament Shield
+### Paso 6 — Registrar los permisos de página nuevos en Filament Shield
 
-La página `GerenciaDashboard` (Fase 3) usa `HasPageShield` con un permiso propio
-(`page_GerenciaDashboard`) que todavía no existe en la tabla `permissions` de producción — sin
-este paso, nadie va a poder asignarlo a un rol gerencial desde el panel de Shield:
+**No es solo el Tablero Gerencial.** Las 3 páginas agregadas en Fase 2/3 usan el trait
+`HasPageShield`, cuyo `canView()` hace `Auth::user()->can('page_xxx')` **sin ningún bypass
+automático para `super_admin`** (verificado en `vendor/bezhansalleh/filament-shield` — no hay
+`Gate::before` en ningún lado del proyecto ni del paquete). Si el permiso no existe en la tabla
+`permissions`, la página **no aparece en el menú para nadie, ni siquiera para `super_admin`** — no
+es un bug de código, es un paso de aprovisionamiento que falta:
+
+- `page_completion_view` — página "Estatus de Perfiles" (`CompletionView.php`)
+- `page_sectors_view` — página "Sectores por Empresa" (`SectorsView.php`)
+- `page_gerencia_dashboard` — página "Tablero de Métricas Gerenciales" (`GerenciaDashboard.php`)
+
+Ninguno de los 3 existe todavía en la tabla `permissions` de producción. Un solo comando los crea
+los 3 de una vez **y ya deja `super_admin`/`filament_user` con acceso automático** (ver
+`FilamentShield::giveSuperAdminPermission()` — se llama sola dentro de `generateForPage()`, no
+requiere un paso manual aparte para esos 2 roles):
 
 ```bash
 php artisan shield:generate
 ```
 
-Después, desde el panel de Filament Shield (Roles), asignar `page_GerenciaDashboard` a los roles
-que deban ver el Tablero Gerencial.
+Si además existe algún rol gerencial custom (no `super_admin`/`filament_user`) que deba ver el
+Tablero, asignarle `page_gerencia_dashboard` manualmente desde el panel de Filament Shield (Roles)
+— ese es el único paso manual restante.
+
+**Mismo requisito aplica al servidor de pruebas** (no solo a producción) — si en el entorno de QA
+del cliente/usuario no aparecen "Estatus de Perfiles", "Sectores por Empresa" ni el Tablero
+Gerencial en el menú, es casi seguro este mismo paso sin correr ahí, no un bug de código.
 
 ---
 
@@ -267,6 +295,8 @@ que deban ver el Tablero Gerencial.
   (deberían aparecer como activas tras el UPDATE del Paso 5.1).
 - [ ] Buscar alguna empresa que antes tuviera RIF con guion — confirmar que ahora se ve sin
   guion/símbolos en el listado y al editar.
+- [ ] "Estatus de Perfiles" y "Sectores por Empresa" aparecen en el menú "Reportes", y el Tablero
+  Gerencial aparece en el menú "Gerencia" (si falta alguno, ver Paso 6 — `shield:generate`).
 - [ ] Tablero Gerencial (`/admin/gerencia-dashboard` o la ruta que corresponda): los 15 widgets
   cargan, los filtros (Sector/Cámara/Estado) no se revierten solos a los ~5s.
 - [ ] Botón "Descargar PDF" del Tablero Gerencial: el PDF descarga (no falla en silencio) y
@@ -313,8 +343,9 @@ primer error.
 ```
 Antes de la ventana:
 [ ] Cliente aprobó explícitamente cada ítem 🟡/🔴 de la tabla de Fase del proyecto
-[ ] Se resolvió el reporte de la máscara de teléfono (pull faltante vs. bug real)
-[ ] GD confirmado habilitado en PHP de producción
+[x] Se resolvió el reporte de la máscara de teléfono — era el `git pull` faltante, no un bug
+    real (2026-08-10, confirmado funcionando en staging)
+[x] GD confirmado habilitado en PHP de producción (2026-08-10, ver Pre-requisitos)
 [ ] Acceso a phpMyAdmin/SSH de producción confirmado
 
 Durante la ventana:
@@ -322,9 +353,13 @@ Durante la ventana:
 [ ] Paso 2 — Merge staging→main (fast-forward)
 [ ] Paso 3 — Push a main
 [ ] Paso 4 — Deploy vía cPanel, log revisado sin errores
-[ ] Paso 5.1 — UPDATE status_id corrido
-[ ] Paso 5.2 — SQL de RIF corrido (chequeo de colisiones → preview → update)
-[ ] Paso 6 — shield:generate corrido + permiso asignado a roles gerenciales
+[x] Paso 5.1 — UPDATE status_id corrido (adelantado a producción el 2026-08-10, ver B.1 — solo
+    re-verificar en la ventana)
+[x] Paso 5.2 — SQL de RIF corrido (adelantado a producción el 2026-08-10, ver B.2 — re-correr el
+    chequeo de colisiones por las dudas antes de dar por cerrado)
+[ ] Paso 6 — shield:generate corrido (crea `page_completion_view`/`page_sectors_view`/
+    `page_gerencia_dashboard` de una vez) + `page_gerencia_dashboard` asignado a roles
+    gerenciales custom si aplica
 
 Después de la ventana:
 [ ] Checklist de "Verificación post-despliegue" completo
