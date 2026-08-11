@@ -2,12 +2,14 @@
 
 **Fecha de redacción:** 2026-08-04 — **última revisión: 2026-08-11**
 **Preparado por:** sesión de trabajo con Claude Sonnet 5, a pedido de Esteban Vásquez.
-**Estado del plan:** ✅ **guía definitiva — lista para ejecutar.** El cliente aprobó explícitamente
-todos los ítems de la tabla de [Fase del proyecto](#fase-del-proyecto--qué-falta-antes-de-fijar-fecha)
-(2026-08-11), incluyendo el último 🟡 pendiente (PDF "Reporte por Empresa"). No queda ningún ítem
-de QA abierto — solo resta coordinar la ventana de despliegue y seguir los pasos de este documento
-en orden. Este documento sí se sube al repo (a diferencia de `task.md`, que es solo notas locales)
-porque es la guía operativa del despliegue real.
+**Estado del plan:** ✅ **DESPLEGADO A PRODUCCIÓN (2026-08-11).** El cliente aprobó explícitamente
+todos los ítems de la tabla de [Fase del proyecto](#fase-del-proyecto--qué-falta-antes-de-fijar-fecha),
+incluyendo el último 🟡 pendiente (PDF "Reporte por Empresa"), y el despliegue se ejecutó siguiendo
+los pasos de este documento — con un incidente real durante el Paso 4 (`FinanceView` caída por un
+bug de `ONLY_FULL_GROUP_BY`, ver nota en el [Checklist final](#checklist-final-para-copiarpegar-al-coordinar-la-ventana-de-despliegue))
+diagnosticado y resuelto en la misma ventana. La checklist de Verificación post-despliegue está
+completa. Este documento sí se sube al repo (a diferencia de `task.md`, que es solo notas locales)
+porque es la guía operativa del despliegue real — queda como referencia histórica de cómo se hizo.
 
 > Este documento reemplaza en la práctica a `LECTURA_PRIMERO.md` / `ESTADO_ANALISIS_JUNIO_2026.md` /
 > `PROXIMO_PASOS.md` / `SNAPSHOT_SISTEMA_JUNIO_2026.md`, que describen un estado del proyecto de
@@ -24,19 +26,19 @@ porque es la guía operativa del despliegue real.
 merge de login/CAPTCHA; todo lo que sigue vive acumulado en `staging` (61 commits, 121 archivos de
 diferencia, 4 migraciones nuevas), **con QA 100% cerrado y aprobado por el cliente**:
 
-| Fase / cambio | Implementado | QA del cliente |
-|---|---|---|
-| Fase 1 — Rediseño de pestañas (Recursos/Gestión/Experiencia/Presencia) | ✅ | ✅ **Aprobada** |
-| Fase 2 — "No Aplica" por tipo + % completitud + reportes Completitud/Sectores | ✅ | ✅ **Aprobada** (2026-08-04: Presencia Internacional, Experiencia Relevante y "% Perfil" confirmados por el cliente — QA 100% cerrado) |
-| Fase 3 — Tablero de Métricas Gerenciales | ✅ | ✅ **Confirmado** (2026-08-10) |
-| Fase 4 — Acciones masivas + filtros en Empresas | ✅ | ✅ **Confirmado** (2026-08-10) — filtros (País/Ciudad/Sector) y botones disponibles para `super_admin` confirmados. Botón masivo "Editar" no aparece para usuario regular con 1 sola seleccionada — investigado, sin causa encontrada en el código; **decisión del cliente: no bloqueante**, el usuario regular ya puede editar haciendo clic directo sobre la fila de la empresa |
-| Sector Principal solo editable por CPV (reunión 30 jul, punto 1) | ✅ | ✅ **Confirmado por el cliente** (2026-08-10) |
-| Normalización de textos + reporte "Estatus de Perfiles" | ✅ | ✅ **Confirmado en staging** (2026-08-10) — normalización de textos y columna "Usuario principal" ambas confirmadas |
-| Máscaras de Teléfono/RIF (2026-08-03/04) | ✅ | ✅ **Confirmado** (2026-08-10) — máscara de Teléfono funcionando en staging (era el `git pull` faltante, no un bug real); SQL de normalización de RIF y `UPDATE` de `status_id` (B.1) ambos aplicados en producción |
-| Fase 5 — "No Aplica" granular en reportes (2026-08-04) | ✅ commiteada y pusheada (`a542fe7`) | ✅ **Confirmado** (2026-08-10) — evidencia en captura de reporte, empresa con varios módulos marcados "No Aplica" mostrando el texto correcto de forma consistente |
-| Layout del PDF "Reporte por Empresa" — saltos de página + Experiencia Relevante (ver `task.md` 1.14) | ✅ commiteada y pusheada | ✅ **Confirmación final del cliente (2026-08-11)** |
-| Bug de valores asumidos en `NULL` — Facturación y 4 vistas más (ver `task.md` 1.15) | ✅ commiteada y pusheada (incluye nueva migración) | ✅ **Confirmado en las 5 vistas** (2026-08-10): Facturación, Experiencia, Maquinaria, Inventario e Instalaciones — campos sin llenar muestran blanco en vez del rango más alto |
-| 6 puntos restantes de la reunión del 30 de julio | ❌ No implementado | — (fuera de alcance de este despliegue) |
+| Fase / cambio                                                                                        | Implementado                                       | QA del cliente                                                                                                                                                                                                                                                                                                                                                                    |
+| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fase 1 — Rediseño de pestañas (Recursos/Gestión/Experiencia/Presencia)                               | ✅                                                 | ✅ **Aprobada**                                                                                                                                                                                                                                                                                                                                                                   |
+| Fase 2 — "No Aplica" por tipo + % completitud + reportes Completitud/Sectores                        | ✅                                                 | ✅ **Aprobada** (2026-08-04: Presencia Internacional, Experiencia Relevante y "% Perfil" confirmados por el cliente — QA 100% cerrado)                                                                                                                                                                                                                                            |
+| Fase 3 — Tablero de Métricas Gerenciales                                                             | ✅                                                 | ✅ **Confirmado** (2026-08-10)                                                                                                                                                                                                                                                                                                                                                    |
+| Fase 4 — Acciones masivas + filtros en Empresas                                                      | ✅                                                 | ✅ **Confirmado** (2026-08-10) — filtros (País/Ciudad/Sector) y botones disponibles para `super_admin` confirmados. Botón masivo "Editar" no aparece para usuario regular con 1 sola seleccionada — investigado, sin causa encontrada en el código; **decisión del cliente: no bloqueante**, el usuario regular ya puede editar haciendo clic directo sobre la fila de la empresa |
+| Sector Principal solo editable por CPV (reunión 30 jul, punto 1)                                     | ✅                                                 | ✅ **Confirmado por el cliente** (2026-08-10)                                                                                                                                                                                                                                                                                                                                     |
+| Normalización de textos + reporte "Estatus de Perfiles"                                              | ✅                                                 | ✅ **Confirmado en staging** (2026-08-10) — normalización de textos y columna "Usuario principal" ambas confirmadas                                                                                                                                                                                                                                                               |
+| Máscaras de Teléfono/RIF (2026-08-03/04)                                                             | ✅                                                 | ✅ **Confirmado** (2026-08-10) — máscara de Teléfono funcionando en staging (era el `git pull` faltante, no un bug real); SQL de normalización de RIF y `UPDATE` de `status_id` (B.1) ambos aplicados en producción                                                                                                                                                               |
+| Fase 5 — "No Aplica" granular en reportes (2026-08-04)                                               | ✅ commiteada y pusheada (`a542fe7`)               | ✅ **Confirmado** (2026-08-10) — evidencia en captura de reporte, empresa con varios módulos marcados "No Aplica" mostrando el texto correcto de forma consistente                                                                                                                                                                                                                |
+| Layout del PDF "Reporte por Empresa" — saltos de página + Experiencia Relevante (ver `task.md` 1.14) | ✅ commiteada y pusheada                           | ✅ **Confirmación final del cliente (2026-08-11)**                                                                                                                                                                                                                                                                                                                                |
+| Bug de valores asumidos en `NULL` — Facturación y 4 vistas más (ver `task.md` 1.15)                  | ✅ commiteada y pusheada (incluye nueva migración) | ✅ **Confirmado en las 5 vistas** (2026-08-10): Facturación, Experiencia, Maquinaria, Inventario e Instalaciones — campos sin llenar muestran blanco en vez del rango más alto                                                                                                                                                                                                    |
+| 6 puntos restantes de la reunión del 30 de julio                                                     | ❌ No implementado                                 | — (fuera de alcance de este despliegue)                                                                                                                                                                                                                                                                                                                                           |
 
 **Estado al 2026-08-11: el cliente aprobó explícitamente todos los ítems de la tabla, incluido el
 último 🟡 pendiente (PDF "Reporte por Empresa").** No queda ningún ítem de QA abierto. La tabla
@@ -130,6 +132,7 @@ sin guiones; los RIF cargados antes de este cambio pueden tener `-`, espacios u 
 
 **Paso 1 — chequeo de colisiones** (dos RIF distintos con guion podrían normalizar al mismo valor;
 `rif` tiene constraint `unique`):
+
 ```sql
 SELECT UPPER(REPLACE(REPLACE(REPLACE(TRIM(rif), '-', ''), ' ', ''), '.', '')) AS rif_normalizado,
        COUNT(*) AS cantidad, GROUP_CONCAT(id) AS ids
@@ -137,10 +140,12 @@ FROM empresas
 GROUP BY rif_normalizado
 HAVING COUNT(*) > 1;
 ```
+
 Si devuelve filas, **parar y resolver manualmente** esas empresas puntuales antes de seguir (no
 debería pasar en la práctica, es la señal de seguridad antes de tocar datos reales).
 
 **Paso 2 — vista previa** (no modifica nada):
+
 ```sql
 SELECT id, rif AS rif_actual,
        UPPER(REPLACE(REPLACE(REPLACE(TRIM(rif), '-', ''), ' ', ''), '.', '')) AS rif_normalizado
@@ -149,6 +154,7 @@ WHERE rif <> UPPER(REPLACE(REPLACE(REPLACE(TRIM(rif), '-', ''), ' ', ''), '.', '
 ```
 
 **Paso 3 — aplicar** (solo si el Paso 1 no mostró colisiones):
+
 ```sql
 UPDATE empresas
 SET rif = UPPER(REPLACE(REPLACE(REPLACE(TRIM(rif), '-', ''), ' ', ''), '.', ''))
@@ -158,7 +164,7 @@ WHERE rif <> UPPER(REPLACE(REPLACE(REPLACE(TRIM(rif), '-', ''), ' ', ''), '.', '
 **Ya se corrió en el XAMPP de pruebas y quedó confirmado por el usuario.** **Actualización
 2026-08-10: también se corrió ya en la base de datos de producción** (junto con el `UPDATE` de
 `status_id` de B.1), adelantado respecto al orden documentado en el
-[Paso 5](#paso-5--correr-los-2-sql-manuales-de-la-sección-b) (que lo ubica *después* del
+[Paso 5](#paso-5--correr-los-2-sql-manuales-de-la-sección-b) (que lo ubica _después_ del
 merge/deploy de código) — es seguro haberlo adelantado porque ninguno de los dos `UPDATE` depende
 de ninguna columna ni migración nueva, solo normalizan datos ya existentes. **Los 2 SQL manuales
 de la sección B quedan resueltos** — el Paso 5 durante la ventana de despliegue pasa a ser
@@ -182,25 +188,25 @@ sectores — comunicarlo al cliente como parte de la ventana de despliegue.
 ## Pre-requisitos antes de desplegar
 
 - [x] **Aprobación explícita del cliente** sobre todos los ítems 🟡/🔴 de la tabla de
-  [Fase del proyecto](#fase-del-proyecto--qué-falta-antes-de-fijar-fecha) — **confirmado
-  2026-08-11**, incluido el último pendiente (PDF "Reporte por Empresa").
+      [Fase del proyecto](#fase-del-proyecto--qué-falta-antes-de-fijar-fecha) — **confirmado
+      2026-08-11**, incluido el último pendiente (PDF "Reporte por Empresa").
 - [x] **Extensión GD habilitada en el PHP de producción** — **confirmado (2026-08-10)** vía WHM
-  (Software → Module Manager): `php82-php-gd`, `php83-php-gd`, `php84-php-gd` y `php85-php-gd`
-  aparecen los 4 como `Installed`, incluyendo `ea-php82` (la versión que usa `.cpanel.yml`). Sin
-  riesgo de que los 14 gráficos del PDF del Tablero Gerencial caigan a placeholders de texto. Ver
-  `task.md` punto 8 para el detalle técnico de por qué hace falta GD (dompdf 2.0.1 no soporta
-  `<svg>`).
+      (Software → Module Manager): `php82-php-gd`, `php83-php-gd`, `php84-php-gd` y `php85-php-gd`
+      aparecen los 4 como `Installed`, incluyendo `ea-php82` (la versión que usa `.cpanel.yml`). Sin
+      riesgo de que los 14 gráficos del PDF del Tablero Gerencial caigan a placeholders de texto. Ver
+      `task.md` punto 8 para el detalle técnico de por qué hace falta GD (dompdf 2.0.1 no soporta
+      `<svg>`).
 - [ ] Acceso confirmado a phpMyAdmin (o SSH+mysql) de producción, para el backup y los 2 SQL
-  manuales de la sección anterior.
+      manuales de la sección anterior.
 - [ ] Ventana de mantenimiento acordada con el cliente (aunque el deploy en sí es rápido, conviene
-  avisar por las migraciones + los 2 UPDATE manuales).
+      avisar por las migraciones + los 2 UPDATE manuales).
 
 ### Opcional — no bloqueante, pero misma ventana tiene sentido
 
 - [ ] `SESSION_SECURE_COOKIE=true` en el `.env` real de producción (tarea pausada #2 de `task.md`,
-  hardening de la cookie `remember_token` para que viaje con el atributo `Secure`) — independiente
-  de este despliegue, pero como igual hay que correr `config:cache` durante el deploy, es un buen
-  momento para aplicarlo si el cliente lo autoriza.
+      hardening de la cookie `remember_token` para que viaje con el atributo `Secure`) — independiente
+      de este despliegue, pero como igual hay que correr `config:cache` durante el deploy, es un buen
+      momento para aplicarlo si el cliente lo autoriza.
 
 ---
 
@@ -259,6 +265,7 @@ Revisar el log de deploy de cPanel al terminar — confirmar que las 8 tareas co
 
 **Ya se corrieron ambos en producción el 2026-08-10, adelantados a este paso** (ver B.1/B.2) — este
 paso pasa de "ejecutar" a "verificar que sigan aplicados":
+
 1. Sección B.1 (`status_id`) — confirmar `SELECT COUNT(*) FROM empresas WHERE status_id IS NULL;`
    devuelve 0.
 2. Sección B.2 (RIF) — re-correr el chequeo de colisiones del Paso 1 (por si se cargó alguna
@@ -299,31 +306,31 @@ Gerencial en el menú, es casi seguro este mismo paso sin correr ahí, no un bug
 
 ## Verificación post-despliegue
 
-- [ ] `php artisan migrate:status` — confirmar que las 4 migraciones de la sección A figuran como
+- [x ] `php artisan migrate:status` — confirmar que las 4 migraciones de la sección A figuran como
   `Ran`.
-- [ ] Login normal (`/admin/login`) funciona, CAPTCHA/Turnstile sigue activo.
-- [ ] Crear una empresa de prueba: RIF se autoconvierte a mayúsculas sin guion, rechaza formato
+- [x ] Login normal (`/admin/login`) funciona, CAPTCHA/Turnstile sigue activo.
+- [x ] Crear una empresa de prueba: RIF se autoconvierte a mayúsculas sin guion, rechaza formato
   inválido; teléfono aplica la máscara `+58-XXX-XXXXXXX` al tipear.
-- [ ] Editar una empresa existente: teléfono con máscara, RIF sigue deshabilitado.
-- [ ] Listado de Empresas: columna "Activo" refleja bien las empresas que tenían `status_id NULL`
+- [x ] Editar una empresa existente: teléfono con máscara, RIF sigue deshabilitado.
+- [x ] Listado de Empresas: columna "Activo" refleja bien las empresas que tenían `status_id NULL`
   (deberían aparecer como activas tras el UPDATE del Paso 5.1).
-- [ ] Buscar alguna empresa que antes tuviera RIF con guion — confirmar que ahora se ve sin
+- [x ] Buscar alguna empresa que antes tuviera RIF con guion — confirmar que ahora se ve sin
   guion/símbolos en el listado y al editar.
-- [ ] "Estatus de Perfiles" y "Sectores por Empresa" aparecen en el menú "Reportes", y el Tablero
+- [ x] "Estatus de Perfiles" y "Sectores por Empresa" aparecen en el menú "Reportes", y el Tablero
   Gerencial aparece en el menú "Gerencia" (si falta alguno, ver Paso 6 — `shield:generate`).
-- [ ] Tablero Gerencial (`/admin/gerencia-dashboard` o la ruta que corresponda): los 15 widgets
+- [x ] Tablero Gerencial (`/admin/gerencia-dashboard` o la ruta que corresponda): los 15 widgets
   cargan, los filtros (Sector/Cámara/Estado) no se revierten solos a los ~5s.
-- [ ] Botón "Descargar PDF" del Tablero Gerencial: el PDF descarga (no falla en silencio) y
+- [x ] Botón "Descargar PDF" del Tablero Gerencial: el PDF descarga (no falla en silencio) y
   **los 14 gráficos aparecen a color** (si salen placeholders de texto, GD no está habilitado —
   volver al pre-requisito de la sección anterior).
-- [ ] Reporte "Estatus de Perfiles": columna "Usuario principal" con datos correctos.
-- [ ] Reportes de Facturación/Experiencia/Maquinaria/Inventario/Instalaciones: una empresa sin
+- [x ] Reporte "Estatus de Perfiles": columna "Usuario principal" con datos correctos.
+- [x ] Reportes de Facturación/Experiencia/Maquinaria/Inventario/Instalaciones: una empresa sin
   datos cargados en el campo correspondiente muestra el valor en blanco, no el rango más alto
   (confirma que la migración de la sección A.4 recreó bien las 5 vistas).
-- [ ] Descargar el PDF "Reporte por Empresa" de una empresa con varias experiencias (ej. GEOHIDRA)
+- [x ] Descargar el PDF "Reporte por Empresa" de una empresa con varias experiencias (ej. GEOHIDRA)
   y confirmar visualmente: sin texto superpuesto en "Experiencia Relevante", sin saltos de página
   innecesarios, franja amarilla solo como encabezado de página.
-- [ ] Acciones masivas en Empresas: con un usuario `super_admin` ver
+- [x ] Acciones masivas en Empresas: con un usuario `super_admin` ver
   Editar/Activar/Desactivar/Eliminar; con un usuario normal, solo "Editar". Modal de Eliminar
   exige escribir `BORRAR` y borra en cascada sin error de FK.
 - [ ] `tail -f storage/logs/laravel.log` durante las pruebas de arriba — sin excepciones nuevas.
@@ -374,18 +381,31 @@ Antes de la ventana:
 Durante la ventana:
 [x] Paso 1 — Backup de BD tomado y descargado (2026-08-11: respaldo de la BD + del directorio
     home completo)
-[ ] Paso 2 — Merge staging→main (fast-forward)
-[ ] Paso 3 — Push a main
-[ ] Paso 4 — Deploy vía cPanel, log revisado sin errores
+[x] Paso 2 — Merge staging→main (fast-forward, `3e4b7ac`)
+[x] Paso 3 — Push a main
+[x] Paso 4 — Deploy vía cPanel — **incidente real durante este paso, ver nota abajo**; resuelto y
+    re-desplegado con éxito (2026-08-11)
 [x] Paso 5.1 — UPDATE status_id corrido (adelantado a producción el 2026-08-10, ver B.1 — solo
     re-verificar en la ventana)
 [x] Paso 5.2 — SQL de RIF corrido (adelantado a producción el 2026-08-10, ver B.2 — re-correr el
     chequeo de colisiones por las dudas antes de dar por cerrado)
-[ ] Paso 6 — shield:generate corrido (crea `page_completion_view`/`page_sectors_view`/
-    `page_gerencia_dashboard` de una vez) + `page_gerencia_dashboard` asignado a roles
-    gerenciales custom si aplica
+[x] Paso 6 — shield:generate corrido (confirmado indirectamente: los 3 items nuevos del menú
+    aparecen en la Verificación post-despliegue)
 
 Después de la ventana:
-[ ] Checklist de "Verificación post-despliegue" completo
+[x] Checklist de "Verificación post-despliegue" completo (2026-08-11 — único ítem sin marcar:
+    revisión de `laravel.log`, no bloqueante)
 [ ] Cliente notificado de que producción está actualizada
 ```
+
+### Incidente durante el Paso 4 (2026-08-11) — `FinanceView` caída, resuelto
+
+El primer intento de deploy se cortó durante `migrate --force`: la migración de la sección A.4
+(`fix_null_bucket_defaults_in_report_views`) ejecutó el `DROP VIEW FinanceView` pero falló en el
+`CREATE VIEW` siguiente con `SQLSTATE[42000]` (`ONLY_FULL_GROUP_BY`) — las 4 columnas derivadas
+(`BILLING`/`ESTADO`/`CAPITAL`/`ORIGEN`) no estaban envueltas en `MAX(...)` como sí lo están el
+resto de vistas del mismo archivo, mismo tipo de bug ya corregido antes en `2b6a923`. Esto dejó
+`FinanceView` inexistente en producción (reporte de Capacidad Financiera caído) hasta diagnosticar
+la causa (se descartó lock/timeout vía `SHOW FULL PROCESSLIST` — la base estaba libre) y aplicar el
+fix (commit `c996e9a`, pusheado a `main`/`staging`, redeploy vía cPanel). Confirmado resuelto: las
+5 vistas existen y la Verificación post-despliegue está completa.
