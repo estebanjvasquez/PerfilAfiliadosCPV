@@ -100,7 +100,9 @@
       "Bash(python build_manual.py)",
       "Bash(python build_manual_v2.py)",
       "Bash(git rev-list *)",
-      "Bash(python build_propuesta_socio.py)"
+      "Bash(python build_propuesta_socio.py)",
+      "Bash(php -l \"c:/Proyectos/Github/CampetApp/PerfilAfiliadosCPV/database/migrations/2026_08_04_000001_fix_null_bucket_defaults_in_report_views.php\")",
+      "Bash(awk -F: '$1>814 && $1<1177')"
     ],
     "additionalDirectories": [
       "c:\\Users\\EstebanVasquez\\OneDrive - MSFT\\Documents\\GitHub\\CampetApp\\PerfilAfiliadosCPV\\.claude",
