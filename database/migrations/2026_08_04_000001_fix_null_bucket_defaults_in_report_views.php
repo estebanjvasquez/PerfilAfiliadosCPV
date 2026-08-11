@@ -40,31 +40,31 @@ return new class extends Migration
                     )
                 ) AS TOT_RH  where assets.empresa_id = empresas.id))  as rrhh,
 
-                CASE
+                MAX(CASE
                     WHEN billing_id = '1' THEN '< 100.000 USD'
                     WHEN billing_id = '2' THEN '100.001 - 1.000.000 USD'
                     WHEN billing_id = '3' THEN '1.000.001 - 10.000.000 USD'
                     WHEN billing_id = '4' THEN '> 10.000.001 USD'
                     ELSE NULL
-                END AS BILLING,
+                END) AS BILLING,
 
-                CASE
+                MAX(CASE
                     WHEN status_id = '1' THEN 'Activa'
                     WHEN status_id = '0' THEN 'Inactiva'
                     ELSE NULL
-                END AS ESTADO,
+                END) AS ESTADO,
 
-                CASE
+                MAX(CASE
                     WHEN property_id = '1' THEN 'Privado'
                     WHEN property_id = '0' THEN 'Publico'
                     ELSE NULL
-                END AS CAPITAL,
+                END) AS CAPITAL,
 
-                CASE
+                MAX(CASE
                     WHEN origin_id = '1' THEN 'Nacional'
                     WHEN origin_id = '0' THEN 'Internacional'
                     ELSE NULL
-                END AS ORIGEN
+                END) AS ORIGEN
 
             from
                 empresas
