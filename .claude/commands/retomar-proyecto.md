@@ -1,5 +1,5 @@
 ---
-description: Retoma el trabajo en PerfilAfiliadosCPV — lee task.md, sincroniza staging y resume el estado antes de seguir
+description: Retoma el trabajo en PerfilAfiliadosCPV — lee docs/task.md, sincroniza staging y resume el estado antes de seguir
 ---
 
 Retomá el contexto de este proyecto (PerfilAfiliadosCPV) después de una pausa. Hacé lo siguiente,
@@ -16,14 +16,15 @@ git log --oneline -15
 
 - Si `git status` (antes del `checkout`/`pull`) muestra cambios sin commitear, **no los
   descartes**: repórtalos tal cual, son casi seguro el "pendiente sin commitear" que haya quedado
-  anotado en `task.md` de la última sesión.
-- Si `git pull` trae commits nuevos que no están descritos en `task.md`, avisar — puede que otra
-  persona (o el cliente directo en el servidor) haya tocado algo.
+  anotado en `docs/task.md` de la última sesión.
+- Si `git pull` trae commits nuevos que no están descritos en `docs/task.md`, avisar — puede que
+  otra persona (o el cliente directo en el servidor) haya tocado algo.
 
-## 2. Leer `task.md` completo
+## 2. Leer `docs/task.md` completo
 
-Es la fuente de verdad de en qué quedó todo (nunca se sube al repo, vive solo local). Prestar
-atención especial a:
+Es la fuente de verdad de en qué quedó todo (nunca se sube al repo, vive solo local dentro de
+`docs/`, junto con el resto de la documentación del proyecto — análisis, planes de despliegue,
+etc.). Prestar atención especial a:
 - La sección marcada `[ACTIVA]` (o las que estén activas) vs. `[PAUSADA]`.
 - El bloque "Pendiente — retomar aquí cuando el cliente responda" de la tarea activa.
 - Cualquier nota de "sin commitear" o "sin pushear" y contrastarla contra el resultado del paso 1.
@@ -32,10 +33,10 @@ atención especial a:
 
 ## 3. Leer el/los plan(es) referenciados
 
-Si `task.md` apunta a un archivo de plan (ej. `noble-wondering-metcalfe.md`,
+Si `docs/task.md` apunta a un archivo de plan (ej. `noble-wondering-metcalfe.md`,
 `golden-splashing-nova.md`), leerlo también — puede tener contexto de diseño/decisiones que no
-está repetido en `task.md`. Si el archivo ya no existe o el contenido no coincide con lo que dice
-`task.md` (se reutiliza el mismo archivo entre fases distintas en este proyecto), decirlo
+está repetido en `docs/task.md`. Si el archivo ya no existe o el contenido no coincide con lo que
+dice `docs/task.md` (se reutiliza el mismo archivo entre fases distintas en este proyecto), decirlo
 explícitamente en vez de asumir.
 
 ## 4. Resumir al usuario y preguntar cómo seguir

@@ -1,5 +1,5 @@
 ---
-description: Cierra la jornada de trabajo en PerfilAfiliadosCPV — actualiza task.md y Notion con lo hecho hoy
+description: Cierra la jornada de trabajo en PerfilAfiliadosCPV — actualiza docs/task.md y Notion con lo hecho hoy
 ---
 
 Cierra el día de trabajo en este proyecto (PerfilAfiliadosCPV). Hacé lo siguiente, en orden:
@@ -11,7 +11,8 @@ Cierra el día de trabajo en este proyecto (PerfilAfiliadosCPV). Hacé lo siguie
 - Repasá la conversación de esta sesión para identificar: qué pidió el cliente/usuario, qué se
   implementó, qué bugs aparecieron y cómo se corrigieron, y qué quedó pendiente o sin confirmar.
 
-## 2. Actualizar `task.md` (raíz del proyecto, nunca se commitea — está en `.gitignore`)
+## 2. Actualizar `docs/task.md` (dentro de `docs/`, nunca se commitea — está en `.gitignore`; el resto
+de la documentación del proyecto también vive en `docs/`, ver `docs/README.md` si existe un índice)
 
 - Actualizar la fecha en "Última actualización" (arriba del todo).
 - Si ya existe una sección para la tarea/fase activa de hoy, **agregar una subsección nueva**

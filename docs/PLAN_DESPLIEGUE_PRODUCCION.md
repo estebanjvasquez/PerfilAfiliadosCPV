@@ -1,8 +1,13 @@
 # Plan de Despliegue a Producción — `staging` → `main`
 
-**Fecha de redacción:** 2026-08-04
+**Fecha de redacción:** 2026-08-04 — **última revisión: 2026-08-11**
 **Preparado por:** sesión de trabajo con Claude Sonnet 5, a pedido de Esteban Vásquez.
-**Estado del plan:** guía de referencia — **no ejecutar todavía**, ver [Fase del proyecto](#fase-del-proyecto--qué-falta-antes-de-fijar-fecha) abajo. Este documento sí se sube al repo (a diferencia de `task.md`, que es solo notas locales) porque es la guía operativa del despliegue real.
+**Estado del plan:** ✅ **guía definitiva — lista para ejecutar.** El cliente aprobó explícitamente
+todos los ítems de la tabla de [Fase del proyecto](#fase-del-proyecto--qué-falta-antes-de-fijar-fecha)
+(2026-08-11), incluyendo el último 🟡 pendiente (PDF "Reporte por Empresa"). No queda ningún ítem
+de QA abierto — solo resta coordinar la ventana de despliegue y seguir los pasos de este documento
+en orden. Este documento sí se sube al repo (a diferencia de `task.md`, que es solo notas locales)
+porque es la guía operativa del despliegue real.
 
 > Este documento reemplaza en la práctica a `LECTURA_PRIMERO.md` / `ESTADO_ANALISIS_JUNIO_2026.md` /
 > `PROXIMO_PASOS.md` / `SNAPSHOT_SISTEMA_JUNIO_2026.md`, que describen un estado del proyecto de
@@ -16,8 +21,8 @@
 ## Fase del proyecto — qué falta antes de fijar fecha
 
 **Ningún commit de todo este trabajo llegó a `main` todavía.** `main` está congelado desde el
-merge de login/CAPTCHA; todo lo que sigue vive acumulado en `staging` (~40 commits, 107 archivos
-de diferencia, 3 migraciones nuevas), en distintos grados de QA:
+merge de login/CAPTCHA; todo lo que sigue vive acumulado en `staging` (61 commits, 121 archivos de
+diferencia, 4 migraciones nuevas), **con QA 100% cerrado y aprobado por el cliente**:
 
 | Fase / cambio | Implementado | QA del cliente |
 |---|---|---|
@@ -29,23 +34,22 @@ de diferencia, 3 migraciones nuevas), en distintos grados de QA:
 | Normalización de textos + reporte "Estatus de Perfiles" | ✅ | ✅ **Confirmado en staging** (2026-08-10) — normalización de textos y columna "Usuario principal" ambas confirmadas |
 | Máscaras de Teléfono/RIF (2026-08-03/04) | ✅ | ✅ **Confirmado** (2026-08-10) — máscara de Teléfono funcionando en staging (era el `git pull` faltante, no un bug real); SQL de normalización de RIF y `UPDATE` de `status_id` (B.1) ambos aplicados en producción |
 | Fase 5 — "No Aplica" granular en reportes (2026-08-04) | ✅ commiteada y pusheada (`a542fe7`) | ✅ **Confirmado** (2026-08-10) — evidencia en captura de reporte, empresa con varios módulos marcados "No Aplica" mostrando el texto correcto de forma consistente |
-| Layout del PDF "Reporte por Empresa" — saltos de página + Experiencia Relevante (ver `task.md` 1.14) | ✅ commiteada y pusheada | 🟡 Mejoró (2026-08-10: "funciona mejor"), **se espera confirmación final** del cliente antes de cerrar el ítem |
+| Layout del PDF "Reporte por Empresa" — saltos de página + Experiencia Relevante (ver `task.md` 1.14) | ✅ commiteada y pusheada | ✅ **Confirmación final del cliente (2026-08-11)** |
 | Bug de valores asumidos en `NULL` — Facturación y 4 vistas más (ver `task.md` 1.15) | ✅ commiteada y pusheada (incluye nueva migración) | ✅ **Confirmado en las 5 vistas** (2026-08-10): Facturación, Experiencia, Maquinaria, Inventario e Instalaciones — campos sin llenar muestran blanco en vez del rango más alto |
 | 6 puntos restantes de la reunión del 30 de julio | ❌ No implementado | — (fuera de alcance de este despliegue) |
 
-**Estado al 2026-08-10: todas las Fases (1-5) y todos los ítems de datos/máscaras quedaron
-confirmados.** Queda un solo ítem 🟡 en la tabla — el layout del PDF "Reporte por Empresa"
-("funciona mejor", pendiente de confirmación final — no es una Fase, es el fix puntual de
-`task.md` 1.16). Con ese último punto cerrado, la tabla completa queda en ✅ y se puede coordinar
-la ventana de despliegue siguiendo el resto de este documento (pre-requisitos, backup, pasos 1-6).
+**Estado al 2026-08-11: el cliente aprobó explícitamente todos los ítems de la tabla, incluido el
+último 🟡 pendiente (PDF "Reporte por Empresa").** No queda ningún ítem de QA abierto. La tabla
+completa está en ✅ — corresponde coordinar la ventana de despliegue y ejecutar el resto de este
+documento (pre-requisitos, backup, pasos 1-6).
 
 ---
 
 ## Alcance de este despliegue
 
 Todo lo commiteado en `staging` desde el último merge a `main` (login/CAPTCHA). Ver
-`git log main..staging --oneline` para el detalle completo (~40 commits) — resumen por fase en la
-tabla de arriba y en `task.md`.
+`git log main..staging --oneline` para el detalle completo (61 commits, 121 archivos, +8308/-2078
+líneas) — resumen por fase en la tabla de arriba y en `task.md`.
 
 **Buena noticia de integración:** `main` es ancestro directo de `staging`
 (`git merge-base --is-ancestor main staging` ⇒ true) — o sea que **no hay commits en `main` que no
@@ -64,7 +68,7 @@ diferente:
 ### A. Migraciones (se aplican solas, automáticamente, al desplegar)
 
 `.cpanel.yml` corre `php artisan migrate --force` como parte del pipeline de deploy (ver
-[Pasos de despliegue](#pasos-de-despliegue)) — estas 3 migraciones nuevas en `staging` se aplican
+[Pasos de despliegue](#pasos-de-despliegue)) — estas 4 migraciones nuevas en `staging` se aplican
 sin que haga falta tocar nada a mano:
 
 1. **`2026_06_12_000001_add_sector_principal_secundario_to_empresas_table.php`**
@@ -82,7 +86,16 @@ sin que haga falta tocar nada a mano:
    viejo para no romper la FK de `empresa_id` — ver comentario dentro del archivo) — si el deploy
    se corta a mitad de camino, un segundo `php artisan migrate` la retoma sin error.
 
-No hace falta ninguna acción manual para estas 3 — solo confirmar que corrieron
+4. **`2026_08_04_000001_fix_null_bucket_defaults_in_report_views.php`**
+   Recrea (`DROP VIEW` + `CREATE VIEW`) `FinanceView`, `ExperienceView`, `MachineryView`,
+   `InventoryView` y `FacilityView` para corregir el bug de `task.md` 1.15: el `CASE` de cada vista
+   asumía el rango numérico más alto (ej. "> 10.000.001 USD") cuando la empresa nunca había
+   seleccionado nada en ese campo, en vez de mostrar vacío. Son vistas de solo consulta — **no
+   toca ninguna fila de datos**, solo redefine las 5 vistas con un `ELSE NULL` explícito. No tiene
+   `down()` reversible a la definición anterior (recrearía el bug); si hiciera falta revertir, ver
+   [Rollback](#rollback).
+
+No hace falta ninguna acción manual para estas 4 — solo confirmar que corrieron
 (ver [Verificación post-despliegue](#verificación-post-despliegue)).
 
 ### B. Cambios de datos manuales (NO están en ninguna migración — hay que replicarlos a mano)
@@ -168,8 +181,9 @@ sectores — comunicarlo al cliente como parte de la ventana de despliegue.
 
 ## Pre-requisitos antes de desplegar
 
-- [ ] **Aprobación explícita del cliente** sobre todos los ítems 🟡/🔴 de la tabla de
-  [Fase del proyecto](#fase-del-proyecto--qué-falta-antes-de-fijar-fecha).
+- [x] **Aprobación explícita del cliente** sobre todos los ítems 🟡/🔴 de la tabla de
+  [Fase del proyecto](#fase-del-proyecto--qué-falta-antes-de-fijar-fecha) — **confirmado
+  2026-08-11**, incluido el último pendiente (PDF "Reporte por Empresa").
 - [x] **Extensión GD habilitada en el PHP de producción** — **confirmado (2026-08-10)** vía WHM
   (Software → Module Manager): `php82-php-gd`, `php83-php-gd`, `php84-php-gd` y `php85-php-gd`
   aparecen los 4 como `Installed`, incluyendo `ea-php82` (la versión que usa `.cpanel.yml`). Sin
@@ -233,7 +247,7 @@ composer install --no-dev --prefer-dist --optimize-autoloader
 php artisan config:clear
 php artisan view:clear
 php artisan cache:clear
-php artisan migrate --force   # ← acá se aplican las 3 migraciones de la sección A
+php artisan migrate --force   # ← acá se aplican las 4 migraciones de la sección A
 php artisan config:cache
 php artisan view:cache
 ```
@@ -285,7 +299,7 @@ Gerencial en el menú, es casi seguro este mismo paso sin correr ahí, no un bug
 
 ## Verificación post-despliegue
 
-- [ ] `php artisan migrate:status` — confirmar que las 3 migraciones de la sección A figuran como
+- [ ] `php artisan migrate:status` — confirmar que las 4 migraciones de la sección A figuran como
   `Ran`.
 - [ ] Login normal (`/admin/login`) funciona, CAPTCHA/Turnstile sigue activo.
 - [ ] Crear una empresa de prueba: RIF se autoconvierte a mayúsculas sin guion, rechaza formato
@@ -303,6 +317,12 @@ Gerencial en el menú, es casi seguro este mismo paso sin correr ahí, no un bug
   **los 14 gráficos aparecen a color** (si salen placeholders de texto, GD no está habilitado —
   volver al pre-requisito de la sección anterior).
 - [ ] Reporte "Estatus de Perfiles": columna "Usuario principal" con datos correctos.
+- [ ] Reportes de Facturación/Experiencia/Maquinaria/Inventario/Instalaciones: una empresa sin
+  datos cargados en el campo correspondiente muestra el valor en blanco, no el rango más alto
+  (confirma que la migración de la sección A.4 recreó bien las 5 vistas).
+- [ ] Descargar el PDF "Reporte por Empresa" de una empresa con varias experiencias (ej. GEOHIDRA)
+  y confirmar visualmente: sin texto superpuesto en "Experiencia Relevante", sin saltos de página
+  innecesarios, franja amarilla solo como encabezado de página.
 - [ ] Acciones masivas en Empresas: con un usuario `super_admin` ver
   Editar/Activar/Desactivar/Eliminar; con un usuario normal, solo "Editar". Modal de Eliminar
   exige escribir `BORRAR` y borra en cascada sin error de FK.
@@ -327,10 +347,12 @@ git push origin main --force-with-lease        # ⚠️ requiere aprobación exp
 mysql -u <user> -p <database> < backup_pre_despliegue_YYYYMMDD_HHMMSS.sql
 ```
 
-Las 3 migraciones tienen `down()` funcional (`php artisan migrate:rollback`) si se prefiere
-revertir solo el esquema sin restaurar el backup completo — pero dado que hay UPDATEs manuales de
-por medio (sección B), restaurar desde backup es más seguro que confiar solo en los rollbacks de
-Laravel.
+Las primeras 3 migraciones tienen `down()` funcional (`php artisan migrate:rollback`) si se
+prefiere revertir solo el esquema sin restaurar el backup completo. La 4ª (`fix_null_bucket_defaults...`)
+tiene `down()` intencionalmente vacío — no hay una versión "anterior" útil a la que volver, ya que
+recrearía el bug de datos que corrige — así que un rollback de esa migración puntual no hace nada
+por diseño. Dado que además hay UPDATEs manuales de por medio (sección B), restaurar desde backup
+es más seguro que confiar solo en los rollbacks de Laravel.
 
 **Nota:** un `git push --force` a `main` es una acción destructiva sobre una rama compartida —
 pedir confirmación explícita antes de ejecutarlo, no es algo para correr automáticamente ante el
@@ -342,14 +364,16 @@ primer error.
 
 ```
 Antes de la ventana:
-[ ] Cliente aprobó explícitamente cada ítem 🟡/🔴 de la tabla de Fase del proyecto
+[x] Cliente aprobó explícitamente cada ítem 🟡/🔴 de la tabla de Fase del proyecto (2026-08-11,
+    incluido el último pendiente: PDF "Reporte por Empresa")
 [x] Se resolvió el reporte de la máscara de teléfono — era el `git pull` faltante, no un bug
     real (2026-08-10, confirmado funcionando en staging)
 [x] GD confirmado habilitado en PHP de producción (2026-08-10, ver Pre-requisitos)
 [ ] Acceso a phpMyAdmin/SSH de producción confirmado
 
 Durante la ventana:
-[ ] Paso 1 — Backup de BD tomado y descargado
+[x] Paso 1 — Backup de BD tomado y descargado (2026-08-11: respaldo de la BD + del directorio
+    home completo)
 [ ] Paso 2 — Merge staging→main (fast-forward)
 [ ] Paso 3 — Push a main
 [ ] Paso 4 — Deploy vía cPanel, log revisado sin errores
