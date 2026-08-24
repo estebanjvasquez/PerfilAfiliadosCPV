@@ -59,7 +59,13 @@ class ChambersRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
-                Tables\Actions\AttachAction::make(),
+                // Filament ya excluye del buscador las cámaras que la empresa tiene vinculadas
+                // (AttachAction::getRecordSelect() -> whereDoesntHave), por eso nunca se puede
+                // vincular una duplicada. El helper text explica por qué el buscador "no encuentra"
+                // una cámara que en realidad ya está vinculada.
+                Tables\Actions\AttachAction::make()
+                    ->recordSelect(fn (Forms\Components\Select $select) => $select
+                        ->helperText('Las cámaras en las que su empresa ya está vinculada no aparecen en esta lista.')),
             ])
             ->actions([
                 /* Tables\Actions\EditAction::make(),

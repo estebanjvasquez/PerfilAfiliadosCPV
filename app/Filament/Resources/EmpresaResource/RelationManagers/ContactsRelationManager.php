@@ -31,6 +31,14 @@ class ContactsRelationManager extends BelongsToManyRelationManager
         return false;
     }
 
+    // Se desactiva "Vincular" (AttachAction): buscaba en TODA la tabla contacts sin filtrar por
+    // empresa, exponiendo nombre/telefono/email de contactos de otras empresas afiliadas. Los
+    // contactos ahora solo se cargan con "Crear Contacto", propios de cada empresa.
+    protected function canAttach(): bool
+    {
+        return false;
+    }
+
     public static function form(Form $form): Form
     {
         return $form

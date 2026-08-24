@@ -101,15 +101,23 @@ class ServicesRelationManager extends BelongsToManyRelationManager
                     $action->getRecordSelect()
                         ->label(('Servicios'))
                         ->disableLabel(false)
-                        ->options(function (callable $get) {
+                        ->options(function (callable $get, BelongsToManyRelationManager $livewire) {
                             $sector = Sector::find($get('sectors_id'));
                             if (!$sector) {
                                 $sector_values = Service::all();
                             } else
                                 $sector_values = $sector->services;
 
-                            return $sector_values->pluck('name', 'id');
+                            // Este ->options() reemplaza por completo la búsqueda por defecto de
+                            // AttachAction (que sí excluye duplicados vía whereDoesntHave), así
+                            // que hay que volver a excluir acá los servicios que la empresa ya
+                            // tiene vinculados — si no, se podía seleccionar y vincular un
+                            // servicio repetido.
+                            $alreadyLinkedIds = $livewire->ownerRecord->services->pluck('id');
+
+                            return $sector_values->whereNotIn('id', $alreadyLinkedIds)->pluck('name', 'id');
                         })
+                        ->helperText('Los servicios que su empresa ya tiene vinculados no aparecen en esta lista.')
                         ->searchable(false)
                         ->hidden(fn (callable $get) => $get('sectors_id') === null),
 
