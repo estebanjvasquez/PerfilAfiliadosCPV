@@ -174,7 +174,8 @@ class EmpresaResource extends Resource
                 Tables\Columns\IconColumn::make('status_id')
                     ->label('Activo')
                     ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->tooltip('Indica si la empresa está activa en el sistema. Solo un administrador de la Cámara puede activarla o desactivarla.'),
                 Tables\Columns\TextColumn::make('ano_fund')->label('Año de fundación'),
                 Tables\Columns\TextColumn::make('city.city_name')->label('Ciudad'),
                 Tables\Columns\TextColumn::make('city.countries.country_name')
@@ -304,35 +305,44 @@ class EmpresaResource extends Resource
                 FilamentExportBulkAction::make('export'),
             ])
 
-            ->filters([
-                TernaryFilter::make('status_id')->label('Activo'),
+            // Los filtros (Activo/País/Ciudad/Sector) solo tienen sentido para quien administra
+            // varias empresas a la vez — la gran mayoría de los usuarios ven una sola empresa y
+            // el ícono de filtro solo agregaba ruido sin aportarles nada. Se ocultan por completo
+            // para no-administradores (Filament esconde el ícono de filtro cuando no hay filtros
+            // registrados).
+            ->filters(
+                (Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                    ? [
+                        TernaryFilter::make('status_id')->label('Activo'),
 
-                SelectFilter::make('country')
-                    ->label('País')
-                    ->searchable()
-                    ->options(fn () => Country::orderBy('country_name')->pluck('country_name', 'id'))
-                    ->query(fn (Builder $query, array $data) => filled($data['value'] ?? null)
-                        ? $query->whereHas('city', fn (Builder $q) => $q->where('country_id', $data['value']))
-                        : $query),
+                        SelectFilter::make('country')
+                            ->label('País')
+                            ->searchable()
+                            ->options(fn () => Country::orderBy('country_name')->pluck('country_name', 'id'))
+                            ->query(fn (Builder $query, array $data) => filled($data['value'] ?? null)
+                                ? $query->whereHas('city', fn (Builder $q) => $q->where('country_id', $data['value']))
+                                : $query),
 
-                SelectFilter::make('city_id')
-                    ->label('Ciudad')
-                    ->searchable()
-                    ->options(fn () => City::orderBy('city_name')->pluck('city_name', 'id')),
+                        SelectFilter::make('city_id')
+                            ->label('Ciudad')
+                            ->searchable()
+                            ->options(fn () => City::orderBy('city_name')->pluck('city_name', 'id')),
 
-                Filter::make('sector')
-                    ->label('Sector')
-                    ->form([
-                        Select::make('sector_id')
+                        Filter::make('sector')
                             ->label('Sector')
-                            ->options(fn () => Sector::orderBy('name')->pluck('name', 'id')),
-                    ])
-                    ->query(fn (Builder $query, array $data) => filled($data['sector_id'] ?? null)
-                        ? $query->where(fn (Builder $q) => $q
-                            ->where('sector_principal_id', $data['sector_id'])
-                            ->orWhere('sector_secundario_id', $data['sector_id']))
-                        : $query),
-            ]);
+                            ->form([
+                                Select::make('sector_id')
+                                    ->label('Sector')
+                                    ->options(fn () => Sector::orderBy('name')->pluck('name', 'id')),
+                            ])
+                            ->query(fn (Builder $query, array $data) => filled($data['sector_id'] ?? null)
+                                ? $query->where(fn (Builder $q) => $q
+                                    ->where('sector_principal_id', $data['sector_id'])
+                                    ->orWhere('sector_secundario_id', $data['sector_id']))
+                                : $query),
+                    ]
+                    : []
+            );
     }
 
 
