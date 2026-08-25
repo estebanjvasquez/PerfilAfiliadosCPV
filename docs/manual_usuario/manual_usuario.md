@@ -65,6 +65,16 @@ explica en detalle en su sección correspondiente.
 
 ## 2. Datos generales de la empresa
 
+### Descargar el perfil completo en PDF
+
+En el listado de "Empresas", la primera columna de cada fila muestra un ícono de descarga (⬇,
+etiquetado "PDF"). Al hacer clic se abre en una pestaña nueva un reporte en PDF con todo el perfil
+cargado de esa empresa: datos generales, sectores y servicios, contactos, cámaras, recursos en
+Venezuela, sistemas de gestión, presencia internacional, experiencia relevante y sostenibilidad.
+
+> **CONSEJO:** Es la forma más rápida de revisar o compartir de un vistazo todo lo que su empresa
+> tiene cargado en el sistema, sin tener que entrar pestaña por pestaña.
+
 Vaya a "Empresas" y presione "Editar" sobre su empresa.
 
 1. El RIF y el Nombre de la Empresa los precarga la Cámara: verifíquelos y complete Año de Fundación, Teléfono, Dirección y Ciudad.
@@ -85,8 +95,9 @@ Vaya a "Empresas" y presione "Editar" sobre su empresa.
 > desarrollo para su corrección; si le pasa lo mismo, contacte a la Cámara.
 
 **Capturas:**
-- ![Listado de Empresas](capturas/03-empresas-listado.png) — *captura pendiente de actualizar
-  tras el próximo deploy: el ícono de filtro (arriba a la derecha de la lista) va a dejar de
+- ![Listado de Empresas](capturas/03-empresas-listado.png) — la primera columna (ícono ⬇) es el
+  acceso al PDF del perfil completo, descrito arriba. *Captura pendiente de actualizar tras el
+  próximo deploy: el ícono de filtro (arriba a la derecha de la lista) va a dejar de
   aparecer para la mayoría de los usuarios — queda reservado para administradores de la Cámara,
   ya que casi todos administran una sola empresa y el filtro no les aporta nada.*
 - ![Editar Empresa — Datos Generales](capturas/04-editar-datos-generales.png)
