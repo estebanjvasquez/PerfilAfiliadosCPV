@@ -21,9 +21,13 @@ return new class extends Migration
             $table->string('rif', 12)->unique();
             $table->string('name', 100);
             $table->year('ano_fund')->nullable();
-            $table->string('phone', 20)->nullable();
+            // Ampliado de 20 a 40: datos reales de produccion tienen hasta 22 caracteres
+            // (formatos de telefono con codigo de pais/extension) - MySQL no lo bloqueaba,
+            // Postgres si (encontrado al migrar los datos, ver Fase 1 del plan).
+            $table->string('phone', 40)->nullable();
             $table->string('website')->nullable();
-            $table->string('street', 100)->nullable();
+            // Ampliado de 100 a 150: datos reales de produccion tienen hasta 104 caracteres.
+            $table->string('street', 150)->nullable();
             $table->unsignedBigInteger('city_id')->nullable();
 
             $table->string('linkedin_profile', 20)->nullable();
