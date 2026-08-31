@@ -33,7 +33,9 @@ return new class extends Migration
             $table->string('youtube_profile', 20)->nullable();
             $table->string('otros_profile', 20)->nullable();
 
-            $table->foreign('city_id')->references('id')->on('cities');
+            // FK a 'cities' agregada en 2026_08_31_.. add_deferred_foreign_keys_out_of_order_tables
+            // (esta migracion es anterior a create_cities_table por fecha de archivo; declararla
+            // aca rompe cualquier corrida desde cero contra una BD vacia, ej. Postgres/Supabase).
 
             $table->unsignedBigInteger('billing_id')->nullable();
             $table->unsignedBigInteger('employees_id')->nullable();

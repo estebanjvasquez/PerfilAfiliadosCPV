@@ -15,7 +15,9 @@ return new class extends Migration
     {
         Schema::create('infrafacilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('infraregion_infrasystem_id')->references('id')->on('infraregion_infrasystem');
+            // FK agregada en 2026_08_31_.. add_deferred_foreign_keys_out_of_order_tables (esta
+            // migracion es anterior a create_infraregion_infrasystem_table por fecha de archivo).
+            $table->foreignId('infraregion_infrasystem_id');
             //$table->foreignId('infrasystems_id')->references('infrasystem_id')->on('infraregion_infrasystem');
             //$table->foreignId('infraregions_id')->references('infraregion_id')->on('infraregion_infrasystem');
             $table->string('facility_name', 100);

@@ -75,12 +75,19 @@ return new class extends Migration
         }
     }
 
+    /**
+     * Portable entre MySQL y PostgreSQL: information_schema.statistics es especifico de MySQL
+     * (no existe en Postgres), pero information_schema.table_constraints es estandar ANSI y
+     * expone los UNIQUE key/constraint en ambos motores. Sin filtro de schema a proposito: en
+     * Postgres 'table_schema' es el schema ('public'), no el nombre de la BD, y esta app usa un
+     * solo schema por conexion, asi que table_name + constraint_name ya es inequivoco.
+     */
     private function indexExists(string $indexName): bool
     {
-        return DB::table('information_schema.statistics')
-            ->where('table_schema', Schema::getConnection()->getDatabaseName())
+        return DB::table('information_schema.table_constraints')
             ->where('table_name', 'empresa_module_status')
-            ->where('index_name', $indexName)
+            ->where('constraint_name', $indexName)
+            ->where('constraint_type', 'UNIQUE')
             ->exists();
     }
 };
