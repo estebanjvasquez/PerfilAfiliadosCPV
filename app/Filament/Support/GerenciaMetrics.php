@@ -372,9 +372,18 @@ class GerenciaMetrics
     {
         $desde = now()->startOfMonth()->subMonths($months - 1);
 
-        $rows = static::baseQuery($filters)
-            ->where('created_at', '>=', $desde)
-            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as ym"), DB::raw('count(*) as total'))
+        $query = static::baseQuery($filters)->where('created_at', '>=', $desde);
+
+        // DATE_FORMAT es especifico de MySQL; to_char es el equivalente de Postgres. Se elige segun
+        // la conexion real del modelo Empresa en vez de asumir una sola, porque durante la Fase 2 el
+        // modelo sigue apuntando a mysql (conexion default) mientras las vistas ya migraron a pgsql -
+        // este metodo debe seguir funcionando en ambas conexiones sin romper produccion.
+        $ym = $query->getConnection()->getDriverName() === 'pgsql'
+            ? "to_char(created_at, 'YYYY-MM')"
+            : "DATE_FORMAT(created_at, '%Y-%m')";
+
+        $rows = $query
+            ->select(DB::raw("{$ym} as ym"), DB::raw('count(*) as total'))
             ->groupBy('ym')
             ->pluck('total', 'ym');
 
