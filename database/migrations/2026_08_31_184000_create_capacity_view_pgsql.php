@@ -36,21 +36,19 @@ use Illuminate\Support\Facades\DB;
  * el original -> NULL si no hay elementos o el valor no es 1-4 (se agrega `ELSE NULL` explicito en
  * Postgres, equivalente).
  *
- * *** Bug real de produccion confirmado y replicado a proposito (no corregido) ***: `inventario`
- * busca la clave `facility_own` DENTRO del array `inventory` de `assets` - pero segun
- * InventoryView, los elementos de `inventory` tienen las claves `inventory_q`/`inventory_est`/
- * `inventory_unit`/`inventory_name`, NUNCA `facility_own` (ese es un campo de `facility`, no de
- * `inventory` - parece un copy-paste-error de la consulta de `maquinaria`/`instalaciones`).
- * Sorprendentemente NO es un bug "silencioso siempre-NULL" como el de `service` en ExperienceView:
- * se encontraron 20 elementos reales (en 15 de 402 empresas) que SI tienen, ademas de sus claves
- * normales, una clave adicional `facility_own` con valores numericos 1-4 validos - un artefacto de
- * captura de datos historico (posiblemente un campo compartido entre los formularios de Facility e
- * Inventory en alguna version anterior de la app). Se replica literalmente la busqueda de
- * `facility_own` dentro de `inventory`, filtrando solo los elementos que SI tienen esa clave
- * (`(elem ->> 'facility_own') IS NOT NULL`, para emular que el NESTED PATH original no genera fila
- * alguna para los elementos sin esa clave) - NO se "corrige" a `inventory_est`, que cambiaria el
- * resultado observable de este reporte en produccion sin que el cliente lo haya pedido. Se deja
- * documentado aqui como hallazgo a discutir aparte.
+ * *** Bug real de produccion CORREGIDO a proposito (no replicado) - decision tomada con el cliente
+ * despues de verificar con datos reales ***: `inventario` buscaba la clave `facility_own` DENTRO
+ * del array `inventory` de `assets` - pero segun InventoryView, los elementos de `inventory` tienen
+ * las claves `inventory_q`/`inventory_est`/`inventory_unit`/`inventory_name`, NUNCA `facility_own`
+ * (ese es un campo de `facility`, no de `inventory` - copy-paste-error de la consulta de
+ * `maquinaria`/`instalaciones`, ademas las etiquetas de rango ya codificadas en el CASE de abajo
+ * - '< 100.000', '100.001 - 1.000.000', etc. - coinciden exactamente con la escala 1-4 de
+ * `inventory_est` en InventoryView, no con `facility_own`, que ademas solo tiene 3 valores validos
+ * de sentido distinto: Propia/Alquilada/Ambas). Verificado antes de corregir: el campo
+ * `facility_own` (usado hoy en produccion) solo aparece, por un artefacto de captura historico, en
+ * 20 elementos de 15 de 402 empresas; `inventory_est` (el campo correcto) tiene datos validos 1-4
+ * en 72 de 402 empresas - la version corregida no solo es mas correcta semanticamente, da un dato
+ * util en 4.8x mas empresas. Se cambia la clave buscada a `inventory_est`.
  *
  * El `GROUP_CONCAT(DISTINCT ... SEPARATOR ', ')` de Sector/Servicios (sin ORDER BY explicito en el
  * original) se traduce con `string_agg(DISTINCT ..., ', ' ORDER BY ...)` - Postgres exige el
@@ -100,7 +98,7 @@ return new class extends Migration
                     WHERE a2.empresa_id = empresas.id
                 ) AS maquinaria,
                 (
-                    SELECT CASE MAX(round((elem ->> \'facility_own\')::numeric))
+                    SELECT CASE MAX(round((elem ->> \'inventory_est\')::numeric))
                         WHEN 1 THEN \'< 100.000\'
                         WHEN 2 THEN \'100.001 - 1.000.000\'
                         WHEN 3 THEN \'1.000.001 - 10.000.000\'
@@ -109,7 +107,7 @@ return new class extends Migration
                     END
                     FROM assets a2
                     CROSS JOIN LATERAL jsonb_array_elements((a2.inventory)::jsonb) AS elem
-                    WHERE a2.empresa_id = empresas.id AND (elem ->> \'facility_own\') IS NOT NULL
+                    WHERE a2.empresa_id = empresas.id AND (elem ->> \'inventory_est\') IS NOT NULL
                 ) AS inventario
             from empresas
             left join empresa_sector_service on empresas.id = empresa_sector_service.empresa_id

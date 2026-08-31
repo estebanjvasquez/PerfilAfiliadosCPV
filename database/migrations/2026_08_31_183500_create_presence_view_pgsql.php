@@ -42,9 +42,11 @@ use Illuminate\Support\Facades\DB;
  *
  * `proj_q` es distinto: solo tiene `COALESCE(json_unquote(...), '')`, SIN REPLACE. Aqui "clave
  * ausente" (SQL NULL -> coalesce a '') y "valor JSON null" (texto literal "null" -> coalesce no
- * actua, queda "null" visible) NO convergen - mismo caso que `descripcion` en ExperienceView. Se
- * usa el mismo CASE de 3 ramas (ausente -> NULL/coalescido a ''; JSON null explicito -> queda como
- * el texto "null"; valor real -> tal cual) para replicar exacto.
+ * actua, queda "null" visible) NO convergen en el original - mismo caso que `descripcion` en
+ * ExperienceView. *** CORREGIDO a proposito (no replicado) ***: confirmado en 2 de 75 filas
+ * reales; se decidio, junto con el cliente, no mostrar el texto "null" (sin utilidad para el
+ * usuario, mismo criterio que en ExperienceView.descripcion) - se usa un CASE de 3 ramas dando ''
+ * tanto para clave ausente como para JSON null explicito, en vez de dejar "null" visible.
  *
  * `office_data`/`experience_data` son `$table->json(...)` de Laravel = tipo `json` en Postgres -
  * se castea `::jsonb`.
@@ -71,7 +73,7 @@ return new class extends Migration
                 COALESCE(c_exp.country_name, '') AS paisx,
                 CASE
                     WHEN p.recx -> 'projects_q' IS NULL THEN ''
-                    WHEN jsonb_typeof(p.recx -> 'projects_q') = 'null' THEN 'null'
+                    WHEN jsonb_typeof(p.recx -> 'projects_q') = 'null' THEN ''
                     ELSE p.recx ->> 'projects_q'
                 END AS \"proj_q\",
                 CASE

@@ -12,21 +12,36 @@ use Illuminate\Support\Facades\DB;
  * el mismo drift ya visto en Machinery/Facility/Inventory - el CASE de `magnitud` en la migracion
  * tiene `ELSE '> 10.000.001 USD'` generico, la definicion real tiene `ELSE NULL`. Se usa la real.
  *
- * *** Bug real de produccion encontrado y replicado a proposito (no corregido) ***: la subconsulta
- * interna tiene `experiences t ... LEFT JOIN experiences ON experiences.empresa_id = t.id` - un
- * self-join de `experiences` contra si misma, comparando `empresa_id` (de la segunda instancia)
- * contra `t.id` (el ID PROPIO de una fila de experiences, NO su empresa_id) - parece un
- * copy-paste-error de otro patron de join, sin sentido semantico. Como no se selecciona ninguna
- * columna de esa segunda instancia, su UNICO efecto observable es multiplicar cada fila cuando el
- * `id` de una experiencia coincide con el `empresa_id` de OTRA fila de experiences (fan-out de
- * join). Confirmado con datos reales (scratchpad diag_experience_selfjoin.php, solo conteos): 21
- * de 93 `experiences.id` coinciden por casualidad con algun `experiences.empresa_id`, y esto
- * produce 13 grupos de filas duplicadas en la vista real de produccion HOY. Como el objetivo de
- * esta fase es paridad exacta con lo que ve el usuario en produccion (no corregir bugs de reporte
- * sin que el cliente lo pida), se replica el mismo fan-out con
- * `generate_series(1, GREATEST(1, <conteo de coincidencias>))`. Se documenta aqui explicitamente
- * para que quede registrado como un hallazgo a discutir con el cliente en otro momento - no es un
- * comportamiento intencional de reporte, es un bug de la consulta original.
+ * *** 1 bug de produccion CORREGIDO a proposito (no replicado), + 1 limpieza de codigo muerto que
+ * resulto NO ser un bug real al verificar con datos - decision tomada con el cliente despues de
+ * medir con datos reales, no por apariencia:
+ *
+ * 1) `service` (nombres de servicios de cada experiencia) daba NULL en el 100% de las 973 filas en
+ *    produccion, por un doble `json_extract(json_unquote(json_extract(...)))` roto. Verificado con
+ *    datos reales antes de corregir: se encontraron 1323 referencias a service_id en 890 elementos
+ *    de exp_year, y las 83 IDs unicas referenciadas EXISTEN TODAS en la tabla `services` (0
+ *    huerfanos) - confirma que la columna es corregible con datos limpios y fiables, no solo
+ *    "distinta". Se implementa con `jsonb_array_elements_text` sobre el array nativo `services_id`.
+ *
+ * 2) Self-join aparentemente sin sentido: la subconsulta interna original tiene
+ *    `experiences t ... LEFT JOIN experiences ON experiences.empresa_id = t.id` - compara
+ *    `empresa_id` (de una segunda instancia de experiences) contra `t.id` (el ID PROPIO de una fila
+ *    de experiences, no su empresa_id). A primera vista parecia un bug de fan-out (multiplicar
+ *    filas cuando el `id` de una experiencia coincide con el `empresa_id` de otra) - la
+ *    investigacion inicial encontro 21 `experiences.id` que SI coinciden con algun
+ *    `experiences.empresa_id`, y asumio que eso causaba duplicados. Verificacion mas profunda
+ *    (antes de aplicar el "fix") demostro que esa suposicion era INCORRECTA:
+ *    `experiences.empresa_id` es UNICO (93 filas, 93 empresa_id distintos, confirmado), asi que el
+ *    self-join NUNCA produce mas de 1 fila coincidente por `t.id` - `GREATEST(1, COUNT(...))` da
+ *    SIEMPRE 1, sin fan-out real con los datos actuales. Los "duplicados" que parecian confirmar el
+ *    bug (20 filas con el mismo ano+descripcion+sector) resultaron ser, en su mayoria, entradas
+ *    DISTINTAS que coinciden en esos 3 campos por coincidencia de negocio (mismo ano/sector/
+ *    descripcion pero otros campos distintos) - solo 2 empresas (5 elementos) tienen entradas
+ *    REALMENTE identicas dentro de su propio array `exp_year`, y eso es un dato de origen (alguien
+ *    cargo la misma experiencia dos veces), no algo que esta vista deba "limpiar" silenciosamente.
+ *    Conclusion: el self-join es codigo muerto sin ningun efecto observable hoy (confirmado con una
+ *    comparacion de multiset completa excluyendo solo la columna `service`: 0 diferencias con o sin
+ *    el join) - se elimina igual, por claridad/mantenibilidad, no porque corrigiera un bug real.
  *
  * Igual que en ClientsView, el truco `ROW_NUMBER() OVER()` (usando una tabla NO relacionada -
  * empresas/customers_country - solo como generador de un rango de indices 0..N-1 "casualmente"
@@ -38,17 +53,14 @@ use Illuminate\Support\Facades\DB;
  * `services_id` (dentro de `rec.data.services_id`) es un array JSON nativo (no un string
  * JSON-dentro-de-JSON como parecia sugerir el doble `json_extract(json_unquote(...))` del
  * original) - confirmado con datos reales, maximo 10 elementos observados (coincide exactamente
- * con el rango 0-9 del truco `UNION SELECT 0..9` del original: no se puede descartar del todo que
- * el original trunque arrays de mas de 10, pero no se encontro ningun caso real hoy). Se usa
- * `jsonb_array_elements_text` directo sobre el array, sin limite de 10, mas correcto y sin cambiar
- * el resultado observable con los datos actuales.
+ * con el rango 0-9 del truco `UNION SELECT 0..9` del original, aunque no hizo falta replicar ese
+ * limite: `jsonb_array_elements_text` no tiene tope). Se manejan 2 casos especiales (ver bugs de
+ * datos abajo): clave ausente y valor JSON null explicito, ambos tratados como "sin servicios".
  *
  * `GROUP_CONCAT(services.name, ' ' SEPARATOR ',')`: MySQL concatena primero `name` + `' '` por
  * fila y luego une las filas con `,` (sin espacio despues de la coma) - se replica con
  * `string_agg(services.name || ' ', ',')`. Sin ORDER BY explicito en el original (orden no
- * garantizado por MySQL); se ordena por `services.id` para tener un resultado determinista y se
- * verifica con db:diff-view si esto genera alguna diferencia de orden (analogo a los casos ya
- * aceptados en catalogoView/ClientsView).
+ * garantizado por MySQL); se ordena por `services.id` para tener un resultado determinista.
  *
  * Los campos `prof_tech`/`manpower` usan el mismo patron `REPLACE(json_unquote(...), 'null', '')`
  * que `cliente` en ClientsView (gotcha de `json_unquote` sobre JSON null). A diferencia de
@@ -62,27 +74,17 @@ use Illuminate\Support\Facades\DB;
  * contuviera la subcadena literal "null").
  *
  * `descripcion`, a diferencia de `prof_tech`/`manpower`, NO tiene ningun `REPLACE` en el SQL
- * original - es solo `json_unquote(json_extract(rec,'$.data.Descripcion'))` a secas. Esto importa:
+ * original - es solo `json_unquote(json_extract(rec,'$.data.Descripcion'))` a secas. Por eso,
  * cuando el valor de `Descripcion` es JSON null, MySQL deja el artefacto de texto "null" (4
- * caracteres) TAL CUAL en el reporte real (sin limpiar), mientras que `->>` de Postgres convierte
- * un JSON null directamente a SQL NULL (comportamiento distinto y "mas correcto", pero que rompe la
- * paridad). Se usa un CASE explicito con `jsonb_typeof(...) = 'null'` para forzar el mismo string
- * "null" visible que muestra produccion hoy, sin aplicar ningun replace/coalesce en este campo
- * (a proposito, para no confundirlo con el tratamiento de prof_tech/manpower).
+ * caracteres) TAL CUAL visible en el reporte real, en vez de una celda vacia - confirmado en 18 de
+ * 973 filas. *** CORREGIDO a proposito (no replicado) ***: se decidio, junto con el cliente, NO
+ * reproducir este artefacto - un usuario viendo "null" como descripcion de una experiencia es
+ * confuso y menos fiable que una celda vacia, sin ninguna razon de negocio para preservarlo (a
+ * diferencia de los otros 2 bugs de esta vista, este no cambia ningun conteo ni cardinalidad, solo
+ * el texto mostrado). Se trata igual que `prof_tech`/`manpower`: JSON null explicito -> '' en vez
+ * de dejar el texto "null".
  *
  * `exp_year` es `$table->json(...)` de Laravel = tipo `json` en Postgres - se castea `::jsonb`.
- *
- * *** Hallazgo importante para el cliente (bug preexistente en produccion, no una diferencia de
- * traduccion) ***: la columna `service` de MySQL, con su doble
- * `json_extract(json_unquote(json_extract(rec,'$.data.services_id')), concat('$[',idx,']'))`, da
- * **NULL en el 100% de las 973 filas de ExperienceView en produccion hoy** (verificado
- * exhaustivamente, sin ninguna excepcion - scratchpad diag_experience_service2.php). La traduccion
- * directa a Postgres con `jsonb_array_elements_text` SI logra extraer los servicios reales (los
- * datos existen y son validos, ver nota de `services_id` mas abajo) - es decir, la version de
- * Postgres seria "mas correcta" que la de produccion. Se decide, para esta fase, REPLICAR el bug
- * (columna siempre NULL) en vez de corregirlo silenciosamente: el alcance de la Fase 2 es paridad
- * exacta con lo que el usuario ve hoy, no un rediseno de reportes sin que el cliente lo pida. Se
- * deja registrado aqui para discutirlo aparte - el reporte "Experiencia" nunca mostro esta columna.
  *
  * *** Bugs de datos reales encontrados al correr esta migracion (bloqueantes, no cosmeticos) ***:
  *
@@ -101,11 +103,9 @@ use Illuminate\Support\Facades\DB;
  * 2) Fallo similar (mismo SQLSTATE) en la extraccion de `services_id` para 8 elementos repartidos en
  *    4 experiencias (ids 9/20/66/92): en esos elementos puntuales, `rec.data.services_id` es
  *    litealmente el valor JSON `null` (no una clave ausente - `jsonb_typeof` confirma el tipo
- *    `'null'`), y `jsonb_array_elements_text` tampoco acepta un escalar JSON null. El primer intento
- *    (`coalesce(x, '[]'::jsonb)`) no alcanza porque `coalesce` solo actua sobre SQL NULL, no sobre
- *    un valor JSON null (que SI es un valor no-NULL para SQL). Se agrega el mismo patron de CASE +
+ *    `'null'`), y `jsonb_array_elements_text` tampoco acepta un escalar JSON null. Se usa un CASE +
  *    `jsonb_typeof(...) = 'array'` para cubrir ambos casos (clave ausente Y JSON null explicito) de
- *    forma uniforme.
+ *    forma uniforme, tratando ambos como "arreglo vacio" (sin servicios).
  */
 return new class extends Migration
 {
@@ -124,7 +124,17 @@ return new class extends Migration
                 (select infraregions.region_name from infraregions where infraregions.id = (z.rec -> 'data' ->> 'infraregions_id')::int) as regionind,
                 (select infrafacilities.facility_name from infrafacilities where infrafacilities.id = (z.rec -> 'data' ->> 'infrafacilities_id')::int) as facilityind,
                 (select sectors.name from sectors where sectors.id = (z.rec -> 'data' ->> 'sectors_id')::int) as sector,
-                NULL::text as service,
+                (
+                    select string_agg(services.name || ' ', ',' ORDER BY services.id) from services
+                    where services.id in (
+                        select (v)::int from jsonb_array_elements_text(
+                            CASE WHEN jsonb_typeof(coalesce(z.rec -> 'data' -> 'services_id', 'null'::jsonb)) = 'array'
+                                THEN z.rec -> 'data' -> 'services_id'
+                                ELSE '[]'::jsonb
+                            END
+                        ) as v
+                    )
+                ) as service,
                 z.rec -> 'data' ->> 'exp_year' as ano,
                 CASE z.rec -> 'data' ->> 'magnitud'
                     WHEN '1' THEN '< 100.000 USD'
@@ -144,7 +154,7 @@ return new class extends Migration
                     ELSE replace(z.rec -> 'data' ->> 'manpower', 'null', '')
                 END as manpower,
                 CASE WHEN jsonb_typeof(z.rec -> 'data' -> 'Descripcion') = 'null'
-                    THEN 'null'
+                    THEN ''
                     ELSE z.rec -> 'data' ->> 'Descripcion'
                 END as descripcion
             from (
@@ -156,9 +166,6 @@ return new class extends Migration
                         ELSE jsonb_build_array((t.exp_year)::jsonb)
                     END
                 ) as elem
-                cross join lateral generate_series(1, GREATEST(1, (
-                    select count(*)::int from experiences e2 where e2.empresa_id = t.id
-                ))) as dup(n)
             ) z
             ORDER BY z.empresa_id
         ");
