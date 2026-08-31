@@ -63,19 +63,24 @@ return [
             ]) : [],
         ],
 
+        // Conexion a Supabase/PostgreSQL para el proyecto de categorizacion SupplHi + buscador
+        // semantico (ver docs/task.md seccion 3 y el plan de fases). Usa variables DB_PGSQL_*
+        // dedicadas (no las DB_HOST/DB_DATABASE/etc. de arriba) a proposito: la conexion 'mysql'
+        // sigue siendo la 'default' de produccion durante todo el desarrollo, y ambas conexiones
+        // deben poder coexistir sin pisarse en el mismo .env.
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'url' => env('DB_PGSQL_URL'),
+            'host' => env('DB_PGSQL_HOST', '127.0.0.1'),
+            'port' => env('DB_PGSQL_PORT', '5432'),
+            'database' => env('DB_PGSQL_DATABASE', 'forge'),
+            'username' => env('DB_PGSQL_USERNAME', 'forge'),
+            'password' => env('DB_PGSQL_PASSWORD', ''),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'prefer',
+            'sslmode' => env('DB_PGSQL_SSLMODE', 'require'),
         ],
 
         'sqlsrv' => [
