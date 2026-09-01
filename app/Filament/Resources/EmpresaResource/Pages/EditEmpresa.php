@@ -13,7 +13,6 @@ use App\Models\Sector;
 //use App\Models\State;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Forms\Components\TextInput\Mask;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\BelongsToSelect;
@@ -104,7 +103,7 @@ class EditEmpresa extends EditRecord
 
                     Fieldset::make('Dirección')->schema([
                         Forms\Components\TextInput::make('phone')->tel()->label('Teléfono')
-                            ->mask(fn (Mask $mask) => $mask->pattern('+58-000-0000000'))
+                            ->mask('+58-999-9999999')
                             ->placeholder('+58-XXX-XXXXXXX'),
                         Forms\Components\TextInput::make('street')->maxLength(100)->label('Dirección')
                             ->afterStateUpdated(function ($component, $state, $set) {
@@ -124,16 +123,16 @@ class EditEmpresa extends EditRecord
             Forms\Components\Wizard\Step::make('2 - Datos de contacto')
                 ->schema([
                     Fieldset::make('Redes sociales')->schema([
-                        Forms\Components\TextInput::make('website')->mask(fn (Mask $mask) => $mask->pattern('http://********************************')),
-                        Forms\Components\TextInput::make('linkedin_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************'))
+                        Forms\Components\TextInput::make('website')->mask('http://********************************'),
+                        Forms\Components\TextInput::make('linkedin_profile')->mask('@********************')
                             ->label('Perfil de LinkedIn'),
-                        Forms\Components\TextInput::make('twitter_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************'))
+                        Forms\Components\TextInput::make('twitter_profile')->mask('@********************')
                             ->label('Perfil de Twitter'),
-                        Forms\Components\TextInput::make('instagram_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************'))
+                        Forms\Components\TextInput::make('instagram_profile')->mask('@********************')
                             ->label('Perfil de Instagram'),
-                        Forms\Components\TextInput::make('facebook_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************'))
+                        Forms\Components\TextInput::make('facebook_profile')->mask('@********************')
                             ->label('Perfil de Facebook'),
-                        Forms\Components\TextInput::make('youtube_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************'))
+                        Forms\Components\TextInput::make('youtube_profile')->mask('@********************')
                             ->label('Youtube'),
 
                         Forms\Components\TextInput::make('otros_profile')->label('Otros'),

@@ -12,6 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\RawJs;
 use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -236,7 +237,8 @@ class AssetsRelationManager extends RelationManager
                                     Select::make('facility_type')->required()->label('Tipo de instalación')->options($titles['facility']),
                                     TextInput::make('facility_q')->required()->label('Cantidad')->numeric()->minValue(0),
                                     TextInput::make('facility_surf')->required()->label('Sup (mt2)')->numeric()->minValue(0)
-                                        ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(2)->minValue(0)->thousandsSeparator('.')),
+                                        ->mask(RawJs::make('$money($input)'))
+                                        ->stripCharacters(','),
                                     Select::make('facility_own')->options(['1' => 'Propia', '2' => 'Alquilada', '3' => 'Ambas'])->label('Tipo de Propiedad')->placeholder('Por favor seleccione una opción')->required(),
                                 ])
                                 ->columns(4)

@@ -9,7 +9,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Forms\Components\TextInput\Mask;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 
@@ -52,7 +51,7 @@ class ContactsRelationManager extends RelationManager
                         return $set($component, mb_strtoupper($state));
                     }),
                 Forms\Components\TextInput::make('phone')->tel()->label('Teléfono')
-                    ->mask(fn (Mask $mask) => $mask->pattern('+58-000-0000000'))
+                    ->mask('+58-999-9999999')
                     ->placeholder('+58-XXX-XXXXXXX'),
                 Forms\Components\TextInput::make('email')->email()
                     ->afterStateUpdated(function ($component, $state, $set) {

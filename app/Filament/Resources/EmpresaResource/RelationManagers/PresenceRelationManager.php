@@ -16,6 +16,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\RawJs;
 use Filament\Tables\Table;
 use Filament\Tables;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
@@ -55,9 +56,9 @@ class PresenceRelationManager extends RelationManager
                                             ->label('País')
                                             ->options($countries->pluck('country_name', 'id')),
                                         TextInput::make('offices_surf')->label('Superficie (㎡)')->numeric()->minValue(0)
-                                            ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(2)->minValue(0)->thousandsSeparator(',')),
-                                        TextInput::make('employees_q')->label('Empleados (n)')->numeric()->minValue(0)
-                                            ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(0)->minValue(0)->thousandsSeparator(',')),
+                                            ->mask(RawJs::make('$money($input)'))
+                                            ->stripCharacters(','),
+                                        TextInput::make('employees_q')->label('Empleados (n)')->numeric()->minValue(0),
                                         Checkbox::make('status')->label('Activa?')->inline(false),
                                     ])->columns(2)->orderable(false)->label('Datos de oficinas')
                             ])->hidden(fn (callable $get) => $get('has_offices') === false),
@@ -77,8 +78,7 @@ class PresenceRelationManager extends RelationManager
                                         Select::make('expcountry_id')
                                             ->options($countries->pluck('country_name', 'id'))->label('País'),
                                         TextInput::make('projects_q')->label('Nro. de proyectos')
-                                            ->numeric()->minValue(0)
-                                            ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(0)->minValue(0)),
+                                            ->numeric()->minValue(0),
                                         Select::make('role')
                                             ->options([
                                                 '1' => 'Subcontratista',
@@ -93,8 +93,7 @@ class PresenceRelationManager extends RelationManager
                                                 '4' => '> 10.000.001 USD'
                                             ])->required()->label('Monto total ejecutado'),
                                         TextInput::make('expemployees_q')->label('Empleados (n)')
-                                            ->numeric()->minValue(0)
-                                            ->mask(fn (TextInput\Mask $mask) => $mask->numeric()->decimalPlaces(0)->minValue(0)),
+                                            ->numeric()->minValue(0),
                                         TextInput::make('main_clients')->label('Principales clientes')
                                             ->afterStateUpdated(fn ($component, $state, $set) => $set($component, mb_strtoupper($state))),
                                     ])->columns(3)->orderable(false)->label('Datos de experiencia')

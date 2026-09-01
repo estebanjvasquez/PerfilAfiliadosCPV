@@ -11,7 +11,6 @@ use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\TextInput\Mask;
 
 class CreateEmpresa extends CreateRecord
 {
@@ -46,7 +45,7 @@ class CreateEmpresa extends CreateRecord
                         ->label('Año de fundación')->placeholder('aaaa'),
                     Fieldset::make('Dirección')->schema([
                         Forms\Components\TextInput::make('phone')->tel()->label('Tefléfono')
-                            ->mask(fn (Mask $mask) => $mask->pattern('+58-000-0000000'))
+                            ->mask('+58-999-9999999')
                             ->placeholder('+58-XXX-XXXXXXX'),
                         Forms\Components\TextInput::make('street')->maxLength(100)->label('Dirección')
                             ->afterStateUpdated(function ($component, $state, $set) {
@@ -62,12 +61,12 @@ class CreateEmpresa extends CreateRecord
             Wizard\Step::make('2 - Datos de contacto')
                 ->schema([
                     Fieldset::make('Redes sociales')->schema([
-                        Forms\Components\TextInput::make('website')->mask(fn (Mask $mask) => $mask->pattern('http://**********************************')),
-                        Forms\Components\TextInput::make('linkedin_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************')),
-                        Forms\Components\TextInput::make('twitter_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************')),
-                        Forms\Components\TextInput::make('instagram_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************')),
-                        Forms\Components\TextInput::make('facebook_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************')),
-                        Forms\Components\TextInput::make('youtube_profile')->mask(fn (Mask $mask) => $mask->pattern('@********************')),
+                        Forms\Components\TextInput::make('website')->mask('http://**********************************'),
+                        Forms\Components\TextInput::make('linkedin_profile')->mask('@********************'),
+                        Forms\Components\TextInput::make('twitter_profile')->mask('@********************'),
+                        Forms\Components\TextInput::make('instagram_profile')->mask('@********************'),
+                        Forms\Components\TextInput::make('facebook_profile')->mask('@********************'),
+                        Forms\Components\TextInput::make('youtube_profile')->mask('@********************'),
                         Forms\Components\TextInput::make('otros_profile'),
                     ])->columns(3),
                 ]),
