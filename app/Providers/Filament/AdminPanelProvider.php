@@ -13,6 +13,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Tables\Table;
 use Filament\Widgets;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
@@ -35,6 +36,29 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
  */
 class AdminPanelProvider extends PanelProvider
 {
+    /**
+     * Fase F del upgrade: aplica "esto en todo" (pedido del cliente) sin tocar los ~20
+     * archivos de Resources/RelationManagers/reportes uno por uno. Table::configureUsing()
+     * es un hook global de Filament (Table::make() llama a configure() -> setUp() en TODA
+     * tabla que se construya en el panel, ver Filament\Support\Concerns\Configurable) - un
+     * unico ->deferLoading() aca cubre todas las tablas existentes y las que se agreguen
+     * despues, sin necesidad de repetirlo en cada table().
+     *
+     * deferLoading() hace que la tabla renderice su carcasa (header, filtros, paginacion)
+     * de inmediato y dispare la consulta real en un segundo request via wire:init="loadTable"
+     * (ver vendor/filament/tables/resources/views/index.blade.php) - la fila de "streaming"
+     * pedida: la pagina no espera a la consulta para mostrarse, se ve un skeleton
+     * (animate-pulse) mientras carga.
+     *
+     * Los widgets (StatsOverview, los de GerenciaDashboard) no necesitan nada aca: son lazy
+     * por defecto en Filament v3 (Filament\Support\Concerns\CanBeLazy::$isLazy = true),
+     * ningun widget de esta app lo desactiva.
+     */
+    public function boot(): void
+    {
+        Table::configureUsing(fn (Table $table) => $table->deferLoading());
+    }
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -50,6 +74,14 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('images/capet.jpg'))
             ->darkMode()
             ->font('DM Sans')
+            // Fase F del upgrade: navegacion tipo SPA con Livewire wire:navigate (Filament
+            // renderiza cada link interno del panel con wire:navigate cuando esto esta activo -
+            // ver Filament\Support\generate_href_html()). Elimina el full-page-reload entre
+            // paginas del panel (assets/head ya cargados no se vuelven a pedir) y precarga la
+            // pagina de destino al presionar el link (antes de soltar el click), no solo al
+            // completarse la navegacion. El widget de Turnstile (wire:ignore) y el link de
+            // descarga de PDF (target=_blank, ver generate_href_html()) no se ven afectados.
+            ->spa()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
