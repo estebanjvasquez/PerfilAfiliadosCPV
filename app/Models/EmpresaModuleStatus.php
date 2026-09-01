@@ -105,10 +105,31 @@ class EmpresaModuleStatus extends Model
      */
     public static function flagsFor(int $empresaId): array
     {
+        return self::flagsFromCollection(static::where('empresa_id', $empresaId)->get());
+    }
+
+    /**
+     * Flags de "No Aplica" por sub-tipo de un módulo para una empresa,
+     * con todos los sub-tipos del módulo presentes (false por defecto).
+     */
+    public static function subTypeFlagsFor(int $empresaId, string $module): array
+    {
+        return self::subTypeFlagsFromCollection(static::where('empresa_id', $empresaId)->get(), $module);
+    }
+
+    /**
+     * Version de flagsFor() que opera sobre una coleccion YA CARGADA en memoria (ej. la relacion
+     * Empresa::moduleStatuses() eager-cargada) en vez de disparar una consulta nueva - pensado
+     * para Empresa::moduleBreakdown(), que se llama una vez por empresa en reportes que iteran
+     * TODAS las empresas (CompletionExport, GerenciaMetrics). Sin esto, cada llamada a
+     * moduleBreakdown() dispara 3 consultas separadas a esta tabla (flagsFor + 2x
+     * subTypeFlagsFor); con la coleccion ya cargada, cuesta 0 consultas adicionales.
+     */
+    public static function flagsFromCollection($statuses): array
+    {
         $flags = array_fill_keys(array_keys(self::MODULES), false);
 
-        static::where('empresa_id', $empresaId)
-            ->where('sub_type', self::SUB_TYPE_WHOLE)
+        $statuses->where('sub_type', self::SUB_TYPE_WHOLE)
             ->where('no_aplica', true)
             ->pluck('module')
             ->each(function ($module) use (&$flags) {
@@ -119,16 +140,14 @@ class EmpresaModuleStatus extends Model
     }
 
     /**
-     * Flags de "No Aplica" por sub-tipo de un módulo para una empresa,
-     * con todos los sub-tipos del módulo presentes (false por defecto).
+     * Version de subTypeFlagsFor() sobre una coleccion ya cargada - ver flagsFromCollection().
      */
-    public static function subTypeFlagsFor(int $empresaId, string $module): array
+    public static function subTypeFlagsFromCollection($statuses, string $module): array
     {
         $subTypes = self::SUB_TYPES[$module] ?? [];
         $flags = array_fill_keys(array_keys($subTypes), false);
 
-        static::where('empresa_id', $empresaId)
-            ->where('module', $module)
+        $statuses->where('module', $module)
             ->whereIn('sub_type', array_keys($subTypes))
             ->where('no_aplica', true)
             ->pluck('sub_type')

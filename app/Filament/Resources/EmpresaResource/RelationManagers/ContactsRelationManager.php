@@ -71,7 +71,14 @@ class ContactsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('email'),
             ])
             ->actions([
-                Tables\Actions\DetachAction::make(),
+                // "Crear Contacto" (headerAction por defecto del RelationManager, no declarado
+                // explicitamente aca) tambien cambia el % de "Contactos" pero NO se le agrega
+                // ->after() aca: reimplementar ese CreateAction a mano se arriesga a romper su
+                // wiring interno (form, creacion+attach en un solo paso). Ese caso (y cualquier
+                // otro que se escape) queda cubierto por el refresco periodico programado en
+                // app/Console/Kernel.php (empresas:refresh-completion --only-stale).
+                Tables\Actions\DetachAction::make()
+                    ->after(fn (RelationManager $livewire) => $livewire->ownerRecord->refreshCompletionPercentage()),
                 /* Tables\Actions\DeleteAction::make()
                     ->before(function (DeleteAction $action, $record) {
                         if ($record->contact_empresa->count() > 0) {

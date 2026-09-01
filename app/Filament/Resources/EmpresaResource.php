@@ -147,7 +147,37 @@ class EmpresaResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->whereRelation('users', 'users.id', '=', Auth::User()->id);
+        // Portado de feature/supplhi-postgres-buscador (commits a540066/cf7435d/8eb4a19):
+        // medido contra Postgres/Supabase remoto (~470ms fijos por round-trip, sin importar
+        // cuantas filas trae cada query), esta tabla llego a pedir 12 round-trips por pagina
+        // (7.6s). Al quitarse las columnas "Servicios" y "% Perfil" (unico motivo de
+        // eager-loadear services/moduleStatuses/assets/management/contacts/experiences/
+        // sustainabilities/presence), ninguna relacion hace falta ya para mostrar esta tabla:
+        // solo quedan las 3 subqueries correlacionadas de ciudad/pais/sector (van DENTRO del
+        // query principal via addSelect, 0 round-trips extra). Resultado: 1 solo round-trip
+        // por pagina. Localmente (mysql) el mismo N+1 tardaba ~90s/311 queries para 30 filas.
+        return parent::getEloquentQuery()
+            ->whereRelation('users', 'users.id', '=', Auth::User()->id)
+            ->select('empresas.*')
+            ->addSelect([
+                'joined_city_name' => DB::table('cities')
+                    ->select('city_name')
+                    ->whereColumn('cities.id', 'empresas.city_id')
+                    ->limit(1),
+            ])
+            ->addSelect([
+                'joined_country_name' => DB::table('cities')
+                    ->join('countries', 'countries.id', '=', 'cities.country_id')
+                    ->select('countries.country_name')
+                    ->whereColumn('cities.id', 'empresas.city_id')
+                    ->limit(1),
+            ])
+            ->addSelect([
+                'joined_sector_name' => DB::table('sectors')
+                    ->select('name')
+                    ->whereColumn('sectors.id', 'empresas.sector_principal_id')
+                    ->limit(1),
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -177,8 +207,8 @@ class EmpresaResource extends Resource
                     ->sortable()
                     ->tooltip('Indica si la empresa está activa en el sistema. Solo un administrador de la Cámara puede activarla o desactivarla.'),
                 Tables\Columns\TextColumn::make('ano_fund')->label('Año de fundación'),
-                Tables\Columns\TextColumn::make('city.city_name')->label('Ciudad'),
-                Tables\Columns\TextColumn::make('city.countries.country_name')
+                Tables\Columns\TextColumn::make('joined_city_name')->label('Ciudad'),
+                Tables\Columns\TextColumn::make('joined_country_name')
                     ->label('País')
                     ->formatStateUsing(function (?string $state): ?string {
                         if (blank($state)) {
@@ -188,16 +218,11 @@ class EmpresaResource extends Resource
                         // "VEN – Venezuela (Bolivarian Republic of)" -> "VEN"
                         return preg_match('/^[A-Za-z]{2,4}/', $state, $matches) ? $matches[0] : $state;
                     })
-                    ->tooltip(fn (Empresa $record): ?string => $record->city?->countries?->country_name),
-                Tables\Columns\TextColumn::make('sectorPrincipal.name')->label('Sector principal'),
-                Tables\Columns\TextColumn::make('services.name')
-                    ->label('Servicios')
-                    ->limit(40)
-                    ->tooltip(fn (Empresa $record): ?string => $record->services->pluck('name')->join(', ') ?: null)
-                    ->wrap(),
-                Tables\Columns\TextColumn::make('completitud')
-                    ->label('% Perfil')
-                    ->getStateUsing(fn (Empresa $record): string => $record->completionPercentage() . ' %'),
+                    ->tooltip(fn (Empresa $record): ?string => $record->joined_country_name),
+                Tables\Columns\TextColumn::make('joined_sector_name')->label('Sector principal'),
+                // Columnas "Servicios" y "% Perfil" removidas (ver getEloquentQuery()): forzaban
+                // eager-loading de 7 relaciones para calcular completionPercentage() por fila,
+                // el origen del N+1.
 
             ])
             ->actions([

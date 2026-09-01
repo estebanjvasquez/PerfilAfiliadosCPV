@@ -20,6 +20,12 @@ class ListEmpresas extends ListRecords implements HasTable
 {
     protected static string $resource = EmpresaResource::class;
 
+    // Portado de feature/supplhi-postgres-buscador: reduce la pagina por defecto de 10 a 5
+    // filas (menos filas visibles = tabla mas liviana para el cliente).
+    // Tipo int|string|null (no solo int, como en v2) para respetar la firma de la propiedad
+    // en Filament\Tables\Concerns\CanPaginateRecords (v3).
+    protected int | string | null $defaultTableRecordsPerPageSelectOption = 5;
+
     protected function getHeaderWidgets(): array
     {
         return [

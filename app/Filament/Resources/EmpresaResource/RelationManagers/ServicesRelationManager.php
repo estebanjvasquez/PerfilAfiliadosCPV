@@ -155,11 +155,17 @@ class ServicesRelationManager extends RelationManager
 
                         $action->cancel();
                     }
-                }),
+                })
+                    // attach()/detach() de un pivote (belongsToMany) no dispara eventos de
+                    // modelo, asi que EmpresaCompletionObserver no se entera solo - hay que
+                    // refrescar el cache de completitud a mano (empresas.completion_percentage,
+                    // ver migracion 2026_09_01_130000).
+                    ->after(fn (RelationManager $livewire) => $livewire->ownerRecord->refreshCompletionPercentage()),
 
             ])
             ->actions([
-                Tables\Actions\DetachAction::make(),
+                Tables\Actions\DetachAction::make()
+                    ->after(fn (RelationManager $livewire) => $livewire->ownerRecord->refreshCompletionPercentage()),
 
             ])
             ->bulkActions([

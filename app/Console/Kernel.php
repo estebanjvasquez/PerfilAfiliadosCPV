@@ -16,6 +16,12 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+
+        // Red de seguridad para empresas.completion_percentage (cache de
+        // Empresa::completionPercentage(), ver migracion 2026_09_01_130000):
+        // cubre mutation paths que no se pueden enganchar limpiamente (p.ej.
+        // el CreateAction por defecto de "Crear Contacto" de Filament/Breezy).
+        $schedule->command('empresas:refresh-completion --only-stale')->everyFifteenMinutes();
     }
 
     /**
