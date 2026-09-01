@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\SupplierCategory;
+use App\Observers\SupplierCategoryObserver;
 use Filament\Facades\Filament;
 
 use Illuminate\Support\Facades\Schema;
@@ -33,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        SupplierCategory::observe(SupplierCategoryObserver::class);
 
         /*  Page::$reportValidationErrorUsing = function (ValidationException $exception) {
             Notification::make()
