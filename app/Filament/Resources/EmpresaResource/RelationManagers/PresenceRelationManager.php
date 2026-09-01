@@ -14,9 +14,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 
@@ -32,7 +32,7 @@ class PresenceRelationManager extends RelationManager
 
     protected static ?string $title = 'Presencia internacional';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         $countries = (new Country())->getCountry();
 
@@ -104,7 +104,7 @@ class PresenceRelationManager extends RelationManager
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

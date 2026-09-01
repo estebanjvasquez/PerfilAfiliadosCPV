@@ -5,7 +5,7 @@ namespace App\Filament\Pages;
 use App\Exports\InventoryExport;
 use Filament\Pages\Page;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Maatwebsite\Excel\Facades\Excel;
 
 class InventoryView extends Page

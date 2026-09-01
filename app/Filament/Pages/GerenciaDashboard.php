@@ -24,7 +24,7 @@ use App\Models\Sector;
 use App\Models\State;
 use Barryvdh\DomPDF\Facade\Pdf;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Pages\Page;
 
 class GerenciaDashboard extends Page
@@ -108,7 +108,7 @@ class GerenciaDashboard extends Page
         ];
     }
 
-    protected function getFooterWidgetsColumns(): int | array
+    public function getFooterWidgetsColumns(): int | array
     {
         return ['default' => 1, 'md' => 2, 'xl' => 3];
     }

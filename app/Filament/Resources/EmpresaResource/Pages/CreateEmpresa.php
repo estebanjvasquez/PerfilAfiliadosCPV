@@ -19,7 +19,7 @@ class CreateEmpresa extends CreateRecord
 
     protected static string $resource = EmpresaResource::class;
 
-    protected function getSteps(): array
+    public function getSteps(): array
     {
         $value = '';
         $ciudades = City::get();

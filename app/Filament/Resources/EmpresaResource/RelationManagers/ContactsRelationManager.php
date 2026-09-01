@@ -4,16 +4,16 @@ namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Forms\Components\TextInput\Mask;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
-use Filament\Resources\RelationManagers\BelongsToManyRelationManager;
+use Filament\Resources\RelationManagers\RelationManager;
 
-class ContactsRelationManager extends BelongsToManyRelationManager
+class ContactsRelationManager extends RelationManager
 {
     protected static string $relationship = 'contacts';
 
@@ -39,7 +39,7 @@ class ContactsRelationManager extends BelongsToManyRelationManager
         return false;
     }
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -62,7 +62,7 @@ class ContactsRelationManager extends BelongsToManyRelationManager
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

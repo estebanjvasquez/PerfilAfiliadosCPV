@@ -7,8 +7,8 @@ use Filament\Tables;
 use App\Models\State;
 use Livewire\Livewire;
 use App\Models\Country;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\DeleteAction;
@@ -26,7 +26,7 @@ class CitiesRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Ciudades';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         /* $country =
             DB::table('states')
@@ -52,7 +52,7 @@ class CitiesRelationManager extends RelationManager
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

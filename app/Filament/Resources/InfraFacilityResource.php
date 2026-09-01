@@ -9,9 +9,9 @@ use App\Models\InfraRegion;
 use App\Models\infraregion_infrasystem;
 use App\Models\InfraSystem;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -20,7 +20,7 @@ class InfraFacilityResource extends Resource
 {
     protected static ?string $model = InfraFacility::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-office-building';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
     protected static ?string $navigationGroup = 'Mantenimiento';
 

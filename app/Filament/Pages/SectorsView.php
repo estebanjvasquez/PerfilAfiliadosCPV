@@ -7,7 +7,7 @@ use App\Filament\Resources\EmpresaResource;
 use App\Models\Empresa;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Closure;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;

@@ -18,7 +18,7 @@ use App\Models\Sustainability;
 use App\Exports\JoinViewExport;
 use App\Models\chamber_empresa;
 use App\Models\PresenceViewModel;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use App\Models\ExperienceViewModel;
 use Illuminate\Support\Facades\App;
 use Maatwebsite\Excel\Facades\Excel;

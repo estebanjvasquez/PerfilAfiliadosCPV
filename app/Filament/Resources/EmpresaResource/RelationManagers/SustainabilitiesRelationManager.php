@@ -8,9 +8,9 @@ use App\Models\Area;
 use App\Models\EmpresaModuleStatus;
 use App\Models\Sustainability;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 
 
@@ -28,7 +28,7 @@ class SustainabilitiesRelationManager extends RelationManager
 
     protected static ?string $title = 'Enfoques de sostenibilidad';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         $varea = Area::get();
         //dd($varea);
@@ -70,7 +70,7 @@ class SustainabilitiesRelationManager extends RelationManager
             ])->columns(1);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

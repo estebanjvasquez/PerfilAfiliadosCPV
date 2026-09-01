@@ -6,8 +6,8 @@ use Filament\Forms;
 use Filament\Tables;
 use Mpdf\Tag\TextArea;
 use App\Models\Chamber;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\DeleteAction;
@@ -22,7 +22,7 @@ class ChamberResource extends Resource
 
     protected static ?string $model = Chamber::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-library';
+    protected static ?string $navigationIcon = 'heroicon-o-building-library';
 
     // IF USER IS ADMIN THEN........
     protected static ?string $navigationGroup = 'Mantenimiento';

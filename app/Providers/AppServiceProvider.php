@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
             Filament::registerNavigationGroups([
                 NavigationGroup::make()
                     ->label('Maintenance')
-                    ->icon('heroicon-o-pencil-alt')
+                    ->icon('heroicon-o-pencil-square')
                     ->collapsed(),
 
                 NavigationGroup::make()

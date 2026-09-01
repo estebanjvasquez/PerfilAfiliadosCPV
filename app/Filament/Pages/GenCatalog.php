@@ -4,11 +4,11 @@ namespace App\Filament\Pages;
 
 use App\Exports\Catalog;
 use Filament\Pages\Page;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Tables\Columns\TextColumn;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf as DompdfDompdf;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;

@@ -2,52 +2,33 @@
 
 namespace App\Filament\Pages;
 
-//AGREGADOS PARA HACER FUNCIONAR EL PLUGIN PASSWORD REVEAL...................
-use JeffGreco13\FilamentBreezy\Http\Livewire\Auth\Login as BreezyLogin;
-use Phpsa\FilamentPasswordReveal\Password;
-use Filament\Forms;
-
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use DanHarrin\LivewireRateLimiting\WithRateLimiting;
 use Filament\Facades\Filament;
-use Filament\Forms\ComponentContainer;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\View;
+use Filament\Forms\Form;
 use Filament\Http\Responses\Auth\Contracts\LoginResponse;
-use Illuminate\Contracts\View\View;
+use Filament\Pages\Auth\Login as BaseLogin;
 use Illuminate\Validation\ValidationException;
-use Livewire\Component;
-
+use Phpsa\FilamentPasswordReveal\Password;
 
 /**
- * @property ComponentContainer $form
+ * Breezy v2 elimino su propio componente de Login (el paquete ahora delega
+ * por completo en el Login nativo de Filament v3 - JeffGreco13\FilamentBreezy\
+ * Http\Livewire\Auth\Login ya no existe). Se reescribe extendiendo
+ * Filament\Pages\Auth\Login directamente, preservando intacta la logica de
+ * negocio propia: rate limiting + verificacion de Turnstile antes de
+ * intentar autenticar, y el campo de password con reveal (Phpsa).
+ *
+ * mount() se elimina - es identica a la del padre en v3 (chequea sesion +
+ * $this->form->fill()), no hace falta repetirla.
  */
-
-class Login extends BreezyLogin
+class Login extends BaseLogin
 {
-
-    use InteractsWithForms;
     use WithRateLimiting;
 
-    public $email = '';
-
-    public $password = '';
-
-    public $remember = false;
-
-    /** Token del widget Turnstile (sincronizado por JS). */
+    /** Token del widget Turnstile (sincronizado por JS via @this.set(...)). */
     public $ts_token = '';
-
-    public function mount(): void
-    {
-        if (Filament::auth()->check()) {
-            redirect()->intended(Filament::getUrl());
-        }
-
-        $this->form->fill();
-    }
 
     public function authenticate(): ?LoginResponse
     {
@@ -55,7 +36,7 @@ class Login extends BreezyLogin
             $this->rateLimit(5);
         } catch (TooManyRequestsException $exception) {
             throw ValidationException::withMessages([
-                'email' => __('filament::login.messages.throttled', [
+                'data.email' => __('filament-panels::pages/auth/login.messages.throttled', [
                     'seconds' => $exception->secondsUntilAvailable,
                     'minutes' => ceil($exception->secondsUntilAvailable / 60),
                 ]),
@@ -64,7 +45,7 @@ class Login extends BreezyLogin
 
         if (! app(\App\Support\Turnstile::class)->verify($this->ts_token, request()->ip())) {
             $this->ts_token = '';
-            $this->dispatchBrowserEvent('turnstile-reset');
+            $this->dispatch('turnstile-reset');
 
             throw ValidationException::withMessages([
                 'ts_token' => __('Verificación anti-bot fallida, intenta de nuevo.'),
@@ -73,13 +54,8 @@ class Login extends BreezyLogin
 
         $data = $this->form->getState();
 
-        if (!Filament::auth()->attempt([
-            'email' => $data['email'],
-            'password' => $data['password'],
-        ], $data['remember'])) {
-            throw ValidationException::withMessages([
-                'email' => __('filament::login.messages.failed'),
-            ]);
+        if (! Filament::auth()->attempt($this->getCredentialsFromFormData($data), $data['remember'] ?? false)) {
+            $this->throwFailureValidationException();
         }
 
         session()->regenerate();
@@ -87,35 +63,35 @@ class Login extends BreezyLogin
         return app(LoginResponse::class);
     }
 
-
-    protected function getFormSchema(): array
+    /**
+     * @return array<int|string, Form>
+     */
+    protected function getForms(): array
     {
         return [
-            Forms\Components\TextInput::make('email')
-                ->label(__('filament::login.fields.email.label'))
-                ->email()
-                ->required()
-                ->autocomplete(),
-            Password::make('password')
-                ->label(__('filament::login.fields.password.label'))
-                ->autocomplete('current-password')
-                ->required()
-                ->revealable(true)
-                ->showIcon('heroicon-o-eye')
-                ->hideIcon('heroicon-o-eye-off')
-                ->helperText('Haz clic en el icono del ojo para ver tu contraseña'),
-            Forms\Components\Checkbox::make('remember')
-                ->label(__('filament::login.fields.remember.label')),
-            Forms\Components\View::make('partials.turnstile'),
+            'form' => $this->form(
+                $this->makeForm()
+                    ->schema([
+                        $this->getEmailFormComponent(),
+                        $this->getPasswordFormComponent(),
+                        $this->getRememberFormComponent(),
+                        View::make('partials.turnstile'),
+                    ])
+                    ->statePath('data'),
+            ),
         ];
     }
 
-
-    public function render(): View
+    protected function getPasswordFormComponent(): Password
     {
-        return view('filament::login')
-            ->layout('filament::components.layouts.card', [
-                'title' => __('filament::login.title'),
-            ]);
+        return Password::make('password')
+            ->label(__('filament-panels::pages/auth/login.form.password.label'))
+            ->autocomplete('current-password')
+            ->required()
+            ->revealable(true)
+            ->showIcon('heroicon-o-eye')
+            ->hideIcon('heroicon-o-eye-slash')
+            ->helperText('Haz clic en el icono del ojo para ver tu contraseña')
+            ->extraInputAttributes(['tabindex' => 2]);
     }
 }

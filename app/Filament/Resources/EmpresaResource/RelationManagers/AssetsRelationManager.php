@@ -12,7 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\HtmlString;
@@ -127,7 +127,7 @@ class AssetsRelationManager extends RelationManager
             ));
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         $titles = static::titles();
 
@@ -223,7 +223,7 @@ class AssetsRelationManager extends RelationManager
 
                 Action::make('instalaciones')
                     ->label('Instalaciones')
-                    ->icon('heroicon-o-office-building')
+                    ->icon('heroicon-o-building-office')
                     ->modalHeading('Agregar / editar instalaciones')
                     ->modalWidth('4xl')
                     ->form([
@@ -248,7 +248,7 @@ class AssetsRelationManager extends RelationManager
 
                 Action::make('inventario')
                     ->label('Inventario')
-                    ->icon('heroicon-o-archive')
+                    ->icon('heroicon-o-archive-box')
                     ->modalHeading('Agregar / editar inventario')
                     ->modalWidth('4xl')
                     ->form([

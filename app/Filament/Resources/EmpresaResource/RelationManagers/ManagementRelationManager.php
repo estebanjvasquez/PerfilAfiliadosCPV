@@ -13,7 +13,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Arr;
@@ -112,7 +112,7 @@ class ManagementRelationManager extends RelationManager
             });
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -145,7 +145,7 @@ class ManagementRelationManager extends RelationManager
 
                 Action::make('calidad')
                     ->label('Calidad')
-                    ->icon('heroicon-o-badge-check')
+                    ->icon('heroicon-o-check-badge')
                     ->modalHeading('Agregar / editar: calidad')
                     ->form([
                         static::noAplicaToggle('calidad'),
@@ -171,7 +171,7 @@ class ManagementRelationManager extends RelationManager
 
                 Action::make('ambiente')
                     ->label('Ambiente')
-                    ->icon('heroicon-o-badge-check')
+                    ->icon('heroicon-o-check-badge')
                     ->modalHeading('Agregar / editar: ambiente')
                     ->form([
                         static::noAplicaToggle('ambiente'),
@@ -197,7 +197,7 @@ class ManagementRelationManager extends RelationManager
 
                 Action::make('credibilidad')
                     ->label('Credibilidad y transparencia')
-                    ->icon('heroicon-o-badge-check')
+                    ->icon('heroicon-o-check-badge')
                     ->modalHeading('Agregar / editar: credibilidad y transparencia')
                     ->form([
                         static::noAplicaToggle('credibilidad'),
@@ -223,7 +223,7 @@ class ManagementRelationManager extends RelationManager
 
                 Action::make('seguridad')
                     ->label('Seguridad')
-                    ->icon('heroicon-o-badge-check')
+                    ->icon('heroicon-o-check-badge')
                     ->modalHeading('Agregar / editar: seguridad')
                     ->form([
                         static::noAplicaToggle('seguridad'),
@@ -249,7 +249,7 @@ class ManagementRelationManager extends RelationManager
 
                 Action::make('proyectos')
                     ->label('Gestión de proyectos')
-                    ->icon('heroicon-o-badge-check')
+                    ->icon('heroicon-o-check-badge')
                     ->modalHeading('Agregar / editar: gestión de proyectos')
                     ->form([
                         static::noAplicaToggle('proyectos'),
@@ -276,7 +276,7 @@ class ManagementRelationManager extends RelationManager
 
                 Action::make('seguridad_info')
                     ->label('Seguridad de la información')
-                    ->icon('heroicon-o-badge-check')
+                    ->icon('heroicon-o-check-badge')
                     ->modalHeading('Agregar / editar: seguridad de la información')
                     ->form([
                         static::noAplicaToggle('seguridad_info'),

@@ -156,7 +156,7 @@ class Empresa extends Model
     public function principalUser(): ?User
     {
         return $this->users()
-            ->whereDoesntHave('roles', fn ($query) => $query->where('name', config('filament-shield.super_admin.role_name')))
+            ->whereDoesntHave('roles', fn ($query) => $query->where('name', config('filament-shield.super_admin.name')))
             ->orderBy('empresa_user.created_at')
             ->first();
     }

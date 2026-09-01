@@ -6,7 +6,7 @@ use App\Exports\ExperienceExport;
 use App\Models\ExperienceViewModel;
 use Filament\Pages\Page;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExperienceView extends Page

@@ -25,7 +25,7 @@ class StatsOverview extends BaseWidget
             Card::make('','La Cámara Petrolera de Venezuela no se hace responsable de la veracidad de la información suministrada por la empresa afiliada en esta plataforma','La empresa afiliada es responsable de la veracidad de la información suministrada de manera directa y voluntaria en este formulario'),
             Card::make('','La empresa afiliada es responsable de la veracidad de la información suministrada de manera directa y voluntaria en este formulario'),
             //Card::make('Porcentaje en Sistema', number_format($percentage, 2) . ' ' . '%'),
-            //Card::make('Enlace', 'Manual de Usuario')->url("user.pdf", true)->descriptionIcon('heroicon-s-trending-up'),
+            //Card::make('Enlace', 'Manual de Usuario')->url("user.pdf", true)->descriptionIcon('heroicon-s-arrow-trending-up'),
         ];
     }
 }

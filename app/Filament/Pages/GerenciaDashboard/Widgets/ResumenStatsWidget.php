@@ -23,7 +23,7 @@ class ResumenStatsWidget extends BaseWidget
 
         return [
             Card::make('Empresas activas', $data['total_empresas'])
-                ->icon('heroicon-o-office-building')
+                ->icon('heroicon-o-building-office')
                 ->color('primary'),
 
             Card::make('% Completado promedio', $data['completitud_promedio'] . '%')
@@ -36,7 +36,7 @@ class ResumenStatsWidget extends BaseWidget
                 ->color($this->colorFor($data['frescura_dato'])),
 
             Card::make('Sedes con infraestructura', $data['sedes'])
-                ->icon('heroicon-o-office-building')
+                ->icon('heroicon-o-building-office')
                 ->color('primary'),
 
             Card::make('Historial de proyectos', $data['proyectos'])

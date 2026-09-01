@@ -11,8 +11,8 @@ use App\Models\Country;
 use App\Models\Empresa;
 use Barryvdh\DomPDF\PDF;
 use App\Models\empresa_user;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use App\Models\JoinViewsModel;
 use App\Exports\JoinViewExport;
 use App\Models\countries_cities;
@@ -57,7 +57,7 @@ class EmpresaResource extends Resource
 
     public static ?string $navigationLabel = 'Empresas';
 
-    protected static ?string $navigationIcon = 'heroicon-s-office-building';
+    protected static ?string $navigationIcon = 'heroicon-s-building-office';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -86,8 +86,8 @@ class EmpresaResource extends Resource
                     ->placeholder('Seleccione el sector principal')
                     ->reactive()
                     ->required()
-                    ->disabled(fn (): bool => ! (Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false))
-                    ->helperText(fn (): ?string => (Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                    ->disabled(fn (): bool => ! (Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false))
+                    ->helperText(fn (): ?string => (Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false)
                         ? null
                         : 'Este dato lo define la Cámara Petrolera al registrar tu empresa. Si no estás de acuerdo, contacta a la CPV para solicitar el cambio.'),
                 Select::make('sector_secundario_id')
@@ -160,11 +160,11 @@ class EmpresaResource extends Resource
                 Tables\Columns\IconColumn::make('')
                     ->options([
                         //'heroicon-o-printer',
-                        'heroicon-o-download',
+                        'heroicon-o-arrow-down-tray',
                     ])
                     ->label('PDF')
                     //->color('success')
-                    //->icon('heroicon-o-download')
+                    //->icon('heroicon-o-arrow-down-tray')
                     ->url(fn (Empresa $record) => route('pdf', $record))
                     ->openUrlInNewTab(),
                 //->url(fn (Empresa $record): string => route('filament.pages.join-views', $record)), RUTA PARA REPORTE HTML........
@@ -205,7 +205,7 @@ class EmpresaResource extends Resource
                 /*Tables\Actions\Action::make('pdf')
                     ->label('PDF')
                     ->color('success')
-                    ->icon('heroicon-o-download')
+                    ->icon('heroicon-o-arrow-down-tray')
                     ->url(fn (Empresa $record) => route('pdf', $record))
                     ->openUrlInNewTab(),*/
 
@@ -213,7 +213,7 @@ class EmpresaResource extends Resource
                 /* Tables\Actions\Action::make('xls')
                     ->label('XLS')
                     ->color('success')
-                    ->icon('heroicon-o-download')
+                    ->icon('heroicon-o-arrow-down-tray')
                     ->url(fn (Empresa $record) => route('xls', $record))
                     ->openUrlInNewTab(), */
 
@@ -243,7 +243,7 @@ class EmpresaResource extends Resource
                     ->label('Activar')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (): bool => Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                    ->visible(fn (): bool => Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false)
                     ->requiresConfirmation()
                     ->modalHeading('Activar empresas seleccionadas')
                     ->action(function (Collection $records) {
@@ -257,7 +257,7 @@ class EmpresaResource extends Resource
                     ->label('Desactivar')
                     ->icon('heroicon-o-x-circle')
                     ->color('warning')
-                    ->visible(fn (): bool => Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                    ->visible(fn (): bool => Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false)
                     ->requiresConfirmation()
                     ->modalHeading('Desactivar empresas seleccionadas')
                     ->action(function (Collection $records) {
@@ -271,7 +271,7 @@ class EmpresaResource extends Resource
                     ->label('Eliminar')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
-                    ->visible(fn (): bool => Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                    ->visible(fn (): bool => Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false)
                     ->requiresConfirmation()
                     ->modalHeading('Eliminar empresas seleccionadas')
                     ->modalSubheading('Esta acción eliminará permanentemente las empresas seleccionadas y TODOS sus datos asociados (Recursos, Sistemas de gestión, Experiencias, Presencia internacional, Enfoque de sostenibilidad, Contactos). Esta acción no se puede deshacer.')
@@ -311,7 +311,7 @@ class EmpresaResource extends Resource
             // para no-administradores (Filament esconde el ícono de filtro cuando no hay filtros
             // registrados).
             ->filters(
-                (Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                (Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false)
                     ? [
                         TernaryFilter::make('status_id')->label('Activo'),
 
@@ -373,7 +373,7 @@ class EmpresaResource extends Resource
     }
 
 
-    protected static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): ?string
     {
         //return self::$model::all()->count();
         return self::$model::whereRelation('users', 'users.id', '=', Auth::User()->id)->count();

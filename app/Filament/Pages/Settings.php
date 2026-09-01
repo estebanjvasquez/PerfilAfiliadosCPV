@@ -13,7 +13,7 @@ class Settings extends Page
 
     protected static string $view = 'filament.pages.settings';
 
-    protected static function shouldRegisterNavigation(): bool
+    public static function shouldRegisterNavigation(): bool
     {
         return false;
     }

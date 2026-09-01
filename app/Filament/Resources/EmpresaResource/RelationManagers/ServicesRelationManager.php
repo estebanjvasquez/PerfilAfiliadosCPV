@@ -7,8 +7,8 @@ use Filament\Tables;
 use App\Models\Sector;
 use App\Models\Service;
 use Prophecy\Call\Call;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Illuminate\Console\Application;
 use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Model;
@@ -16,9 +16,9 @@ use Filament\Tables\Actions\AttachAction;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Resources\RelationManagers\BelongsToManyRelationManager;
+use Filament\Resources\RelationManagers\RelationManager;
 
-class ServicesRelationManager extends BelongsToManyRelationManager
+class ServicesRelationManager extends RelationManager
 {
     //protected static string $model = 'empresasectorservice';
 
@@ -51,7 +51,7 @@ class ServicesRelationManager extends BelongsToManyRelationManager
 
 
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([]);
@@ -62,7 +62,7 @@ class ServicesRelationManager extends BelongsToManyRelationManager
         return parent::getEloquentQuery()->whereRelation('empresasectorservice', 'sectors_id', '=', 2);
     } */
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
 
@@ -77,7 +77,7 @@ class ServicesRelationManager extends BelongsToManyRelationManager
                     Forms\Components\Select::make('sectors_id')
                         ->relationship('sectors', 'name')
                         ->label('Sectores')
-                        ->options(function (BelongsToManyRelationManager $livewire) {
+                        ->options(function (RelationManager $livewire) {
                             $empresa = $livewire->ownerRecord;
                             $allowed = $empresa->allowedSectorIds();
 
@@ -101,7 +101,7 @@ class ServicesRelationManager extends BelongsToManyRelationManager
                     $action->getRecordSelect()
                         ->label(('Servicios'))
                         ->disableLabel(false)
-                        ->options(function (callable $get, BelongsToManyRelationManager $livewire) {
+                        ->options(function (callable $get, RelationManager $livewire) {
                             $sector = Sector::find($get('sectors_id'));
                             if (!$sector) {
                                 $sector_values = Service::all();
@@ -121,7 +121,7 @@ class ServicesRelationManager extends BelongsToManyRelationManager
                         ->searchable(false)
                         ->hidden(fn (callable $get) => $get('sectors_id') === null),
 
-                ])->before(function (AttachAction $action, array $data, BelongsToManyRelationManager $livewire) {
+                ])->before(function (AttachAction $action, array $data, RelationManager $livewire) {
                     $empresa = $livewire->ownerRecord;
                     $service = Service::find($data['recordId'] ?? null);
                     $sectorId = $service ? (int) $service->sectors_id : null;

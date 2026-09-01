@@ -64,7 +64,7 @@ class EditEmpresa extends EditRecord
         }
     }
 
-    protected function getSteps(): array
+    public function getSteps(): array
     {
         $ciudades = City::get();
         foreach ($ciudades as $key => $value) {
@@ -149,8 +149,8 @@ class EditEmpresa extends EditRecord
                             ->placeholder('Por favor seleccione una opción')
                             ->reactive()
                             ->required()
-                            ->disabled(fn (): bool => ! (Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false))
-                            ->helperText(fn (): ?string => (Auth::user()?->hasRole(config('filament-shield.super_admin.role_name')) ?? false)
+                            ->disabled(fn (): bool => ! (Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false))
+                            ->helperText(fn (): ?string => (Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false)
                                 ? null
                                 : 'Este dato lo define la Cámara Petrolera al registrar tu empresa. Si no estás de acuerdo, contacta a la CPV para solicitar el cambio.'),
                         Select::make('sector_secundario_id')
