@@ -2,7 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Asset;
+use App\Models\Management;
+use App\Models\EmpresaModuleStatus;
+use App\Models\Presence;
+use App\Models\Experience;
+use App\Models\Sustainability;
 use App\Models\SupplierCategory;
+use App\Observers\EmpresaCompletionObserver;
 use App\Observers\SupplierCategoryObserver;
 use Filament\Facades\Filament;
 
@@ -36,6 +43,19 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         SupplierCategory::observe(SupplierCategoryObserver::class);
+
+        // Mantiene empresas.completion_percentage (cache de
+        // Empresa::completionPercentage(), ver migracion 2026_09_01_130000)
+        // al dia cuando cambia cualquier dato que afecte el calculo. No
+        // cubre servicios/contactos (belongsToMany, ver hooks ->after() en
+        // ServicesRelationManager/ContactsRelationManager) porque un
+        // attach()/detach() de pivote no dispara eventos de modelo.
+        Asset::observe(EmpresaCompletionObserver::class);
+        Management::observe(EmpresaCompletionObserver::class);
+        EmpresaModuleStatus::observe(EmpresaCompletionObserver::class);
+        Presence::observe(EmpresaCompletionObserver::class);
+        Experience::observe(EmpresaCompletionObserver::class);
+        Sustainability::observe(EmpresaCompletionObserver::class);
 
         /*  Page::$reportValidationErrorUsing = function (ValidationException $exception) {
             Notification::make()

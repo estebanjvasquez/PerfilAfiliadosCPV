@@ -155,11 +155,17 @@ class ServicesRelationManager extends BelongsToManyRelationManager
 
                         $action->cancel();
                     }
-                }),
+                })
+                    // attach()/detach() de un pivote (belongsToMany) no dispara eventos de
+                    // modelo en esta version de Laravel, asi que EmpresaCompletionObserver
+                    // no se entera solo - hay que refrescar el cache de completitud a mano
+                    // (empresas.completion_percentage, ver migracion 2026_09_01_130000).
+                    ->after(fn (BelongsToManyRelationManager $livewire) => $livewire->ownerRecord->refreshCompletionPercentage()),
 
             ])
             ->actions([
-                Tables\Actions\DetachAction::make(),
+                Tables\Actions\DetachAction::make()
+                    ->after(fn (BelongsToManyRelationManager $livewire) => $livewire->ownerRecord->refreshCompletionPercentage()),
 
             ])
             ->bulkActions([

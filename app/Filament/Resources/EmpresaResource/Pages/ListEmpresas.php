@@ -21,6 +21,11 @@ class ListEmpresas extends ListRecords implements HasTable
 {
     protected static string $resource = EmpresaResource::class;
 
+    // Filament v2 no tiene metodo en el Table builder para esto (eso es v3) -
+    // se controla con esta propiedad en la pagina. Las opciones del selector
+    // (5/10/25/50/-1) ya vienen asi por defecto via config('tables.pagination').
+    protected int $defaultTableRecordsPerPageSelectOption = 5;
+
     protected function getHeaderWidgets(): array
     {
         return [

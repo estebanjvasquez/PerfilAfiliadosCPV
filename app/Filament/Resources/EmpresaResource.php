@@ -148,28 +148,15 @@ class EmpresaResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         // Medido contra Postgres/Supabase remoto (~470ms fijos por round-trip,
-        // sin importar cuantas filas trae cada query): el primer intento con
-        // ->with([...]) para las 10 relaciones bajo el N+1 por-fila, pero
-        // seguian siendo 10-12 round-trips *por pagina* (uno por relacion,
-        // no por fila) - ~7.6s para 10 filas. Aca se reduce ese numero:
-        // - city/pais/sector: eran 3 relaciones (city, city.countries,
-        //   sectorPrincipal) -> 3 round-trips. Se reemplazan por subqueries
-        //   correlacionadas (addSelect) que van dentro del MISMO query
-        //   principal (0 round-trips extra) en vez de un join real, para no
-        //   arriesgar que un join duplique filas si alguna vez alguna de
-        //   estas relaciones deja de ser 1:1.
-        // - contacts/experiences/sustainabilities: solo se usaban para un
-        //   count()>0 en completionPercentage(), nunca se muestra su
-        //   contenido en esta tabla -> withCount() los agrega como subquery
-        //   del query principal (0 round-trips extra) en vez de eager-load
-        //   aparte. Empresa::relationHasAny() lee el "*_count" resultante.
-        // - presence: solo se usaba para "!== null" -> withExists() (0
-        //   round-trips extra, atributo "presence_exists" via
-        //   Empresa::relationExists()).
-        // Quedan como eager-load real (necesitan datos de fila, no solo
-        // conteo): services (se muestra su nombre), moduleStatuses/assets/
-        // management (logica de booleans de completionPercentage()) - 4
-        // round-trips en vez de los 12 originales.
+        // sin importar cuantas filas trae cada query): esta tabla llego a
+        // pedir 12 round-trips por pagina (7.6s). Al quitarse las columnas
+        // "Servicios" y "% Perfil" (unico motivo de eager-loadear services/
+        // moduleStatuses/assets/management/contacts/experiences/
+        // sustainabilities/presence - ver historial en git blame de este
+        // metodo), ninguna relacion hace falta ya para mostrar esta tabla:
+        // solo quedan las 3 subqueries correlacionadas de ciudad/pais/sector
+        // (van DENTRO del query principal via addSelect, 0 round-trips
+        // extra). Resultado: 1 solo round-trip por pagina.
         return parent::getEloquentQuery()
             ->whereRelation('users', 'users.id', '=', Auth::User()->id)
             ->select('empresas.*')
@@ -191,14 +178,6 @@ class EmpresaResource extends Resource
                     ->select('name')
                     ->whereColumn('sectors.id', 'empresas.sector_principal_id')
                     ->limit(1),
-            ])
-            ->withCount(['contacts', 'experiences', 'sustainabilities'])
-            ->withExists('presence')
-            ->with([
-                'services',
-                'moduleStatuses',
-                'assets',
-                'management',
             ]);
     }
 
@@ -242,14 +221,6 @@ class EmpresaResource extends Resource
                     })
                     ->tooltip(fn (Empresa $record): ?string => $record->joined_country_name),
                 Tables\Columns\TextColumn::make('joined_sector_name')->label('Sector principal'),
-                Tables\Columns\TextColumn::make('services.name')
-                    ->label('Servicios')
-                    ->limit(40)
-                    ->tooltip(fn (Empresa $record): ?string => $record->services->pluck('name')->join(', ') ?: null)
-                    ->wrap(),
-                Tables\Columns\TextColumn::make('completitud')
-                    ->label('% Perfil')
-                    ->getStateUsing(fn (Empresa $record): string => $record->completionPercentage() . ' %'),
 
             ])
             ->actions([

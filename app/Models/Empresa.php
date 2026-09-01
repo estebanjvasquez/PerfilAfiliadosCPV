@@ -511,6 +511,41 @@ class Empresa extends Model
     }
 
     /**
+     * Recalcula completionPercentage() y lo persiste en la columna cacheada
+     * "completion_percentage" (ver migracion 2026_09_01_130000). Es la UNICA
+     * fuente de escritura de esa columna - todo lo que pueda cambiar el
+     * resultado de moduleBreakdown() debe llamar esto para que el cache no
+     * quede desactualizado (ver EmpresaObserver y los hooks ->after() en
+     * ServicesRelationManager/ContactsRelationManager).
+     *
+     * Recarga las relaciones en vez de confiar en las que ya esten en memoria
+     * (fresh()) porque esto se llama justo despues de que ALGO cambio (un
+     * asset, un attach de servicio, etc.) y la instancia que dispara el
+     * refresh puede no ser la misma que trae los datos ya actualizados.
+     *
+     * updateQuietly() (no update()) para no re-disparar el evento "saved" de
+     * Empresa y evitar cualquier posibilidad de loop con observers futuros
+     * que a su vez escuchen ese evento.
+     */
+    public function refreshCompletionPercentage(): void
+    {
+        $fresh = static::query()->withCompletionData()->find($this->id);
+
+        if (! $fresh) {
+            return;
+        }
+
+        // Asignacion directa de atributo (NO updateQuietly(['completion_percentage' => ...])):
+        // "completion_percentage" a proposito no esta en $fillable (es un campo interno
+        // calculado, no debe poder llegar por mass-assignment desde un form/request), asi que
+        // pasarlo por un array de update() lo descartaria en silencio - bug real encontrado y
+        // corregido durante la verificacion de este mismo cambio (updateQuietly() devolvia
+        // true pero no persistia nada).
+        $fresh->completion_percentage = $fresh->completionPercentage();
+        $fresh->saveQuietly();
+    }
+
+    /**
      * Borra la empresa y todo lo que depende exclusivamente de ella. Las FK de
      * assets/management/experiences/presences/sustainabilities/contact_empresa/
      * chamber_empresa/empresa_sector_service/empresa_user no tienen
