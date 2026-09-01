@@ -44,7 +44,6 @@ Route::get('xls/{empresa}', function () {
 })->name('xls');
 
 
-Route::get('/empresa', \App\Http\Livewire\Empresa::class);
 /* Route::get('/gen-catalog/exportxls', [GenCatalog::class, 'exportAllCatalogXls'])->name('gen-catalog.exportxls');
 Route::get('/gen-catalog/exportpdf', [GenCatalog::class, 'exportAllCatalogPdf'])->name('gen-catalog.exportpdf'); */
 

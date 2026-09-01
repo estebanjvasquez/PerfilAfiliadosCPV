@@ -4,7 +4,6 @@ namespace App\Filament\Resources\EmpresaResource\Pages;
 
 use App\Filament\Resources\EmpresaResource;
 use App\Filament\Resources\EmpresaResource\Widgets\StatsOverview;
-use App\Http\Livewire\Empresa as LivewireEmpresa;
 use Filament\Resources\Pages\ListRecords;
 use App\Models\Empresa;
 use App\Models\empresa_user;

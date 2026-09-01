@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f829113595a9e449c5443dbb00af0867",
+    "content-hash": "bf025ab5e4f0928227c51f4e88d71694",
     "packages": [
         {
             "name": "3x1io/filament-user",
@@ -405,12 +405,12 @@
             "version": "1.3.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/blade-ui-kit/blade-heroicons.git",
+                "url": "https://github.com/driesvints/blade-heroicons.git",
                 "reference": "a2749abc7b8eb6149ff643ffa99a3d33a2de7961"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/blade-ui-kit/blade-heroicons/zipball/a2749abc7b8eb6149ff643ffa99a3d33a2de7961",
+                "url": "https://api.github.com/repos/driesvints/blade-heroicons/zipball/a2749abc7b8eb6149ff643ffa99a3d33a2de7961",
                 "reference": "a2749abc7b8eb6149ff643ffa99a3d33a2de7961",
                 "shasum": ""
             },
@@ -474,12 +474,12 @@
             "version": "1.4.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/blade-ui-kit/blade-icons.git",
+                "url": "https://github.com/driesvints/blade-icons.git",
                 "reference": "977559507feebba431019abf1b319d71dfdacd95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/blade-ui-kit/blade-icons/zipball/977559507feebba431019abf1b319d71dfdacd95",
+                "url": "https://api.github.com/repos/driesvints/blade-icons/zipball/977559507feebba431019abf1b319d71dfdacd95",
                 "reference": "977559507feebba431019abf1b319d71dfdacd95",
                 "shasum": ""
             },
@@ -1595,12 +1595,12 @@
             "version": "v2.16.51",
             "source": {
                 "type": "git",
-                "url": "https://github.com/filamentphp/admin.git",
+                "url": "https://github.com/filamentphp/panels.git",
                 "reference": "581089529cea5acd453760927cc8f694bba16096"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/admin/zipball/581089529cea5acd453760927cc8f694bba16096",
+                "url": "https://api.github.com/repos/filamentphp/panels/zipball/581089529cea5acd453760927cc8f694bba16096",
                 "reference": "581089529cea5acd453760927cc8f694bba16096",
                 "shasum": ""
             },
@@ -2336,12 +2336,12 @@
             "version": "v1.4.7",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jeffgreco13/filament-breezy.git",
+                "url": "https://github.com/Jacobtims/filament-breezy.git",
                 "reference": "b0c962bb03f3e06f55e71b88a379299d4b0b6e29"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffgreco13/filament-breezy/zipball/b0c962bb03f3e06f55e71b88a379299d4b0b6e29",
+                "url": "https://api.github.com/repos/Jacobtims/filament-breezy/zipball/b0c962bb03f3e06f55e71b88a379299d4b0b6e29",
                 "reference": "b0c962bb03f3e06f55e71b88a379299d4b0b6e29",
                 "shasum": ""
             },
@@ -4068,12 +4068,12 @@
             "version": "2.63.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/briannesbitt/Carbon.git",
+                "url": "https://github.com/CarbonPHP/carbon.git",
                 "reference": "ad35dd71a6a212b98e4b87e97389b6fa85f0e347"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/ad35dd71a6a212b98e4b87e97389b6fa85f0e347",
+                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/ad35dd71a6a212b98e4b87e97389b6fa85f0e347",
                 "reference": "ad35dd71a6a212b98e4b87e97389b6fa85f0e347",
                 "shasum": ""
             },
@@ -4570,6 +4570,63 @@
                 "source": "https://github.com/paragonie/random_compat"
             },
             "time": "2020-10-15T08:29:30+00:00"
+        },
+        {
+            "name": "pgvector/pgvector",
+            "version": "v0.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pgvector/pgvector-php.git",
+                "reference": "79e2c080df13f38e696ebd66039898dc87bdbcc7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pgvector/pgvector-php/zipball/79e2c080df13f38e696ebd66039898dc87bdbcc7",
+                "reference": "79e2c080df13f38e696ebd66039898dc87bdbcc7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">= 8.1"
+            },
+            "require-dev": {
+                "doctrine/dbal": "^4",
+                "doctrine/orm": "^3",
+                "illuminate/database": ">= 10",
+                "laravel/serializable-closure": "^1.3",
+                "phpunit/phpunit": "^10",
+                "symfony/cache": "^6"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Pgvector\\Laravel\\PgvectorServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Pgvector\\": "src/",
+                    "Pgvector\\Laravel\\": "src/laravel/",
+                    "Pgvector\\Doctrine\\": "src/doctrine/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andrew Kane",
+                    "email": "andrew@ankane.org"
+                }
+            ],
+            "description": "pgvector support for PHP",
+            "support": {
+                "issues": "https://github.com/pgvector/pgvector-php/issues",
+                "source": "https://github.com/pgvector/pgvector-php"
+            },
+            "time": "2025-02-15T23:27:08+00:00"
         },
         {
             "name": "phenx/php-font-lib",
@@ -5664,77 +5721,6 @@
             "time": "2022-11-05T23:03:38+00:00"
         },
         {
-            "name": "rappasoft/laravel-livewire-tables",
-            "version": "v2.8.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/rappasoft/laravel-livewire-tables.git",
-                "reference": "e6069cd0fac4b7f8a5d492388a735a3b7351bc80"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rappasoft/laravel-livewire-tables/zipball/e6069cd0fac4b7f8a5d492388a735a3b7351bc80",
-                "reference": "e6069cd0fac4b7f8a5d492388a735a3b7351bc80",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/contracts": "^8.0|^9.0",
-                "livewire/livewire": "^2.6",
-                "php": "^7.4|^8.0",
-                "spatie/laravel-package-tools": "^1.4.3"
-            },
-            "require-dev": {
-                "ext-sqlite3": "*",
-                "orchestra/testbench": "^6.13|^7.0",
-                "phpunit/phpunit": "^9.3",
-                "spatie/laravel-ray": "^1.9"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Rappasoft\\LaravelLivewireTables\\LaravelLivewireTablesServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Rappasoft\\LaravelLivewireTables\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Anthony Rappa",
-                    "email": "rappa819@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A dynamic table component for Laravel Livewire",
-            "homepage": "https://github.com/rappasoft/laravel-livewire-tables",
-            "keywords": [
-                "datatables",
-                "laravel",
-                "livewire",
-                "rappasoft",
-                "tables"
-            ],
-            "support": {
-                "issues": "https://github.com/rappasoft/laravel-livewire-tables/issues",
-                "source": "https://github.com/rappasoft/laravel-livewire-tables/tree/v2.8.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/rappasoft",
-                    "type": "github"
-                }
-            ],
-            "time": "2022-07-25T00:44:21+00:00"
-        },
-        {
             "name": "ryangjchandler/blade-capture-directive",
             "version": "v0.2.2",
             "source": {
@@ -5817,12 +5803,12 @@
             "version": "8.4.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sabberworm/PHP-CSS-Parser.git",
+                "url": "https://github.com/MyIntervals/PHP-CSS-Parser.git",
                 "reference": "e41d2140031d533348b2192a83f02d8dd8a71d30"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabberworm/PHP-CSS-Parser/zipball/e41d2140031d533348b2192a83f02d8dd8a71d30",
+                "url": "https://api.github.com/repos/MyIntervals/PHP-CSS-Parser/zipball/e41d2140031d533348b2192a83f02d8dd8a71d30",
                 "reference": "e41d2140031d533348b2192a83f02d8dd8a71d30",
                 "shasum": ""
             },
