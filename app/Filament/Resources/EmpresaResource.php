@@ -147,29 +147,58 @@ class EmpresaResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        // Sin este eager-load, cada fila de la tabla dispara ~10 queries por
-        // separado (city.countries, sectorPrincipal, services, y las 8
-        // relaciones que toca completionPercentage()/moduleBreakdown() via
-        // recursosSubTypeStatus()/gestionSubTypeStatus()) - invisible en MySQL
-        // local (latencia ~0) pero catastrofico contra Postgres/Supabase
-        // remoto (~400ms/query): listar ~400 empresas paso de minutos a
-        // segundos. Mismo patron N+1 ya resuelto en Empresa::scopeWithCompletionData(),
-        // pero esa scope restringe columnas de forma incompatible con lo que
-        // esta tabla necesita mostrar (ej. "services.name" completo, no solo
-        // "services:id"), asi que se declara aparte en vez de reutilizarla.
+        // Medido contra Postgres/Supabase remoto (~470ms fijos por round-trip,
+        // sin importar cuantas filas trae cada query): el primer intento con
+        // ->with([...]) para las 10 relaciones bajo el N+1 por-fila, pero
+        // seguian siendo 10-12 round-trips *por pagina* (uno por relacion,
+        // no por fila) - ~7.6s para 10 filas. Aca se reduce ese numero:
+        // - city/pais/sector: eran 3 relaciones (city, city.countries,
+        //   sectorPrincipal) -> 3 round-trips. Se reemplazan por subqueries
+        //   correlacionadas (addSelect) que van dentro del MISMO query
+        //   principal (0 round-trips extra) en vez de un join real, para no
+        //   arriesgar que un join duplique filas si alguna vez alguna de
+        //   estas relaciones deja de ser 1:1.
+        // - contacts/experiences/sustainabilities: solo se usaban para un
+        //   count()>0 en completionPercentage(), nunca se muestra su
+        //   contenido en esta tabla -> withCount() los agrega como subquery
+        //   del query principal (0 round-trips extra) en vez de eager-load
+        //   aparte. Empresa::relationHasAny() lee el "*_count" resultante.
+        // - presence: solo se usaba para "!== null" -> withExists() (0
+        //   round-trips extra, atributo "presence_exists" via
+        //   Empresa::relationExists()).
+        // Quedan como eager-load real (necesitan datos de fila, no solo
+        // conteo): services (se muestra su nombre), moduleStatuses/assets/
+        // management (logica de booleans de completionPercentage()) - 4
+        // round-trips en vez de los 12 originales.
         return parent::getEloquentQuery()
             ->whereRelation('users', 'users.id', '=', Auth::User()->id)
+            ->select('empresas.*')
+            ->addSelect([
+                'joined_city_name' => DB::table('cities')
+                    ->select('city_name')
+                    ->whereColumn('cities.id', 'empresas.city_id')
+                    ->limit(1),
+            ])
+            ->addSelect([
+                'joined_country_name' => DB::table('cities')
+                    ->join('countries', 'countries.id', '=', 'cities.country_id')
+                    ->select('countries.country_name')
+                    ->whereColumn('cities.id', 'empresas.city_id')
+                    ->limit(1),
+            ])
+            ->addSelect([
+                'joined_sector_name' => DB::table('sectors')
+                    ->select('name')
+                    ->whereColumn('sectors.id', 'empresas.sector_principal_id')
+                    ->limit(1),
+            ])
+            ->withCount(['contacts', 'experiences', 'sustainabilities'])
+            ->withExists('presence')
             ->with([
-                'city.countries',
-                'sectorPrincipal',
                 'services',
                 'moduleStatuses',
                 'assets',
                 'management',
-                'contacts:id',
-                'presence',
-                'experiences:id,empresa_id',
-                'sustainabilities:id,empresa_id',
             ]);
     }
 
@@ -200,8 +229,8 @@ class EmpresaResource extends Resource
                     ->sortable()
                     ->tooltip('Indica si la empresa está activa en el sistema. Solo un administrador de la Cámara puede activarla o desactivarla.'),
                 Tables\Columns\TextColumn::make('ano_fund')->label('Año de fundación'),
-                Tables\Columns\TextColumn::make('city.city_name')->label('Ciudad'),
-                Tables\Columns\TextColumn::make('city.countries.country_name')
+                Tables\Columns\TextColumn::make('joined_city_name')->label('Ciudad'),
+                Tables\Columns\TextColumn::make('joined_country_name')
                     ->label('País')
                     ->formatStateUsing(function (?string $state): ?string {
                         if (blank($state)) {
@@ -211,8 +240,8 @@ class EmpresaResource extends Resource
                         // "VEN – Venezuela (Bolivarian Republic of)" -> "VEN"
                         return preg_match('/^[A-Za-z]{2,4}/', $state, $matches) ? $matches[0] : $state;
                     })
-                    ->tooltip(fn (Empresa $record): ?string => $record->city?->countries?->country_name),
-                Tables\Columns\TextColumn::make('sectorPrincipal.name')->label('Sector principal'),
+                    ->tooltip(fn (Empresa $record): ?string => $record->joined_country_name),
+                Tables\Columns\TextColumn::make('joined_sector_name')->label('Sector principal'),
                 Tables\Columns\TextColumn::make('services.name')
                     ->label('Servicios')
                     ->limit(40)

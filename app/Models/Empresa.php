@@ -250,6 +250,40 @@ class Empresa extends Model
      * lazy-load-y-cache si no) en vez de `$this->assets()->first()`/consultas nuevas a
      * EmpresaModuleStatus - ver nota de rendimiento en moduleBreakdown() mas abajo.
      */
+    /**
+     * Cuenta de una relacion hasMany/belongsToMany usada en moduleBreakdown() solo para saber
+     * si hay "al menos una fila". Si el caller ya trajo el conteo con withCount('relacion')
+     * (1 subquery dentro del query principal, sin round-trip aparte - ver
+     * EmpresaResource::getEloquentQuery()) lo usa directo; si no, cae al conteo sobre la
+     * coleccion eager-cargada (o la carga de una, cacheandola) - mismo resultado, un poco
+     * mas caro en round-trips.
+     */
+    private function relationHasAny(string $relation): bool
+    {
+        $countKey = $relation . '_count';
+
+        if (array_key_exists($countKey, $this->attributes)) {
+            return ((int) $this->attributes[$countKey]) > 0;
+        }
+
+        return count($this->{$relation}) > 0;
+    }
+
+    /**
+     * Igual que relationHasAny() pero para relaciones hasOne consultadas con
+     * withExists('relacion') en vez de eager-load completo.
+     */
+    private function relationExists(string $relation): bool
+    {
+        $existsKey = $relation . '_exists';
+
+        if (array_key_exists($existsKey, $this->attributes)) {
+            return (bool) $this->attributes[$existsKey];
+        }
+
+        return $this->{$relation} !== null;
+    }
+
     public function recursosSubTypeStatus(): array
     {
         $asset = $this->assets->first();
@@ -333,12 +367,12 @@ class Empresa extends Model
             ],
             'sectores' => [
                 'label' => 'Sectores y Servicios',
-                'percentage' => count($this->services) > 0 ? 100 : 0,
+                'percentage' => $this->relationHasAny('services') ? 100 : 0,
                 'detail' => null,
             ],
             'contactos' => [
                 'label' => 'Contactos',
-                'percentage' => count($this->contacts) > 0 ? 100 : 0,
+                'percentage' => $this->relationHasAny('contacts') ? 100 : 0,
                 'detail' => null,
             ],
             EmpresaModuleStatus::MODULE_RECURSOS => [
@@ -353,17 +387,17 @@ class Empresa extends Model
             ],
             EmpresaModuleStatus::MODULE_PRESENCIA => [
                 'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_PRESENCIA],
-                'percentage' => ($this->presence !== null || $naFlags[EmpresaModuleStatus::MODULE_PRESENCIA]) ? 100 : 0,
+                'percentage' => ($this->relationExists('presence') || $naFlags[EmpresaModuleStatus::MODULE_PRESENCIA]) ? 100 : 0,
                 'detail' => null,
             ],
             EmpresaModuleStatus::MODULE_EXPERIENCIAS => [
                 'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_EXPERIENCIAS],
-                'percentage' => (count($this->experiences) > 0 || $naFlags[EmpresaModuleStatus::MODULE_EXPERIENCIAS]) ? 100 : 0,
+                'percentage' => ($this->relationHasAny('experiences') || $naFlags[EmpresaModuleStatus::MODULE_EXPERIENCIAS]) ? 100 : 0,
                 'detail' => null,
             ],
             EmpresaModuleStatus::MODULE_SOSTENIBILIDAD => [
                 'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD],
-                'percentage' => (count($this->sustainabilities) > 0 || $naFlags[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD]) ? 100 : 0,
+                'percentage' => ($this->relationHasAny('sustainabilities') || $naFlags[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD]) ? 100 : 0,
                 'detail' => null,
             ],
         ];
