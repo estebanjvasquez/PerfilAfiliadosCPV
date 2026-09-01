@@ -147,7 +147,30 @@ class EmpresaResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->whereRelation('users', 'users.id', '=', Auth::User()->id);
+        // Sin este eager-load, cada fila de la tabla dispara ~10 queries por
+        // separado (city.countries, sectorPrincipal, services, y las 8
+        // relaciones que toca completionPercentage()/moduleBreakdown() via
+        // recursosSubTypeStatus()/gestionSubTypeStatus()) - invisible en MySQL
+        // local (latencia ~0) pero catastrofico contra Postgres/Supabase
+        // remoto (~400ms/query): listar ~400 empresas paso de minutos a
+        // segundos. Mismo patron N+1 ya resuelto en Empresa::scopeWithCompletionData(),
+        // pero esa scope restringe columnas de forma incompatible con lo que
+        // esta tabla necesita mostrar (ej. "services.name" completo, no solo
+        // "services:id"), asi que se declara aparte en vez de reutilizarla.
+        return parent::getEloquentQuery()
+            ->whereRelation('users', 'users.id', '=', Auth::User()->id)
+            ->with([
+                'city.countries',
+                'sectorPrincipal',
+                'services',
+                'moduleStatuses',
+                'assets',
+                'management',
+                'contacts:id',
+                'presence',
+                'experiences:id,empresa_id',
+                'sustainabilities:id,empresa_id',
+            ]);
     }
 
     public static function table(Table $table): Table
