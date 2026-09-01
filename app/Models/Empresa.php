@@ -245,11 +245,15 @@ class Empresa extends Model
     /**
      * Estado (completo/incompleto) de cada tipo de Recursos: tiene datos cargados
      * en el Asset, o fue marcado "No Aplica" a nivel de ese tipo individual.
+     *
+     * Usa `$this->assets`/`$this->moduleStatuses` (acceso a la relacion ya cargada, o
+     * lazy-load-y-cache si no) en vez de `$this->assets()->first()`/consultas nuevas a
+     * EmpresaModuleStatus - ver nota de rendimiento en moduleBreakdown() mas abajo.
      */
     public function recursosSubTypeStatus(): array
     {
-        $asset = $this->assets()->first();
-        $naFlags = EmpresaModuleStatus::subTypeFlagsFor($this->id, EmpresaModuleStatus::MODULE_RECURSOS);
+        $asset = $this->assets->first();
+        $naFlags = EmpresaModuleStatus::subTypeFlagsFromCollection($this->moduleStatuses, EmpresaModuleStatus::MODULE_RECURSOS);
 
         return [
             'employee' => ! empty($asset?->employee) || $naFlags['employee'],
@@ -266,8 +270,8 @@ class Empresa extends Model
      */
     public function gestionSubTypeStatus(): array
     {
-        $management = $this->management()->first();
-        $naFlags = EmpresaModuleStatus::subTypeFlagsFor($this->id, EmpresaModuleStatus::MODULE_GESTION);
+        $management = $this->management->first();
+        $naFlags = EmpresaModuleStatus::subTypeFlagsFromCollection($this->moduleStatuses, EmpresaModuleStatus::MODULE_GESTION);
 
         return [
             'calidad' => (bool) ($management?->iso9001 || $management?->iso17025 || $management?->quality_otros) || $naFlags['calidad'],
@@ -301,10 +305,22 @@ class Empresa extends Model
      * Detalle de completitud del perfil, un renglón por módulo/sección. Fuente
      * única de verdad para completionData()/completionPercentage() y para el
      * reporte/vista de completitud de administradores.
+     *
+     * *** Nota de rendimiento (Fase 2, verificacion de renderizado contra Postgres/Supabase) ***:
+     * este metodo dispara ~8-11 consultas por llamada si cada relacion/EmpresaModuleStatus se
+     * consulta "en frio". Eso es invisible en MySQL local (latencia <1ms por consulta), pero
+     * contra Supabase (latencia de red real, medida en ~400ms/consulta desde este entorno de
+     * desarrollo) convertia un export de las 402 empresas (CompletionExport) en ~30 minutos.
+     * Se cambio `->relacion()->metodo()` (SIEMPRE dispara una consulta nueva) por
+     * `$this->relacion` (usa la coleccion ya eager-cargada si el caller uso
+     * `Empresa::query()->withCompletionData()->get()`, o hace lazy-load-y-cachea una sola vez si
+     * no) - mismo resultado, pero de 1 consulta compartida por relacion en vez de 1 por llamada,
+     * y de 0 consultas adicionales cuando el caller eager-carga de antemano (ver
+     * scopeWithCompletionData() mas abajo, usado por CompletionExport/GerenciaMetrics).
      */
     public function moduleBreakdown(): array
     {
-        $naFlags = EmpresaModuleStatus::flagsFor($this->id);
+        $naFlags = EmpresaModuleStatus::flagsFromCollection($this->moduleStatuses);
 
         $recursosDetail = $this->recursosSubTypeStatus();
         $gestionDetail = $this->gestionSubTypeStatus();
@@ -317,12 +333,12 @@ class Empresa extends Model
             ],
             'sectores' => [
                 'label' => 'Sectores y Servicios',
-                'percentage' => $this->services()->count() > 0 ? 100 : 0,
+                'percentage' => count($this->services) > 0 ? 100 : 0,
                 'detail' => null,
             ],
             'contactos' => [
                 'label' => 'Contactos',
-                'percentage' => $this->contacts()->count() > 0 ? 100 : 0,
+                'percentage' => count($this->contacts) > 0 ? 100 : 0,
                 'detail' => null,
             ],
             EmpresaModuleStatus::MODULE_RECURSOS => [
@@ -337,20 +353,111 @@ class Empresa extends Model
             ],
             EmpresaModuleStatus::MODULE_PRESENCIA => [
                 'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_PRESENCIA],
-                'percentage' => ($this->presence()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_PRESENCIA]) ? 100 : 0,
+                'percentage' => ($this->presence !== null || $naFlags[EmpresaModuleStatus::MODULE_PRESENCIA]) ? 100 : 0,
                 'detail' => null,
             ],
             EmpresaModuleStatus::MODULE_EXPERIENCIAS => [
                 'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_EXPERIENCIAS],
-                'percentage' => ($this->experiences()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_EXPERIENCIAS]) ? 100 : 0,
+                'percentage' => (count($this->experiences) > 0 || $naFlags[EmpresaModuleStatus::MODULE_EXPERIENCIAS]) ? 100 : 0,
                 'detail' => null,
             ],
             EmpresaModuleStatus::MODULE_SOSTENIBILIDAD => [
                 'label' => EmpresaModuleStatus::MODULES[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD],
-                'percentage' => ($this->sustainabilities()->count() > 0 || $naFlags[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD]) ? 100 : 0,
+                'percentage' => (count($this->sustainabilities) > 0 || $naFlags[EmpresaModuleStatus::MODULE_SOSTENIBILIDAD]) ? 100 : 0,
                 'detail' => null,
             ],
         ];
+    }
+
+    /**
+     * Scope de conveniencia: agrega el eager-loading que moduleBreakdown() (y sus metodos
+     * privados recursosSubTypeStatus()/gestionSubTypeStatus()) necesitan para no disparar
+     * consultas nuevas fila por fila. Usar en cualquier lugar que llame moduleBreakdown()/
+     * completionPercentage()/completionData() sobre una coleccion COMPLETA de empresas (reportes,
+     * dashboards) - no hace falta para una sola empresa suelta (ManagementView, etc.), donde el
+     * lazy-load-y-cache de cada relacion ya es suficientemente barato.
+     */
+    public function scopeWithCompletionData(Builder $query): Builder
+    {
+        return $query->with([
+            'assets',
+            'management',
+            'services:id',
+            'contacts:id',
+            'presence',
+            // experiences/sustainabilities son hasMany: restringir columnas en una relacion
+            // hasMany/hasOne exige incluir la FK (empresa_id) explicitamente, si no Eloquent no
+            // puede asociar las filas cargadas a su empresa y la relacion queda vacia para TODAS
+            // (bug real encontrado al verificar: sin empresa_id aqui, moduleBreakdown() daba
+            // 'experiencias' => 0% para empresas que en realidad SI tenian experiencias).
+            'experiences:id,empresa_id',
+            'sustainabilities:id,empresa_id',
+            'moduleStatuses',
+        ]);
+    }
+
+    /**
+     * Version en bloque de principalUser()->name, para reportes que iteran TODAS las empresas
+     * (CompletionExport) - evita 1 consulta por empresa (join+whereDoesntHave+orderBy+first)
+     * reduciendolo a 2 consultas totales (ids de super_admin, y el join en bloque). Devuelve
+     * [empresa_id => nombre] solo para las empresas que SI tienen un usuario principal.
+     */
+    public static function principalUserNamesFor(iterable $empresaIds): array
+    {
+        $empresaIds = collect($empresaIds)->values()->all();
+
+        if (empty($empresaIds)) {
+            return [];
+        }
+
+        $superAdminRole = config('filament-shield.super_admin.role_name');
+        $superAdminIds = User::role($superAdminRole)->pluck('id')->all();
+
+        $rows = DB::table('empresa_user')
+            ->join('users', 'users.id', '=', 'empresa_user.user_id')
+            ->whereIn('empresa_user.empresa_id', $empresaIds)
+            ->when(! empty($superAdminIds), fn ($q) => $q->whereNotIn('users.id', $superAdminIds))
+            ->orderBy('empresa_user.empresa_id')
+            ->orderBy('empresa_user.created_at')
+            ->select('empresa_user.empresa_id', 'users.name')
+            ->get();
+
+        $names = [];
+        foreach ($rows as $row) {
+            // El primero por empresa_id, ya ordenado por antiguedad de vinculacion, es el
+            // "principal" - misma regla que principalUser() (ver docblock de ese metodo).
+            $names[$row->empresa_id] ??= $row->name;
+        }
+
+        return $names;
+    }
+
+    /**
+     * Version en bloque de count(distinctSectorIds()), para reportes que iteran TODAS las
+     * empresas (SectorsExport) - evita 1 consulta por empresa. Devuelve [empresa_id => cantidad],
+     * con 0 para las empresas sin ningun sector vinculado (no aparecen en el resultado del join).
+     */
+    public static function distinctSectorCountsFor(iterable $empresaIds): array
+    {
+        $empresaIds = collect($empresaIds)->values()->all();
+
+        if (empty($empresaIds)) {
+            return [];
+        }
+
+        $rows = DB::table('empresa_sector_service')
+            ->join('services', 'services.id', '=', 'empresa_sector_service.service_id')
+            ->whereIn('empresa_sector_service.empresa_id', $empresaIds)
+            ->select('empresa_sector_service.empresa_id', 'services.sectors_id')
+            ->distinct()
+            ->get();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[$row->empresa_id] = ($counts[$row->empresa_id] ?? 0) + 1;
+        }
+
+        return $counts;
     }
 
     /**

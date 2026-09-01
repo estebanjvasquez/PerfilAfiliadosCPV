@@ -78,7 +78,7 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
 
     protected function getTableQuery(): Builder
     {
-        return Empresa::query();
+        return Empresa::query()->withCompletionData();
     }
 
     protected function getTableRecordUrlUsing(): ?Closure

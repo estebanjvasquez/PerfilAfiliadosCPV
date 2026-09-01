@@ -60,7 +60,9 @@ class GerenciaMetrics
      */
     public static function resumen(array $filters): array
     {
-        $empresas = static::baseQuery($filters)->get();
+        // withCompletionData() evita el N+1 de completionPercentage()/assets() sobre TODAS las
+        // empresas del dashboard - ver la nota de rendimiento en Empresa::moduleBreakdown().
+        $empresas = static::baseQuery($filters)->withCompletionData()->get();
         $total = $empresas->count();
 
         $completitudPromedio = $total > 0
@@ -73,7 +75,7 @@ class GerenciaMetrics
         $frescura = $total > 0 ? (int) round(100 * $frescos / $total) : 0;
 
         $sedes = $empresas->filter(function (Empresa $e) {
-            $asset = $e->assets()->first();
+            $asset = $e->assets->first();
 
             return ! empty($asset?->facility);
         })->count();
@@ -98,7 +100,7 @@ class GerenciaMetrics
     {
         $buckets = ['< 50%' => 0, '50% - 89%' => 0, '90% - 100%' => 0];
 
-        foreach (static::baseQuery($filters)->get() as $empresa) {
+        foreach (static::baseQuery($filters)->withCompletionData()->get() as $empresa) {
             $percentage = $empresa->completionPercentage();
 
             if ($percentage < 50) {

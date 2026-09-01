@@ -15,19 +15,27 @@ class SectorsExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
 {
     use Exportable;
 
+    /**
+     * Rendimiento (mismo hallazgo que CompletionExport): distinctSectorIds() dispara 1 consulta
+     * por empresa; con distinctSectorCountsFor() se calcula para las 402 empresas en 1 sola
+     * consulta agrupada en PHP, en vez de 402 - critico contra Supabase (latencia de red real).
+     */
     public function collection()
     {
-        return Empresa::query()
+        $empresas = Empresa::query()
             ->with(['sectorPrincipal', 'sectorSecundario'])
             ->orderBy('name')
-            ->get()
-            ->map(fn (Empresa $empresa) => [
-                $empresa->id,
-                $empresa->name,
-                $empresa->sectorPrincipal?->name ?? 'Sin configurar',
-                $empresa->sectorSecundario?->name ?? 'Sin configurar',
-                count($empresa->distinctSectorIds()),
-            ]);
+            ->get();
+
+        $sectorCounts = Empresa::distinctSectorCountsFor($empresas->pluck('id'));
+
+        return $empresas->map(fn (Empresa $empresa) => [
+            $empresa->id,
+            $empresa->name,
+            $empresa->sectorPrincipal?->name ?? 'Sin configurar',
+            $empresa->sectorSecundario?->name ?? 'Sin configurar',
+            $sectorCounts[$empresa->id] ?? 0,
+        ]);
     }
 
     public function headings(): array

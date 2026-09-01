@@ -20,18 +20,29 @@ class CompletionExport implements FromCollection, ShouldAutoSize, WithHeadings, 
      * A diferencia de los demas Export (que leen de una vista SQL ya armada),
      * el % de completitud se calcula en PHP por empresa via
      * Empresa::moduleBreakdown() — ver app/Models/Empresa.php.
+     *
+     * Rendimiento (hallazgo de Fase 2): sin `withCompletionData()` + el mapa de
+     * `principalUserNamesFor()`, este export dispara ~12 consultas por empresa (una por cada
+     * relacion que moduleBreakdown() toca sin eager-load, mas principalUser()) - invisible en
+     * MySQL local, pero ~30 minutos contra Supabase por la latencia de red real medida (~400ms
+     * por consulta desde este entorno). Con el eager-load + el mapa en bloque, el export entero
+     * pasa a un puñado de consultas totales en vez de ~4800 (402 empresas x ~12).
      */
     public function collection()
     {
-        return Empresa::query()->orderBy('name')->get()->map(function (Empresa $empresa) {
+        $empresas = Empresa::query()->withCompletionData()->orderBy('name')->get();
+        $principalUserNames = Empresa::principalUserNamesFor($empresas->pluck('id'));
+
+        return $empresas->map(function (Empresa $empresa) use ($principalUserNames) {
             $breakdown = $empresa->moduleBreakdown();
+            $totalPercentage = (int) round(collect($breakdown)->avg('percentage'));
 
             return array_merge(
                 [
                     $empresa->id,
                     $empresa->name,
-                    $empresa->principalUser()?->name ?? 'Sin usuario asignado',
-                    $empresa->completionPercentage(),
+                    $principalUserNames[$empresa->id] ?? 'Sin usuario asignado',
+                    $totalPercentage,
                 ],
                 array_column($breakdown, 'percentage')
             );
