@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\EmpresaResource\Pages;
 
 use App\Filament\Resources\EmpresaResource;
-use App\Filament\Resources\EmpresaResource\Widgets\StatsOverview;
 use Filament\Resources\Pages\ListRecords;
 use App\Models\Empresa;
 use App\Models\empresa_user;
@@ -26,11 +25,10 @@ class ListEmpresas extends ListRecords implements HasTable
     // en Filament\Tables\Concerns\CanPaginateRecords (v3).
     protected int | string | null $defaultTableRecordsPerPageSelectOption = 5;
 
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            StatsOverview::class,
-            //CustomerResource\Widgets\CustomerOverview::class,
-        ];
-    }
+    // StatsOverview (el aviso legal "La Camara Petrolera de Venezuela no se hace responsable...")
+    // se removio de aca: ya esta registrado panel-wide en AdminPanelProvider y se mostraba
+    // duplicado en Escritorio + Empresas. Queda solo en Escritorio, que es donde corresponde.
+    // Ademas de la duplicacion visual, cada carga de esta pagina disparaba 2 queries propias del
+    // widget (Empresa::whereRelation(...)->count() y Empresa::count()) contra Supabase sin
+    // necesidad, ya que ninguna de las dos alimenta el texto que se muestra.
 }
