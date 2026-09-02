@@ -109,14 +109,27 @@ php artisan config:clear
 ```powershell
 php artisan filament:assets
 php artisan optimize:clear
-php artisan migrate --force              # deberia mostrar "Nothing to migrate" (ya esta todo aplicado, ver seccion B)
-php artisan migrate:status                # confirmar visualmente
+php artisan db:skip-mysql-only-view-migrations   # ver nota abajo, correr ANTES de migrate
+php artisan migrate --force                       # deberia mostrar "Nothing to migrate"
+php artisan migrate:status                        # confirmar visualmente
 php artisan empresas:refresh-completion   # backfill/reconciliacion, seguro repetirlo
 php artisan shield:generate --all --panel=admin --ignore-existing-policies --no-interaction
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 ```
+
+> **Nota real encontrada en este despliegue**: la primera vez que se corrio `migrate --force` contra
+> pgsql (sin el paso `db:skip-mysql-only-view-migrations`), explotó en
+> `2022_10_19_213831_create_catalogo_view` con `SQLSTATE[42601] syntax error ... SEPARATOR` —
+> `GROUP_CONCAT(...SEPARATOR...)` es sintaxis exclusiva de MySQL (Postgres usa `STRING_AGG`). Las 13
+> vistas reales ya existen en Supabase (creadas por `feature/supplhi-postgres-buscador`, confirmado
+> con `information_schema.views`), pero Laravel las seguía viendo "Pending" para siempre en pgsql.
+> Se agregó el comando `db:skip-mysql-only-view-migrations` (commit `808410d`, mismo patrón que
+> `SkipVendorPgsqlOnlyMigrations` de la otra rama pero en sentido inverso) que las marca como ya
+> corridas — correrlo **una vez por cada base pgsql nueva** (test, producción) **antes** de
+> `migrate --force`, si no cualquier migración futura fechada después de esas 14 va a fallar en el
+> mismo punto antes de llegar a la nueva.
 
 ## Verificación post-despliegue (servidor de pruebas)
 
