@@ -78,7 +78,12 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
 
     protected function getTableQuery(): Builder
     {
-        return Empresa::query();
+        // Sin esto, cada fila dispara ~8 queries lazy (una por relacion que usa
+        // moduleBreakdown(): services, contacts, assets, management, moduleStatuses, presence,
+        // experiences, sustainabilities) en vez de 1 query compartida por relacion para toda la
+        // pagina - con latencia real de red (Supabase) esto llegaba a timeout/500 en esta
+        // pantalla. Mismo scope ya usado por RefreshCompletionPercentages y GerenciaMetrics.
+        return Empresa::query()->withCompletionData();
     }
 
     protected function getTableRecordUrlUsing(): ?Closure

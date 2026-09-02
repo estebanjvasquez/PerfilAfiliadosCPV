@@ -23,7 +23,13 @@ class CompletionExport implements FromCollection, ShouldAutoSize, WithHeadings, 
      */
     public function collection()
     {
-        return Empresa::query()->orderBy('name')->get()->map(function (Empresa $empresa) {
+        // withCompletionData() eager-carga lo que necesita moduleBreakdown()/
+        // completionPercentage() - sin esto, cada empresa exportada dispara ~8 queries lazy
+        // propias (mismo problema que en CompletionView.php y GerenciaMetrics::baseQuery()).
+        // principalUser() sigue siendo 1 query por empresa (hace su propia consulta
+        // personalizada sobre la relacion, no es cacheable por eager-load simple) - queda como
+        // mejora pendiente, menor que el x8 que se resuelve aca.
+        return Empresa::query()->withCompletionData()->orderBy('name')->get()->map(function (Empresa $empresa) {
             $breakdown = $empresa->moduleBreakdown();
 
             return array_merge(

@@ -31,7 +31,12 @@ class GerenciaMetrics
 
     public static function baseQuery(array $filters): Builder
     {
-        $query = Empresa::query();
+        // withCompletionData() eager-carga lo que necesita completionPercentage()/
+        // moduleBreakdown() (llamados en bucle sobre TODAS las empresas activas en varios
+        // metodos de esta clase, sin paginacion) - sin esto, cada empresa dispara ~8 queries
+        // lazy propias; con cientos de empresas y latencia real de red (Supabase) esto
+        // colapsaba el Tablero Gerencial completo.
+        $query = Empresa::query()->withCompletionData();
 
         if (empty($filters['include_inactive'])) {
             $query->where('status_id', 1);
@@ -73,7 +78,11 @@ class GerenciaMetrics
         $frescura = $total > 0 ? (int) round(100 * $frescos / $total) : 0;
 
         $sedes = $empresas->filter(function (Empresa $e) {
-            $asset = $e->assets()->first();
+            // $e->assets (propiedad, sin parentesis) usa la coleccion ya eager-cargada por
+            // withCompletionData() - $e->assets() (metodo) dispara SIEMPRE una consulta nueva,
+            // incluso con la relacion ya eager-cargada. Con cientos de empresas esto era una
+            // query nueva por cada una a pesar del eager-load.
+            $asset = $e->assets->first();
 
             return ! empty($asset?->facility);
         })->count();
@@ -298,7 +307,10 @@ class GerenciaMetrics
         $counts = array_fill_keys(array_keys($subTypes), 0);
 
         foreach ($empresas as $empresa) {
-            $asset = $empresa->assets()->first();
+            // $empresa->assets (propiedad) usa la coleccion eager-cargada por
+            // withCompletionData() - ->assets() (metodo) dispara una consulta nueva por
+            // empresa a pesar del eager-load, ver mismo fix en resumen() mas arriba.
+            $asset = $empresa->assets->first();
 
             foreach ($counts as $key => $count) {
                 if (! empty($asset?->{$key})) {
@@ -372,9 +384,16 @@ class GerenciaMetrics
     {
         $desde = now()->startOfMonth()->subMonths($months - 1);
 
-        $rows = static::baseQuery($filters)
-            ->where('created_at', '>=', $desde)
-            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as ym"), DB::raw('count(*) as total'))
+        $query = static::baseQuery($filters)->where('created_at', '>=', $desde);
+
+        // DATE_FORMAT() es exclusivo de MySQL - Postgres usa TO_CHAR() con su propia mascara de
+        // formato. Encontrado al desplegar contra Supabase: SQLSTATE[42883] Undefined function.
+        $ymExpression = $query->getConnection()->getDriverName() === 'pgsql'
+            ? "TO_CHAR(created_at, 'YYYY-MM')"
+            : "DATE_FORMAT(created_at, '%Y-%m')";
+
+        $rows = $query
+            ->select(DB::raw("{$ymExpression} as ym"), DB::raw('count(*) as total'))
             ->groupBy('ym')
             ->pluck('total', 'ym');
 
