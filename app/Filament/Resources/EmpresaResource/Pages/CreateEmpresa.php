@@ -56,8 +56,8 @@ class CreateEmpresa extends CreateRecord
                             ->options($value->getFullCity()->pluck('full_location', 'id'))
                             ->searchable()
 
-                    ])->columns(3),
-                ])->columns(3),
+                    ])->columns(['default' => 1, 'md' => 3]),
+                ])->columns(['default' => 1, 'md' => 3]),
             Wizard\Step::make('2 - Datos de contacto')
                 ->schema([
                     Fieldset::make('Redes sociales')->schema([
@@ -68,7 +68,7 @@ class CreateEmpresa extends CreateRecord
                         Forms\Components\TextInput::make('facebook_profile')->mask('@********************'),
                         Forms\Components\TextInput::make('youtube_profile')->mask('@********************'),
                         Forms\Components\TextInput::make('otros_profile'),
-                    ])->columns(3),
+                    ])->columns(['default' => 1, 'md' => 3]),
                 ]),
             Wizard\Step::make('3 - Operaciones')
                 ->schema([
@@ -87,7 +87,7 @@ class CreateEmpresa extends CreateRecord
                             ->placeholder('Por favor seleccione una opción')
                             ->different('sector_principal_id')
                             ->helperText('Solo podrá asociar servicios de los sectores aquí seleccionados.'),
-                    ])->columns(2),
+                    ])->columns(['default' => 1, 'md' => 2]),
                     Fieldset::make('Operaciones en Venezuela')->schema([
                         Forms\Components\Select::make('billing_id')
                             ->options([
@@ -114,7 +114,7 @@ class CreateEmpresa extends CreateRecord
                             ])->label('Estatus actual')
                             ->default('1')
                             ->required(),
-                    ])->columns(3),
+                    ])->columns(['default' => 1, 'md' => 3]),
                     Fieldset::make('Capital de la empresa')->schema([
                         Forms\Components\Select::make('property_id')
                             ->options([
@@ -142,7 +142,7 @@ class CreateEmpresa extends CreateRecord
                             Select::make('country_id')->relationship('country', 'country_name')->label('País'),
                         ])->label('Principales clientes en los últimos 15 años:')
                         ->createItemButtonLabel('Añadir cliente')
-                        ->columns(2)
+                        ->columns(['default' => 1, 'md' => 2])
                         ->orderable(false)
                     //->defaultItems(3)
                 ])->columns(1),

@@ -118,8 +118,8 @@ class EditEmpresa extends EditRecord
 
 
 
-                    ])->columns(3),
-                ])->columns(3)->id('uno'),
+                    ])->columns(['default' => 1, 'md' => 3]),
+                ])->columns(['default' => 1, 'md' => 3])->id('uno'),
             Forms\Components\Wizard\Step::make('2 - Datos de contacto')
                 ->schema([
                     Fieldset::make('Redes sociales')->schema([
@@ -136,7 +136,7 @@ class EditEmpresa extends EditRecord
                             ->label('Youtube'),
 
                         Forms\Components\TextInput::make('otros_profile')->label('Otros'),
-                    ])->columns(3)->id('dos'),
+                    ])->columns(['default' => 1, 'md' => 3])->id('dos'),
                     //Fieldset::make('Persona Contacto')->schema([]),
                 ]),
             Forms\Components\Wizard\Step::make('3 - Operaciones')
@@ -160,7 +160,7 @@ class EditEmpresa extends EditRecord
                             ->placeholder('Por favor seleccione una opción')
                             ->different('sector_principal_id')
                             ->helperText('Solo podrá asociar servicios de los sectores aquí seleccionados.'),
-                    ])->columns(2),
+                    ])->columns(['default' => 1, 'md' => 2]),
                     Fieldset::make('Operaciones en Venezuela')->schema([
                         Forms\Components\Select::make('billing_id')
                             ->options([
@@ -185,7 +185,7 @@ class EditEmpresa extends EditRecord
                             ])->label('Estatus actual')
                             ->default('1')
                             ->required(),
-                    ])->columns(3),
+                    ])->columns(['default' => 1, 'md' => 3]),
                     Fieldset::make('Capital de la empresa')->schema([
                         Forms\Components\Select::make('property_id')
                             ->options([
@@ -213,7 +213,7 @@ class EditEmpresa extends EditRecord
                             //Select::make('city_id')->relationship('city', 'city_name')->required(),
                         ])->label('Principales clientes en los últimos 15 años:')
                         ->createItemButtonLabel('Añadir cliente')
-                        ->columns(2)
+                        ->columns(['default' => 1, 'md' => 2])
                         ->orderable(false)
                     //->defaultItems(3)
                 ])->columns(1),

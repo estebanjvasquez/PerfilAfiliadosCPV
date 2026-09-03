@@ -6,6 +6,8 @@ use App\Filament\Pages\Login;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Filament\Pages\Register;
 use App\Filament\Resources\EmpresaResource;
+use Filament\Support\Assets\Css;
+use Filament\Support\Facades\FilamentAsset;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -57,6 +59,12 @@ class AdminPanelProvider extends PanelProvider
     public function boot(): void
     {
         Table::configureUsing(fn (Table $table) => $table->deferLoading());
+
+        // Ver public/css/filament/custom/panel.css: fix puntual del Select de una sola opcion
+        // con etiquetas largas (Ciudad) que se rompe visualmente en mobile.
+        FilamentAsset::register([
+            Css::make('panel-custom', public_path('css/filament/custom/panel.css')),
+        ]);
     }
 
     public function panel(Panel $panel): Panel

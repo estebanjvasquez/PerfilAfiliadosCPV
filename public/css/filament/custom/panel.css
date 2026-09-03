@@ -1,0 +1,22 @@
+/*
+ * CSS custom del panel de admin (registrado via FilamentAsset en AdminPanelProvider).
+ * Cada regla documenta el bug real que corrige - no tocar sin revisar el porque.
+ */
+
+/*
+ * Bug: Select (Choices.js) de una sola opcion con etiquetas muy largas (ej. Ciudad:
+ * "CARACAS, VEN - Venezuela (Bolivarian Republic of)") envuelve el texto a varias lineas,
+ * pero el boton de limpiar (.choices__button) esta posicionado 'absolute; top: 50%' en
+ * vendor/filament/forms/resources/css/components/select.css, asumiendo una sola linea -
+ * termina flotando en medio del texto envuelto (encontrado en vivo en mobile, ver captura
+ * de /admin > Empresas > Editar > Datos generales > Ciudad).
+ * Fix: truncar con ellipsis en vez de envolver, para que el alto del contenedor siempre
+ * corresponda a una sola linea (mismo supuesto que usa el boton para posicionarse).
+ */
+.choices[data-type*='select-one'] .choices__list--single .choices__item {
+    display: block;
+    max-width: calc(100% - 2.5rem);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
