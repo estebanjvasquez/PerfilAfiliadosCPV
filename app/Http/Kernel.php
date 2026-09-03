@@ -14,10 +14,6 @@ class Kernel extends HttpKernel
      * @var array<int, class-string|string>
      */
     protected $middleware = [
-        // DIAGNOSTICO TEMPORAL - eliminar tras resolver el 403 intermitente en /admin.
-        // Va primero para capturar la peticion cruda antes de que cualquier otro
-        // middleware (TrustProxies, maintenance, etc.) pueda intervenir.
-        \App\Http\Middleware\LogAdminAccessDiag::class,
         // \App\Http\Middleware\TrustHosts::class,
         \App\Http\Middleware\TrustProxies::class,
         \Illuminate\Http\Middleware\HandleCors::class,

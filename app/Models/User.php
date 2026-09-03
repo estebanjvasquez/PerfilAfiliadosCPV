@@ -9,9 +9,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\DB;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
     /**
@@ -36,6 +38,19 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return $this->belongsToMany(Empresa::class, 'empresa_user');
         // ->wherePivot('empresa_id', 5);
+    }
+
+    /**
+     * Filament v3 exige implementar FilamentUser::canAccessPanel(); sin esto, el panel
+     * solo se permite cuando APP_ENV=local (salvaguarda propia de Filament para no dejar
+     * un panel sin autorizacion explicita en un entorno real) - por eso cualquier usuario
+     * autenticado recibia 403 en staging/produccion pese a loguear bien. Esto no existia
+     * en Filament v2 (todo usuario autenticado podia entrar); se mantiene ese mismo
+     * comportamiento aqui para no cambiar reglas de acceso como parte del upgrade.
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
     }
 
     public function users()
