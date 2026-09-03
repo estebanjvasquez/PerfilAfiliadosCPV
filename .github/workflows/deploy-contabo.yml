@@ -18,18 +18,28 @@ jobs:
           host: ${{ secrets.CONTABO_HOST }}
           username: ${{ secrets.CONTABO_USER }}
           key: ${{ secrets.CONTABO_SSH_KEY }}
+          # El VPS de Contabo tiene I/O de disco con latencia alta (confirmado con vmstat: ~25%
+          # wait, CPU casi libre) — cada `docker compose run` arranca un contenedor nuevo y ese
+          # boot de Laravel por sí solo tarda ~28s ahí (normal es <1s). Con 6-8 `run` separados
+          # más el build sin cache, el comando entero supera fácil los 10 minutos. Por eso: un
+          # solo `run` encadenado para todos los artisan (un solo boot, no seis) y timeout amplio.
+          command_timeout: 20m
           script: |
             set -e
             cd /opt/perfilafiliados
             git fetch origin
             git reset --hard origin/feature/upgrade-filament-v3
             docker compose build app
-            docker compose run --rm app php artisan down || true
-            docker compose run --rm app composer install --no-dev --prefer-dist --optimize-autoloader
-            docker compose run --rm app php artisan db:skip-mysql-only-view-migrations
-            docker compose run --rm app php artisan migrate --force
-            docker compose run --rm app php artisan filament:assets
-            docker compose run --rm app php artisan config:cache
-            docker compose run --rm app php artisan view:cache
+            # composer install ya corrió dentro del build (Dockerfile) - no hace falta repetirlo
+            # acá, cada `docker compose run` extra cuesta ~28s+ de boot en este disco.
+            docker compose run --rm app sh -c '
+              set -e
+              php artisan down || true
+              php artisan db:skip-mysql-only-view-migrations
+              php artisan migrate --force
+              php artisan filament:assets
+              php artisan config:cache
+              php artisan view:cache
+            '
             docker compose up -d
-            docker compose run --rm app php artisan up
+            docker compose exec -T app php artisan up
