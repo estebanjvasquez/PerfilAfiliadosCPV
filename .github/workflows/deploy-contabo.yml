@@ -1,0 +1,35 @@
+name: Deploy a Contabo
+
+# Dispara en push a la rama de despliegue. Cambiar 'feature/upgrade-filament-v3' por la rama
+# definitiva cuando se decida (ver docs/arquitectura_final_contabo_cloudflare.md).
+on:
+  push:
+    branches:
+      - feature/upgrade-filament-v3
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy por SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.CONTABO_HOST }}
+          username: ${{ secrets.CONTABO_USER }}
+          key: ${{ secrets.CONTABO_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/perfilafiliados
+            git fetch origin
+            git reset --hard origin/feature/upgrade-filament-v3
+            docker compose build app
+            docker compose run --rm app php artisan down || true
+            docker compose run --rm app composer install --no-dev --prefer-dist --optimize-autoloader
+            docker compose run --rm app php artisan db:skip-mysql-only-view-migrations
+            docker compose run --rm app php artisan migrate --force
+            docker compose run --rm app php artisan filament:assets
+            docker compose run --rm app php artisan config:cache
+            docker compose run --rm app php artisan view:cache
+            docker compose up -d
+            docker compose run --rm app php artisan up

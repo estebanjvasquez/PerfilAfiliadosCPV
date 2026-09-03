@@ -1,0 +1,25 @@
+# Entorno de pruebas/producción en Contabo. La base de datos NO corre acá (es Supabase, externo) -
+# este compose solo levanta la app en sí. Ver docs/arquitectura_final_contabo_cloudflare.md.
+#
+# cloudflared (Cloudflare Tunnel) corre como su propio servicio systemd en el host, no acá - así
+# sobrevive independientemente de si se reinicia el stack de la app.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+
+  nginx:
+    image: nginx:stable-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./public:/var/www/html/public:ro
