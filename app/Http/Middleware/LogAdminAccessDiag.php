@@ -37,9 +37,33 @@ class LogAdminAccessDiag
         $response = $next($request);
 
         if ($isAdmin) {
+            $sessionData = null;
+            $authInfo = null;
+            try {
+                if ($request->hasSession()) {
+                    $sessionData = $request->session()->all();
+                }
+                $authInfo = [
+                    'check' => auth()->check(),
+                    'id' => auth()->id(),
+                    'guard_default' => config('auth.defaults.guard'),
+                ];
+            } catch (\Throwable $e) {
+                $authInfo = ['error' => get_class($e) . ': ' . $e->getMessage()];
+            }
+
             Log::info('DIAG_ADMIN_RESPONSE', [
                 'path' => $request->path(),
                 'status' => $response->getStatusCode(),
+                'session' => $sessionData,
+                'auth' => $authInfo,
+                'exception' => $response->exception ? [
+                    'class' => get_class($response->exception),
+                    'message' => $response->exception->getMessage(),
+                    'file' => $response->exception->getFile(),
+                    'line' => $response->exception->getLine(),
+                    'trace' => collect($response->exception->getTrace())->take(15)->map(fn ($t) => ($t['class'] ?? '') . ($t['type'] ?? '') . ($t['function'] ?? '') . ' @ ' . ($t['file'] ?? '') . ':' . ($t['line'] ?? ''))->all(),
+                ] : null,
             ]);
         }
 
