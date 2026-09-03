@@ -12,6 +12,12 @@ services:
     volumes:
       - ./storage:/var/www/html/storage
       - ./bootstrap/cache:/var/www/html/bootstrap/cache
+      # Sin esto, `php artisan filament:assets` (que corre en un contenedor `docker compose run
+      # --rm`, efimero) escribe css/js publicados en el filesystem del CONTENEDOR, no del host -
+      # se destruyen al salir el contenedor. nginx sirve ./public del HOST (abajo, :ro) y nunca
+      # veia esos archivos: panel de Filament sin ningun estilo/JS (encontrado en vivo: /admin
+      # cargaba pero completamente roto visualmente, 404 en /css|js/filament/**).
+      - ./public:/var/www/html/public
 
   nginx:
     image: nginx:stable-alpine
