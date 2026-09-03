@@ -48,4 +48,9 @@ jobs:
               php artisan view:cache
             '
             docker compose up -d
+            # docker/nginx/default.conf esta bind-mounted (no forma parte de la imagen), asi que
+            # `docker compose up -d` no reinicia nginx solo porque el archivo cambio en disco -
+            # nginx no relee su config solo. Reload explicito y sin downtime (encontrado en vivo:
+            # un cambio a ese archivo no se aplicaba hasta reiniciar el contenedor a mano).
+            docker compose exec -T nginx nginx -s reload
             docker compose exec -T app php artisan up
