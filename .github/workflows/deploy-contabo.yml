@@ -29,6 +29,12 @@ jobs:
             cd /opt/perfilafiliados
             git fetch origin
             git reset --hard origin/feature/upgrade-filament-v3
+            # storage/ es un bind mount del host (docker-compose.yml) - el `git reset --hard`
+            # de arriba corre como root vía SSH y deja los archivos root:root. El Dockerfile hace
+            # chown a www-data, pero eso queda tapado en runtime por el bind mount. Sin esto,
+            # PHP-FPM (corre como www-data, uid 33) no puede escribir logs/cache/sesiones y cada
+            # request termina en 500 genérico (encontrado y diagnosticado en vivo en esta sesión).
+            chown -R 33:33 storage bootstrap/cache
             docker compose build app
             # composer install ya corrió dentro del build (Dockerfile) - no hace falta repetirlo
             # acá, cada `docker compose run` extra cuesta ~28s+ de boot en este disco.
