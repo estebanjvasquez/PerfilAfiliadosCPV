@@ -26,13 +26,13 @@
       rel="stylesheet"
     />
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../public/css/style.css?v=3" />
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=3" />
   </head>
   <body>
     <main>
       <picture class="logo">
         <img
-          src="../public/images/Campet-Logo.png"
+          src="{{ asset('images/Campet-Logo.png') }}"
           alt="Logo de la Camara Petrolera de Venezuela"
         />
       </picture>
@@ -40,7 +40,7 @@
         <div class="even-columns">
           <figure class="articulo-imagen">
             <img
-              src="../public/images/Perfil-Afiliados.png"
+              src="{{ asset('images/Perfil-Afiliados.png') }}"
               alt="Perfil de Afiliados a la Camara Petrolera de Venezuela"
             />
           </figure>
@@ -54,12 +54,12 @@
               negocios. Para formar parte haz clic aquí
             </p>
             <div class="cta-group">
-              <a class="link-btn" href="https://camarapetrolera.app/admin/login"
+              <a class="link-btn" href="{{ route('filament.admin.auth.login') }}"
                 >Pulse para acceder a su perfil</a
               >
               <a
                 class="link-btn"
-                href="https://camarapetrolera.app/admin/register"
+                href="{{ route('filament.admin.auth.register') }}"
                 >Regístrate aquí</a
               >
             </div>
