@@ -20,3 +20,24 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+/*
+ * Bug: en tablas con varios headerActions (ej. RelationManager de "Sistemas de gestion", que
+ * tiene 8: CompletionBadge + NoAplicaAction + 6 botones de sector), Filament v3 pone al
+ * contenedor de acciones (.fi-ta-actions) con "shrink-0" (flex-shrink: 0) dentro de la fila del
+ * header (.fi-ta-header, que desde 'sm' es flex-row con la etiqueta de la tabla). Un item con
+ * shrink-0 nunca se achica, asi que aunque .fi-ta-actions ya trae su propia clase flex-wrap,
+ * esta nunca llega a activarse: el flex-row del header prefiere desbordar el contenedor (sin
+ * scroll, sin salto de linea) antes que reducirle el ancho a las acciones. Confirmado en vivo
+ * con DevTools (ver captura en /admin > Empresas > Editar > Sistemas de gestion, ventana angosta:
+ * los botones se cortaban en seco contra el borde de la tarjeta, sin ninguna forma de llegar a
+ * los que faltaban).
+ * Fix: dejar que el contenedor de acciones SI se achique (quitando el flex-shrink:0 y el
+ * min-width:auto implicito de todo flex item) para que su propio flex-wrap haga lo suyo y baje
+ * los botones que no entran a una segunda linea, en vez de desbordar. Acotado a .fi-ta-header
+ * (headerActions) para no tocar las acciones por fila de cada registro, que son otro patron.
+ */
+.fi-ta-header .fi-ta-actions {
+    flex-shrink: 1;
+    min-width: 0;
+}
