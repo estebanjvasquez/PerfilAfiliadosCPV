@@ -26,17 +26,21 @@ class CompletionExport implements FromCollection, ShouldAutoSize, WithHeadings, 
         // withCompletionData() eager-carga lo que necesita moduleBreakdown()/
         // completionPercentage() - sin esto, cada empresa exportada dispara ~8 queries lazy
         // propias (mismo problema que en CompletionView.php y GerenciaMetrics::baseQuery()).
-        // principalUser() sigue siendo 1 query por empresa (hace su propia consulta
-        // personalizada sobre la relacion, no es cacheable por eager-load simple) - queda como
-        // mejora pendiente, menor que el x8 que se resuelve aca.
-        return Empresa::query()->withCompletionData()->orderBy('name')->get()->map(function (Empresa $empresa) {
+        $empresas = Empresa::query()->withCompletionData()->orderBy('name')->get();
+
+        // Contacto principal (pedido del cliente, reemplaza al viejo "Usuario principal"
+        // inferido por antiguedad de vinculacion - ver Empresa::principalContactNamesFor()):
+        // 1 sola consulta en bloque para TODAS las empresas exportadas, no 1 por fila.
+        $principalContacts = Empresa::principalContactNamesFor($empresas->pluck('id'));
+
+        return $empresas->map(function (Empresa $empresa) use ($principalContacts) {
             $breakdown = $empresa->moduleBreakdown();
 
             return array_merge(
                 [
                     $empresa->id,
                     $empresa->name,
-                    $empresa->principalUser()?->name ?? 'Sin usuario asignado',
+                    $principalContacts[$empresa->id] ?? 'Falta por asignar',
                     $empresa->completionPercentage(),
                 ],
                 array_column($breakdown, 'percentage')
@@ -49,7 +53,7 @@ class CompletionExport implements FromCollection, ShouldAutoSize, WithHeadings, 
         return [
             'ID',
             'Nombre',
-            'Usuario principal',
+            'Contacto principal',
             '% Total',
             'Datos generales',
             'Sectores y servicios',

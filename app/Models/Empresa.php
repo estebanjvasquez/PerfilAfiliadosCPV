@@ -494,6 +494,30 @@ class Empresa extends Model
     }
 
     /**
+     * Version en bloque de principalContact()->name, para reportes que iteran TODAS las empresas
+     * (CompletionView/CompletionExport) - evita 1 consulta por empresa. A diferencia de
+     * principalUserNamesFor(), no hace falta ordenar/quedarse con el primero: is_principal
+     * garantiza a lo sumo un contacto marcado por empresa (ver setPrincipalContact()), asi que
+     * el join da directo 0 o 1 fila por empresa_id. Devuelve [empresa_id => nombre] solo para
+     * las empresas que YA tienen un contacto marcado como principal.
+     */
+    public static function principalContactNamesFor(iterable $empresaIds): array
+    {
+        $empresaIds = collect($empresaIds)->values()->all();
+
+        if (empty($empresaIds)) {
+            return [];
+        }
+
+        return DB::table('contact_empresa')
+            ->join('contacts', 'contacts.id', '=', 'contact_empresa.contact_id')
+            ->whereIn('contact_empresa.empresa_id', $empresaIds)
+            ->where('contact_empresa.is_principal', true)
+            ->pluck('contacts.name', 'contact_empresa.empresa_id')
+            ->all();
+    }
+
+    /**
      * Version en bloque de count(distinctSectorIds()), para reportes que iteran TODAS las
      * empresas (SectorsExport) - evita 1 consulta por empresa. Devuelve [empresa_id => cantidad],
      * con 0 para las empresas sin ningun sector vinculado (no aparecen en el resultado del join).

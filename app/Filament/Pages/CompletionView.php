@@ -59,6 +59,25 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
     }
 
     /**
+     * [empresa_id => nombre del contacto principal], cargado en bloque (1 sola consulta) la
+     * primera vez que se pide, con los ids de TODA la pagina actual - null significa "todavia
+     * no se cargo", no "esta vacio" (evita repetir la consulta si en esta pagina no hay ningun
+     * contacto principal marcado, caso valido y probable mientras el cliente va migrando).
+     */
+    protected ?array $principalContactCache = null;
+
+    protected function principalContactNameFor(Empresa $empresa): ?string
+    {
+        if ($this->principalContactCache === null) {
+            $this->principalContactCache = Empresa::principalContactNamesFor(
+                $this->getTableRecords()->pluck('id')
+            );
+        }
+
+        return $this->principalContactCache[$empresa->id] ?? null;
+    }
+
+    /**
      * Misma formula que Empresa::completionPercentage(), pero reutilizando el
      * breakdown ya memoizado en breakdownFor() en vez de recalcularlo.
      */
@@ -99,13 +118,15 @@ class CompletionView extends Page implements Tables\Contracts\HasTable
                 ->searchable()
                 ->sortable(),
 
-            Tables\Columns\TextColumn::make('principal_user')
-                ->label('Usuario principal')
-                ->getStateUsing(fn (Empresa $record) => $record->principalUser()?->name)
-                ->default('Sin usuario asignado')
+            Tables\Columns\TextColumn::make('principal_contact')
+                ->label('Contacto principal')
+                ->getStateUsing(fn (Empresa $record) => $this->principalContactNameFor($record))
+                ->default('Falta por asignar')
+                ->color(fn (Empresa $record) => $this->principalContactNameFor($record) ? null : 'danger')
                 ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereHas(
-                    'users',
-                    fn (Builder $q) => $q->where('name', 'like', "%{$search}%")
+                    'contacts',
+                    fn (Builder $q) => $q->where('contacts.name', 'like', "%{$search}%")
+                        ->where('contact_empresa.is_principal', true)
                 )),
 
             Tables\Columns\TextColumn::make('completion_total')
