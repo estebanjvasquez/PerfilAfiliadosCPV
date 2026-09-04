@@ -22,6 +22,24 @@
 }
 
 /*
+ * Bug (regresion del fix anterior, confirmado en vivo con DevTools en mobile - 414px): el
+ * max-width de arriba nunca recortaba de verdad. vendor/filament/forms/resources/css/components/
+ * select.css define ".choices__list--single { display: inline-block }" - un inline-block SIN
+ * ancho propio se ajusta (shrink-to-fit) al ancho MAXIMO de su contenido, y ese calculo IGNORA
+ * los porcentajes de los hijos (referencia circular: no se puede resolver "100% del padre" si el
+ * ancho del padre depende de medir a ese mismo hijo). Resultado: .choices__list--single crecia
+ * hasta el ancho completo del texto sin truncar (confirmado: DevTools midio el item en 336.88px,
+ * mas ancho que el input real), y el max-width del item de mas arriba terminaba calculado contra
+ * ese ancho ya inflado - no recortaba nada, solo timaba a ojo cuando coincidia con el texto real.
+ * Fix real: forzar .choices__list--single a block (toma el 100% real de .choices__inner, que si
+ * tiene el ancho correcto del input) para que el max-width de arriba por fin tenga contra que
+ * ancho calcularse.
+ */
+.choices[data-type*='select-one'] .choices__list--single {
+    display: block;
+}
+
+/*
  * Bug: en tablas con varios headerActions (ej. RelationManager de "Sistemas de gestion", que
  * tiene 8: CompletionBadge + NoAplicaAction + 6 botones de sector), Filament v3 pone al
  * contenedor de acciones (.fi-ta-actions) con "shrink-0" (flex-shrink: 0) dentro de la fila del

@@ -62,6 +62,20 @@ class AdminPanelProvider extends PanelProvider
 
         // Ver public/css/filament/custom/panel.css: fix puntual del Select de una sola opcion
         // con etiquetas largas (Ciudad) que se rompe visualmente en mobile.
+        //
+        // Cache-busting: Asset::getVersion() (vendor/filament/support/src/Assets/Asset.php) usa
+        // FilamentAsset::getAppVersion() para el "?v=" del link cuando el asset es del package
+        // 'app' (el default de Css::make(), ver Css::getRelativePublicPath()) - sin esto, cae al
+        // fallback de la version de filament/support, que NO cambia entre nuestros propios
+        // despliegues. Encontrado en vivo: un fix a este mismo archivo quedo confirmado en el
+        // servidor (curl trae el contenido nuevo) pero Cloudflare seguia sirviendo la version
+        // vieja desde cache (cf-cache-status: HIT, Cache-Control: max-age=14400 = 4h) porque la
+        // URL nunca cambiaba. Atar la version al filemtime() del propio archivo hace que la URL
+        // cambie automaticamente cada vez que este CSS se edita y se despliega (git deja el mtime
+        // en el momento del `git reset --hard` del deploy), forzando a Cloudflare/navegador a
+        // pedir el archivo de nuevo en vez de reusar el cache viejo.
+        FilamentAsset::appVersion((string) filemtime(public_path('css/filament/custom/panel.css')));
+
         FilamentAsset::register([
             Css::make('panel-custom', public_path('css/filament/custom/panel.css')),
         ]);
