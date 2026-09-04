@@ -43,6 +43,15 @@ class RefreshCompletionPercentages extends Command
                 // Asignacion directa, no updateQuietly(['completion_percentage' => ...]) - ver
                 // el comentario en Empresa::refreshCompletionPercentage() (mass-assignment lo
                 // descarta en silencio, $fillable no incluye este campo a proposito).
+                //
+                // timestamps=false: mismo fix que Empresa::refreshCompletionPercentage() (ver
+                // ese comentario) - este comando es la fuente original del bug de "frescura del
+                // dato" reportado por el cliente (corrio una vez sin esto tras la migracion
+                // 2026_09_01_130000 y piso empresas.updated_at de las 402 empresas existentes,
+                // que arrancaban en completion_percentage=0). Sin esta linea, cada vez que este
+                // comando encuentre una discrepancia real (--only-stale) volveria a pisar
+                // updated_at, aunque nadie haya tocado el perfil de la empresa.
+                $empresa->timestamps = false;
                 $empresa->completion_percentage = $real;
                 $empresa->saveQuietly();
             }

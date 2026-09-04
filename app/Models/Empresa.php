@@ -122,7 +122,34 @@ class Empresa extends Model
 
     public function contacts()
     {
-        return $this->belongsToMany(Contact::class);
+        return $this->belongsToMany(Contact::class)->withPivot('is_principal');
+    }
+
+    /**
+     * Contacto principal de la empresa (pedido del cliente): a diferencia de principalUser(),
+     * esto SI es explicito (columna contact_empresa.is_principal, ver migracion
+     * 2026_09_04_083547) porque el cliente necesita poder elegirlo a mano, no inferirlo por
+     * antiguedad - el contacto mas viejo no es necesariamente el que la empresa quiere mostrar
+     * en reportes/graficas. setPrincipalContact() garantiza que nunca haya mas de uno.
+     */
+    public function principalContact(): ?Contact
+    {
+        return $this->contacts()->wherePivot('is_principal', true)->first();
+    }
+
+    /**
+     * Marca $contact como el unico contacto principal de esta empresa, desmarcando cualquier
+     * otro. $contact debe ya estar vinculado (contacts()) a esta empresa - no lo vincula solo.
+     */
+    public function setPrincipalContact(Contact $contact): void
+    {
+        DB::transaction(function () use ($contact) {
+            DB::table('contact_empresa')->where('empresa_id', $this->id)->update(['is_principal' => false]);
+            DB::table('contact_empresa')
+                ->where('empresa_id', $this->id)
+                ->where('contact_id', $contact->id)
+                ->update(['is_principal' => true]);
+        });
     }
 
     public function chambers()
@@ -523,9 +550,26 @@ class Empresa extends Model
      * asset, un attach de servicio, etc.) y la instancia que dispara el
      * refresh puede no ser la misma que trae los datos ya actualizados.
      *
-     * updateQuietly() (no update()) para no re-disparar el evento "saved" de
+     * saveQuietly() (no update()) para no re-disparar el evento "saved" de
      * Empresa y evitar cualquier posibilidad de loop con observers futuros
      * que a su vez escuchen ese evento.
+     *
+     * timestamps=false antes de guardar: bug real encontrado en la BD de pruebas (pedido del
+     * cliente, "frescura del dato" en los reportes gerenciales). empresas.updated_at se usa en
+     * EmpresasEstancadasWidget/GerenciaMetrics como "hace cuanto la empresa actualizo su
+     * perfil" - un dato que la Camara necesita para saber si una afiliada dejo de mantener su
+     * informacion al dia. Sin esto, CUALQUIER save() (incluso saveQuietly()) toca updated_at
+     * automaticamente si el valor de completion_percentage cambia, y este metodo es EXACTAMENTE
+     * eso: un recalculo interno de cache, no una edicion real de la empresa. El caso mas grave ya
+     * ocurrido: el backfill unico de la migracion 2026_09_01_130000 (columna nace en 0 para todas
+     * las filas existentes) hizo que TODAS las empresas mostraran completion_percentage real
+     * distinto de 0 la primera vez que corrio - eso SI disparo un cambio real de atributo, y
+     * updated_at de las 402 empresas existentes quedo pisado con la fecha de ese backfill
+     * (verificado: los 402 registros cayeron en una ventana de ~4 minutos), perdiendo el
+     * historial real de cuando cada una edito su perfil de verdad. Esto no revierte ese dano ya
+     * hecho (el valor original no se puede recuperar desde la app), pero evita que se repita en
+     * cada recalculo periodico (empresas:refresh-completion cada 15 min, o cualquier attach/
+     * detach de servicios/contactos) de aca en adelante.
      */
     public function refreshCompletionPercentage(): void
     {
@@ -541,6 +585,7 @@ class Empresa extends Model
         // pasarlo por un array de update() lo descartaria en silencio - bug real encontrado y
         // corregido durante la verificacion de este mismo cambio (updateQuietly() devolvia
         // true pero no persistia nada).
+        $fresh->timestamps = false;
         $fresh->completion_percentage = $fresh->completionPercentage();
         $fresh->saveQuietly();
     }
