@@ -86,7 +86,18 @@ class EditEmpresa extends EditRecord
 
                             return $record->completionPercentage() . '% completado'
                                 . ($pendientes !== '' ? ' — Pendiente: ' . $pendientes : '');
-                        })->columnSpan(3),
+                        })
+                        // Bug real (confirmado leyendo vendor/filament/support/.../grid/column.blade.php):
+                        // columnSpan(3) sin array fija 'default' => 3 (ver CanSpanColumns::columnSpan()),
+                        // o sea que este Placeholder pide 3 columnas de ancho INCLUSO en mobile, donde el
+                        // grid del Step solo tiene 1 columna explícita (columns(['default' => 1, 'md' => 3])
+                        // de mas abajo). CSS Grid resuelve ese desborde creando columnas implícitas extra
+                        // para acomodar el span - y esas columnas de más las heredan también los siguientes
+                        // hermanos del grid (Rif/Nombre/Año), que terminan apretados 3-en-fila en vez de
+                        // apilados (visto en vivo en la captura de mobile: fila angosta con Rif/Nombre/Año).
+                        // Fix: el span de 3 solo tiene sentido desde md en adelante (donde el grid sí abre a
+                        // 3 columnas); en mobile debe pedir 1 sola, igual que el resto de los campos.
+                        ->columnSpan(['default' => 1, 'md' => 3]),
                     Forms\Components\TextInput::make('rif')->required()->disabled()
                         ->afterStateUpdated(function ($component, $state, $set) {
                             return $set($component, mb_strtoupper($state));

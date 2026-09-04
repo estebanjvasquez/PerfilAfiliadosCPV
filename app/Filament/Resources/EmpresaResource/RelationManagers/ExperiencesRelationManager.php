@@ -44,6 +44,15 @@ class ExperiencesRelationManager extends RelationManager
      */
     protected static function fields(): array
     {
+        // Mismo bug de columnSpan encontrado y corregido en EditEmpresa.php (Placeholder
+        // 'completitud'): el modal de esta Action ('agregar_experiencia'/'editar', más abajo)
+        // no tiene ->columns(2) explícito, así que su grid nunca abre a más de 1 columna en
+        // ningún breakpoint (ver HasColumns::getColumnsConfig() - fallback 'default' => 1 y
+        // el resto null). Los 3 Group::make([...])->columnSpan(2) de acá pedían 2 columnas de
+        // ancho en un grid de 1 sola siempre - CSS Grid resuelve ese desborde con columnas
+        // implícitas, apretando el layout (mismo síntoma que el bug de EditEmpresa, aunque
+        // esta pantalla en particular no fue la reportada por el usuario). Fix: columnSpan(1),
+        // que es lo único que el grid real de este modal soporta hoy.
         return [
             Group::make([
                 TextInput::make('exp_year')
@@ -106,7 +115,7 @@ class ExperiencesRelationManager extends RelationManager
                             return $iregsys->getFacility($iregsys->id, $get('infrasystems_id'))->pluck('facility_name', 'id');
                         }),
                 ])->columns(1)->label('Infraestructura en la que trabajó'),
-            ])->columns(1)->columnSpan(2),
+            ])->columns(1)->columnSpan(1),
 
             Group::make([
                 Select::make('magnitud')
@@ -141,13 +150,13 @@ class ExperiencesRelationManager extends RelationManager
                             return $sector->services->pluck('name', 'id');
                         }),
                 ])->columns(1)->label('Clasificación del tipo de trabajo realizado'),
-            ])->columns(1)->columnSpan(2),
+            ])->columns(1)->columnSpan(1),
 
             Group::make([
                 Textarea::make('Descripcion')
                     ->label('Breve descripción del trabajo realizado')
                     ->rows(10),
-            ])->columns(1)->columnSpan(2),
+            ])->columns(1)->columnSpan(1),
         ];
     }
 
