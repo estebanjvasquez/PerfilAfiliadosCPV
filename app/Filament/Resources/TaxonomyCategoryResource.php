@@ -25,6 +25,11 @@ use App\Filament\Resources\TaxonomyCategoryResource\RelationManagers;
  * (`chamber_relevance`/`is_active`) y administrar traducciones/diccionario de sinónimos sin volver
  * a correr `taxonomy:import`. Ver docs/taxonomia/acuerdos_pendientes_con_lorenzo.md para el
  * contexto de cada campo.
+ *
+ * Escopado a level=2 (categorías hoja) desde el 7 sep 2026: Grupos y Familias —igual de
+ * importantes para el buscador de las empresas, ver TaxonomyGroupResource— ahora tienen sus
+ * propios módulos dedicados (más fácil de administrar 48/332 filas ahí que mezcladas con las
+ * 3.103 categorías de acá). Las 3 vistas comparten la misma tabla `taxonomy_categories`.
  */
 class TaxonomyCategoryResource extends Resource
 {
@@ -40,7 +45,7 @@ class TaxonomyCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Categorías';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -74,6 +79,7 @@ class TaxonomyCategoryResource extends Resource
         // fallback a ingles para la columna de nombre - evita 1 query extra por fila en la tabla
         // (mismo criterio de rendimiento ya establecido en Empresa::moduleBreakdown()).
         return parent::getEloquentQuery()
+            ->where('level', TaxonomyCategory::LEVEL_CATEGORY)
             ->with(['translations' => fn ($q) => $q->whereIn('locale', ['es', 'en'])])
             ->withCount(['children', 'empresaLinks']);
     }
@@ -91,18 +97,21 @@ class TaxonomyCategoryResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->helperText('Ej. CPV-01.01.01G — el código de Lorenzo con el prefijo CPV- agregado. No repetir.'),
                     Forms\Components\Select::make('parent_id')
-                        ->label('Categoría padre')
+                        ->label('Familia o Grupo padre')
+                        ->required()
                         ->relationship(
+                            // Una categoría es siempre hoja - su padre es una Familia o,
+                            // directamente, un Grupo (cuando Lorenzo no definió familia para esa
+                            // fila) - nunca otra Categoría. Administrar Grupos/Familias en sus
+                            // propios módulos (TaxonomyGroupResource/TaxonomyFamilyResource).
                             name: 'parent',
                             titleAttribute: 'code',
-                            modifyQueryUsing: fn (Builder $query, $record) => $record
-                                ? $query->where('id', '!=', $record->id)
-                                : $query
+                            modifyQueryUsing: fn (Builder $query) => $query->where('level', '<', TaxonomyCategory::LEVEL_CATEGORY)
                         )
                         ->searchable()
                         ->preload()
                         ->getOptionLabelFromRecordUsing(fn (TaxonomyCategory $record) => "{$record->code} — {$record->nameIn('es')}")
-                        ->helperText('Vacío = nodo raíz (Grupo).'),
+                        ->helperText('El código de la categoría debe empezar con el código de la Familia/Grupo elegido (ej. "05.01.01" solo puede colgar de "05.01").'),
                     Forms\Components\Select::make('tipo_oferta')
                         ->label('Tipo de oferta')
                         ->options([

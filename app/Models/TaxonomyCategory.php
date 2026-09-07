@@ -28,6 +28,12 @@ class TaxonomyCategory extends Model
     public const TIPO_BIEN = 'bien';
     public const TIPO_SERVICIO = 'servicio';
 
+    public const LEVEL_GROUP = 0;
+    public const LEVEL_FAMILY = 1;
+    public const LEVEL_CATEGORY = 2;
+
+    public const CODE_PREFIX = 'CPV-';
+
     protected $fillable = [
         'code',
         'parent_id',
@@ -106,6 +112,38 @@ class TaxonomyCategory extends Model
         return $this->ancestorsAndSelf()
             ->map(fn (self $category) => $category->nameIn($locale))
             ->implode(' > ');
+    }
+
+    /** Quita el prefijo "CPV-" si está — para comparar códigos por su jerarquía numérica. */
+    public static function stripCodePrefix(string $code): string
+    {
+        return str_starts_with($code, self::CODE_PREFIX) ? substr($code, strlen(self::CODE_PREFIX)) : $code;
+    }
+
+    /**
+     * True si $childCode es hijo DIRECTO de $parentCode según la jerarquía numérica del propio
+     * código (ej. "CPV-05.01.01G" es hijo de "CPV-05.01", que es hijo de "CPV-05") — independiente
+     * de lo que diga `parent_id` en la base. Pedido explícito de Lorenzo (7 sep 2026): "no se debe
+     * poder crear una categoría 05.01.01 y asociarle una familia distinta de 05.01, e igual debe
+     * validarse que la familia 05.01 esté dentro del grupo 05". Se usa en
+     * TaxonomyCategoryObserver para bloquear guardar un parent_id que no corresponda al código.
+     */
+    public static function codeBelongsToParent(string $childCode, string $parentCode): bool
+    {
+        // Solo las categorías (hojas) llevan el sufijo G/S pegado al final del código — quitarlo
+        // acá para poder comparar segmento a segmento contra el padre (Grupo/Familia), que nunca
+        // lo tiene.
+        $child = preg_replace('/[GS]$/i', '', self::stripCodePrefix($childCode));
+        $parent = self::stripCodePrefix($parentCode);
+
+        $childSegments = explode('.', $child);
+        $parentSegments = explode('.', $parent);
+
+        if (count($childSegments) !== count($parentSegments) + 1) {
+            return false;
+        }
+
+        return array_slice($childSegments, 0, count($parentSegments)) === $parentSegments;
     }
 
     /**

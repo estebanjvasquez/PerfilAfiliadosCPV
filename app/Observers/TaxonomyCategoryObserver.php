@@ -32,6 +32,19 @@ class TaxonomyCategoryObserver
             ]);
         }
 
+        // Pedido explícito de Lorenzo (7 sep 2026): la jerarquía numérica del CÓDIGO manda — no se
+        // puede guardar, por ejemplo, "CPV-05.01.01G" con parent_id apuntando a la familia
+        // "CPV-05.02" (ni una familia "CPV-05.01" colgando de un grupo que no sea "CPV-05"). Esto
+        // ya encontró datos reales inconsistentes del Excel de origen al escribir esta regla (12
+        // categorías del Grupo 48 con "Category Code" mal tipeado apuntando al Family Code
+        // correcto pero con code de otro segmento) — quedan bloqueadas hasta corregir código o
+        // padre, no se "arreglan solas" con este chequeo.
+        if ($category->code && ! TaxonomyCategory::codeBelongsToParent($category->code, $parent->code)) {
+            throw ValidationException::withMessages([
+                'code' => "El código {$category->code} no corresponde al padre elegido ({$parent->code}) — la jerarquía numérica del código debe coincidir (ej. \"05.01.01\" solo puede colgar de \"05.01\").",
+            ]);
+        }
+
         if ($category->exists) {
             if ((int) $parent->id === (int) $category->id) {
                 throw ValidationException::withMessages([

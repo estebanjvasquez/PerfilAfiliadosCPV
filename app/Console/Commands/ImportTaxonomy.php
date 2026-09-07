@@ -125,10 +125,10 @@ class ImportTaxonomy extends Command
                 'subbranch' => trim((string) ($row['Subbranch'] ?? '')) ?: null,
                 'chamber_relevance' => self::RELEVANCE_MAP[$classification] ?? null,
                 'relevance_basis' => trim((string) ($row['Classification Basis'] ?? '')) ?: null,
-                // Default mientras se confirma con Lorenzo el punto 4 del acuerdo (que hacer con
-                // las "MAYBE"): lo unico que se apaga solo es lo que el archivo ya marca fuera de
-                // alcance. Administrable despues a mano desde el panel, sin re-importar.
-                'is_active' => $classification !== 'DOES NOT BELONG',
+                // Punto 4 del acuerdo, cerrado con Lorenzo el 7 sep 2026: tanto "DOES NOT BELONG"
+                // como "MAYBE" arrancan inactivas — solo "BELONGS" se carga activa por defecto.
+                // Administrable despues a mano desde el panel (toggle "Activa"), sin re-importar.
+                'is_active' => $classification === 'BELONGS',
             ];
         }
 
