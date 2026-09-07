@@ -152,6 +152,22 @@ class SyncMysqlToPgsql extends Command
             }));
         }
 
+        // Bug real encontrado al re-correr esta migracion (no en la corrida inicial con
+        // --truncate, que arranca de una tabla vacia): 'contact_empresa'/'chamber_empresa'/
+        // 'empresa_sector_service' no tienen 'id' propio, y ninguna de las dos bases tiene un
+        // indice UNIQUE compuesto sobre sus columnas *_id (solo indices simples por FK) - sin un
+        // indice asi, "insertOrIgnore" (INSERT ... ON CONFLICT DO NOTHING) no tiene contra que
+        // comparar y Postgres inserta TODO de nuevo sin control. Una segunda corrida sin
+        // --truncate duplico por completo esas 3 tablas (verificado en vivo: 545 filas pasaron a
+        // 1084). Fix: para tablas sin 'id', se deduplica del lado de PHP contra lo que ya existe
+        // en pgsql, usando como clave natural las columnas *_id (patron estandar de pivots
+        // Laravel) - nunca las demas columnas de datos (ej. is_principal), porque si el par ya
+        // existe no debe insertarse una copia con esas en su valor default, pisando en la
+        // practica cualquier dato que se haya cargado directo en pgsql para esa fila.
+        if (! DB::connection('pgsql')->getSchemaBuilder()->hasColumn($table, 'id')) {
+            $data = $this->dedupeAgainstExisting($table, $data);
+        }
+
         $copied = 0;
         $failedIds = [];
 
@@ -189,6 +205,43 @@ class SyncMysqlToPgsql extends Command
 
         $method = empty($failedIds) ? 'info' : 'error';
         $this->{$method}("  {$table}: {$copied}/{$total} filas copiadas.{$note}");
+    }
+
+    /**
+     * Para tablas pivot sin 'id' propio (ver nota en copyTable()): quita de $data cualquier fila
+     * cuya clave natural (columnas *_id) ya exista en pgsql, para que insertOrIgnore() no reciba
+     * nunca un duplicado que Postgres no sabria rechazar por si solo.
+     *
+     * @param  array<int, array<string, mixed>>  $data
+     * @return array<int, array<string, mixed>>
+     */
+    private function dedupeAgainstExisting(string $table, array $data): array
+    {
+        $keyColumns = array_values(array_filter(
+            DB::connection('pgsql')->getSchemaBuilder()->getColumnListing($table),
+            fn ($c) => str_ends_with($c, '_id')
+        ));
+
+        if (empty($keyColumns)) {
+            // No hay columnas *_id para armar una clave natural - no se puede deduplicar de
+            // forma generica, se deja pasar tal cual (mismo comportamiento que antes de este fix).
+            return $data;
+        }
+
+        $existingKeys = DB::connection('pgsql')->table($table)->get($keyColumns)
+            ->map(fn ($row) => $this->naturalKey((array) $row, $keyColumns))
+            ->flip();
+
+        return array_values(array_filter(
+            $data,
+            fn ($row) => ! $existingKeys->has($this->naturalKey($row, $keyColumns))
+        ));
+    }
+
+    /** @param  array<string, mixed>  $row  @param  array<int, string>  $keyColumns */
+    private function naturalKey(array $row, array $keyColumns): string
+    {
+        return implode('|', array_map(fn ($c) => $row[$c] ?? '', $keyColumns));
     }
 
     /**
