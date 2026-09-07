@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Support\QueryBuilder\WideSelectIsOperator;
 use App\Models\TaxonomyCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -46,6 +47,25 @@ class TaxonomyCategoryResource extends Resource
     public static function getGloballySearchableAttributes(): array
     {
         return ['code', 'branch', 'subbranch'];
+    }
+
+    /**
+     * Reemplaza el operador "Es" por defecto de SelectConstraint por WideSelectIsOperator (mismo
+     * comportamiento, solo el select de "Valor" ocupa el ancho completo en vez de ~1/3 - ver
+     * docblock de esa clase). Se deja afuera "Está rellenado"/IsFilledOperator a propósito: su
+     * visibilidad depende de `$constraint->isNullable()`, y `HasOperators::getOperators()` llama
+     * `$operator->isVisible()` SIN fijar antes `$operator->constraint(...)` - la única forma de
+     * que funcione es una closure creada con `$this` ya ligado a la constraint puntual (por eso
+     * Filament la escribe DENTRO de SelectConstraint::setUp(), un método de instancia normal), algo
+     * que este método `static` compartido entre 3 constraints no puede replicar sin fragilidad. No
+     * hace falta igual: level/chamber_relevance/tipo_oferta son null exactamente cuando level != 2
+     * (Grupo/Familia) - el filtro "Nivel" ya cubre ese caso.
+     *
+     * @return array<class-string>
+     */
+    private static function wideSelectOperators(): array
+    {
+        return [WideSelectIsOperator::class];
     }
 
     public static function getEloquentQuery(): Builder
@@ -203,7 +223,8 @@ class TaxonomyCategoryResource extends Resource
                         SelectConstraint::make('level')
                             ->label('Nivel')
                             ->options([0 => 'Grupo', 1 => 'Familia', 2 => 'Categoría'])
-                            ->multiple(),
+                            ->multiple()
+                            ->operators(static::wideSelectOperators()),
                         SelectConstraint::make('chamber_relevance')
                             ->label('Belongs')
                             ->options([
@@ -218,7 +239,7 @@ class TaxonomyCategoryResource extends Resource
                             // (ej. "Belongs es Maybe" O "Tipo es Servicio") el grupo "O" sigue
                             // siendo el camino, ver el bloque "Agregar grupo O" del selector.
                             ->multiple()
-                            ->nullable(),
+                            ->operators(static::wideSelectOperators()),
                         SelectConstraint::make('tipo_oferta')
                             ->label('Tipo de oferta')
                             ->options([
@@ -226,7 +247,7 @@ class TaxonomyCategoryResource extends Resource
                                 TaxonomyCategory::TIPO_SERVICIO => 'Servicio',
                             ])
                             ->multiple()
-                            ->nullable(),
+                            ->operators(static::wideSelectOperators()),
                         BooleanConstraint::make('is_active')->label('Activa'),
                     ]),
                 // Queda aparte como acceso rapido de un clic (el QueryBuilder de arriba tambien lo
