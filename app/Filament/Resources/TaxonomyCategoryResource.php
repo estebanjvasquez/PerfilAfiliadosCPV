@@ -202,7 +202,8 @@ class TaxonomyCategoryResource extends Resource
                         TextConstraint::make('subbranch')->label('Subbranch')->nullable(),
                         SelectConstraint::make('level')
                             ->label('Nivel')
-                            ->options([0 => 'Grupo', 1 => 'Familia', 2 => 'Categoría']),
+                            ->options([0 => 'Grupo', 1 => 'Familia', 2 => 'Categoría'])
+                            ->multiple(),
                         SelectConstraint::make('chamber_relevance')
                             ->label('Belongs')
                             ->options([
@@ -210,6 +211,13 @@ class TaxonomyCategoryResource extends Resource
                                 TaxonomyCategory::RELEVANCE_MAYBE => 'Maybe',
                                 TaxonomyCategory::RELEVANCE_DOES_NOT_BELONG => 'Does not belong',
                             ])
+                            // ->multiple(): "Belongs es Maybe O Does not belong" queda en 1 sola
+                            // regla (whereIn), sin depender del grupo "O" - resuelve directo el
+                            // caso que motivo el pedido del 7 sep de poder elegir Y/O entre 2
+                            // reglas de la MISMA columna. Para comparar columnas DISTINTAS con O
+                            // (ej. "Belongs es Maybe" O "Tipo es Servicio") el grupo "O" sigue
+                            // siendo el camino, ver el bloque "Agregar grupo O" del selector.
+                            ->multiple()
                             ->nullable(),
                         SelectConstraint::make('tipo_oferta')
                             ->label('Tipo de oferta')
@@ -217,6 +225,7 @@ class TaxonomyCategoryResource extends Resource
                                 TaxonomyCategory::TIPO_BIEN => 'Bien',
                                 TaxonomyCategory::TIPO_SERVICIO => 'Servicio',
                             ])
+                            ->multiple()
                             ->nullable(),
                         BooleanConstraint::make('is_active')->label('Activa'),
                     ]),
