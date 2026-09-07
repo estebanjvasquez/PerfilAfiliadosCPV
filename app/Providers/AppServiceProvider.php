@@ -8,7 +8,9 @@ use App\Models\EmpresaModuleStatus;
 use App\Models\Presence;
 use App\Models\Experience;
 use App\Models\Sustainability;
+use App\Models\TaxonomyCategory;
 use App\Observers\EmpresaCompletionObserver;
+use App\Observers\TaxonomyCategoryObserver;
 use Filament\Facades\Filament;
 
 use Illuminate\Support\Facades\Schema;
@@ -52,6 +54,10 @@ class AppServiceProvider extends ServiceProvider
         Presence::observe(EmpresaCompletionObserver::class);
         Experience::observe(EmpresaCompletionObserver::class);
         Sustainability::observe(EmpresaCompletionObserver::class);
+
+        // Mantiene level/path de la taxonomia CPV sincronizados con parent_id/code y previene
+        // ciclos (ver app/Observers/TaxonomyCategoryObserver.php).
+        TaxonomyCategory::observe(TaxonomyCategoryObserver::class);
 
         /*  Page::$reportValidationErrorUsing = function (ValidationException $exception) {
             Notification::make()
