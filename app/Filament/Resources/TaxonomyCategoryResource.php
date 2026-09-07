@@ -9,6 +9,9 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Filters\QueryBuilder\Constraints\BooleanConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\SelectConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -175,23 +178,51 @@ class TaxonomyCategoryResource extends Resource
                 Tables\Columns\TextColumn::make('empresa_links_count')->label('Empresas')->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('level')
-                    ->label('Nivel')
-                    ->options([0 => 'Grupo', 1 => 'Familia', 2 => 'Categoría']),
-                Tables\Filters\SelectFilter::make('chamber_relevance')
-                    ->label('Belongs')
-                    ->options([
-                        TaxonomyCategory::RELEVANCE_BELONGS => 'Belongs',
-                        TaxonomyCategory::RELEVANCE_MAYBE => 'Maybe',
-                        TaxonomyCategory::RELEVANCE_DOES_NOT_BELONG => 'Does not belong',
+                // Filtro tipo Excel: elegís la columna (incluye nombre en ES/EN y el diccionario
+                // de sinónimos), el operador (igual/contiene/empieza/termina) y combinás varias
+                // condiciones con Y/O - pedido puntual del 7 sep para que el administrador pueda
+                // encontrar, por ejemplo, "arbolito"/"árbol de navidad" (sinónimo venezolano de
+                // "Wellhead") sin tener que recorrer las 3.103 categorías a mano.
+                Tables\Filters\QueryBuilder::make()
+                    ->constraints([
+                        TextConstraint::make('code')->label('Código'),
+                        TextConstraint::make('name_en')
+                            ->label('Nombre (EN)')
+                            ->relationship('translations', 'name', fn (Builder $query) => $query->where('locale', 'en'))
+                            ->nullable(),
+                        TextConstraint::make('name_es')
+                            ->label('Nombre (ES)')
+                            ->relationship('translations', 'name', fn (Builder $query) => $query->where('locale', 'es'))
+                            ->nullable(),
+                        TextConstraint::make('synonym_term')
+                            ->label('Sinónimo / término local (diccionario)')
+                            ->relationship('synonyms', 'term')
+                            ->nullable(),
+                        TextConstraint::make('branch')->label('Branch')->nullable(),
+                        TextConstraint::make('subbranch')->label('Subbranch')->nullable(),
+                        SelectConstraint::make('level')
+                            ->label('Nivel')
+                            ->options([0 => 'Grupo', 1 => 'Familia', 2 => 'Categoría']),
+                        SelectConstraint::make('chamber_relevance')
+                            ->label('Belongs')
+                            ->options([
+                                TaxonomyCategory::RELEVANCE_BELONGS => 'Belongs',
+                                TaxonomyCategory::RELEVANCE_MAYBE => 'Maybe',
+                                TaxonomyCategory::RELEVANCE_DOES_NOT_BELONG => 'Does not belong',
+                            ])
+                            ->nullable(),
+                        SelectConstraint::make('tipo_oferta')
+                            ->label('Tipo de oferta')
+                            ->options([
+                                TaxonomyCategory::TIPO_BIEN => 'Bien',
+                                TaxonomyCategory::TIPO_SERVICIO => 'Servicio',
+                            ])
+                            ->nullable(),
+                        BooleanConstraint::make('is_active')->label('Activa'),
                     ]),
-                Tables\Filters\SelectFilter::make('tipo_oferta')
-                    ->label('Tipo de oferta')
-                    ->options([
-                        TaxonomyCategory::TIPO_BIEN => 'Bien',
-                        TaxonomyCategory::TIPO_SERVICIO => 'Servicio',
-                    ]),
-                Tables\Filters\TernaryFilter::make('is_active')->label('Activa'),
+                // Queda aparte como acceso rapido de un clic (el QueryBuilder de arriba tambien lo
+                // puede armar con "Nombre (ES) - vacio", pero este es mas directo para el caso mas
+                // comun: revisar de una todo lo que todavia no tiene traduccion).
                 Tables\Filters\Filter::make('sin_traducir_es')
                     ->label('Sin traducir a español')
                     ->query(fn (Builder $query) => $query->whereDoesntHave('translations', fn ($q) => $q->where('locale', 'es'))),
