@@ -41,6 +41,16 @@ jobs:
             docker compose run --rm app sh -c '
               set -e
               php artisan down || true
+              # Encontrado en vivo (7 sep 2026, al agregar 3x1io/filament-user +
+              # stechstudio/filament-impersonate + lab404/laravel-impersonate +
+              # queents/console-helpers): el `composer dump-autoload --optimize` del
+              # Dockerfile SI corre su post-autoload-dump (package:discover), pero
+              # bootstrap/cache/packages.php quedo sin esos 4 paquetes nuevos pese a
+              # que vendor/composer/installed.json ya los tenia bien - re-correrlo
+              # aca a mano (con el .env real ya disponible, a diferencia del build)
+              # lo repara sin falta. No hizo falta antes porque hasta ahora nunca se
+              # habia agregado un paquete nuevo end-to-end en un deploy de esta rama.
+              php artisan package:discover --ansi
               php artisan db:skip-mysql-only-view-migrations
               php artisan migrate --force
               php artisan filament:assets
