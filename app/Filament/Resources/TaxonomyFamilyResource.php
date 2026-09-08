@@ -76,11 +76,13 @@ class TaxonomyFamilyResource extends Resource
                         ->relationship(
                             name: 'parent',
                             titleAttribute: 'code',
-                            modifyQueryUsing: fn (Builder $query) => $query->where('level', TaxonomyCategory::LEVEL_GROUP)
+                            modifyQueryUsing: fn (Builder $query) => $query
+                                ->where('level', TaxonomyCategory::LEVEL_GROUP)
+                                ->with(['translations' => fn ($q) => $q->whereIn('locale', ['es', 'en'])])
                         )
                         ->searchable()
                         ->preload()
-                        ->getOptionLabelFromRecordUsing(fn (TaxonomyCategory $record) => "{$record->code} — {$record->nameIn('es')}"),
+                        ->getOptionLabelFromRecordUsing(fn (TaxonomyCategory $record) => "{$record->code} — {$record->displayName()}"),
                     Forms\Components\TextInput::make('source_version')
                         ->label('Versión de origen')
                         ->disabled()
@@ -113,7 +115,7 @@ class TaxonomyFamilyResource extends Resource
                 Tables\Columns\TextColumn::make('parent.code')
                     ->label('Grupo')
                     ->formatStateUsing(fn (TaxonomyCategory $record) => $record->parent
-                        ? "{$record->parent->code} — {$record->parent->nameIn('es')}"
+                        ? "{$record->parent->code} — {$record->parent->displayName()}"
                         : '—')
                     ->searchable(query: fn (Builder $query, string $search) => $query->whereHas(
                         'parent',

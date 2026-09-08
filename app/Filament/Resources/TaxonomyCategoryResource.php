@@ -145,9 +145,9 @@ class TaxonomyCategoryResource extends Resource
                         ->label('Grupo')
                         ->options(fn () => TaxonomyCategory::query()
                             ->where('level', TaxonomyCategory::LEVEL_GROUP)
-                            ->with(['translations' => fn ($q) => $q->where('locale', 'es')])
+                            ->with(['translations' => fn ($q) => $q->whereIn('locale', ['es', 'en'])])
                             ->get()
-                            ->mapWithKeys(fn (TaxonomyCategory $g) => [$g->id => "{$g->code} — {$g->nameIn('es')}"]))
+                            ->mapWithKeys(fn (TaxonomyCategory $g) => [$g->id => "{$g->code} — {$g->displayName()}"]))
                         ->searchable()
                         ->live()
                         ->dehydrated(false)
@@ -170,7 +170,11 @@ class TaxonomyCategoryResource extends Resource
                             name: 'parent',
                             titleAttribute: 'code',
                             modifyQueryUsing: function (Builder $query, Forms\Get $get, string $operation) {
-                                $query->where('level', '<', TaxonomyCategory::LEVEL_CATEGORY);
+                                // Eager-load para que displayName() (usado por
+                                // getOptionLabelFromRecordUsing abajo) no dispare 1 query extra
+                                // por cada opción del desplegable.
+                                $query->where('level', '<', TaxonomyCategory::LEVEL_CATEGORY)
+                                    ->with(['translations' => fn ($q) => $q->whereIn('locale', ['es', 'en'])]);
 
                                 if ($operation !== 'create') {
                                     return;
@@ -184,7 +188,7 @@ class TaxonomyCategoryResource extends Resource
                         ->preload()
                         ->live()
                         ->disabled(fn (string $operation, Forms\Get $get) => $operation === 'create' && ! $get('group_id'))
-                        ->getOptionLabelFromRecordUsing(fn (TaxonomyCategory $record) => "{$record->code} — {$record->nameIn('es')}")
+                        ->getOptionLabelFromRecordUsing(fn (TaxonomyCategory $record) => "{$record->code} — {$record->displayName()}")
                         ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, string $operation) {
                             if ($operation === 'create') {
                                 $set('code', static::buildNextCode($get('parent_id'), $get('tipo_oferta')));

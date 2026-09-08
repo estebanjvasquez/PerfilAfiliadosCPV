@@ -89,6 +89,21 @@ class TaxonomyCategory extends Model
     }
 
     /**
+     * Nombre para mostrarle al ADMINISTRADOR (selects/dropdowns del panel, no la vista del
+     * afiliado) — español si ya está cargado, si no inglés (que sí viene siempre desde el Excel
+     * de Lorenzo), y solo si no hay ninguno de los dos cae al código. Encontrado el 8 sep 2026: los
+     * selectores de Grupo/Familia usaban `nameIn('es')` directo, que cae al `code` en vez de al
+     * nombre en inglés cuando la traducción a español todavía no llegó (el caso de HOY, para casi
+     * toda la taxonomía) — mostraba "CPV-05 — CPV-05" en vez de "CPV-05 — Valves".
+     */
+    public function displayName(): string
+    {
+        return $this->translations->firstWhere('locale', 'es')?->name
+            ?? $this->translations->firstWhere('locale', 'en')?->name
+            ?? $this->code;
+    }
+
+    /**
      * Cadena de nodos desde la raíz (Grupo) hasta este, resuelta a partir de `path` (codes
      * separados por '/') en una sola consulta — igual patrón que la Fase 4 original, para no
      * disparar 1 consulta por nivel al armar un breadcrumb.
