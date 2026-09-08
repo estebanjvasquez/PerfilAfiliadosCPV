@@ -73,6 +73,50 @@ class TaxonomyCategoryResource extends Resource
         return [WideSelectIsOperator::class];
     }
 
+    /**
+     * Arma el próximo código libre para una Familia + Tipo (flujo guiado de creación, pedido el 8
+     * sep 2026 después de encontrar 12 códigos mal tipeados a mano en el Grupo 48 — ver commit
+     * e904533). El incremental es UNA sola secuencia compartida entre G y S dentro de la misma
+     * Familia (verificado contra datos reales: la Familia CPV-03.02 tiene "01S" seguido de
+     * "02G".."43G" — no son 2 secuencias separadas por tipo), así que se calcula el máximo
+     * existente entre TODOS los hijos de la familia, sin filtrar por tipo, y se le suma 1. El
+     * ancho (2 dígitos, 3 si ya hay más de 99) se toma del código existente más largo, para no
+     * "bajarle" el padding a una familia que ya viene con 3 dígitos.
+     */
+    private static function buildNextCode(?int $familyId, ?string $tipoOferta): ?string
+    {
+        if (! $familyId || ! $tipoOferta) {
+            return null;
+        }
+
+        $family = TaxonomyCategory::query()->find($familyId);
+
+        if (! $family) {
+            return null;
+        }
+
+        $suffix = $tipoOferta === TaxonomyCategory::TIPO_SERVICIO ? 'S' : 'G';
+        $familyNumeric = TaxonomyCategory::stripCodePrefix($family->code);
+
+        $max = 0;
+        $width = 2;
+
+        foreach (TaxonomyCategory::query()->where('parent_id', $familyId)->pluck('code') as $siblingCode) {
+            $numeric = preg_replace('/[GS]$/i', '', TaxonomyCategory::stripCodePrefix($siblingCode));
+            $segments = explode('.', $numeric);
+            $last = end($segments);
+
+            if ($last !== false && ctype_digit($last)) {
+                $max = max($max, (int) $last);
+                $width = max($width, strlen($last));
+            }
+        }
+
+        $next = str_pad((string) ($max + 1), $width, '0', STR_PAD_LEFT);
+
+        return TaxonomyCategory::CODE_PREFIX.$familyNumeric.'.'.$next.$suffix;
+    }
+
     public static function getEloquentQuery(): Builder
     {
         // Precarga la traduccion en espanol (la que de verdad se le muestra al afiliado) con
@@ -90,28 +134,65 @@ class TaxonomyCategoryResource extends Resource
             Forms\Components\Section::make('Identidad')
                 ->columns(2)
                 ->schema([
-                    Forms\Components\TextInput::make('code')
-                        ->label('Código (CPV)')
-                        ->required()
-                        ->maxLength(50)
-                        ->unique(ignoreRecord: true)
-                        ->helperText('Ej. CPV-01.01.01G — el código de Lorenzo con el prefijo CPV- agregado. No repetir.'),
+                    // Flujo guiado pedido el 8 sep 2026: al CREAR, el código ya no se teclea a
+                    // mano (fuente real de los 12 códigos mal tipeados del Grupo 48, ver commit
+                    // e904533) - se arma solo a partir de Grupo + Familia + Tipo, con el
+                    // incremental correcto según lo que ya exista en esa combinación. Al EDITAR
+                    // una categoría existente se mantiene el selector amplio de siempre (Familia
+                    // o Grupo padre, código editable a mano) - ahí el código ya existe, no hay
+                    // nada que "construir".
+                    Forms\Components\Select::make('group_id')
+                        ->label('Grupo')
+                        ->options(fn () => TaxonomyCategory::query()
+                            ->where('level', TaxonomyCategory::LEVEL_GROUP)
+                            ->with(['translations' => fn ($q) => $q->where('locale', 'es')])
+                            ->get()
+                            ->mapWithKeys(fn (TaxonomyCategory $g) => [$g->id => "{$g->code} — {$g->nameIn('es')}"]))
+                        ->searchable()
+                        ->live()
+                        ->dehydrated(false)
+                        // No es una columna real de la categoría (esta solo para filtrar el
+                        // selector de Familia de abajo) - por eso no se guarda ni se precarga en
+                        // modo Editar.
+                        ->visible(fn (string $operation) => $operation === 'create')
+                        ->afterStateUpdated(fn (Forms\Set $set) => $set('parent_id', null))
+                        ->required(fn (string $operation) => $operation === 'create'),
                     Forms\Components\Select::make('parent_id')
-                        ->label('Familia o Grupo padre')
+                        ->label(fn (string $operation) => $operation === 'create' ? 'Familia' : 'Familia o Grupo padre')
                         ->required()
                         ->relationship(
                             // Una categoría es siempre hoja - su padre es una Familia o,
                             // directamente, un Grupo (cuando Lorenzo no definió familia para esa
                             // fila) - nunca otra Categoría. Administrar Grupos/Familias en sus
-                            // propios módulos (TaxonomyGroupResource/TaxonomyFamilyResource).
+                            // propios módulos (TaxonomyGroupResource/TaxonomyFamilyResource). Al
+                            // crear, además, se restringe a las Familias DEL grupo elegido arriba
+                            // (no tiene sentido ofrecer familias de otro grupo en el flujo guiado).
                             name: 'parent',
                             titleAttribute: 'code',
-                            modifyQueryUsing: fn (Builder $query) => $query->where('level', '<', TaxonomyCategory::LEVEL_CATEGORY)
+                            modifyQueryUsing: function (Builder $query, Forms\Get $get, string $operation) {
+                                $query->where('level', '<', TaxonomyCategory::LEVEL_CATEGORY);
+
+                                if ($operation !== 'create') {
+                                    return;
+                                }
+
+                                $query->where('level', TaxonomyCategory::LEVEL_FAMILY);
+                                $query->where('parent_id', $get('group_id') ?: 0);
+                            }
                         )
                         ->searchable()
                         ->preload()
+                        ->live()
+                        ->disabled(fn (string $operation, Forms\Get $get) => $operation === 'create' && ! $get('group_id'))
                         ->getOptionLabelFromRecordUsing(fn (TaxonomyCategory $record) => "{$record->code} — {$record->nameIn('es')}")
-                        ->helperText('El código de la categoría debe empezar con el código de la Familia/Grupo elegido (ej. "05.01.01" solo puede colgar de "05.01").'),
+                        ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, string $operation) {
+                            if ($operation === 'create') {
+                                $set('code', static::buildNextCode($get('parent_id'), $get('tipo_oferta')));
+                            }
+                        })
+                        ->helperText(fn (string $operation) => $operation === 'create'
+                            ? 'Elegí primero el Grupo — acá solo aparecen sus Familias.'
+                            : 'El código de la categoría debe empezar con el código de la Familia/Grupo elegido (ej. "05.01.01" solo puede colgar de "05.01").'),
                     Forms\Components\Select::make('tipo_oferta')
                         ->label('Tipo de oferta')
                         ->options([
@@ -119,7 +200,26 @@ class TaxonomyCategoryResource extends Resource
                             TaxonomyCategory::TIPO_SERVICIO => 'Servicio',
                         ])
                         ->native(false)
+                        ->live()
+                        ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, string $operation) {
+                            if ($operation === 'create') {
+                                $set('code', static::buildNextCode($get('parent_id'), $get('tipo_oferta')));
+                            }
+                        })
                         ->helperText('Solo aplica a categorías hoja (Goods/Services de Lorenzo).'),
+                    Forms\Components\TextInput::make('code')
+                        ->label('Código (CPV)')
+                        ->required()
+                        ->maxLength(50)
+                        ->unique(ignoreRecord: true)
+                        ->disabled(fn (string $operation) => $operation === 'create')
+                        // disabled() por si solo NO envia el valor al guardar - hace falta
+                        // dehydrated() explicito para que el codigo calculado (Grupo+Familia+Tipo
+                        // +incremental) sí llegue a guardarse al crear.
+                        ->dehydrated()
+                        ->helperText(fn (string $operation) => $operation === 'create'
+                            ? 'Se arma solo al elegir Grupo, Familia y Tipo — incluye el próximo incremental libre, no se puede repetir.'
+                            : 'Ej. CPV-01.01.01G — el código de Lorenzo con el prefijo CPV- agregado. No repetir.'),
                     Forms\Components\TextInput::make('source_version')
                         ->label('Versión de origen')
                         ->disabled()
