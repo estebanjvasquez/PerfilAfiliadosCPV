@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\ManagesInlineTranslations;
 use App\Models\TaxonomyCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -27,6 +28,8 @@ use App\Filament\Resources\TaxonomyGroupResource\Pages;
  */
 class TaxonomyGroupResource extends Resource
 {
+    use ManagesInlineTranslations;
+
     protected static ?string $model = TaxonomyCategory::class;
 
     protected static ?string $slug = 'taxonomy-groups';
@@ -70,6 +73,11 @@ class TaxonomyGroupResource extends Resource
                         ->disabled()
                         ->dehydrated(false),
                 ]),
+
+            Forms\Components\Section::make('Traducciones (ES/EN)')
+                ->description('Se puede cargar de una vez, sin guardar primero y volver a entrar a editar.')
+                ->columns(2)
+                ->schema(static::translationFields()),
         ]);
     }
 

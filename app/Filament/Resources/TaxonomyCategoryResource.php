@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\ManagesInlineTranslations;
 use App\Filament\Support\QueryBuilder\WideSelectIsOperator;
 use App\Models\TaxonomyCategory;
 use Filament\Forms;
@@ -33,6 +34,10 @@ use App\Filament\Resources\TaxonomyCategoryResource\RelationManagers;
  */
 class TaxonomyCategoryResource extends Resource
 {
+    // Solo se usa translationFields() acá (estático) - el resto del trait (guardar/precargar las
+    // traducciones) lo usan las páginas de Crear/Editar, no el Resource.
+    use ManagesInlineTranslations;
+
     protected static ?string $model = TaxonomyCategory::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
@@ -230,6 +235,11 @@ class TaxonomyCategoryResource extends Resource
                         ->dehydrated(false)
                         ->helperText('La carga (Excel) de donde vino esta fila.'),
                 ]),
+
+            Forms\Components\Section::make('Traducciones (ES/EN)')
+                ->description('Se puede cargar de una vez, sin guardar primero y volver a entrar a editar. La pestaña "Traducciones" (abajo, al editar) sigue disponible para un 3er idioma o revisar el detalle.')
+                ->columns(2)
+                ->schema(static::translationFields()),
 
             Forms\Components\Section::make('Etiquetas descriptivas (sin código propio)')
                 ->description('Branch/Subbranch del archivo de Lorenzo — texto libre, no son nodos navegables (acuerdo punto 2).')
