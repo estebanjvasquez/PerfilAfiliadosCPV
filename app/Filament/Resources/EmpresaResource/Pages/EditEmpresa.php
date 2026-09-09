@@ -63,6 +63,42 @@ class EditEmpresa extends EditRecord
         }
     }
 
+    /**
+     * Pedido del cliente (9 sep 2026): el RIF solo lo puede modificar un Super Admin - el resto
+     * de los usuarios lo ve en greyout, sin poder tocarlo. `disabled()` ya deja el campo
+     * visualmente greyed-out y evita que se guarde su valor (dehydrated(false) automático, ver
+     * Filament\Forms\Components\Concerns\CanBeDisabled) — pero eso NO alcanza solo, porque
+     * Filament sigue corriendo la validación (required/regex/unique) de un campo disabled
+     * mientras siga VISIBLE (`isHiddenAndNotDehydrated()` en
+     * vendor/filament/forms/src/Concerns/CanBeValidated.php solo salta componentes ocultos, no
+     * disabled). Sin este chequeo extra, cualquier usuario no-Super-Admin quedaría bloqueado
+     * para guardar CUALQUIER cambio de la empresa si su RIF actual no matcheara el regex nuevo
+     * (ej. datos históricos con formato distinto) — por eso unique()/maxLength()/regex() solo se
+     * agregan cuando sí es Super Admin, en vez de dejarlos siempre puestos.
+     */
+    protected function rifField(): Forms\Components\TextInput
+    {
+        $isSuperAdmin = (bool) auth()->user()?->hasRole('super_admin');
+
+        $field = Forms\Components\TextInput::make('rif')
+            ->required($isSuperAdmin)
+            ->disabled(! $isSuperAdmin)
+            ->placeholder('X123456789')
+            ->helperText(
+                'Formato: letra (V/E/J/P/G) seguida de 9 dígitos, sin guiones ni espacios.'
+                .($isSuperAdmin ? '' : ' Solo un Super Admin puede modificar el RIF.')
+            )
+            ->afterStateUpdated(function ($component, $state, $set) {
+                return $set($component, mb_strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $state)));
+            });
+
+        if ($isSuperAdmin) {
+            $field->unique(ignoreRecord: true)->maxLength(10)->regex('/^[VEJPG]\d{9}$/i');
+        }
+
+        return $field;
+    }
+
     public function getSteps(): array
     {
         $ciudades = City::get();
@@ -98,21 +134,7 @@ class EditEmpresa extends EditRecord
                         // Fix: el span de 3 solo tiene sentido desde md en adelante (donde el grid sí abre a
                         // 3 columnas); en mobile debe pedir 1 sola, igual que el resto de los campos.
                         ->columnSpan(['default' => 1, 'md' => 3]),
-                    // Antes tenía ->disabled(): si al crear la empresa el RIF quedaba mal
-                    // tipeado, no había forma de corregirlo desde el panel (reportado por el
-                    // cliente, presente desde el primer commit del proyecto, en producción y en
-                    // pruebas). Ahora es editable, con la misma validación que ya usa
-                    // CreateEmpresa.php (formato + unicidad) — ->unique(ignoreRecord: true) para
-                    // que no choque contra su propio valor actual al guardar sin cambiarlo.
-                    Forms\Components\TextInput::make('rif')->required()
-                        ->unique(ignoreRecord: true)
-                        ->maxLength(10)
-                        ->regex('/^[VEJPG]\d{9}$/i')
-                        ->placeholder('X123456789')
-                        ->helperText('Formato: letra (V/E/J/P/G) seguida de 9 dígitos, sin guiones ni espacios.')
-                        ->afterStateUpdated(function ($component, $state, $set) {
-                            return $set($component, mb_strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $state)));
-                        }),
+                    $this->rifField(),
                     Forms\Components\TextInput::make('name')->label(__('Nombre de la empresa'))->required()
                         ->afterStateUpdated(function ($component, $state, $set) {
                             return $set($component, mb_strtoupper($state));
