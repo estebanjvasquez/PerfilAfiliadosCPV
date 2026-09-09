@@ -98,9 +98,20 @@ class EditEmpresa extends EditRecord
                         // Fix: el span de 3 solo tiene sentido desde md en adelante (donde el grid sí abre a
                         // 3 columnas); en mobile debe pedir 1 sola, igual que el resto de los campos.
                         ->columnSpan(['default' => 1, 'md' => 3]),
-                    Forms\Components\TextInput::make('rif')->required()->disabled()
+                    // Antes tenía ->disabled(): si al crear la empresa el RIF quedaba mal
+                    // tipeado, no había forma de corregirlo desde el panel (reportado por el
+                    // cliente, presente desde el primer commit del proyecto, en producción y en
+                    // pruebas). Ahora es editable, con la misma validación que ya usa
+                    // CreateEmpresa.php (formato + unicidad) — ->unique(ignoreRecord: true) para
+                    // que no choque contra su propio valor actual al guardar sin cambiarlo.
+                    Forms\Components\TextInput::make('rif')->required()
+                        ->unique(ignoreRecord: true)
+                        ->maxLength(10)
+                        ->regex('/^[VEJPG]\d{9}$/i')
+                        ->placeholder('X123456789')
+                        ->helperText('Formato: letra (V/E/J/P/G) seguida de 9 dígitos, sin guiones ni espacios.')
                         ->afterStateUpdated(function ($component, $state, $set) {
-                            return $set($component, mb_strtoupper($state));
+                            return $set($component, mb_strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $state)));
                         }),
                     Forms\Components\TextInput::make('name')->label(__('Nombre de la empresa'))->required()
                         ->afterStateUpdated(function ($component, $state, $set) {
