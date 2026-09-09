@@ -64,6 +64,41 @@ class EditEmpresa extends EditRecord
         }
     }
 
+    /**
+     * Pedido del cliente (9 sep 2026): el RIF solo lo puede modificar un Super Admin - el resto
+     * de los usuarios lo ve en greyout, sin poder tocarlo. `disabled()` deja el campo
+     * visualmente greyed-out y evita que se guarde su valor, pero eso NO alcanza solo: en
+     * Filament v2 (filament/forms v2.16.51, confirmado leyendo el vendor)
+     * `ComponentContainer::getValidationRules()` NI SIQUIERA salta componentes ocultos/disabled
+     * al recorrer el nivel superior del formulario (solo lo hace para contenedores hijos vía
+     * `isHidden()`) - la validación de un campo disabled se sigue corriendo igual. Sin este
+     * chequeo extra, cualquier usuario no-Super-Admin quedaría bloqueado para guardar CUALQUIER
+     * cambio de la empresa si su RIF actual no matcheara el regex nuevo (dato histórico con otro
+     * formato) — por eso unique()/maxLength()/regex() solo se agregan cuando sí es Super Admin.
+     */
+    protected function rifField(): Forms\Components\TextInput
+    {
+        $isSuperAdmin = (bool) auth()->user()?->hasRole('super_admin');
+
+        $field = Forms\Components\TextInput::make('rif')
+            ->required($isSuperAdmin)
+            ->disabled(! $isSuperAdmin)
+            ->placeholder('X123456789')
+            ->helperText(
+                'Formato: letra (V/E/J/P/G) seguida de 9 dígitos, sin guiones ni espacios.'
+                .($isSuperAdmin ? '' : ' Solo un Super Admin puede modificar el RIF.')
+            )
+            ->afterStateUpdated(function ($component, $state, $set) {
+                return $set($component, mb_strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $state)));
+            });
+
+        if ($isSuperAdmin) {
+            $field->unique(ignoreRecord: true)->maxLength(10)->regex('/^[VEJPG]\d{9}$/i');
+        }
+
+        return $field;
+    }
+
     protected function getSteps(): array
     {
         $ciudades = City::get();
@@ -88,20 +123,7 @@ class EditEmpresa extends EditRecord
                             return $record->completionPercentage() . '% completado'
                                 . ($pendientes !== '' ? ' — Pendiente: ' . $pendientes : '');
                         })->columnSpan(3),
-                    // Antes tenía ->disabled(): si al crear la empresa el RIF quedaba mal
-                    // tipeado, no había forma de corregirlo desde el panel (reportado por el
-                    // cliente). Ahora es editable, con la misma validación que ya usa
-                    // CreateEmpresa.php (formato + unicidad) — ->unique(ignoreRecord: true) para
-                    // que no choque contra su propio valor actual al guardar sin cambiarlo.
-                    Forms\Components\TextInput::make('rif')->required()
-                        ->unique(ignoreRecord: true)
-                        ->maxLength(10)
-                        ->regex('/^[VEJPG]\d{9}$/i')
-                        ->placeholder('X123456789')
-                        ->helperText('Formato: letra (V/E/J/P/G) seguida de 9 dígitos, sin guiones ni espacios.')
-                        ->afterStateUpdated(function ($component, $state, $set) {
-                            return $set($component, mb_strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $state)));
-                        }),
+                    $this->rifField(),
                     Forms\Components\TextInput::make('name')->label(__('Nombre de la empresa'))->required()
                         ->afterStateUpdated(function ($component, $state, $set) {
                             return $set($component, mb_strtoupper($state));
