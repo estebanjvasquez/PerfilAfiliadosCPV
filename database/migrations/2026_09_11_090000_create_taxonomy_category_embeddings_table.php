@@ -19,6 +19,20 @@ use Illuminate\Support\Facades\DB;
  * Dimension del vector (1024): verificada empiricamente contra el modelo real
  * (@cf/baai/bge-m3 en el Worker perfilafiliados-mcp), no asumida de la documentacion de
  * Cloudflare (que no la especifica) - ver README de ese repo.
+ *
+ * Gotcha real encontrado al correr esta migracion (11 sep 2026): `$connection = 'pgsql'` hace
+ * que el `up()` de ESTA clase corra contra pgsql, pero el BOOKKEEPING de "esta migracion ya se
+ * corrio" lo escribe el Migrator en la tabla `migrations` de la conexion POR DEFECTO del comando
+ * (`mysql` en este proyecto, no pgsql) - dos tablas `migrations` fisicamente distintas. Si se
+ * corre `php artisan migrate` local (default mysql) contra el mismo Supabase que usa Contabo, la
+ * fila de bookkeeping queda en la `migrations` de mysql, NO en la de pgsql - el siguiente
+ * `migrate --force` de un entorno con `DB_CONNECTION=pgsql` (Contabo) no la ve como corrida e
+ * intenta crear la tabla de nuevo -> `SQLSTATE[42P07] Duplicate table` (pasó en vivo en el
+ * deploy de este mismo commit). Fix aplicado a mano una vez: insertar la fila correspondiente
+ * en `DB::connection('pgsql')->table('migrations')` (mismo patron que
+ * `SkipMysqlOnlyViewMigrationsOnPgsql`). Para la PROXIMA migracion con `$connection = 'pgsql'`:
+ * correrla ya sea con `--database=pgsql`, o replicar ese insert manual una vez contra pgsql
+ * despues de correrla localmente.
  */
 return new class extends Migration
 {
