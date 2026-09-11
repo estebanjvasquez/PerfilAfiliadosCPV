@@ -88,7 +88,7 @@
     <div id="msgs"></div>
     <footer>
       <textarea id="input" rows="1" placeholder="Escribe una consulta de prueba..."></textarea>
-      <button class="send" id="send">&#10148;</button>
+      <button class="send" id="send" type="button">&#10148;</button>
     </footer>
   </main>
 
@@ -98,7 +98,7 @@
 
   // Webhook del flujo CLONADO de n8n ("Chat CIRA V5 - MCP", zbVLoCdR09IA9yQK) — Fase MCP-2.
   // Requiere que ese workflow esté ACTIVO en n8n; si no, el fetch devuelve 404.
-  var WEBHOOK_URL = "https://vmi2945958.contaboserver.net/webhook/4882efaf-6d0e-44ae-82fe-61ebab61f54b/4882efaf-6d0e-44ae-82fe-61ebab61f54b";
+  var WEBHOOK_URL = "https://vmi2945958.contaboserver.net/webhook/4882efaf-6d0e-44ae-82fe-61ebab61f54b";
 
   var msgs   = document.getElementById("msgs");
   var input  = document.getElementById("input");
