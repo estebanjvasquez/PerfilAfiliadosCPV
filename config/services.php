@@ -36,4 +36,11 @@ return [
         'secret_key' => env('TURNSTILE_SECRET_KEY'),
     ],
 
+    // Worker de embeddings de la taxonomia CPV (repo aparte perfilafiliados-mcp), Fase MCP-1 de
+    // docs/taxonomia/plan_mcp_cira.md. token debe coincidir con el secret EMBED_TOKEN del Worker.
+    'mcp' => [
+        'embed_url' => env('MCP_EMBED_URL'),
+        'embed_token' => env('MCP_EMBED_TOKEN'),
+    ],
+
 ];
