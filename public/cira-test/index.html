@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>CIRA — Entorno de Pruebas (MCP)</title>
+<link rel="preconnect" href="https://vmi2945958.contaboserver.net">
+<style>
+  :root{ --gold:#faa819; --gold-soft:#fff8ee; }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:#f2f2f2; color:#222; height:100vh; display:flex; flex-direction:column;
+  }
+  .banner{
+    background:#1a1a2e; color:#fff; padding:10px 16px; font-size:13px; text-align:center;
+    line-height:1.5;
+  }
+  .banner strong{ color:var(--gold); }
+  header{
+    display:flex; align-items:center; gap:10px; padding:12px 16px; background:#fff;
+    border-bottom:1px solid #e2e2e2; flex-shrink:0;
+  }
+  header img{ width:36px; height:36px; border-radius:50%; }
+  header .title{ font-weight:700; font-size:15px; }
+  header .sub{ font-size:11px; color:#888; }
+  header .session{ margin-left:auto; font-size:11px; color:#999; text-align:right; }
+  header button{
+    margin-left:12px; border:1px solid #ddd; background:#fff; border-radius:20px;
+    padding:6px 12px; font-size:12px; cursor:pointer; color:#444;
+  }
+  header button:hover{ border-color:var(--gold); color:var(--gold); }
+  main{ flex:1; overflow:hidden; display:flex; flex-direction:column; max-width:760px; width:100%; margin:0 auto; background:#fff; }
+  #msgs{ flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; background:#f9f9f9; }
+  .row{ display:flex; gap:8px; align-items:flex-start; }
+  .row.user{ justify-content:flex-end; }
+  .bubble{ padding:11px 14px; border-radius:10px; max-width:82%; font-size:14px; line-height:1.55; word-break:break-word; }
+  .row.user .bubble{ background:var(--gold); color:#fff; }
+  .row.bot .bubble{ background:#fff; border:1px solid #e0e0e0; }
+  .avatar{ width:26px; height:26px; border-radius:50%; flex-shrink:0; margin-top:2px; }
+  .meta-tag{
+    display:inline-block; font-size:10px; text-transform:uppercase; letter-spacing:.03em;
+    color:#999; margin-bottom:4px; font-weight:600;
+  }
+  .loader{ font-style:italic; color:#888; display:flex; align-items:center; gap:8px; }
+  .spinner{ width:13px; height:13px; border:2px solid var(--gold); border-top-color:transparent; border-radius:50%; animation:spin .8s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  footer{ display:flex; padding:10px; gap:8px; border-top:1px solid #eee; background:#fff; flex-shrink:0; }
+  textarea{
+    flex:1; border-radius:20px; border:1px solid #ddd; padding:9px 14px; resize:none;
+    height:42px; font-size:14px; font-family:inherit; outline:none;
+  }
+  textarea:focus{ border-color:var(--gold); }
+  button.send{
+    width:40px; height:40px; border-radius:50%; border:none; background:var(--gold);
+    color:#fff; cursor:pointer; font-size:16px; flex-shrink:0;
+  }
+  button.send:hover{ opacity:.85; }
+  .quick{ display:flex; flex-wrap:wrap; gap:6px; padding:0 16px 10px; }
+  .quick button{
+    border:1px solid #ddd; background:var(--gold-soft); border-radius:14px; padding:5px 10px;
+    font-size:11px; cursor:pointer; color:#7a5800;
+  }
+  .quick button:hover{ border-color:var(--gold); }
+</style>
+</head>
+<body>
+
+  <div class="banner">
+    🧪 <strong>Ambiente de pruebas — Fase MCP-2</strong>: conectado al flujo clonado de n8n
+    ("Chat CIRA V5 - MCP"), no al bot de producción. Las conversaciones acá no las ve ningún
+    visitante real del sitio.
+  </div>
+
+  <header>
+    <img src="/images/cirabot.png" alt="CIRA">
+    <div>
+      <div class="title">CIRA — Asistente CPV</div>
+      <div class="sub">Entorno de pruebas MCP</div>
+    </div>
+    <div class="session">sesión: <span id="sid-label">—</span></div>
+    <button id="reset-btn" type="button">Nueva conversación</button>
+  </header>
+
+  <main>
+    <div class="quick" id="quick"></div>
+    <div id="msgs"></div>
+    <footer>
+      <textarea id="input" rows="1" placeholder="Escribe una consulta de prueba..."></textarea>
+      <button class="send" id="send">&#10148;</button>
+    </footer>
+  </main>
+
+<script>
+(function(){
+  "use strict";
+
+  // Webhook del flujo CLONADO de n8n ("Chat CIRA V5 - MCP", zbVLoCdR09IA9yQK) — Fase MCP-2.
+  // Requiere que ese workflow esté ACTIVO en n8n; si no, el fetch devuelve 404.
+  var WEBHOOK_URL = "https://vmi2945958.contaboserver.net/webhook/4882efaf-6d0e-44ae-82fe-61ebab61f54b/4882efaf-6d0e-44ae-82fe-61ebab61f54b";
+
+  var msgs   = document.getElementById("msgs");
+  var input  = document.getElementById("input");
+  var send   = document.getElementById("send");
+  var sidLbl = document.getElementById("sid-label");
+  var quick  = document.getElementById("quick");
+
+  var SID_KEY = "cira_test_sid"; // distinto de "cira_sid" (producción) a propósito
+  var sid = newSid();
+  renderSid();
+
+  function newSid(){
+    var s = "test-" + (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString());
+    sessionStorage.setItem(SID_KEY, s);
+    return s;
+  }
+  function renderSid(){ sidLbl.textContent = sid.replace("test-", "").slice(0, 8) + "…"; }
+
+  document.getElementById("reset-btn").onclick = function(){
+    sid = newSid();
+    renderSid();
+    msgs.innerHTML = "";
+    addBot("Conversación reiniciada. ¿Qué querés probar?", null);
+  };
+
+  var QUICK_PROMPTS = [
+    "hola",
+    "operadores",
+    "necesito una empresa de perforacion",
+    "necesito arbolitos para pozos petroleros",
+    "dame todas las empresas",
+    "como me afilio a la camara?"
+  ];
+  QUICK_PROMPTS.forEach(function(p){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = p;
+    b.onclick = function(){ sendMsg(p); };
+    quick.appendChild(b);
+  });
+
+  function linkify(text){
+    return String(text).replace(/\n/g, "<br>");
+  }
+
+  function addUser(text){
+    var row = document.createElement("div");
+    row.className = "row user";
+    row.innerHTML = '<div class="bubble"></div>';
+    row.querySelector(".bubble").textContent = text;
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function addBot(html, type){
+    var row = document.createElement("div");
+    row.className = "row bot";
+    var tag = type ? '<div class="meta-tag">type: ' + type + '</div>' : "";
+    row.innerHTML =
+      '<img class="avatar" src="/images/cirabot.png" alt="">' +
+      '<div class="bubble">' + tag + linkify(html) + '</div>';
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function addLoader(){
+    var row = document.createElement("div");
+    row.className = "row bot";
+    row.id = "loader-row";
+    row.innerHTML =
+      '<img class="avatar" src="/images/cirabot.png" alt="">' +
+      '<div class="bubble loader"><div class="spinner"></div><span>Procesando…</span></div>';
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+  function removeLoader(){
+    var l = document.getElementById("loader-row");
+    if(l) l.remove();
+  }
+
+  window.sendPrompt = function(text){ sendMsg(text); };
+
+  async function sendMsg(text){
+    if(typeof text !== "string" || !text){ text = input.value.trim(); }
+    if(!text) return;
+
+    addUser(text);
+    input.value = "";
+    addLoader();
+
+    var t0 = Date.now();
+    try {
+      var r = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chatInput: text, sessionId: sid })
+      });
+
+      var elapsed = Date.now() - t0;
+      removeLoader();
+
+      if(!r.ok){
+        addBot("Error HTTP " + r.status + " — ¿el workflow clonado está activo en n8n? (" + elapsed + "ms)", "error");
+        return;
+      }
+
+      var data = await r.json();
+      var item = Array.isArray(data) ? data[0] : data;
+      var reply = item && (item.output || item.text);
+      addBot(reply || "Sin respuesta.", (item && item.type) ? item.type + " · " + elapsed + "ms" : elapsed + "ms");
+
+    } catch(e){
+      removeLoader();
+      addBot("Error de conexión: " + e.message, "error");
+    }
+  }
+
+  send.onclick = function(){ sendMsg(); };
+  input.addEventListener("keypress", function(e){
+    if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); sendMsg(); }
+  });
+  input.addEventListener("input", function(){
+    this.style.height = "42px";
+    this.style.height = Math.min(this.scrollHeight, 120) + "px";
+  });
+
+  addBot("¡Hola! Este es el entorno de pruebas del flujo MCP-2. Probá cualquier consulta o usá los atajos de arriba.", null);
+})();
+</script>
+</body>
+</html>
