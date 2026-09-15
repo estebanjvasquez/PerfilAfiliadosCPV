@@ -123,39 +123,55 @@ class TaxonomyCategoriesRelationManager extends RelationManager
             ]);
     }
 
+    /**
+     * Reescrita (15 sep 2026) tras probar en vivo contra `pruebas.camarapetrolera.app`: 2 búsquedas
+     * reales ("servicio valvula", "cabezales") no devolvían nada en pantalla, aunque
+     * `TaxonomyCategorySearch::search()` sí devuelve resultados correctos para esas mismas frases
+     * probado por tinker (8 resultados cada una) - el bug estaba en el mecanismo de UI, no en la
+     * búsqueda: un `TextInput` con `suffixAction` escribiendo a un campo `Hidden` para que un
+     * `CheckboxList` lo leyera por `Get` es un combo poco probado en Filament v3, y no refrescaba
+     * bien dentro del modal de la Action. Se reemplaza por `Select::make(...)->multiple()
+     * ->searchable()->getSearchResultsUsing(...)` - el mismo patrón reactivo (`Select` con
+     * `getSearchResultsUsing`/`live()`) que YA funciona en este mismo proyecto
+     * (`TaxonomyCategoryResource.php`, cascada Grupo→Familia→Categoría) - built-in de Filament, sin
+     * juntar estado a mano entre 2 campos.
+     *
+     * También responde el pedido de poder "ver las categorías de una Familia": el segundo Select
+     * (`familia_a_explorar`) + el `CheckboxList` que depende de él (`categorias_de_familia`) dejan
+     * elegir una Familia y ver/marcar sus categorías hijas directamente - antes esto solo era un
+     * texto de aviso ("tiene 8 categorías más específicas"), ahora es realmente navegable.
+     */
     private function buscarYAgregarAction(): Tables\Actions\Action
     {
         return Tables\Actions\Action::make('buscarYAgregar')
             ->label('Buscar y agregar categoría')
             ->icon('heroicon-o-magnifying-glass')
             ->form([
-                Forms\Components\TextInput::make('busqueda')
+                Forms\Components\Select::make('categorias')
                     ->label('¿Qué ofrece su empresa? (texto libre, español o inglés)')
-                    ->placeholder('ej. mantenimiento de válvulas, servicios de perforación direccional...')
-                    ->suffixAction(
-                        Forms\Components\Actions\Action::make('buscar')
-                            ->icon('heroicon-m-magnifying-glass')
-                            ->action(function (Get $get, Set $set) {
-                                $resultados = app(TaxonomyCategorySearch::class)
-                                    ->search((string) $get('busqueda'), 12)
-                                    ->all();
-
-                                $set('resultados', $resultados);
-                            })
-                    ),
-                Forms\Components\Hidden::make('resultados')->default([]),
-                Forms\Components\CheckboxList::make('seleccion_busqueda')
-                    ->label('Resultados')
-                    ->options(fn (Get $get) => collect($get('resultados') ?? [])->pluck('breadcrumb', 'category_id'))
-                    ->descriptions(fn (Get $get) => $this->descripcionesDeHijos($get('resultados') ?? []))
-                    ->columns(1)
-                    ->visible(fn (Get $get) => ! empty($get('resultados'))),
-                Forms\Components\Select::make('categoria_arbol')
-                    ->label('O elegí directamente una categoría existente')
-                    ->helperText('Alternativa a la búsqueda, para quien prefiera encontrarla por nombre exacto.')
+                    ->placeholder('ej. mantenimiento de válvulas, cabezales, perforación direccional...')
+                    ->multiple()
                     ->searchable()
-                    ->getSearchResultsUsing(fn (string $search) => $this->opcionesArbol($search))
-                    ->getOptionLabelUsing(fn ($value) => TaxonomyCategory::find($value)?->breadcrumb('es')),
+                    ->getSearchResultsUsing(fn (string $search) => $this->opcionesBusqueda($search))
+                    ->getOptionLabelsUsing(fn (array $values) => TaxonomyCategory::query()
+                        ->whereIn('id', $values)
+                        ->get()
+                        ->mapWithKeys(fn (TaxonomyCategory $c) => [$c->id => $c->breadcrumb('es')])
+                        ->all())
+                    ->helperText('Escriba y espere un instante — los resultados aparecen solos, no hace falta apretar nada.'),
+                Forms\Components\Select::make('familia_a_explorar')
+                    ->label('¿Prefiere explorar una Familia completa en vez de buscar?')
+                    ->helperText('Elija una Familia para ver y marcar directamente sus categorías más específicas.')
+                    ->searchable()
+                    ->getSearchResultsUsing(fn (string $search) => $this->opcionesFamilia($search))
+                    ->getOptionLabelUsing(fn ($value) => TaxonomyCategory::find($value)?->breadcrumb('es'))
+                    ->live()
+                    ->afterStateUpdated(fn (Set $set) => $set('categorias_de_familia', [])),
+                Forms\Components\CheckboxList::make('categorias_de_familia')
+                    ->label('Categorías de esa Familia')
+                    ->options(fn (Get $get) => $this->opcionesHijosDe($get('familia_a_explorar')))
+                    ->columns(1)
+                    ->visible(fn (Get $get) => filled($get('familia_a_explorar'))),
                 Forms\Components\Radio::make('tipo')
                     ->label('Guardar como')
                     ->options([
@@ -167,8 +183,8 @@ class TaxonomyCategoriesRelationManager extends RelationManager
                     ->required(),
             ])
             ->action(function (array $data) {
-                $categoryIds = collect($data['seleccion_busqueda'] ?? [])
-                    ->merge(array_filter([$data['categoria_arbol'] ?? null]))
+                $categoryIds = collect($data['categorias'] ?? [])
+                    ->merge($data['categorias_de_familia'] ?? [])
                     ->unique()
                     ->map(fn ($id) => (int) $id)
                     ->values();
@@ -205,18 +221,36 @@ class TaxonomyCategoriesRelationManager extends RelationManager
             });
     }
 
+    /** @return array<int, string> category_id => breadcrumb (+ aviso si es una Familia con hijos). */
+    private function opcionesBusqueda(string $search): array
+    {
+        $resultados = app(TaxonomyCategorySearch::class)->search($search, 15);
+
+        $hijosPorFamilia = TaxonomyCategory::query()
+            ->whereIn('parent_id', $resultados->where('level', TaxonomyCategory::LEVEL_FAMILY)->pluck('category_id'))
+            ->get()
+            ->countBy('parent_id');
+
+        return $resultados->mapWithKeys(function (array $r) use ($hijosPorFamilia) {
+            $aviso = $r['level'] === TaxonomyCategory::LEVEL_FAMILY && ($hijosPorFamilia[$r['category_id']] ?? 0) > 0
+                ? ' — Familia completa ('.$hijosPorFamilia[$r['category_id']].' categorías más específicas debajo, ver "explorar una Familia")'
+                : '';
+
+            return [$r['category_id'] => $r['breadcrumb'].$aviso];
+        })->all();
+    }
+
     /**
      * @return array<int, string>
      *
      * Postgres distingue tildes en ILIKE (a diferencia de MySQL) - sin `unaccent()` en ambos lados
      * "valvulas" nunca matchea "Válvulas" en la base real. Mismo gotcha ya documentado y resuelto
-     * en `perfilafiliados-mcp/src/taxonomy-tools.ts` y en `TaxonomyCategorySearch` - encontrado acá
-     * probando este método contra la Supabase real antes de darlo por terminado.
+     * en `perfilafiliados-mcp/src/taxonomy-tools.ts` y en `TaxonomyCategorySearch`.
      */
-    private function opcionesArbol(string $search): array
+    private function opcionesFamilia(string $search): array
     {
         return TaxonomyCategory::query()
-            ->where('level', '!=', TaxonomyCategory::LEVEL_GROUP)
+            ->where('level', TaxonomyCategory::LEVEL_FAMILY)
             ->where('is_active', true)
             ->whereHas('translations', fn ($q) => $q->whereRaw('unaccent(name) ilike unaccent(?)', ['%'.$search.'%']))
             ->limit(20)
@@ -225,22 +259,18 @@ class TaxonomyCategoriesRelationManager extends RelationManager
             ->all();
     }
 
-    /** Aviso de un clic (sin forzar navegación) cuando el match es una Familia con hijos - ver el PDF de diseño, sección 4. */
-    private function descripcionesDeHijos(array $resultados): array
+    /** @return array<int, string> Categorías hijas directas de la Familia elegida en el explorador. */
+    private function opcionesHijosDe(mixed $familiaId): array
     {
-        $familiaIds = collect($resultados)
-            ->where('level', TaxonomyCategory::LEVEL_FAMILY)
-            ->pluck('category_id');
-
-        if ($familiaIds->isEmpty()) {
+        if (! $familiaId) {
             return [];
         }
 
         return TaxonomyCategory::query()
-            ->whereIn('parent_id', $familiaIds)
+            ->where('parent_id', $familiaId)
+            ->where('is_active', true)
             ->get()
-            ->groupBy('parent_id')
-            ->map(fn ($hijos, $parentId) => "Tiene {$hijos->count()} categorías más específicas — ¿alguna aplica mejor?")
+            ->mapWithKeys(fn (TaxonomyCategory $c) => [$c->id => $c->breadcrumb('es')])
             ->all();
     }
 
