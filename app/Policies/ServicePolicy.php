@@ -32,47 +32,27 @@ class ServicePolicy
     }
 
     /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
+     * Catálogo viejo puesto en SOLO LECTURA (15 sep 2026) - ver el mismo comentario en
+     * SectorPolicy::create(). `viewAny`/`view` no se tocan.
      */
     public function create(User $user)
     {
-        return $user->can('create_service');
+        return false;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
     public function update(User $user)
     {
-        return $user->can('update_service');
+        return false;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
     public function delete(User $user)
     {
-        return $user->can('delete_service');
+        return false;
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
     public function deleteAny(User $user)
     {
-        return $user->can('delete_any_service');
+        return false;
     }
 
 }

@@ -32,47 +32,32 @@ class SectorPolicy
     }
 
     /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
+     * Catálogo viejo puesto en SOLO LECTURA (15 sep 2026) al retomar la Fase 3 del proyecto de
+     * taxonomía: la clasificación por Sector/Servicio sigue siendo la fuente de los reportes
+     * actuales (por eso no se toca ni se inactiva ningún dato), pero deja de ser editable desde el
+     * panel - la taxonomía CPV nueva (`TaxonomyCategoryResource`) es la que se sigue manteniendo
+     * hacia adelante. Hardcodeado a `false` (ya no delega en `$user->can(...)`) para que ni
+     * siquiera Super Admin pueda crear/editar/borrar un Sector por error - `viewAny`/`view` no se
+     * tocan, siguen dependiendo del permiso de siempre.
      */
     public function create(User $user)
     {
-        return $user->can('create_sector');
+        return false;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
     public function update(User $user)
     {
-        return $user->can('update_sector');
+        return false;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
     public function delete(User $user)
     {
-        return $user->can('delete_sector');
+        return false;
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
     public function deleteAny(User $user)
     {
-        return $user->can('delete_any_sector');
+        return false;
     }
 
 }
