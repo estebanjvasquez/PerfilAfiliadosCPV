@@ -27,11 +27,13 @@ class EmpresaTaxonomyCategory extends Model
         'empresa_id',
         'category_id',
         'origen',
+        'es_principal',
         'approved_by',
         'approved_at',
     ];
 
     protected $casts = [
+        'es_principal' => 'boolean',
         'approved_at' => 'datetime',
     ];
 

@@ -240,6 +240,17 @@ class Empresa extends Model
     }
 
     /**
+     * Categorías CPV vinculadas (Fase 4) - `EmpresaTaxonomyCategory` vive en la conexión `pgsql`,
+     * distinta a la de este modelo (`mysql`), pero un `hasMany` corre siempre contra la conexión
+     * del modelo RELACIONADO, no la del dueño - mismo patrón cross-connection ya usado en el
+     * proyecto (ver `EmpresaTaxonomyCategory::empresa()` -> `EmpresaPgsql`, no `self`).
+     */
+    public function taxonomyCategories(): HasMany
+    {
+        return $this->hasMany(EmpresaTaxonomyCategory::class, 'empresa_id');
+    }
+
+    /**
      * Ids de los sectores permitidos para la empresa (principal y secundario).
      */
     public function allowedSectorIds(): array

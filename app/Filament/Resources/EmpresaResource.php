@@ -24,6 +24,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Select;
 use Illuminate\Support\Facades\Blade;
@@ -378,6 +379,7 @@ class EmpresaResource extends Resource
             RelationManagers\ContactsRelationManager::class,
             RelationManagers\UsersRelationManager::class,
             RelationManagers\ServicesRelationManager::class,
+            RelationManagers\TaxonomyCategoriesRelationManager::class,
             RelationManagers\AssetsRelationManager::class,
             RelationManagers\ManagementRelationManager::class,
             RelationManagers\ExperiencesRelationManager::class,
@@ -400,8 +402,24 @@ class EmpresaResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        //return self::$model::all()->count();
-        return self::$model::whereRelation('users', 'users.id', '=', Auth::User()->id)->count();
+        // Este metodo lo llama Filament en CADA carga de pagina del panel (arma el badge del
+        // sidebar), no solo al entrar a Empresas. Sin cache, esta query contra Supabase se
+        // sumaba a la respuesta de CUALQUIER navegacion (incluida la carcasa con el skeleton de
+        // deferLoading, ver AdminPanelProvider::boot()) y la bloqueaba hasta terminar - eso daba
+        // la sensacion de "sistema colgado" en TODAS las opciones de navegacion, no solo en
+        // reportes pesados. El numero no necesita estar exacto al segundo (solo cambia cuando se
+        // vincula/desvincula un usuario a una empresa), asi que se cachea 60s por usuario.
+        $userId = Auth::id();
+
+        if (! $userId) {
+            return null;
+        }
+
+        return (string) Cache::remember(
+            "empresas-nav-badge-user-{$userId}",
+            60,
+            fn () => self::$model::whereRelation('users', 'users.id', '=', $userId)->count()
+        );
     }
 
     public static function getWidgets(): array
