@@ -21,6 +21,15 @@ use Illuminate\Support\Facades\DB;
  * inmutabilidad en la expresión de una columna generada (el workaround típico es una función wrapper
  * marcada IMMUTABLE, pero es más simple calcularlo a mano en el mismo comando que ya escribe
  * `document`, igual que ya se hace con las columnas de embedding de este proyecto).
+ *
+ * `IF NOT EXISTS` (TAXV3-7, incidente 18 sep 2026): esta migración se había corrido una vez desde un
+ * entorno con `DB_CONNECTION=mysql` por default - la tabla quedó creada en el pgsql compartido, pero
+ * el registro de "ya corrió" se guardó en la tabla `migrations` de MYSQL (bookkeeping sigue la
+ * conexión default, no el `$connection` de la migración - mismo gotcha ya documentado para
+ * Spatie Permission). Al desplegar en el servidor (`DB_CONNECTION=pgsql` ahí) `artisan migrate` no
+ * la veía como aplicada e intentó crear la tabla de nuevo, sin la app de por medio, se planto en
+ * mantenimiento (`artisan down` sin el `up` posterior). Idempotente de acá en más para que cualquier
+ * entorno que la corra por primera vez la registre sin fallar aunque la tabla ya exista.
  */
 return new class extends Migration
 {
@@ -29,7 +38,7 @@ return new class extends Migration
     public function up(): void
     {
         DB::connection('pgsql')->statement(<<<'SQL'
-            CREATE TABLE empresa_search_documents (
+            CREATE TABLE IF NOT EXISTS empresa_search_documents (
                 empresa_id BIGINT PRIMARY KEY REFERENCES empresas(id) ON DELETE CASCADE,
                 document TEXT NOT NULL,
                 search_vector TSVECTOR NOT NULL,
@@ -38,7 +47,7 @@ return new class extends Migration
         SQL);
 
         DB::connection('pgsql')->statement(
-            'CREATE INDEX empresa_search_documents_gin ON empresa_search_documents USING gin (search_vector)'
+            'CREATE INDEX IF NOT EXISTS empresa_search_documents_gin ON empresa_search_documents USING gin (search_vector)'
         );
     }
 
