@@ -262,7 +262,7 @@
 
     if(/^\/debug-on$/i.test(trimmed)){
       addUser(text);
-      addBot("Uso: /debug-on <clave>", null);
+      addBot("Uso: /debug-on [clave]", null);
       return true;
     }
 
@@ -318,7 +318,7 @@
         body: JSON.stringify({ query: text })
       });
       if(r.status === 401){
-        addBot("🔧 DEBUG: la clave guardada dejó de ser válida - usá /debug-on <clave> de nuevo.", "error");
+        addBot("🔧 DEBUG: la clave guardada dejó de ser válida - usá /debug-on [clave] de nuevo.", "error");
         sessionStorage.removeItem(DEBUG_KEY);
         return;
       }
@@ -387,7 +387,7 @@
   });
 
   refreshDebugBadge();
-  addBot("¡Hola! Este es el entorno de pruebas del flujo MCP-2. Probá cualquier consulta o usá los atajos de arriba. Comandos: /debug-on <clave>, /debug-off, /debug-status.", null);
+  addBot("¡Hola! Este es el entorno de pruebas del flujo MCP-2. Probá cualquier consulta o usá los atajos de arriba. Comandos: /debug-on [clave], /debug-off, /debug-status.", null);
 })();
 </script>
 </body>
