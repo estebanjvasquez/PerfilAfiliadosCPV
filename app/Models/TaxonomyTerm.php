@@ -88,6 +88,13 @@ class TaxonomyTerm extends Model
         return $this->belongsTo(TaxonomySource::class, 'primary_source_id', 'source_id');
     }
 
+    /** TAXV3-2: concepto(s) canónico(s) a los que pertenece este término/variante/regionalismo. */
+    public function concepts()
+    {
+        return $this->belongsToMany(TaxonomyCanonicalConcept::class, 'taxonomy_term_concepts', 'term_id', 'concept_id')
+            ->withPivot('created_at');
+    }
+
     /** V2->V3: bindings verificados (N:M real) - ver docblock de `taxonomy_term_source_bindings`. */
     public function sourceBindings()
     {
