@@ -27,6 +27,22 @@ use Illuminate\Support\Facades\DB;
  * la Fase B (Full Source Discovery, fuera de esta fase) los resuelva si encuentra una fuente real
  * que documente el regionalismo.
  *
+ * **Corrección TAXV3-7** (encontrada al preparar la integración con el buscador real de CIRA):
+ * `pg_trgm` puntúa igual de alto un hiperónimo genérico de una sola palabra contra un concepto de
+ * dos palabras que comparte esa palabra (ej. "drilling" vs "drilling mud", similarity 0.6923) que un
+ * subtipo legítimo del mismo objeto (ej. "annular preventer" vs "annular blowout preventer", misma
+ * similarity) - el número solo no distingue "es un tipo de" de "aparece en el nombre de". Esto había
+ * fusionado 22 términos genéricos de perforación ("drilling equipment/tools/services", "servicios/
+ * equipos/ingeniería de perforación", etc. - todos con su propia relación CPV `approved` directa,
+ * CPV-28.06.01S) dentro del concepto "drilling mud", con el riesgo real de que el término genuino
+ * "drilling mud"/"lodo de perforación" (que NO tiene relación propia aprobada) heredara por el
+ * concepto el código de "perforación general" en vez de quedar sin señal. Corregido con el guard de
+ * `hasOwnApprovedRelation()` abajo: un término que YA tiene su propia relación `approved` no necesita
+ * la capa de conceptos (esa capa es para los que no tienen ninguna verificación propia todavía), así
+ * que nunca se auto-vincula por similitud - elimina la fuente del falso positivo sin bajar el umbral
+ * ni perder los casos legítimos (kelly/hex kelly, drill string + variantes, annular/blowout
+ * preventer, oil based mud) que sí quedaron intactos porque ninguno tenía relación propia previa.
+ *
  * Idempotente: un término ya vinculado a cualquier concepto no se vuelve a tocar en una segunda
  * corrida.
  */
@@ -107,11 +123,20 @@ class BootstrapTaxonomyCanonicalConcepts extends Command
     {
         $linked = 0;
 
+        // Excluye términos que YA tienen su propia relación CPV `approved`: la capa de conceptos
+        // existe para que un término SIN verificación propia herede la de un hermano - uno que ya
+        // tiene la suya no gana nada uniéndose, y sí puede generar un falso positivo si un hiperónimo
+        // genérico (ej. "drilling") queda agrupado por trigram con un concepto más específico que
+        // comparte la palabra (ej. "drilling mud") - ver docblock de la clase, corrección TAXV3-7.
         $unlinkedTerms = DB::connection('pgsql')->select(<<<'SQL'
             SELECT t.id, t.canonical_term
             FROM taxonomy_terms t
             WHERE t.canonical_term IS NOT NULL
               AND NOT EXISTS (SELECT 1 FROM taxonomy_term_concepts tc WHERE tc.term_id = t.id)
+              AND NOT EXISTS (
+                  SELECT 1 FROM taxonomy_term_cpv_relations r
+                  WHERE r.term_id = t.id AND r.status = 'approved'
+              )
         SQL);
 
         foreach ($unlinkedTerms as $term) {
