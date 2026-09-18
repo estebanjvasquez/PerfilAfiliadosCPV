@@ -26,6 +26,20 @@ use Spatie\Permission\Models\Role;
  * fuera de `shield:generate` (como estos 7) no le llega solo; sin este seeder asignándoselo a mano,
  * ni el propio super_admin podía acceder al Dashboard/Pesos/aprobar-rechazar/fuentes - se
  * verificó el error real contra un usuario real antes de este fix.
+ *
+ * **CRÍTICO: correr esto una sola vez NO alcanza.** Los modelos de `spatie/laravel-permission`
+ * (`Role`/`Permission`/`User`) no fijan una conexión propia - usan `database.default`, que cambia
+ * según el `.env` de CADA entorno (`mysql` en local/producción WHM, `pgsql` en el servidor Contabo
+ * de pruebas). Esto significa que `roles`/`permissions`/`model_has_roles` son 2 copias
+ * INDEPENDIENTES que no se sincronizan solas - correr este seeder en un entorno (p.ej. local, contra
+ * `mysql`) NO le llega al otro (p.ej. Contabo, contra `pgsql`), aunque ambos compartan las mismas
+ * tablas de taxonomía (`taxonomy_terms` etc. sí fijan `$connection='pgsql'` a propósito, por eso esas
+ * no tienen este problema). Bug real encontrado en producción: el panel de Contabo mostraba "406/406
+ * permisos" al verificarlo desde una tinker local, pero el propio servidor de Contabo (conexión
+ * `pgsql`) solo tenía 403 y ninguno de estos 7 - el grupo de navegación "Taxonomía CPV" entero
+ * desaparecía para el super_admin ahí, sin ningún error visible. Hay que correr
+ * `php artisan db:seed --class=Database\Seeders\TaxonomyV2PermissionsSeeder --force` en CADA entorno
+ * desplegado por separado, no solo donde se desarrolla.
  */
 class TaxonomyV2PermissionsSeeder extends Seeder
 {
