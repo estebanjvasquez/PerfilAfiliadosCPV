@@ -22,6 +22,8 @@ class TaxonomyAuditLog extends Model
         'new_value',
         'reason',
         'taxonomy_version_id',
+        'actor_type',
+        'algorithm_version',
         'created_at',
     ];
 

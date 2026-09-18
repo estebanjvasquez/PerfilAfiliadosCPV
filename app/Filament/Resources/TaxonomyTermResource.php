@@ -159,13 +159,15 @@ class TaxonomyTermResource extends Resource
                     Forms\Components\TextInput::make('term_category')->label('Categoría temática')->maxLength(100),
                     Forms\Components\TextInput::make('term_subcategory')->label('Subcategoría temática')->maxLength(100),
                     Forms\Components\Select::make('mapping_review_status')
-                        ->label('Estado de mapeo')
+                        ->label('Estado de mapeo CPV')
                         ->options([
                             TaxonomyTerm::MAPPING_AUTO_MAPPED => 'Auto-mapeado',
+                            TaxonomyTerm::MAPPING_NEEDS_REVIEW => 'Falta mapear (Auto Mapper pendiente)',
                             TaxonomyTerm::MAPPING_UNMAPPED => 'Sin mapear',
                         ])
                         ->native(false)
-                        ->required(),
+                        ->required()
+                        ->helperText('Eje independiente de la procedencia de fuente (ver sección "Procedencia" abajo) - un término puede estar sin fuente externa verificada y aun así estar correctamente mapeado a CPV.'),
                     Forms\Components\TagsInput::make('region')
                         ->label('Región')
                         ->helperText('Ej. GLOBAL, US, VE.')
@@ -242,9 +244,10 @@ class TaxonomyTermResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip('Cómo entró la fila al sistema (import JSON/crawler/manual) - no implica que sea la fuente verificada del término, ver "Fuente".'),
                 Tables\Columns\BadgeColumn::make('mapping_review_status')
-                    ->label('Estado')
+                    ->label('Estado CPV')
                     ->colors([
                         'success' => TaxonomyTerm::MAPPING_AUTO_MAPPED,
+                        'warning' => TaxonomyTerm::MAPPING_NEEDS_REVIEW,
                         'gray' => TaxonomyTerm::MAPPING_UNMAPPED,
                     ]),
                 Tables\Columns\TextColumn::make('aliases_count')->label('Alias')->toggleable(isToggledHiddenByDefault: true),
@@ -275,9 +278,10 @@ class TaxonomyTermResource extends Resource
                             ])
                             ->multiple(),
                         SelectConstraint::make('mapping_review_status')
-                            ->label('Estado de mapeo')
+                            ->label('Estado de mapeo CPV')
                             ->options([
                                 TaxonomyTerm::MAPPING_AUTO_MAPPED => 'Auto-mapeado',
+                                TaxonomyTerm::MAPPING_NEEDS_REVIEW => 'Falta mapear',
                                 TaxonomyTerm::MAPPING_UNMAPPED => 'Sin mapear',
                             ])
                             ->multiple(),

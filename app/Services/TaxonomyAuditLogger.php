@@ -14,9 +14,18 @@ use Illuminate\Support\Facades\Auth;
  *
  * No registra si `$oldValue == $newValue` (evita ruido de un "guardar" que no cambió nada - ej.
  * volver a correr `taxonomy:seed-settings` no genera filas si no había admin loggeado).
+ *
+ * TAXV3-1: `$actorType`/`$algorithmVersion` son opcionales con default `'user'`/`null` - TODOS los
+ * call sites existentes (TAXV2-9 a TAXV2-13) siguen funcionando sin cambios y quedan correctamente
+ * clasificados como decisión humana. Las fases nuevas que generan decisiones automáticas (TAXV3-3
+ * Auto Mapper, TAXV3-5 Source Sync) pasan `actorType: 'system'` y su propio `algorithmVersion`.
  */
 class TaxonomyAuditLogger
 {
+    public const ACTOR_USER = 'user';
+
+    public const ACTOR_SYSTEM = 'system';
+
     public static function record(
         string $entityType,
         int|string $entityId,
@@ -24,6 +33,8 @@ class TaxonomyAuditLogger
         mixed $oldValue,
         mixed $newValue,
         ?string $reason = null,
+        string $actorType = self::ACTOR_USER,
+        ?string $algorithmVersion = null,
     ): void {
         if (self::stringify($oldValue) === self::stringify($newValue)) {
             return;
@@ -37,6 +48,8 @@ class TaxonomyAuditLogger
             'old_value' => self::stringify($oldValue),
             'new_value' => self::stringify($newValue),
             'reason' => $reason,
+            'actor_type' => $actorType,
+            'algorithm_version' => $algorithmVersion,
             'created_at' => now(),
         ]);
     }

@@ -29,6 +29,9 @@ class TaxonomyTerm extends Model
     public const MAPPING_AUTO_MAPPED = 'auto_mapped';
     public const MAPPING_UNMAPPED = 'unmapped';
 
+    /** V2->V3 (TAXV3-1): reemplaza el valor ad-hoc `source_verified_needs_cpv_mapping`. */
+    public const MAPPING_NEEDS_REVIEW = 'needs_review';
+
     /** V2->V3: ver docblock de la migración `add_provenance_columns_to_taxonomy_terms_table`. */
     public const ORIGIN_EXTERNAL_VERIFIED = 'external_verified';
 

@@ -63,7 +63,12 @@ class TaxonomyAuditLogResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')->label('Fecha')->dateTime()->sortable(),
+                Tables\Columns\BadgeColumn::make('actor_type')
+                    ->label('Actor')
+                    ->colors(['gray' => 'user', 'info' => 'system'])
+                    ->formatStateUsing(fn (string $state) => $state === 'system' ? 'Sistema' : 'Humano'),
                 Tables\Columns\TextColumn::make('user.name')->label('Usuario')->default('sistema')->toggleable(),
+                Tables\Columns\TextColumn::make('algorithm_version')->label('Algoritmo')->toggleable(isToggledHiddenByDefault: true)->placeholder('—'),
                 Tables\Columns\TextColumn::make('entity_type')
                     ->label('Entidad')
                     ->formatStateUsing(fn (string $state) => class_basename($state))

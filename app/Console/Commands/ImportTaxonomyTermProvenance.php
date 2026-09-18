@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Casts\PostgresTextArrayCast;
 use App\Models\TaxonomySource;
+use App\Models\TaxonomyTerm;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -179,7 +180,7 @@ class ImportTaxonomyTermProvenance extends Command
                     PostgresTextArrayCast::toLiteral($record['negative_context'] ?? []),
                     PostgresTextArrayCast::toLiteral([]),
                     $sourceId,
-                    $record['mapping_review_status'] ?? 'unmapped',
+                    $this->normalizeMappingReviewStatus($record['mapping_review_status'] ?? null),
                     $provenance['origin_type'] ?? null,
                     $provenance['display_source'] ?? null,
                     $primarySourceId,
@@ -242,6 +243,21 @@ class ImportTaxonomyTermProvenance extends Command
         $this->info("Totales: taxonomy_terms={$totalTerms}, taxonomy_term_source_bindings={$totalBindings}.");
 
         return self::SUCCESS;
+    }
+
+    /**
+     * TAXV3-1: el JSON V3 trae `source_verified_needs_cpv_mapping` para los términos nuevos sin
+     * ninguna relación CPV todavía - se normaliza al eje limpio de 4 valores desde el import mismo
+     * (no solo vía la migración de limpieza, que fue un fix de una sola vez para los datos ya
+     * cargados).
+     */
+    private function normalizeMappingReviewStatus(?string $rawStatus): string
+    {
+        return match ($rawStatus) {
+            'source_verified_needs_cpv_mapping' => TaxonomyTerm::MAPPING_NEEDS_REVIEW,
+            TaxonomyTerm::MAPPING_AUTO_MAPPED, TaxonomyTerm::MAPPING_NEEDS_REVIEW => $rawStatus,
+            default => TaxonomyTerm::MAPPING_UNMAPPED,
+        };
     }
 
     private function syncAliases(int $termId, array $aliases): void
