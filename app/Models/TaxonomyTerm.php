@@ -29,6 +29,13 @@ class TaxonomyTerm extends Model
     public const MAPPING_AUTO_MAPPED = 'auto_mapped';
     public const MAPPING_UNMAPPED = 'unmapped';
 
+    /** V2->V3: ver docblock de la migración `add_provenance_columns_to_taxonomy_terms_table`. */
+    public const ORIGIN_EXTERNAL_VERIFIED = 'external_verified';
+
+    public const ORIGIN_PENDING_SOURCE_VERIFICATION = 'seed_taxonomy_pending_source_verification';
+
+    public const ORIGIN_CURATED_OR_GENERATED = 'curated_or_generated';
+
     protected $fillable = [
         'external_id',
         'term',
@@ -48,6 +55,10 @@ class TaxonomyTerm extends Model
         'positive_context',
         'source_id',
         'mapping_review_status',
+        'origin_type',
+        'display_source',
+        'primary_source_id',
+        'candidate_sources',
     ];
 
     protected $casts = [
@@ -60,11 +71,24 @@ class TaxonomyTerm extends Model
         'context_required' => 'boolean',
         'minimum_supporting_terms' => 'integer',
         'context_window_words' => 'integer',
+        'candidate_sources' => 'array',
     ];
 
     public function source()
     {
         return $this->belongsTo(TaxonomySource::class, 'source_id', 'source_id');
+    }
+
+    /** V2->V3: la fuente externa verificada principal (null si `origin_type` no es `external_verified`). */
+    public function primarySource()
+    {
+        return $this->belongsTo(TaxonomySource::class, 'primary_source_id', 'source_id');
+    }
+
+    /** V2->V3: bindings verificados (N:M real) - ver docblock de `taxonomy_term_source_bindings`. */
+    public function sourceBindings()
+    {
+        return $this->hasMany(TaxonomyTermSourceBinding::class, 'term_id');
     }
 
     public function aliases()

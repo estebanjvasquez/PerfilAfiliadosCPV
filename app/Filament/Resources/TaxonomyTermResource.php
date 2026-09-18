@@ -102,12 +102,54 @@ class TaxonomyTermResource extends Resource
                         ->native(false)
                         ->required(),
                     Forms\Components\Select::make('source_id')
-                        ->label('Fuente')
+                        ->label('Origen del import (legacy)')
                         ->relationship('source', 'name')
                         ->native(false)
                         ->searchable()
                         ->preload()
-                        ->default(TaxonomySource::CURATED),
+                        ->default(TaxonomySource::CURATED)
+                        ->helperText('Cómo entró la fila (import JSON/crawler/manual) - no es la fuente verificada, ver sección "Procedencia" abajo.'),
+                ]),
+
+            Forms\Components\Section::make('Procedencia (V2→V3)')
+                ->description('Corrige el bug donde todo aparecía como "Curado manualmente" (ver docs/taxonomia/MIGRACION_TAXONOMIA_CPV_V2_A_V3.md) - un término puede no tener ninguna fuente externa verificada todavía, y eso es normal, no un error.')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\Select::make('origin_type')
+                        ->label('Tipo de procedencia')
+                        ->options([
+                            TaxonomyTerm::ORIGIN_EXTERNAL_VERIFIED => 'Fuente externa verificada',
+                            TaxonomyTerm::ORIGIN_PENDING_SOURCE_VERIFICATION => 'Pendiente de verificación',
+                            TaxonomyTerm::ORIGIN_CURATED_OR_GENERATED => 'Curado/generado (semilla)',
+                        ])
+                        ->native(false)
+                        ->nullable(),
+                    Forms\Components\Select::make('primary_source_id')
+                        ->label('Fuente externa principal (verificada)')
+                        ->relationship('primarySource', 'name')
+                        ->native(false)
+                        ->searchable()
+                        ->preload()
+                        ->nullable()
+                        ->helperText('Solo se llena cuando hay un binding verificado real (ver pestaña "Bindings de fuente" abajo) - nunca se adivina.'),
+                    Forms\Components\TextInput::make('display_source')
+                        ->label('Etiqueta a mostrar')
+                        ->maxLength(255)
+                        ->columnSpanFull()
+                        ->helperText('Texto exacto que ve el administrador en el listado (ej. "OSHA verified", "Seed taxonomy — source verification pending").'),
+                    Forms\Components\Placeholder::make('candidate_sources_display')
+                        ->label('Fuentes candidatas sin verificar')
+                        ->columnSpanFull()
+                        ->content(function (?TaxonomyTerm $record) {
+                            $candidates = $record?->candidate_sources ?? [];
+                            if (empty($candidates)) {
+                                return 'Ninguna.';
+                            }
+
+                            return collect($candidates)
+                                ->map(fn ($c) => ($c['source_id'] ?? '?').' ('.($c['verification_status'] ?? 'pending_verification').')')
+                                ->implode(', ');
+                        }),
                 ]),
 
             Forms\Components\Section::make('Clasificación temática')
@@ -184,7 +226,21 @@ class TaxonomyTermResource extends Resource
                 Tables\Columns\TextColumn::make('relevance_weight')->label('Peso')->sortable(),
                 Tables\Columns\TextColumn::make('oil_gas_exclusivity')->label('Exclus. O&G')->sortable()->toggleable(),
                 Tables\Columns\IconColumn::make('context_required')->label('Req. contexto')->boolean()->toggleable(),
-                Tables\Columns\TextColumn::make('source.name')->label('Fuente')->toggleable(),
+                Tables\Columns\BadgeColumn::make('display_source')
+                    ->label('Fuente')
+                    ->default('Sin procedencia importada (V2 previo a la corrección V3)')
+                    ->colors([
+                        'success' => fn ($state) => str_contains((string) $state, 'verified'),
+                        'warning' => fn ($state) => str_contains((string) $state, 'pending'),
+                        'gray' => fn ($state) => $state === null || str_contains((string) $state, 'Seed') || str_contains((string) $state, 'CIRA'),
+                    ])
+                    ->tooltip(fn (TaxonomyTerm $record) => $record->origin_type === TaxonomyTerm::ORIGIN_EXTERNAL_VERIFIED
+                        ? 'Fuente externa verificada (ver pestaña Bindings de fuente)'
+                        : 'Sin fuente externa verificada todavía - puede tener candidatos sin confirmar (ver detalle del término)'),
+                Tables\Columns\TextColumn::make('source.name')
+                    ->label('Origen del import (legacy)')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Cómo entró la fila al sistema (import JSON/crawler/manual) - no implica que sea la fuente verificada del término, ver "Fuente".'),
                 Tables\Columns\BadgeColumn::make('mapping_review_status')
                     ->label('Estado')
                     ->colors([
@@ -226,8 +282,16 @@ class TaxonomyTermResource extends Resource
                             ])
                             ->multiple(),
                         SelectConstraint::make('source_id')
-                            ->label('Fuente')
+                            ->label('Origen del import (legacy)')
                             ->relationship('source', 'name')
+                            ->multiple(),
+                        SelectConstraint::make('origin_type')
+                            ->label('Procedencia (V3)')
+                            ->options([
+                                TaxonomyTerm::ORIGIN_EXTERNAL_VERIFIED => 'Fuente externa verificada',
+                                TaxonomyTerm::ORIGIN_PENDING_SOURCE_VERIFICATION => 'Pendiente de verificación',
+                                TaxonomyTerm::ORIGIN_CURATED_OR_GENERATED => 'Curado/generado (semilla)',
+                            ])
                             ->multiple(),
                         BooleanConstraint::make('context_required')->label('Requiere contexto'),
                     ]),
@@ -265,6 +329,7 @@ class TaxonomyTermResource extends Resource
     {
         return [
             RelationManagers\AliasesRelationManager::class,
+            RelationManagers\SourceBindingsRelationManager::class,
             RelationManagers\CpvRelationsRelationManager::class,
             RelationManagers\ServiceRelationsRelationManager::class,
         ];

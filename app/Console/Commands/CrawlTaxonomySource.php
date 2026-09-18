@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\TaxonomyCandidateTerm;
 use App\Models\TaxonomyCrawlRun;
 use App\Models\TaxonomySource;
+use App\Models\TaxonomyTerm;
 use App\Models\TaxonomyTermCpvRelation;
 use App\Services\Taxonomy\HtmlPageExtractor;
 use App\Services\Taxonomy\RobotsTxtChecker;
@@ -266,10 +267,27 @@ class CrawlTaxonomySource extends Command
         $run->save();
     }
 
+    /**
+     * V2->V3 ("crawler_rule" de docs/taxonomia/MIGRACION_TAXONOMIA_CPV_V2_A_V3.md sección 2): si el
+     * término crawleado YA es un término real del diccionario (coincidencia exacta, no difusa), no
+     * se trata como candidato nuevo - se verifica su binding de fuente directamente. Nunca toca
+     * relaciones/pesos CPV (regla explícita del documento).
+     */
     private function storeCandidate(TaxonomySource $source, TaxonomyCrawlRun $run, string $url, string $term, string $definition): bool
     {
         $term = trim($term);
         if ($term === '') {
+            return false;
+        }
+
+        $existing = DB::connection('pgsql')->selectOne(
+            'SELECT id FROM taxonomy_terms WHERE LOWER(canonical_term) = LOWER(?) OR LOWER(term) = LOWER(?) LIMIT 1',
+            [$term, $term]
+        );
+
+        if ($existing) {
+            $this->verifyExistingTermBinding((int) $existing->id, $source, $url, $term);
+
             return false;
         }
 
@@ -317,6 +335,55 @@ class CrawlTaxonomySource extends Command
         ]);
 
         return true;
+    }
+
+    /**
+     * V2->V3: crea/actualiza un binding VERIFICADO (el crawler acaba de ver este término exacto en
+     * esta URL de esta fuente) y, si el término todavía no tenía ninguna procedencia externa
+     * verificada, lo promueve a `origin_type=external_verified` - nunca toca sus relaciones/pesos
+     * CPV (regla explícita de la sección 2 del documento de migración).
+     */
+    private function verifyExistingTermBinding(int $termId, TaxonomySource $source, string $url, string $sourceTerm): void
+    {
+        $now = now();
+
+        DB::connection('pgsql')->statement(
+            'INSERT INTO taxonomy_term_source_bindings (
+                term_id, source_id, source_term, source_url, binding_type,
+                verification_status, sync_enabled, first_seen_at, last_seen_at, last_verified_at,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (term_id, source_id) DO UPDATE SET
+                source_term = excluded.source_term,
+                source_url = excluded.source_url,
+                verification_status = excluded.verification_status,
+                sync_enabled = excluded.sync_enabled,
+                first_seen_at = COALESCE(taxonomy_term_source_bindings.first_seen_at, excluded.first_seen_at),
+                last_seen_at = excluded.last_seen_at,
+                last_verified_at = excluded.last_verified_at,
+                updated_at = excluded.updated_at',
+            [
+                $termId, $source->source_id, $sourceTerm, $url, 'exact_source_term',
+                'verified', true, $now, $now, $now, $now, $now,
+            ]
+        );
+
+        DB::connection('pgsql')->update(
+            'UPDATE taxonomy_terms SET
+                origin_type = ?,
+                display_source = ?,
+                primary_source_id = COALESCE(primary_source_id, ?),
+                updated_at = ?
+             WHERE id = ? AND origin_type IS DISTINCT FROM ?',
+            [
+                TaxonomyTerm::ORIGIN_EXTERNAL_VERIFIED,
+                "{$source->name} verified",
+                $source->source_id,
+                $now,
+                $termId,
+                TaxonomyTerm::ORIGIN_EXTERNAL_VERIFIED,
+            ]
+        );
     }
 
     /**

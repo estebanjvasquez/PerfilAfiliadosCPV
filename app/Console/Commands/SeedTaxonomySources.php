@@ -63,6 +63,24 @@ class SeedTaxonomySources extends Command
         );
         $this->line('  - '.TaxonomySource::CURATED.': Curado manualmente (no crawleable)');
 
+        // V2->V3 (docs/taxonomia/oil_gas_master_taxonomy_v3_source_driven.json -> `source_catalog`):
+        // "CPV" identifica términos cuyo origen es la propia taxonomía CPV suministrada por el
+        // proyecto (no un glosario externo, no curación manual libre) - tampoco crawleable.
+        TaxonomySource::query()->updateOrCreate(
+            ['source_id' => 'CPV'],
+            [
+                'name' => 'CPV supplied taxonomy',
+                'base_url' => null,
+                'discovery_url' => null,
+                'crawlable' => false,
+                'enabled' => false,
+                'respect_robots_txt' => true,
+                'rate_limit_rpm' => null,
+                'requires_admin_approval_before_import' => true,
+            ]
+        );
+        $this->line('  - CPV: CPV supplied taxonomy (no crawleable)');
+
         $total = TaxonomySource::query()->count();
         $this->info("Listo. Total en taxonomy_sources: {$total}.");
 

@@ -42,10 +42,17 @@ class TaxonomyOverviewWidget extends BaseWidget
         $sourcesEnabled = TaxonomySource::query()->where('enabled', true)->count();
         $sourcesTotal = TaxonomySource::query()->count();
 
+        $verifiedExternal = TaxonomyTerm::query()->where('origin_type', TaxonomyTerm::ORIGIN_EXTERNAL_VERIFIED)->count();
+        $pendingVerification = TaxonomyTerm::query()->where('origin_type', TaxonomyTerm::ORIGIN_PENDING_SOURCE_VERIFICATION)->count();
+
         return [
             Stat::make('Términos en el diccionario', $termsTotal)
                 ->description("{$termsUnmapped} sin ningún mapeo a CPV")
                 ->color($termsUnmapped > 0 ? 'warning' : 'success'),
+
+            Stat::make('Procedencia verificada (V3)', "{$verifiedExternal} / {$termsTotal}")
+                ->description("{$pendingVerification} con fuente candidata sin verificar - ver detalle del término")
+                ->color($verifiedExternal > 0 ? 'success' : 'gray'),
 
             Stat::make('Relaciones Término↔CPV', array_sum($relationsByStatus->all()))
                 ->description(sprintf(
