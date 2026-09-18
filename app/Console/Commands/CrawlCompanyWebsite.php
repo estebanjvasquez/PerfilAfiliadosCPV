@@ -175,6 +175,7 @@ class CrawlCompanyWebsite extends Command
                     'http_status' => $response->status(),
                     'title' => $title ? mb_substr($title, 0, 500) : null,
                     'content_hash' => hash('sha256', $text),
+                    'visible_text' => $text,
                     'fetched_at' => now(),
                 ]
             );
@@ -338,34 +339,6 @@ class CrawlCompanyWebsite extends Command
      */
     private function storeMatch(CompanyPage $page, int $empresaId, array $found): bool
     {
-        $term = $found['term'];
-
-        $exists = CompanyTermMatch::query()
-            ->where('page_id', $page->id)
-            ->where('taxonomy_term_id', $term->id)
-            ->exists();
-        if ($exists) {
-            return false;
-        }
-
-        $bestRelation = $term->cpvRelations->sortByDesc('weight')->first();
-        $evidenceScore = round(($bestRelation->weight ?? 0.5) * ($term->oil_gas_exclusivity ?? 1.0), 4);
-
-        CompanyTermMatch::query()->create([
-            'page_id' => $page->id,
-            'empresa_id' => $empresaId,
-            'taxonomy_term_id' => $term->id,
-            'matched_text' => $found['matched_text'],
-            'canonical_term' => $term->canonical_term ?: $term->term,
-            'match_type' => 'exact_page_text',
-            'context' => $found['context'],
-            'cpv_code' => $bestRelation->cpv_code ?? null,
-            'relation_weight' => $bestRelation->weight ?? null,
-            'evidence_score' => $evidenceScore,
-            'status' => CompanyTermMatch::STATUS_PENDING_REVIEW,
-            'crawled_at' => now(),
-        ]);
-
-        return true;
+        return CompanyTermMatch::recordFromMatch($page, $empresaId, $found);
     }
 }

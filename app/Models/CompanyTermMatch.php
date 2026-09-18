@@ -54,4 +54,46 @@ class CompanyTermMatch extends Model
     {
         return $this->belongsTo(TaxonomyTerm::class, 'taxonomy_term_id');
     }
+
+    /**
+     * TAXV3-6: extraído de `CrawlCompanyWebsite::storeMatch()` para poder reusarlo desde
+     * `taxonomy:rematch-company-pages` sin duplicar la lógica de scoring - ambos comandos terminan
+     * en el mismo lugar (una fila de evidencia), solo cambia de dónde viene el texto (recién
+     * crawleado vs ya almacenado).
+     *
+     * @param  array{term: TaxonomyTerm, matched_text: string, context: string}  $found
+     * @return bool true si se creó una fila nueva (false si ya existía para esta página+término).
+     */
+    public static function recordFromMatch(CompanyPage $page, int $empresaId, array $found): bool
+    {
+        $term = $found['term'];
+
+        $exists = static::query()
+            ->where('page_id', $page->id)
+            ->where('taxonomy_term_id', $term->id)
+            ->exists();
+        if ($exists) {
+            return false;
+        }
+
+        $bestRelation = $term->cpvRelations->sortByDesc('weight')->first();
+        $evidenceScore = round(($bestRelation->weight ?? 0.5) * ($term->oil_gas_exclusivity ?? 1.0), 4);
+
+        static::query()->create([
+            'page_id' => $page->id,
+            'empresa_id' => $empresaId,
+            'taxonomy_term_id' => $term->id,
+            'matched_text' => $found['matched_text'],
+            'canonical_term' => $term->canonical_term ?: $term->term,
+            'match_type' => 'exact_page_text',
+            'context' => $found['context'],
+            'cpv_code' => $bestRelation->cpv_code ?? null,
+            'relation_weight' => $bestRelation->weight ?? null,
+            'evidence_score' => $evidenceScore,
+            'status' => static::STATUS_PENDING_REVIEW,
+            'crawled_at' => now(),
+        ]);
+
+        return true;
+    }
 }

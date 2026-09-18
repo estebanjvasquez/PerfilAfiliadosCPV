@@ -16,6 +16,7 @@ class CompanyPage extends Model
         'http_status',
         'title',
         'content_hash',
+        'visible_text',
         'fetched_at',
     ];
 
