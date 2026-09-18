@@ -63,6 +63,25 @@
     font-size:11px; cursor:pointer; color:#7a5800;
   }
   .quick button:hover{ border-color:var(--gold); }
+  .debug-badge{
+    background:#1a1a2e; color:var(--gold); font-size:10px; font-weight:700; padding:3px 8px;
+    border-radius:10px; margin-left:8px; letter-spacing:.03em;
+  }
+  .debug-block{
+    margin-top:8px; border:1px dashed #999; border-radius:8px; background:#111; color:#d8d8d8;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace; font-size:11px;
+  }
+  .debug-header{
+    display:flex; align-items:center; justify-content:space-between; padding:8px 10px;
+    border-bottom:1px solid #333; color:var(--gold); font-weight:700;
+  }
+  .debug-header button{
+    background:#222; color:#eee; border:1px solid #444; border-radius:12px; padding:4px 10px;
+    font-size:11px; cursor:pointer;
+  }
+  .debug-header button:hover{ border-color:var(--gold); color:var(--gold); }
+  .debug-body{ padding:8px 10px; max-height:420px; overflow:auto; white-space:pre-wrap; word-break:break-word; }
+  .debug-summary{ padding:6px 10px; border-top:1px solid #333; color:#aaa; font-size:10px; }
 </style>
 </head>
 <body>
@@ -79,6 +98,7 @@
       <div class="title">CIRA — Asistente CPV</div>
       <div class="sub">Entorno de pruebas MCP</div>
     </div>
+    <span id="debug-badge" class="debug-badge" hidden>DEBUG ON</span>
     <div class="session">sesión: <span id="sid-label">—</span></div>
     <button id="reset-btn" type="button">Nueva conversación</button>
   </header>
@@ -99,6 +119,13 @@
   // Webhook del flujo CLONADO de n8n ("Chat CIRA V5 - MCP", zbVLoCdR09IA9yQK) — Fase MCP-2.
   // Requiere que ese workflow esté ACTIVO en n8n; si no, el fetch devuelve 404.
   var WEBHOOK_URL = "https://vmi2945958.contaboserver.net/webhook/4882efaf-6d0e-44ae-82fe-61ebab61f54b";
+
+  // Fase 23B: endpoint de DEBUG, fuera de n8n y del protocolo MCP - ver docblock de
+  // handleDebugSearch en perfilafiliados-mcp/src/index.ts. Esta página NUNCA guarda la clave en su
+  // código fuente - la pide con "/debug-on <clave>" y la guarda solo en sessionStorage del
+  // navegador (se pierde al cerrar la pestaña).
+  var DEBUG_URL = "https://perfilafiliados-mcp.sisteg.workers.dev/debug-search";
+  var DEBUG_KEY = "cira_debug_password";
 
   var msgs   = document.getElementById("msgs");
   var input  = document.getElementById("input");
@@ -181,9 +208,139 @@
 
   window.sendPrompt = function(text){ sendMsg(text); };
 
+  // ---- Fase 23B: modo DEBUG (/debug-on, /debug-off, /debug-status) ----
+  // Observa el pipeline, no lo altera: la respuesta normal de CIRA sigue viniendo del MISMO
+  // webhook de n8n, sin ningún cambio. Cuando debug está ON, en paralelo (nunca en vez de) se
+  // llama a /debug-search y se muestra el reporte técnico debajo de la respuesta normal.
+  function debugPassword(){ return sessionStorage.getItem(DEBUG_KEY); }
+  function isDebugOn(){ return !!debugPassword(); }
+  function refreshDebugBadge(){
+    document.getElementById("debug-badge").hidden = !isDebugOn();
+  }
+
+  function tryHandleDebugCommand(text){
+    var trimmed = text.trim();
+
+    if(/^\/debug-status$/i.test(trimmed)){
+      addUser(text);
+      addBot("DEBUG MODE: " + (isDebugOn() ? "ON" : "OFF"), null);
+      return true;
+    }
+
+    if(/^\/debug-off$/i.test(trimmed)){
+      addUser(text);
+      sessionStorage.removeItem(DEBUG_KEY);
+      refreshDebugBadge();
+      addBot("🔧 DEBUG MODE: OFF", null);
+      return true;
+    }
+
+    var onMatch = trimmed.match(/^\/debug-on\s+(.+)$/i);
+    if(onMatch){
+      addUser(text);
+      var candidate = onMatch[1].trim();
+      addLoader();
+      fetch(DEBUG_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + candidate },
+        body: JSON.stringify({ query: "prueba de clave" })
+      }).then(function(r){
+        removeLoader();
+        if(r.status === 401){
+          addBot("🔧 Clave incorrecta - DEBUG sigue OFF.", "error");
+          return;
+        }
+        sessionStorage.setItem(DEBUG_KEY, candidate);
+        refreshDebugBadge();
+        addBot("🔧 DEBUG MODE: ON\nLas próximas búsquedas incluirán trazabilidad completa del pipeline.", null);
+      }).catch(function(e){
+        removeLoader();
+        addBot("Error de conexión al activar DEBUG: " + e.message, "error");
+      });
+      return true;
+    }
+
+    if(/^\/debug-on$/i.test(trimmed)){
+      addUser(text);
+      addBot("Uso: /debug-on <clave>", null);
+      return true;
+    }
+
+    return false;
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+
+  function addDebugBlock(report){
+    var id = "debug-" + Math.random().toString(36).slice(2, 9);
+    var json = JSON.stringify(report, null, 2);
+    var row = document.createElement("div");
+    row.className = "row bot";
+    row.innerHTML =
+      '<div style="width:26px;flex-shrink:0"></div>' +
+      '<div class="debug-block" style="flex:1;min-width:0">' +
+        '<div class="debug-header">' +
+          '<span>🔧 CIRA SEARCH DEBUG · ' + escapeHtml(report.debug_id) + '</span>' +
+          '<button type="button" data-copy="' + id + '">Copiar debug</button>' +
+        '</div>' +
+        '<div class="debug-summary">' +
+          'intent: ' + escapeHtml(report.query_understanding.detected_intent) +
+          ' · conceptos: ' + escapeHtml(report.query_understanding.canonical_concepts.join(", ") || "—") +
+          ' · candidatos: ' + report.candidate_generation.candidates_before_dedup + ' → ' + report.candidate_generation.candidates_after_dedup +
+          ' · flags: ' + escapeHtml(report.diagnostic_flags.join(", ")) +
+          ' · ' + report.timings_ms.total + 'ms' +
+        '</div>' +
+        '<pre class="debug-body" id="' + id + '">' + escapeHtml(json) + '</pre>' +
+      '</div>';
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    row.querySelector("[data-copy]").onclick = function(){
+      navigator.clipboard.writeText(json).then(function(){
+        row.querySelector("[data-copy]").textContent = "¡Copiado!";
+        setTimeout(function(){ row.querySelector("[data-copy]").textContent = "Copiar debug"; }, 1500);
+      });
+    };
+  }
+
+  async function fetchDebugReport(text){
+    var password = debugPassword();
+    if(!password) return;
+
+    try {
+      var r = await fetch(DEBUG_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + password },
+        body: JSON.stringify({ query: text })
+      });
+      if(r.status === 401){
+        addBot("🔧 DEBUG: la clave guardada dejó de ser válida - usá /debug-on <clave> de nuevo.", "error");
+        sessionStorage.removeItem(DEBUG_KEY);
+        return;
+      }
+      if(!r.ok){
+        addBot("🔧 DEBUG: error HTTP " + r.status + " al pedir el reporte.", "error");
+        return;
+      }
+      var report = await r.json();
+      addDebugBlock(report);
+    } catch(e){
+      addBot("🔧 DEBUG: error de conexión - " + e.message, "error");
+    }
+  }
+
   async function sendMsg(text){
     if(typeof text !== "string" || !text){ text = input.value.trim(); }
     if(!text) return;
+
+    if(tryHandleDebugCommand(text)){
+      input.value = "";
+      return;
+    }
 
     addUser(text);
     input.value = "";
@@ -210,6 +367,10 @@
       var reply = item && (item.output || item.text);
       addBot(reply || "Sin respuesta.", (item && item.type) ? item.type + " · " + elapsed + "ms" : elapsed + "ms");
 
+      // Fase 23B: llamada APARTE, de solo lectura, nunca reemplaza ni modifica lo que CIRA ya
+      // respondió arriba - si falla, la respuesta normal ya se mostró igual.
+      if(isDebugOn()) fetchDebugReport(text);
+
     } catch(e){
       removeLoader();
       addBot("Error de conexión: " + e.message, "error");
@@ -225,7 +386,8 @@
     this.style.height = Math.min(this.scrollHeight, 120) + "px";
   });
 
-  addBot("¡Hola! Este es el entorno de pruebas del flujo MCP-2. Probá cualquier consulta o usá los atajos de arriba.", null);
+  refreshDebugBadge();
+  addBot("¡Hola! Este es el entorno de pruebas del flujo MCP-2. Probá cualquier consulta o usá los atajos de arriba. Comandos: /debug-on <clave>, /debug-off, /debug-status.", null);
 })();
 </script>
 </body>
