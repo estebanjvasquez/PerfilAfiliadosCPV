@@ -34,6 +34,13 @@ class Kernel extends ConsoleKernel
         // es la fase de mayor riesgo/menos especificada del documento (sección 6), así que arrancar
         // vía cron requiere que un admin lo decida explícitamente y agregue su propia entrada.
         $schedule->command('taxonomy:crawl-source')->hourly()->withoutOverlapping();
+
+        // TAXV3-5: re-verifica un lote chico de bindings YA conocidos por día (no descubre nada
+        // nuevo - eso sigue siendo taxonomy:crawl-source arriba). El contenido de un glosario
+        // externo no cambia seguido, así que a diferencia del discovery no hace falta correrlo
+        // más seguido que 1 vez al día - `--limit=20` mantiene cada corrida corta en el mismo
+        // hosting compartido.
+        $schedule->command('taxonomy:sync-source-bindings --limit=20')->daily()->withoutOverlapping();
     }
 
     /**

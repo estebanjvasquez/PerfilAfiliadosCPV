@@ -21,6 +21,9 @@ class TaxonomyTermSourceBinding extends Model
 
     public const STATUS_MISSING = 'missing';
 
+    /** TAXV3-5: la URL respondió con error (timeout/HTTP no-2xx) - distinto de MISSING (respondió, pero el término ya no aparece). */
+    public const STATUS_SOURCE_ERROR = 'source_error';
+
     protected $fillable = [
         'term_id',
         'source_id',

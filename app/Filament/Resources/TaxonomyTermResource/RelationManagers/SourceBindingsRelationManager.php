@@ -50,6 +50,7 @@ class SourceBindingsRelationManager extends RelationManager
                     TaxonomyTermSourceBinding::STATUS_PENDING_VERIFICATION => 'Pendiente',
                     TaxonomyTermSourceBinding::STATUS_STALE => 'Desactualizado',
                     TaxonomyTermSourceBinding::STATUS_MISSING => 'Ya no aparece en la fuente',
+                    TaxonomyTermSourceBinding::STATUS_SOURCE_ERROR => 'Error al consultar la fuente',
                 ])
                 ->native(false)
                 ->required()
@@ -73,7 +74,7 @@ class SourceBindingsRelationManager extends RelationManager
                         'success' => TaxonomyTermSourceBinding::STATUS_VERIFIED,
                         'warning' => TaxonomyTermSourceBinding::STATUS_PENDING_VERIFICATION,
                         'gray' => TaxonomyTermSourceBinding::STATUS_STALE,
-                        'danger' => TaxonomyTermSourceBinding::STATUS_MISSING,
+                        'danger' => [TaxonomyTermSourceBinding::STATUS_MISSING, TaxonomyTermSourceBinding::STATUS_SOURCE_ERROR],
                     ]),
                 Tables\Columns\IconColumn::make('sync_enabled')->label('Sync')->boolean(),
                 Tables\Columns\TextColumn::make('last_verified_at')->label('Verificado')->dateTime()->toggleable(isToggledHiddenByDefault: true),
