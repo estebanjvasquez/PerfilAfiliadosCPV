@@ -106,12 +106,19 @@ class TaxonomyTermCpvRelationResource extends Resource
             Forms\Components\Select::make('status')
                 ->label('Estado')
                 ->options([
+                    TaxonomyTermCpvRelation::STATUS_CANDIDATE => 'Candidata (no urgente)',
                     TaxonomyTermCpvRelation::STATUS_NEEDS_REVIEW => 'En revisión',
                     TaxonomyTermCpvRelation::STATUS_APPROVED => 'Aprobada',
                     TaxonomyTermCpvRelation::STATUS_REJECTED => 'Rechazada',
                     TaxonomyTermCpvRelation::STATUS_DEPRECATED => 'Descartada',
                 ])
                 ->native(false)->required(),
+            Forms\Components\Placeholder::make('evidence_display')
+                ->label('Evidencia (TAXV3-3 Auto Mapper)')
+                ->columnSpanFull()
+                ->content(fn (?TaxonomyTermCpvRelation $record) => $record?->evidence
+                    ? collect($record->evidence)->map(fn ($e) => "• {$e}")->implode("\n")
+                    : 'Sin evidencia registrada (relación anterior al Auto Mapper, o creada/editada a mano).'),
         ]);
     }
 
@@ -134,10 +141,10 @@ class TaxonomyTermCpvRelationResource extends Resource
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Estado')
                     ->colors([
+                        'gray' => [TaxonomyTermCpvRelation::STATUS_CANDIDATE, TaxonomyTermCpvRelation::STATUS_DEPRECATED],
                         'warning' => TaxonomyTermCpvRelation::STATUS_NEEDS_REVIEW,
                         'success' => TaxonomyTermCpvRelation::STATUS_APPROVED,
                         'danger' => TaxonomyTermCpvRelation::STATUS_REJECTED,
-                        'gray' => TaxonomyTermCpvRelation::STATUS_DEPRECATED,
                     ]),
                 Tables\Columns\TextColumn::make('reviewed_at')->label('Revisada')->dateTime()->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -145,6 +152,7 @@ class TaxonomyTermCpvRelationResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Estado')
                     ->options([
+                        TaxonomyTermCpvRelation::STATUS_CANDIDATE => 'Candidata (no urgente)',
                         TaxonomyTermCpvRelation::STATUS_NEEDS_REVIEW => 'En revisión',
                         TaxonomyTermCpvRelation::STATUS_APPROVED => 'Aprobada',
                         TaxonomyTermCpvRelation::STATUS_REJECTED => 'Rechazada',

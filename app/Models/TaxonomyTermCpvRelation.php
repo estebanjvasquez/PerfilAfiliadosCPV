@@ -33,6 +33,7 @@ class TaxonomyTermCpvRelation extends Model
         'weight',
         'confidence',
         'matched_on',
+        'evidence',
         'source',
         'status',
         'reviewed_by',
@@ -42,6 +43,7 @@ class TaxonomyTermCpvRelation extends Model
     protected $casts = [
         'weight' => 'float',
         'confidence' => 'float',
+        'evidence' => 'array',
         'reviewed_at' => 'datetime',
     ];
 

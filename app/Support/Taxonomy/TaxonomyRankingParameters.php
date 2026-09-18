@@ -22,6 +22,7 @@ class TaxonomyRankingParameters
     public const GROUP_MATCHING = 'Matching (fuzzy/semántico)';
     public const GROUP_CONTEXT = 'Contexto y control de ruido';
     public const GROUP_RANKING = 'Pesos de ranking';
+    public const GROUP_AUTO_MAPPING = 'Auto Mapper (confianza)';
 
     /**
      * @return array<string, array{label:string, description:string, default:float, min:float, max:float, example:string, group:string}>
@@ -182,6 +183,34 @@ class TaxonomyRankingParameters
                 'default' => 1.12, 'min' => 1.0, 'max' => 3.0,
                 'example' => 'El mismo CPV aparece por declaración Y por texto libre en el perfil.',
                 'group' => self::GROUP_RANKING,
+            ],
+            'auto_mapping.auto_approve_confidence' => [
+                'label' => 'Confianza para auto-aprobar',
+                'description' => 'A partir de esta confianza, el Auto Mapper (TAXV3-3) crea la relación Término→CPV directamente como aprobada, sin revisión.',
+                'default' => 0.95, 'min' => 0.80, 'max' => 1.0,
+                'example' => 'Coincidencia exacta con el nombre de una categoría CPV.',
+                'group' => self::GROUP_AUTO_MAPPING,
+            ],
+            'auto_mapping.auto_activate_confidence' => [
+                'label' => 'Confianza para activar con peso conservador',
+                'description' => 'Entre este valor y el de auto-aprobar, la relación también se crea aprobada pero con un peso reducido (menos certeza) - queda visible como candidata a revisión opcional, no urgente.',
+                'default' => 0.85, 'min' => 0.50, 'max' => 1.0,
+                'example' => 'Heredado de un concepto canónico cuyo término hermano ya está aprobado.',
+                'group' => self::GROUP_AUTO_MAPPING,
+            ],
+            'auto_mapping.candidate_confidence_floor' => [
+                'label' => 'Piso de confianza para candidato',
+                'description' => 'Por debajo de "activar" pero por encima de este piso, la relación se guarda como `candidate` (no aparece en el buscador, no es una tarea urgente) en vez de descartarse.',
+                'default' => 0.70, 'min' => 0.30, 'max' => 1.0,
+                'example' => 'Similitud léxica moderada contra un término ya mapeado.',
+                'group' => self::GROUP_AUTO_MAPPING,
+            ],
+            'auto_mapping.source_corrob_boost' => [
+                'label' => 'Boost por corroboración de fuente',
+                'description' => 'Multiplicador de CONFIANZA (no de ranking de búsqueda) cuando el término tiene bindings verificados de más de 1 fuente - más fuentes documentando lo mismo da más certeza, pero no debe inflar el ranking proporcionalmente.',
+                'default' => 1.00, 'min' => 1.0, 'max' => 1.05,
+                'example' => 'Un término con binding verificado en OSHA Y SLB a la vez.',
+                'group' => self::GROUP_AUTO_MAPPING,
             ],
         ];
     }

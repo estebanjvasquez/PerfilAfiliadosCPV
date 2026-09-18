@@ -34,7 +34,7 @@ class TaxonomyCanonicalConceptResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Conceptos canónicos';
 
-    protected static ?int $navigationSort = 9;
+    protected static ?int $navigationSort = 15;
 
     public static function getEloquentQuery(): Builder
     {

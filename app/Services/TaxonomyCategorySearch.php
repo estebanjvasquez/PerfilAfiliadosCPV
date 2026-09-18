@@ -3,10 +3,9 @@
 namespace App\Services;
 
 use App\Models\TaxonomyCategory;
+use App\Services\Taxonomy\EmbeddingClient;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Fase 4 del proyecto de taxonomía (ver docs/taxonomia/plan_mcp_cira.md): "dado un texto libre,
@@ -37,6 +36,14 @@ use Illuminate\Support\Facades\Log;
  * de esta fase, para no tener 2 sistemas de ranking sin reconciliar). `explanation` es la
  * explicabilidad de la sección 8, adaptada a esta búsqueda de categorías (no la de empresas, que
  * vive en el Worker externo, fuera de alcance de este repo).
+ *
+ * TAXV3-3: **esta clase es para autocompletado interactivo** (el admin escribe, ve resultados,
+ * elige) - está afinada para esa UX (dedupe agresivo por categoría, `take($limit)` temprano,
+ * mezcla de 3 niveles). `App\Services\Taxonomy\TaxonomyAutoMapper` (decide relaciones Término→CPV
+ * que pueden auto-aprobarse sin revisión humana) NO debe llamar a `search()` - reusa
+ * `EmbeddingClient` y las mismas queries léxico/`pg_trgm` como primitivas propias, con su propia
+ * lógica de confianza/evidencia. Mezclar ambos casos de uso en un solo método terminaría afinando
+ * el autocompletado para decisiones de auto-aprobación, o al revés.
  */
 class TaxonomyCategorySearch
 {
@@ -164,7 +171,7 @@ class TaxonomyCategorySearch
 
     private function semantic(string $query, int $limit, array $excludeIds): Collection
     {
-        $vector = $this->embed($query);
+        $vector = app(EmbeddingClient::class)->embed($query);
 
         if (! $vector) {
             return collect();
@@ -193,29 +200,4 @@ class TaxonomyCategorySearch
         });
     }
 
-    /** Mismo contrato que GenerateTaxonomyEmbeddings.php/HomologateServicesTaxonomy.php: POST {texts:[...]} -> {embeddings:[[...]]}. */
-    private function embed(string $text): ?string
-    {
-        $embedUrl = config('services.mcp.embed_url');
-        $embedToken = config('services.mcp.embed_token');
-
-        if (! $embedUrl || ! $embedToken) {
-            Log::warning('TaxonomyCategorySearch: falta MCP_EMBED_URL/MCP_EMBED_TOKEN, se omite el nivel semántico.');
-
-            return null;
-        }
-
-        $response = Http::withToken($embedToken)->timeout(15)->post($embedUrl, ['texts' => [$text]]);
-
-        if (! $response->successful()) {
-            Log::warning('TaxonomyCategorySearch: fallo el request a /embed', ['status' => $response->status()]);
-
-            return null;
-        }
-
-        $embeddings = $response->json('embeddings');
-        $vector = $embeddings[0] ?? null;
-
-        return is_array($vector) ? '['.implode(',', $vector).']' : null;
-    }
 }
