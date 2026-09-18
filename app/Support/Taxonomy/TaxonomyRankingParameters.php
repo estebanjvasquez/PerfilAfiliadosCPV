@@ -24,6 +24,8 @@ class TaxonomyRankingParameters
     public const GROUP_RANKING = 'Pesos de ranking';
     public const GROUP_AUTO_MAPPING = 'Auto Mapper (confianza)';
 
+    public const GROUP_MCP_CANONICAL_EXPANSION = 'MCP - Expansión canónica (CIRA)';
+
     /**
      * @return array<string, array{label:string, description:string, default:float, min:float, max:float, example:string, group:string}>
      */
@@ -211,6 +213,83 @@ class TaxonomyRankingParameters
                 'default' => 1.00, 'min' => 1.0, 'max' => 1.05,
                 'example' => 'Un término con binding verificado en OSHA Y SLB a la vez.',
                 'group' => self::GROUP_AUTO_MAPPING,
+            ],
+            'mcp_canonical.level0_weight' => [
+                'label' => 'Peso Nivel 0 (término exacto)',
+                'description' => 'Fase 23A: peso de expansión canónica cuando la consulta matchea el término exacto de `taxonomy_terms` (sin alias, sin herencia por concepto).',
+                'default' => 1.00, 'min' => 0.0, 'max' => 1.5,
+                'example' => '"cabria" matchea literalmente el término "cabria" en el diccionario.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.level2_weight' => [
+                'label' => 'Peso Nivel 2 (concepto canónico)',
+                'description' => 'Fase 23A: peso cuando el término matchea vía pertenencia a un `taxonomy_canonical_concepts`, antes de resolver a un CPV concreto.',
+                'default' => 0.90, 'min' => 0.0, 'max' => 1.5,
+                'example' => '"cabria" pertenece al concepto "Derrick and Mast".',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.level3_weight' => [
+                'label' => 'Peso Nivel 3 (CPV directo)',
+                'description' => 'Fase 23A: peso cuando la relación Término→CPV es `approved` (propia o heredada de un hermano de concepto).',
+                'default' => 0.90, 'min' => 0.0, 'max' => 1.5,
+                'example' => '"cabria" resuelve a CPV-28.02.01G vía relación aprobada propia o heredada.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.level4_weight' => [
+                'label' => 'Peso Nivel 4 (concepto técnico relacionado - reservado)',
+                'description' => 'Fase 23A: peso reservado para un futuro salto semántico/conceptual (ej. DERRICK→"drilling equipment") - NO se usa mientras `canonical_related_l4_expansion_enabled` esté en 0. Definido para no rediseñar el schema cuando se calibre.',
+                'default' => 0.65, 'min' => 0.0, 'max' => 1.5,
+                'example' => 'Reservado - ver `canonical_related_l4_expansion_enabled`.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.level5_fallback_penalty' => [
+                'label' => 'Penalización Nivel 5 (familia, fallback)',
+                'description' => 'Fase 23A: peso muy reducido para el fallback determinístico de UN solo salto por `taxonomy_categories.parent_id` (Familia inmediata), usado solo cuando el CPV directo no tiene ninguna empresa. Nunca un salto semántico.',
+                'default' => 0.30, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'CPV-28.02.01G sin empresas -> se prueba con su Familia CPV-28.02, marcado como RELATED_CANDIDATE, no DIRECT_MATCH.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.minimum_expansion_confidence' => [
+                'label' => 'Confianza mínima de expansión',
+                'description' => 'Fase 23A: por debajo de este peso, un match de expansión canónica se descarta (no genera evidencia) - evita contaminación semántica de matches muy débiles.',
+                'default' => 0.50, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Un match de Nivel 5 ya penalizado que caería por debajo de este piso no se usa.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.canonical_query_expansion_enabled' => [
+                'label' => 'Expansión canónica activa (interruptor general)',
+                'description' => 'Fase 23A: 1 = el MCP consulta la Taxonomía V3 para expandir regionalismos/conceptos canónicos antes de buscar empresas. 0 = comportamiento idéntico a antes de esta fase (rollback sin redeploy).',
+                'default' => 1, 'min' => 0, 'max' => 1,
+                'example' => 'Apagar en caliente si una regresión aparece en producción.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.canonical_cpv_expansion_enabled' => [
+                'label' => 'Expansión por CPV directo activa (L0-L3)',
+                'description' => 'Fase 23A: 1 = habilita las señales `canonical_exact`/`canonical_alias`/`canonical_cpv`. Permite aislar un problema de L0-L3 sin apagar todo.',
+                'default' => 1, 'min' => 0, 'max' => 1,
+                'example' => 'Apagar solo esto si el ruido viene del CPV directo, no del fallback.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.canonical_related_expansion_enabled' => [
+                'label' => 'Fallback de familia activo (L5)',
+                'description' => 'Fase 23A: 1 = habilita la señal `canonical_related` (un salto de familia, penalizado). Se puede apagar por separado si el fallback genera falsos positivos sin tocar L0-L3.',
+                'default' => 1, 'min' => 0, 'max' => 1,
+                'example' => 'Apagar si el salto de familia empieza a traer empresas sin relación real.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.canonical_related_l4_expansion_enabled' => [
+                'label' => 'Expansión por concepto técnico relacionado (L4 - reservado)',
+                'description' => 'Fase 23A: reservado para un futuro salto semántico (ej. DERRICK→"drilling equipment"). Debe quedar en 0 hasta que haya datos reales que justifiquen abrirlo - es exactamente el riesgo de contaminación semántica que motivó esta fase.',
+                'default' => 0, 'min' => 0, 'max' => 1,
+                'example' => 'No activar sin recalibrar el benchmark completo primero.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.regional_expansion_enabled' => [
+                'label' => 'Expansión de regionalismos activa (L1)',
+                'description' => 'Fase 23A: 1 = habilita la detección de alias/regionalismos (`taxonomy_term_aliases`, `region`) como señal de expansión, usando `ranking.regional_alias_boost` como peso.',
+                'default' => 1, 'min' => 0, 'max' => 1,
+                'example' => '"cabrias" (alias de "cabria") cuenta como Nivel 1.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
             ],
         ];
     }

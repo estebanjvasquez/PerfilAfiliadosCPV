@@ -44,6 +44,7 @@ class TaxonomyRankingSettingsPage extends Page implements HasForms
             TaxonomyRankingParameters::GROUP_MATCHING,
             TaxonomyRankingParameters::GROUP_RANKING,
             TaxonomyRankingParameters::GROUP_AUTO_MAPPING,
+            TaxonomyRankingParameters::GROUP_MCP_CANONICAL_EXPANSION,
         ];
     }
 }
