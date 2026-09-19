@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TaxonomyCandidateConceptLinkResource\Pages;
 use App\Models\TaxonomyCandidateConceptLink;
+use App\Services\Taxonomy\CandidateConceptApprovalService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -11,7 +12,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Phase 3 (secciones 7/20 del pedido): cola de revisión del Canonical Concept Builder. Mismo
@@ -86,39 +86,54 @@ class TaxonomyCandidateConceptLinkResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                // Phase 3.1 (sección 9 del pedido): la lógica real (autorización, re-chequeo de
+                // status con lock, transacción, idempotencia, audit log) vive en
+                // CandidateConceptApprovalService - este Action solo llama al servicio e informa el
+                // resultado. `visible()` incluye el chequeo de permiso (Filament no lo aplica solo
+                // automáticamente a Actions custom) - es UX, no la salvaguarda real: la salvaguarda
+                // real está en el servicio, que se re-verifica sin importar qué mostró la UI.
                 Tables\Actions\Action::make('approve')
                     ->label('Aprobar y publicar')
                     ->icon('heroicon-o-check')
                     ->color('success')
-                    ->visible(fn (TaxonomyCandidateConceptLink $record) => $record->status === TaxonomyCandidateConceptLink::STATUS_PENDING && ! $record->isProposingNewConcept())
+                    ->visible(fn (TaxonomyCandidateConceptLink $record) => $record->status === TaxonomyCandidateConceptLink::STATUS_PENDING
+                        && ! $record->isProposingNewConcept()
+                        && Auth::user()?->can('update', $record))
                     ->requiresConfirmation()
                     ->action(function (TaxonomyCandidateConceptLink $record) {
-                        $termConceptId = DB::connection('pgsql')->table('taxonomy_term_concepts')->insertGetId([
-                            'term_id' => $record->suggested_term_id,
-                            'concept_id' => $record->suggested_concept_id,
-                            'created_at' => now(),
-                        ]);
+                        $outcome = app(CandidateConceptApprovalService::class)->approve($record->id, Auth::user());
 
-                        $record->update([
-                            'status' => TaxonomyCandidateConceptLink::STATUS_PUBLISHED,
-                            'reviewed_by' => Auth::id(),
-                            'reviewed_at' => now(),
-                            'published_term_concept_id' => $termConceptId,
-                        ]);
-
-                        Notification::make()->title('Candidato aprobado y publicado en taxonomy_term_concepts')->success()->send();
+                        match ($outcome['result']) {
+                            CandidateConceptApprovalService::RESULT_APPROVED => Notification::make()
+                                ->title("Candidato aprobado y publicado en taxonomy_term_concepts#{$outcome['term_concept_id']}")->success()->send(),
+                            CandidateConceptApprovalService::RESULT_ALREADY_PROCESSED => Notification::make()
+                                ->title('Este candidato ya fue procesado (doble click o ya revisado por otro admin) - no se creó ningún link nuevo.')->warning()->send(),
+                            CandidateConceptApprovalService::RESULT_NOT_SUPPORTED => Notification::make()
+                                ->title('PROPOSE_NEW_CONCEPT no se puede aprobar desde acá todavía.')->danger()->send(),
+                            CandidateConceptApprovalService::RESULT_UNAUTHORIZED => Notification::make()
+                                ->title('No tenés permiso para aprobar candidatos.')->danger()->send(),
+                            default => Notification::make()->title('El candidato ya no existe.')->danger()->send(),
+                        };
                     }),
                 Tables\Actions\Action::make('reject')
                     ->label('Rechazar')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
-                    ->visible(fn (TaxonomyCandidateConceptLink $record) => $record->status === TaxonomyCandidateConceptLink::STATUS_PENDING)
+                    ->visible(fn (TaxonomyCandidateConceptLink $record) => $record->status === TaxonomyCandidateConceptLink::STATUS_PENDING
+                        && Auth::user()?->can('update', $record))
                     ->requiresConfirmation()
-                    ->action(fn (TaxonomyCandidateConceptLink $record) => $record->update([
-                        'status' => TaxonomyCandidateConceptLink::STATUS_REJECTED,
-                        'reviewed_by' => Auth::id(),
-                        'reviewed_at' => now(),
-                    ])),
+                    ->action(function (TaxonomyCandidateConceptLink $record) {
+                        $outcome = app(CandidateConceptApprovalService::class)->reject($record->id, Auth::user());
+
+                        match ($outcome['result']) {
+                            CandidateConceptApprovalService::RESULT_REJECTED => Notification::make()->title('Candidato rechazado')->success()->send(),
+                            CandidateConceptApprovalService::RESULT_ALREADY_PROCESSED => Notification::make()
+                                ->title('Este candidato ya fue procesado (doble click o ya revisado por otro admin).')->warning()->send(),
+                            CandidateConceptApprovalService::RESULT_UNAUTHORIZED => Notification::make()
+                                ->title('No tenés permiso para rechazar candidatos.')->danger()->send(),
+                            default => Notification::make()->title('El candidato ya no existe.')->danger()->send(),
+                        };
+                    }),
             ]);
     }
 

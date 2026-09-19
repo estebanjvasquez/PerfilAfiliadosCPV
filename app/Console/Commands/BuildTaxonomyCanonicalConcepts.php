@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\Taxonomy\CanonicalConceptBuilderService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 
 /**
  * Phase 3 (secciones 14-16 del pedido): CLI del Canonical Concept Builder.
@@ -21,7 +22,9 @@ class BuildTaxonomyCanonicalConcepts extends Command
         {--mode=audit : audit (default, solo lectura) es el único modo soportado fuera de --dry-run}
         {--dry-run : Corre además el Builder multi-signal (retrieval + scoring + tiers), sin persistir nada}
         {--apply : BLOQUEADO en esta entrega - ver sección 16/17 del pedido de Phase 3}
-        {--limit= : Tope de términos a procesar en --dry-run (para corridas rápidas de verificación)}';
+        {--limit= : Tope de términos a procesar en --dry-run (para corridas rápidas de verificación)}
+        {--skip-audit : Phase 3.1 - omite AUDIT_EXISTING para medir --dry-run de forma aislada (diagnóstico de performance)}
+        {--save-snapshot= : Phase 3.1 - vuelca el dry-run completo (all_results + instrumentación) a un JSON, para result-equivalence antes/después de un refactor}';
 
     protected $description = 'Phase 3: AUDIT_EXISTING (default) y/o dry-run del Canonical Concept Builder. Nunca escribe sin --apply, que está bloqueado en esta entrega.';
 
@@ -33,20 +36,25 @@ class BuildTaxonomyCanonicalConcepts extends Command
             return self::FAILURE;
         }
 
-        $this->info('AUDIT_EXISTING (solo lectura) - clasificando los conceptos canónicos ya existentes...');
-        $audit = $builder->auditExisting();
+        $result = [];
 
-        $this->info("Conceptos auditados (carga dinámica, sin conteo fijo asumido): {$audit['concept_count']}");
-        $this->table(['Flag', 'Conceptos'], collect($audit['flag_summary'])->map(fn ($count, $flag) => [$flag, $count])->values()->all());
+        if (! $this->option('skip-audit')) {
+            $this->info('AUDIT_EXISTING (solo lectura) - clasificando los conceptos canónicos ya existentes...');
+            $audit = $builder->auditExisting();
 
-        foreach ($audit['concepts'] as $concept) {
-            if (in_array('VALID_IDENTITY_CLUSTER', $concept['flags'], true) && count($concept['flags']) === 1) {
-                continue;
+            $this->info("Conceptos auditados (carga dinámica, sin conteo fijo asumido): {$audit['concept_count']}");
+            $this->table(['Flag', 'Conceptos'], collect($audit['flag_summary'])->map(fn ($count, $flag) => [$flag, $count])->values()->all());
+
+            foreach ($audit['concepts'] as $concept) {
+                if (in_array('VALID_IDENTITY_CLUSTER', $concept['flags'], true) && count($concept['flags']) === 1) {
+                    continue;
+                }
+                $this->line("  #{$concept['concept_id']} \"{$concept['concept_name']}\" ({$concept['term_count']} términos) -> ".implode(', ', $concept['flags']));
             }
-            $this->line("  #{$concept['concept_id']} \"{$concept['concept_name']}\" ({$concept['term_count']} términos) -> ".implode(', ', $concept['flags']));
-        }
 
-        $result = ['mode' => 'audit', 'audit' => $audit];
+            $result['mode'] = 'audit';
+            $result['audit'] = $audit;
+        }
 
         if ($this->option('dry-run')) {
             $this->newLine();
@@ -57,9 +65,15 @@ class BuildTaxonomyCanonicalConcepts extends Command
             $this->info("Términos procesados: {$dryRun['terms_processed']} | Pares candidatos: {$dryRun['candidate_pairs_generated']} | Pares puntuados: {$dryRun['pairs_scored']}");
             $this->table(['Tier', 'Candidatos'], collect($dryRun['candidates_by_tier'])->map(fn ($c, $tier) => [$tier, $c])->values()->all());
             $this->info("Propuestas de concepto nuevo (PROPOSE_NEW_CONCEPT): {$dryRun['propose_new_concept_candidates']}");
-            $this->info("Runtime: {$dryRun['runtime_ms']}ms | DB queries: {$dryRun['db_queries']} | Embedding calls: {$dryRun['embedding_calls_made']} (siempre 0 en dry-run)");
+            $this->info("Runtime: {$dryRun['runtime_ms']}ms | DB queries: {$dryRun['db_queries']} ({$dryRun['queries_per_term']}/término, {$dryRun['queries_per_candidate']}/candidato) | Embedding calls: {$dryRun['embedding_calls_made']} (siempre 0 en dry-run)");
+            $this->table(['Etapa', 'Queries', 'Tiempo (ms)'], collect($dryRun['query_count_by_stage'])->map(fn ($c, $stage) => [$stage, $c, $dryRun['time_ms_by_stage'][$stage] ?? 0])->values()->all());
 
             $result['dry_run'] = $dryRun;
+        }
+
+        if ($this->option('save-snapshot')) {
+            File::put($this->option('save-snapshot'), json_encode($result, JSON_PRETTY_PRINT));
+            $this->info('Snapshot guardado en '.$this->option('save-snapshot'));
         }
 
         return self::SUCCESS;
