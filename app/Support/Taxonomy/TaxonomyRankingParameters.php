@@ -291,6 +291,34 @@ class TaxonomyRankingParameters
                 'example' => '"cabrias" (alias de "cabria") cuenta como Nivel 1.',
                 'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
             ],
+            'mcp_canonical.related_candidates_parallel_enabled' => [
+                'label' => 'Relacionados en paralelo activo (evidence layering)',
+                'description' => 'Fase 24, Fase 2: 0 (default) = comportamiento de Fase 23A sin cambios - `canonical_related` (Nivel 5) solo corre si el CPV directo no encontró NINGUNA empresa (fallback puro). 1 = `canonical_related` corre SIEMPRE que exista un código de familia relacionado, coexistiendo con evidencia directa - protegido por `minimum_relation_confidence`/`max_related_candidates`/`generic_relation_penalty` de abajo. Apagar vuelve al comportamiento ya validado, sin redeploy.',
+                'default' => 0, 'min' => 0, 'max' => 1,
+                'example' => '"cabrias" ya tiene 7 empresas directas - con esto en 1, además se evalúan (acotadas) empresas de la Familia CPV-28.02.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.minimum_relation_confidence' => [
+                'label' => 'Confianza mínima para relacionados en paralelo',
+                'description' => 'Fase 24, Fase 2: solo aplica cuando `related_candidates_parallel_enabled`=1. El match de Nivel 5 (familia) que originó los candidatos relacionados debe tener un weight igual o mayor a este umbral - independiente de `minimum_expansion_confidence` (que aplica a todos los niveles), un dial específico para esta señal.',
+                'default' => 0.30, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Con el default de `level5_fallback_penalty` (0.30), el umbral por defecto deja pasar exactamente ese caso - subirlo exige una familia con menos penalización relativa.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.max_related_candidates' => [
+                'label' => 'Tope de candidatos relacionados por frase',
+                'description' => 'Fase 24, Fase 2: solo aplica cuando `related_candidates_parallel_enabled`=1. Límite duro de empresas que la señal `canonical_related` puede aportar por frase - protección directa contra explosión de recall al dejar de ser un fallback exclusivo.',
+                'default' => 5, 'min' => 0, 'max' => 50,
+                'example' => 'Una familia CPV amplia con 40 empresas tageadas solo aporta 5 candidatos relacionados, nunca las 40.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'mcp_canonical.generic_relation_penalty' => [
+                'label' => 'Penalización adicional de la señal relacionada',
+                'description' => 'Fase 24, Fase 2: multiplicador GENERAL sobre el peso RRF de la señal completa `canonical_related` (no de cada match individual, eso ya lo hace `level5_fallback_penalty`) - un segundo dial para bajar cuánto pesa TODA la señal relacionada frente a las demás, sin tocar las demás listas. 1.0 = sin penalización adicional.',
+                'default' => 1.00, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Bajar a 0.5 si, tras el benchmark CURRENT vs NEW, los candidatos relacionados resultan demasiado competitivos frente a evidencia semántica genuina.',
+                'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
         ];
     }
 
