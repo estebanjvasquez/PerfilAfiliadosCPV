@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\TaxonomyCanonicalConcept;
-use App\Models\TaxonomyTerm;
+use App\Services\Taxonomy\CanonicalConceptBuilderService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -45,6 +45,10 @@ use Illuminate\Support\Facades\DB;
  *
  * Idempotente: un término ya vinculado a cualquier concepto no se vuelve a tocar en una segunda
  * corrida.
+ *
+ * Phase 3: la lógica de ambos pasos vive ahora en `CanonicalConceptBuilderService` (reutilizable
+ * desde `taxonomy:build-canonical-concepts`) - este command es un wrapper delgado, mismo signature,
+ * mismo comportamiento, mismos mensajes de salida.
  */
 class BootstrapTaxonomyCanonicalConcepts extends Command
 {
@@ -52,64 +56,13 @@ class BootstrapTaxonomyCanonicalConcepts extends Command
 
     protected $description = 'TAXV3-2: crea 1 concepto por grupo de términos external_verified y enlaza conservadoramente el resto por similitud léxica.';
 
-    public function handle(): int
+    public function handle(CanonicalConceptBuilderService $builder): int
     {
-        $conceptsCreated = 0;
-        $verifiedLinked = 0;
-
-        $verifiedTerms = TaxonomyTerm::query()
-            ->where('origin_type', TaxonomyTerm::ORIGIN_EXTERNAL_VERIFIED)
-            ->get(['id', 'canonical_term', 'language']);
-
-        $groups = $verifiedTerms->groupBy(fn (TaxonomyTerm $t) => mb_strtolower(trim($t->canonical_term)));
-
-        foreach ($groups as $key => $termsInGroup) {
-            if ($key === '') {
-                continue;
-            }
-
-            $alreadyLinked = DB::connection('pgsql')->table('taxonomy_term_concepts')
-                ->whereIn('term_id', $termsInGroup->pluck('id'))
-                ->pluck('term_id')
-                ->all();
-
-            $pending = $termsInGroup->reject(fn (TaxonomyTerm $t) => in_array($t->id, $alreadyLinked, true));
-            if ($pending->isEmpty()) {
-                continue;
-            }
-
-            $enName = $termsInGroup->firstWhere('language', 'en')?->canonical_term;
-            $esName = $termsInGroup->firstWhere('language', 'es')?->canonical_term;
-
-            $concept = TaxonomyCanonicalConcept::query()
-                ->where('canonical_name_en', $enName)
-                ->where('canonical_name_es', $esName)
-                ->first();
-
-            if (! $concept) {
-                $concept = TaxonomyCanonicalConcept::query()->create([
-                    'canonical_name_en' => $enName,
-                    'canonical_name_es' => $esName,
-                    'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE,
-                ]);
-                $conceptsCreated++;
-            }
-
-            foreach ($pending as $term) {
-                DB::connection('pgsql')->table('taxonomy_term_concepts')->insert([
-                    'term_id' => $term->id,
-                    'concept_id' => $concept->id,
-                    'created_at' => now(),
-                ]);
-                $verifiedLinked++;
-            }
-        }
-
-        $this->info("Paso 1: {$conceptsCreated} concepto(s) nuevo(s), {$verifiedLinked} término(s) verificado(s) vinculado(s).");
+        $step1 = $builder->bootstrapFromExternalVerified();
+        $this->info("Paso 1: {$step1['concepts_created']} concepto(s) nuevo(s), {$step1['terms_linked']} término(s) verificado(s) vinculado(s).");
 
         $similarity = (float) $this->option('similarity');
-        $autoLinked = $this->autoLinkBySimilarity($similarity);
-
+        $autoLinked = $builder->autoLinkBySimilarity($similarity);
         $this->info("Paso 2: {$autoLinked} término(s) adicionales auto-vinculados por similitud léxica (umbral {$similarity}).");
 
         $totalConcepts = TaxonomyCanonicalConcept::query()->count();
@@ -117,54 +70,5 @@ class BootstrapTaxonomyCanonicalConcepts extends Command
         $this->info("Totales: {$totalConcepts} conceptos, {$totalLinked} término(s) vinculado(s) a algún concepto.");
 
         return self::SUCCESS;
-    }
-
-    private function autoLinkBySimilarity(float $threshold): int
-    {
-        $linked = 0;
-
-        // Excluye términos que YA tienen su propia relación CPV `approved`: la capa de conceptos
-        // existe para que un término SIN verificación propia herede la de un hermano - uno que ya
-        // tiene la suya no gana nada uniéndose, y sí puede generar un falso positivo si un hiperónimo
-        // genérico (ej. "drilling") queda agrupado por trigram con un concepto más específico que
-        // comparte la palabra (ej. "drilling mud") - ver docblock de la clase, corrección TAXV3-7.
-        $unlinkedTerms = DB::connection('pgsql')->select(<<<'SQL'
-            SELECT t.id, t.canonical_term
-            FROM taxonomy_terms t
-            WHERE t.canonical_term IS NOT NULL
-              AND NOT EXISTS (SELECT 1 FROM taxonomy_term_concepts tc WHERE tc.term_id = t.id)
-              AND NOT EXISTS (
-                  SELECT 1 FROM taxonomy_term_cpv_relations r
-                  WHERE r.term_id = t.id AND r.status = 'approved'
-              )
-        SQL);
-
-        foreach ($unlinkedTerms as $term) {
-            $match = DB::connection('pgsql')->selectOne(<<<'SQL'
-                SELECT id,
-                    GREATEST(
-                        COALESCE(similarity(canonical_name_en, ?), 0),
-                        COALESCE(similarity(canonical_name_es, ?), 0)
-                    ) AS sim
-                FROM taxonomy_canonical_concepts
-                WHERE (canonical_name_en IS NOT NULL AND canonical_name_en % ?)
-                   OR (canonical_name_es IS NOT NULL AND canonical_name_es % ?)
-                ORDER BY sim DESC
-                LIMIT 1
-            SQL, [$term->canonical_term, $term->canonical_term, $term->canonical_term, $term->canonical_term]);
-
-            if (! $match || (float) $match->sim < $threshold) {
-                continue;
-            }
-
-            DB::connection('pgsql')->table('taxonomy_term_concepts')->insert([
-                'term_id' => $term->id,
-                'concept_id' => $match->id,
-                'created_at' => now(),
-            ]);
-            $linked++;
-        }
-
-        return $linked;
     }
 }

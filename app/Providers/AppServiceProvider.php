@@ -11,6 +11,7 @@ use App\Models\Sustainability;
 use App\Models\TaxonomyCategory;
 use App\Observers\EmpresaCompletionObserver;
 use App\Observers\TaxonomyCategoryObserver;
+use App\Services\Taxonomy\IntentContaminationDetector;
 use Filament\Facades\Filament;
 
 use Illuminate\Support\Facades\Schema;
@@ -32,7 +33,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // Phase 3: IntentContaminationDetector recibe su vocabulario de marcadores por
+        // constructor (testeable con fixtures sintéticos, sin depender de la BD) - en producción
+        // se resuelve siempre desde taxonomy_intent_markers (vocabulario gobernado, sección 2/13
+        // del pedido de Phase 3).
+        $this->app->bind(IntentContaminationDetector::class, fn () => IntentContaminationDetector::fromGovernedVocabulary());
     }
 
     /**

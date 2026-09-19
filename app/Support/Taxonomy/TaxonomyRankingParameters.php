@@ -26,6 +26,8 @@ class TaxonomyRankingParameters
 
     public const GROUP_MCP_CANONICAL_EXPANSION = 'MCP - Expansión canónica (CIRA)';
 
+    public const GROUP_CONCEPT_BUILDER = 'Phase 3 - Canonical Concept Builder';
+
     /**
      * @return array<string, array{label:string, description:string, default:float, min:float, max:float, example:string, group:string}>
      */
@@ -318,6 +320,174 @@ class TaxonomyRankingParameters
                 'default' => 1.00, 'min' => 0.0, 'max' => 1.0,
                 'example' => 'Bajar a 0.5 si, tras el benchmark CURRENT vs NEW, los candidatos relacionados resultan demasiado competitivos frente a evidencia semántica genuina.',
                 'group' => self::GROUP_MCP_CANONICAL_EXPANSION,
+            ],
+            'concept_builder.auto_accept_threshold' => [
+                'label' => 'Umbral AUTO_ACCEPT',
+                'description' => 'Phase 3: score compuesto mínimo para que el Builder clasifique un candidato término→concepto como AUTO_ACCEPT. Sujeto además a la regla de seguridad de corroboración mínima (ver concept_builder.min_corroborating_signals_for_auto_accept) - ninguna señal semántica sola puede alcanzar este tier.',
+                'default' => 0.90, 'min' => 0.80, 'max' => 1.0,
+                'example' => 'Identidad canónica exacta + solapamiento de alias + CPV compartido de categoría, todos altos a la vez.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.auto_accept_conservative_threshold' => [
+                'label' => 'Umbral AUTO_ACCEPT_CONSERVATIVE',
+                'description' => 'Phase 3: score compuesto mínimo para AUTO_ACCEPT_CONSERVATIVE (se crea igual, pero queda marcado para revisión opcional, no urgente).',
+                'default' => 0.80, 'min' => 0.60, 'max' => 1.0,
+                'example' => 'Similitud léxica alta + CPV de familia compartido, sin identidad exacta.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.review_threshold' => [
+                'label' => 'Umbral REVIEW',
+                'description' => 'Phase 3: score compuesto mínimo para que un candidato entre a la cola de revisión humana en vez de descartarse (REJECT).',
+                'default' => 0.55, 'min' => 0.30, 'max' => 0.90,
+                'example' => 'Un candidato con una sola señal moderada (ej. solo similitud léxica 0.65).',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.min_corroborating_signals_for_auto_accept' => [
+                'label' => 'Señales corroborantes mínimas para AUTO_ACCEPT',
+                'description' => 'Phase 3 (regla de seguridad, sección 12 del pedido): cuántas señales independientes deben superar su propio umbral de corroboración para que un candidato pueda llegar a AUTO_ACCEPT/AUTO_ACCEPT_CONSERVATIVE - ninguna señal individual (pg_trgm, embedding, CPV compartido) puede producir ese tier por sí sola.',
+                'default' => 2, 'min' => 1, 'max' => 5,
+                'example' => 'pg_trgm alto por sí solo nunca basta; pg_trgm alto + CPV de categoría compartido sí corrobora.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.corroborating_signal_threshold' => [
+                'label' => 'Umbral de señal corroborante',
+                'description' => 'Phase 3: valor mínimo (0..1) que una señal individual del score compuesto debe alcanzar para contar hacia concept_builder.min_corroborating_signals_for_auto_accept.',
+                'default' => 0.60, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'lexical_similarity=0.72 cuenta como corroborante; lexical_similarity=0.40 no.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.weight_exact_canonical_signal' => [
+                'label' => 'Peso: identidad canónica exacta',
+                'description' => 'Phase 3: peso del signal exact_canonical_signal en el score compuesto (los 10 pesos de este grupo sin contar la penalización de intención suman 1.0).',
+                'default' => 0.20, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Mismo canonical_term normalizado que un término ya vinculado al concepto.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.weight_lexical_similarity' => [
+                'label' => 'Peso: similitud léxica',
+                'description' => 'Phase 3: peso del signal lexical_similarity (pg_trgm) en el score compuesto.',
+                'default' => 0.12, 'min' => 0.0, 'max' => 1.0,
+                'example' => '"gas natural" vs concepto "natural gas".',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.weight_alias_overlap' => [
+                'label' => 'Peso: solapamiento de alias',
+                'description' => 'Phase 3: peso del signal alias_overlap (taxonomy_term_aliases compartidos con miembros del concepto).',
+                'default' => 0.10, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'El candidato comparte un alias registrado con un término ya vinculado.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.weight_shared_cpv' => [
+                'label' => 'Peso: CPV compartido',
+                'description' => 'Phase 3: peso del signal shared_cpv - si el candidato y algún miembro del concepto apuntan al mismo nodo CPV (o un ancestro común). NO implica identidad por sí solo (sección 11 del pedido).',
+                'default' => 0.12, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Candidato y miembro del concepto ambos mapeados a CPV-28.02.01G.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.weight_cpv_specificity' => [
+                'label' => 'Peso: especificidad del CPV compartido',
+                'description' => 'Phase 3: peso del signal cpv_specificity - CATEGORY > FAMILY > GROUP (sección 11 del pedido); un CPV compartido a nivel de Categoría pesa más que uno compartido solo a nivel de Grupo.',
+                'default' => 0.08, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Compartir la Categoría hoja puntúa 1.0; compartir solo el Grupo raíz puntúa 0.0.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.weight_cpv_mapping_quality' => [
+                'label' => 'Peso: calidad del mapping CPV',
+                'description' => 'Phase 3: peso del signal cpv_mapping_quality - pondera el shared_cpv por el relation_type/confidence/weight/status reales de las relaciones término→CPV involucradas (ver concept_builder.mapping_quality_*). Un anchor `contextual` de baja confianza no puede pesar igual que uno `exact`/`approved`.',
+                'default' => 0.08, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Dos relaciones `exact`/`approved` sólidas puntúan mucho más que dos `contextual`/`candidate`.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.weight_legacy_service_overlap' => [
+                'label' => 'Peso: solapamiento de servicios legacy',
+                'description' => 'Phase 3: peso del signal legacy_service_overlap (taxonomy_term_service_relations compartidas).',
+                'default' => 0.08, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Candidato y miembro del concepto comparten el mismo servicio legacy declarado.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.weight_embedding_similarity' => [
+                'label' => 'Peso: similitud de embedding',
+                'description' => 'Phase 3: peso del signal embedding_similarity, solo disponible cuando ambos términos ya tienen un vector persistido en taxonomy_term_embeddings (nunca se genera un embedding nuevo solo para puntuar - sección 9 del pedido).',
+                'default' => 0.12, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Distancia coseno baja entre los vectores ya persistidos de ambos términos.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.weight_language_equivalence' => [
+                'label' => 'Peso: equivalencia de idioma',
+                'description' => 'Phase 3: peso del signal language_equivalence (el concepto ya tiene un nombre en el idioma opuesto al del candidato, vía term_type=translation_alias u origen verificado bilingüe).',
+                'default' => 0.05, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Concepto con canonical_name_en poblado y el candidato es la traducción ES verificada.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.weight_source_evidence' => [
+                'label' => 'Peso: evidencia de fuente',
+                'description' => 'Phase 3: peso del signal source_evidence (taxonomy_term_source_bindings verificados que también corroboran algún miembro del concepto).',
+                'default' => 0.05, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Ambos términos verificados por la misma fuente externa (ej. SLB).',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.intent_contamination_penalty_weight' => [
+                'label' => 'Peso de penalización por contaminación de intención',
+                'description' => 'Phase 3 (sección 13 del pedido): cuánto RESTA del score compuesto cuando IntentContaminationDetector encuentra que el candidato es [INTENT + SUBJECT] de un término ya presente en el concepto (o viceversa). Se resta después de la suma ponderada, no se normaliza junto a los demás pesos.',
+                'default' => 0.35, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Concepto ya contiene "cabria"; candidato es "mantenimiento de cabria" -> penalización fuerte.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.vector_top_k' => [
+                'label' => 'Top-K de retrieval por vecino más cercano',
+                'description' => 'Phase 3 (sección 9 del pedido): cuántos vecinos más cercanos trae la búsqueda vectorial por término antes del scoring compuesto - nunca comparación embedding all-pairs.',
+                'default' => 20, 'min' => 1, 'max' => 100,
+                'example' => 'Con ~1.900 términos, un KNN acotado evita los ~1.8M pares de una comparación exhaustiva.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.max_candidate_concepts_per_term' => [
+                'label' => 'Tope de conceptos candidatos por término',
+                'description' => 'Phase 3: cuántos conceptos candidatos (tras fusionar todas las señales de retrieval) se puntúan como máximo por término evaluado.',
+                'default' => 10, 'min' => 1, 'max' => 50,
+                'example' => 'Un término con matches débiles en 30 conceptos distintos solo puntúa los 10 mejores.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.mapping_quality_exact' => [
+                'label' => 'Calidad de mapping: exact',
+                'description' => 'Phase 3: peso de calidad para relaciones término→CPV con relation_type=exact, usado por el signal cpv_mapping_quality. taxonomy_term_cpv_relations.relation_type describe la calidad del MAPPING, nunca se reinterpreta como tipo de relación semántica entre conceptos (sección 11 del pedido).',
+                'default' => 1.00, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Relación exact/approved usada como anchor de shared_cpv.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.mapping_quality_explicit_synonym' => [
+                'label' => 'Calidad de mapping: explicit_synonym',
+                'description' => 'Phase 3: peso de calidad para relation_type=explicit_synonym.',
+                'default' => 0.95, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Relación explicit_synonym usada como anchor de shared_cpv.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.mapping_quality_strong_lexical' => [
+                'label' => 'Calidad de mapping: strong_lexical',
+                'description' => 'Phase 3: peso de calidad para relation_type=strong_lexical.',
+                'default' => 0.85, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Relación strong_lexical usada como anchor de shared_cpv.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.mapping_quality_lexical' => [
+                'label' => 'Calidad de mapping: lexical',
+                'description' => 'Phase 3: peso de calidad para relation_type=lexical.',
+                'default' => 0.70, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Relación lexical usada como anchor de shared_cpv.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.mapping_quality_contextual' => [
+                'label' => 'Calidad de mapping: contextual',
+                'description' => 'Phase 3: peso de calidad para relation_type=contextual (la más débil) - una relación contextual de baja confianza no puede funcionar como anchor equivalente a una exact/approved (sección 11 del pedido).',
+                'default' => 0.50, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Relación contextual usada como anchor de shared_cpv.',
+                'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_builder.low_coherence_avg_similarity_threshold' => [
+                'label' => 'Umbral de coherencia mínima (AUDIT_EXISTING)',
+                'description' => 'Phase 3 (sección 14 del pedido): similitud léxica promedio mínima entre los términos de un concepto existente para NO marcarlo LOW_COHERENCE_CLUSTER durante la auditoría de solo-lectura.',
+                'default' => 0.35, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Un concepto cuyos términos casi no comparten letras entre sí (posible agrupación espuria).',
+                'group' => self::GROUP_CONCEPT_BUILDER,
             ],
         ];
     }

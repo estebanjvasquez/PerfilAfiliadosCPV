@@ -19,12 +19,32 @@ class TaxonomyCanonicalConcept extends Model
         'canonical_name_en',
         'canonical_name_es',
         'status',
+        'concept_type',
+        'domain',
     ];
 
     public function terms()
     {
         return $this->belongsToMany(TaxonomyTerm::class, 'taxonomy_term_concepts', 'concept_id', 'term_id')
             ->withPivot('created_at');
+    }
+
+    /** Phase 3: relaciones tipadas donde este concepto es el origen. */
+    public function relationsAsSource()
+    {
+        return $this->hasMany(TaxonomyConceptRelation::class, 'source_concept_id');
+    }
+
+    /** Phase 3: relaciones tipadas donde este concepto es el destino. */
+    public function relationsAsTarget()
+    {
+        return $this->hasMany(TaxonomyConceptRelation::class, 'target_concept_id');
+    }
+
+    /** Phase 3: candidatos de la cola de revisión que proponen vincular un término a este concepto. */
+    public function candidateLinks()
+    {
+        return $this->hasMany(TaxonomyCandidateConceptLink::class, 'suggested_concept_id');
     }
 
     public function getDisplayNameAttribute(): string

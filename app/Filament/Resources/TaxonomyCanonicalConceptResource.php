@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Models\TaxonomyCanonicalConcept;
+use App\Models\TaxonomyConceptType;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -60,6 +61,16 @@ class TaxonomyCanonicalConceptResource extends Resource
                 ->native(false)
                 ->required()
                 ->default(TaxonomyCanonicalConcept::STATUS_ACTIVE),
+            Forms\Components\Select::make('concept_type')
+                ->label('Tipo de concepto (Phase 3, opcional)')
+                ->helperText('Clasificación opcional - los conceptos existentes quedan en null hasta que un administrador los revise a mano. Ver vocabulario en "Tipos de concepto".')
+                ->options(fn () => TaxonomyConceptType::activeOptions())
+                ->native(false)
+                ->nullable(),
+            Forms\Components\TextInput::make('domain')
+                ->label('Dominio (Phase 3, opcional)')
+                ->maxLength(50)
+                ->nullable(),
         ]);
     }
 
@@ -70,6 +81,8 @@ class TaxonomyCanonicalConceptResource extends Resource
                 Tables\Columns\TextColumn::make('canonical_name_en')->label('EN')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('canonical_name_es')->label('ES')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('terms_count')->label('Términos vinculados')->sortable(),
+                Tables\Columns\TextColumn::make('concept_type')->label('Tipo (Phase 3)')->badge()->toggleable(),
+                Tables\Columns\TextColumn::make('domain')->label('Dominio (Phase 3)')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Estado')
                     ->colors([

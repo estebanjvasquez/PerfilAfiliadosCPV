@@ -115,4 +115,16 @@ class TaxonomyTerm extends Model
     {
         return $this->hasMany(TaxonomyTermServiceRelation::class, 'term_id');
     }
+
+    /** Phase 3: embedding persistido/reusable de este término (null si nunca se generó). */
+    public function embedding()
+    {
+        return $this->hasOne(TaxonomyTermEmbedding::class, 'term_id');
+    }
+
+    /** Phase 3: propuestas pendientes de la cola de revisión del Canonical Concept Builder. */
+    public function candidateConceptLinks()
+    {
+        return $this->hasMany(TaxonomyCandidateConceptLink::class, 'suggested_term_id');
+    }
 }
