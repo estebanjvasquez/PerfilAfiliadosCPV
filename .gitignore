@@ -13,8 +13,6 @@ yarn-error.log
 /.idea
 /.vscode
 *.sql
-task.md
-implementation_plan.md
 Propuesta_Categorizacion_Buscador_CPV.docx
 Manual_Usuario_Perfil_Afiliados.docx
 Manual_Usuario_Perfil_Afiliados_v2.docx

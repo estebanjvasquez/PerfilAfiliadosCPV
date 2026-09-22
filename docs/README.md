@@ -7,13 +7,16 @@ consultan esta carpeta.
 ## Vigentes (consultar primero)
 
 - **[task.md](task.md)** — fuente de verdad de en qué quedó el trabajo, tarea por tarea, QA
-  pendiente y notas técnicas. No se sube al repo (`.gitignore`), vive solo local. La actualiza
-  `/cerrar-proyecto` al cierre de cada jornada.
+  pendiente y notas técnicas. **Se sube al repo desde el 2026-09-23** (cambio de convención — antes
+  era local-only vía `.gitignore`; se decidió versionarlo para que sobreviva a la pérdida de un
+  equipo de desarrollo, como pasó antes de esa fecha). La actualiza `/cerrar-proyecto` al cierre de
+  cada jornada.
 - **[PLAN_DESPLIEGUE_PRODUCCION.md](PLAN_DESPLIEGUE_PRODUCCION.md)** — guía operativa para el
   despliegue `staging` → `main`: tabla de fase-por-fase de QA, migraciones/SQL manuales, pasos de
   despliegue y rollback. Sí se sube al repo.
 - **[implementation_plan.md](implementation_plan.md)** — plan de la fase en curso más reciente.
-  No se sube al repo. Se reescribe entre fases (ver notas de reciclado en `task.md`).
+  **Se sube al repo desde el 2026-09-23** (mismo cambio de convención que `task.md`). Se reescribe
+  entre fases (ver notas de reciclado en `task.md`).
 - **[informe_migracion_mysql_supabase_camara_petrolera_v2.md](informe_migracion_mysql_supabase_camara_petrolera_v2.md)**
   — informe vigente sobre el módulo de categorización (SupplHi) y el buscador de afiliados,
   evaluado a partir del estado real del repo. Propone una Fase A sin migrar motor (MySQL
