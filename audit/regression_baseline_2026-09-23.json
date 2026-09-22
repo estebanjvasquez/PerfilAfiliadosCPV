@@ -1,0 +1,910 @@
+{
+  "represas": {
+    "group": "A_baseline",
+    "query": "represas",
+    "candidates_after_dedup": 1,
+    "direct_company_count": 1,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "140"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH"
+    ]
+  },
+  "camiones": {
+    "group": "A_baseline",
+    "query": "camiones",
+    "candidates_after_dedup": 24,
+    "direct_company_count": 4,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "391",
+      "76",
+      "543",
+      "333",
+      "177"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "TAXONOMY_INFERENCE"
+    ]
+  },
+  "grua": {
+    "group": "A_baseline",
+    "query": "grua",
+    "candidates_after_dedup": 2,
+    "direct_company_count": 2,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "333",
+      "480"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH"
+    ]
+  },
+  "ISO 9001": {
+    "group": "A_baseline",
+    "query": "ISO 9001",
+    "candidates_after_dedup": 70,
+    "direct_company_count": 66,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "94",
+      "73",
+      "331",
+      "90",
+      "80"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH"
+    ]
+  },
+  "reciclaje": {
+    "group": "A_baseline",
+    "query": "reciclaje",
+    "candidates_after_dedup": 46,
+    "direct_company_count": 33,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "74",
+      "1",
+      "96",
+      "257",
+      "115"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH"
+    ]
+  },
+  "rehabilitacion de vialidad": {
+    "group": "A_baseline",
+    "query": "rehabilitacion de vialidad",
+    "candidates_after_dedup": 25,
+    "direct_company_count": 4,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "74",
+      "115",
+      "140",
+      "305",
+      "214"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "SEMANTIC_INFERENCE"
+    ]
+  },
+  "tratamiento de aguas de perforacion": {
+    "group": "A_baseline",
+    "query": "tratamiento de aguas de perforacion",
+    "candidates_after_dedup": 32,
+    "direct_company_count": 3,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "96",
+      "179",
+      "115",
+      "79",
+      "333"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE",
+      "LITERAL_MATCH"
+    ]
+  },
+  "construccion": {
+    "group": "A_baseline",
+    "query": "construccion",
+    "candidates_after_dedup": 90,
+    "direct_company_count": 86,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "74",
+      "1",
+      "140",
+      "75",
+      "115"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH"
+    ]
+  },
+  "gandola": {
+    "group": "B_regional",
+    "query": "gandola",
+    "candidates_after_dedup": 7,
+    "direct_company_count": 1,
+    "detected_intent": "generic",
+    "regional_terms": [
+      "gandola"
+    ],
+    "canonical_concepts": [],
+    "cpv_relations": [
+      "CPV-42.01"
+    ],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "433",
+      "165",
+      "187",
+      "204",
+      "426"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY"
+    ]
+  },
+  "gandolas": {
+    "group": "B_regional",
+    "query": "gandolas",
+    "candidates_after_dedup": 7,
+    "direct_company_count": 1,
+    "detected_intent": "generic",
+    "regional_terms": [
+      "gandola"
+    ],
+    "canonical_concepts": [],
+    "cpv_relations": [
+      "CPV-42.01"
+    ],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "433",
+      "165",
+      "187",
+      "204",
+      "426"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY"
+    ]
+  },
+  "cabria": {
+    "group": "B_regional",
+    "query": "cabria",
+    "candidates_after_dedup": 7,
+    "direct_company_count": 0,
+    "detected_intent": "generic",
+    "regional_terms": [
+      "cabria"
+    ],
+    "canonical_concepts": [
+      "Torre y Mástil de Perforación"
+    ],
+    "cpv_relations": [
+      "CPV-28.02.01G"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "86",
+      "138",
+      "157",
+      "170",
+      "179"
+    ],
+    "top_evidence_strengths": [
+      "RELATED_CAPABILITY",
+      "RELATED_CAPABILITY",
+      "RELATED_CAPABILITY",
+      "RELATED_CAPABILITY",
+      "RELATED_CAPABILITY"
+    ]
+  },
+  "cabrias": {
+    "group": "B_regional",
+    "query": "cabrias",
+    "candidates_after_dedup": 7,
+    "direct_company_count": 0,
+    "detected_intent": "generic",
+    "regional_terms": [
+      "cabria"
+    ],
+    "canonical_concepts": [
+      "Torre y Mástil de Perforación"
+    ],
+    "cpv_relations": [
+      "CPV-28.02.01G"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "86",
+      "138",
+      "157",
+      "170",
+      "179"
+    ],
+    "top_evidence_strengths": [
+      "RELATED_CAPABILITY",
+      "RELATED_CAPABILITY",
+      "RELATED_CAPABILITY",
+      "RELATED_CAPABILITY",
+      "RELATED_CAPABILITY"
+    ]
+  },
+  "mechurrio": {
+    "group": "B_regional",
+    "query": "mechurrio",
+    "candidates_after_dedup": 2,
+    "direct_company_count": 2,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "140",
+      "391"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH"
+    ]
+  },
+  "macolla": {
+    "group": "B_regional",
+    "query": "macolla",
+    "candidates_after_dedup": 13,
+    "direct_company_count": 13,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "155",
+      "171",
+      "1",
+      "72",
+      "76"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH"
+    ]
+  },
+  "guaya fina": {
+    "group": "B_regional",
+    "query": "guaya fina",
+    "candidates_after_dedup": 4,
+    "direct_company_count": 3,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [
+      "CPV-29.02.14S"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "EXPANSION_NOT_PROPAGATED",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "182",
+      "458",
+      "198",
+      "128"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "SEMANTIC_INFERENCE"
+    ]
+  },
+  "guaya eléctrica": {
+    "group": "B_regional",
+    "query": "guaya eléctrica",
+    "candidates_after_dedup": 2,
+    "direct_company_count": 1,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "79",
+      "72"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "SEMANTIC_INFERENCE"
+    ]
+  },
+  "camión chupón": {
+    "group": "B_regional",
+    "query": "camión chupón",
+    "candidates_after_dedup": 0,
+    "direct_company_count": 0,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [],
+    "top_evidence_strengths": []
+  },
+  "revestidor": {
+    "group": "B_regional",
+    "query": "revestidor",
+    "candidates_after_dedup": 11,
+    "direct_company_count": 1,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "157",
+      "91",
+      "312",
+      "317",
+      "145"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE"
+    ]
+  },
+  "mecha": {
+    "group": "B_regional",
+    "query": "mecha",
+    "candidates_after_dedup": 22,
+    "direct_company_count": 22,
+    "detected_intent": "generic",
+    "regional_terms": [
+      "mecha"
+    ],
+    "canonical_concepts": [
+      "drill bit"
+    ],
+    "cpv_relations": [
+      "CPV-28.05.01G"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "EXPANSION_NOT_PROPAGATED",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "140",
+      "1",
+      "73",
+      "74",
+      "75"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH"
+    ]
+  },
+  "caballito": {
+    "group": "B_regional",
+    "query": "caballito",
+    "candidates_after_dedup": 0,
+    "direct_company_count": 0,
+    "detected_intent": "generic",
+    "regional_terms": [
+      "caballito"
+    ],
+    "canonical_concepts": [
+      "Balancín"
+    ],
+    "cpv_relations": [
+      "CPV-29.04.02G"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "EXPANSION_NOT_PROPAGATED",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [],
+    "top_evidence_strengths": []
+  },
+  "balancín": {
+    "group": "B_regional",
+    "query": "balancín",
+    "candidates_after_dedup": 4,
+    "direct_company_count": 4,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [
+      "CPV-29.04.02G"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "EXPANSION_NOT_PROPAGATED",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "157",
+      "91",
+      "333",
+      "391"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH"
+    ]
+  },
+  "levantamiento artificial": {
+    "group": "B_regional",
+    "query": "levantamiento artificial",
+    "candidates_after_dedup": 16,
+    "direct_company_count": 2,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [
+      "artificial lift"
+    ],
+    "cpv_relations": [
+      "CPV-26.05"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "EXPANSION_NOT_PROPAGATED",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "276",
+      "72",
+      "383",
+      "257",
+      "187"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE"
+    ]
+  },
+  "fabricantes de gandolas": {
+    "group": "C_intent_x_subject",
+    "query": "fabricantes de gandolas",
+    "candidates_after_dedup": 14,
+    "direct_company_count": 0,
+    "detected_intent": "manufacturing",
+    "regional_terms": [
+      "gandola"
+    ],
+    "canonical_concepts": [],
+    "cpv_relations": [
+      "CPV-42.01"
+    ],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "165",
+      "187",
+      "204",
+      "426",
+      "452"
+    ],
+    "top_evidence_strengths": [
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY"
+    ]
+  },
+  "mantenimiento de gandolas": {
+    "group": "C_intent_x_subject",
+    "query": "mantenimiento de gandolas",
+    "candidates_after_dedup": 24,
+    "direct_company_count": 1,
+    "detected_intent": "maintenance",
+    "regional_terms": [
+      "gandola"
+    ],
+    "canonical_concepts": [],
+    "cpv_relations": [
+      "CPV-42.01"
+    ],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "433",
+      "74",
+      "107",
+      "78",
+      "165"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE",
+      "CPV_CAPABILITY"
+    ]
+  },
+  "alquiler de gandolas": {
+    "group": "C_intent_x_subject",
+    "query": "alquiler de gandolas",
+    "candidates_after_dedup": 10,
+    "direct_company_count": 0,
+    "detected_intent": "rental",
+    "regional_terms": [
+      "gandola"
+    ],
+    "canonical_concepts": [],
+    "cpv_relations": [
+      "CPV-42.01"
+    ],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "165",
+      "187",
+      "204",
+      "426",
+      "452"
+    ],
+    "top_evidence_strengths": [
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY",
+      "CPV_CAPABILITY"
+    ]
+  },
+  "transporte de gandolas": {
+    "group": "C_intent_x_subject",
+    "query": "transporte de gandolas",
+    "candidates_after_dedup": 6,
+    "direct_company_count": 0,
+    "detected_intent": "generic",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [],
+    "diagnostic_flags": [
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "165",
+      "187",
+      "204",
+      "426",
+      "452"
+    ],
+    "top_evidence_strengths": [
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE"
+    ]
+  },
+  "fabricantes de cabrias": {
+    "group": "C_intent_x_subject",
+    "query": "fabricantes de cabrias",
+    "candidates_after_dedup": 14,
+    "direct_company_count": 0,
+    "detected_intent": "manufacturing",
+    "regional_terms": [
+      "cabria"
+    ],
+    "canonical_concepts": [
+      "Torre y Mástil de Perforación"
+    ],
+    "cpv_relations": [
+      "CPV-28.02.01G"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "157",
+      "151",
+      "141",
+      "210",
+      "107"
+    ],
+    "top_evidence_strengths": [
+      "RELATED_CAPABILITY",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE"
+    ]
+  },
+  "mantenimiento de cabrias": {
+    "group": "C_intent_x_subject",
+    "query": "mantenimiento de cabrias",
+    "candidates_after_dedup": 23,
+    "direct_company_count": 0,
+    "detected_intent": "maintenance",
+    "regional_terms": [
+      "cabria"
+    ],
+    "canonical_concepts": [
+      "Torre y Mástil de Perforación"
+    ],
+    "cpv_relations": [
+      "CPV-28.02.01G"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "107",
+      "78",
+      "157",
+      "73",
+      "75"
+    ],
+    "top_evidence_strengths": [
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE",
+      "RELATED_CAPABILITY",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE"
+    ]
+  },
+  "fabricantes de balancines": {
+    "group": "C_intent_x_subject",
+    "query": "fabricantes de balancines",
+    "candidates_after_dedup": 9,
+    "direct_company_count": 1,
+    "detected_intent": "manufacturing",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [
+      "CPV-29.04.02G"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "EXPANSION_NOT_PROPAGATED",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "157",
+      "494",
+      "138",
+      "560",
+      "141"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE"
+    ]
+  },
+  "mantenimiento de balancín": {
+    "group": "C_intent_x_subject",
+    "query": "mantenimiento de balancín",
+    "candidates_after_dedup": 22,
+    "direct_company_count": 3,
+    "detected_intent": "maintenance",
+    "regional_terms": [],
+    "canonical_concepts": [],
+    "cpv_relations": [
+      "CPV-29.04.02G"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "EXPANSION_NOT_PROPAGATED",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "333",
+      "157",
+      "391",
+      "73",
+      "74"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "LITERAL_MATCH",
+      "TAXONOMY_INFERENCE",
+      "TAXONOMY_INFERENCE"
+    ]
+  },
+  "fabricantes de levantamiento artificial": {
+    "group": "C_intent_x_subject",
+    "query": "fabricantes de levantamiento artificial",
+    "candidates_after_dedup": 9,
+    "direct_company_count": 1,
+    "detected_intent": "manufacturing",
+    "regional_terms": [],
+    "canonical_concepts": [
+      "artificial lift"
+    ],
+    "cpv_relations": [
+      "CPV-26.05"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "EXPANSION_NOT_PROPAGATED",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "276",
+      "138",
+      "494",
+      "560",
+      "141"
+    ],
+    "top_evidence_strengths": [
+      "LITERAL_MATCH",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE",
+      "SEMANTIC_INFERENCE"
+    ]
+  },
+  "mantenimiento de levantamiento artificial": {
+    "group": "C_intent_x_subject",
+    "query": "mantenimiento de levantamiento artificial",
+    "candidates_after_dedup": 45,
+    "direct_company_count": 1,
+    "detected_intent": "maintenance",
+    "regional_terms": [],
+    "canonical_concepts": [
+      "artificial lift"
+    ],
+    "cpv_relations": [
+      "CPV-26.05"
+    ],
+    "diagnostic_flags": [
+      "CPV_WITHOUT_COMPANIES",
+      "EXPANSION_NOT_PROPAGATED",
+      "NO_CRAWLER_EVIDENCE"
+    ],
+    "top_empresa_ids": [
+      "107",
+      "78",
+      "72",
+      "122",
+      "94"
+    ],
+    "top_evidence_strengths": [
+      "TAXONOMY_INFERENCE",
+      "SEMANTIC_INFERENCE",
+      "LITERAL_MATCH",
+      "TAXONOMY_INFERENCE",
+      "SEMANTIC_INFERENCE"
+    ]
+  }
+}

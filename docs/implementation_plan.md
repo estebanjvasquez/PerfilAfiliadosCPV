@@ -11,13 +11,13 @@ Este plan refleja el trabajo **real** que queda, verificado contra código y bas
 
 ## Fase A — Verificación / estabilización (bloqueante para todo lo demás)
 
-**Status (2026-09-23): BLOCKED BY EXTERNAL CREDENTIAL.** Ver `audit/phase3_runtime_validation.md`
-para el detalle completo. Se investigó a fondo cómo se configuran `DEBUG_TOKEN`/`MCP_TOKEN` antes
-de pedir nada — conclusión: no viven en ningún `.env` desplegado, y no son recuperables vía ningún
-permiso de Cloudflare (la plataforma nunca expone valores de secrets ya seteados). Tareas 4 y 5
-de esta fase sí se completaron (smoke test funcional hasta el máximo legítimo sin bypasear auth,
-verificación de Shield). Tareas 1-3 siguen bloqueadas hasta que Esteban provea el valor o autorice
-generar uno nuevo.
+**Status (2026-09-23): PASS — CERRADA.** Ver `audit/phase3_runtime_validation.md` para el detalle
+completo. El usuario autorizó explícitamente generar valores nuevos de `DEBUG_TOKEN`/`MCP_TOKEN`
+(nunca se recuperó el valor anterior) tras confirmarse que no eran recuperables de ningún entorno
+desplegado. Con eso: regresión ejecutada (32/32 OK, 0 `ENGINE FAILURE`), `/mcp` autenticado
+verificado end-to-end contra Supabase real, Shield corregido (455→471, aditivo), smoke test
+funcional completado hasta el máximo legítimo sin bypasear autenticación. Cero mutaciones de
+Phase 3 confirmadas antes y después. **Fase B es ahora el próximo trabajo real.**
 
 **Objetivo:** cerrar los huecos de verificación que quedaron `BLOCKED` por falta de credenciales,
 antes de decidir cualquier trabajo de escritura sobre Phase 3.
@@ -41,14 +41,14 @@ antes de decidir cualquier trabajo de escritura sobre Phase 3.
 **Rollback/safety:** ninguna escritura en esta fase — es enteramente de verificación.
 
 **Acceptance criteria:**
-- [ ] Regresión corrida y guardada como línea base — **BLOCKED, falta `DEBUG_TOKEN`**
-- [ ] `/mcp`/`/debug-search` verificados con una llamada real — **BLOCKED, falta `MCP_TOKEN`/`DEBUG_TOKEN`**
+- [x] Regresión corrida y guardada como línea base — **32/32 OK**, `audit/regression_baseline_2026-09-23.json`
+- [x] `/mcp`/`/debug-search` verificados con una llamada real — **200 en ambos, con datos reales de Supabase**
 - [x] Checklist funcional de staging completo hasta el máximo legítimo sin bypasear auth (login,
       Turnstile, protección de panel — verificados; alta de empresa/exports/perfil requieren
       sesión real, quedan `BLOCKED` por diseño, no se bypasea autenticación para probarlos)
-- [x] Conteo de permisos de Shield confirmado: **455 totales, 3 páginas legacy sin generar**
-      (`page_completion_view`, `page_sectors_view`, `page_gerencia_dashboard`) — corrección
-      (`shield:generate`) pendiente de autorización explícita, no ejecutada
+- [x] Conteo de permisos de Shield confirmado y **corregido**: 455 → 471 (aditivo, 0 duplicados).
+      Las 3 páginas legacy (`page_CompletionView`, `page_SectorsView`, `page_GerenciaDashboard` —
+      nombre real PascalCase, no snake_case) ahora tienen permiso generado y `super_admin` lo tiene
 
 ---
 

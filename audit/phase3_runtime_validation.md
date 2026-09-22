@@ -159,7 +159,85 @@ registrada en `docs/task.md`.
 - [x] `task.md` actualizado
 - [x] `implementation_plan.md` actualizado
 
-**PHASE A — BLOCKED BY EXTERNAL CREDENTIAL.** No se marca PASS. El bloqueo es específicamente la
-falta de `DEBUG_TOKEN`/`MCP_TOKEN` como valores de aplicación — no hay ninguna acción adicional de
-permisos de Cloudflare que lo resuelva; requiere que el usuario provea el valor existente o
-autorice generar uno nuevo.
+**PHASE A — BLOCKED BY EXTERNAL CREDENTIAL** (estado al momento de escribir esta sección). El
+bloqueo era específicamente la falta de `DEBUG_TOKEN`/`MCP_TOKEN` como valores de aplicación — no
+había ninguna acción adicional de permisos de Cloudflare que lo resolviera; requería que el
+usuario proveyera el valor existente o autorizara generar uno nuevo.
+
+---
+
+## Actualización (2026-09-23, misma fecha, autorización explícita recibida)
+
+El usuario autorizó explícitamente generar **valores nuevos** de `DEBUG_TOKEN` y `MCP_TOKEN`
+(nunca se intentó recuperar/reutilizar los anteriores) y proveyó un token de Cloudflare nuevo
+(`Workers Scripts: Edit`, cuenta `cb77662770c0955288691715afa25690`) para setearlos.
+
+**Ejecutado:**
+1. Generados 2 valores aleatorios criptográficamente seguros (32 bytes,
+   `RandomNumberGenerator.Create().GetBytes()` — la primera API usada, `.Fill()`, no existe en
+   .NET Framework/PowerShell 5.1 y hubiera dejado el valor en ceros; se detectó y corrigió antes
+   de usarlo, verificado con hashes SHA-256 distintos entre ambos valores).
+2. `wrangler secret put DEBUG_TOKEN` y `wrangler secret put MCP_TOKEN` contra el Worker
+   `perfilafiliados-mcp` — ambos `✨ Success`.
+3. Regresión ejecutada: **32/32 queries sin error**. Ver `audit/regression_2026-09-23.md` para el
+   detalle completo y la clasificación de banderas de diagnóstico (todas `DATA GAP`, cero
+   `ENGINE FAILURE`).
+4. `/mcp` autenticado: `tools/list` (200) + `tools/call` real sobre `search_taxonomy` (200, datos
+   reales de Supabase) — confirma el camino completo Worker → Hyperdrive → Supabase.
+5. Conteos de taxonomía verificados antes y después de toda la actividad: **0 cambios** (ver tabla
+   abajo).
+6. Shield corregido con el mecanismo estándar (`php artisan shield:generate --all --panel=admin
+   --ignore-existing-policies --no-interaction`) — ver sección 7 actualizada abajo.
+7. Archivos temporales con los valores de los tokens borrados de esta máquina inmediatamente
+   después de usarlos. Ningún valor de token se imprimió en ningún documento ni se commiteó.
+
+## Base de datos — antes/después de toda la actividad de Phase A
+
+| Tabla | Antes | Después | Δ |
+|---|---|---|---|
+| `taxonomy_term_cpv_relations` | 9.749 | 9.749 | 0 |
+| `taxonomy_canonical_concepts` | 79 | 79 | 0 |
+| `taxonomy_term_concepts` | 142 | 142 | 0 |
+| `taxonomy_concept_relations` | 0 | 0 | 0 |
+| `taxonomy_candidate_concept_links` | 0 | 0 | 0 |
+
+**Cero drift, cero mutaciones de Phase 3 — confirmado antes y después de rotar tokens, correr la
+regresión y verificar `/mcp`.**
+
+## 7 (actualizado) — Shield: corregido y verificado
+
+- Total de permisos: **455 → 471** (16 nuevos, estrictamente aditivo — ningún permiso existente
+  desapareció).
+- `super_admin`: sigue teniendo el 100% de los permisos existentes (471/471).
+- Los 3 permisos objetivo **ahora existen y `super_admin` los tiene**:
+  `page_CompletionView`, `page_SectorsView`, `page_GerenciaDashboard` — **nota importante**: el
+  nombre real generado por Filament Shield v3 es PascalCase (`page_CompletionView`), no
+  snake_case (`page_completion_view`) como decía la documentación heredada de la era Shield v1/v2
+  (`docs/PLAN_DESPLIEGUE_PRODUCCION.md`) — es un cambio de convención de nombres entre versiones
+  de Shield, no un error de esta corrección.
+- Cero duplicados por nombre de permiso (verificado con `GROUP BY name HAVING count(*) > 1`).
+- Se usó el mecanismo estándar del framework (`shield:generate`), no inserciones manuales.
+- No verificado con clic real en el navegador (requeriría sesión autenticada real) que las 3
+  páginas aparezcan visualmente en el menú — verificado a nivel de datos (permiso existe + rol lo
+  tiene), que es la condición suficiente según `canView()` de Filament (sin bypass adicional,
+  confirmado en auditorías previas).
+
+## Phase A — Quality Gate (actualizado)
+
+- [x] Mecanismo de autenticación legítimo identificado
+- [x] Regresión ejecutada — **32/32 sin error, 0 ENGINE FAILURE**
+- [x] `/mcp` autenticado ejecutado — **200, tools/list + tools/call reales verificados**
+- [x] Worker health válido
+- [x] Camino Hyperdrive/Supabase verificado con una llamada real (`search_taxonomy` devolvió datos
+      reales de Supabase)
+- [x] Checklist funcional de staging completado hasta el máximo legítimo posible
+- [x] Estado de Shield verificado **y corregido** (455→471, aditivo, sin duplicados)
+- [x] Cero mutaciones de producción de Phase 3
+- [x] Sin fixes específicos de query
+- [x] Sin modificaciones de taxonomía
+- [x] `task.md` actualizado
+- [x] `implementation_plan.md` actualizado
+- [x] Secretos ausentes de git (valores nunca impresos, commiteados, ni guardados en
+      `task.md`/`implementation_plan.md`)
+
+**PHASE A — PASS.**

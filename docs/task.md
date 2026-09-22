@@ -105,10 +105,20 @@ persistido — no debería repetirse ese síntoma puntual.
   desde esta máquina en cualquier repo, en adelante.
 
 **PENDING (seguimiento de seguridad):**
-- [ ] Confirmar que el token de API de Cloudflare usado hoy (scope Hyperdrive + Tunnels, creado
-      específicamente para las tareas de esta sesión) fue revocado por el usuario — no confirmado.
+- [ ] Confirmar que el token de API de Cloudflare usado el 2026-09-22 (scope Hyperdrive + Tunnels)
+      fue revocado por el usuario — no confirmado.
+- [ ] **Nuevo (2026-09-23):** token de Cloudflare con scope `Workers Scripts:Edit`, usado para
+      setear `DEBUG_TOKEN`/`MCP_TOKEN` nuevos en el Worker — ya cumplió su propósito, no se
+      necesita para nada más de esta sesión. Recomendado revocarlo.
 - [ ] Revisar periódicamente la fecha de expiración del PAT de GitHub guardado y rotarlo antes de
       que venza.
+
+**Rotación de secretos del Worker (2026-09-23):** `DEBUG_TOKEN` y `MCP_TOKEN` de
+`perfilafiliados-mcp` fueron rotados a valores nuevos, criptográficamente aleatorios, con
+autorización explícita del usuario. Los valores nunca se imprimieron, commitearon, ni se guardaron
+en este archivo — viven únicamente como secretos del Worker en Cloudflare. Si algún consumidor
+externo dependía del valor anterior (no se detectó ninguno activo en esta sesión), dejó de
+funcionar y necesita el valor nuevo.
 
 ---
 
@@ -146,13 +156,12 @@ Ver `audit/staging_deployment_status.md` para el detalle completo verificado en 
 - Checklist funcional completo de `docs/migracion.md` (login/Turnstile, alta de empresa, exports,
   perfil de Breezy) — **NOT VERIFIED** en esta pasada, solo se confirmaron versiones/conexión/
   migraciones.
-- `shield:generate` contra pgsql — **VERIFIED (2026-09-23): la brecha sigue sin corregirse.**
-  455 permisos totales en staging, `super_admin` tiene los 455 que existen, pero
-  `page_completion_view`/`page_sectors_view`/`page_gerencia_dashboard` (3 páginas legacy, las
-  clases siguen en el código) **siguen sin permiso generado** — invisibles en el menú incluso para
-  `super_admin`. No se corrió `shield:generate` para corregirlo (aditivo y de bajo riesgo, pero se
-  dejó pendiente de autorización explícita en vez de ejecutarlo de oficio). Ver
-  `audit/phase3_runtime_validation.md` sección 7.
+- `shield:generate` contra pgsql — **CORREGIDO Y VERIFICADO (2026-09-23), con autorización
+  explícita del usuario.** 455 → 471 permisos (16 nuevos, estrictamente aditivo, 0 duplicados,
+  0 permisos existentes perdidos). Los 3 permisos objetivo ahora existen y `super_admin` los
+  tiene — **ojo con el nombre real**: Filament Shield v3 genera `page_CompletionView` (PascalCase),
+  no `page_completion_view` (snake_case, era Shield v1/v2) como decía la documentación heredada de
+  `docs/PLAN_DESPLIEGUE_PRODUCCION.md`. Detalle en `audit/phase3_runtime_validation.md` sección 7.
 
 **DECISION REQUIRED (del cliente/negocio, no técnica):**
 - [ ] ¿Producción pasa a pgsql/Supabase en el mismo despliegue que el upgrade de Filament v3, o se
@@ -244,32 +253,28 @@ capa TAXV3-2, independiente). No se activó ni se backfilleó nada.
 
 # 9 — MCP regression suite
 
-**Status: BLOCKED — APPLICATION AUTH TOKEN REQUIRED (causa exacta confirmada 2026-09-23)**
+**Status: DONE / VERIFIED (2026-09-23) — PASS**
 
-Ver `audit/regression_2026-09-23.md` (+ adenda) y `audit/phase3_runtime_validation.md`.
-`perfilafiliados-mcp/scripts/regression-suite.mjs` necesita `--url` (se tiene) y `--token` =
-`DEBUG_TOKEN`. **Se investigó antes de pedir un token de Cloudflare nuevo**: ni `DEBUG_TOKEN` ni
-`MCP_TOKEN`/`MCP_EMBED_TOKEN` existen en el `.env` del servidor de staging (verificado, solo
-existencia de clave) — la integración MCP↔Laravel que documenta `perfilafiliados-mcp/README.md`
-nunca se configuró en ningún entorno accesible. `DEBUG_TOKEN` además está diseñado para nunca vivir
-en un archivo (se tipea a mano). Esto **no** es un problema de permisos de Cloudflare — ningún
-scope de token de Cloudflare permite leer el valor de un secreto de Worker ya seteado (por diseño
-de la plataforma), solo rotarlo.
-
-**Next action:** pedir a Esteban directamente el valor de `DEBUG_TOKEN` (si lo tiene guardado en
-algún gestor de notas/contraseñas personal), o su autorización explícita para generar uno **nuevo**
-vía `wrangler secret put` (esto sí requeriría un token de Cloudflare `Workers Scripts:Edit`, recién
-en ese momento, e invalidaría cualquier valor anterior).
+El usuario autorizó explícitamente generar valores **nuevos** de `DEBUG_TOKEN`/`MCP_TOKEN`
+(nunca se recuperó ni reutilizó el valor anterior) y proveyó un token de Cloudflare
+`Workers Scripts:Edit` para setearlos vía `wrangler secret put`. Regresión ejecutada:
+**32/32 queries respondieron sin error**, 0 `ENGINE FAILURE` — las banderas de diagnóstico
+observadas (`NO_CRAWLER_EVIDENCE`, `CPV_WITHOUT_COMPANIES`, `EXPANSION_NOT_PROPAGATED`) son todas
+`DATA GAP` esperado (crawler no implementado, cobertura de datos), no fallas de motor. Línea base
+guardada en `audit/regression_baseline_2026-09-23.json`. Detalle completo:
+`audit/regression_2026-09-23.md`, `audit/phase3_runtime_validation.md`.
 
 ---
 
 # 10 — MCP live authenticated verification
 
-**Status: PARTIAL — health check VERIFIED, endpoints autenticados BLOCKED (misma causa que sección 9)**
+**Status: VERIFIED (2026-09-23) — PASS**
 
-- `GET https://perfilafiliados-mcp.sisteg.workers.dev/` → `200 {"ok":true,"service":"perfilafiliados-mcp"}` — **VERIFIED**.
-- `/mcp` (necesita `MCP_TOKEN`) y `/debug-search` (necesita `DEBUG_TOKEN`) — **BLOCKED — APPLICATION
-  AUTH TOKEN REQUIRED**, ver sección 9.
+- `GET https://perfilafiliados-mcp.sisteg.workers.dev/` → `200` — health check.
+- `/mcp` con `MCP_TOKEN` nuevo: `tools/list` → 200 (5 tools) + `tools/call` real sobre
+  `search_taxonomy` → 200 con datos reales de Supabase — **confirma el camino completo Worker →
+  Hyperdrive → Supabase → evidencia → respuesta**, no solo el health check.
+- `/debug-search` con `DEBUG_TOKEN` nuevo: usado por la regresión (sección 9), 32/32 OK.
 
 ---
 
@@ -361,12 +366,10 @@ Ver "Orden de ejecución recomendado" en `audit/phase3_completion_audit.md` — 
 
 # 16 — Immediate next action
 
-**Pedirle a Esteban directamente el valor de `DEBUG_TOKEN` (guardado en algún gestor de notas
-personal, si existe) — confirmado el 2026-09-23 que no vive en ningún `.env` desplegado ni es
-recuperable vía permisos de Cloudflare (la plataforma nunca expone valores de secrets ya seteados,
-solo permite rotarlos). Es el único bloqueador real que impide cerrar la verificación completa de
-Phase 3 antes de decidir los próximos pasos de escritura.**
-
-**Secundario, de menor prioridad:** decidir si correr `php artisan shield:generate` en staging
-para las 3 páginas legacy que siguen invisibles en el menú (sección 4/9 arriba) — cambio aditivo,
-bajo riesgo, pendiente de autorización explícita.
+**Fase A (verificación/estabilización) está PASS y cerrada (2026-09-23)** — regresión, MCP
+autenticado y Shield resueltos, cero mutaciones de taxonomía. El siguiente paso real es **Fase B**
+del plan de implementación (`docs/implementation_plan.md`): diseñar los 2 campos faltantes del
+dry-run (relación concepto↔concepto propuesta, empresas afectadas predichas) y el camino de
+aprobación de "proponer concepto nuevo" — trabajo de diseño/código puro, sin escritura de datos de
+producción. No se debe avanzar a Fase C (`--apply`) ni a población real sin una autorización
+explícita separada del usuario para tocar datos de producción.
