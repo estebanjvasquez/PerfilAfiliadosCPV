@@ -50,3 +50,19 @@ Una de estas dos cosas, a pedir directamente al usuario (Esteban):
 
 **BLOCKED — AUTH CREDENTIAL REQUIRED.** No se debe interpretar como fallo de búsqueda ni como
 señal para modificar ninguna lógica de resolución/taxonomía.
+
+---
+
+## Adenda (2026-09-23) — investigación de dónde vive `DEBUG_TOKEN` antes de pedir un token nuevo
+
+Se investigó, antes de pedir un token de Cloudflare `Workers Scripts:Edit`, si `DEBUG_TOKEN` (o
+`MCP_TOKEN`, que el README de `perfilafiliados-mcp` documenta que debería reflejarse en el `.env`
+de Laravel como `MCP_TOKEN`/`MCP_EMBED_TOKEN`) ya existía en algún entorno desplegado. Verificado
+(solo existencia de clave, nunca valor) en `/opt/perfilafiliados/.env` del servidor de staging:
+**ninguna de las 4 variables (`MCP_EMBED_TOKEN`, `MCP_EMBED_URL`, `MCP_TOKEN`, `DEBUG_TOKEN`)
+existe ahí.** La integración MCP↔Laravel documentada nunca se configuró en este entorno. Además,
+`DEBUG_TOKEN` está diseñado deliberadamente para nunca vivir en un archivo (se tipea a mano en el
+navegador, `src/index.ts:35-38`). Conclusión: no es un problema de permisos de Cloudflare — es que
+el valor de aplicación no es recuperable desde ningún entorno accesible. Detalle completo en
+`audit/phase3_runtime_validation.md`, sección 1. Se mantiene **BLOCKED — APPLICATION AUTH TOKEN
+REQUIRED**, ahora con la causa exacta documentada.

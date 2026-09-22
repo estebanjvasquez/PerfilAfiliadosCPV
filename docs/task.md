@@ -146,8 +146,13 @@ Ver `audit/staging_deployment_status.md` para el detalle completo verificado en 
 - Checklist funcional completo de `docs/migracion.md` (login/Turnstile, alta de empresa, exports,
   perfil de Breezy) — **NOT VERIFIED** en esta pasada, solo se confirmaron versiones/conexión/
   migraciones.
-- `shield:generate` contra pgsql — `docs/migracion.md` documentaba una brecha de permisos
-  (163 vs 285 esperados). **NOT VERIFIED** si se corrigió.
+- `shield:generate` contra pgsql — **VERIFIED (2026-09-23): la brecha sigue sin corregirse.**
+  455 permisos totales en staging, `super_admin` tiene los 455 que existen, pero
+  `page_completion_view`/`page_sectors_view`/`page_gerencia_dashboard` (3 páginas legacy, las
+  clases siguen en el código) **siguen sin permiso generado** — invisibles en el menú incluso para
+  `super_admin`. No se corrió `shield:generate` para corregirlo (aditivo y de bajo riesgo, pero se
+  dejó pendiente de autorización explícita en vez de ejecutarlo de oficio). Ver
+  `audit/phase3_runtime_validation.md` sección 7.
 
 **DECISION REQUIRED (del cliente/negocio, no técnica):**
 - [ ] ¿Producción pasa a pgsql/Supabase en el mismo despliegue que el upgrade de Filament v3, o se
@@ -239,26 +244,32 @@ capa TAXV3-2, independiente). No se activó ni se backfilleó nada.
 
 # 9 — MCP regression suite
 
-**Status: BLOCKED — AUTH CREDENTIAL REQUIRED**
+**Status: BLOCKED — APPLICATION AUTH TOKEN REQUIRED (causa exacta confirmada 2026-09-23)**
 
-Ver `audit/regression_2026-09-23.md`. `perfilafiliados-mcp/scripts/regression-suite.mjs` necesita
-`--url` (se tiene) y `--token` = `DEBUG_TOKEN` (secreto del Worker, no disponible en esta sesión —
-un token de Cloudflare con scope Hyperdrive+Tunnels no alcanza para leer/rotar secretos de
-Workers).
+Ver `audit/regression_2026-09-23.md` (+ adenda) y `audit/phase3_runtime_validation.md`.
+`perfilafiliados-mcp/scripts/regression-suite.mjs` necesita `--url` (se tiene) y `--token` =
+`DEBUG_TOKEN`. **Se investigó antes de pedir un token de Cloudflare nuevo**: ni `DEBUG_TOKEN` ni
+`MCP_TOKEN`/`MCP_EMBED_TOKEN` existen en el `.env` del servidor de staging (verificado, solo
+existencia de clave) — la integración MCP↔Laravel que documenta `perfilafiliados-mcp/README.md`
+nunca se configuró en ningún entorno accesible. `DEBUG_TOKEN` además está diseñado para nunca vivir
+en un archivo (se tipea a mano). Esto **no** es un problema de permisos de Cloudflare — ningún
+scope de token de Cloudflare permite leer el valor de un secreto de Worker ya seteado (por diseño
+de la plataforma), solo rotarlo.
 
-**Next action:** pedir a Esteban el valor de `DEBUG_TOKEN`, o un token de Cloudflare con permiso
-`Account → Workers Scripts → Edit` para rotarlo (esto invalidaría el valor anterior — pedir
-autorización explícita antes).
+**Next action:** pedir a Esteban directamente el valor de `DEBUG_TOKEN` (si lo tiene guardado en
+algún gestor de notas/contraseñas personal), o su autorización explícita para generar uno **nuevo**
+vía `wrangler secret put` (esto sí requeriría un token de Cloudflare `Workers Scripts:Edit`, recién
+en ese momento, e invalidaría cualquier valor anterior).
 
 ---
 
 # 10 — MCP live authenticated verification
 
-**Status: PARTIAL — health check VERIFIED, endpoints autenticados BLOCKED**
+**Status: PARTIAL — health check VERIFIED, endpoints autenticados BLOCKED (misma causa que sección 9)**
 
 - `GET https://perfilafiliados-mcp.sisteg.workers.dev/` → `200 {"ok":true,"service":"perfilafiliados-mcp"}` — **VERIFIED**.
-- `/mcp` (necesita `MCP_TOKEN`) y `/debug-search` (necesita `DEBUG_TOKEN`) — **BLOCKED**, mismo
-  motivo que la sección 9.
+- `/mcp` (necesita `MCP_TOKEN`) y `/debug-search` (necesita `DEBUG_TOKEN`) — **BLOCKED — APPLICATION
+  AUTH TOKEN REQUIRED**, ver sección 9.
 
 ---
 
@@ -350,7 +361,12 @@ Ver "Orden de ejecución recomendado" en `audit/phase3_completion_audit.md` — 
 
 # 16 — Immediate next action
 
-**Pedirle a Esteban el valor de `DEBUG_TOKEN` (o un token de Cloudflare con permiso `Workers
-Scripts: Edit`) para desbloquear la verificación de regresión y del Worker en vivo — es el único
-bloqueador real que impide cerrar la verificación completa de Phase 3 antes de decidir los
-próximos pasos de escritura.**
+**Pedirle a Esteban directamente el valor de `DEBUG_TOKEN` (guardado en algún gestor de notas
+personal, si existe) — confirmado el 2026-09-23 que no vive en ningún `.env` desplegado ni es
+recuperable vía permisos de Cloudflare (la plataforma nunca expone valores de secrets ya seteados,
+solo permite rotarlos). Es el único bloqueador real que impide cerrar la verificación completa de
+Phase 3 antes de decidir los próximos pasos de escritura.**
+
+**Secundario, de menor prioridad:** decidir si correr `php artisan shield:generate` en staging
+para las 3 páginas legacy que siguen invisibles en el menú (sección 4/9 arriba) — cambio aditivo,
+bajo riesgo, pendiente de autorización explícita.
