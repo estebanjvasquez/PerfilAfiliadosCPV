@@ -54,6 +54,17 @@ antes de decidir cualquier trabajo de escritura sobre Phase 3.
 
 ## Fase B — Completar el diseño de Phase 3 (Canonical Concept Builder)
 
+**Status (2026-09-23): DONE (código + tests).** Ver `audit/phase3_phase_b.md`. Las 3 tareas de
+abajo se implementaron: `proposeConceptRelations()`/`validateConceptRelationProposal()` (B1),
+`predictAffectedCompanies()`/`predictedImpactForConcept()` (B2, adjunto a cada resultado de
+`dryRun()` como `predicted_impact`), `resolveNewConceptProposal()`/`findPossibleDuplicateConcepts()`
+(B3, camino nuevo, `approve()` existente intacto). Dry-run: 6/8 → 8/8. 24 tests nuevos, todos
+dentro de `DatabaseTransactions`. Regresión re-corrida: sin cambios reales (1 falso positivo
+transitorio explicado y confirmado resuelto). Cero mutaciones de producción.
+
+**Pendiente real (no bloqueante para Fase C):** wiring de UI en Filament para que un revisor humano
+use `resolveNewConceptProposal()` desde el panel (hoy solo la capa de servicio está lista/testeada).
+
 **Objetivo:** cerrar los 2 gaps de diseño encontrados en la auditoría antes de tocar código de
 escritura.
 

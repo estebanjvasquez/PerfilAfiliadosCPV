@@ -3,6 +3,7 @@
 namespace App\Services\Taxonomy;
 
 use App\Models\TaxonomyCandidateConceptLink;
+use App\Models\TaxonomyCanonicalConcept;
 use App\Models\User;
 use App\Services\TaxonomyAuditLogger;
 use Illuminate\Support\Facades\DB;
@@ -47,6 +48,156 @@ class CandidateConceptApprovalService
     public const RESULT_NOT_FOUND = 'NOT_FOUND';
 
     public const RESULT_UNAUTHORIZED = 'UNAUTHORIZED';
+
+    // Phase B (B3, secciones 15-18 del pedido): resolución de candidatos "proponer concepto
+    // nuevo" - `approve()` de arriba sigue rechazándolos (RESULT_NOT_SUPPORTED, sin cambios, test
+    // existente intacto) porque un candidato de concepto nuevo no es un sí/no binario; necesita
+    // que el revisor elija entre 3 caminos, resueltos acá.
+    public const DECISION_MAP_TO_EXISTING = 'MAP_TO_EXISTING';
+
+    public const DECISION_CREATE_NEW = 'CREATE_NEW';
+
+    public const DECISION_REJECT = 'REJECT';
+
+    public const RESULT_MAPPED_TO_EXISTING = 'MAPPED_TO_EXISTING';
+
+    public const RESULT_CREATED_NEW_CONCEPT = 'CREATED_NEW_CONCEPT';
+
+    public const RESULT_NOT_APPLICABLE = 'NOT_APPLICABLE_NOT_A_NEW_CONCEPT_PROPOSAL';
+
+    public function __construct(private ?CanonicalConceptBuilderService $conceptBuilder = null) {}
+
+    private function conceptBuilder(): CanonicalConceptBuilderService
+    {
+        // Lazy + resuelto por el contenedor (no `new` directo) para que
+        // IntentContaminationDetector::fromGovernedVocabulary() (bind de AppServiceProvider) se
+        // use en producción, sin romper los tests existentes que siguen instanciando este
+        // servicio con `new CandidateConceptApprovalService()` sin argumentos.
+        return $this->conceptBuilder ??= app(CanonicalConceptBuilderService::class);
+    }
+
+    /**
+     * Phase B (B3, sección 17 del pedido): "antes de proponer un concepto nuevo, buscar
+     * duplicados posibles". Reutiliza el MISMO pipeline de retrieval+scoring que `dryRun()`
+     * (`CanonicalConceptBuilderService::scoredCandidatesForTerm()`) - no un segundo algoritmo de
+     * similitud paralelo. Solo lectura, no cambia ningún estado.
+     *
+     * @return array<int, array{concept_id:int, concept_name:string, score:float, tier:string}>
+     */
+    public function findPossibleDuplicateConcepts(TaxonomyCandidateConceptLink $candidate): array
+    {
+        if (! $candidate->isProposingNewConcept()) {
+            return [];
+        }
+
+        $term = $candidate->term;
+        if (! $term) {
+            return [];
+        }
+
+        return array_map(fn (array $s) => [
+            'concept_id' => $s['concept_id'],
+            'concept_name' => $s['concept_name'],
+            'score' => $s['score'],
+            'tier' => $s['tier'],
+        ], $this->conceptBuilder()->scoredCandidatesForTerm($term));
+    }
+
+    /**
+     * Phase B (B3, secciones 15-18 del pedido): resuelve un candidato "proponer concepto nuevo"
+     * según la decisión explícita del revisor - mismas salvaguardas que `approve()`/`reject()`
+     * (transacción, lock, autorización re-verificada, idempotencia, audit log). NUNCA se invoca
+     * automáticamente ni en bulk - siempre requiere un `$reviewer` autorizado y una `$decision`
+     * explícita.
+     *
+     * @return array{result:string, candidate:?TaxonomyCandidateConceptLink, concept_id:?int, term_concept_id:?int}
+     */
+    public function resolveNewConceptProposal(
+        int $candidateId,
+        ?User $reviewer,
+        string $decision,
+        ?int $targetConceptId = null,
+        ?string $notes = null,
+    ): array {
+        if ($decision === self::DECISION_REJECT) {
+            $outcome = $this->reject($candidateId, $reviewer, $notes);
+
+            return ['result' => $outcome['result'], 'candidate' => $outcome['candidate'], 'concept_id' => null, 'term_concept_id' => null];
+        }
+
+        if (! in_array($decision, [self::DECISION_MAP_TO_EXISTING, self::DECISION_CREATE_NEW], true)) {
+            return ['result' => self::RESULT_NOT_APPLICABLE, 'candidate' => null, 'concept_id' => null, 'term_concept_id' => null];
+        }
+
+        return DB::connection('pgsql')->transaction(function () use ($candidateId, $reviewer, $decision, $targetConceptId, $notes) {
+            $candidate = TaxonomyCandidateConceptLink::query()->lockForUpdate()->find($candidateId);
+
+            if (! $candidate) {
+                return ['result' => self::RESULT_NOT_FOUND, 'candidate' => null, 'concept_id' => null, 'term_concept_id' => null];
+            }
+
+            if (! $candidate->isProposingNewConcept()) {
+                return ['result' => self::RESULT_NOT_APPLICABLE, 'candidate' => $candidate, 'concept_id' => null, 'term_concept_id' => null];
+            }
+
+            if (! $reviewer || ! $reviewer->can('update', $candidate)) {
+                return ['result' => self::RESULT_UNAUTHORIZED, 'candidate' => $candidate, 'concept_id' => null, 'term_concept_id' => null];
+            }
+
+            if ($candidate->status !== TaxonomyCandidateConceptLink::STATUS_PENDING) {
+                return ['result' => self::RESULT_ALREADY_PROCESSED, 'candidate' => $candidate, 'concept_id' => null, 'term_concept_id' => $candidate->published_term_concept_id];
+            }
+
+            if ($decision === self::DECISION_MAP_TO_EXISTING) {
+                if (! $targetConceptId || ! TaxonomyCanonicalConcept::query()->whereKey($targetConceptId)->exists()) {
+                    return ['result' => self::RESULT_NOT_FOUND, 'candidate' => $candidate, 'concept_id' => null, 'term_concept_id' => null];
+                }
+                $conceptId = $targetConceptId;
+                $resultCode = self::RESULT_MAPPED_TO_EXISTING;
+            } else {
+                $term = $candidate->term;
+                $concept = TaxonomyCanonicalConcept::query()->create([
+                    'canonical_name_es' => $term?->language === 'en' ? null : ($candidate->suggested_new_concept_name ?? $term?->canonical_term),
+                    'canonical_name_en' => $term?->language === 'en' ? ($candidate->suggested_new_concept_name ?? $term?->canonical_term) : null,
+                    'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE,
+                ]);
+                $conceptId = $concept->id;
+                $resultCode = self::RESULT_CREATED_NEW_CONCEPT;
+            }
+
+            $existingLink = DB::connection('pgsql')->table('taxonomy_term_concepts')
+                ->where('term_id', $candidate->suggested_term_id)
+                ->where('concept_id', $conceptId)
+                ->first();
+
+            $termConceptId = $existingLink->id ?? DB::connection('pgsql')->table('taxonomy_term_concepts')->insertGetId([
+                'term_id' => $candidate->suggested_term_id,
+                'concept_id' => $conceptId,
+                'created_at' => now(),
+            ]);
+
+            $previousStatus = $candidate->status;
+
+            $candidate->update([
+                'status' => TaxonomyCandidateConceptLink::STATUS_PUBLISHED,
+                'reviewed_by' => $reviewer->id,
+                'reviewed_at' => now(),
+                'published_term_concept_id' => $termConceptId,
+                'review_notes' => $notes ?? $candidate->review_notes,
+            ]);
+
+            TaxonomyAuditLogger::record(
+                entityType: TaxonomyCandidateConceptLink::class,
+                entityId: $candidate->id,
+                field: 'status',
+                oldValue: $previousStatus,
+                newValue: $candidate->status,
+                reason: "{$decision} -> concept_id={$conceptId}, taxonomy_term_concepts#{$termConceptId}".($notes ? " ({$notes})" : ''),
+            );
+
+            return ['result' => $resultCode, 'candidate' => $candidate, 'concept_id' => $conceptId, 'term_concept_id' => $termConceptId];
+        });
+    }
 
     /** @return array{result:string, candidate:?TaxonomyCandidateConceptLink, term_concept_id:?int} */
     public function approve(int $candidateId, ?User $reviewer): array

@@ -28,6 +28,8 @@ class TaxonomyRankingParameters
 
     public const GROUP_CONCEPT_BUILDER = 'Phase 3 - Canonical Concept Builder';
 
+    public const GROUP_CONCEPT_RELATIONS = 'Phase B - Grafo de relaciones entre conceptos';
+
     /**
      * @return array<string, array{label:string, description:string, default:float, min:float, max:float, example:string, group:string}>
      */
@@ -488,6 +490,41 @@ class TaxonomyRankingParameters
                 'default' => 0.35, 'min' => 0.0, 'max' => 1.0,
                 'example' => 'Un concepto cuyos términos casi no comparten letras entre sí (posible agrupación espuria).',
                 'group' => self::GROUP_CONCEPT_BUILDER,
+            ],
+            'concept_relations.min_lexical_similarity' => [
+                'label' => 'Similitud léxica mínima entre nombres de concepto',
+                'description' => 'Phase B: umbral `pg_trgm` mínimo entre los nombres (ES/EN) de dos conceptos canónicos para que la similitud de nombre cuente como señal hacia una propuesta RELATED_TO.',
+                'default' => 0.35, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Nombres de concepto con alta superposición de subcadenas.',
+                'group' => self::GROUP_CONCEPT_RELATIONS,
+            ],
+            'concept_relations.min_corroborating_signals' => [
+                'label' => 'Señales corroborantes mínimas para proponer RELATED_TO',
+                'description' => 'Phase B: cuántas de las 3 señales (similitud de nombre, CPV compartido, solapamiento de términos/alias) deben superar su propio umbral para que el par de conceptos genere una propuesta - ninguna señal sola alcanza.',
+                'default' => 2, 'min' => 1, 'max' => 3,
+                'example' => 'CPV compartido + solapamiento de alias, sin necesitar además nombre similar.',
+                'group' => self::GROUP_CONCEPT_RELATIONS,
+            ],
+            'concept_relations.auto_eligible_threshold' => [
+                'label' => 'Umbral AUTO_ELIGIBLE para relación entre conceptos',
+                'description' => 'Phase B: confianza compuesta mínima para que una propuesta RELATED_TO se marque AUTO_ELIGIBLE en vez de REVIEW_REQUIRED. Nunca se usa para tipos direccionales/jerárquicos (PART_OF/HAS_PART/SUPERSEDES/SUPERSEDED_BY), que siempre son REVIEW_REQUIRED por diseño (ver audit/phase3_phase_b.md).',
+                'default' => 0.75, 'min' => 0.50, 'max' => 1.0,
+                'example' => 'Nombre muy similar + CPV compartido a nivel de Categoría.',
+                'group' => self::GROUP_CONCEPT_RELATIONS,
+            ],
+            'concept_relations.review_threshold' => [
+                'label' => 'Umbral REVIEW_REQUIRED para relación entre conceptos',
+                'description' => 'Phase B: confianza compuesta mínima para que un par de conceptos se proponga (aunque sea para revisión), por debajo se descarta sin proponer nada.',
+                'default' => 0.40, 'min' => 0.0, 'max' => 1.0,
+                'example' => 'Una sola señal moderada (ej. solo CPV de Familia compartido).',
+                'group' => self::GROUP_CONCEPT_RELATIONS,
+            ],
+            'concept_relations.max_cycle_check_depth' => [
+                'label' => 'Profundidad máxima de chequeo de ciclos',
+                'description' => 'Phase B: tope de saltos que la validación de ciclos recorre antes de asumir que no hay ciclo, para tipos de relación jerárquicos (PART_OF/HAS_PART). Independiente del `max_depth` por tipo del catálogo de gobernanza (ese limita traversal de negocio; este limita el costo del chequeo de seguridad).',
+                'default' => 20, 'min' => 1, 'max' => 100,
+                'example' => 'Con 79 conceptos, ninguna cadena real debería acercarse a este tope.',
+                'group' => self::GROUP_CONCEPT_RELATIONS,
             ],
         ];
     }

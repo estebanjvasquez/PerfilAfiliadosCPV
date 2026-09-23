@@ -364,12 +364,53 @@ Ver "Orden de ejecución recomendado" en `audit/phase3_completion_audit.md` — 
 
 ---
 
+# 6bis — Phase B: dry-run 8/8 + concept relation proposer + new-concept approval path
+
+**Status: DONE (código + tests) — pendiente wiring de UI en Filament**
+
+Ver `audit/phase3_phase_b.md` para el detalle completo. Resumen:
+
+- **B1 (relación concepto↔concepto propuesta):** `CanonicalConceptBuilderService::proposeConceptRelations()`.
+  Solo auto-propone `RELATED_TO` (decisión de diseño deliberada — los 4 tipos direccionales/
+  jerárquicos del catálogo real de 5 tipos seedeados NO se infieren automáticamente, para no
+  confundir jerarquía CPV con semántica de concepto). `validateConceptRelationProposal()` cubre
+  duplicados (exacto, simétrico, vía inverso) y detección de ciclos para cuando un humano proponga
+  un tipo direccional a mano.
+- **B2 (empresas afectadas predichas):** `CanonicalConceptBuilderService::predictAffectedCompanies()`,
+  reusa `empresa_taxonomy_category` (misma fuente que expone el Worker como evidencia
+  `canonical_cpv`) — no reinventa la semántica de alcanzabilidad en PHP. Deduplicado por
+  `empresa_id`, adjunto a cada resultado del dry-run como `predicted_impact`.
+- **B3 (proponer concepto nuevo):** `CandidateConceptApprovalService::resolveNewConceptProposal()`
+  con `decision` ∈ `{MAP_TO_EXISTING, CREATE_NEW, REJECT}` — `approve()` existente NO se tocó
+  (sigue rechazando este caso, cero regresión). Duplicados se detectan reutilizando el mismo
+  pipeline de scoring del Builder (`scoredCandidatesForTerm()`), no un segundo algoritmo.
+- Dry-run: 6/8 → **8/8** campos esperados.
+- 24 tests nuevos (15 en `CanonicalConceptBuilderServiceTest`, 9 en
+  `CandidateConceptApprovalServiceTest`), todos dentro de `DatabaseTransactions` — nada persiste.
+- Regresión re-corrida tras los cambios: 31/32 idénticas a la línea base, 1/32 (`represas`) con un
+  401 transitorio por propagación del `DEBUG_TOKEN` recién rotado — confirmado resuelto al
+  reintentar (200 OK, mismo resultado que la línea base). No es una regresión real.
+- Conteos de taxonomía verificados sin drift antes/después (ver `audit/phase3_phase_b.md`).
+- **Cero escritura de producción** — todo lo anterior es código nuevo + tests, `--apply` sigue sin
+  implementarse (Phase C, no iniciada).
+
+**Pendiente real:**
+- Wiring de UI en Filament para `resolveNewConceptProposal()` — hoy solo existe la capa de
+  servicio (testeada), el Resource no tiene botones para elegir MAP_TO_EXISTING/CREATE_NEW todavía.
+- Campos 4-6 del dry-run (provenance/conflicto/revisión explícitos para candidatos término→concepto)
+  siguen parciales — fuera del alcance pedido para Phase B.
+
+---
+
 # 16 — Immediate next action
 
 **Fase A (verificación/estabilización) está PASS y cerrada (2026-09-23)** — regresión, MCP
-autenticado y Shield resueltos, cero mutaciones de taxonomía. El siguiente paso real es **Fase B**
-del plan de implementación (`docs/implementation_plan.md`): diseñar los 2 campos faltantes del
-dry-run (relación concepto↔concepto propuesta, empresas afectadas predichas) y el camino de
-aprobación de "proponer concepto nuevo" — trabajo de diseño/código puro, sin escritura de datos de
-producción. No se debe avanzar a Fase C (`--apply`) ni a población real sin una autorización
-explícita separada del usuario para tocar datos de producción.
+autenticado y Shield resueltos, cero mutaciones de taxonomía.
+
+**Fase B (dry-run 8/8 + proponedor de relaciones + aprobación de concepto nuevo) está DONE
+(2026-09-23)** — ver sección "6bis" arriba y `audit/phase3_phase_b.md`. Código + 24 tests nuevos,
+cero escritura de producción, regresión re-verificada sin cambios reales.
+
+El siguiente paso real es completar el wiring de UI en Filament para B3 (pendiente, ver sección
+6bis), y luego evaluar **Fase C** (`--apply`) — que sigue **NO iniciada** y requiere autorización
+explícita separada del usuario antes de tocar cualquier dato de producción.

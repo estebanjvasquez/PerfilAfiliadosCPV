@@ -4,6 +4,7 @@ namespace App\Services\Taxonomy;
 
 use App\Models\TaxonomyCandidateConceptLink;
 use App\Models\TaxonomyCanonicalConcept;
+use App\Models\TaxonomyConceptRelationType;
 use App\Models\TaxonomyTerm;
 use App\Models\TaxonomyTermEmbedding;
 use App\Support\Taxonomy\TaxonomyRankingParameters;
@@ -418,6 +419,11 @@ class CanonicalConceptBuilderService
         // (frecuente: 79 conceptos totales, docenas de términos evaluados) solo se hidrata una vez.
         $conceptEvidenceCache = [];
 
+        // Phase B (B2): impacto predicho, memoizado por concepto - mismo motivo que el cache de
+        // arriba, nunca una query de empresas por PAR término×concepto.
+        $conceptImpactCache = [];
+        $proposeNewConceptDetails = [];
+
         $tierCounts = [
             TaxonomyCandidateConceptLink::TIER_AUTO_ACCEPT => 0,
             TaxonomyCandidateConceptLink::TIER_AUTO_ACCEPT_CONSERVATIVE => 0,
@@ -452,12 +458,22 @@ class CanonicalConceptBuilderService
 
             $bestTier = TaxonomyCandidateConceptLink::TIER_REJECT;
 
+            $possibleExistingForThisTerm = [];
+
             foreach ($candidateConcepts as $concept) {
                 if (! isset($conceptEvidenceCache[$concept->id])) {
                     $conceptEvidenceCache[$concept->id] = $this->precomputeConceptEvidence($concept);
                 }
+                // Phase B (B2): impacto predicho por concepto, memoizado - una sola query de
+                // empresas por concepto distinto visto en toda la corrida, nunca por par.
+                if (! isset($conceptImpactCache[$concept->id])) {
+                    $conceptImpactCache[$concept->id] = $this->predictedImpactForConcept($concept);
+                }
 
                 $scored = $this->scoreCandidate($term, $concept, $settings, $termEvidence, $conceptEvidenceCache[$concept->id], $embeddingsAvailable);
+                // Phase B (B2): se adjunta DESPUÉS de scoreCandidate() (que sigue siendo puro/
+                // testeable en aislamiento, sin este campo) - solo dryRun() lo agrega, desde el cache.
+                $scored['predicted_impact'] = $conceptImpactCache[$concept->id];
                 $pairsScored++;
                 $tierCounts[$scored['tier']]++;
 
@@ -471,6 +487,15 @@ class CanonicalConceptBuilderService
                     $bestTier = $scored['tier'];
                 }
 
+                if ($scored['tier'] !== TaxonomyCandidateConceptLink::TIER_REJECT) {
+                    $possibleExistingForThisTerm[] = [
+                        'concept_id' => $concept->id,
+                        'concept_name' => $concept->display_name,
+                        'score' => $scored['score'],
+                        'tier' => $scored['tier'],
+                    ];
+                }
+
                 if (count($sampleResults) < 50) {
                     $sampleResults[] = $scored;
                 }
@@ -482,8 +507,36 @@ class CanonicalConceptBuilderService
 
             if ($candidateConcepts->isEmpty() || $bestTier === TaxonomyCandidateConceptLink::TIER_REJECT) {
                 $proposeNewConceptCount++;
+
+                // Phase B (B3): detalle estructurado en vez de solo un contador - "posibles
+                // duplicados" son los mismos candidatos que este término YA evaluó y quedaron por
+                // debajo de REJECT (nunca None) - reusa el mismo pipeline de retrieval/scoring, no
+                // inventa un segundo algoritmo de detección de duplicados.
+                $proposeNewConceptDetails[] = [
+                    'term_id' => $term->id,
+                    'term' => $term->term,
+                    'language' => $term->language,
+                    'region' => $term->region,
+                    'term_type' => $term->term_type,
+                    'suggested_canonical_name' => $term->canonical_term ?: $term->term,
+                    'possible_existing_concepts' => $possibleExistingForThisTerm,
+                    'automation_decision' => 'REVIEW_REQUIRED', // nunca AUTO_ELIGIBLE - crear concepto siempre requiere revisión humana (sección 19 del pedido)
+                    'reason' => $possibleExistingForThisTerm === []
+                        ? 'Ningún concepto existente corrobora lo suficiente - candidato genuino a concepto nuevo.'
+                        : 'Hay conceptos existentes con evidencia parcial (por debajo de REJECT) - el revisor debe elegir MAP_TO_EXISTING, CREATE_NEW o REJECT.',
+                ];
             }
         }
+
+        // Phase B (B1): propuestas de relación concepto<->concepto, acotadas a los conceptos que
+        // efectivamente aparecieron como candidatos en ESTA corrida (nunca all-pairs de los 79
+        // sin motivo) - mismo espíritu de "candidate retrieval acotado" que el resto del Builder.
+        // `proposeConceptRelations(null)` (todos los conceptos activos) sigue disponible como
+        // llamada independiente para un análisis exhaustivo fuera del dry-run de términos.
+        $conceptIdsEncountered = array_keys($conceptEvidenceCache);
+        $conceptRelationProposals = empty($conceptIdsEncountered)
+            ? ['proposals' => [], 'pairs_evaluated' => 0, 'concepts_considered' => 0]
+            : $this->proposeConceptRelations($conceptIdsEncountered);
 
         $queryCount = count(DB::connection('pgsql')->getQueryLog());
         DB::connection('pgsql')->disableQueryLog();
@@ -502,6 +555,11 @@ class CanonicalConceptBuilderService
             'candidates_by_tier' => $tierCounts,
             'candidate_count_by_signal' => $candidateCountBySignal,
             'propose_new_concept_candidates' => $proposeNewConceptCount,
+            // Phase B (B3): detalle estructurado (no solo el contador de arriba, que se conserva
+            // por compatibilidad con nada lo consumía todavía, pero no rompe nada quitarlo).
+            'propose_new_concept_details' => $proposeNewConceptDetails,
+            // Phase B (B1): dry-run 8/8 - relaciones concepto<->concepto propuestas.
+            'concept_relation_proposals' => $conceptRelationProposals,
             'embedding_calls_made' => 0,
             'db_queries' => $queryCount,
             'queries_per_term' => $termsProcessed > 0 ? round($queryCount / $termsProcessed, 2) : 0.0,
@@ -514,6 +572,32 @@ class CanonicalConceptBuilderService
             'sample_results' => $sampleResults,
             'all_results' => $allResults,
         ];
+    }
+
+    /**
+     * Phase B (soporte de B3): mismo pipeline de retrieval+scoring que usa `dryRun()` internamente,
+     * expuesto para UN término aislado - la "detección de duplicados" al aprobar un candidato de
+     * concepto nuevo (`CandidateConceptApprovalService::findPossibleDuplicateConcepts()`) reutiliza
+     * esto en vez de un segundo algoritmo de similitud paralelo (sección 17 del pedido).
+     *
+     * @return array<int, array{term_id:int,term:string,concept_id:int,concept_name:string,signals:array,score:float,corroborating_signal_count:int,tier:string}>
+     */
+    public function scoredCandidatesForTerm(TaxonomyTerm $term): array
+    {
+        $settings = $this->settings();
+        $embeddingsAvailable = DB::connection('pgsql')->table('taxonomy_term_embeddings')->exists();
+        [$candidateConcepts] = $this->retrieveCandidateConcepts($term, $settings, $embeddingsAvailable);
+        $termEvidence = $this->precomputeTermEvidence($term);
+
+        $results = [];
+        foreach ($candidateConcepts as $concept) {
+            $scored = $this->scoreCandidate($term, $concept, $settings, $termEvidence, $this->precomputeConceptEvidence($concept), $embeddingsAvailable);
+            if ($scored['tier'] !== TaxonomyCandidateConceptLink::TIER_REJECT) {
+                $results[] = $scored;
+            }
+        }
+
+        return $results;
     }
 
     /** @return array{0: Collection<int, TaxonomyCanonicalConcept>, 1: bool} */
@@ -919,17 +1003,419 @@ class CanonicalConceptBuilderService
     /** @return array<string, float> Solo las claves `concept_builder.*`, valor real de taxonomy_settings o default. */
     public function settings(): array
     {
+        return $this->settingsWithPrefix('concept_builder.');
+    }
+
+    /** @return array<string, float> Solo las claves `concept_relations.*` (Phase B), valor real de taxonomy_settings o default. */
+    public function conceptRelationSettings(): array
+    {
+        return $this->settingsWithPrefix('concept_relations.');
+    }
+
+    private function settingsWithPrefix(string $prefix): array
+    {
         $defaults = TaxonomyRankingParameters::defaults();
         $stored = $this->stage('settings', fn () => DB::connection('pgsql')->table('taxonomy_settings')->pluck('value', 'key'));
 
         $merged = [];
         foreach ($defaults as $key => $default) {
-            if (! str_starts_with($key, 'concept_builder.')) {
+            if (! str_starts_with($key, $prefix)) {
                 continue;
             }
             $merged[$key] = isset($stored[$key]) ? (float) $stored[$key] : (float) $default;
         }
 
         return $merged;
+    }
+
+    // =====================================================================================
+    // PHASE B - B2: IMPACTO PREDICHO (empresas afectadas) - CERO ESCRITURA, solo lectura de
+    // `empresa_taxonomy_category` (el vínculo real empresa<->CPV, TAXV2/Fase 4) y
+    // `company_term_matches` (evidencia de crawler, TAXV2-13 - hoy vacía, el crawler es Fase E).
+    // No se reimplementa la semántica de alcanzabilidad del Worker (hybrid-search.ts) en PHP -
+    // se consulta la MISMA tabla de origen (`empresa_taxonomy_category`) que esa capa expone como
+    // evidencia `canonical_cpv`/`declared_profile`, así que ambos lados leen la misma fuente de
+    // verdad en vez de tener dos definiciones divergentes de "empresa alcanzable".
+    // =====================================================================================
+
+    /** @return array<int,int> IDs de taxonomy_categories con relación `approved` para estos términos. */
+    public function conceptApprovedCategoryIds(array $memberTermIds): array
+    {
+        if (empty($memberTermIds)) {
+            return [];
+        }
+
+        return $this->stage('predicted_impact', fn () => DB::connection('pgsql')->table('taxonomy_term_cpv_relations')
+            ->whereIn('term_id', $memberTermIds)
+            ->where('status', 'approved')
+            ->pluck('category_id')
+            ->unique()
+            ->values()
+            ->all());
+    }
+
+    /**
+     * B2 del pedido de Phase B. Dado un conjunto de IDs de `taxonomy_categories`, calcula el
+     * impacto de empresas de la MISMA forma en que lo expondría un dry-run: predicción, nunca
+     * escritura. Deduplicado por `empresa_id` (sección 12/13 del pedido: rutas de evidencia
+     * múltiples no deben inflar el conteo, pero SÍ se preservan todas).
+     *
+     * `expanded_company_count` queda en 0 a propósito: no hay ningún consumidor de
+     * `taxonomy_concept_relations`/traversal todavía (confirmado en `audit/phase3_completion_audit.md`),
+     * así que no hay ninguna expansión real que calcular - existe el campo para cuando eso exista
+     * (Fase G del plan), en vez de inventar un número.
+     *
+     * @return array{direct_company_count:int, evidence_company_count:int, expanded_company_count:int, total_unique_company_count:int, companies:array, data_gap_flags:array}
+     */
+    public function predictAffectedCompanies(array $categoryIds): array
+    {
+        $categoryIds = array_values(array_unique(array_filter($categoryIds)));
+
+        if (empty($categoryIds)) {
+            return [
+                'direct_company_count' => 0,
+                'evidence_company_count' => 0,
+                'expanded_company_count' => 0,
+                'total_unique_company_count' => 0,
+                'companies' => [],
+                'data_gap_flags' => ['CONCEPT_RESOLUTION_FAILURE'],
+            ];
+        }
+
+        $directRows = $this->stage('predicted_impact', fn () => DB::connection('pgsql')->table('empresa_taxonomy_category')
+            ->whereIn('category_id', $categoryIds)
+            ->select('empresa_id', 'category_id', 'origen', 'es_principal', 'approved_at')
+            ->get());
+
+        // Evidencia de crawler (TAXV2-13) - tabla real, hoy vacía (el crawler es Fase E). Se
+        // consulta igual (no se asume que está vacía) para que este método siga siendo correcto
+        // el día que el crawler exista, sin tocarlo de nuevo.
+        $cpvCodes = $this->stage('predicted_impact', fn () => DB::connection('pgsql')->table('taxonomy_categories')
+            ->whereIn('id', $categoryIds)->pluck('code')->all());
+
+        $evidenceRows = $this->stage('predicted_impact', fn () => DB::connection('pgsql')->table('company_term_matches')
+            ->whereIn('cpv_code', $cpvCodes)
+            ->select('empresa_id', 'cpv_code', 'evidence_score', 'match_type')
+            ->get());
+
+        $companies = [];
+        foreach ($directRows as $row) {
+            $companies[$row->empresa_id]['direct'][] = [
+                'category_id' => $row->category_id,
+                'origen' => $row->origen,
+                'es_principal' => (bool) $row->es_principal,
+                'confirmed' => $row->approved_at !== null,
+            ];
+        }
+        foreach ($evidenceRows as $row) {
+            $companies[$row->empresa_id]['crawler_evidence'][] = [
+                'cpv_code' => $row->cpv_code,
+                'match_type' => $row->match_type,
+                'evidence_score' => (float) $row->evidence_score,
+            ];
+        }
+
+        $companyList = [];
+        foreach ($companies as $empresaId => $paths) {
+            $reasons = [];
+            if (! empty($paths['direct'])) {
+                $reasons[] = 'declared_taxonomy_category';
+            }
+            if (! empty($paths['crawler_evidence'])) {
+                $reasons[] = 'crawler_evidence';
+            }
+
+            $companyList[] = [
+                'company_id' => $empresaId,
+                'evidence_paths' => $paths,
+                'reason' => implode('+', $reasons),
+            ];
+        }
+
+        $dataGapFlags = [];
+        if (empty($companyList)) {
+            $dataGapFlags[] = 'CPV_WITHOUT_COMPANIES';
+        }
+        if ($evidenceRows->isEmpty()) {
+            $dataGapFlags[] = 'NO_CRAWLER_EVIDENCE';
+        }
+
+        return [
+            'direct_company_count' => $directRows->pluck('empresa_id')->unique()->count(),
+            'evidence_company_count' => $evidenceRows->pluck('empresa_id')->unique()->count(),
+            'expanded_company_count' => 0,
+            'total_unique_company_count' => count($companyList),
+            'companies' => $companyList,
+            'data_gap_flags' => $dataGapFlags,
+        ];
+    }
+
+    /** Atajo: impacto predicho de un concepto completo (unión de las categorías CPV aprobadas de todos sus miembros). */
+    public function predictedImpactForConcept(TaxonomyCanonicalConcept $concept): array
+    {
+        $memberIds = $concept->relationLoaded('terms') ? $concept->terms->pluck('id')->all() : $concept->terms()->pluck('taxonomy_terms.id')->all();
+        $categoryIds = $this->conceptApprovedCategoryIds($memberIds);
+
+        return $this->predictAffectedCompanies($categoryIds);
+    }
+
+    // =====================================================================================
+    // PHASE B - B1: PROPUESTA DE RELACIONES CONCEPTO<->CONCEPTO (`taxonomy_concept_relations`).
+    // CERO ESCRITURA. Usa el catálogo de gobernanza YA seedeado (5 tipos reales: RELATED_TO,
+    // PART_OF/HAS_PART, SUPERSEDES/SUPERSEDED_BY - ver `taxonomy_concept_relation_types`), nunca
+    // un vocabulario inventado.
+    //
+    // Decisión de diseño (documentada también en audit/phase3_phase_b.md): solo se AUTO-PROPONE
+    // `RELATED_TO` (no direccional) a partir de señales reales (nombre, CPV compartido, alias/
+    // términos compartidos). Los 4 tipos direccionales/jerárquicos (PART_OF/HAS_PART/SUPERSEDES/
+    // SUPERSEDED_BY) NO se infieren automáticamente acá - inferir "parte de" desde el anidamiento
+    // de paths de `taxonomy_categories` confundiría la jerarquía CPV (una dimensión) con relación
+    // semántica entre conceptos (otra dimensión), justo lo que el proyecto ya decidió evitar para
+    // `relation_type` de CPV (ver audit/phase3_completion_audit.md). Esos 4 tipos solo se validan
+    // (`validateConceptRelationProposal()`) cuando un humano los propone a mano - el Builder no
+    // adivina jerarquía.
+    // =====================================================================================
+
+    /** @return array{proposals:array, pairs_evaluated:int, concepts_considered:int} */
+    public function proposeConceptRelations(?array $conceptIds = null): array
+    {
+        $settings = $this->conceptRelationSettings();
+        $cpvQualitySettings = $this->settings(); // concept_builder.mapping_quality_* - una sola vez, no por par
+
+        $concepts = $conceptIds === null
+            ? TaxonomyCanonicalConcept::query()->where('status', TaxonomyCanonicalConcept::STATUS_ACTIVE)->with('terms')->orderBy('id')->get()
+            : TaxonomyCanonicalConcept::query()->whereIn('id', $conceptIds)->with('terms')->orderBy('id')->get();
+
+        $evidenceCache = [];
+        foreach ($concepts as $concept) {
+            $evidenceCache[$concept->id] = $this->precomputeConceptEvidence($concept);
+        }
+
+        $existingPairs = $this->stage('concept_relations', fn () => DB::connection('pgsql')->table('taxonomy_concept_relations')
+            ->select('source_concept_id', 'target_concept_id', 'relation_type')
+            ->get()
+            ->map(fn ($r) => "{$r->source_concept_id}:{$r->target_concept_id}:{$r->relation_type}")
+            ->flip());
+
+        $proposals = [];
+        $pairsEvaluated = 0;
+        $conceptList = $concepts->values();
+
+        for ($i = 0; $i < $conceptList->count(); $i++) {
+            for ($j = $i + 1; $j < $conceptList->count(); $j++) {
+                $a = $conceptList[$i];
+                $b = $conceptList[$j];
+                $pairsEvaluated++;
+
+                if (isset($existingPairs["{$a->id}:{$b->id}:RELATED_TO"]) || isset($existingPairs["{$b->id}:{$a->id}:RELATED_TO"])) {
+                    continue; // ya existe, no proponer de nuevo
+                }
+
+                $proposal = $this->scoreConceptPair($a, $b, $evidenceCache[$a->id], $evidenceCache[$b->id], $settings, $cpvQualitySettings);
+                if ($proposal !== null) {
+                    $proposals[] = $proposal;
+                }
+            }
+        }
+
+        return [
+            'proposals' => $proposals,
+            'pairs_evaluated' => $pairsEvaluated,
+            'concepts_considered' => $conceptList->count(),
+        ];
+    }
+
+    /** @return array|null null si ninguna señal corrobora lo suficiente para siquiera proponer (por debajo de review_threshold). */
+    private function scoreConceptPair(
+        TaxonomyCanonicalConcept $a,
+        TaxonomyCanonicalConcept $b,
+        array $evidenceA,
+        array $evidenceB,
+        array $settings,
+        array $cpvQualitySettings,
+    ): ?array {
+        $nameSim = (float) ($this->stage('concept_relations', fn () => DB::connection('pgsql')->selectOne(
+            'SELECT GREATEST(
+                COALESCE(similarity(?, ?), 0),
+                COALESCE(similarity(?, ?), 0),
+                COALESCE(similarity(?, ?), 0),
+                COALESCE(similarity(?, ?), 0)
+            ) AS s',
+            [
+                (string) $a->canonical_name_es, (string) $b->canonical_name_es,
+                (string) $a->canonical_name_en, (string) $b->canonical_name_en,
+                (string) $a->canonical_name_es, (string) $b->canonical_name_en,
+                (string) $a->canonical_name_en, (string) $b->canonical_name_es,
+            ]
+        ))->s ?? 0);
+
+        [$sharedCpv] = $this->cpvSignals($evidenceA['cpv_rows'], $evidenceB['cpv_rows'], $cpvQualitySettings);
+
+        $termsA = collect($evidenceA['member_strings'] ?? [])->merge($evidenceA['alias_forms'] ?? [])->map(fn ($s) => mb_strtolower(trim($s)))->filter()->unique();
+        $termsB = collect($evidenceB['member_strings'] ?? [])->merge($evidenceB['alias_forms'] ?? [])->map(fn ($s) => mb_strtolower(trim($s)))->filter()->unique();
+        $termOverlap = $termsA->intersect($termsB)->isNotEmpty() ? 1.0 : 0.0;
+
+        $signals = [
+            'name_similarity' => round($nameSim, 4),
+            'shared_cpv' => $sharedCpv,
+            'term_or_alias_overlap' => $termOverlap,
+        ];
+
+        $corroborating = 0;
+        if ($signals['name_similarity'] >= $settings['concept_relations.min_lexical_similarity']) {
+            $corroborating++;
+        }
+        if ($signals['shared_cpv'] > 0) {
+            $corroborating++;
+        }
+        if ($signals['term_or_alias_overlap'] > 0) {
+            $corroborating++;
+        }
+
+        $confidence = round(($signals['name_similarity'] + $signals['shared_cpv'] + $signals['term_or_alias_overlap']) / 3, 4);
+
+        if ($confidence < $settings['concept_relations.review_threshold']) {
+            return null;
+        }
+
+        $minCorroborating = (int) $settings['concept_relations.min_corroborating_signals'];
+        $automationDecision = ($confidence >= $settings['concept_relations.auto_eligible_threshold'] && $corroborating >= $minCorroborating)
+            ? 'AUTO_ELIGIBLE'
+            : 'REVIEW_REQUIRED';
+
+        $reasons = [];
+        if ($signals['name_similarity'] >= $settings['concept_relations.min_lexical_similarity']) {
+            $reasons[] = 'nombres de concepto lexicamente similares';
+        }
+        if ($signals['shared_cpv'] > 0) {
+            $reasons[] = 'CPV compartido entre miembros de ambos conceptos';
+        }
+        if ($signals['term_or_alias_overlap'] > 0) {
+            $reasons[] = 'termino o alias compartido entre miembros';
+        }
+        if ($corroborating < $minCorroborating) {
+            $reasons[] = "solo {$corroborating} de {$minCorroborating} señales requeridas para AUTO_ELIGIBLE - queda en revisión";
+        }
+
+        return [
+            'source_concept_id' => $a->id,
+            'source_concept' => $a->display_name,
+            'target_concept_id' => $b->id,
+            'target_concept' => $b->display_name,
+            'relation_type' => 'RELATED_TO',
+            'direction' => 'symmetric',
+            'confidence' => $confidence,
+            'evidence' => $signals,
+            'provenance' => ['generated_by' => 'CanonicalConceptBuilderService::proposeConceptRelations', 'generated_at' => now()->toIso8601String()],
+            'context' => [],
+            'automation_decision' => $automationDecision,
+            'reasons' => $reasons,
+        ];
+    }
+
+    // =====================================================================================
+    // PHASE B - B1 (secciones 6/7 del pedido): validación de seguridad para CUALQUIER propuesta
+    // de relación concepto<->concepto (tanto las auto-generadas arriba como una que un admin
+    // proponga a mano para un tipo direccional/jerárquico) - direccionalidad, duplicados y
+    // ciclos, ANTES de que exista ningún modo de escritura real (Phase C) que pudiera persistirla.
+    // =====================================================================================
+
+    /** @return array{valid:bool, reason:?string, possible_duplicate_of:?array} */
+    public function validateConceptRelationProposal(int $sourceConceptId, int $targetConceptId, string $relationType): array
+    {
+        if ($sourceConceptId === $targetConceptId) {
+            return ['valid' => false, 'reason' => 'SELF_RELATION_NOT_ALLOWED', 'possible_duplicate_of' => null];
+        }
+
+        $type = TaxonomyConceptRelationType::query()->where('code', $relationType)->where('active', true)->first();
+        if (! $type) {
+            return ['valid' => false, 'reason' => 'UNKNOWN_OR_INACTIVE_RELATION_TYPE', 'possible_duplicate_of' => null];
+        }
+
+        // Duplicado exacto (mismo sentido).
+        $exact = DB::connection('pgsql')->table('taxonomy_concept_relations')
+            ->where('source_concept_id', $sourceConceptId)
+            ->where('target_concept_id', $targetConceptId)
+            ->where('relation_type', $relationType)
+            ->first();
+        if ($exact) {
+            return ['valid' => false, 'reason' => 'DUPLICATE', 'possible_duplicate_of' => (array) $exact];
+        }
+
+        if (! $type->directional) {
+            // Simétrico (ej. RELATED_TO): (B,A) es la MISMA relación que (A,B) - no proponer dos veces.
+            $reverse = DB::connection('pgsql')->table('taxonomy_concept_relations')
+                ->where('source_concept_id', $targetConceptId)
+                ->where('target_concept_id', $sourceConceptId)
+                ->where('relation_type', $relationType)
+                ->first();
+            if ($reverse) {
+                return ['valid' => false, 'reason' => 'DUPLICATE_VIA_SYMMETRY', 'possible_duplicate_of' => (array) $reverse];
+            }
+        } elseif ($type->inverse_relation_code) {
+            // Direccional con inverso (ej. PART_OF/HAS_PART): (B,A,INVERSO) expresa la MISMA
+            // relación semántica - proponer (A,B,TIPO) además sería una duplicación real, no un
+            // hecho distinto.
+            $viaInverse = DB::connection('pgsql')->table('taxonomy_concept_relations')
+                ->where('source_concept_id', $targetConceptId)
+                ->where('target_concept_id', $sourceConceptId)
+                ->where('relation_type', $type->inverse_relation_code)
+                ->first();
+            if ($viaInverse) {
+                return ['valid' => false, 'reason' => 'DUPLICATE_VIA_INVERSE', 'possible_duplicate_of' => (array) $viaInverse];
+            }
+        }
+
+        // Ciclos: solo tiene sentido para tipos direccionales que representan una jerarquía real
+        // (PART_OF/HAS_PART - "SUPERSEDES" es una cadena de reemplazo, no un contenedor, un ciclo
+        // ahí también sería absurdo semánticamente pero no rompe un traversal de contención; se
+        // protege igual por seguridad, mismo mecanismo, sin distinguir casos hoy).
+        if ($type->directional) {
+            $cycle = $this->wouldCreateCycle($sourceConceptId, $targetConceptId, $relationType, $type->inverse_relation_code);
+            if ($cycle) {
+                return ['valid' => false, 'reason' => 'CYCLE_DETECTED', 'possible_duplicate_of' => null];
+            }
+        }
+
+        return ['valid' => true, 'reason' => null, 'possible_duplicate_of' => null];
+    }
+
+    /**
+     * BFS acotado: ¿ya existe un camino target -> ... -> source usando el mismo tipo de relación
+     * (o su inverso, recorrido en sentido contrario)? Si sí, agregar source->target cerraría un
+     * ciclo. Acotado por `concept_relations.max_cycle_check_depth` (seguridad de costo, no de
+     * negocio - el `max_depth` del catálogo de gobernanza es un concepto aparte).
+     */
+    private function wouldCreateCycle(int $sourceConceptId, int $targetConceptId, string $relationType, ?string $inverseType): bool
+    {
+        $maxDepth = (int) ($this->conceptRelationSettings()['concept_relations.max_cycle_check_depth'] ?? 20);
+        $types = array_filter([$relationType, $inverseType]);
+
+        $visited = [$targetConceptId => true];
+        $frontier = [$targetConceptId];
+        $depth = 0;
+
+        while (! empty($frontier) && $depth < $maxDepth) {
+            $next = DB::connection('pgsql')->table('taxonomy_concept_relations')
+                ->whereIn('source_concept_id', $frontier)
+                ->whereIn('relation_type', $types)
+                ->pluck('target_concept_id')
+                ->unique()
+                ->all();
+
+            foreach ($next as $id) {
+                if ($id === $sourceConceptId) {
+                    return true;
+                }
+            }
+
+            $frontier = array_values(array_diff($next, array_keys($visited)));
+            foreach ($frontier as $id) {
+                $visited[$id] = true;
+            }
+            $depth++;
+        }
+
+        return false;
     }
 }

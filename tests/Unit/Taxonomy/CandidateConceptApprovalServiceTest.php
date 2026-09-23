@@ -271,4 +271,157 @@ class CandidateConceptApprovalServiceTest extends TestCase
 
         $this->assertSame(CandidateConceptApprovalService::RESULT_NOT_FOUND, $outcome['result']);
     }
+
+    // ============================= PHASE B (B3) - PROPOSE NEW CONCEPT =============================
+
+    private function newConceptCandidate(?string $suggestedName = null): TaxonomyCandidateConceptLink
+    {
+        $term = TaxonomyTerm::create([
+            'external_id' => 'phaseb-test-'.uniqid('', true),
+            'term' => 'zzz_phaseb_newconcept_'.uniqid('', true),
+            'language' => 'es',
+            'canonical_term' => 'zzz_phaseb_newconcept_'.uniqid('', true),
+            'term_type' => TaxonomyTerm::TERM_TYPE_TECHNICAL,
+            'region' => [], 'negative_context' => [], 'positive_context' => [],
+            'mapping_review_status' => TaxonomyTerm::MAPPING_UNMAPPED,
+        ]);
+
+        return TaxonomyCandidateConceptLink::create([
+            'suggested_term_id' => $term->id,
+            'suggested_concept_id' => null,
+            'suggested_new_concept_name' => $suggestedName ?? 'Concepto nuevo propuesto '.uniqid(),
+            'signals' => [], 'confidence' => 0.5, 'tier' => TaxonomyCandidateConceptLink::TIER_REVIEW,
+            'status' => TaxonomyCandidateConceptLink::STATUS_PENDING,
+        ]);
+    }
+
+    #[Test]
+    public function find_possible_duplicate_concepts_returns_empty_for_a_candidate_that_already_targets_an_existing_concept(): void
+    {
+        $candidate = $this->pendingCandidate(); // ya tiene suggested_concept_id, no es propose-new
+
+        $duplicates = (new CandidateConceptApprovalService())->findPossibleDuplicateConcepts($candidate);
+
+        $this->assertSame([], $duplicates);
+    }
+
+    #[Test]
+    public function resolve_new_concept_proposal_with_reject_delegates_to_reject(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $user = $this->authorizedUser();
+
+        $outcome = (new CandidateConceptApprovalService())->resolveNewConceptProposal(
+            $candidate->id, $user, CandidateConceptApprovalService::DECISION_REJECT, notes: 'no aplica'
+        );
+
+        $this->assertSame(CandidateConceptApprovalService::RESULT_REJECTED, $outcome['result']);
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_REJECTED, $candidate->fresh()->status);
+    }
+
+    #[Test]
+    public function resolve_new_concept_proposal_is_refused_without_authorization_and_writes_nothing(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
+
+        $outcome = (new CandidateConceptApprovalService())->resolveNewConceptProposal(
+            $candidate->id, $this->unauthorizedUser(), CandidateConceptApprovalService::DECISION_CREATE_NEW
+        );
+
+        $this->assertSame(CandidateConceptApprovalService::RESULT_UNAUTHORIZED, $outcome['result']);
+        $this->assertSame($conceptCountBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count());
+    }
+
+    #[Test]
+    public function resolve_new_concept_proposal_rejects_a_candidate_that_is_not_proposing_a_new_concept(): void
+    {
+        $candidate = $this->pendingCandidate(); // ya tiene suggested_concept_id
+
+        $outcome = (new CandidateConceptApprovalService())->resolveNewConceptProposal(
+            $candidate->id, $this->authorizedUser(), CandidateConceptApprovalService::DECISION_CREATE_NEW
+        );
+
+        $this->assertSame(CandidateConceptApprovalService::RESULT_NOT_APPLICABLE, $outcome['result']);
+    }
+
+    #[Test]
+    public function resolve_new_concept_proposal_creates_a_new_concept_and_links_the_term(): void
+    {
+        $candidate = $this->newConceptCandidate('Concepto Genuinamente Nuevo '.uniqid());
+        $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
+
+        $outcome = (new CandidateConceptApprovalService())->resolveNewConceptProposal(
+            $candidate->id, $this->authorizedUser(), CandidateConceptApprovalService::DECISION_CREATE_NEW
+        );
+
+        $this->assertSame(CandidateConceptApprovalService::RESULT_CREATED_NEW_CONCEPT, $outcome['result']);
+        $this->assertNotNull($outcome['concept_id']);
+        $this->assertSame($conceptCountBefore + 1, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count());
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PUBLISHED, $candidate->fresh()->status);
+        $this->assertSame(1, DB::connection('pgsql')->table('taxonomy_term_concepts')
+            ->where('term_id', $candidate->suggested_term_id)->where('concept_id', $outcome['concept_id'])->count());
+    }
+
+    #[Test]
+    public function resolve_new_concept_proposal_maps_to_an_existing_concept_instead_of_creating_one(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $existingConcept = TaxonomyCanonicalConcept::create([
+            'canonical_name_es' => 'zzz_phaseb_existing_'.uniqid(), 'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE,
+        ]);
+        $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
+
+        $outcome = (new CandidateConceptApprovalService())->resolveNewConceptProposal(
+            $candidate->id, $this->authorizedUser(), CandidateConceptApprovalService::DECISION_MAP_TO_EXISTING, targetConceptId: $existingConcept->id
+        );
+
+        $this->assertSame(CandidateConceptApprovalService::RESULT_MAPPED_TO_EXISTING, $outcome['result']);
+        $this->assertSame($existingConcept->id, $outcome['concept_id']);
+        $this->assertSame($conceptCountBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(), 'MAP_TO_EXISTING no debe crear ningun concepto nuevo.');
+    }
+
+    #[Test]
+    public function resolve_new_concept_proposal_map_to_existing_without_a_target_id_is_not_found(): void
+    {
+        $candidate = $this->newConceptCandidate();
+
+        $outcome = (new CandidateConceptApprovalService())->resolveNewConceptProposal(
+            $candidate->id, $this->authorizedUser(), CandidateConceptApprovalService::DECISION_MAP_TO_EXISTING
+        );
+
+        $this->assertSame(CandidateConceptApprovalService::RESULT_NOT_FOUND, $outcome['result']);
+    }
+
+    #[Test]
+    public function resolve_new_concept_proposal_is_idempotent(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $user = $this->authorizedUser();
+
+        $first = (new CandidateConceptApprovalService())->resolveNewConceptProposal($candidate->id, $user, CandidateConceptApprovalService::DECISION_CREATE_NEW);
+        $second = (new CandidateConceptApprovalService())->resolveNewConceptProposal($candidate->id, $user, CandidateConceptApprovalService::DECISION_CREATE_NEW);
+
+        $this->assertSame(CandidateConceptApprovalService::RESULT_CREATED_NEW_CONCEPT, $first['result']);
+        $this->assertSame(CandidateConceptApprovalService::RESULT_ALREADY_PROCESSED, $second['result']);
+    }
+
+    #[Test]
+    public function resolve_new_concept_proposal_writes_an_audit_log_entry(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $user = $this->authorizedUser();
+        $this->actingAs($user);
+
+        (new CandidateConceptApprovalService())->resolveNewConceptProposal($candidate->id, $user, CandidateConceptApprovalService::DECISION_CREATE_NEW);
+
+        $logRow = DB::connection('pgsql')->table('taxonomy_audit_log')
+            ->where('entity_type', TaxonomyCandidateConceptLink::class)
+            ->where('entity_id', (string) $candidate->id)
+            ->where('field', 'status')
+            ->first();
+
+        $this->assertNotNull($logRow);
+        $this->assertSame('published', $logRow->new_value);
+    }
 }
