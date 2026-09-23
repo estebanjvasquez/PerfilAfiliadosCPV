@@ -76,6 +76,76 @@ class CandidateConceptApprovalService
         return $this->conceptBuilder ??= app(CanonicalConceptBuilderService::class);
     }
 
+    // Phase B.1 (sección 7 del pedido): categorías conceptuales de motivo de rechazo. No existe
+    // ninguna columna/enum de "reject_reason" en el esquema real (auditado antes de escribir esto -
+    // ver audit/phase3_phase_b1_review_workflow.md) y el pedido pide explícitamente no inventar un
+    // enum arbitrario sin chequear antes - por eso esto NO es una columna nueva, es una convención de
+    // formato de texto ("[CATEGORIA] nota libre") compuesta dentro de la columna `review_notes` que
+    // YA existe, la misma que ya usan `reject()`/`resolveNewConceptProposal()`.
+    public const REJECT_REASON_DUPLICATE = 'DUPLICATE';
+
+    public const REJECT_REASON_IRRELEVANT = 'IRRELEVANT';
+
+    public const REJECT_REASON_INSUFFICIENT_EVIDENCE = 'INSUFFICIENT_EVIDENCE';
+
+    public const REJECT_REASON_AMBIGUOUS = 'AMBIGUOUS';
+
+    public const REJECT_REASON_INCORRECT_EXTRACTION = 'INCORRECT_EXTRACTION';
+
+    public const REJECT_REASON_WRONG_CONTEXT = 'WRONG_CONTEXT';
+
+    public const REJECT_REASON_OTHER = 'OTHER';
+
+    public const REJECT_REASON_LABELS = [
+        self::REJECT_REASON_DUPLICATE => 'Duplicado de un concepto/relación ya existente',
+        self::REJECT_REASON_IRRELEVANT => 'Irrelevante para la taxonomía CPV',
+        self::REJECT_REASON_INSUFFICIENT_EVIDENCE => 'Evidencia insuficiente',
+        self::REJECT_REASON_AMBIGUOUS => 'Ambiguo - no se puede decidir con la evidencia disponible',
+        self::REJECT_REASON_INCORRECT_EXTRACTION => 'Extracción incorrecta del término/concepto',
+        self::REJECT_REASON_WRONG_CONTEXT => 'Contexto incorrecto',
+        self::REJECT_REASON_OTHER => 'Otro (requiere nota)',
+    ];
+
+    /**
+     * Phase B.1 (sección 7 del pedido): compone el motivo estructurado + nota libre en el formato
+     * persistido a `review_notes`. Función pura, sin efectos secundarios - reutilizable por
+     * cualquier UI (Filament hoy, otra cosa mañana) sin duplicar el formato.
+     */
+    public static function composeReviewReason(string $reasonCategory, ?string $notes): string
+    {
+        $label = self::REJECT_REASON_LABELS[$reasonCategory] ?? $reasonCategory;
+        $trimmedNotes = trim((string) $notes);
+
+        return $trimmedNotes === '' ? "[{$reasonCategory}] {$label}" : "[{$reasonCategory}] {$trimmedNotes}";
+    }
+
+    /**
+     * Phase B.1 (sección 9 del pedido): ¿el candidato fue generado contra un estado del grafo de
+     * conceptos distinto del actual? Ver `CanonicalConceptBuilderService::conceptGraphFingerprint()`.
+     * Solo lectura, sin efectos secundarios - la UI de revisión la llama antes de mostrar el
+     * formulario de decisión, nunca dentro de la transacción de escritura (esa sigue siendo la
+     * autoridad real vía re-chequeo de `status`, no de fingerprint - el fingerprint es informativo
+     * para el humano, no una segunda salvaguarda de concurrencia).
+     *
+     * `tracked=false` (fingerprint NULL) es el caso de HOY para el 100% de los candidatos, porque
+     * ningún proceso los estampa todavía (Phase C no existe) - se reporta como "no rastreado", nunca
+     * como una falsa alarma de "obsoleto".
+     *
+     * @return array{tracked:bool, stale:bool, current_fingerprint:string, stored_fingerprint:?string}
+     */
+    public function conceptGraphStaleness(TaxonomyCandidateConceptLink $candidate): array
+    {
+        $current = CanonicalConceptBuilderService::conceptGraphFingerprint();
+        $stored = $candidate->taxonomy_state_fingerprint;
+
+        return [
+            'tracked' => $stored !== null,
+            'stale' => $stored !== null && $stored !== $current,
+            'current_fingerprint' => $current,
+            'stored_fingerprint' => $stored,
+        ];
+    }
+
     /**
      * Phase B (B3, sección 17 del pedido): "antes de proponer un concepto nuevo, buscar
      * duplicados posibles". Reutiliza el MISMO pipeline de retrieval+scoring que `dryRun()`

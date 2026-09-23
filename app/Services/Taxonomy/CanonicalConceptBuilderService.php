@@ -560,6 +560,10 @@ class CanonicalConceptBuilderService
             'propose_new_concept_details' => $proposeNewConceptDetails,
             // Phase B (B1): dry-run 8/8 - relaciones concepto<->concepto propuestas.
             'concept_relation_proposals' => $conceptRelationProposals,
+            // Phase B.1 (sección 20 del pedido): estado del grafo en el momento de esta corrida -
+            // parte del contrato mínimo que Phase C (--apply) debe consumir para no persistir un
+            // candidato ya obsoleto. Ver CanonicalConceptBuilderService::conceptGraphFingerprint().
+            'concept_graph_fingerprint' => self::conceptGraphFingerprint(),
             'embedding_calls_made' => 0,
             'db_queries' => $queryCount,
             'queries_per_term' => $termsProcessed > 0 ? round($queryCount / $termsProcessed, 2) : 0.0,
@@ -1000,6 +1004,24 @@ class CanonicalConceptBuilderService
         return hash('sha256', $rows->toJson());
     }
 
+    /**
+     * Phase B.1 (sección 9 del pedido): fingerprint del ESTADO del grafo de conceptos
+     * (`taxonomy_canonical_concepts` + `taxonomy_term_concepts` - las dos tablas cuyo cambio puede
+     * volver obsoleta una propuesta de `taxonomy_candidate_concept_links`: un concepto nuevo, uno
+     * fusionado/mergeado, o un término re-vinculado). Reusa `tableFingerprint()` dos veces en vez de
+     * inventar un segundo mecanismo de hashing. Contrato de Phase C (sección 20): el futuro
+     * `--apply` debe estampar este valor en `taxonomy_candidate_concept_links.taxonomy_state_fingerprint`
+     * al generar cada candidato; la UI de revisión (Phase B.1) compara contra el valor actual en el
+     * momento de la revisión.
+     */
+    public static function conceptGraphFingerprint(): string
+    {
+        return hash('sha256',
+            self::tableFingerprint('taxonomy_canonical_concepts').
+            self::tableFingerprint('taxonomy_term_concepts')
+        );
+    }
+
     /** @return array<string, float> Solo las claves `concept_builder.*`, valor real de taxonomy_settings o default. */
     public function settings(): array
     {
@@ -1176,9 +1198,20 @@ class CanonicalConceptBuilderService
     // adivina jerarquía.
     // =====================================================================================
 
-    /** @return array{proposals:array, pairs_evaluated:int, concepts_considered:int} */
+    // Phase B.1 (sección 16 del pedido): umbral de advertencia SOLO documental/de instrumentación -
+    // all-pairs sobre 79 conceptos activos es 3.081 pares (medido, ver
+    // audit/phase3_phase_b1_review_workflow.md sección 12), barato en la práctica. Complejidad real:
+    // O(n²) en `concepts_considered` - si el catálogo de conceptos crece a un orden de magnitud
+    // más (ej. cientos/miles), este método deja de ser el approach correcto y necesitaría
+    // generación de candidatos acotada/indexada (mismo espíritu que `retrieveCandidateConcepts()`
+    // ya usa para término->concepto) en vez de comparar todos los pares. NO se reemplaza el
+    // algoritmo acá sin evidencia real de que haga falta (pedido explícito de la sección 16).
+    public const CONCEPT_RELATION_PAIRS_WARNING_THRESHOLD = 20000;
+
+    /** @return array{proposals:array, pairs_evaluated:int, concepts_considered:int, runtime_ms:float, complexity_warning:?string} */
     public function proposeConceptRelations(?array $conceptIds = null): array
     {
+        $startedAt = microtime(true);
         $settings = $this->conceptRelationSettings();
         $cpvQualitySettings = $this->settings(); // concept_builder.mapping_quality_* - una sola vez, no por par
 
@@ -1222,6 +1255,10 @@ class CanonicalConceptBuilderService
             'proposals' => $proposals,
             'pairs_evaluated' => $pairsEvaluated,
             'concepts_considered' => $conceptList->count(),
+            'runtime_ms' => round((microtime(true) - $startedAt) * 1000, 1),
+            'complexity_warning' => $pairsEvaluated > self::CONCEPT_RELATION_PAIRS_WARNING_THRESHOLD
+                ? "all-pairs generó {$pairsEvaluated} pares (> ".self::CONCEPT_RELATION_PAIRS_WARNING_THRESHOLD.") - considerar generación de candidatos acotada en vez de all-pairs si esto se vuelve recurrente."
+                : null,
         ];
     }
 

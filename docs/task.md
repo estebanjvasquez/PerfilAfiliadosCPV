@@ -394,11 +394,53 @@ Ver `audit/phase3_phase_b.md` para el detalle completo. Resumen:
 - **Cero escritura de producción** — todo lo anterior es código nuevo + tests, `--apply` sigue sin
   implementarse (Phase C, no iniciada).
 
-**Pendiente real:**
-- Wiring de UI en Filament para `resolveNewConceptProposal()` — hoy solo existe la capa de
-  servicio (testeada), el Resource no tiene botones para elegir MAP_TO_EXISTING/CREATE_NEW todavía.
+**Pendiente real (resuelto en 6ter, ver abajo):**
+- ~~Wiring de UI en Filament para `resolveNewConceptProposal()`~~ — **DONE (Phase B.1, 2026-09-23)**.
 - Campos 4-6 del dry-run (provenance/conflicto/revisión explícitos para candidatos término→concepto)
-  siguen parciales — fuera del alcance pedido para Phase B.
+  siguen parciales — auditado de nuevo en Phase B.1 (`review_required` es trivial de normalizar,
+  `provenance`/`conflict` requieren diseño adicional) — sigue fuera de alcance, documentado.
+
+---
+
+# 6ter — Phase B.1: human review workflow + Phase C preconditions
+
+**Status: DONE (2026-09-23)**
+
+Ver `audit/phase3_phase_b1_review_workflow.md` para el detalle completo (22 secciones). Resumen:
+
+- **Auditoría previa** (obligatoria antes de escribir código): se extendió
+  `TaxonomyCandidateConceptLinkResource` (Resource ya existente) en vez de crear una pantalla
+  paralela — ya tenía `approve`/`reject` funcionales desde Phase 3.1, pero `resolveNewConceptProposal()`
+  (Phase B) no tenía ningún botón que lo invocara.
+- **Workflow de revisión**: Action nueva `resolveNewConcept` (candidatos `PROPOSE_NEW_CONCEPT`) con
+  las 3 decisiones (MAP_TO_EXISTING/CREATE_NEW/REJECT), formulario reactivo con posibles duplicados,
+  impacto predicho en vivo, y estado del grafo de conceptos ANTES de confirmar. `approve`/`reject`
+  existentes enriquecidos con la misma evidencia; `reject` ahora exige motivo estructurado (hueco
+  real encontrado: antes no pedía ninguno).
+- **Stale-dry-run**: columna nueva `taxonomy_candidate_concept_links.taxonomy_state_fingerprint`
+  (única migración de esta entrega, aditiva sobre tabla vacía) +
+  `CanonicalConceptBuilderService::conceptGraphFingerprint()` (reusa `tableFingerprint()` ya
+  existente) + `CandidateConceptApprovalService::conceptGraphStaleness()`. `tracked=false` (caso de
+  HOY, ningún proceso estampa el fingerprint todavía) se muestra como "no rastreado", nunca como
+  falsa alarma.
+- **Validación de relaciones manuales**: `TaxonomyConceptRelationResource` (CRUD puro hasta ahora)
+  ahora valida cada creación/edición contra `validateConceptRelationProposal()` — un humano ya no
+  puede crear a mano un ciclo o duplicado que el Builder ya sabe prevenir para sus propuestas
+  automáticas.
+- **Permisos**: cero nuevos — todo reusa la Policy Shield ya generada (`update_taxonomy::candidate::concept::link`).
+  Conteo de `permissions` verificado sin cambios (471 antes/después).
+- **Contrato de Phase C** (sección 20 del pedido original): formalizado en la sección 16 de la
+  auditoría — qué campos ya existen (`reviewed_by`, `reviewed_at`, `taxonomy_state_fingerprint`) y
+  cuáles faltan (`resolver_version`, un productor real del fingerprint) para que un futuro `--apply`
+  consuma un payload ya congelado en vez de recalcular sobre la marcha.
+- **79 tests corridos, 79/79 PASS** (23 nuevos: 7 de staleness/reason a nivel de servicio, 9 de
+  wiring de Filament vía Livewire —primera cobertura de este tipo en el proyecto—, 7 de validación
+  de relaciones manuales; 56 re-corridos de Phase A/B sin cambios).
+- Taxonomía verificada sin drift antes/después (9.749/79/142/0/0, sin cambios). Cero mutaciones de
+  producción de Phase 3. `main` sin tocar.
+
+**Pendiente real:** productor de `taxonomy_state_fingerprint` (parte del diseño de Phase C, no de
+esta entrega); `provenance`/`conflict` explícitos del dry-run (documentado, no implementado).
 
 ---
 
@@ -408,9 +450,13 @@ Ver `audit/phase3_phase_b.md` para el detalle completo. Resumen:
 autenticado y Shield resueltos, cero mutaciones de taxonomía.
 
 **Fase B (dry-run 8/8 + proponedor de relaciones + aprobación de concepto nuevo) está DONE
-(2026-09-23)** — ver sección "6bis" arriba y `audit/phase3_phase_b.md`. Código + 24 tests nuevos,
-cero escritura de producción, regresión re-verificada sin cambios reales.
+(2026-09-23)** — ver sección "6bis" arriba y `audit/phase3_phase_b.md`.
 
-El siguiente paso real es completar el wiring de UI en Filament para B3 (pendiente, ver sección
-6bis), y luego evaluar **Fase C** (`--apply`) — que sigue **NO iniciada** y requiere autorización
-explícita separada del usuario antes de tocar cualquier dato de producción.
+**Fase B.1 (workflow de revisión humana + precondiciones de Fase C) está DONE (2026-09-23)** — ver
+sección "6ter" arriba y `audit/phase3_phase_b1_review_workflow.md`. Un revisor humano ya puede usar
+las 3 decisiones (MAP_TO_EXISTING/CREATE_NEW/REJECT) desde el panel de Filament.
+
+El siguiente paso real es evaluar **Fase C** (`--apply`) — que sigue **NO iniciada** y requiere
+autorización explícita separada del usuario antes de tocar cualquier dato de producción. El diseño
+de Fase C debería incluir el productor de `taxonomy_state_fingerprint`/`resolver_version` (gap
+identificado en Phase B.1, sección 16 de su auditoría).

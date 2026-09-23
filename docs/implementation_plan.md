@@ -62,8 +62,9 @@ abajo se implementaron: `proposeConceptRelations()`/`validateConceptRelationProp
 dentro de `DatabaseTransactions`. Regresión re-corrida: sin cambios reales (1 falso positivo
 transitorio explicado y confirmado resuelto). Cero mutaciones de producción.
 
-**Pendiente real (no bloqueante para Fase C):** wiring de UI en Filament para que un revisor humano
-use `resolveNewConceptProposal()` desde el panel (hoy solo la capa de servicio está lista/testeada).
+**Pendiente real (no bloqueante para Fase C):** ~~wiring de UI en Filament~~ — **DONE (Phase B.1,
+2026-09-23)**, ver `audit/phase3_phase_b1_review_workflow.md`. Un revisor humano ya puede usar
+`resolveNewConceptProposal()` desde el panel.
 
 **Objetivo:** cerrar los 2 gaps de diseño encontrados en la auditoría antes de tocar código de
 escritura.
@@ -94,13 +95,31 @@ nuevo"; extender el corpus de validación (`ValidationCorpusTest.php`) si el sco
 
 ---
 
+## Fase B.1 — Human review workflow + Phase C preconditions
+
+**Status (2026-09-23): DONE.** Ver `audit/phase3_phase_b1_review_workflow.md`. Cierra el loop de
+revisión humana creado en Fase B: `resolveNewConceptProposal()` (MAP_TO_EXISTING/CREATE_NEW/REJECT)
+ahora es operable desde `TaxonomyCandidateConceptLinkResource` (extendido, no una pantalla paralela).
+Agrega protección de stale-dry-run (`taxonomy_state_fingerprint` + `conceptGraphFingerprint()`),
+validación de relaciones concepto↔concepto propuestas a mano
+(`TaxonomyConceptRelationResource` ahora usa `validateConceptRelationProposal()`), y formaliza el
+contrato de payload que Fase C debe consumir (sección 16 de la auditoría). 79/79 tests PASS (23
+nuevos), cero mutaciones de producción, cero cambio en permisos de Shield, único cambio de esquema
+una columna nueva NULLABLE sobre una tabla vacía.
+
+**Gap identificado para el diseño de Fase C:** no existe todavía ningún productor que estampe
+`taxonomy_state_fingerprint`/`resolver_version` al generar un candidato real — Fase C debe incluir
+esto como parte de su propio diseño, no como tarea separada.
+
+---
+
 ## Fase C — Diseñar e implementar `--apply` (write-mode real)
 
 **Objetivo:** implementar desde cero el modo de escritura de
 `taxonomy:build-canonical-concepts --apply` — hoy es un guard clause sin código detrás.
 
-**Dependencias:** Fase A (línea base de regresión) y Fase B (dry-run completo) deben estar
-cerradas antes de empezar esto.
+**Dependencias:** Fase A (línea base de regresión), Fase B (dry-run completo) y Fase B.1 (workflow
+de revisión humana + contrato de payload) deben estar cerradas antes de empezar esto.
 
 **Tareas:**
 1. Transacciones por lote (no una transacción gigante para toda la corrida).
@@ -111,6 +130,10 @@ cerradas antes de empezar esto.
    paralelo).
 5. Provenance explícito por fila escrita (qué corrida, qué señales, cuándo).
 6. Versionado — decidir el mecanismo (columna de versión, o snapshot completo antes/después).
+   Fase B.1 ya agregó `taxonomy_candidate_concept_links.taxonomy_state_fingerprint` +
+   `CanonicalConceptBuilderService::conceptGraphFingerprint()` como building block reusable - falta
+   el productor que la estampe al generar cada candidato real, y decidir si hace falta también un
+   `resolver_version` explícito (código del Builder, no solo estado de datos).
 7. Rollback documentado y probado (no solo "en teoría revertible").
 
 **Tests:** tests de integración con `DatabaseTransactions`, casos de: escritura exitosa,

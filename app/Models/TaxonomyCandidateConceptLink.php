@@ -44,6 +44,7 @@ class TaxonomyCandidateConceptLink extends Model
         'reviewed_by',
         'reviewed_at',
         'published_term_concept_id',
+        'taxonomy_state_fingerprint',
     ];
 
     protected $casts = [
@@ -65,5 +66,13 @@ class TaxonomyCandidateConceptLink extends Model
     public function isProposingNewConcept(): bool
     {
         return $this->suggested_concept_id === null;
+    }
+
+    // Phase B.1 (sección 14 del pedido, auditabilidad): mismo patrón que
+    // `TaxonomyCandidateTerm::reviewedBy()` - UserPgsql (no User) para quedarse en la conexión
+    // `pgsql` de este modelo.
+    public function reviewedBy()
+    {
+        return $this->belongsTo(UserPgsql::class, 'reviewed_by');
     }
 }

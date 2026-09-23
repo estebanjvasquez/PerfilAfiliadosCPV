@@ -7,6 +7,7 @@ use App\Models\TaxonomyCanonicalConcept;
 use App\Models\TaxonomyTerm;
 use App\Models\User;
 use App\Services\Taxonomy\CandidateConceptApprovalService;
+use App\Services\Taxonomy\CanonicalConceptBuilderService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Test;
@@ -423,5 +424,94 @@ class CandidateConceptApprovalServiceTest extends TestCase
 
         $this->assertNotNull($logRow);
         $this->assertSame('published', $logRow->new_value);
+    }
+
+    // =========================================================================================
+    // Phase B.1 (sección 7 del pedido): composeReviewReason() - función pura, sin DB.
+    // =========================================================================================
+
+    #[Test]
+    public function compose_review_reason_uses_the_category_label_when_no_note_is_given(): void
+    {
+        $reason = CandidateConceptApprovalService::composeReviewReason(CandidateConceptApprovalService::REJECT_REASON_DUPLICATE, null);
+
+        $this->assertSame('[DUPLICATE] Duplicado de un concepto/relación ya existente', $reason);
+    }
+
+    #[Test]
+    public function compose_review_reason_prefers_the_free_text_note_when_given(): void
+    {
+        $reason = CandidateConceptApprovalService::composeReviewReason(CandidateConceptApprovalService::REJECT_REASON_OTHER, 'no corresponde a este dominio');
+
+        $this->assertSame('[OTHER] no corresponde a este dominio', $reason);
+    }
+
+    #[Test]
+    public function compose_review_reason_treats_a_blank_note_as_no_note(): void
+    {
+        $reason = CandidateConceptApprovalService::composeReviewReason(CandidateConceptApprovalService::REJECT_REASON_AMBIGUOUS, '   ');
+
+        $this->assertSame('[AMBIGUOUS] Ambiguo - no se puede decidir con la evidencia disponible', $reason);
+    }
+
+    // =========================================================================================
+    // Phase B.1 (sección 9 del pedido): conceptGraphStaleness() - protección de stale dry-run.
+    // =========================================================================================
+
+    #[Test]
+    public function concept_graph_staleness_is_not_tracked_for_a_candidate_without_a_stamped_fingerprint(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $this->assertNull($candidate->taxonomy_state_fingerprint, 'Ningún proceso puebla esta columna todavía (Phase C no existe).');
+
+        $staleness = (new CandidateConceptApprovalService())->conceptGraphStaleness($candidate);
+
+        $this->assertFalse($staleness['tracked']);
+        $this->assertFalse($staleness['stale'], 'No rastreado nunca debe reportarse como obsoleto (falsa alarma).');
+        $this->assertNull($staleness['stored_fingerprint']);
+        $this->assertNotEmpty($staleness['current_fingerprint']);
+    }
+
+    #[Test]
+    public function concept_graph_staleness_is_not_stale_when_the_stamped_fingerprint_still_matches(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $currentFingerprint = CanonicalConceptBuilderService::conceptGraphFingerprint();
+        $candidate->update(['taxonomy_state_fingerprint' => $currentFingerprint]);
+
+        $staleness = (new CandidateConceptApprovalService())->conceptGraphStaleness($candidate->fresh());
+
+        $this->assertTrue($staleness['tracked']);
+        $this->assertFalse($staleness['stale']);
+    }
+
+    #[Test]
+    public function concept_graph_staleness_is_stale_when_the_concept_graph_changed_after_the_stamp(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        // Estampa un fingerprint deliberadamente distinto del real (simula que el grafo cambió
+        // después de que este candidato se generó - ej. otro concepto se creó o fusionó mientras
+        // tanto).
+        $candidate->update(['taxonomy_state_fingerprint' => hash('sha256', 'deliberately-stale-fingerprint')]);
+
+        $staleness = (new CandidateConceptApprovalService())->conceptGraphStaleness($candidate->fresh());
+
+        $this->assertTrue($staleness['tracked']);
+        $this->assertTrue($staleness['stale']);
+    }
+
+    #[Test]
+    public function concept_graph_fingerprint_changes_when_a_new_canonical_concept_is_created(): void
+    {
+        $before = CanonicalConceptBuilderService::conceptGraphFingerprint();
+
+        TaxonomyCanonicalConcept::create([
+            'canonical_name_es' => 'zzz_fingerprint_test_'.uniqid('', true),
+            'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE,
+        ]);
+
+        $after = CanonicalConceptBuilderService::conceptGraphFingerprint();
+
+        $this->assertNotSame($before, $after, 'Crear un concepto nuevo debe cambiar el fingerprint del grafo.');
     }
 }
