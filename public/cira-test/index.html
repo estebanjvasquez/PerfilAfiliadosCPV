@@ -307,6 +307,32 @@
     };
   }
 
+  // Regresión 2026-09-23 (audit/cira_test_json_error_2026-09-23.md): antes de esto, tanto
+  // fetchDebugReport() como sendMsg() llamaban `r.json()` directo apenas `r.ok` era true - un 200
+  // con body vacío (confirmado real: el webhook de n8n a veces responde así) hacía que el navegador
+  // tirara "Unexpected end of JSON input" en vez del fallo real. `parseJsonResponseOrThrow()`
+  // preserva el fallo HTTP real (status + lo que haya en el body) en vez de dejar que se pierda
+  // detrás de un error de parseo genérico.
+  async function parseJsonResponseOrThrow(r){
+    var contentType = (r.headers && r.headers.get && r.headers.get("content-type")) || "";
+    var text = await r.text();
+
+    if(!r.ok){
+      throw new Error("HTTP " + r.status + ": " + (text ? text.slice(0, 300) : "(respuesta vacía)"));
+    }
+    if(!text){
+      throw new Error("HTTP " + r.status + ": el servidor respondió sin body (respuesta vacía) - ver audit/cira_test_json_error_2026-09-23.md");
+    }
+    if(contentType.indexOf("application/json") === -1){
+      throw new Error("HTTP " + r.status + ": se esperaba JSON pero llegó '" + (contentType || "sin content-type") + "'");
+    }
+    try {
+      return JSON.parse(text);
+    } catch(parseErr){
+      throw new Error("HTTP " + r.status + ": JSON inválido en la respuesta (" + text.slice(0, 200) + ")");
+    }
+  }
+
   async function fetchDebugReport(text){
     var password = debugPassword();
     if(!password) return;
@@ -322,11 +348,7 @@
         sessionStorage.removeItem(DEBUG_KEY);
         return;
       }
-      if(!r.ok){
-        addBot("🔧 DEBUG: error HTTP " + r.status + " al pedir el reporte.", "error");
-        return;
-      }
-      var report = await r.json();
+      var report = await parseJsonResponseOrThrow(r);
       addDebugBlock(report);
     } catch(e){
       addBot("🔧 DEBUG: error de conexión - " + e.message, "error");
@@ -357,12 +379,11 @@
       var elapsed = Date.now() - t0;
       removeLoader();
 
-      if(!r.ok){
-        addBot("Error HTTP " + r.status + " — ¿el workflow clonado está activo en n8n? (" + elapsed + "ms)", "error");
-        return;
-      }
-
-      var data = await r.json();
+      // Regresión 2026-09-23: el workflow de n8n a veces responde 200 con body VACÍO (confirmado
+      // reproducible desde afuera, no un caso hipotético) - antes esto llegaba directo a `r.json()`
+      // y el navegador mostraba "Unexpected end of JSON input", ocultando que en realidad la
+      // respuesta llegó vacía. `parseJsonResponseOrThrow()` conserva el diagnóstico real.
+      var data = await parseJsonResponseOrThrow(r);
       var item = Array.isArray(data) ? data[0] : data;
       var reply = item && (item.output || item.text);
       addBot(reply || "Sin respuesta.", (item && item.type) ? item.type + " · " + elapsed + "ms" : elapsed + "ms");
@@ -373,7 +394,7 @@
 
     } catch(e){
       removeLoader();
-      addBot("Error de conexión: " + e.message, "error");
+      addBot("Error de conexión: " + e.message + " — ¿el workflow clonado está activo en n8n?", "error");
     }
   }
 

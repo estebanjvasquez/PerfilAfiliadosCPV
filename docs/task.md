@@ -278,6 +278,32 @@ guardada en `audit/regression_baseline_2026-09-23.json`. Detalle completo:
 
 ---
 
+# 10bis — CIRA-test (chat de prueba) roto por fuera del Worker: BLOCKED en n8n
+
+**Status: PARTIALLY FIXED (frontend) / BLOCKED (causa raíz) — abierto 2026-09-23**
+
+Ver `audit/cira_test_json_error_2026-09-23.md` para el diagnóstico completo. Resumen:
+
+- El chat de `/cira-test/` mostraba `Error de conexión: ... Unexpected end of JSON input`.
+- Reproducido desde afuera: el webhook de n8n que usa esa página
+  (`https://vmi2945958.contaboserver.net/webhook/...`, workflow "Chat CIRA V5 - MCP") responde
+  `200` con `Content-Type: application/json` pero **0 bytes de body**, de forma consistente.
+- **Confirmado que NO es el Worker MCP** (`perfilafiliados-mcp`): health check y capa de auth
+  responden sanos por separado, sin relación con esta falla.
+- `vmi2945958.contaboserver.net` es un **VPS de Contabo distinto** del ya documentado para este
+  proyecto (`vmi3554091.contaboserver.net`/`66.94.121.98`) — sin credenciales de acceso
+  documentadas para este proyecto. **Causa raíz dentro del workflow de n8n sigue sin diagnosticar,
+  bloqueada por falta de acceso.**
+- **Fix aplicado** (`public/cira-test/index.html`): el frontend ya no crashea con un mensaje
+  críptico ante una respuesta vacía — muestra el diagnóstico real ("el servidor respondió sin
+  body"). Esto NO repara el workflow de n8n en sí, solo evita el crash feo del lado del navegador.
+
+**Next action:** alguien con acceso al panel de n8n (o SSH a `vmi2945958.contaboserver.net`) debe
+revisar el historial de ejecuciones del workflow "Chat CIRA V5 - MCP" (id `zbVLoCdR09IA9yQK`) para
+encontrar el nodo que termina devolviendo una respuesta HTTP 200 vacía.
+
+---
+
 # 11 — Hybrid search target architecture
 
 **Status: PARTIAL — la mayoría de las señales de retrieval existen, RRF/re-ranking implementado, Phase 3 (grafo de conceptos) es el eslabón que falta poblar**
