@@ -158,7 +158,38 @@ class TaxonomyCategoriesRelationManager extends RelationManager
                         ->get()
                         ->mapWithKeys(fn (TaxonomyCategory $c) => [$c->id => $c->breadcrumb('es')])
                         ->all())
-                    ->helperText('Escriba y espere un instante — los resultados aparecen solos, no hace falta apretar nada.'),
+                    ->helperText('Escriba y espere un instante — los resultados aparecen solos, no hace falta apretar nada. Si el resultado es una Familia completa, no se agrega directo: se abre el listado de sus categorías para elegir las que correspondan.')
+                    // 2026-09-25 (pedido del cliente en reunión): antes, elegir una Familia en esta
+                    // búsqueda libre la agregaba completa de un solo click - una empresa podía quedar
+                    // vinculada a TODAS sus categorías hijas sin cubrir ninguna en particular
+                    // (mecanismo real para "inflar" resultados de búsqueda). Filament no permite
+                    // interceptar el click de UNA opción del Select para abrir un modal aparte -
+                    // el reemplazo fiel a la intención del pedido ("clic en la Familia -> ventana con
+                    // sus categorías para tildar") es: apenas se elige una Familia acá, se saca
+                    // automáticamente de esta selección (nunca queda como pendiente de guardar) y se
+                    // completa/revela el explorador de Familia de abajo (mismo CheckboxList que ya
+                    // existía para "explorar una Familia completa" - no se duplica lógica).
+                    ->live()
+                    ->afterStateUpdated(function (Set $set, ?array $state) {
+                        $state ??= [];
+                        $niveles = TaxonomyCategory::query()->whereIn('id', $state)->pluck('level', 'id');
+                        $familiasElegidas = collect($state)->filter(fn ($id) => ($niveles[$id] ?? null) === TaxonomyCategory::LEVEL_FAMILY)->values();
+
+                        if ($familiasElegidas->isEmpty()) {
+                            return;
+                        }
+
+                        $set('categorias', collect($state)->reject(fn ($id) => $familiasElegidas->contains($id))->values()->all());
+                        $set('familia_a_explorar', (string) $familiasElegidas->first());
+
+                        $nombreFamilia = TaxonomyCategory::find($familiasElegidas->first())?->breadcrumb('es');
+                        $aviso = "\"{$nombreFamilia}\" es una Familia completa - no se agrega directo. Elegí abajo cuáles de sus categorías específicas corresponden a su empresa.";
+                        if ($familiasElegidas->count() > 1) {
+                            $aviso .= ' (Eligió más de una Familia a la vez - agregue las demás una por una con el explorador de abajo.)';
+                        }
+
+                        Notification::make()->warning()->title('Elija categorías específicas, no la Familia completa')->body($aviso)->send();
+                    }),
                 Forms\Components\Select::make('familia_a_explorar')
                     ->label('¿Prefiere explorar una Familia completa en vez de buscar?')
                     ->helperText('Elija una Familia para ver y marcar directamente sus categorías más específicas.')
@@ -192,6 +223,24 @@ class TaxonomyCategoriesRelationManager extends RelationManager
                 if ($categoryIds->isEmpty()) {
                     Notification::make()->warning()->title('No se seleccionó ninguna categoría')->send();
 
+                    return;
+                }
+
+                // 2026-09-25 (pedido del cliente): guarda dura del lado del servidor - el filtro
+                // reactivo de arriba (afterStateUpdated en 'categorias') es solo UX, nunca la
+                // salvaguarda real (mismo principio que Phase B.1: "UI state must not be the
+                // security boundary"). Si por cualquier motivo llega un id que no sea Categoría hoja
+                // (level=2) hasta acá, se descarta en vez de guardarlo - nunca se vincula una empresa
+                // a una Familia/Grupo completo desde este formulario.
+                $niveles = TaxonomyCategory::query()->whereIn('id', $categoryIds)->pluck('level', 'id');
+                $noHojas = $categoryIds->filter(fn ($id) => ($niveles[$id] ?? null) !== TaxonomyCategory::LEVEL_CATEGORY);
+                if ($noHojas->isNotEmpty()) {
+                    $categoryIds = $categoryIds->diff($noHojas)->values();
+                    Notification::make()->warning()->title('Algunas selecciones no eran categorías específicas y no se guardaron')
+                        ->body('Solo se pueden vincular categorías específicas, no Familias ni Grupos completos.')->send();
+                }
+
+                if ($categoryIds->isEmpty()) {
                     return;
                 }
 
