@@ -222,6 +222,40 @@ class TaxonomyCandidateConceptLinkResource extends Resource
             ]);
     }
 
+    /**
+     * Phase B.1 (seguimiento 2026-09-25): texto compartido de impacto predicho, con el desglose
+     * confirmado/sugerido de `predictAffectedCompanies()` - reusado por el modal de `approve`, el
+     * formulario de `resolveNewConcept` y la vista de detalle, para no repetir 3 veces la misma
+     * lógica de formato con el riesgo de que se desincronicen entre sí.
+     *
+     * "Confirmado" = `empresa_taxonomy_category.origen = self_declared` (la empresa lo declaró ella
+     * misma). "Sugerido" = `origen = suggested` (viene de `taxonomy:homologate-empresas`, un mapeo
+     * automático por similitud semántica del catálogo viejo de servicios - la empresa nunca lo
+     * confirmó). Verificado en vivo (2026-09-25): 755 de 764 filas reales son `suggested` - la
+     * inmensa mayoría del "impacto predicho" que ve un revisor es evidencia sugerida, no confirmada.
+     */
+    public static function formatImpactSummary(array $impact): string
+    {
+        $lines = [];
+
+        $lines[] = sprintf(
+            'Impacto predicho: %d empresas directas (%d confirmadas por la empresa, %d solo sugeridas automáticamente), %d con evidencia de crawler, %d total único.',
+            $impact['direct_company_count'],
+            $impact['direct_confirmed_company_count'] ?? 0,
+            $impact['direct_suggested_company_count'] ?? 0,
+            $impact['evidence_company_count'],
+            $impact['total_unique_company_count'],
+        );
+        if (! empty($impact['data_gap_flags'])) {
+            $lines[] = 'Brechas de datos: '.implode(', ', $impact['data_gap_flags']).' (esperado, no es una falla del motor).';
+        }
+        if (($impact['direct_company_count'] ?? 0) > 0 && ($impact['direct_confirmed_company_count'] ?? 0) === 0) {
+            $lines[] = 'Ninguna de estas empresas confirmó esta categoría ella misma - toda la evidencia directa es sugerida automáticamente, tratarla con precaución.';
+        }
+
+        return implode("\n", $lines);
+    }
+
     /** Phase B.1 (secciones 5/11 del pedido): texto de impacto + estado del grafo mostrado antes de confirmar `approve`. */
     private static function impactAndStalenessSummary(TaxonomyCandidateConceptLink $record): string
     {
@@ -229,15 +263,7 @@ class TaxonomyCandidateConceptLinkResource extends Resource
 
         if ($record->concept) {
             $impact = app(CanonicalConceptBuilderService::class)->predictedImpactForConcept($record->concept);
-            $lines[] = sprintf(
-                'Impacto predicho: %d empresas directas, %d con evidencia de crawler, %d total único.',
-                $impact['direct_company_count'],
-                $impact['evidence_company_count'],
-                $impact['total_unique_company_count'],
-            );
-            if (! empty($impact['data_gap_flags'])) {
-                $lines[] = 'Brechas de datos: '.implode(', ', $impact['data_gap_flags']).' (esperado, no es una falla del motor).';
-            }
+            $lines[] = self::formatImpactSummary($impact);
         }
 
         $staleness = app(CandidateConceptApprovalService::class)->conceptGraphStaleness($record);
@@ -329,14 +355,7 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                         return '—';
                     }
 
-                    return sprintf(
-                        'Directas: %d | Con evidencia de crawler: %d | Expandidas: %d | Total único: %d%s',
-                        $impact['direct_company_count'],
-                        $impact['evidence_company_count'],
-                        $impact['expanded_company_count'],
-                        $impact['total_unique_company_count'],
-                        empty($impact['data_gap_flags']) ? '' : ' — brechas de datos: '.implode(', ', $impact['data_gap_flags']),
-                    );
+                    return self::formatImpactSummary($impact);
                 })
                 ->visible(fn (Get $get) => in_array($get('decision'), [
                     CandidateConceptApprovalService::DECISION_MAP_TO_EXISTING,

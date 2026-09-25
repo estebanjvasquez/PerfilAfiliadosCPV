@@ -1087,7 +1087,20 @@ class CanonicalConceptBuilderService
      * así que no hay ninguna expansión real que calcular - existe el campo para cuando eso exista
      * (Fase G del plan), en vez de inventar un número.
      *
-     * @return array{direct_company_count:int, evidence_company_count:int, expanded_company_count:int, total_unique_company_count:int, companies:array, data_gap_flags:array}
+     * Phase B.1 (seguimiento post-entrega, 2026-09-25): `direct_company_count` mezclaba dos calidades
+     * de evidencia muy distintas sin distinguirlas para el revisor - `empresa_taxonomy_category.origen`
+     * ya traía esa distinción (poblada por `taxonomy:homologate-empresas`, un proceso ANTERIOR y
+     * separado de Phase 3 que mapea el catálogo viejo de servicios a categorías CPV por similitud
+     * semántica) pero solo se exponía dentro de `companies[].evidence_paths`, nunca como conteo
+     * agregado. Verificado en vivo (2026-09-25): de las 764 filas reales de
+     * `empresa_taxonomy_category`, 755 son `suggested` (sugeridas automáticamente, la empresa nunca
+     * las confirmó) y solo 9 son `self_declared` (la empresa las declaró ella misma) - una proporción
+     * que un revisor humano necesita ver para no sobreestimar la confianza del impacto predicho.
+     * `direct_confirmed_company_count` + `direct_suggested_company_count` no necesariamente suman
+     * `direct_company_count` (una empresa puede tener evidencia de ambos orígenes para categorías
+     * distintas del mismo concepto - se cuenta en ambos baldes, nunca se infla el total).
+     *
+     * @return array{direct_company_count:int, direct_confirmed_company_count:int, direct_suggested_company_count:int, evidence_company_count:int, expanded_company_count:int, total_unique_company_count:int, companies:array, data_gap_flags:array}
      */
     public function predictAffectedCompanies(array $categoryIds): array
     {
@@ -1096,6 +1109,8 @@ class CanonicalConceptBuilderService
         if (empty($categoryIds)) {
             return [
                 'direct_company_count' => 0,
+                'direct_confirmed_company_count' => 0,
+                'direct_suggested_company_count' => 0,
                 'evidence_company_count' => 0,
                 'expanded_company_count' => 0,
                 'total_unique_company_count' => 0,
@@ -1164,6 +1179,10 @@ class CanonicalConceptBuilderService
 
         return [
             'direct_company_count' => $directRows->pluck('empresa_id')->unique()->count(),
+            // Phase B.1 (seguimiento 2026-09-25): mismo `$directRows` ya cargado arriba, sin query
+            // adicional - solo se le suma un filtro por `origen` antes de deduplicar por empresa_id.
+            'direct_confirmed_company_count' => $directRows->where('origen', 'self_declared')->pluck('empresa_id')->unique()->count(),
+            'direct_suggested_company_count' => $directRows->where('origen', 'suggested')->pluck('empresa_id')->unique()->count(),
             'evidence_company_count' => $evidenceRows->pluck('empresa_id')->unique()->count(),
             'expanded_company_count' => 0,
             'total_unique_company_count' => count($companyList),

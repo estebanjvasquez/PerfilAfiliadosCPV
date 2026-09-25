@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\TaxonomyCandidateConceptLinkResource\Pages;
 
-use App\Filament\Resources\TaxonomyCandidateConceptLinkResource;
+use App\Filament\Resources\TaxonomyCandidateConceptLinkResource as Resource;
 use App\Models\TaxonomyCandidateConceptLink;
 use App\Services\Taxonomy\CandidateConceptApprovalService;
 use App\Services\Taxonomy\CanonicalConceptBuilderService;
@@ -13,7 +13,7 @@ use Filament\Resources\Pages\ViewRecord;
 
 class ViewTaxonomyCandidateConceptLink extends ViewRecord
 {
-    protected static string $resource = TaxonomyCandidateConceptLinkResource::class;
+    protected static string $resource = Resource::class;
 
     public function infolist(Infolist $infolist): Infolist
     {
@@ -46,14 +46,7 @@ class ViewTaxonomyCandidateConceptLink extends ViewRecord
                         return '—';
                     }
 
-                    return sprintf(
-                        'Directas: %d | Con evidencia de crawler: %d | Expandidas: %d | Total único: %d%s',
-                        $impact['direct_company_count'],
-                        $impact['evidence_company_count'],
-                        $impact['expanded_company_count'],
-                        $impact['total_unique_company_count'],
-                        empty($impact['data_gap_flags']) ? '' : ' — brechas de datos: '.implode(', ', $impact['data_gap_flags']).' (brecha de datos esperada, no falla de motor)',
-                    );
+                    return Resource::formatImpactSummary($impact);
                 }),
             TextEntry::make('possible_duplicate_concepts')
                 ->label('Posibles conceptos duplicados')

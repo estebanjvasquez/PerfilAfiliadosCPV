@@ -173,6 +173,30 @@ class CanonicalConceptBuilderServiceTest extends TestCase
     }
 
     #[Test]
+    public function predict_affected_companies_breaks_down_direct_evidence_by_origen(): void
+    {
+        // Phase B.1 (seguimiento 2026-09-25): `direct_confirmed_company_count` (self_declared) vs
+        // `direct_suggested_company_count` (suggested, viene de taxonomy:homologate-empresas) -
+        // un revisor necesita distinguir evidencia confirmada por la empresa de una sugerencia
+        // automática nunca confirmada, sin tener que leer companies[].evidence_paths a mano.
+        $category = $this->syntheticCategory();
+        $empresaIds = DB::connection('pgsql')->table('empresas')->limit(2)->pluck('id')->all();
+        $this->assertCount(2, $empresaIds, 'Se necesitan al menos 2 empresas reales en la BD de pruebas para este test.');
+        [$confirmedEmpresaId, $suggestedEmpresaId] = $empresaIds;
+
+        DB::connection('pgsql')->table('empresa_taxonomy_category')->insert([
+            ['empresa_id' => $confirmedEmpresaId, 'category_id' => $category->id, 'origen' => 'self_declared', 'es_principal' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['empresa_id' => $suggestedEmpresaId, 'category_id' => $category->id, 'origen' => 'suggested', 'es_principal' => false, 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        $impact = $this->builder()->predictAffectedCompanies([$category->id]);
+
+        $this->assertSame(2, $impact['direct_company_count']);
+        $this->assertSame(1, $impact['direct_confirmed_company_count']);
+        $this->assertSame(1, $impact['direct_suggested_company_count']);
+    }
+
+    #[Test]
     public function predict_affected_companies_flags_cpv_without_companies_as_data_gap(): void
     {
         $category = $this->syntheticCategory();
