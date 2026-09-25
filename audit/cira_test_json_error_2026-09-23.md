@@ -188,13 +188,79 @@ taxonomy_candidate_concept_links:     0 →    0
 
 ---
 
-## Pendiente / bloqueado
+## Actualización 2026-09-25 — RESUELTO (causa raíz real encontrada y corregida)
 
-**Necesita acción de alguien con acceso a n8n** (`vmi2945958.contaboserver.net`, workflow "Chat CIRA
-V5 - MCP", id `zbVLoCdR09IA9yQK`): revisar el historial de ejecuciones del workflow para encontrar
-el nodo que falla y por qué termina devolviendo una respuesta HTTP 200 vacía en vez de propagar el
-error o el resultado real. Sin esto, el chat de `/cira-test/` seguirá "funcionando" (ya no crashea
-feo, gracias al fix de esta entrega) pero seguirá sin dar respuestas reales.
+El usuario proveyó acceso SSH nuevo a `vmi2945958.contaboserver.net` (clave ed25519 dedicada,
+inyectada vía consola VNC de Contabo, mismo patrón que el otro VPS — clave guardada en
+`C:\Users\esteb\.ssh\n8n_vmi2945958_ed25519`, nunca compartida/impresa).
 
-Si el usuario puede compartir acceso a ese servidor/n8n (SSH o el panel de n8n), se puede continuar
-el diagnóstico hasta la causa raíz real dentro del workflow.
+**Causa raíz real:** `MCP_TOKEN` fue rotado en Phase A (2026-09-23) sin que se detectara ningún
+consumidor externo activo en ese momento. **Sí existía uno: el workflow de n8n "Chat CIRA V5 - MCP"**
+(`zbVLoCdR09IA9yQK`), cuyos nodos `MCP Perfil Afiliados CPV` (tipo `mcpClientTool`) y
+`Call MCP Empresas` (tipo `httpRequest`) llaman a `https://perfilafiliados-mcp.sisteg.workers.dev/mcp`
+usando una credencial Bearer Auth compartida (`FDDQ7NJogMMHUZG9`, nombre "MCP Perfil Afiliados
+CPV") que seguía con el valor VIEJO de `MCP_TOKEN`.
+
+**Evidencia que confirmó esto (no una suposición):**
+- Logs del contenedor `n8n-n8n-1` (`docker logs`): múltiples `MCP client: Failed to connect to MCP
+  Server` / `Error in sub-node MCP Perfil Afiliados CPV` — exactamente el nodo que llama al Worker.
+- Descartada causa de red/DNS: `curl` sin auth desde el propio host de n8n a `/mcp` devolvió `401`
+  limpio (no timeout/conexión rechazada) — confirma que la conectividad es correcta, el problema es
+  de autenticación.
+- Export de workflow (`n8n export:workflow`, solo lectura, sin exponer valores de credenciales)
+  confirmó la configuración exacta de ambos nodos y el ID de credencial compartido.
+
+**Fix aplicado (autorizado explícitamente por el usuario antes de tocar nada):**
+1. Se generó un valor nuevo de `MCP_TOKEN` (aleatorio, criptográficamente seguro, igual método que
+   Phase A) — nunca impreso en el chat ni commiteado, vivió solo en un archivo temporal del
+   scratchpad de esta sesión, borrado apenas se confirmó sincronizado en ambos lados.
+2. Seteado como secret del Worker vía `wrangler secret put MCP_TOKEN` (token de Cloudflare
+   `perfilafiliados-waf-diagnostico`, permiso `Workers Scripts:Edit`, provisto por el usuario).
+3. **Verificado directamente contra el Worker** antes de tocar n8n: `POST /mcp` con el token nuevo
+   → `200` con la lista real de tools (antes de esto, sin el header `Accept` correcto daba `406`,
+   no `401` — confirmando que la autenticación en sí ya era válida).
+4. El usuario actualizó la credencial `MCP Perfil Afiliados CPV` en la UI de n8n (login propio del
+   usuario — esta sesión nunca tuvo ni pidió acceso al panel de n8n) con el mismo valor nuevo.
+
+**Verificación end-to-end post-fix** (reproduciendo el request exacto del frontend, 4 queries
+distintas):
+
+| Query | Status | Longitud de body | Resultado |
+|---|---|---|---|
+| `hola` | 200 | 174 bytes | Saludo real del asistente |
+| `necesito una empresa de perforacion` | 200 | 741 bytes | 6 empresas reales con nombre/ciudad/teléfono/web |
+| `operadores` | 200 | 33.255 bytes | Respuesta HTML rica con resultados |
+| `necesito arbolitos para pozos petroleros` | 200 | 17.237 bytes | Respuesta HTML rica con resultados |
+
+Los 4 con `type: conversation`, ninguno vacío, ninguno con el error original.
+
+**Clasificación final (corrección de la sección "Causa raíz" original):** el problema SÍ era
+**AUTHENTICATION** (no un OTHER genérico e indeterminado como se dejó documentado el 23/09) — la
+etapa que fallaba primero era la llamada MCP autenticada desde n8n hacia el Worker, exactamente
+donde el diagnóstico original ya sospechaba mirar (sección 4 del pedido original: "Phase A
+previously observed a DEBUG_TOKEN propagation race" — la hipótesis correcta, aplicada al
+`MCP_TOKEN`, en un consumidor que no se había detectado a tiempo).
+
+## Database before/after (post-fix)
+
+Sin cambios — esta corrección fue 100% credenciales/infraestructura (Worker secret + credencial de
+n8n), cero escritura de taxonomía:
+
+```
+taxonomy_term_cpv_relations:       9749 → 9749
+taxonomy_canonical_concepts:         79 →   79
+taxonomy_term_concepts:             142 →  142
+taxonomy_concept_relations:           0 →    0
+taxonomy_candidate_concept_links:     0 →    0
+```
+
+## Seguimiento de seguridad
+
+- [ ] La clave SSH dedicada `n8n_vmi2945958_ed25519` queda como acceso permanente a
+  `vmi2945958.contaboserver.net` (mismo patrón que la del otro VPS) — decidir si se documenta como
+  acceso estándar del proyecto o se revoca si no se prevé más trabajo sobre ese servidor.
+- [x] `MCP_TOKEN` nuevo confirmado sincronizado en ambos consumidores conocidos (Worker + n8n) — no
+  se detectó ningún otro consumidor activo en esta ronda tampoco, pero la lección de esta incidencia
+  es que "no se detectó" no es lo mismo que "no existe": cualquier rotación futura de `MCP_TOKEN`/
+  `DEBUG_TOKEN` debe incluir una prueba explícita contra el workflow de n8n, no solo contra
+  `/debug-search`/`/mcp` directo.
