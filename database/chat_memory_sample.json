@@ -1,0 +1,402 @@
+﻿[
+    {
+        "id":  "5",
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784",
+        "role":  "user",
+        "created_at":  "2026-03-25 11:06:44.41637+00",
+        "msg_type":  "human",
+        "content":  "vinccler\\n\\n[PREBUILT_WHERE: ]\\n[NEEDS_CLARIFICATION: false]\\n[QUERY_INTENT: UNKNOWN]\\n[PAGE: 1]"
+    },
+    {
+        "id":  "244",
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784",
+        "role":  "user",
+        "created_at":  "2026-03-26 08:34:24.106103+00",
+        "msg_type":  "ai",
+        "content":  "[INTENT:LIST] [{\"name\":\"EHCOPEK S.A.\",\"Sector\":\"CONSTRUCCIÓN, SERVICIOS ASOCIADOS, SUPLIDORES\",\"state\":\"ZULIA\",\"CIUDAD\":\"MARACAIBO, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"02617593436\",\"rif\":\"J070285508\",\"street\":\"CALLE 77 (5 DE JULIO) CON AV 17 (BARALT), EDIFICIO SAN LUIS, PISO 4\",\"website\":\"www.ehcopek.com.ve\"},{\"name\":\"EVERGREEN SERVICE, C.A.\",\"Sector\":\"SERVICIOS A POZOS, SERVICIOS ASOCIADOS, SERVICIOS TECNOLÓGICOS, SUPLIDORES\",\"state\":\"ANZOATEGUI\",\"CIUDAD\":\"ANACO, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"+58.282.400.7000\",\"rif\":\"J-301692349\",\"street\":\"AV JOSE ANTONIO ANZOATEGUI KM 97 SECTOR CARRETERA NEGRA ANACO ANZOATEGUI ZONA POSTAL 6003\",\"website\":\"evergreenservice.net\"},{\"name\":\"COSTA NORTE CONSTRUCCIONES, C.A.\",\"Sector\":\"CONSTRUCCIÓN, INGENIERÍA Y SERVICIOS INTEGRADOS, OPERADORES, SERVICIOS A POZOS, SERVICIOS ASOCIADOS\",\"state\":\"ZULIA\",\"CIUDAD\":\"MARACAIBO, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"+582617610287\",\"rif\":\"J-070056002\",\"street\":\"AVENIDA 24 N 65-81\",\"website\":\"www.costa-norte.com\"},{\"name\":\"OEG INTERNACIONAL SERVICE, C.A.\",\"Sector\":\"CONSTRUCCIÓN, INGENIERÍA Y SERVICIOS INTEGRADOS, OPERADORES, SERVICIOS ASOCIADOS, SUPLIDORES\",\"state\":\"DISTRITO CAPITAL\",\"CIUDAD\":\"CARACAS, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"02122328914\",\"rif\":\"J-310301174\",\"street\":\"CALLE TIUNA EDF. WILSON ATHLETIS PISO 1 OFIC. 11, URB. BOLEITA NORTE CARACAS\",\"website\":\"www.oeginternacionalvz.wixsite\"},{\"name\":\"INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)\",\"Sector\":\"INGENIERÍA Y SERVICIOS INTEGRADOS, OPERADORES, SERVICIOS ASOCIADOS, SUPLIDORES\",\"state\":\"DISTRITO CAPITAL\",\"CIUDAD\":\"CARACAS, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"02129938062\",\"rif\":\"J-400964849\",\"street\":\"AV. LA GUAIRITA, EDIF. CENTRO PROFESIONAL EUROBUILDING, PISO 3, OFICINA 3F Y 3G. URB. CHUAO. CARACAS\",\"website\":\"www.ioedco.com\"},{\"name\":\"HOLANDA VENEZUELA C.A.\",\"Sector\":\"FABRICANTES, INGENIERÍA Y SERVICIOS INTEGRADOS, SERVICIOS ASOCIADOS, SERVICIOS TECNOLÓGICOS\",\"state\":\"CARABOBO\",\"CIUDAD\":\"VALENCIA, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"0241-2007200\",\"rif\":\"J000654816\",\"street\":\"ZONA INDUSTRIAL CARABOBO, 8VA. TRANSVERSAL, PARCELA 15-A Y 15-B, VALENCIA-EDO. CARABOBO\",\"website\":null},{\"name\":\"CLOVER INTERNACIONAL, C.A.\",\"Sector\":\"SERVICIOS ASOCIADOS\",\"state\":\"CARABOBO\",\"CIUDAD\":\"VALENCIA, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"02128191100\",\"rif\":\"J-000420009\",\"street\":\"AV HENRY FORD, PARCELA NRO. B-2, ZONA URBANIZACIÓN INDUSTRIAL LA CARACARITA, LOS GUAYOS, CARABOBO\",\"website\":\"www.cloverve.com/\"},{\"name\":\"CORPORACION SHIBARI, C.A\",\"Sector\":\"CONSTRUCCIÓN, SERVICIOS A POZOS, SERVICIOS ASOCIADOS, SUPLIDORES\",\"state\":\"ANZOATEGUI\",\"CIUDAD\":\"LECHERIAS, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"+(58)4148296059\",\"rif\":\"J-404284354\",\"street\":\"AV. ARISMENDI CC EMPRESARIAL OLEUS NIVEL MEZZANINA 3 OF SIGLAS TNM3-02 SECTOR EL PEÑON \",\"website\":\"www.corporacionshibari.com.ve\"},{\"name\":\"KALA\\\u0027S, C.A.\",\"Sector\":\"INGENIERÍA Y SERVICIOS INTEGRADOS, SERVICIOS ASOCIADOS, SUPLIDORES\",\"state\":\"ANZOATEGUI\",\"CIUDAD\":\"ANACO, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"+(58)04148389631\",\"rif\":\"J-314908570\",\"street\":\"CALLE LOS CEREZOS, EDIF KALA´S, FUNDO ANACO\",\"website\":\"www.kalasca.com\"},{\"name\":\"MEGA SERVICES AND SUPPLIES, C.A\",\"Sector\":\"SERVICIOS ASOCIADOS\",\"state\":\"ANZOATEGUI\",\"CIUDAD\":\"PUERTO LA CRUZ, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"04248366282\",\"rif\":\"J504420689\",\"street\":\"AV JOSE ANTONIO ANZOATEGUI EDIF TORRE 14 PISO PB APT PB A CONJUNTO RESIDENCIAL PARQUE GUARAGUAO\",\"website\":null}]\nMostrando 1-10 de 11 empresas. Escriba \u0027ver mas\u0027 para ver las siguientes 1."
+    },
+    {
+        "id":  "483",
+        "session_id":  "865b061e-2ce9-4276-b377-e240e1d44439",
+        "role":  "user",
+        "created_at":  "2026-03-30 19:21:42.218574+00",
+        "msg_type":  "tool",
+        "content":  "\"\""
+    },
+    {
+        "id":  "722",
+        "session_id":  "bb1ca9f1-d41f-4e1f-93ce-339e4dbc6d75",
+        "role":  "user",
+        "created_at":  "2026-03-31 21:55:04.704081+00",
+        "msg_type":  "ai",
+        "content":  "Calling tools: Count Tool3, Search Tool (Summary)3"
+    },
+    {
+        "id":  "961",
+        "session_id":  "865b061e-2ce9-4276-b377-e240e1d44439",
+        "role":  "user",
+        "created_at":  "2026-04-01 16:30:51.577909+00",
+        "msg_type":  "tool",
+        "content":  "[{\"name\":\"GEOHIDRA CONSULTORES, C.A.\",\"Sector\":\"CONSTRUCCIÓN, INGENIERÍA Y SERVICIOS INTEGRADOS, SERVICIOS TECNOLÓGICOS\",\"state\":\"DISTRITO CAPITAL\",\"CIUDAD\":\"CARACAS, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"0212-6937877\",\"rif\":\"J-00129497-0\",\"street\":\"CALLE RAZETTI ENTRE AV. LAS CIENCIAS Y LA FACULTAD. EDF. GEOHIDRA. LOS CHAGUARAMOS.\",\"website\":\"www.geohidra.com\"},{\"name\":\"TROIL SERVICES, C.A.\",\"Sector\":\"SERVICIOS A POZOS\",\"state\":\"DISTRITO CAPITAL\",\"CIUDAD\":\"CARACAS, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"02122670767\",\"rif\":\"J-308904317\",\"street\":\"CARRETERA BARCELONA-EL TIGRE, DISTRIBUIDOR MIRANDA, GALPÓN TROIL, ANACO, ANZOATEGUI\",\"website\":\"www.troilservices.com\"},{\"name\":\"ADVANCED LOGGING AND EXPLORATIONS, C.A.\",\"Sector\":\"SERVICIOS A POZOS\",\"state\":\"ANZOATEGUI\",\"CIUDAD\":\"ANACO, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"02824246751\",\"rif\":\"J-306629025\",\"street\":\"AV. JOSÉ ANTONIO ANZOÁTEGUI KM 97 CAMPO OCANA EDIF. ALEX\",\"website\":\"www.alex.com.ve\"},{\"name\":\"TUBOACERO, C.A.\",\"Sector\":\"SUPLIDORES\",\"state\":\"DISTRITO CAPITAL\",\"CIUDAD\":\"CARACAS, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"+58 212 2868322\",\"rif\":\"J-085071172\",\"street\":\"AV FCO DE MIRANDA, TORRE MENE GRANDE, OFIC 902\",\"website\":\"www.tuboacero.com\"},{\"name\":\"EVERGREEN SERVICE, C.A.\",\"Sector\":\"SERVICIOS A POZOS, SERVICIOS ASOCIADOS, SERVICIOS TECNOLÓGICOS, SUPLIDORES\",\"state\":\"ANZOATEGUI\",\"CIUDAD\":\"ANACO, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"+58.282.400.7000\",\"rif\":\"J-301692349\",\"street\":\"AV JOSE ANTONIO ANZOATEGUI KM 97 SECTOR CARRETERA NEGRA ANACO ANZOATEGUI ZONA POSTAL 6003\",\"website\":\"evergreenservice.net\"},{\"name\":\"CLAM INSTALACIONES, S.A.\",\"Sector\":\"CONSTRUCCIÓN, INGENIERÍA Y SERVICIOS INTEGRADOS, SERVICIOS A POZOS, SUPLIDORES\",\"state\":\"ZULIA\",\"CIUDAD\":\"MARACAIBO, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"0412 2627869\",\"rif\":\"J-070361425\",\"street\":\"KM 6 1/2 VIA A PERIJÁ, AV. 50 #155-150, C.E. INDICA, SAN FRANCISCO, EDO. ZULIA\",\"website\":\"www.claminstalaciones.com\"},{\"name\":\"STRATA SERVICES, C.A.\",\"Sector\":\"SERVICIOS A POZOS\",\"state\":\"MONAGAS\",\"CIUDAD\":\"MATURIN, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"04143220208\",\"rif\":\"J-408897270 \",\"street\":\"CENTRO COMERCIAL PETRORIENTE, MATURIN EDO MONAGAS\",\"website\":null},{\"name\":\"ALCAVE VENEZUELA C.A.\",\"Sector\":\"FABRICANTES\",\"state\":\"CARABOBO\",\"CIUDAD\":\"VALENCIA, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"04122461649\",\"rif\":\"J-000008280\",\"street\":\"CARRETERA NACIONAL VALENCIA LOS GUAYOS EDIF PLANTA CONAL, CP 2003\",\"website\":\"www.alcave.com.ve\"},{\"name\":\"MARITIME CONTRACTORS DE VENEZUELA S.A\",\"Sector\":\"INGENIERÍA Y SERVICIOS INTEGRADOS, SERVICIOS A POZOS\",\"state\":\"ZULIA\",\"CIUDAD\":\"CIUDAD OJEDA, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"04127032721\",\"rif\":\"J313279323\",\"street\":\"MUELLE TERMINALES MARACAIBO, CIUDAD OJEDA\",\"website\":\"maritime-contractors.com/\"},{\"name\":\"LUKIVEN, S.A. \",\"Sector\":\"CONSTRUCCIÓN, FABRICANTES, SERVICIOS A POZOS, SUPLIDORES\",\"state\":\"ZULIA\",\"CIUDAD\":\"MARACAIBO, VEN - Venezuela (Bolivarian Republic of)\",\"phone\":\"582617001212\",\"rif\":\"J-070115076\",\"street\":\"CIRCUNV NO 2 EDIF LUKIVEN NO 111A 250 ZONA IND\",\"website\":\"WWW.LUKIVEN.COM\"}]"
+    },
+    {
+        "id":  "1200",
+        "session_id":  "default",
+        "role":  "user",
+        "created_at":  "2026-04-15 16:40:13.958391+00",
+        "msg_type":  "ai",
+        "content":  "Hola! Soy CIRA, asistente virtual de la Camara Petrolera de Venezuela. Puedo ayudarte a encontrar empresas afiliadas, servicios y datos de contacto. Que necesitas buscar hoy?"
+    },
+    {
+        "id":  "1439",
+        "session_id":  "865b061e-2ce9-4276-b377-e240e1d44439",
+        "role":  "user",
+        "created_at":  "2026-04-15 22:36:12.789454+00",
+        "msg_type":  "tool",
+        "content":  "[{\"total\":14}]"
+    },
+    {
+        "id":  "1678",
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+        "role":  "user",
+        "created_at":  "2026-04-16 08:21:51.323182+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\n\":\"LOWER(CIUDAD) LIKE LOWER(\u0027%maracaibo%\u0027)\",\"queryIntent\":\"CITY\",\"hasFilter\n\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresas en Maraca\nibo\"}"
+    },
+    {
+        "id":  "1917",
+        "session_id":  "865b061e-2ce9-4276-b377-e240e1d44439_intent",
+        "role":  "user",
+        "created_at":  "2026-04-16 20:25:49.125902+00",
+        "msg_type":  "human",
+        "content":  "ADQUISICIÓN PROCESAMIENTO E INTERPRETACIÓN DE DATOS"
+    },
+    {
+        "id":  "2156",
+        "session_id":  "f9804225-54b6-4f51-9ed4-1c48b87d999f",
+        "role":  "user",
+        "created_at":  "2026-04-20 13:19:49.281453+00",
+        "msg_type":  "ai",
+        "content":  "Calling Search_Tool_Summary_3 with input: {\"page\":1,\"where_clause\":\"(Sector LIKE \u0027%OPERADOR%\u0027)\"}"
+    },
+    {
+        "id":  "2395",
+        "session_id":  "865b061e-2ce9-4276-b377-e240e1d44439_intent",
+        "role":  "user",
+        "created_at":  "2026-04-22 23:34:42.589376+00",
+        "msg_type":  "human",
+        "content":  "Remediación Ambiental"
+    },
+    {
+        "id":  "2634",
+        "session_id":  "865b061e-2ce9-4276-b377-e240e1d44439_intent",
+        "role":  "user",
+        "created_at":  "2026-04-23 22:44:54.607061+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(Servicios) LIKE LOWER(\u0027%empacaduras y sellos%\u0027)\",\"queryIntent\":\"SERVICE\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresas con servicio de Empacaduras y Sellos\"}"
+    },
+    {
+        "id":  "2873",
+        "session_id":  "e4f1547c-c7ec-47e1-99b8-ea1d4c2c2e6d_intent",
+        "role":  "user",
+        "created_at":  "2026-04-24 14:52:41.817424+00",
+        "msg_type":  "human",
+        "content":  "Quimainca"
+    },
+    {
+        "id":  "3112",
+        "session_id":  "d46c0ff3-2d5d-4309-bf6c-23d2cdeecbbf_intent",
+        "role":  "user",
+        "created_at":  "2026-04-27 15:05:43.190198+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(Servicios) LIKE LOWER(\u0027%sistemas y telecomunicaciones%\u0027)\",\"queryIntent\":\"SERVICE\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresas con servicio de Sistemas y Telecomunicaciones\"}"
+    },
+    {
+        "id":  "3351",
+        "session_id":  "3f4701ac-e5da-4b39-84ba-a5cf2a6904b5_intent",
+        "role":  "user",
+        "created_at":  "2026-05-06 17:23:15.74261+00",
+        "msg_type":  "human",
+        "content":  "dame información sobre la empresa GAS TOTAL SOLUTIONS, C.A"
+    },
+    {
+        "id":  "3590",
+        "session_id":  "c55d02f6-6d5e-4671-8b6d-65eacd273c14_intent",
+        "role":  "user",
+        "created_at":  "2026-05-07 13:31:01.117553+00",
+        "msg_type":  "ai",
+        "content":  "Sí, puedo proporcionarte el teléfono y el sitio web de las empresas, si están disponibles en nuestra base de datos."
+    },
+    {
+        "id":  "3829",
+        "session_id":  "ca798f61-c0b6-46fa-bfca-c6e339bc9d18_intent",
+        "role":  "user",
+        "created_at":  "2026-05-11 21:25:45.77338+00",
+        "msg_type":  "human",
+        "content":  "dame información sobre la empresa SCAN GEOFÍSICA, C.A."
+    },
+    {
+        "id":  "4068",
+        "session_id":  "3b5ad17a-06f8-4143-9396-01d5d74ded37_intent",
+        "role":  "user",
+        "created_at":  "2026-05-12 17:20:45.468716+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%interamericana de cables venezuela, s.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa INTERAMERICANA DE CABLES VENEZUELA, S.A.\"}"
+    },
+    {
+        "id":  "4307",
+        "session_id":  "d471e3c8-3995-4ec6-8920-c5dc8a5e6884_intent",
+        "role":  "user",
+        "created_at":  "2026-05-13 17:54:03.53497+00",
+        "msg_type":  "human",
+        "content":  "dame información sobre la empresa GREEN PARK CONSTRUCTION, C.A."
+    },
+    {
+        "id":  "4546",
+        "session_id":  "d471e3c8-3995-4ec6-8920-c5dc8a5e6884_intent",
+        "role":  "user",
+        "created_at":  "2026-05-19 12:52:43.569045+00",
+        "msg_type":  "ai",
+        "content":  "No puedo listar todas las ciudades donde hay empresas registradas. Sin embargo, puedo buscar empresas en una ciudad específica si me indicas cuál."
+    },
+    {
+        "id":  "4785",
+        "session_id":  "80876202-43ab-4b74-95e5-1adbc3a85df2_intent",
+        "role":  "user",
+        "created_at":  "2026-05-25 15:22:06.754112+00",
+        "msg_type":  "human",
+        "content":  "cuales son las empresas aliadas y/o inscritas a la camara"
+    },
+    {
+        "id":  "5024",
+        "session_id":  "5e1b414e-f6e3-4210-8cfa-997d04bce227_intent",
+        "role":  "user",
+        "created_at":  "2026-05-27 14:15:53.954773+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%asex%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresas con el nombre Asex\"}"
+    },
+    {
+        "id":  "5263",
+        "session_id":  "8aa17810-d59b-44f0-961a-e55356e95032_intent",
+        "role":  "user",
+        "created_at":  "2026-06-02 13:05:59.421741+00",
+        "msg_type":  "human",
+        "content":  "actual presidente de la camara"
+    },
+    {
+        "id":  "5502",
+        "session_id":  "aa53ba50-f508-48c5-a4f8-e968329825b3_intent",
+        "role":  "user",
+        "created_at":  "2026-06-09 01:46:08.983166+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%promotores de ingenieria proyectos y construcciones, c.a. (p.a.p. construcciones c.a.)%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)\"}"
+    },
+    {
+        "id":  "5741",
+        "session_id":  "d50dc1e2-3301-431a-9607-c4e71fc49b5e_intent",
+        "role":  "user",
+        "created_at":  "2026-06-11 01:51:45.150096+00",
+        "msg_type":  "human",
+        "content":  "dame información sobre la empresa SUMINISTROS OBRAS Y SISTEMAS, C.A."
+    },
+    {
+        "id":  "5981",
+        "session_id":  "11c6d93a-7a9f-4274-b300-2d02e5fa2469_intent",
+        "role":  "user",
+        "created_at":  "2026-06-12 12:21:27.496185+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%venezolana de inversiones y construcciones clérico, c.a.vinccle%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa Venezolana de Inversiones y Construcciones Clérico, C.A. VINCCLER\"}"
+    },
+    {
+        "id":  "6220",
+        "session_id":  "a61d1048-3fa9-47dd-83e5-f5e37a6526bd_intent",
+        "role":  "user",
+        "created_at":  "2026-06-17 12:57:09.888969+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%dayco telecom, c. a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa DAYCO TELECOM, C. A.\"}"
+    },
+    {
+        "id":  "6459",
+        "session_id":  "3ab89965-3ae5-4620-b8df-dda215937cdf_intent",
+        "role":  "user",
+        "created_at":  "2026-06-23 18:58:37.609218+00",
+        "msg_type":  "human",
+        "content":  "mantenimiento de calentadores"
+    },
+    {
+        "id":  "6698",
+        "session_id":  "6e6a8ca0-f307-4679-a378-9d3f8574cd75_intent",
+        "role":  "user",
+        "created_at":  "2026-06-24 12:58:31.321754+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%constructora b\u0026p, c.a%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre CONSTRUCTORA B\u0026P, C.A\"}"
+    },
+    {
+        "id":  "6937",
+        "session_id":  "f509e6a0-e520-4eb1-b4df-5c5d42cbe5d5_intent",
+        "role":  "user",
+        "created_at":  "2026-07-13 14:54:32.718644+00",
+        "msg_type":  "human",
+        "content":  "Completacion de pozos"
+    },
+    {
+        "id":  "7176",
+        "session_id":  "a5f759e2-0573-454c-9592-509a7228ded3_intent",
+        "role":  "user",
+        "created_at":  "2026-07-22 22:37:57.589857+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%evergreen service, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa EVERGREEN SERVICE, C.A.\"}"
+    },
+    {
+        "id":  "7415",
+        "session_id":  "a5f759e2-0573-454c-9592-509a7228ded3_intent",
+        "role":  "user",
+        "created_at":  "2026-07-24 23:14:00.319505+00",
+        "msg_type":  "human",
+        "content":  "dame información sobre la empresa COUTTENYE \u0026 CO, S.A."
+    },
+    {
+        "id":  "7654",
+        "session_id":  "d3a14d95-4f7d-4bb8-993d-0df762444ed3_intent",
+        "role":  "user",
+        "created_at":  "2026-07-29 15:29:48.229551+00",
+        "msg_type":  "ai",
+        "content":  "Debe limitar su busqueda como se indica en el instructivo de uso"
+    },
+    {
+        "id":  "7893",
+        "session_id":  "508d6788-0650-4efe-99df-633c78d3dd02_intent",
+        "role":  "user",
+        "created_at":  "2026-08-05 19:21:42.208527+00",
+        "msg_type":  "human",
+        "content":  "ANDAMIOS"
+    },
+    {
+        "id":  "8132",
+        "session_id":  "5612dae3-22cf-4a37-8b41-33f98c3ec607_intent",
+        "role":  "user",
+        "created_at":  "2026-08-09 19:54:16.41066+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%cvcon%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"CVCON, C.A. (CEVCONCA)\"}"
+    },
+    {
+        "id":  "8371",
+        "session_id":  "cc91379f-ae77-4bbe-a612-bdb50e779c85_intent",
+        "role":  "user",
+        "created_at":  "2026-08-11 18:34:43.971386+00",
+        "msg_type":  "human",
+        "content":  "dame información sobre la empresa MEGA SERVICES AND SUPPLIES, C.A"
+    },
+    {
+        "id":  "8610",
+        "session_id":  "a9c8a3ac-1517-4b33-8d3e-88d6a54fbca7_intent",
+        "role":  "user",
+        "created_at":  "2026-08-15 23:09:31.254748+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%lukiven%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"LUKIVEN, S.A.\"}"
+    },
+    {
+        "id":  "8849",
+        "session_id":  "245f5433-0c87-4dde-bd43-7af63bf13873_intent",
+        "role":  "user",
+        "created_at":  "2026-08-24 15:09:30.345966+00",
+        "msg_type":  "human",
+        "content":  "SOMANIN, C.A. es afiliado de la CPV?"
+    },
+    {
+        "id":  "9088",
+        "session_id":  "76770286-022f-44c3-b007-39fca88853fb_intent",
+        "role":  "user",
+        "created_at":  "2026-08-25 18:10:44.616531+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%shibari%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"CORPORACION SHIBARI, C.A\"}"
+    },
+    {
+        "id":  "9327",
+        "session_id":  "c8cc2375-a229-46a6-a17d-c9881201b276_intent",
+        "role":  "user",
+        "created_at":  "2026-08-26 20:52:05.662799+00",
+        "msg_type":  "human",
+        "content":  "dame información sobre la empresa FERVENCA, C.A."
+    },
+    {
+        "id":  "9566",
+        "session_id":  "44d29ea8-a195-44f5-b6e9-977494a1c51f_intent",
+        "role":  "user",
+        "created_at":  "2026-09-02 17:24:22.842786+00",
+        "msg_type":  "ai",
+        "content":  "Los temas relacionados con la afiliación (como los costos de inscripción, cuotas bimestrales, requisitos y beneficios) los gestiona directamente la Cámara Petrolera de Venezuela. \\n\\nPuedes comunicarte con ellos a través de los siguientes datos de contacto:\\n* **Sitio web:** https://camarapetrolera.org/\\n* **Correo:** perfilafiliados@camarapetrolera.org\\n* **Teléfono:** +58 212 7941222"
+    },
+    {
+        "id":  "9805",
+        "session_id":  "32a264d6-4173-4dc1-8669-efa57e565989_intent",
+        "role":  "user",
+        "created_at":  "2026-09-09 16:47:07.727539+00",
+        "msg_type":  "human",
+        "content":  "necesito el nombre de las empresas alquiladoras de andamios"
+    },
+    {
+        "id":  "10044",
+        "session_id":  "ddd8665e-7c2d-46c5-a19d-c34c962b4e52_intent",
+        "role":  "user",
+        "created_at":  "2026-09-10 17:41:52.043822+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(CIUDAD) LIKE LOWER(\u0027%ciudad ojeda%\u0027) AND (LOWER(Sector) LIKE LOWER(\u0027%servicios%\u0027) OR LOWER(Servicios) LIKE LOWER(\u0027%servicios%\u0027) OR LOWER(name) LIKE LOWER(\u0027%servicios%\u0027))\",\"queryIntent\":\"MIXED\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresas con servicios en Ciudad Ojeda\"}"
+    },
+    {
+        "id":  "10283",
+        "session_id":  "test-71ef3c6b-1381-4904-a1bf-ecf809e7b526_intent",
+        "role":  "user",
+        "created_at":  "2026-09-11 17:29:27.01581+00",
+        "msg_type":  "human",
+        "content":  "dame información sobre la empresa EVERGREEN SERVICE, C.A."
+    },
+    {
+        "id":  "10522",
+        "session_id":  "test-limit-fix-1_intent",
+        "role":  "user",
+        "created_at":  "2026-09-16 07:16:15.301764+00",
+        "msg_type":  "ai",
+        "content":  "{\"tool\":\"search_empresas\",\"params\":{\"query\":\"construccion\"},\"queryIntent\":\"SECTOR\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresas del sector Construcción\"}"
+    },
+    {
+        "id":  "10761",
+        "session_id":  "test-ff472adf-7f95-4bcb-b30f-6492702e2f31_intent",
+        "role":  "user",
+        "created_at":  "2026-09-16 21:50:22.521324+00",
+        "msg_type":  "human",
+        "content":  "vacum"
+    },
+    {
+        "id":  "11000",
+        "session_id":  "98501cfd-fb25-4bc3-bd06-8deab0fa0097_intent",
+        "role":  "user",
+        "created_at":  "2026-09-17 18:45:39.511741+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%roff oilfield%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"ROFF OILFIELD SERVICES C A (ROFFCO)\"}"
+    },
+    {
+        "id":  "11239",
+        "session_id":  "taxv3-test-after-1789759499-12_intent",
+        "role":  "user",
+        "created_at":  "2026-09-18 19:25:06.396907+00",
+        "msg_type":  "human",
+        "content":  "arbolito"
+    },
+    {
+        "id":  "11478",
+        "session_id":  "cf4892bb-9622-4a44-8db5-955c50c7ae4a_intent",
+        "role":  "user",
+        "created_at":  "2026-09-21 22:41:11.195416+00",
+        "msg_type":  "ai",
+        "content":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%coatings de oriente%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"COATINGS DE ORIENTE C A\"}"
+    },
+    {
+        "id":  "11717",
+        "session_id":  "cf4892bb-9622-4a44-8db5-955c50c7ae4a_intent",
+        "role":  "user",
+        "created_at":  "2026-09-21 23:15:53.31293+00",
+        "msg_type":  "human",
+        "content":  "dame información sobre la empresa ROWART LOGISTICS, S.A."
+    }
+]

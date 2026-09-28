@@ -1,0 +1,132 @@
+﻿{
+    "generated_at":  "2026-09-28 12:25:31",
+    "total_failures":  536,
+    "by_category":  [
+                        {
+                            "category":  "TRUNCATED_OR_NOT_JSON",
+                            "count":  526
+                        },
+                        {
+                            "category":  "OTHER",
+                            "count":  5
+                        },
+                        {
+                            "category":  "MARKDOWN_FENCED_JSON",
+                            "count":  5
+                        }
+                    ],
+    "examples":  {
+                     "TRUNCATED_OR_NOT_JSON":  [
+                                                   {
+                                                       "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+                                                       "created_at":  "2026-04-16 07:20:20.315493+00",
+                                                       "query":  "que puedes hacer?",
+                                                       "raw_ai_content_snippet":  "Hola! Soy el asistente de búsqueda de CIRA. Puedo ayudarte a encontrar empresas afiliadas en nuestra base de\\n datos. \\n\\nPuedes buscarme por:\\n- **Sector** (ej. Construcción, Servicios Tecnológicos,\\n etc.)\\n- **Ciudad** (ej. Maracaibo, Caracas, Valencia)\\n- **Nombre de la\\n empresa**\\n- **RIF**\\n\\n¿Qué sector, servicio o empresa estás buscando hoy?",
+                                                       "full_length":  352
+                                                   },
+                                                   {
+                                                       "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+                                                       "created_at":  "2026-04-16 07:30:20.924708+00",
+                                                       "query":  "que puedes hacer?",
+                                                       "raw_ai_content_snippet":  "Hola! Soy el asistente de búsqueda de CIRA. Puedo\\n ayudarte a encontrar empresas afiliadas en nuestra base de datos.\\n\\nPuedes buscar empresas por:\\n- **Sector** (\\nej. Construcción, Servicios Tecnológicos, Servicios a Pozos, etc.)\\n- **Ciudad** (ej.\\n Maracaibo, Caracas, Valencia, Barcelona)\\n- **Nombre de la empresa**\\n- **RIF**\\n\\n\\n¿Qué sector, servicio o empresa estás buscando hoy?",
+                                                       "full_length":  390
+                                                   },
+                                                   {
+                                                       "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+                                                       "created_at":  "2026-04-16 07:40:18.201641+00",
+                                                       "query":  "que puedes hacer?",
+                                                       "raw_ai_content_snippet":  "¡Hola! Soy el asistente de búsqueda de C\\nIRA. Puedo ayudarte a encontrar empresas afiliadas en nuestra base de datos.\\n\\nPuedes buscar por:\\n- **\\nSector** (ej. Construcción, Servicios Tecnológicos, Servicios a Pozos, etc.)\\n- **Ciudad**\\n (ej. Maracaibo, Caracas, Valencia)\\n- **Nombre de la empresa**\\n- **RIF\\n**\\n\\n¿Qué sector, servicio, empresa o ciudad estás buscando?",
+                                                       "full_length":  375
+                                                   },
+                                                   {
+                                                       "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+                                                       "created_at":  "2026-04-16 07:54:40.144058+00",
+                                                       "query":  "que puedes hacer?",
+                                                       "raw_ai_content_snippet":  "¡Hola! Soy el Asistente de Búsqueda de CIRA. Puedo ayudarte\\n a encontrar empresas afiliadas en nuestra base de datos.\\n\\nPuedes buscar por:\\n- **Sector** (ej.\\n Construcción, Servicios Tecnológicos, Servicios a Pozos, etc.)\\n- **Ciudad** (ej. Maraca\\nibo, Caracas, Valencia)\\n- **Nombre de la empresa**\\n- **RIF**\\n\\n¿Qué sector\\n, servicio, empresa o ciudad estás buscando?",
+                                                       "full_length":  375
+                                                   },
+                                                   {
+                                                       "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+                                                       "created_at":  "2026-04-16 09:24:10.619024+00",
+                                                       "query":  "que puedes hacer?",
+                                                       "raw_ai_content_snippet":  "¡Hola! Soy el asistente de CIRA. Puedo ayudarte a encontrar empresas afiliadas en nuestra base de datos. Puedes buscar por:\n\n*   **Sector:** Por ejemplo, \"empresas de construcción\" o \"operadores\".\n*   **Servicio:** Como \"perforación\" o \"cementación\".\n*   **Ciudad:** Por ejemplo, \"empresas en Maracaibo\".\n*   **Nombre de la empresa:** Si conoces el nombre de una empresa.\n*   **RIF:** Si tienes el número de RIF de la empresa.\n\n¿Qué tipo de empresa o servicio estás buscando hoy?",
+                                                       "full_length":  479
+                                                   }
+                                               ],
+                     "MARKDOWN_FENCED_JSON":  [
+                                                  {
+                                                      "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+                                                      "created_at":  "2026-04-16 06:37:50.686213+00",
+                                                      "query":  "dime que empresas son de maracaibo?",
+                                                      "raw_ai_content_snippet":  "```json\n\n{\n  \"whereClause\": \"LOWER(CIUDAD) LIKE LOWER(\u0027%maracaibo%\u0027)\",\n\n  \"queryIntent\": \"CITY\",\n  \"hasFilter\": true,\n  \"needsClarification\": false\n,\n  \"isSearchReady\": true,\n  \"humanSummary\": \"Empresas en Maracaibo\n\"\n}\n```",
+                                                      "full_length":  223
+                                                  },
+                                                  {
+                                                      "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+                                                      "created_at":  "2026-04-16 07:17:51.82408+00",
+                                                      "query":  "dime que empresas son de maracaibo?",
+                                                      "raw_ai_content_snippet":  "```json\n{\n  \"whereClause\": \"LOWER(\nCIUDAD) LIKE LOWER(\u0027%maracaibo%\u0027)\",\n  \"queryIntent\": \"CITY\",\n  \"\nhasFilter\": true,\n  \"needsClarification\": false,\n  \"isSearchReady\": true,\n\n  \"humanSummary\": \"Empresas en Maracaibo\"\n}\n```",
+                                                      "full_length":  222
+                                                  },
+                                                  {
+                                                      "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+                                                      "created_at":  "2026-04-16 07:20:55.704036+00",
+                                                      "query":  "servicios tecnologicos",
+                                                      "raw_ai_content_snippet":  "```json\n{\n  \"whereClause\": \"Sector = \u0027SERVICIOS TECNOLÓG\nICOS\u0027\",\n  \"queryIntent\": \"SECTOR\",\n  \"hasFilter\": true,\n  \"needs\nClarification\": false,\n  \"isSearchReady\": true,\n  \"humanSummary\": \"Empresas\n de Servicios Tecnológicos\"\n}\n```",
+                                                      "full_length":  231
+                                                  },
+                                                  {
+                                                      "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+                                                      "created_at":  "2026-04-16 07:29:23.145373+00",
+                                                      "query":  "dime que empresas son de maracaibo?",
+                                                      "raw_ai_content_snippet":  "```json\n{\n  \"whereClause\": \"\nLOWER(CIUDAD) LIKE LOWER(\u0027%maracaibo%\u0027)\",\n  \"queryIntent\": \"CITY\",\n\n  \"hasFilter\": true,\n  \"needsClarification\": false,\n  \"isSearchReady\":\n true,\n  \"humanSummary\": \"Empresas en Maracaibo\"\n}\n```",
+                                                      "full_length":  222
+                                                  },
+                                                  {
+                                                      "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+                                                      "created_at":  "2026-04-16 07:30:49.587037+00",
+                                                      "query":  "ok que empresas estan en el sector construccion?",
+                                                      "raw_ai_content_snippet":  "```json\n{\n  \"whereClause\n\": \"Sector = \u0027CONSTRUCCIÓN\u0027\",\n  \"queryIntent\": \"SECTOR\",\n  \"hasFilter\n\": true,\n  \"needsClarification\": false,\n  \"isSearchReady\": true,\n  \"\nhumanSummary\": \"Empresas del sector Construcción\"\n}\n```",
+                                                      "full_length":  219
+                                                  }
+                                              ],
+                     "OTHER":  [
+                                   {
+                                       "session_id":  "d471e3c8-3995-4ec6-8920-c5dc8a5e6884_intent",
+                                       "created_at":  "2026-05-13 12:26:48.627717+00",
+                                       "query":  "buenos días que tal todo bien? hoy por favor me vas a dar una lista de todas las empresas con mayor importancia y que estén activas funcionando con algún requerimiento de conductores eléctrico",
+                                       "raw_ai_content_snippet":  "¡Buenos días! Espero que todo esté muy bien.\n\nSobre tu solicitud, puedo buscar empresas que ofrezcan servicios o pertenezcan a sectores relacionados con \"conductores eléctricos\". He encontrado los siguientes servicios que podrían ser de tu interés: \"MAQUINARIAS Y EQUIPOS PARA ELECTRICIDAD\", \"MONTAJE MECÁNICO DE EQUIPOS DE ELECTRICIDAD\" y \"TENDIDO LÍNEAS DE ALTA TENSIÓN\".\n\nSin embargo, no puedo filtrar por \"mayor importancia\" o si están \"activas funcionando\", ya que esa información no está disponible en mi base de datos.\n\nA continuación, te proporciono la consulta para las empresas que cumplen ",
+                                       "full_length":  958
+                                   },
+                                   {
+                                       "session_id":  "a5f759e2-0573-454c-9592-509a7228ded3_intent",
+                                       "created_at":  "2026-07-24 23:13:15.24631+00",
+                                       "query":  "dame información sobre la empresa SERVICIOS INDUSTRIALES DE ELECTRICIDAD, C.A.",
+                                       "raw_ai_content_snippet":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%gente generación de tecnología, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa GENTE GENERACIÓN DE TECNOLOGÍA, C.A.\"}\n{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%servicios industriales de electricidad, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa SERVICIOS INDUSTRIALES DE ELECTRICIDAD, C.A.\"}",
+                                       "full_length":  525
+                                   },
+                                   {
+                                       "session_id":  "a5f759e2-0573-454c-9592-509a7228ded3_intent",
+                                       "created_at":  "2026-07-24 23:13:16.764065+00",
+                                       "query":  "dame información sobre la empresa RG, C.A.",
+                                       "raw_ai_content_snippet":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%oterca maquinarias, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa OTERCA MAQUINARIAS, C.A.\"}\n{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%rg, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa RG, C.A.\"}",
+                                       "full_length":  429
+                                   },
+                                   {
+                                       "session_id":  "a5f759e2-0573-454c-9592-509a7228ded3_intent",
+                                       "created_at":  "2026-07-24 23:13:19.332959+00",
+                                       "query":  "dame información sobre la empresa C.A. VENEZOLANA DE PINTURAS",
+                                       "raw_ai_content_snippet":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%oxicorte de venezuela, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa OXICORTE DE VENEZUELA, C.A.\"}\n{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%c.a. venezolana de pinturas%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa C.A. VENEZOLANA DE PINTURAS\"}",
+                                       "full_length":  473
+                                   },
+                                   {
+                                       "session_id":  "a3b6853a-c8d4-4e20-afb0-c011027697a9_intent",
+                                       "created_at":  "2026-09-11 03:56:29.239696+00",
+                                       "query":  "logging",
+                                       "raw_ai_content_snippet":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%logging%\u0027) OR LOWER(Servicios) LIKE LOWER(\u0027%logging%\u0027) OR LOWER(Sector) LIKE LOWER(\u0027%logging%\u0027)\",\"queryIntent\":\"SERVICE\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresas relacionadas con logging / registros\"/* */}",
+                                       "full_length":  295
+                                   }
+                               ]
+                 },
+    "notes":  "Clasificacion heuristica de los pares intent cuyo JSON de respuesta del modelo no pudo parsearse ni tras reintentos (fix de saltos de linea literales + colapso de backslash doble). Categorias: MARKDOWN_FENCED_JSON (el modelo envolvio la respuesta en un bloque de codigo con formato bonito en vez de una linea compacta), DOUBLE_ESCAPED_BACKSLASH (patron de doble backslash que indica doble serializacion JSON), TRUNCATED_OR_NOT_JSON (no termina en llave o corchete de cierre, probablemente cortado o no es JSON), EMPTY, OTHER (no cayo en ninguna de las anteriores, revisar a mano)."
+}

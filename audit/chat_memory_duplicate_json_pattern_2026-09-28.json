@@ -1,0 +1,40 @@
+﻿{
+    "generated_at":  "2026-09-28 12:50:26",
+    "total_hits":  3,
+    "distinct_sessions_affected":  3,
+    "by_session":  {
+                       "session_id":  "a5f759e2-0573-454c-9592-509a7228ded3_intent",
+                       "count":  3
+                   },
+    "seconds_since_last_human_msg_stats":  {
+                                               "count":  3,
+                                               "min":  0,
+                                               "max":  0,
+                                               "avg":  0,
+                                               "under_5s_count":  3
+                                           },
+    "all_hits":  [
+                     {
+                         "session_id":  "a5f759e2-0573-454c-9592-509a7228ded3_intent",
+                         "created_at":  "2026-07-24 23:13:15.273359+00",
+                         "seconds_since_last_human_msg":  0,
+                         "json_object_count_estimate":  2,
+                         "content_snippet":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%gente generación de tecnología, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa GENTE GENERACIÓN DE TECNOLOGÍA, C.A.\"}\n{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%servicios industriales de electricidad, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa SERVICIOS INDUSTRIALES DE ELECTRICIDAD, C.A.\"}"
+                     },
+                     {
+                         "session_id":  "a5f759e2-0573-454c-9592-509a7228ded3_intent",
+                         "created_at":  "2026-07-24 23:13:16.791485+00",
+                         "seconds_since_last_human_msg":  0,
+                         "json_object_count_estimate":  2,
+                         "content_snippet":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%oterca maquinarias, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa OTERCA MAQUINARIAS, C.A.\"}\n{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%rg, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa RG, C.A.\"}"
+                     },
+                     {
+                         "session_id":  "a5f759e2-0573-454c-9592-509a7228ded3_intent",
+                         "created_at":  "2026-07-24 23:13:19.361378+00",
+                         "seconds_since_last_human_msg":  0,
+                         "json_object_count_estimate":  2,
+                         "content_snippet":  "{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%oxicorte de venezuela, c.a.%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa OXICORTE DE VENEZUELA, C.A.\"}\n{\"whereClause\":\"LOWER(name) LIKE LOWER(\u0027%c.a. venezolana de pinturas%\u0027)\",\"queryIntent\":\"COMPANY\",\"hasFilter\":true,\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Información sobre la empresa C.A. VENEZOLANA DE PINTURAS\"}"
+                     }
+                 ],
+    "notes":  "Detecta respuestas ai en sesiones *_intent donde el contenido tiene dos o mas objetos JSON pegados (patron cierre-llave + salto de linea + apertura-llave). seconds_since_last_human_msg es el tiempo entre el turno human anterior en la misma sesion y esta respuesta ai; valores bajos apoyan la hipotesis de que preguntas muy seguidas en el tiempo generan mezcla/arrastre de contexto entre turnos."
+}

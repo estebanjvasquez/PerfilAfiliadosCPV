@@ -1,0 +1,409 @@
+{
+    "summary": {
+        "total_cases_with_whereClause": 27,
+        "raw_ok": 4,
+        "raw_error": 23,
+        "patched_ok": 23,
+        "patched_error": 4,
+        "patched_ok_with_results": 16
+    },
+    "cases": [
+        {
+            "query": "dime empresas del serctor construccion",
+            "queryIntent": "\nSECTOR",
+            "whereClause": "Sector = 'CONSTRUCCIÓN'",
+            "humanSummary": "Emp\nresas del sector Construcción",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"sector\" does not exist\nLINE 1: ...w\" ON \"catalogoView\".id = \"capacityView\".id WHERE Sector = '...\n                                                 ",
+            "whereClause_patched": "\"capacityView\".\"Sector\" = 'CONSTRUCCIÓN'",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+                "FABRICA DE PRODUCTOS IMPERMEABILIZANTES EDIL C.A (EDIL, C.A.)",
+                "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+                "CONSTRUCCIONES MONSERCA S.A.",
+                "CONSTRUCTORA NASE, C.A."
+            ]
+        },
+        {
+            "query": "dime empresas del serctor construccion",
+            "queryIntent": "\nSECTOR",
+            "whereClause": "Sector = 'CONSTRUCCIÓN'",
+            "humanSummary": "Emp\nresas del sector Construcción",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"sector\" does not exist\nLINE 1: ...w\" ON \"catalogoView\".id = \"capacityView\".id WHERE Sector = '...\n                                                 ",
+            "whereClause_patched": "\"capacityView\".\"Sector\" = 'CONSTRUCCIÓN'",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+                "FABRICA DE PRODUCTOS IMPERMEABILIZANTES EDIL C.A (EDIL, C.A.)",
+                "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+                "CONSTRUCCIONES MONSERCA S.A.",
+                "CONSTRUCTORA NASE, C.A."
+            ]
+        },
+        {
+            "query": "contruccion",
+            "queryIntent": "SECTOR",
+            "whereClause": "Sector = 'CONSTRUCCIÓN'",
+            "humanSummary": "Empresas del sector Construcción\n",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"sector\" does not exist\nLINE 1: ...w\" ON \"catalogoView\".id = \"capacityView\".id WHERE Sector = '...\n                                                 ",
+            "whereClause_patched": "\"capacityView\".\"Sector\" = 'CONSTRUCCIÓN'",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+                "FABRICA DE PRODUCTOS IMPERMEABILIZANTES EDIL C.A (EDIL, C.A.)",
+                "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+                "CONSTRUCCIONES MONSERCA S.A.",
+                "CONSTRUCTORA NASE, C.A."
+            ]
+        },
+        {
+            "query": "perforacion",
+            "queryIntent": "SERVICE",
+            "whereClause": "LOWER(name)\n LIKE LOWER('%perforacion%')",
+            "humanSummary": "Empresas de perforación",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42702]: Ambiguous column: 7 ERROR:  column reference \"name\" is ambiguous\nLINE 1: ...\" ON \"catalogoView\".id = \"capacityView\".id WHERE LOWER(name)\n                                              ",
+            "whereClause_patched": "LOWER(\"catalogoView\".name)\n LIKE LOWER('%perforacion%')",
+            "patched_status": "OK",
+            "patched_count_capped": 0,
+            "patched_sample_names": []
+        },
+        {
+            "query": "CONSTRUCCION EN MARACAIBO",
+            "queryIntent": "MIXED",
+            "whereClause": "LOWER(Sector) LIKE LOWER('%construcción%') AND LOWER(CIUDAD) LIKE LOWER('%maracaibo%')",
+            "humanSummary": "Construcción en Maracaibo",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"sector\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(Sector) LI...\n                                                 ",
+            "whereClause_patched": "LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%construcción%') AND LOWER(\"catalogoView\".\"CIUDAD\") LIKE LOWER('%maracaibo%')",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "N&V CONSULTORES, C.A.",
+                "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+                "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+                "EHCOPEK S.A.",
+                "CLAM INSTALACIONES, S.A."
+            ]
+        },
+        {
+            "query": "N&V CONSULTORES",
+            "queryIntent": "COMPANY",
+            "whereClause": "LOWER(name) LIKE LOWER('%n&v consultores%')",
+            "humanSummary": "Empresas con nombre similar a N&V CONSULTORES",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42702]: Ambiguous column: 7 ERROR:  column reference \"name\" is ambiguous\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(name) LIKE...\n                                           ",
+            "whereClause_patched": "LOWER(\"catalogoView\".name) LIKE LOWER('%n&v consultores%')",
+            "patched_status": "OK",
+            "patched_count_capped": 1,
+            "patched_sample_names": [
+                "N&V CONSULTORES, C.A."
+            ]
+        },
+        {
+            "query": "J386579",
+            "queryIntent": "RIF",
+            "whereClause": "rif = 'J386579'",
+            "humanSummary": "Información sobre la empresa con RIF J386579",
+            "raw_status": "OK",
+            "raw_count_capped": 0,
+            "whereClause_patched": "\"catalogoView\".rif = 'J386579'",
+            "patched_status": "OK",
+            "patched_count_capped": 0,
+            "patched_sample_names": []
+        },
+        {
+            "query": "maturin",
+            "queryIntent": "CITY",
+            "whereClause": "LOWER(CIUDAD) LIKE LOWER('%maturin%')",
+            "humanSummary": "Empresas en Maturín",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"ciudad\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(CIUDAD) LI...\n                                                 ",
+            "whereClause_patched": "LOWER(\"catalogoView\".\"CIUDAD\") LIKE LOWER('%maturin%')",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "CONSTRUCCIONES Y SERVICIOS LAS RIAS C.A. ",
+                "GARCIA CASAFRANCA & D´ALFONZO, S.C.",
+                "HERNANDEZ QUIJADA & SOSA ABOGADOS ",
+                "PROYECTOS TOM, C.A. ",
+                "SYSVENCOL, C.A."
+            ]
+        },
+        {
+            "query": "sismica",
+            "queryIntent": "SERVICE",
+            "whereClause": "LOWER(Servicios) LIKE LOWER('%geotecnia, fundaciones, riesgos geológicos y amenazas sísmicas%')",
+            "humanSummary": "Empresas con servicio de Geotecnia, Fundaciones, Riesgos Geológicos y Amenazas Sísmicas",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"servicios\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(Servicios)...\n                                              ",
+            "whereClause_patched": "LOWER(\"capacityView\".\"Servicios\") LIKE LOWER('%geotecnia, fundaciones, riesgos geológicos y amenazas sísmicas%')",
+            "patched_status": "OK",
+            "patched_count_capped": 2,
+            "patched_sample_names": [
+                "GEOHIDRA CONSULTORES, C.A.",
+                "INGENIERIA DE CONSULTA INCOSTAS, S.A."
+            ]
+        },
+        {
+            "query": "J296033323",
+            "queryIntent": "RIF",
+            "whereClause": "rif = 'J296033323'",
+            "humanSummary": "Empresa con RIF J296033323",
+            "raw_status": "OK",
+            "raw_count_capped": 1,
+            "whereClause_patched": "\"catalogoView\".rif = 'J296033323'",
+            "patched_status": "OK",
+            "patched_count_capped": 1,
+            "patched_sample_names": [
+                "EMPRESA DE CONSTRUCCIÓN SAN ANTONIO, C.A."
+            ]
+        },
+        {
+            "query": "DAME INFORMACION SOBRE LA EMPRESA REGISTRADAS EN EL AREA MINERA Y PETROLERA",
+            "queryIntent": "SECTOR",
+            "whereClause": "LOWER(Sector) LIKE LOWER('%operadores%') OR LOWER(Sector) LIKE LOWER('%servicios a pozos%')",
+            "humanSummary": "Empresas en los sectores de Operadores o Servicios a Pozos",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"sector\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(Sector) LI...\n                                                 ",
+            "whereClause_patched": "LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%operadores%') OR LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%servicios a pozos%')",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "TROIL SERVICES, C.A.",
+                "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+                "EHCOPEK S.A.",
+                "EVERGREEN SERVICE, C.A.",
+                "SERVI COMPRESORES, C.A."
+            ]
+        },
+        {
+            "query": "aliva stum",
+            "queryIntent": "COMPANY",
+            "whereClause": "LOWER(name) LIKE LOWER('%aliva stum%')",
+            "humanSummary": "Información sobre la empresa Aliva Stum",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42702]: Ambiguous column: 7 ERROR:  column reference \"name\" is ambiguous\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(name) LIKE...\n                                           ",
+            "whereClause_patched": "LOWER(\"catalogoView\".name) LIKE LOWER('%aliva stum%')",
+            "patched_status": "OK",
+            "patched_count_capped": 0,
+            "patched_sample_names": []
+        },
+        {
+            "query": "J-075249550 forma parte de la Camara?",
+            "queryIntent": "RIF",
+            "whereClause": "rif = 'J-075249550'",
+            "humanSummary": "Empresa con RIF J-075249550",
+            "raw_status": "OK",
+            "raw_count_capped": 0,
+            "whereClause_patched": "\"catalogoView\".rif = 'J-075249550'",
+            "patched_status": "OK",
+            "patched_count_capped": 0,
+            "patched_sample_names": []
+        },
+        {
+            "query": "Necesito empresas del sector ingeniería en la ciudad de Anzoátegui",
+            "queryIntent": "MIXED",
+            "whereClause": "LOWER(Sector) LIKE LOWER('%ingeniería%') AND LOWER(CIUDAD) LIKE LOWER('%anzoátegui%')",
+            "humanSummary": "Empresas de ingeniería en Anzoátegui",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"sector\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(Sector) LI...\n                                                 ",
+            "whereClause_patched": "LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%ingeniería%') AND LOWER(\"catalogoView\".\"CIUDAD\") LIKE LOWER('%anzoátegui%')",
+            "patched_status": "OK",
+            "patched_count_capped": 0,
+            "patched_sample_names": []
+        },
+        {
+            "query": "Empresas en Anzoátegui",
+            "queryIntent": "CITY",
+            "whereClause": "LOWER(CIUDAD) LIKE LOWER('%anzoátegui%')",
+            "humanSummary": "Empresas en Anzoátegui",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"ciudad\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(CIUDAD) LI...\n                                                 ",
+            "whereClause_patched": "LOWER(\"catalogoView\".\"CIUDAD\") LIKE LOWER('%anzoátegui%')",
+            "patched_status": "OK",
+            "patched_count_capped": 0,
+            "patched_sample_names": []
+        },
+        {
+            "query": "Servicios de engomado",
+            "queryIntent": "SERVICE",
+            "whereClause": "LOWER(Servicios) LIKE LOWER('%revestimientos%')",
+            "humanSummary": "Empresas que ofrecen servicios de revestimientos",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"servicios\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(Servicios)...\n                                              ",
+            "whereClause_patched": "LOWER(\"capacityView\".\"Servicios\") LIKE LOWER('%revestimientos%')",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "REPRESENTACIONES BARCAN, C.A.",
+                "TUBOACERO, C.A.",
+                "DISTEINSA, C.A. ",
+                "OXICORTE DE VENEZUELA, C.A.",
+                "COATINGS DE ORIENTE C A"
+            ]
+        },
+        {
+            "query": "Fabricantes",
+            "queryIntent": "SECTOR",
+            "whereClause": "LOWER(Sector) LIKE LOWER('%fabricantes%')",
+            "humanSummary": "Empresas del sector Fabricantes",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"sector\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(Sector) LI...\n                                                 ",
+            "whereClause_patched": "LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%fabricantes%')",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+                "TEMI, C.A.",
+                "ELEKTROMEK, C.A. ",
+                "VENEZUELAN HEAVY INDUSTRIES, C.A. (VHICOA)",
+                "QUIMICOS DE MANTENIMIENTO INDUSTRIAL QUIMAINCA CA "
+            ]
+        },
+        {
+            "query": "Empresas operaciones en Zulia",
+            "queryIntent": "STATE",
+            "whereClause": "LOWER(state) LIKE LOWER('%zulia%')",
+            "humanSummary": "Empresas con operaciones en Zulia",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"state\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(state) LIK...\n                                                  ",
+            "whereClause_patched": "LOWER(state) LIKE LOWER('%zulia%')",
+            "patched_status": "ERROR",
+            "patched_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"state\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(state) LIK...\n                                                  "
+        },
+        {
+            "query": "dame información sobre la empresa VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+            "queryIntent": "COMPANY",
+            "whereClause": "LOWER(name) LIKE LOWER('%VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER%')",
+            "humanSummary": "Información de la empresa VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42702]: Ambiguous column: 7 ERROR:  column reference \"name\" is ambiguous\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(name) LIKE...\n                                           ",
+            "whereClause_patched": "LOWER(\"catalogoView\".name) LIKE LOWER('%VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER%')",
+            "patched_status": "OK",
+            "patched_count_capped": 1,
+            "patched_sample_names": [
+                "VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER"
+            ]
+        },
+        {
+            "query": "petroleo",
+            "queryIntent": "MIXED",
+            "whereClause": "LOWER(name) LIKE LOWER('%petroleo%') OR LOWER(Servicios) LIKE LOWER('%petroleo%') OR LOWER(Sector) LIKE LOWER('%operadores%')",
+            "humanSummary": "Empresas relacionadas con petróleo u operadores",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42702]: Ambiguous column: 7 ERROR:  column reference \"name\" is ambiguous\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(name) LIKE...\n                                           ",
+            "whereClause_patched": "LOWER(\"catalogoView\".name) LIKE LOWER('%petroleo%') OR LOWER(\"capacityView\".\"Servicios\") LIKE LOWER('%petroleo%') OR LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%operadores%')",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "SERVI COMPRESORES, C.A.",
+                "DBS SEAPORT S.A.",
+                "REPSOL SERVICIOS CARIBE S.A.S., SUCURSAL VENEZUELA",
+                "INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+                "CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY"
+            ]
+        },
+        {
+            "query": "empresas afiliadas a la cámara que operan en el zulia",
+            "queryIntent": "STATE",
+            "whereClause": "LOWER(state) LIKE LOWER('%zulia%')",
+            "humanSummary": "Empresas que operan en Zulia",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"state\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(state) LIK...\n                                                  ",
+            "whereClause_patched": "LOWER(state) LIKE LOWER('%zulia%')",
+            "patched_status": "ERROR",
+            "patched_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"state\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(state) LIK...\n                                                  "
+        },
+        {
+            "query": "donde puedo obtener un listado de las empresas afiliadas a la cámara que operan en el zulia y tienen sede en este estado",
+            "queryIntent": "STATE",
+            "whereClause": "LOWER(state) LIKE LOWER('%zulia%')",
+            "humanSummary": "Empresas afiliadas que operan en Zulia",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"state\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(state) LIK...\n                                                  ",
+            "whereClause_patched": "LOWER(state) LIKE LOWER('%zulia%')",
+            "patched_status": "ERROR",
+            "patched_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"state\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(state) LIK...\n                                                  "
+        },
+        {
+            "query": "todos del Zulia",
+            "queryIntent": "CITY",
+            "whereClause": "LOWER(state) LIKE LOWER('%zulia%')",
+            "humanSummary": "Empresas en el estado Zulia",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"state\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(state) LIK...\n                                                  ",
+            "whereClause_patched": "LOWER(state) LIKE LOWER('%zulia%')",
+            "patched_status": "ERROR",
+            "patched_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"state\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(state) LIK...\n                                                  "
+        },
+        {
+            "query": "muestrame en servicios asociados las compañías de seguros afiliadas",
+            "queryIntent": "MIXED",
+            "whereClause": "LOWER(Sector) LIKE LOWER('%servicios asociados%') AND (LOWER(name) LIKE LOWER('%seguro%') OR LOWER(Servicios) LIKE LOWER('%seguro%'))",
+            "humanSummary": "Compañías de seguros afiliadas en el sector Servicios Asociados",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"sector\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(Sector) LI...\n                                                 ",
+            "whereClause_patched": "LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%servicios asociados%') AND (LOWER(\"catalogoView\".name) LIKE LOWER('%seguro%') OR LOWER(\"capacityView\".\"Servicios\") LIKE LOWER('%seguro%'))",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "MARSH VENEZUELA, C.A. SOCIEDAD DE CORRETAJE DE SEGUROS",
+                "OCEÁNICA DE SEGUROS, C.A. ",
+                "MAKLER SOCIEDAD DE CORRETAJE DE SEGUROS, C.A.",
+                "HISPANA DE SEGUROS, S.A.",
+                "SEGUROS PIRÁMIDE, C.A."
+            ]
+        },
+        {
+            "query": "Hola, muéstrame una lista de empresas del sector petrolero prestadoras de servicios como perforación y rehabilitación, estimulación y producción, logística y compras, materia prima y manejo de pozos, constructoras y evaluación, ingeniería, maquinaria y tecnología afiliadas",
+            "queryIntent": "SECTOR",
+            "whereClause": "LOWER(Sector) LIKE LOWER('%servicios a pozos%') OR LOWER(Sector) LIKE LOWER('%construccion%') OR LOWER(Sector) LIKE LOWER('%ingenieria y servicios integrados%') OR LOWER(Sector) LIKE LOWER('%servicios tecnologicos%') OR LOWER(Sector) LIKE LOWER('%servicios asociados%') OR LOWER(Sector) LIKE LOWER('%suplidores%') OR LOWER(Sector) LIKE LOWER('%fabricantes%')",
+            "humanSummary": "Empresas de perforación, rehabilitación, estimulación, producción, logística, compras, materia prima, manejo de pozos, construcción, evaluación, ingeniería, maquinaria y tecnología",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42703]: Undefined column: 7 ERROR:  column \"sector\" does not exist\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(Sector) LI...\n                                                 ",
+            "whereClause_patched": "LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%servicios a pozos%') OR LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%construccion%') OR LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%ingenieria y servicios integrados%') OR LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%servicios tecnologicos%') OR LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%servicios asociados%') OR LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%suplidores%') OR LOWER(\"capacityView\".\"Sector\") LIKE LOWER('%fabricantes%')",
+            "patched_status": "OK",
+            "patched_count_capped": 5,
+            "patched_sample_names": [
+                "VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+                "N&V CONSULTORES, C.A.",
+                "TROIL SERVICES, C.A.",
+                "TEMI, C.A.",
+                "ADVANCED LOGGING AND EXPLORATIONS, C.A."
+            ]
+        },
+        {
+            "query": "dame información sobre la empresa TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA) ",
+            "queryIntent": "COMPANY",
+            "whereClause": "LOWER(name) LIKE LOWER('%tierra alta%')",
+            "humanSummary": "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA)",
+            "raw_status": "ERROR",
+            "raw_error": "SQLSTATE[42702]: Ambiguous column: 7 ERROR:  column reference \"name\" is ambiguous\nLINE 1: ...\"catalogoView\".id = \"capacityView\".id WHERE LOWER(name) LIKE...\n                                           ",
+            "whereClause_patched": "LOWER(\"catalogoView\".name) LIKE LOWER('%tierra alta%')",
+            "patched_status": "OK",
+            "patched_count_capped": 1,
+            "patched_sample_names": [
+                "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA) "
+            ]
+        },
+        {
+            "query": "J-070167661",
+            "queryIntent": "RIF",
+            "whereClause": "rif = 'J070167661'",
+            "humanSummary": "Empresa con RIF J-070167661",
+            "raw_status": "OK",
+            "raw_count_capped": 0,
+            "whereClause_patched": "\"catalogoView\".rif = 'J070167661'",
+            "patched_status": "OK",
+            "patched_count_capped": 0,
+            "patched_sample_names": []
+        }
+    ]
+}

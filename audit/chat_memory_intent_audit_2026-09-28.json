@@ -1,0 +1,50 @@
+﻿{
+    "generated_at":  "2026-09-28 12:21:42",
+    "total_intent_pairs":  5055,
+    "by_query_intent":  [
+                            {
+                                "queryIntent":  "COMPANY",
+                                "count":  3098
+                            },
+                            {
+                                "queryIntent":  "SERVICE",
+                                "count":  710
+                            },
+                            {
+                                "queryIntent":  "",
+                                "count":  537
+                            },
+                            {
+                                "queryIntent":  "SECTOR",
+                                "count":  320
+                            },
+                            {
+                                "queryIntent":  "MIXED",
+                                "count":  267
+                            },
+                            {
+                                "queryIntent":  "CITY",
+                                "count":  110
+                            },
+                            {
+                                "queryIntent":  "RIF",
+                                "count":  8
+                            },
+                            {
+                                "queryIntent":  "STATE",
+                                "count":  3
+                            },
+                            {
+                                "queryIntent":  "\nSECTOR",
+                                "count":  2
+                            }
+                        ],
+    "flag_counts":  {
+                        "NEEDS_CLARIFICATION":  7,
+                        "NOT_SEARCH_READY":  6,
+                        "INNER_JSON_PARSE_FAILED":  536,
+                        "UNKNOWN_INTENT":  1,
+                        "HASFILTER_TRUE_BUT_EMPTY_WHERECLAUSE":  1
+                    },
+    "notes":  "Pares extraidos directamente de database/chat_memory_rows.sql (sesiones \u0027*_intent\u0027), sin pasar por Supabase. flags: NEEDS_CLARIFICATION, NOT_SEARCH_READY, HASFILTER_TRUE_BUT_EMPTY_WHERECLAUSE, UNKNOWN_INTENT, INNER_JSON_PARSE_FAILED."
+}

@@ -1,0 +1,737 @@
+﻿[
+    {
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+        "created_at":  "2026-04-16 06:37:50.686213+00",
+        "query":  "dime que empresas son de maracaibo?",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "```json\n\n{\n  \"whereClause\": \"LOWER(CIUDAD) LIKE LOWER(\u0027%maracaibo%\u0027)\",\n\n  \"queryIntent\": \"CITY\",\n  \"hasFilter\": true,\n  \"needsClarification\": false\n,\n  \"isSearchReady\": true,\n  \"humanSummary\": \"Empresas en Maracaibo\n\"\n}\n```"
+    },
+    {
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+        "created_at":  "2026-04-16 07:40:48.02149+00",
+        "query":  "dime empresas del serctor construccion",
+        "queryIntent":  "\nSECTOR",
+        "whereClause":  "Sector = \u0027CONSTRUCCIÓN\u0027",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Emp\nresas del sector Construcción",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+        "created_at":  "2026-04-16 07:43:27.47973+00",
+        "query":  "dime empresas del serctor construccion",
+        "queryIntent":  "\nSECTOR",
+        "whereClause":  "Sector = \u0027CONSTRUCCIÓN\u0027",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Emp\nresas del sector Construcción",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+        "created_at":  "2026-04-16 07:55:02.149036+00",
+        "query":  "contruccion",
+        "queryIntent":  "SECTOR",
+        "whereClause":  "Sector = \u0027CONSTRUCCIÓN\u0027",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas del sector Construcción\n",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+        "created_at":  "2026-04-16 07:59:25.825562+00",
+        "query":  "perforacion",
+        "queryIntent":  "SERVICE",
+        "whereClause":  "LOWER(name)\n LIKE LOWER(\u0027%perforacion%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas de perforación",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+        "created_at":  "2026-04-16 08:21:51.285187+00",
+        "query":  "dime que empresas son de maracaibo?",
+        "queryIntent":  "CITY",
+        "whereClause":  null,
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  null,
+        "humanSummary":  "Empresas en Maraca\nibo",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+        "created_at":  "2026-04-16 08:34:42.01098+00",
+        "query":  "CONSTRUCCION EN MARACAIBO",
+        "queryIntent":  "MIXED",
+        "whereClause":  "LOWER(Sector) LIKE LOWER(\u0027%construcción%\u0027) AND LOWER(CIUDAD) LIKE LOWER(\u0027%maracaibo%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Construcción en Maracaibo",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+        "created_at":  "2026-04-16 08:45:40.953639+00",
+        "query":  "N\u0026V CONSULTORES",
+        "queryIntent":  "COMPANY",
+        "whereClause":  "LOWER(name) LIKE LOWER(\u0027%n\u0026v consultores%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas con nombre similar a N\u0026V CONSULTORES",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "0cf0b044-d1e6-479c-a110-758368c3e784_intent",
+        "created_at":  "2026-04-17 11:19:33.560864+00",
+        "query":  "maduro es colombiano?",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "Lo siento, no puedo responder a preguntas sobre política o información personal. Mi función es ayudarte a encontrar empresas afiliadas en la base de datos de CIRA. ¿Hay algo en lo que pueda ayudarte con eso?"
+    },
+    {
+        "session_id":  "865b061e-2ce9-4276-b377-e240e1d44439_intent",
+        "created_at":  "2026-04-22 22:56:31.358856+00",
+        "query":  "J386579",
+        "queryIntent":  "RIF",
+        "whereClause":  "rif = \u0027J386579\u0027",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Información sobre la empresa con RIF J386579",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "865b061e-2ce9-4276-b377-e240e1d44439_intent",
+        "created_at":  "2026-04-22 23:49:06.672821+00",
+        "query":  "maturin",
+        "queryIntent":  "CITY",
+        "whereClause":  "LOWER(CIUDAD) LIKE LOWER(\u0027%maturin%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas en Maturín",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "865b061e-2ce9-4276-b377-e240e1d44439_intent",
+        "created_at":  "2026-04-23 22:57:17.1076+00",
+        "query":  "sismica",
+        "queryIntent":  "SERVICE",
+        "whereClause":  "LOWER(Servicios) LIKE LOWER(\u0027%geotecnia, fundaciones, riesgos geológicos y amenazas sísmicas%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas con servicio de Geotecnia, Fundaciones, Riesgos Geológicos y Amenazas Sísmicas",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "8abcb44e-3cac-42db-9576-cd503e0830a3_intent",
+        "created_at":  "2026-05-06 17:48:08.497803+00",
+        "query":  "Hola Cira, para saber cuáles son las empresas afiliadas a la cámara por favor",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "¡Hola! Soy el asistente de CIRA. ¿Qué tipo de empresa o servicio estás buscando? Puedo buscar por sector, servicio, ciudad, nombre o RIF."
+    },
+    {
+        "session_id":  "9541b538-89b0-4c03-a894-661b33b65947_intent",
+        "created_at":  "2026-05-07 02:34:22.82652+00",
+        "query":  "J296033323",
+        "queryIntent":  "RIF",
+        "whereClause":  "rif = \u0027J296033323\u0027",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresa con RIF J296033323",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "d471e3c8-3995-4ec6-8920-c5dc8a5e6884_intent",
+        "created_at":  "2026-05-12 11:42:57.265679+00",
+        "query":  "ya cheque esas 100 buscame otras 100 mas",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "Lo siento, no puedo buscar \"otras 100 más\" directamente. Mi función es generar una consulta basada en tus criterios de búsqueda. Si deseas encontrar más empresas, por favor, dame nuevos criterios como un sector diferente, un servicio, una ciudad, o cualquier otra especificación."
+    },
+    {
+        "session_id":  "d471e3c8-3995-4ec6-8920-c5dc8a5e6884_intent",
+        "created_at":  "2026-05-13 18:24:54.327103+00",
+        "query":  "DAME INFORMACION SOBRE LA EMPRESA REGISTRADAS EN EL AREA MINERA Y PETROLERA",
+        "queryIntent":  "SECTOR",
+        "whereClause":  "LOWER(Sector) LIKE LOWER(\u0027%operadores%\u0027) OR LOWER(Sector) LIKE LOWER(\u0027%servicios a pozos%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas en los sectores de Operadores o Servicios a Pozos",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "0e056300-7fb4-4ad6-a19d-ce9a705b9a3d_intent",
+        "created_at":  "2026-05-13 19:21:58.962905+00",
+        "query":  "que se debe hacer para afiliarse a la Camara",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "¡Hola! Para afiliarse a la Cámara Petrolera de Venezuela (CIRA), generalmente se deben seguir algunos pasos y cumplir con ciertos requisitos. Aunque no tengo la información exacta sobre el proceso de afiliación, te recomiendo visitar el sitio web oficial de CIRA o contactarlos directamente. Ellos podrán proporcionarte los detalles más actualizados sobre los requisitos, el formulario de solicitud y cualquier otro paso necesario para la afiliación."
+    },
+    {
+        "session_id":  "f2ac23ce-d10d-4dd0-bef4-e3127e19219d_intent",
+        "created_at":  "2026-05-19 15:02:36.603585+00",
+        "query":  "aliva stum",
+        "queryIntent":  "COMPANY",
+        "whereClause":  "LOWER(name) LIKE LOWER(\u0027%aliva stum%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Información sobre la empresa Aliva Stum",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "3529d728-1f2f-4ad5-ab07-11e11b4dbce7_intent",
+        "created_at":  "2026-05-20 14:30:07.097206+00",
+        "query":  "la Camara no impula este tipo de proyectos",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "La Cámara Petrolera de Venezuela (CIRA) agrupa y representa a las empresas del sector petrolero. Si bien CIRA no impulsa proyectos individuales directamente, su objetivo es fomentar el desarrollo de la industria. Podrías explorar las vías que ofrece la Cámara para la interacción entre sus miembros, como eventos o directorios, una vez que hayas identificado a las empresas de tu interés. Mi función es ayudarte a encontrar esas empresas en nuestra base de datos."
+    },
+    {
+        "session_id":  "9c51efa6-4380-4e4f-bd1f-86e431280542_intent",
+        "created_at":  "2026-05-25 19:49:40.819541+00",
+        "query":  "directorio de proveedores",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "¡Hola! Soy el asistente de CIRA. ¿Qué tipo de empresa o servicio estás buscando? Puedo buscar por sector, servicio, ciudad, nombre o RIF."
+    },
+    {
+        "session_id":  "03a4b5bd-db56-4360-8fba-a5f2ab88a1cb_intent",
+        "created_at":  "2026-05-28 16:47:04.663216+00",
+        "query":  "J-075249550 forma parte de la Camara?",
+        "queryIntent":  "RIF",
+        "whereClause":  "rif = \u0027J-075249550\u0027",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresa con RIF J-075249550",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "8dff15b3-ad6d-4dfa-a96d-59273286d3a2_intent",
+        "created_at":  "2026-06-01 16:22:01.792597+00",
+        "query":  "Prepárame la lista editable, en formato excel",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "Lo siento, no puedo generar listas en formato Excel. Solo puedo ayudarte a encontrar empresas afiliadas y proporcionarte la información en formato JSON."
+    },
+    {
+        "session_id":  "55c3dc79-8f8d-463d-a00f-b3cd44519917_intent",
+        "created_at":  "2026-06-05 16:22:44.638357+00",
+        "query":  "Necesito empresas del sector ingeniería en la ciudad de Anzoátegui",
+        "queryIntent":  "MIXED",
+        "whereClause":  "LOWER(Sector) LIKE LOWER(\u0027%ingeniería%\u0027) AND LOWER(CIUDAD) LIKE LOWER(\u0027%anzoátegui%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas de ingeniería en Anzoátegui",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "55c3dc79-8f8d-463d-a00f-b3cd44519917_intent",
+        "created_at":  "2026-06-05 16:23:21.71453+00",
+        "query":  "Empresas en Anzoátegui",
+        "queryIntent":  "CITY",
+        "whereClause":  "LOWER(CIUDAD) LIKE LOWER(\u0027%anzoátegui%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas en Anzoátegui",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "616cf7cb-6ad4-4b22-8d11-9faad2e79bd3_intent",
+        "created_at":  "2026-06-09 16:13:33.03567+00",
+        "query":  "Servicios de engomado",
+        "queryIntent":  "SERVICE",
+        "whereClause":  "LOWER(Servicios) LIKE LOWER(\u0027%revestimientos%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas que ofrecen servicios de revestimientos",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "4f0ab008-869e-4c0d-b152-a9e90a072c5c_intent",
+        "created_at":  "2026-06-10 15:01:38.795863+00",
+        "query":  "¿Cual es tu junta directiva?",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "Este asistente ha sido desarrollado por SISTEG. Para más información, puedes visitar www.sisteg.net"
+    },
+    {
+        "session_id":  "55fc80e0-4916-4f30-86fa-e138a47f9946_intent",
+        "created_at":  "2026-06-11 21:37:39.845903+00",
+        "query":  "deseo saber que areas geograficas de venezuela seran sujetas a mayor inversión petrolera en la reactivación del país",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "Lo siento, como asistente de búsqueda de CIRA, mi función es ayudarte a encontrar empresas afiliadas en nuestra base de datos. No tengo la capacidad de predecir o proporcionar información sobre futuras inversiones petroleras o áreas geográficas de inversión."
+    },
+    {
+        "session_id":  "7f275479-9f34-439c-8314-a4ae3430ec58_intent",
+        "created_at":  "2026-06-18 13:13:17.655766+00",
+        "query":  "qué servicios se contemplan en este sector Construcción y Montaje.",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "El sector de \"CONSTRUCCIÓN\" (que es el más cercano a \"Construcción y Montaje\" en nuestro catálogo) contempla los siguientes servicios: ARRENDAMIENTO, AUTOMATIZACIÓN Y CONTROL, CONCRETO ARMADO, COSTA AFUERA-OLEODUCTOS, GASODUCTOS, POLIDUCTOS, ACUEDUCTOS, MONOBOYAS, COSTA AFUERA-PLATAFORMAS, ESTACIONES DE FLUJO, PLANTAS COMPRESORAS, HOSPEDAJE, EDIFICACIONES, FABRICACIÓN Y MONTAJE DE ESTRUCTURAS METÁLICAS, GASODUCTOS Y POLIDUCTOS, INSTRUMENTACIÓN, MANTENIMIENTO Y PARADA DE PLANTA, MONTAJE MECÁNICO DE EQUIPOS DE ELECTRICIDAD, MOVIMIENTO DE TIERRA, MUELLES Y TERMINALES, OBRAS CIVILES, OTROS, PRE-FABRICACIÓN E INSTALACIÓN DE TUBERÍAS, PROYECTOS LLAVE EN MANO, TENDIDO LÍNEAS DE ALTA TENSIÓN, VIALIDAD Y DRENAJES, X."
+    },
+    {
+        "session_id":  "7f275479-9f34-439c-8314-a4ae3430ec58_intent",
+        "created_at":  "2026-06-18 13:14:54.200193+00",
+        "query":  "Fabricantes",
+        "queryIntent":  "SECTOR",
+        "whereClause":  "LOWER(Sector) LIKE LOWER(\u0027%fabricantes%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas del sector Fabricantes",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "d198ec1f-dc5e-4522-810f-61f7559c33e4_intent",
+        "created_at":  "2026-07-07 12:54:04.272485+00",
+        "query":  "QUIENES ESTAN AFILIADOS A LA CAMARA PETROLERA DE VENEZUELA",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "¡Hola! Soy el asistente de CIRA. Para poder ayudarte a encontrar empresas afiliadas, necesito que me indiques qué sector, servicio, empresa o ciudad estás buscando."
+    },
+    {
+        "session_id":  "f509e6a0-e520-4eb1-b4df-5c5d42cbe5d5_intent",
+        "created_at":  "2026-07-15 14:51:41.353997+00",
+        "query":  "Empresas operaciones en Zulia",
+        "queryIntent":  "STATE",
+        "whereClause":  "LOWER(state) LIKE LOWER(\u0027%zulia%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas con operaciones en Zulia",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "fc6db1ff-bf14-4f37-a830-827e87dbab16_intent",
+        "created_at":  "2026-07-17 02:50:27.572485+00",
+        "query":  "Quiero afiliarme soy empresa de audiovisuales",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "¡Hola! Soy el asistente de búsqueda de CIRA y mi función es ayudarte a encontrar empresas afiliadas en nuestra base de datos. Para información sobre cómo afiliar tu empresa de audiovisuales, te recomiendo visitar el sitio web de CIRA o contactar directamente a la cámara."
+    },
+    {
+        "session_id":  "3c5b8c25-338f-4069-91b9-fc636b90f8a2_intent",
+        "created_at":  "2026-07-17 14:09:58.514178+00",
+        "query":  "dame información sobre la empresa VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+        "queryIntent":  "COMPANY",
+        "whereClause":  "LOWER(name) LIKE LOWER(\u0027%VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Información de la empresa VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "3b27beec-020b-4f36-8efd-66ee87aac6eb_intent",
+        "created_at":  "2026-07-28 11:39:18.483563+00",
+        "query":  "petroleo",
+        "queryIntent":  "MIXED",
+        "whereClause":  "LOWER(name) LIKE LOWER(\u0027%petroleo%\u0027) OR LOWER(Servicios) LIKE LOWER(\u0027%petroleo%\u0027) OR LOWER(Sector) LIKE LOWER(\u0027%operadores%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas relacionadas con petróleo u operadores",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "f2ac23ce-d10d-4dd0-bef4-e3127e19219d_intent",
+        "created_at":  "2026-07-28 12:46:40.066814+00",
+        "query":  "hola Cira hay cursos o eventos organizados en esta fecha",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "Hola! Soy el asistente de CIRA. No tengo información sobre cursos o eventos. Puedo ayudarte a encontrar empresas afiliadas por sector, servicio, ciudad, nombre o RIF."
+    },
+    {
+        "session_id":  "f8b92d4b-758a-4c0a-aa39-a250accdc022_intent",
+        "created_at":  "2026-08-02 20:12:24.109318+00",
+        "query":  "I see, you only help members, not me",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "No, no es así. Ayudo a cualquier persona que necesite encontrar empresas afiliadas a la Cámara Petrolera de Venezuela, sean miembros o no. Mi objetivo es facilitar la búsqueda de información sobre las empresas en nuestra base de datos.\\n\\n¿Hay algo en lo que pueda ayudarte a buscar?"
+    },
+    {
+        "session_id":  "5612dae3-22cf-4a37-8b41-33f98c3ec607_intent",
+        "created_at":  "2026-08-09 19:52:16.054889+00",
+        "query":  "empresas afiliadas a la cámara que operan en el zulia",
+        "queryIntent":  "STATE",
+        "whereClause":  "LOWER(state) LIKE LOWER(\u0027%zulia%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas que operan en Zulia",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "5612dae3-22cf-4a37-8b41-33f98c3ec607_intent",
+        "created_at":  "2026-08-09 19:53:56.328245+00",
+        "query":  "donde puedo obtener un listado de las empresas afiliadas a la cámara que operan en el zulia y tienen sede en este estado",
+        "queryIntent":  "STATE",
+        "whereClause":  "LOWER(state) LIKE LOWER(\u0027%zulia%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas afiliadas que operan en Zulia",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "eec643cf-fb3b-42e2-989e-293b73daa24f_intent",
+        "created_at":  "2026-08-12 13:39:34.211736+00",
+        "query":  "LISTADO DE AFILIADOS A LA CAMARA PETROLERA POR RUBRO",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "Debe limitar su busqueda como se indica en el instructivo de uso. Por favor, especifica el sector o servicio de tu interés."
+    },
+    {
+        "session_id":  "ceb097d5-17dd-41a9-91f6-e9f51ef9dfa8_intent",
+        "created_at":  "2026-08-13 11:58:41.099444+00",
+        "query":  "todos del Zulia",
+        "queryIntent":  "CITY",
+        "whereClause":  "LOWER(state) LIKE LOWER(\u0027%zulia%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas en el estado Zulia",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "db9fb312-c69e-42b7-aeab-6ecc5804ec17_intent",
+        "created_at":  "2026-08-19 20:06:37.698782+00",
+        "query":  "muestrame en servicios asociados las compañías de seguros afiliadas",
+        "queryIntent":  "MIXED",
+        "whereClause":  "LOWER(Sector) LIKE LOWER(\u0027%servicios asociados%\u0027) AND (LOWER(name) LIKE LOWER(\u0027%seguro%\u0027) OR LOWER(Servicios) LIKE LOWER(\u0027%seguro%\u0027))",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Compañías de seguros afiliadas en el sector Servicios Asociados",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "4dfbda18-71e1-4c8d-b3b3-bc6588758dc8_intent",
+        "created_at":  "2026-08-26 03:14:01.461002+00",
+        "query":  "Hola, muéstrame una lista de empresas del sector petrolero prestadoras de servicios como perforación y rehabilitación, estimulación y producción, logística y compras, materia prima y manejo de pozos, constructoras y evaluación, ingeniería, maquinaria y tecnología afiliadas",
+        "queryIntent":  "SECTOR",
+        "whereClause":  "LOWER(Sector) LIKE LOWER(\u0027%servicios a pozos%\u0027) OR LOWER(Sector) LIKE LOWER(\u0027%construccion%\u0027) OR LOWER(Sector) LIKE LOWER(\u0027%ingenieria y servicios integrados%\u0027) OR LOWER(Sector) LIKE LOWER(\u0027%servicios tecnologicos%\u0027) OR LOWER(Sector) LIKE LOWER(\u0027%servicios asociados%\u0027) OR LOWER(Sector) LIKE LOWER(\u0027%suplidores%\u0027) OR LOWER(Sector) LIKE LOWER(\u0027%fabricantes%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresas de perforación, rehabilitación, estimulación, producción, logística, compras, materia prima, manejo de pozos, construcción, evaluación, ingeniería, maquinaria y tecnología",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "c8cc2375-a229-46a6-a17d-c9881201b276_intent",
+        "created_at":  "2026-08-26 20:51:40.165654+00",
+        "query":  "dame información sobre la empresa TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA) ",
+        "queryIntent":  "COMPANY",
+        "whereClause":  "LOWER(name) LIKE LOWER(\u0027%tierra alta%\u0027)",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA)",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "67c030a0-30ee-4e19-a934-cd1c97af57ba_intent",
+        "created_at":  "2026-08-27 15:10:50.662384+00",
+        "query":  "Hola Cira, soy un corredor de seguros que desea poner a dsiposicion el tramite de fianzas. Como lo puedo hacer?",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "Para ofrecer tus servicios de fianzas y conocer los procesos de afiliación o participación con nuestros miembros, estos temas los gestiona directamente la Cámara Petrolera de Venezuela. Puedes ponerte en contacto a través de los siguientes datos:\\n\\n* **Sitio web:** https://camarapetrolera.org/\\n* **Correo:** perfilafiliados@camarapetrolera.org\\n* **Teléfono:** +58 212 7941222"
+    },
+    {
+        "session_id":  "ddd8665e-7c2d-46c5-a19d-c34c962b4e52_intent",
+        "created_at":  "2026-09-10 17:42:36.792839+00",
+        "query":  "J-070167661",
+        "queryIntent":  "RIF",
+        "whereClause":  "rif = \u0027J070167661\u0027",
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  true,
+        "humanSummary":  "Empresa con RIF J-070167661",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "calib-02_intent",
+        "created_at":  "2026-09-11 15:52:27.425071+00",
+        "query":  "buenas tardes",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "¡Buenas tardes! Soy el asistente de CIRA. ¿Qué tipo de empresa o servicio estás buscando? Puedo buscar por sector, servicio, ciudad, nombre o RIF."
+    },
+    {
+        "session_id":  "test-mcp410-final-1_intent",
+        "created_at":  "2026-09-16 07:57:28.748676+00",
+        "query":  "represas",
+        "queryIntent":  "SERVICE",
+        "whereClause":  null,
+        "needsClarification":  false,
+        "isSearchReady":  true,
+        "hasFilter":  null,
+        "humanSummary":  "Empresas relacionadas con represas",
+        "flags":  [
+
+                  ],
+        "raw_ai_content":  null
+    },
+    {
+        "session_id":  "test-mcp7-fix-007_intent",
+        "created_at":  "2026-09-16 18:09:23.569958+00",
+        "query":  "empresas de construccion en maracaibo",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "¿Buscas empresas de construcción vinculadas a proyectos petroleros o energéticos en Maracaibo?"
+    },
+    {
+        "session_id":  "test-criptoactivos-2-20260917_intent",
+        "created_at":  "2026-09-17 09:01:34.770524+00",
+        "query":  "criptoactivos",
+        "queryIntent":  null,
+        "whereClause":  null,
+        "needsClarification":  null,
+        "isSearchReady":  null,
+        "hasFilter":  null,
+        "humanSummary":  null,
+        "flags":  [
+                      "INNER_JSON_PARSE_FAILED"
+                  ],
+        "raw_ai_content":  "Los criptoactivos no están dentro del ámbito de búsqueda ni gestión de la Cámara Petrolera de Venezuela."
+    }
+]
