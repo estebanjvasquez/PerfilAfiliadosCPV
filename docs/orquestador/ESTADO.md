@@ -7,24 +7,28 @@
 
 ---
 
-## Trabajo sin commitear (en working tree, 2 repos)
+## Estado de git (2026-09-28, bajo el Collaboration Protocol)
 
-**`PerfilAfiliadosCPV`**
+Ambos repos **committeados y pusheados**, working tree limpio en los dos. Nada mezclado entre repos.
+
+**`PerfilAfiliadosCPV`** — rama `feature/upgrade-filament-v3`, HEAD `20bf6eb` (era `cf100e2` al empezar)
 ```
-M  app/Console/Commands/BuildTaxonomyCanonicalConcepts.php     --apply desbloqueado + --max-writes
-M  tests/Feature/Filament/TaxonomyCategoriesRelationManagerTest.php   de-flake de fixture
-M  docs/task.md                                                sección 6quater nueva
-?? app/Services/Taxonomy/CanonicalConceptApplyService.php      lógica de Fase C
-?? tests/Unit/Taxonomy/CanonicalConceptApplyServiceTest.php    14 tests
-?? audit/phase3_phase_c_apply.md                               auditoría de Fase C
-?? audit/chat_memory_intent_audit_2026-09-28.md (+4 JSON)      auditoría del chatbot
-?? database/chat_memory_sample.json, chat_memory_intent_eval_sample.json
+2b9c697  docs(audit): CIRA intent pipeline audit + reusable eval dataset from chat_memory
+62b64b0  test: de-flake TaxonomyCategoriesRelationManagerTest fixture (43.8% de fallo)
+4a773fa  feat: Phase C - --apply materializa propuestas en las colas de revision
+20bf6eb  docs: add docs/orquestador channel (superseded as primary by GitHub per collab protocol)
 ```
 
-**`perfilafiliados-mcp`**
+**`perfilafiliados-mcp`** — rama `master`, HEAD `29de993` (era `12a7fbd` al empezar)
 ```
-M  src/empresa-tools.ts    fix cosmético de matched_via (tsc --noEmit OK)
+29de993  fix: propagate structured-filter label to matched_via in the hybrid search path
 ```
+
+**PR draft: BLOQUEADO.** El PAT guardado en el credential manager no tiene scope
+`pull_requests:write` (403 Forbidden al intentar `POST /repos/.../pulls`). No se intentó escalar el
+permiso por cuenta propia. **Acción pendiente de Esteban:** crear el PR a mano (`base: main`,
+`head: feature/upgrade-filament-v3`, draft) con el cuerpo ya redactado, o dar un token con ese scope.
+Cuerpo del PR listo en el mensaje de handoff — ver `001-para-orquestador-handoff-fase-c.md`.
 
 ## Estado de la base (verificado por consulta directa, 2026-09-28)
 
@@ -73,3 +77,4 @@ decisiones MAP_TO_EXISTING / CREATE_NEW / REJECT). Después, decidir si se corre
 | Archivo | Tema |
 |---|---|
 | `001-para-orquestador-handoff-fase-c.md` | Handoff completo: Fase C + auditoría del chatbot CIRA |
+| `002-para-orquestador-pr-body-fase-c.md` | Cuerpo del PR (creación bloqueada — falta scope `pull_requests:write` en el PAT) |
