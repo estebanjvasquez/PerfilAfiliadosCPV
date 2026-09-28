@@ -474,6 +474,56 @@ esta entrega); `provenance`/`conflict` explícitos del dry-run (documentado, no 
 
 ---
 
+# 6quater — Phase C: `--apply` (modo escritura)
+
+**Status: DONE / VERIFIED (2026-09-28) — primera población controlada ejecutada**
+
+Ver `audit/phase3_phase_c_apply.md` para el detalle completo. Resumen:
+
+- **`--apply` ya no es un `return self::FAILURE`.** Está implementado en
+  `app/Services/Taxonomy/CanonicalConceptApplyService.php` (nuevo) y conectado al comando
+  `taxonomy:build-canonical-concepts --apply` (más la opción nueva `--max-writes`).
+- **Qué escribe:** solo las COLAS DE REVISIÓN — `taxonomy_candidate_concept_links` en `pending` y
+  `taxonomy_concept_relations` en `candidate`. **Nunca `taxonomy_term_concepts`**: publicar sigue
+  siendo exclusivamente resultado de una aprobación humana en Filament
+  (`CandidateConceptApprovalService::approve()`). Esto implementa literalmente la salvaguarda de la
+  sección 15 punto 5 ("nunca bulk-apply"). Un tier `AUTO_ACCEPT` tampoco publica solo — se encola
+  igual que el resto, con confianza más alta.
+- **6 propiedades de seguridad**, las mismas del camino manual, ahora en el automatizado:
+  transacción única, idempotencia explícita (la tabla NO tiene índice único — se chequea a mano, y
+  un par ya rechazado por un humano no se re-encola), guarda de fingerprint obsoleto, tope de
+  escrituras (default 500), audit log por fila (`actor_type=system` + `algorithm_version`), y
+  provenance estampada.
+- **Verificación de tablas protegidas dentro de la transacción**: si `taxonomy_term_cpv_relations`,
+  `taxonomy_term_concepts` o `taxonomy_canonical_concepts` cambian, se lanza excepción y se revierte
+  todo. La salvaguarda global 1 pasa de promesa a código.
+- **Cierra los 2 gaps que Phase B.1 dejó documentados** (sección 16 de su auditoría): el productor de
+  `taxonomy_state_fingerprint` (hasta hoy `tracked=false` siempre) y `resolver_version`
+  (`CanonicalConceptApplyService::ALGORITHM_VERSION`).
+- **14 tests nuevos, 14/14 PASS** (41 assertions), todos dentro de `DatabaseTransactions`.
+- **Suite de taxonomía completa: 140/140 PASS.** El único fallo de la primera corrida era un test
+  flaky preexistente (`TaxonomyCategoriesRelationManagerTest` sorteaba su código de fixture en
+  `CPV-10..CPV-98`, rango que los datos CPV reales ya ocupan hasta `CPV-48` → 43.8% de colisión).
+  Corregido moviendo el fixture al espacio libre de 3 dígitos. No tenía relación con Phase C.
+
+**Primera población controlada (2026-09-28), `--limit=10 --max-writes=50`:**
+
+```
+taxonomy_candidate_concept_links     0 →  10   (10 propuestas de concepto nuevo, todas pending)
+taxonomy_concept_relations           0 →   2   (status=candidate, ninguna approved)
+taxonomy_term_concepts             142 → 142   PROTEGIDA - sin cambios
+taxonomy_canonical_concepts         79 →  79   PROTEGIDA - sin cambios
+taxonomy_term_cpv_relations       9749 → 9749  PROTEGIDA - sin cambios
+```
+
+Verificado con consulta directa (no con el reporte del comando): fingerprint estampado en las 10
+filas, 12 filas de `taxonomy_audit_log` todas con `actor_type=system` + `algorithm_version`.
+**Idempotencia verificada en producción**: una segunda corrida idéntica creó 0 filas.
+Revertir, si hiciera falta, es borrar esas filas — nada se publicó. Ver
+`audit/phase3_phase_c_apply.md` secciones 7-8.
+
+---
+
 # 16 — Immediate next action
 
 **Fase A (verificación/estabilización) está PASS y cerrada (2026-09-23)** — regresión, MCP
@@ -486,7 +536,20 @@ autenticado y Shield resueltos, cero mutaciones de taxonomía.
 sección "6ter" arriba y `audit/phase3_phase_b1_review_workflow.md`. Un revisor humano ya puede usar
 las 3 decisiones (MAP_TO_EXISTING/CREATE_NEW/REJECT) desde el panel de Filament.
 
-El siguiente paso real es evaluar **Fase C** (`--apply`) — que sigue **NO iniciada** y requiere
-autorización explícita separada del usuario antes de tocar cualquier dato de producción. El diseño
-de Fase C debería incluir el productor de `taxonomy_state_fingerprint`/`resolver_version` (gap
-identificado en Phase B.1, sección 16 de su auditoría).
+**Fase C (`--apply`) está IMPLEMENTADA (2026-09-28)** — ver sección "6quater" arriba y
+`audit/phase3_phase_c_apply.md`. Incluye el productor de `taxonomy_state_fingerprint` y
+`resolver_version`, que eran el gap identificado en Phase B.1.
+
+La primera población controlada ya se ejecutó (10 candidatos + 2 relaciones, ver sección 6quater).
+El siguiente paso real es **revisión humana en Filament** de esos 10 candidatos de concepto nuevo,
+usando las 3 decisiones de Phase B.1 (MAP_TO_EXISTING / CREATE_NEW / REJECT). Recién cuando un
+revisor apruebe, el grafo publicado crece y el buscador cambia.
+
+Después de eso, decidir si se corre `--apply` sin `--limit` (la corrida completa encolaría bastante
+más; el tope `--max-writes` está para que una corrida grande aborte en vez de sorprender).
+
+**Nota importante sobre expectativas:** poblar la cola con `--apply` **no cambia por sí solo lo que
+devuelve el buscador**. El buscador consume el grafo publicado (`taxonomy_term_concepts`,
+`empresa_taxonomy_category`), y Phase C deliberadamente no escribe ahí. Para que la población afecte
+resultados de búsqueda hace falta que un humano apruebe candidatos en Filament — que es exactamente
+la salvaguarda que el proyecto eligió tener.

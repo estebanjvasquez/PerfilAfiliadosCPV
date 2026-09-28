@@ -2,40 +2,40 @@
 
 namespace App\Console\Commands;
 
+use App\Services\Taxonomy\CanonicalConceptApplyService;
 use App\Services\Taxonomy\CanonicalConceptBuilderService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
 /**
- * Phase 3 (secciones 14-16 del pedido): CLI del Canonical Concept Builder.
+ * Phase 3 (secciones 14-16 del pedido) + Phase C: CLI del Canonical Concept Builder.
  *
- * SALVAGUARDA PRINCIPAL - WRITE BARRIER (sección 16): sin opciones, este comando SIEMPRE se
- * comporta como AUDIT (solo lectura) - nunca como publish. `--dry-run` corre además el Builder
- * multi-signal (candidate retrieval + scoring + tiers), también 100% en memoria. `--apply` está
- * deliberadamente BLOQUEADO en esta entrega (sección 16/17: "‑‑apply NO debe habilitarse todavía
- * para poblar concept relations automáticamente") - existe en el signature para que la interfaz ya
- * esté preparada, pero cualquier intento de usarlo termina en error, sin tocar la base de datos.
+ * WRITE BARRIER: sin opciones, este comando SIEMPRE se comporta como AUDIT (solo lectura).
+ * `--dry-run` corre además el Builder multi-signal (candidate retrieval + scoring + tiers), también
+ * 100% en memoria.
+ *
+ * `--apply` (Phase C) SÍ escribe, pero solo en las COLAS DE REVISIÓN
+ * (`taxonomy_candidate_concept_links` en `pending`, `taxonomy_concept_relations` en `candidate`) -
+ * nunca publica en `taxonomy_term_concepts`, que sigue siendo exclusivamente resultado de una
+ * aprobación humana en Filament. Ver `CanonicalConceptApplyService` para el detalle de las 6
+ * propiedades de seguridad. `--apply` implica `--dry-run` (necesita las propuestas para
+ * materializarlas, y usa ESA corrida, no uno nuevo, para que el fingerprint estampado corresponda).
  */
 class BuildTaxonomyCanonicalConcepts extends Command
 {
     protected $signature = 'taxonomy:build-canonical-concepts
         {--mode=audit : audit (default, solo lectura) es el único modo soportado fuera de --dry-run}
         {--dry-run : Corre además el Builder multi-signal (retrieval + scoring + tiers), sin persistir nada}
-        {--apply : BLOQUEADO en esta entrega - ver sección 16/17 del pedido de Phase 3}
+        {--apply : Phase C - materializa las propuestas del dry-run en las colas de revisión (NUNCA publica en taxonomy_term_concepts). Implica --dry-run}
+        {--max-writes= : Phase C - tope de filas a crear en una corrida de --apply (default 500). Un plan mayor aborta sin escribir nada}
         {--limit= : Tope de términos a procesar en --dry-run (para corridas rápidas de verificación)}
         {--skip-audit : Phase 3.1 - omite AUDIT_EXISTING para medir --dry-run de forma aislada (diagnóstico de performance)}
         {--save-snapshot= : Phase 3.1 - vuelca el dry-run completo (all_results + instrumentación) a un JSON, para result-equivalence antes/después de un refactor}';
 
-    protected $description = 'Phase 3: AUDIT_EXISTING (default) y/o dry-run del Canonical Concept Builder. Nunca escribe sin --apply, que está bloqueado en esta entrega.';
+    protected $description = 'Phase 3/C: AUDIT_EXISTING (default), dry-run del Canonical Concept Builder, y --apply para encolar propuestas para revisión humana.';
 
-    public function handle(CanonicalConceptBuilderService $builder): int
+    public function handle(CanonicalConceptBuilderService $builder, CanonicalConceptApplyService $applier): int
     {
-        if ($this->option('apply')) {
-            $this->error('WRITE MODE BLOQUEADO: --apply no está habilitado en esta entrega de Phase 3 (sección 16/17 del pedido). No se ejecutó ninguna escritura.');
-
-            return self::FAILURE;
-        }
-
         $result = [];
 
         if (! $this->option('skip-audit')) {
@@ -56,7 +56,7 @@ class BuildTaxonomyCanonicalConcepts extends Command
             $result['audit'] = $audit;
         }
 
-        if ($this->option('dry-run')) {
+        if ($this->option('dry-run') || $this->option('apply')) {
             $this->newLine();
             $this->info('DRY-RUN Builder multi-signal - candidate retrieval + scoring + tiers (CERO escritura)...');
             $limit = $this->option('limit') !== null ? (int) $this->option('limit') : null;
@@ -69,6 +69,54 @@ class BuildTaxonomyCanonicalConcepts extends Command
             $this->table(['Etapa', 'Queries', 'Tiempo (ms)'], collect($dryRun['query_count_by_stage'])->map(fn ($c, $stage) => [$stage, $c, $dryRun['time_ms_by_stage'][$stage] ?? 0])->values()->all());
 
             $result['dry_run'] = $dryRun;
+        }
+
+        if ($this->option('apply')) {
+            $this->newLine();
+            $this->info('APPLY (Phase C) - materializando propuestas en las colas de REVISIÓN...');
+            $this->warn('Recordatorio: --apply NUNCA publica en taxonomy_term_concepts. Todo queda en estado pending/candidate esperando aprobación humana.');
+
+            $maxWrites = $this->option('max-writes') !== null
+                ? (int) $this->option('max-writes')
+                : CanonicalConceptApplyService::DEFAULT_MAX_WRITES;
+
+            $plan = $applier->planFrom($dryRun);
+            $this->table(['A crear', 'Filas'], [
+                ['taxonomy_candidate_concept_links (término→concepto)', count($plan['term_concept_candidates'])],
+                ['taxonomy_candidate_concept_links (concepto nuevo)', count($plan['new_concept_candidates'])],
+                ['taxonomy_concept_relations (status=candidate)', count($plan['concept_relations'])],
+                ['TOTAL', $plan['total_writes']],
+            ]);
+
+            $apply = $applier->apply($dryRun, $maxWrites);
+            $result['apply'] = $apply;
+
+            if ($apply['result'] !== CanonicalConceptApplyService::RESULT_APPLIED) {
+                $this->error("APPLY no se ejecutó: {$apply['result']}");
+                if (isset($apply['note'])) {
+                    $this->line('  '.$apply['note']);
+                }
+
+                if ($this->option('save-snapshot')) {
+                    File::put($this->option('save-snapshot'), json_encode($result, JSON_PRETTY_PRINT));
+                    $this->info('Snapshot guardado en '.$this->option('save-snapshot'));
+                }
+
+                return $apply['result'] === CanonicalConceptApplyService::RESULT_NOTHING_TO_APPLY
+                    ? self::SUCCESS
+                    : self::FAILURE;
+            }
+
+            $this->info('APPLY OK - algoritmo '.$apply['algorithm_version']);
+            $this->table(
+                ['Cola', 'Creados', 'Omitidos (ya existían)'],
+                collect($apply['created'])->map(fn ($count, $key) => [$key, $count, $apply['skipped'][$key] ?? 0])->values()->all()
+            );
+            $this->table(
+                ['Tabla', 'Antes', 'Después'],
+                collect($apply['before'])->map(fn ($count, $table) => [$table, $count, $apply['after'][$table] ?? '?'])->values()->all()
+            );
+            $this->info("Fingerprint estampado en cada candidato: {$apply['fingerprint']}");
         }
 
         if ($this->option('save-snapshot')) {
