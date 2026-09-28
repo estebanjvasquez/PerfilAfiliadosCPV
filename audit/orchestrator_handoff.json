@@ -95,11 +95,64 @@
     },
     {
       "task_id": "TASK-0003",
-      "status": "IN_PROGRESS",
+      "status": "READY_FOR_REVIEW",
       "phase": "PHASE_C_CORRECTIONS",
       "task_definition": "docs/orquestador/tasks/0003-phase-c-corrections.md",
       "source": "Issue #2 comment 5872689869 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5872689869)",
-      "note": "In progress - this checkpoint will be filled in when the 7 findings are addressed and the task reaches READY_FOR_REVIEW."
+      "audit": "audit/phase3_c1_corrections_2026-09-28.md",
+      "review_base_sha": "7ab0d82cad3389e9943557e4268522ae024df3ba",
+      "review_head_sha": "d81b7962ed87e937eacfef078a4292fa91865124",
+      "handoff_commit_sha": "SEE_HEAD_OF_PUSH - a commit cannot contain its own hash; this file's commit is the HEAD reported in the final READY_FOR_REVIEW response for TASK-0003",
+      "phase_c1_c2_split_adopted": true,
+      "findings_response": {
+        "1_contract_mismatch": "Relabeled as Phase C1 (queue materialization). PHASE_LABEL=PHASE_C1_QUEUE_MATERIALIZATION, ALGORITHM_VERSION bumped to phase-c1-v1. Phase C2 (reviewed immutable payload -> apply -> validate -> commit/rollback) documented as separate, unimplemented future work - not built in this task.",
+        "2_production_write_authorization": "apply(array $dryRun, string $authorizedBy, int $maxWrites = ...) - $authorizedBy is required with no default, throws InvalidArgumentException if blank. CLI requires --authorized-by. Recorded in every audit log row and in concept_relations.provenance.authorized_by. No --apply ran against any environment in this task.",
+        "3_concurrency_safe_idempotency": {
+          "mechanism": "Postgres partial unique indexes + insertOrIgnore() (compiles to INSERT ... ON CONFLICT DO NOTHING) - the database arbitrates concurrent writes, not a check-then-act read in the application.",
+          "taxonomy_candidate_concept_links": "Had NO unique constraint before this task (confirmed by reading the code, not assumed). New migration 2026_09_28_165653_add_unique_constraints_to_taxonomy_candidate_concept_links adds two partial unique indexes: (suggested_term_id, suggested_concept_id) WHERE suggested_concept_id IS NOT NULL, and (suggested_term_id) WHERE suggested_concept_id IS NULL. Ran successfully against the shared Supabase instance (php artisan migrate:status confirms [53] Ran), which also proves no duplicate rows existed beforehand.",
+          "taxonomy_concept_relations": "Already had UNIQUE(source_concept_id, target_concept_id, relation_type) since table creation - no new migration needed, code adapted to rely on it via insertOrIgnore() instead of letting a violation abort the whole apply() transaction uncaught.",
+          "rejection_history_preserved": "Indexes are on the pair regardless of status - a prior rejected row still blocks a re-proposal, same semantics as before, nothing deleted."
+        },
+        "4_stale_state_contract": {
+          "mechanism": "CanonicalConceptBuilderService::dryRunInputFingerprint() - conceptGraphFingerprint() (full content hash, unchanged) combined with tableVersionSignal() (COUNT+MAX(updated_at)) for taxonomy_terms, taxonomy_term_aliases, taxonomy_term_cpv_relations, taxonomy_term_embeddings, taxonomy_term_service_relations, taxonomy_term_source_bindings, taxonomy_settings, taxonomy_concept_relations.",
+          "dependency_set_audited_by_reading_code": true,
+          "cost_tradeoff": "Full content hash of the ~9.7k-row taxonomy_term_cpv_relations table on every --apply would be expensive given documented Supabase latency - used the cheaper version-signal alternative the finding itself offered instead of forcing a full hash.",
+          "excluded_by_design": "predicted_impact source tables (empresa_taxonomy_category, company_term_matches, etc.) - that field is always recomputed live at review time, never read from what was stored on the candidate, so it can never go stale."
+        },
+        "5_protected_table_proof": {
+          "counts_relabeled": "Diagnostic only, documented as such in counts()'s docblock.",
+          "structural_verification": "Read the full CanonicalConceptApplyService.php file - confirmed zero write paths (create/insertOrIgnore/update/delete) to taxonomy_term_concepts, taxonomy_canonical_concepts, or taxonomy_term_cpv_relations anywhere in the class.",
+          "content_fingerprint_added": "protectedTableSignature() - full content hash (tableFingerprint()) for the 2 small graph tables + the cheap version signal (tableVersionSignal(), same mechanism as finding 4) for taxonomy_term_cpv_relations. Computed before/after inside apply()'s transaction, aborts on mismatch even if row counts are unchanged."
+        },
+        "6_relation_approval_revalidation": {
+          "real_gap_found": "EditTaxonomyConceptRelation's $unchanged check only compared source/target/relation_type, not status - approving a relation (candidate -> approved) without touching its endpoints was treated as \"no change\" and skipped revalidation entirely. The pre-existing test suite had even encoded this as expected/passing behavior.",
+          "fix_page_layer": "Now revalidates whenever the submitted status is approved, regardless of whether endpoints changed. validateConceptRelationProposal() gained an optional excludeId parameter so the row being approved doesn't match itself as its own duplicate.",
+          "fix_model_layer": "TaxonomyConceptRelation::booted() adds a saving-event guard that runs the same revalidation for ANY entry point (Filament, tinker, a future API), not just this one page - defense in depth."
+        },
+        "7_test_evidence_gate": {
+          "taxonomy_suite": "148/148 PASS (487 assertions) - includes 9 new tests across findings 2/3/4/5/6",
+          "search_regression_32_queries": "NOT re-run - TASK-0003's changes are scoped to the Phase C1 review queue and taxonomy_concept_relations; none of them feed the search index (empresa_taxonomy_category) until a human approves a term-concept candidate, which did not change in this task. Flagged explicitly rather than silently skipped - orchestrator can request it be run if considered necessary.",
+          "docs_updated": ["audit/phase3_phase_c_apply.md", "docs/task.md", "docs/implementation_plan.md", "audit/orchestrator_handoff.json"]
+        }
+      },
+      "database": {
+        "taxonomy_candidate_concept_links": { "before": 10, "after": 10, "note": "untouched, per finding 5 of the original comment (do not delete the existing rows)" },
+        "taxonomy_concept_relations": { "before": 2, "after": 2 },
+        "taxonomy_term_concepts": { "before": 142, "after": 142, "protected": true },
+        "taxonomy_canonical_concepts": { "before": 79, "after": 79, "protected": true },
+        "taxonomy_term_cpv_relations": { "before": 9749, "after": 9749, "protected": true },
+        "verified_by": "direct read against the shared Supabase instance after the full test run, not the test run's own output"
+      },
+      "production_mutations": {
+        "published_taxonomy": 0,
+        "candidate_decisions": 0,
+        "apply_runs": 0,
+        "note": "No --apply ran against any environment in this task - only code, tests, migration (schema-only, additive, no data touched), and docs changed."
+      },
+      "notes": [
+        "Process note: the first version of the two new hallazgo-6 tests failed for an unrelated reason (the test scenario itself tried to create two rows violating a pre-existing unique constraint) - corrected before reporting green, not left as a false pass. See the 'Nota de proceso' in audit/phase3_c1_corrections_2026-09-28.md.",
+        "Do not begin reviewing the 10 candidates / 2 relations - out of scope for this task."
+      ]
     }
   ]
 }

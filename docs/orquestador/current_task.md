@@ -4,16 +4,21 @@
 
 Archivo: [`tasks/0003-phase-c-corrections.md`](tasks/0003-phase-c-corrections.md)
 
-**Estado:** IN_PROGRESS
+**Estado:** READY_FOR_REVIEW
 
-Ver `PROTOCOL.md` antes de tocar esta tarea. TASK-0001 (Fase C, `--apply`) sigue
-**CORRECTIONS_REQUIRED** — no está aprobada. TASK-0002 (500/503) está `APPROVED` (histórico, ver
-`tasks/0002-review-503.md`).
+Ver `PROTOCOL.md` antes de tocar esta tarea. Los 7 hallazgos del comentario `5872689869` están
+respondidos con código+test — detalle punto por punto en `audit/phase3_c1_corrections_2026-09-28.md`
+y en el checkpoint `TASK-0003` de `audit/orchestrator_handoff.json`. Suite de taxonomía completa:
+148/148 PASS. Ningún `--apply` real corrió; los 10 candidatos/2 relaciones de TASK-0001 siguen
+intactos.
+
+**STOP.** No se revisó/aprobó/rechazó ninguno de los 10 candidatos, no se corrió `--apply` de
+nuevo, no se mergeó a `main`.
 
 ## Tareas anteriores (histórico, no activas)
 
 | Tarea | Estado | Archivo |
 |---|---|---|
-| TASK-0001 | CORRECTIONS_REQUIRED | (Fase C, sin archivo de tarea propio - ver `audit/phase3_phase_c_apply.md`) |
+| TASK-0001 | CORRECTIONS_REQUIRED | (Fase C1, sin archivo de tarea propio - ver `audit/phase3_phase_c_apply.md`) |
 | TASK-0002 | APPROVED | [`tasks/0002-review-503.md`](tasks/0002-review-503.md) |
-| TASK-0003 | IN_PROGRESS | [`tasks/0003-phase-c-corrections.md`](tasks/0003-phase-c-corrections.md) |
+| TASK-0003 | READY_FOR_REVIEW | [`tasks/0003-phase-c-corrections.md`](tasks/0003-phase-c-corrections.md) |
