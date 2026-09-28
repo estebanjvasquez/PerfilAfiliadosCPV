@@ -27,7 +27,7 @@ class BuildTaxonomyCanonicalConcepts extends Command
         {--mode=audit : audit (default, solo lectura) es el único modo soportado fuera de --dry-run}
         {--dry-run : Corre además el Builder multi-signal (retrieval + scoring + tiers), sin persistir nada}
         {--apply : Phase C1 - materializa las propuestas del dry-run en las colas de revisión (NUNCA publica en taxonomy_term_concepts). Implica --dry-run}
-        {--authorized-by= : OBLIGATORIO con --apply (TASK-0003, hallazgo 2) - quién autorizó esta escritura real contra este ambiente. "Autorización para desarrollar Phase C" no es lo mismo que autorización para una corrida real - queda en el audit log}
+        {--authorized-by= : OBLIGATORIO con --apply (TASK-0003, hallazgo 2, cerrado en Issue #2 comentario 5877665979) - referencia de autorización de esta escritura real (ej. "Issue #2 comment 5877665979", "TASK-0003"), debe incluir al menos un dígito. El ambiente objetivo se auto-detecta (app()->environment()), no se pasa acá. Ambos quedan en columnas propias del audit log}
         {--max-writes= : Phase C1 - tope de filas a crear en una corrida de --apply (default 500). Un plan mayor aborta sin escribir nada}
         {--limit= : Tope de términos a procesar en --dry-run (para corridas rápidas de verificación)}
         {--skip-audit : Phase 3.1 - omite AUDIT_EXISTING para medir --dry-run de forma aislada (diagnóstico de performance)}
@@ -78,9 +78,9 @@ class BuildTaxonomyCanonicalConcepts extends Command
             $this->warn('Recordatorio: --apply NUNCA publica en taxonomy_term_concepts. Todo queda en estado pending/candidate esperando aprobación humana.');
             $this->warn('Esto NO es Phase C2 (aplicación de un payload ya revisado, inmutable) - ver docblock de CanonicalConceptApplyService.');
 
-            $authorizedBy = trim((string) $this->option('authorized-by'));
-            if ($authorizedBy === '') {
-                $this->error('--apply requiere --authorized-by="<quién autoriza esta escritura real>" (TASK-0003, hallazgo 2). No se ejecutó nada.');
+            $authorizationReference = trim((string) $this->option('authorized-by'));
+            if ($authorizationReference === '' || ! preg_match('/\d/', $authorizationReference)) {
+                $this->error('--apply requiere --authorized-by="<referencia de autorización con al menos un dígito, ej. \'Issue #2 comment 5877665979\' o \'TASK-0003\'>" (TASK-0003, hallazgo 2). No se ejecutó nada.');
 
                 return self::FAILURE;
             }
@@ -97,7 +97,7 @@ class BuildTaxonomyCanonicalConcepts extends Command
                 ['TOTAL', $plan['total_writes']],
             ]);
 
-            $apply = $applier->apply($dryRun, $authorizedBy, $maxWrites);
+            $apply = $applier->apply($dryRun, $authorizationReference, $maxWrites);
             $result['apply'] = $apply;
 
             if ($apply['result'] !== CanonicalConceptApplyService::RESULT_APPLIED) {
@@ -126,7 +126,7 @@ class BuildTaxonomyCanonicalConcepts extends Command
                 collect($apply['before'])->map(fn ($count, $table) => [$table, $count, $apply['after'][$table] ?? '?'])->values()->all()
             );
             $this->info("Fingerprint estampado en cada candidato: {$apply['fingerprint']}");
-            $this->info("Autorizado por: {$apply['authorized_by']}");
+            $this->info("Referencia de autorización: {$apply['authorization_reference']} | Ambiente: {$apply['target_environment']}");
         }
 
         if ($this->option('save-snapshot')) {

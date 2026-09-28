@@ -164,7 +164,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
             'all_results' => [$this->scoredPair($term->id, $concept->id, TaxonomyCandidateConceptLink::TIER_AUTO_ACCEPT, 0.95)],
         ]);
 
-        $outcome = $this->service()->apply($dryRun, authorizedBy: 'test-suite');
+        $outcome = $this->service()->apply($dryRun, authorizationReference: 'TASK-0003 test-suite');
 
         $this->assertSame(CanonicalConceptApplyService::RESULT_APPLIED, $outcome['result']);
         $this->assertSame(1, $outcome['created']['term_concept_candidates']);
@@ -186,7 +186,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
 
         $this->service()->apply($this->fakeDryRun([
             'all_results' => [$this->scoredPair($term->id, $concept->id, TaxonomyCandidateConceptLink::TIER_AUTO_ACCEPT, 0.99)],
-        ]), authorizedBy: 'test-suite');
+        ]), authorizationReference: 'TASK-0003 test-suite');
 
         // La propiedad que define Phase C: ni el tier más alto publica solo.
         $this->assertSame($before, DB::connection('pgsql')->table('taxonomy_term_concepts')->count());
@@ -211,7 +211,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
                 'provenance' => ['generated_by' => 'test'],
                 'evidence' => [],
             ]]],
-        ]), authorizedBy: 'test-suite');
+        ]), authorizationReference: 'TASK-0003 test-suite');
 
         $this->assertSame(1, $outcome['created']['concept_relations']);
         $relation = TaxonomyConceptRelation::where('source_concept_id', $source->id)->firstOrFail();
@@ -232,8 +232,8 @@ class CanonicalConceptApplyServiceTest extends TestCase
             'all_results' => [$this->scoredPair($term->id, $concept->id, TaxonomyCandidateConceptLink::TIER_REVIEW)],
         ]);
 
-        $first = $this->service()->apply($dryRun, authorizedBy: 'test-suite');
-        $second = $this->service()->apply($dryRun, authorizedBy: 'test-suite');
+        $first = $this->service()->apply($dryRun, authorizationReference: 'TASK-0003 test-suite');
+        $second = $this->service()->apply($dryRun, authorizationReference: 'TASK-0003 test-suite');
 
         $this->assertSame(1, $first['created']['term_concept_candidates']);
         $this->assertSame(0, $second['created']['term_concept_candidates']);
@@ -257,7 +257,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
 
         $outcome = $this->service()->apply($this->fakeDryRun([
             'all_results' => [$this->scoredPair($term->id, $concept->id, TaxonomyCandidateConceptLink::TIER_AUTO_ACCEPT)],
-        ]), authorizedBy: 'test-suite');
+        ]), authorizationReference: 'TASK-0003 test-suite');
 
         $this->assertSame(0, $outcome['created']['term_concept_candidates']);
         $this->assertSame(1, $outcome['skipped']['term_concept_candidates']);
@@ -277,7 +277,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
         ]);
 
         $before = TaxonomyCandidateConceptLink::count();
-        $outcome = $this->service()->apply($dryRun, authorizedBy: 'test-suite');
+        $outcome = $this->service()->apply($dryRun, authorizationReference: 'TASK-0003 test-suite');
 
         $this->assertSame(CanonicalConceptApplyService::RESULT_ABORTED_STALE_FINGERPRINT, $outcome['result']);
         $this->assertSame($before, TaxonomyCandidateConceptLink::count());
@@ -296,7 +296,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
         ]);
 
         $before = TaxonomyCandidateConceptLink::count();
-        $outcome = $this->service()->apply($dryRun, authorizedBy: 'test-suite', maxWrites: 2);
+        $outcome = $this->service()->apply($dryRun, authorizationReference: 'TASK-0003 test-suite', maxWrites: 2);
 
         $this->assertSame(CanonicalConceptApplyService::RESULT_ABORTED_WRITE_CAP, $outcome['result']);
         $this->assertSame($before, TaxonomyCandidateConceptLink::count());
@@ -305,7 +305,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
     #[Test]
     public function apply_on_an_empty_plan_reports_nothing_to_apply(): void
     {
-        $outcome = $this->service()->apply($this->fakeDryRun(), authorizedBy: 'test-suite');
+        $outcome = $this->service()->apply($this->fakeDryRun(), authorizationReference: 'TASK-0003 test-suite');
 
         $this->assertSame(CanonicalConceptApplyService::RESULT_NOTHING_TO_APPLY, $outcome['result']);
     }
@@ -318,7 +318,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
 
         $this->service()->apply($this->fakeDryRun([
             'all_results' => [$this->scoredPair($term->id, $concept->id, TaxonomyCandidateConceptLink::TIER_REVIEW)],
-        ]), authorizedBy: 'test-suite');
+        ]), authorizationReference: 'TASK-0003 test-suite');
 
         $candidate = TaxonomyCandidateConceptLink::where('suggested_term_id', $term->id)->firstOrFail();
         $audit = DB::connection('pgsql')->table('taxonomy_audit_log')
@@ -337,7 +337,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
 
     /** Hallazgo 2: sin autorización explícita, ni siquiera se evalúa el plan. */
     #[Test]
-    public function apply_refuses_to_run_without_an_explicit_authorized_by(): void
+    public function apply_refuses_to_run_without_an_explicit_authorization_reference(): void
     {
         $term = $this->term();
         $concept = $this->concept();
@@ -348,10 +348,78 @@ class CanonicalConceptApplyServiceTest extends TestCase
         try {
             $this->service()->apply($this->fakeDryRun([
                 'all_results' => [$this->scoredPair($term->id, $concept->id, TaxonomyCandidateConceptLink::TIER_REVIEW)],
-            ]), authorizedBy: '   ');
+            ]), authorizationReference: '   ');
         } finally {
-            $this->assertSame($before, TaxonomyCandidateConceptLink::count(), 'Un authorizedBy vacío no debe escribir nada, ni siquiera antes de tirar la excepción.');
+            $this->assertSame($before, TaxonomyCandidateConceptLink::count(), 'Un authorizationReference vacío no debe escribir nada, ni siquiera antes de tirar la excepción.');
         }
+    }
+
+    /**
+     * Cierre de gate (Issue #2, comentario `5877665979`): "not merely a free-form name" - un
+     * nombre libre sin ningún dígito (no una referencia real como "TASK-0003" o "Issue #2 comment
+     * 5877665979") se rechaza. Nudge de formato, no autenticación - el propio comentario pidió
+     * explícitamente no sobre-ingenierizar esto en RBAC.
+     */
+    #[Test]
+    public function apply_refuses_an_authorization_reference_that_is_just_a_free_form_name_with_no_digit(): void
+    {
+        $term = $this->term();
+        $concept = $this->concept();
+        $before = TaxonomyCandidateConceptLink::count();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        try {
+            $this->service()->apply($this->fakeDryRun([
+                'all_results' => [$this->scoredPair($term->id, $concept->id, TaxonomyCandidateConceptLink::TIER_REVIEW)],
+            ]), authorizationReference: 'esteban');
+        } finally {
+            $this->assertSame($before, TaxonomyCandidateConceptLink::count());
+        }
+    }
+
+    /**
+     * Cierre de gate: la referencia de autorización y el ambiente objetivo quedan persistidos de
+     * forma ESTRUCTURADA (columnas propias de `taxonomy_audit_log`), no solo embebidos en la
+     * prosa de `reason` - para cada fila creada, tanto de candidatos como de relaciones.
+     */
+    #[Test]
+    public function apply_persists_the_authorization_reference_and_target_environment_as_structured_audit_columns(): void
+    {
+        $term = $this->term();
+        $concept = $this->concept();
+        $source = $this->concept();
+        $target = $this->concept();
+
+        $this->service()->apply($this->fakeDryRun([
+            'all_results' => [$this->scoredPair($term->id, $concept->id, TaxonomyCandidateConceptLink::TIER_REVIEW)],
+            'concept_relation_proposals' => ['proposals' => [[
+                'source_concept_id' => $source->id,
+                'target_concept_id' => $target->id,
+                'relation_type' => 'RELATED_TO',
+                'confidence' => 0.7,
+                'provenance' => [],
+                'evidence' => [],
+            ]]],
+        ]), authorizationReference: 'Issue #2 comment 5877665979');
+
+        $candidate = TaxonomyCandidateConceptLink::where('suggested_term_id', $term->id)->firstOrFail();
+        $candidateAudit = DB::connection('pgsql')->table('taxonomy_audit_log')
+            ->where('entity_type', TaxonomyCandidateConceptLink::class)
+            ->where('entity_id', $candidate->id)
+            ->first();
+        $this->assertSame('Issue #2 comment 5877665979', $candidateAudit->authorization_reference);
+        $this->assertSame('testing', $candidateAudit->target_environment);
+
+        $relation = TaxonomyConceptRelation::where('source_concept_id', $source->id)->firstOrFail();
+        $relationAudit = DB::connection('pgsql')->table('taxonomy_audit_log')
+            ->where('entity_type', TaxonomyConceptRelation::class)
+            ->where('entity_id', $relation->id)
+            ->first();
+        $this->assertSame('Issue #2 comment 5877665979', $relationAudit->authorization_reference);
+        $this->assertSame('testing', $relationAudit->target_environment);
+        $this->assertSame('Issue #2 comment 5877665979', $relation->provenance['authorization_reference']);
+        $this->assertSame('testing', $relation->provenance['target_environment']);
     }
 
     /**
@@ -416,7 +484,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
                 $this->scoredPair($term->id, $concept->id, TaxonomyCandidateConceptLink::TIER_REVIEW),
                 $this->scoredPair($otherTerm->id, $otherConcept->id, TaxonomyCandidateConceptLink::TIER_REVIEW),
             ],
-        ]), authorizedBy: 'test-suite');
+        ]), authorizationReference: 'TASK-0003 test-suite');
 
         // La transacción entera sigue OK - el par que perdió la carrera se omite, el otro par se crea.
         $this->assertSame(CanonicalConceptApplyService::RESULT_APPLIED, $outcome['result']);
@@ -440,7 +508,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
         // scoring sí (un término nuevo apareció). El fingerprint angosto no lo vería; el amplio sí.
         $this->term();
 
-        $outcome = $this->service()->apply($dryRun, authorizedBy: 'test-suite');
+        $outcome = $this->service()->apply($dryRun, authorizationReference: 'TASK-0003 test-suite');
 
         $this->assertSame(CanonicalConceptApplyService::RESULT_ABORTED_STALE_FINGERPRINT, $outcome['result']);
     }
@@ -480,7 +548,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
                 'possible_existing_concepts' => [],
                 'reason' => 'motivo',
             ]],
-        ]), authorizedBy: 'test-suite');
+        ]), authorizationReference: 'TASK-0003 test-suite');
 
         $this->assertSame(CanonicalConceptApplyService::RESULT_APPLIED, $outcome['result']);
         // Las 9.749 relaciones CPV y el grafo publicado quedan exactamente igual.
@@ -513,7 +581,7 @@ class CanonicalConceptApplyServiceTest extends TestCase
                 'provenance' => [],
                 'evidence' => [],
             ]]],
-        ]), authorizedBy: 'test-suite');
+        ]), authorizationReference: 'TASK-0003 test-suite');
 
         $this->assertSame(0, $outcome['created']['concept_relations']);
         $this->assertSame(1, $outcome['skipped']['concept_relations']);

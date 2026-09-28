@@ -273,3 +273,113 @@ hallazgo 5 del comentario original (no borrar las 10/2 filas existentes).
 
 Ver `audit/orchestrator_handoff.json` (checkpoint `TASK-0003`) para el resumen dirigido al
 orquestador.
+
+---
+
+## Cierre de gate (Issue #2, comentario `5877665979`)
+
+El re-audit del orquestador aceptó los hallazgos 1/3/4/5/6 tal cual quedaron arriba y encontró 2
+gates angostos pendientes antes de aprobar. Este bloque los responde.
+
+### Corrección de framing: "zero production mutations" era impreciso
+
+El re-audit señaló correctamente que la migración de índices únicos
+(`2026_09_28_165653_add_unique_constraints_to_taxonomy_candidate_concept_links`) **sí corrió contra
+la instancia compartida de Supabase** (la misma base a la que apunta local/staging/producción) - es
+una mutación de ESQUEMA persistente, aunque no tocó ninguna fila de datos. Reportar "cero mutaciones
+de producción" sin calificar era impreciso. Corregido: **cero mutaciones de DATOS/taxonomía**, con
+la mutación de esquema explícitamente reconocida (ver `audit/orchestrator_handoff.json`,
+`production_mutations.schema_mutations`). Esta tarea agrega una SEGUNDA migración de esquema (ver
+gate 2 abajo), con el mismo criterio: reconocida explícitamente, no descrita como "sin mutaciones".
+Ningún rollback fue pedido para ninguna de las dos.
+
+### Gate 1 — Regresión de 32 queries: BLOCKED (no re-corrida)
+
+**No se pudo ejecutar.** La suite (`perfilafiliados-mcp/scripts/regression-suite.mjs` contra el
+fixture congelado `perfilafiliados-mcp/scripts/fixtures/regression-cases.json`, 32 casos) necesita
+`DEBUG_TOKEN` del Worker de Cloudflare desplegado, para autenticar contra `POST /debug-search`.
+
+Verificado en esta sesión (no asumido, mismo método que la auditoría del 2026-09-23):
+- `DEBUG_TOKEN`/`MCP_TOKEN`/`MCP_EMBED_TOKEN`/`MCP_EMBED_URL` no existen en el `.env` de staging
+  (`/opt/perfilafiliados/.env`, verificado solo existencia de clave, nunca valor, vía SSH).
+- No hay credenciales de Cloudflare (`wrangler`, variables de entorno `CLOUDFLARE_*`/`CF_API_*`)
+  disponibles en esta sesión.
+- `DEBUG_TOKEN` es un secreto de Worker - no se puede leer una vez seteado, solo rotar.
+
+Es el **mismo bloqueo exacto** que documentó `audit/regression_2026-09-22.md`/
+`regression_2026-09-23.md` en la sesión anterior, que en ese momento se resolvió con autorización
+EXPLÍCITA del usuario para rotar el token. Se le preguntó a Esteban cómo proceder (dar el valor,
+autorizar una rotación, o dejar el gate documentado como bloqueado) - **eligió dejarlo documentado
+como bloqueado por ahora**, sin rotar ningún secreto ni intentar adivinar/recuperar el valor.
+
+**Estado: BLOCKED — AUTH CREDENTIAL REQUIRED**, con causa exacta documentada, igual que la vez
+anterior. No se debe interpretar como fallo de búsqueda ni como señal de que el código de esta
+tarea rompió algo - **ningún cambio de TASK-0002/TASK-0003 toca el código de resolución de
+búsqueda** (Worker `perfilafiliados-mcp`, `hybrid-search.ts`) ni el grafo publicado que ese motor
+lee (`taxonomy_term_concepts`, `empresa_taxonomy_category` - ninguno de los dos cambió, ver
+invariantes arriba). Es una inferencia razonable de por qué no debería haber regresión, no un
+sustituto de la corrida real - queda pendiente hasta que el usuario decida desbloquearlo.
+
+### Gate 2 — Referencia de autorización + ambiente objetivo: CERRADO
+
+El re-audit aceptó `authorizedBy` como atribución útil pero señaló, correctamente, que cualquier
+llamador podía pasar un string arbitrario, y que el pedido original era registrar "the exact human
+authorization AND target environment" antes de un `--apply` real - de forma persistida, no solo
+attribution.
+
+**Cambios:**
+
+1. **`apply()` renombró el parámetro** `$authorizedBy` → `$authorizationReference`, y ahora exige
+   que contenga al menos un dígito además de no estar vacío (`preg_match('/\d/', ...)`) - un nudge
+   de formato para que sea una REFERENCIA (`"Issue #2 comment 5877665979"`, `"TASK-0003"`) y no
+   "merely a free-form name" (un nombre como `"esteban"` ya no pasa). **Explícitamente no es
+   autenticación/RBAC** - el propio comentario pidió no sobre-ingenierizar esto, y esta validación
+   es solo una restricción de formato, nunca una verificación de identidad.
+2. **`target_environment` ya NO es un parámetro que el llamador provee** - `apply()` lo auto-captura
+   internamente vía `app()->environment()`. Deliberado: pedirlo como parámetro habría repetido el
+   MISMO defecto que el re-audit señaló para `authorizedBy` (un string que cualquiera puede
+   inventar). Auto-detectado, no se puede mentir sobre el ambiente.
+3. **Persistencia estructurada, no solo prosa embebida en `reason`:** nueva migración
+   `2026_09_28_211540_add_execution_context_to_taxonomy_audit_log_table` agrega
+   `authorization_reference VARCHAR(255)` y `target_environment VARCHAR(30)` a `taxonomy_audit_log`
+   (mismo patrón que `add_actor_columns_to_taxonomy_audit_log_table`, TAXV3-1 - columnas nuevas,
+   nullable, sin backfill de historial). Corrida contra la instancia compartida de Supabase
+   (`php artisan migrate:status` confirma `Ran`). `TaxonomyAuditLogger::record()` ganó los
+   parámetros opcionales `$authorizationReference`/`$targetEnvironment` (default `null`, todos los
+   call sites existentes - humanos, vía Filament - siguen sin cambios). Toda fila de
+   `taxonomy_candidate_concept_links` Y toda fila de `taxonomy_concept_relations` creada por
+   `apply()` ahora tiene su propia entrada de audit log con ambos campos poblados - no solo el
+   candidato/relación en sí, la fila de AUDITORÍA de cada uno.
+4. **`taxonomy_concept_relations.provenance`** (ya JSONB) también lleva `authorization_reference` y
+   `target_environment` (antes solo `authorized_by`).
+
+**No se corrió ningún `--apply` real para probar esto** (pedido explícito del comentario) - se
+probó con tests dentro de transacciones con rollback (`DatabaseTransactions`).
+
+**Tests nuevos:**
+- `apply_refuses_to_run_without_an_explicit_authorization_reference` (reemplaza el test equivalente
+  de la ronda anterior, mismo nombre actualizado).
+- `apply_refuses_an_authorization_reference_that_is_just_a_free_form_name_with_no_digit` - prueba
+  el nudge de formato específicamente (`'esteban'` rechazado).
+- `apply_persists_the_authorization_reference_and_target_environment_as_structured_audit_columns` -
+  crea un candidato Y una relación en la misma corrida, confirma que AMBOS quedan con
+  `authorization_reference`/`target_environment` poblados en sus respectivas filas de
+  `taxonomy_audit_log`, y que la relación además los lleva en su propio `provenance`.
+
+### Resultado final de tests (después de los 2 gates)
+
+**`CanonicalConceptApplyServiceTest`: 21/21 PASS (58 assertions)** - los 19 de la ronda anterior más
+los 2 nuevos de formato/persistencia (el tercero, de persistencia estructurada, reemplazó y amplió
+el de "audit row per created candidate" ya existente en cobertura, no en reemplazo de ese test).
+
+### Invariantes de base de datos (re-verificado después del gate 2)
+
+| Tabla | Esperado | Verificado |
+|---|---|---|
+| `taxonomy_candidate_concept_links` | 10 | 10 |
+| `taxonomy_concept_relations` | 2 | 2 |
+| `taxonomy_term_concepts` | 142 | 142 |
+| `taxonomy_canonical_concepts` | 79 | 79 |
+| `taxonomy_term_cpv_relations` | 9749 | 9749 |
+
+Sin cambios - ningún `--apply` real corrió tampoco en esta ronda de correcciones.

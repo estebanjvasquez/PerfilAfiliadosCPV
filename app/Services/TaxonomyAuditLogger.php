@@ -26,6 +26,12 @@ class TaxonomyAuditLogger
 
     public const ACTOR_SYSTEM = 'system';
 
+    /**
+     * TASK-0003 (cierre de gate, Issue #2 comentario `5877665979`): `$authorizationReference`/
+     * `$targetEnvironment` son opcionales con default `null` - todos los call sites existentes
+     * (humanos, vía Filament) siguen funcionando sin cambios. Solo `CanonicalConceptApplyService`
+     * los pasa hoy, porque es la única escritura que corre sin un usuario autenticado detrás.
+     */
     public static function record(
         string $entityType,
         int|string $entityId,
@@ -35,6 +41,8 @@ class TaxonomyAuditLogger
         ?string $reason = null,
         string $actorType = self::ACTOR_USER,
         ?string $algorithmVersion = null,
+        ?string $authorizationReference = null,
+        ?string $targetEnvironment = null,
     ): void {
         if (self::stringify($oldValue) === self::stringify($newValue)) {
             return;
@@ -50,6 +58,8 @@ class TaxonomyAuditLogger
             'reason' => $reason,
             'actor_type' => $actorType,
             'algorithm_version' => $algorithmVersion,
+            'authorization_reference' => $authorizationReference,
+            'target_environment' => $targetEnvironment,
             'created_at' => now(),
         ]);
     }

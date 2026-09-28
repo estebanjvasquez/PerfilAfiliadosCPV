@@ -58,13 +58,19 @@ use Illuminate\Support\Facades\DB;
  *      ver el docblock de ese método). Si cualquiera de esos insumos cambió entre el scoring y la
  *      escritura, se aborta: las propuestas se calcularon contra un estado que ya no existe.
  *   4. Tope de escrituras - un plan más grande que `maxWrites` aborta antes de escribir nada.
- *   5. Autorización humana explícita (TASK-0003, hallazgo 2) - `apply()` exige un `$authorizedBy`
- *      no vacío. Sin él, ni siquiera compila la llamada (parámetro obligatorio, no una bandera
- *      opcional que se pueda olvidar). Queda registrado en cada fila de audit log - "development
- *      authorization" (poder desarrollar Phase C) nunca implica "production write authorization"
- *      (poder correr `--apply` contra un ambiente real) - son autorizaciones distintas.
- *   6. Audit log por cada fila creada (`actor_type=system` + `algorithm_version` + quién autorizó
- *      la corrida), nunca silencioso.
+ *   5. Autorización humana explícita, con referencia estructurada (TASK-0003, hallazgo 2, cerrado
+ *      en el comentario `5877665979` de Issue #2) - `apply()` exige un `$authorizationReference`
+ *      no vacío y con al menos un dígito (para que sea una REFERENCIA, no un nombre libre). El
+ *      ambiente objetivo (`target_environment`) NUNCA lo provee quien llama - se auto-captura de
+ *      `app()->environment()` dentro del propio método, así no repite el mismo defecto ("cualquiera
+ *      puede inventar un string"). Ambos quedan en columnas propias de `taxonomy_audit_log`
+ *      (`authorization_reference`, `target_environment` - migración
+ *      `add_execution_context_to_taxonomy_audit_log_table`), no solo embebidos en la prosa de
+ *      `reason`. "Development authorization" (poder desarrollar Phase C) nunca implica "production
+ *      write authorization" (poder correr `--apply` contra un ambiente real) - son autorizaciones
+ *      distintas.
+ *   6. Audit log por cada fila creada (`actor_type=system` + `algorithm_version` +
+ *      `authorization_reference` + `target_environment`), nunca silencioso.
  *   7. Provenance - cada candidato queda estampado con `taxonomy_state_fingerprint` (Phase C1 es el
  *      "productor" que faltaba del contrato de Phase B.1, sección 16 de su auditoría).
  *   8. Protección estructural de tablas protegidas (TASK-0003, hallazgo 5) - esta clase no tiene
@@ -187,19 +193,31 @@ class CanonicalConceptApplyService
      * @param  array  $dryRun  Resultado de `dryRun()` - se usa el MISMO objeto que produjo el scoring,
      *                         nunca una corrida nueva, para que el fingerprint estampado corresponda
      *                         al estado contra el que se calcularon las propuestas.
-     * @param  string  $authorizedBy  TASK-0003, hallazgo 2: quién autorizó ESTA corrida contra ESTE
-     *                                ambiente - obligatorio, sin default, para que sea estructuralmente
-     *                                imposible invocar `apply()` sin una autorización explícita
-     *                                registrada. "Autorización para desarrollar Phase C" (la que ya
-     *                                dio el usuario) no es lo mismo que "autorización para esta
-     *                                escritura real" - queda una por corrida, en el audit log.
+     * @param  string  $authorizationReference  TASK-0003, cierre de gate (Issue #2 comentario
+     *                 `5877665979`): identificador de la autorización de ESTA corrida (ej. "Issue #2
+     *                 comment 5877665979", "TASK-0003") - obligatorio, sin default, y debe contener
+     *                 al menos un dígito (nudge de formato para que no sea "merely a free-form name";
+     *                 explícitamente NO un mecanismo de autenticación/RBAC - el propio hallazgo pidió
+     *                 no sobre-ingenierizar esto). El ambiente objetivo NO es un parámetro - se
+     *                 auto-captura de `app()->environment()` dentro del método, precisamente para no
+     *                 repetir el mismo defecto ("cualquiera puede inventar un string") en ese campo.
      * @return array{result:string, created:array, skipped:array, plan:array, before:array, after:array, fingerprint:?string}
      */
-    public function apply(array $dryRun, string $authorizedBy, int $maxWrites = self::DEFAULT_MAX_WRITES): array
+    public function apply(array $dryRun, string $authorizationReference, int $maxWrites = self::DEFAULT_MAX_WRITES): array
     {
-        if (trim($authorizedBy) === '') {
-            throw new \InvalidArgumentException('apply() requiere $authorizedBy no vacío - quién autorizó esta escritura real (TASK-0003, hallazgo 2). No es opcional.');
+        if (trim($authorizationReference) === '') {
+            throw new \InvalidArgumentException('apply() requiere $authorizationReference no vacío - la referencia de autorización de esta escritura real (TASK-0003, hallazgo 2). No es opcional.');
         }
+
+        if (! preg_match('/\d/', $authorizationReference)) {
+            throw new \InvalidArgumentException(
+                'apply() requiere que $authorizationReference sea una REFERENCIA (ej. "Issue #2 comment 5877665979", "TASK-0003"), no un nombre libre - '.
+                'debe contener al menos un dígito. Esto es un nudge de formato, no una verificación de identidad.'
+            );
+        }
+
+        // Auto-capturado, no provisto por quien llama - ver el docblock de este método.
+        $targetEnvironment = app()->environment();
 
         $plan = $this->planFrom($dryRun);
 
@@ -213,7 +231,7 @@ class CanonicalConceptApplyService
             ]);
         }
 
-        return DB::connection('pgsql')->transaction(function () use ($plan, $authorizedBy) {
+        return DB::connection('pgsql')->transaction(function () use ($plan, $authorizationReference, $targetEnvironment) {
             $before = $this->counts();
             $protectedBefore = $this->protectedTableSignature();
 
@@ -260,7 +278,12 @@ class CanonicalConceptApplyService
                     ->where('suggested_concept_id', $candidate['suggested_concept_id'])
                     ->firstOrFail();
 
-                $this->audit($row->id, "Candidato término→concepto encolado por --apply (term_id={$candidate['suggested_term_id']}, concept_id={$candidate['suggested_concept_id']}, tier={$candidate['tier']}, confidence={$candidate['confidence']}, autorizado_por={$authorizedBy})");
+                $this->audit(
+                    $row->id,
+                    "Candidato término→concepto encolado por --apply (term_id={$candidate['suggested_term_id']}, concept_id={$candidate['suggested_concept_id']}, tier={$candidate['tier']}, confidence={$candidate['confidence']})",
+                    $authorizationReference,
+                    $targetEnvironment,
+                );
                 $created['term_concept_candidates']++;
             }
 
@@ -291,7 +314,12 @@ class CanonicalConceptApplyService
                     ->whereNull('suggested_concept_id')
                     ->firstOrFail();
 
-                $this->audit($row->id, "Propuesta de concepto NUEVO encolada por --apply (term_id={$candidate['suggested_term_id']}, nombre sugerido=\"{$candidate['suggested_new_concept_name']}\", autorizado_por={$authorizedBy})");
+                $this->audit(
+                    $row->id,
+                    "Propuesta de concepto NUEVO encolada por --apply (term_id={$candidate['suggested_term_id']}, nombre sugerido=\"{$candidate['suggested_new_concept_name']}\")",
+                    $authorizationReference,
+                    $targetEnvironment,
+                );
                 $created['new_concept_candidates']++;
             }
 
@@ -328,7 +356,8 @@ class CanonicalConceptApplyService
                         'algorithm_version' => self::ALGORITHM_VERSION,
                         'taxonomy_state_fingerprint' => $currentFingerprint,
                         'evidence' => $relation['evidence'],
-                        'authorized_by' => $authorizedBy,
+                        'authorization_reference' => $authorizationReference,
+                        'target_environment' => $targetEnvironment,
                     ]),
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -351,9 +380,11 @@ class CanonicalConceptApplyService
                     field: 'status',
                     oldValue: null,
                     newValue: $row->status,
-                    reason: "Relación concepto↔concepto propuesta por --apply ({$relation['source_concept_id']} -{$relation['relation_type']}-> {$relation['target_concept_id']}, confidence={$relation['confidence']}, autorizado_por={$authorizedBy})",
+                    reason: "Relación concepto↔concepto propuesta por --apply ({$relation['source_concept_id']} -{$relation['relation_type']}-> {$relation['target_concept_id']}, confidence={$relation['confidence']})",
                     actorType: TaxonomyAuditLogger::ACTOR_SYSTEM,
                     algorithmVersion: self::ALGORITHM_VERSION,
+                    authorizationReference: $authorizationReference,
+                    targetEnvironment: $targetEnvironment,
                 );
                 $created['concept_relations']++;
             }
@@ -383,7 +414,8 @@ class CanonicalConceptApplyService
                 'before' => $before,
                 'after' => $after,
                 'fingerprint' => $currentFingerprint,
-                'authorized_by' => $authorizedBy,
+                'authorization_reference' => $authorizationReference,
+                'target_environment' => $targetEnvironment,
             ]);
         });
     }
@@ -432,7 +464,7 @@ class CanonicalConceptApplyService
         return $counts;
     }
 
-    private function audit(int $candidateId, string $reason): void
+    private function audit(int $candidateId, string $reason, string $authorizationReference, string $targetEnvironment): void
     {
         TaxonomyAuditLogger::record(
             entityType: TaxonomyCandidateConceptLink::class,
@@ -443,6 +475,8 @@ class CanonicalConceptApplyService
             reason: $reason,
             actorType: TaxonomyAuditLogger::ACTOR_SYSTEM,
             algorithmVersion: self::ALGORITHM_VERSION,
+            authorizationReference: $authorizationReference,
+            targetEnvironment: $targetEnvironment,
         );
     }
 
