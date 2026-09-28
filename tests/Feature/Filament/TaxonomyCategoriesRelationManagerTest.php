@@ -58,11 +58,19 @@ class TaxonomyCategoriesRelationManagerTest extends TestCase
         return [$empresa, $user];
     }
 
-    /** @return array{0: TaxonomyCategory, 1: TaxonomyCategory} Grupo->Familia y una Categoría hija de esa Familia. */
+    /**
+     * @return array{0: TaxonomyCategory, 1: TaxonomyCategory} Grupo->Familia y una Categoría hija de esa Familia.
+     *
+     * El código del grupo se sortea en el espacio de 3 dígitos (`CPV-900`..`CPV-999`) a propósito:
+     * la taxonomía CPV real usa códigos de 2 dígitos y hoy ocupa `CPV-10`..`CPV-48` (39 de los 89
+     * valores posibles). Sortear en 2 dígitos —como hacía este fixture— colisionaba con datos reales
+     * el ~44% de las corridas, con un `UniqueConstraintViolationException` sobre
+     * `supplier_categories_supplhi_code_unique` que no tenía nada que ver con lo que el test verifica.
+     */
     private function familiaConHija(): array
     {
         $grupo = TaxonomyCategory::create([
-            'code' => 'CPV-'.random_int(10, 98),
+            'code' => 'CPV-'.random_int(900, 999),
             'parent_id' => null,
             'is_active' => true,
             'source_version' => 'test',
