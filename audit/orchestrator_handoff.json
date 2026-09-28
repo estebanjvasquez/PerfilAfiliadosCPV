@@ -101,12 +101,26 @@
       "source": "Issue #2 comment 5872689869 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5872689869)",
       "audit": "audit/phase3_c1_corrections_2026-09-28.md",
       "review_base_sha": "7ab0d82cad3389e9943557e4268522ae024df3ba",
-      "review_head_sha": "d81b7962ed87e937eacfef078a4292fa91865124",
+      "review_head_sha": "1fb8a5af2a996609f04360fca591285241d1f23c",
       "handoff_commit_sha": "SEE_HEAD_OF_PUSH - a commit cannot contain its own hash; this file's commit is the HEAD reported in the final READY_FOR_REVIEW response for TASK-0003",
       "phase_c1_c2_split_adopted": true,
+      "re_audit_rounds": [
+        {
+          "orchestrator_comment": "5872689869",
+          "verdict": "CORRECTIONS_REQUIRED - 7 findings",
+          "our_commit": "d81b7962ed87e937eacfef078a4292fa91865124"
+        },
+        {
+          "orchestrator_comment": "5877665979",
+          "verdict": "CORRECTIONS_REQUIRED (narrow) - findings 1/3/4/5/6 accepted as-is; 2 gates left: (1) re-run the 32-query search regression, (2) strengthen authorization record to a structured reference + auto-detected target environment, and qualify 'zero production mutations' as 'zero data mutations' given the schema-only migration",
+          "our_commit": "1fb8a5af2a996609f04360fca591285241d1f23c",
+          "gate_1_32_query_regression": "BLOCKED - needs perfilafiliados-mcp's Cloudflare Worker DEBUG_TOKEN, which exists in no reachable environment (re-verified via SSH against staging's .env, same result as audit/regression_2026-09-22.md) and no Cloudflare credentials are available in this session to rotate it. Asked the user how to proceed (provide the token / authorize rotating it / leave documented as blocked) - they chose to leave it blocked rather than rotate a shared secret. Not re-run.",
+          "gate_2_authorization_target_env": "CLOSED - see findings_response.2_production_write_authorization below (updated for this round)."
+        }
+      ],
       "findings_response": {
         "1_contract_mismatch": "Relabeled as Phase C1 (queue materialization). PHASE_LABEL=PHASE_C1_QUEUE_MATERIALIZATION, ALGORITHM_VERSION bumped to phase-c1-v1. Phase C2 (reviewed immutable payload -> apply -> validate -> commit/rollback) documented as separate, unimplemented future work - not built in this task.",
-        "2_production_write_authorization": "apply(array $dryRun, string $authorizedBy, int $maxWrites = ...) - $authorizedBy is required with no default, throws InvalidArgumentException if blank. CLI requires --authorized-by. Recorded in every audit log row and in concept_relations.provenance.authorized_by. No --apply ran against any environment in this task.",
+        "2_production_write_authorization": "CLOSED in round 2 (comment 5877665979). apply(array $dryRun, string $authorizationReference, int $maxWrites = ...) - required, non-empty, AND must contain at least one digit (format nudge so it's a reference like 'Issue #2 comment 5877665979', not a free-form name - explicitly not authentication/RBAC). target_environment is no longer caller-supplied at all - auto-captured via app()->environment() inside apply(), so it can't be spoofed the way authorizedBy could. Both persisted as structured columns on taxonomy_audit_log (migration add_execution_context_to_taxonomy_audit_log_table: authorization_reference, target_environment) for every candidate AND every relation row created, not just embedded in the reason string. taxonomy_concept_relations.provenance also carries both keys. No --apply ran against any environment to test this - covered by 3 tests inside DatabaseTransactions.",
         "3_concurrency_safe_idempotency": {
           "mechanism": "Postgres partial unique indexes + insertOrIgnore() (compiles to INSERT ... ON CONFLICT DO NOTHING) - the database arbitrates concurrent writes, not a check-then-act read in the application.",
           "taxonomy_candidate_concept_links": "Had NO unique constraint before this task (confirmed by reading the code, not assumed). New migration 2026_09_28_165653_add_unique_constraints_to_taxonomy_candidate_concept_links adds two partial unique indexes: (suggested_term_id, suggested_concept_id) WHERE suggested_concept_id IS NOT NULL, and (suggested_term_id) WHERE suggested_concept_id IS NULL. Ran successfully against the shared Supabase instance (php artisan migrate:status confirms [53] Ran), which also proves no duplicate rows existed beforehand.",
@@ -130,9 +144,9 @@
           "fix_model_layer": "TaxonomyConceptRelation::booted() adds a saving-event guard that runs the same revalidation for ANY entry point (Filament, tinker, a future API), not just this one page - defense in depth."
         },
         "7_test_evidence_gate": {
-          "taxonomy_suite": "148/148 PASS (487 assertions) - includes 9 new tests across findings 2/3/4/5/6",
-          "search_regression_32_queries": "NOT re-run - TASK-0003's changes are scoped to the Phase C1 review queue and taxonomy_concept_relations; none of them feed the search index (empresa_taxonomy_category) until a human approves a term-concept candidate, which did not change in this task. Flagged explicitly rather than silently skipped - orchestrator can request it be run if considered necessary.",
-          "docs_updated": ["audit/phase3_phase_c_apply.md", "docs/task.md", "docs/implementation_plan.md", "audit/orchestrator_handoff.json"]
+          "taxonomy_suite": "150/150 PASS (495 assertions) after round 2 - includes 12 new tests total across findings 2/3/4/5/6 plus the gate-2 closure tests",
+          "search_regression_32_queries": "STILL BLOCKED after round 2 - see re_audit_rounds[1].gate_1_32_query_regression above. The orchestrator explicitly required this be actually re-run, not reasoned about; it was not silently skipped, it is an acknowledged open item pending a Cloudflare credential decision from the user.",
+          "docs_updated": ["audit/phase3_phase_c_apply.md", "docs/task.md", "docs/implementation_plan.md", "audit/orchestrator_handoff.json", "audit/phase3_c1_corrections_2026-09-28.md"]
         }
       },
       "database": {
@@ -147,10 +161,13 @@
         "published_taxonomy": 0,
         "candidate_decisions": 0,
         "apply_runs": 0,
-        "note": "No --apply ran against any environment in this task - only code, tests, migration (schema-only, additive, no data touched), and docs changed."
+        "data_mutations": 0,
+        "schema_mutations": 2,
+        "note": "ZERO DATA/TAXONOMY MUTATIONS - not 'zero production mutations' unqualified (orchestrator correction, comment 5877665979). Two schema-only migrations were applied against the shared Supabase instance across the two rounds of this task: 2026_09_28_165653_add_unique_constraints_to_taxonomy_candidate_concept_links (round 1) and 2026_09_28_211540_add_execution_context_to_taxonomy_audit_log_table (round 2, adds authorization_reference/target_environment columns to taxonomy_audit_log). Both are additive, nullable/index-only, altered zero data rows, and no --apply ran in either round. Recorded explicitly, not rolled back - no rollback was requested for either."
       },
       "notes": [
         "Process note: the first version of the two new hallazgo-6 tests failed for an unrelated reason (the test scenario itself tried to create two rows violating a pre-existing unique constraint) - corrected before reporting green, not left as a false pass. See the 'Nota de proceso' in audit/phase3_c1_corrections_2026-09-28.md.",
+        "Process note (round 2): rather than unilaterally rotating the Worker's DEBUG_TOKEN to unblock the 32-query regression (as a prior session did with explicit authorization), the user was asked how to proceed and explicitly chose to leave gate 1 blocked. Credential rotation stayed a human-authorization gate, not something decided unilaterally under review pressure.",
         "Do not begin reviewing the 10 candidates / 2 relations - out of scope for this task."
       ]
     }
