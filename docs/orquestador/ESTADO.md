@@ -24,11 +24,20 @@ Ambos repos **committeados y pusheados**, working tree limpio en los dos. Nada m
 29de993  fix: propagate structured-filter label to matched_via in the hybrid search path
 ```
 
-**PR draft: BLOQUEADO.** El PAT guardado en el credential manager no tiene scope
-`pull_requests:write` (403 Forbidden al intentar `POST /repos/.../pulls`). No se intentó escalar el
-permiso por cuenta propia. **Acción pendiente de Esteban:** crear el PR a mano (`base: main`,
-`head: feature/upgrade-filament-v3`, draft) con el cuerpo ya redactado, o dar un token con ese scope.
-Cuerpo del PR listo en el mensaje de handoff — ver `001-para-orquestador-handoff-fase-c.md`.
+**Canal de coordinación actualizado (protocolo revisado, §15-22): GitHub Issue, no PR.**
+
+- **Issue #2 creado:** https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2
+  ("CPV - Development Orchestration & Review"). El PAT SÍ tiene permiso para crear issues.
+- **Comentar en el issue: BLOQUEADO** — el mismo PAT da `403 Forbidden` al intentar
+  `POST /issues/2/comments` (asimetría de permisos: puede crear pero no comentar).
+- **Fallback aplicado exactamente como indica el protocolo §22:**
+  `audit/orchestrator_handoff.json` — el handoff real vive ahí, commiteado y pusheado.
+  El orquestador lee ese archivo en vez de un comentario del issue.
+- **PR draft:** sigue sin crearse — el protocolo §15 actualizado dice explícitamente no usarlo como
+  mecanismo de coordinación en este entorno.
+
+Nada de esto bloqueó el desarrollo (tal como indica el protocolo). El código está en la rama, el
+handoff está en `audit/orchestrator_handoff.json`, listo para que el orquestador lo lea.
 
 ## Estado de la base (verificado por consulta directa, 2026-09-28)
 
