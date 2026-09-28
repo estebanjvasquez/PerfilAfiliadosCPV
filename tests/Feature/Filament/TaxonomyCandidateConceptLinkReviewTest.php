@@ -275,4 +275,49 @@ class TaxonomyCandidateConceptLinkReviewTest extends TestCase
         $this->assertSame(TaxonomyCandidateConceptLink::STATUS_REJECTED, $fresh->status);
         $this->assertSame('[INSUFFICIENT_EVIDENCE] Evidencia insuficiente', $fresh->review_notes);
     }
+
+    /**
+     * Incidente 503/500 (TASK-0002): `CanonicalConceptApplyService::apply()` encola candidatos
+     * PROPOSE_NEW_CONCEPT con `signals = ['possible_existing_concepts' => [...]]` (ver línea 229
+     * de ese servicio) - un valor ANIDADO, no plano. `KeyValueEntry::make('signals')` en la página
+     * de detalle exige string=>string y llama `htmlspecialchars()` sobre cada valor; con PHP 8 eso
+     * es un TypeError en cuanto el valor es un array, incluso uno vacío `[]`. Reproduce exactamente
+     * la forma real de los 10 candidatos de staging (ids 263-272, verificados en vivo) en vez de la
+     * forma simplificada `signals: []` que usan los demás tests de este archivo - por eso ningún
+     * test existente atrapó esto: ninguno abre la página de detalle con esta forma de dato.
+     */
+    #[Test]
+    public function viewing_a_propose_new_concept_candidate_with_duplicate_signals_does_not_500(): void
+    {
+        $term = TaxonomyTerm::create([
+            'external_id' => 'task0002-503-'.uniqid('', true),
+            'term' => 'zzz_task0002_503_'.uniqid('', true),
+            'language' => 'es',
+            'canonical_term' => 'zzz_task0002_503_'.uniqid('', true),
+            'term_type' => TaxonomyTerm::TERM_TYPE_TECHNICAL,
+            'region' => [], 'negative_context' => [], 'positive_context' => [],
+            'mapping_review_status' => TaxonomyTerm::MAPPING_UNMAPPED,
+        ]);
+
+        $candidate = TaxonomyCandidateConceptLink::create([
+            'suggested_term_id' => $term->id,
+            'suggested_concept_id' => null,
+            'suggested_new_concept_name' => 'zzz task0002 503 concept',
+            // Misma forma exacta que produce CanonicalConceptApplyService::apply() - incluye tanto
+            // el caso vacío (263/264 en staging) como uno con contenido, para no dejar pasar un fix
+            // que solo maneje el array vacío.
+            'signals' => ['possible_existing_concepts' => [
+                ['concept_id' => 1, 'concept_name' => 'zzz existing concept', 'score' => 0.8, 'tier' => 'REVIEW'],
+            ]],
+            'confidence' => 0.0,
+            'tier' => TaxonomyCandidateConceptLink::TIER_REVIEW,
+            'status' => TaxonomyCandidateConceptLink::STATUS_PENDING,
+        ]);
+
+        $response = $this->actingAs($this->authorizedReviewer())
+            ->get(\App\Filament\Resources\TaxonomyCandidateConceptLinkResource::getUrl('view', ['record' => $candidate]));
+
+        $response->assertOk();
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status, 'Abrir la página de detalle no debe mutar el candidato.');
+    }
 }

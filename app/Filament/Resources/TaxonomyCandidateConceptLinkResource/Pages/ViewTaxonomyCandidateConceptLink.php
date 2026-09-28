@@ -27,7 +27,23 @@ class ViewTaxonomyCandidateConceptLink extends ViewRecord
             TextEntry::make('confidence')->numeric(4),
             TextEntry::make('tier'),
             TextEntry::make('status'),
-            KeyValueEntry::make('signals')->label('Señales (trazabilidad completa del Builder)'),
+            // Incidente 503/500 (TASK-0002): `signals` no siempre es plano string=>string.
+            // `CanonicalConceptApplyService::apply()` encola candidatos PROPOSE_NEW_CONCEPT con
+            // `signals = ['possible_existing_concepts' => [...]]` (array anidado, no escalar).
+            // `KeyValueEntry` llama `htmlspecialchars()` sobre cada valor tal cual viene del modelo;
+            // en PHP 8 eso es un TypeError en cuanto el valor no es string (incluso un array vacío).
+            // Se normaliza acá, en la capa de presentación, sin tocar la forma real de `signals` en
+            // la base de datos - otros consumidores (auditoría, futuros scorers) siguen viendo la
+            // estructura anidada original.
+            KeyValueEntry::make('signals')
+                ->label('Señales (trazabilidad completa del Builder)')
+                ->state(fn (TaxonomyCandidateConceptLink $record) => collect($record->signals ?? [])
+                    ->mapWithKeys(fn ($value, $key) => [
+                        $key => is_scalar($value) || $value === null
+                            ? (string) $value
+                            : json_encode($value, JSON_UNESCAPED_UNICODE),
+                    ])
+                    ->all()),
             // Phase B.1 (secciones 4/10/11 del pedido): impacto predicho inspeccionable en la vista
             // de detalle, no solo en el modal de confirmación - reusa la misma fuente
             // (`predictAffectedCompanies`/`predictedImpactForConcept`), nunca una segunda semántica
