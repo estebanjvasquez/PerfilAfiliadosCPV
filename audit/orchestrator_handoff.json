@@ -1,10 +1,11 @@
 {
-  "current_task": "TASK-0002",
-  "current_status": "READY_FOR_REVIEW",
+  "current_task": "TASK-0003",
+  "current_status": "IN_PROGRESS",
   "checkpoints": [
     {
       "task_id": "TASK-0001",
-      "status": "APPROVED",
+      "status": "CORRECTIONS_REQUIRED",
+      "status_correction_note": "Was incorrectly written as APPROVED in this file. That reflected the user's blanket authorization to DEVELOP Phase C, not the orchestrator's review verdict. The orchestrator's Issue #2 comment 5872689869 (posted before this file's previous version was written, but not read until TASK-0003) explicitly set Phase C to CHANGES_REQUIRED. Corrected here. See TASK-0003 checkpoint below for the correction work.",
       "phase": "PHASE_C",
       "repository": "estebanjvasquez/PerfilAfiliadosCPV",
       "branch": "feature/upgrade-filament-v3",
@@ -45,7 +46,8 @@
     },
     {
       "task_id": "TASK-0002",
-      "status": "READY_FOR_REVIEW",
+      "status": "APPROVED",
+      "approved_via": "Issue #2 comment 5874313894 - \"TASK-0002 (candidate detail 500/503 incident): APPROVED. No further correction required for TASK-0002.\"",
       "phase": "PHASE_C_REVIEW_503_FIX",
       "repository": "estebanjvasquez/PerfilAfiliadosCPV",
       "branch": "feature/upgrade-filament-v3",
@@ -90,6 +92,14 @@
       "notes": [
         "Do not begin reviewing the 10 candidates - out of scope for this task, per the orchestrator's explicit instruction in docs/orquestador/tasks/0002-review-503.md."
       ]
+    },
+    {
+      "task_id": "TASK-0003",
+      "status": "IN_PROGRESS",
+      "phase": "PHASE_C_CORRECTIONS",
+      "task_definition": "docs/orquestador/tasks/0003-phase-c-corrections.md",
+      "source": "Issue #2 comment 5872689869 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5872689869)",
+      "note": "In progress - this checkpoint will be filled in when the 7 findings are addressed and the task reaches READY_FOR_REVIEW."
     }
   ]
 }

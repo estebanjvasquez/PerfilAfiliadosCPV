@@ -110,10 +110,21 @@ conteos antes/después.
 ## 7. Canal de Issue en GitHub
 
 Issue #2 (`CPV - Development Orchestration & Review`) es el canal de coordinación humano-
-legible. El PAT actual puede crear issues pero no comentar en ellos (403 asimétrico) y no
-tiene `pull_requests:write`, así que no se usa como mecanismo de escritura activo — el
-handoff real vive en `audit/orchestrator_handoff.json`, que el orquestador lee directamente
-con su acceso READ a GitHub.
+legible.
+
+**Corrección (2026-09-28, tras TASK-0002):** la premisa original de esta sección — que el
+orquestador solo tiene lectura y no puede escribir en GitHub — quedó obsoleta. El orquestador
+comentó exitosamente en el Issue #2 (comentarios `5872689869` y `5874313894`), y esos
+comentarios son ahora **el canal de revisión autoritativo en vivo**: es ahí donde llegan los
+veredictos (`APPROVED`/`CORRECTIONS_REQUIRED`) por tarea. **Al iniciar cada ciclo, además de
+leer `current_task.md`, hay que revisar si hay comentarios nuevos en el Issue #2** — no alcanza
+con mirar solo `audit/orchestrator_handoff.json`.
+
+El PAT de **Claude Code** (esta sesión) sigue con el mismo scope asimétrico: puede crear issues
+pero sigue dando `403` al intentar comentar en ellos. Por eso Claude Code sigue sin poder
+escribir en el Issue directamente, y `audit/orchestrator_handoff.json` sigue siendo el
+checkpoint versionado que Claude Code produce como respuesta — pero ya no es un sustituto de
+leer los comentarios del Issue, es un complemento.
 
 ## 8. Qué NO asumir
 
