@@ -1,45 +1,95 @@
 {
-  "status": "READY_FOR_REVIEW",
-  "phase": "PHASE_C",
-  "repository": "estebanjvasquez/PerfilAfiliadosCPV",
-  "branch": "feature/upgrade-filament-v3",
-  "base_sha": "cf100e2b3b2df5011e53f5922ebfff8dcb30fccd",
-  "head_sha": "4a629aa421e3c3962bad24a073db93b869dabd44",
-  "audit": "audit/phase3_phase_c_apply.md",
-  "companion_audit": "audit/chat_memory_intent_audit_2026-09-28.md",
-  "tests": {
-    "CanonicalConceptApplyServiceTest": "14/14 PASS (41 assertions)",
-    "taxonomy_suite": "140/140 PASS (includes de-flake of a pre-existing unrelated failing test)"
-  },
-  "database": {
-    "taxonomy_candidate_concept_links": { "before": 0, "after": 10, "status": "pending" },
-    "taxonomy_concept_relations": { "before": 0, "after": 2, "status": "candidate" },
-    "taxonomy_term_concepts": { "before": 142, "after": 142, "protected": true },
-    "taxonomy_canonical_concepts": { "before": 79, "after": 79, "protected": true },
-    "taxonomy_term_cpv_relations": { "before": 9749, "after": 9749, "protected": true },
-    "idempotency_reverified_against_production": true
-  },
-  "production_mutations": {
-    "published_taxonomy": 0,
-    "review_queue_candidates_created": 10,
-    "review_queue_relations_created": 2,
-    "audit_log_rows_created": 12,
-    "note": "--apply never writes taxonomy_term_concepts by design - see audit doc"
-  },
-  "cross_repo": {
-    "repository": "estebanjvasquez/perfilafiliados-mcp",
-    "branch": "master",
-    "head_sha": "29de993c12fbdadf0577c3630cc07611af020a46",
-    "reason": "matched_via labeling fix found during the CIRA audit, unrelated to Phase C write logic"
-  },
-  "coordination_channel": {
-    "issue_number": 2,
-    "issue_url": "https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2",
-    "issue_status": "created, but PAT lacks permission to comment on it (403 on issues/comments, despite issue creation itself succeeding) - this file is the authoritative handoff per protocol section 22",
-    "pr_status": "not created - PAT lacks pull_requests:write"
-  },
-  "notes": [
-    "Process note: the CIRA audit in this checkpoint reached two false bug conclusions before checking the live deployed workflow/Worker source; both corrected in the same session - see audit doc section 6bis/7 before relying on earlier sections.",
-    "EXTERNAL_VERIFICATION_REQUIRED: the production --apply run and its idempotency check were executed and verified directly against Supabase from this session, not visible from GitHub alone."
+  "current_task": "TASK-0002",
+  "current_status": "READY_FOR_REVIEW",
+  "checkpoints": [
+    {
+      "task_id": "TASK-0001",
+      "status": "APPROVED",
+      "phase": "PHASE_C",
+      "repository": "estebanjvasquez/PerfilAfiliadosCPV",
+      "branch": "feature/upgrade-filament-v3",
+      "base_sha": "cf100e2b3b2df5011e53f5922ebfff8dcb30fccd",
+      "head_sha": "4a629aa421e3c3962bad24a073db93b869dabd44",
+      "handoff_commit_sha": "c6b0707898c8b7a05eed1376b0c15c7ba56245b2",
+      "audit": "audit/phase3_phase_c_apply.md",
+      "companion_audit": "audit/chat_memory_intent_audit_2026-09-28.md",
+      "tests": {
+        "CanonicalConceptApplyServiceTest": "14/14 PASS (41 assertions)",
+        "taxonomy_suite": "140/140 PASS (includes de-flake of a pre-existing unrelated failing test)"
+      },
+      "database": {
+        "taxonomy_candidate_concept_links": { "before": 0, "after": 10, "status": "pending" },
+        "taxonomy_concept_relations": { "before": 0, "after": 2, "status": "candidate" },
+        "taxonomy_term_concepts": { "before": 142, "after": 142, "protected": true },
+        "taxonomy_canonical_concepts": { "before": 79, "after": 79, "protected": true },
+        "taxonomy_term_cpv_relations": { "before": 9749, "after": 9749, "protected": true },
+        "idempotency_reverified_against_production": true
+      },
+      "production_mutations": {
+        "published_taxonomy": 0,
+        "review_queue_candidates_created": 10,
+        "review_queue_relations_created": 2,
+        "audit_log_rows_created": 12,
+        "note": "--apply never writes taxonomy_term_concepts by design - see audit doc"
+      },
+      "cross_repo": {
+        "repository": "estebanjvasquez/perfilafiliados-mcp",
+        "branch": "master",
+        "head_sha": "29de993c12fbdadf0577c3630cc07611af020a46",
+        "reason": "matched_via labeling fix found during the CIRA audit, unrelated to Phase C write logic"
+      },
+      "notes": [
+        "Process note: the CIRA audit in this checkpoint reached two false bug conclusions before checking the live deployed workflow/Worker source; both corrected in the same session - see audit doc section 6bis/7 before relying on earlier sections.",
+        "EXTERNAL_VERIFICATION_REQUIRED: the production --apply run and its idempotency check were executed and verified directly against Supabase from this session, not visible from GitHub alone."
+      ]
+    },
+    {
+      "task_id": "TASK-0002",
+      "status": "READY_FOR_REVIEW",
+      "phase": "PHASE_C_REVIEW_503_FIX",
+      "repository": "estebanjvasquez/PerfilAfiliadosCPV",
+      "branch": "feature/upgrade-filament-v3",
+      "review_base_sha": "c6b0707898c8b7a05eed1376b0c15c7ba56245b2",
+      "review_head_sha": "db44a60e721f9d2a79e903e17fdf521b28cd5098",
+      "handoff_commit_sha": "SEE_HEAD_OF_PUSH - a commit cannot contain its own hash; this file's commit is the HEAD reported in the final READY_FOR_REVIEW response for TASK-0002",
+      "task_definition": "docs/orquestador/tasks/0002-review-503.md",
+      "audit": "audit/phase3_candidate_review_503_incident.md",
+      "root_cause": "KeyValueEntry::make('signals') in ViewTaxonomyCandidateConceptLink.php requires flat string=>string values and calls htmlspecialchars() on each raw value. CanonicalConceptApplyService::apply() (line 229) stores signals = ['possible_existing_concepts' => [...]] for PROPOSE_NEW_CONCEPT candidates - a nested array value, not a scalar. PHP 8.2 throws TypeError on htmlspecialchars(array), even for an empty array. All 10 candidates from the Phase C run (ids 263-272) are PROPOSE_NEW_CONCEPT, so all 10 failed identically.",
+      "symptom_note": "Incident report said HTTP 503. Verified origin status is actually 500 (nginx access log + user-supplied HAR, both independent of each other, same timestamps as the Laravel exception log). Cloudflare/browser-perceived 503 vs origin 500 - flagged, not silently corrected.",
+      "deployment_drift": "none - staging was running exactly c6b0707 (the expected commit) before the fix, confirmed via `git log -1` over SSH",
+      "fix": "Presentation-layer only: KeyValueEntry::make('signals') now uses ->state() to flatten any non-scalar value to JSON before Filament renders it. Does not change the shape of `signals` as stored in the database.",
+      "tests": {
+        "new_regression_test": "TaxonomyCandidateConceptLinkReviewTest::viewing_a_propose_new_concept_candidate_with_duplicate_signals_does_not_500 - confirmed FAIL before the fix (same TypeError), PASS after",
+        "taxonomy_suite": "141/141 PASS (475 assertions), local, after the fix"
+      },
+      "staging_verification": {
+        "deployed_sha_after_fix": "f2822c9e729f0ef212f144b7b8255ce8653d7972",
+        "deploy_workflow_run": "https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/36448392934 (success)",
+        "method": "Livewire::test() executed inside the deployed container against the real ViewTaxonomyCandidateConceptLink page class, acting as the real reviewer user (id 3) whose session originally hit the bug - equivalent fidelity to an HTTP GET for this bug (a Blade/view-layer TypeError), without needing that user's real password",
+        "candidates_263_to_272_render_ok": true,
+        "candidate_status_before_and_after_diagnostic_and_fix": "pending -> pending for all 10, both before and after the fix (opening the page never mutates a candidate)"
+      },
+      "database": {
+        "taxonomy_candidate_concept_links": { "before": 10, "after": 10 },
+        "taxonomy_concept_relations": { "before": 2, "after": 2 },
+        "taxonomy_term_concepts": { "before": 142, "after": 142, "protected": true },
+        "taxonomy_canonical_concepts": { "before": 79, "after": 79, "protected": true },
+        "taxonomy_term_cpv_relations": { "before": 9749, "after": 9749, "protected": true }
+      },
+      "production_mutations": {
+        "published_taxonomy": 0,
+        "candidate_decisions": 0,
+        "note": "This task only made the review page open successfully again. No candidate was approved, rejected, mapped, or created. --apply was not run again."
+      },
+      "coordination_channel": {
+        "issue_number": 2,
+        "issue_url": "https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2",
+        "issue_status": "PAT still lacks permission to comment on it (403) - this file remains the authoritative handoff per PROTOCOL.md section 7",
+        "pr_status": "not used by design - see PROTOCOL.md"
+      },
+      "notes": [
+        "Do not begin reviewing the 10 candidates - out of scope for this task, per the orchestrator's explicit instruction in docs/orquestador/tasks/0002-review-503.md."
+      ]
+    }
   ]
 }
