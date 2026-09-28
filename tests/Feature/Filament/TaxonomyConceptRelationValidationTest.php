@@ -240,4 +240,79 @@ class TaxonomyConceptRelationValidationTest extends TestCase
         $this->assertSame(0.75, (float) $relation->fresh()->weight);
         $this->assertSame(TaxonomyConceptRelation::STATUS_APPROVED, $relation->fresh()->status);
     }
+
+    /**
+     * TASK-0003, hallazgo 6: el escenario exacto que el orquestador señaló - "a candidate may be
+     * valid when queued and stale when reviewed". La relación A->B era válida cuando se encoló;
+     * mientras esperaba revisión, alguien aprobó la relación SIMÉTRICA inversa B->A (mismo tipo no
+     * direccional - semánticamente la misma relación, ver `DUPLICATE_VIA_SYMMETRY`). Esta es la
+     * forma REAL en que el conflicto puede colarse: el índice único de la tabla es sobre la tupla
+     * literal (source, target, type), así que A->B y B->A conviven sin violarlo - solo la
+     * revalidación a nivel de aplicación detecta que son la misma relación. Antes de esta
+     * corrección, aprobar $waiting "sin tocar sus endpoints" se consideraba `$unchanged` y NUNCA
+     * revalidaba. Ahora aprobar SIEMPRE revalida.
+     */
+    #[Test]
+    public function approving_a_relation_that_became_a_duplicate_while_it_waited_for_review_is_rejected(): void
+    {
+        $a = $this->concept('zzz_rel_stale_a_'.uniqid());
+        $b = $this->concept('zzz_rel_stale_b_'.uniqid());
+
+        // La simétrica inversa (B->A) ya estaba aprobada ANTES de que $waiting se creara - orden
+        // deliberado: si se creara al revés, el propio guard del modelo (hallazgo 6) ya bloquearía
+        // esta creación como duplicado, lo cual probaría otra cosa (creación), no la revalidación al
+        // aprobar, que es lo que este test necesita aislar.
+        TaxonomyConceptRelation::create([
+            'source_concept_id' => $b->id, 'target_concept_id' => $a->id, 'relation_type' => 'RELATED_TO',
+            'weight' => 0.5, 'confidence' => 0.9, 'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+        ]);
+
+        // $waiting se crea DESPUÉS y directo por Eloquent (no por la página de Filament, que sí
+        // habría bloqueado esto en la creación) - simula un candidato que --apply encoló sin pasar
+        // por esa validación de creación manual, y que queda esperando revisión ya obsoleto.
+        $waiting = TaxonomyConceptRelation::create([
+            'source_concept_id' => $a->id, 'target_concept_id' => $b->id, 'relation_type' => 'RELATED_TO',
+            'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
+        ]);
+
+        Livewire::actingAs($this->authorizedUser())
+            ->test(EditTaxonomyConceptRelation::class, ['record' => $waiting->getRouteKey()])
+            ->fillForm([
+                'source_concept_id' => $a->id,
+                'target_concept_id' => $b->id,
+                'relation_type' => 'RELATED_TO', // endpoints/tipo SIN cambiar
+                'weight' => 0.5,
+                'confidence' => 0.5,
+                'status' => TaxonomyConceptRelation::STATUS_APPROVED, // pero SÍ se intenta aprobar
+            ])
+            ->call('save');
+
+        $this->assertSame(
+            TaxonomyConceptRelation::STATUS_CANDIDATE,
+            $waiting->fresh()->status,
+            'No debe poder aprobarse - ya existe una relación equivalente aprobada.'
+        );
+    }
+
+    /** Hallazgo 6, capa de modelo: el guard de `TaxonomyConceptRelation::booted()` protege incluso fuera de esta página de Filament. */
+    #[Test]
+    public function the_model_itself_refuses_to_be_saved_as_approved_when_no_longer_valid(): void
+    {
+        $a = $this->concept('zzz_rel_model_guard_a_'.uniqid());
+        $b = $this->concept('zzz_rel_model_guard_b_'.uniqid());
+
+        // Orden deliberado - ver el comentario del test anterior.
+        TaxonomyConceptRelation::create([
+            'source_concept_id' => $b->id, 'target_concept_id' => $a->id, 'relation_type' => 'RELATED_TO',
+            'weight' => 0.5, 'confidence' => 0.9, 'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+        ]);
+        $waiting = TaxonomyConceptRelation::create([
+            'source_concept_id' => $a->id, 'target_concept_id' => $b->id, 'relation_type' => 'RELATED_TO',
+            'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+
+        $waiting->update(['status' => TaxonomyConceptRelation::STATUS_APPROVED]);
+    }
 }

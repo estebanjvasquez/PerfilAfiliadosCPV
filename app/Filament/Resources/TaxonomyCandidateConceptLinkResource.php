@@ -266,7 +266,7 @@ class TaxonomyCandidateConceptLinkResource extends Resource
             $lines[] = self::formatImpactSummary($impact);
         }
 
-        $staleness = app(CandidateConceptApprovalService::class)->conceptGraphStaleness($record);
+        $staleness = app(CandidateConceptApprovalService::class)->proposalStaleness($record);
         $lines[] = match (true) {
             ! $staleness['tracked'] => 'Estado del grafo de conceptos: no rastreado (candidato generado antes de Phase C).',
             $staleness['stale'] => 'ADVERTENCIA: el grafo de conceptos cambió desde que se generó este candidato - revisar de nuevo antes de aprobar.',
@@ -283,7 +283,7 @@ class TaxonomyCandidateConceptLinkResource extends Resource
         $builder = app(CanonicalConceptBuilderService::class);
 
         $duplicates = $service->findPossibleDuplicateConcepts($record);
-        $staleness = $service->conceptGraphStaleness($record);
+        $staleness = $service->proposalStaleness($record);
 
         $duplicateOptions = collect($duplicates)->mapWithKeys(fn (array $d) => [
             $d['concept_id'] => "{$d['concept_name']} (score {$d['score']}, tier {$d['tier']})",

@@ -115,6 +115,16 @@ esto como parte de su propio diseño, no como tarea separada.
 
 ## Fase C — Diseñar e implementar `--apply` (write-mode real)
 
+> **Estado (2026-09-28):** una primera implementación existe (`CanonicalConceptApplyService`,
+> commit `4a773fa`), pero el orquestador la devolvió con `CORRECTIONS_REQUIRED` (Issue #2,
+> comentario `5872689869`) — entre otras cosas porque materializa propuestas en las colas de
+> revisión (lo que este documento describía como el objetivo), no el contrato de "payload inmutable
+> revisado → apply → validate → commit/rollback" que originalmente se acordó acá. Esa
+> implementación se re-etiquetó **Phase C1 (materialización de cola)**; lo que este documento
+> describe como el contrato completo queda como **Phase C2, todavía sin implementar**. Ver
+> `docs/orquestador/tasks/0003-phase-c-corrections.md` y `audit/phase3_c1_corrections_2026-09-28.md`
+> para el detalle de qué se corrigió de Phase C1 y qué sigue pendiente de Phase C2.
+
 **Objetivo:** implementar desde cero el modo de escritura de
 `taxonomy:build-canonical-concepts --apply` — hoy es un guard clause sin código detrás.
 

@@ -75,7 +75,7 @@ class ViewTaxonomyCandidateConceptLink extends ViewRecord
             TextEntry::make('taxonomy_graph_state')
                 ->label('Estado del grafo de conceptos')
                 ->state(function (TaxonomyCandidateConceptLink $record) {
-                    $staleness = app(CandidateConceptApprovalService::class)->conceptGraphStaleness($record);
+                    $staleness = app(CandidateConceptApprovalService::class)->proposalStaleness($record);
 
                     return match (true) {
                         ! $staleness['tracked'] => 'No rastreado (candidato generado antes de Phase C, sin fingerprint estampado).',

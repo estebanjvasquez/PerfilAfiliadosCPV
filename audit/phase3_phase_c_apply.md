@@ -1,10 +1,18 @@
-# Phase C — `--apply` del Canonical Concept Builder
+# Phase C1 — `--apply` del Canonical Concept Builder (materialización de cola)
 
 **Fecha:** 2026-09-28
 **Rama:** `feature/upgrade-filament-v3`
 **Autorización:** explícita del usuario para desarrollar Phase C completa.
 **Estado previo:** `--apply` era un `return self::FAILURE` sin ninguna rama de escritura detrás
 (`docs/task.md` secciones 6-7: "NOT STARTED para escritura real").
+
+> **CORRECCIÓN (2026-09-28, TASK-0003):** el orquestador revisó esta implementación (Issue #2,
+> comentario `5872689869`) y la devolvió con `CORRECTIONS_REQUIRED` — 7 hallazgos, entre ellos que
+> esto es **Phase C1 (materialización de cola)**, no el contrato completo de "Phase C" (payload
+> revisado e inmutable → apply → validate → commit/rollback, que queda como **Phase C2, sin
+> implementar**). Este documento describe la implementación ORIGINAL, antes de esas correcciones.
+> Ver `audit/phase3_c1_corrections_2026-09-28.md` para qué cambió y por qué. No leer este archivo
+> como "aprobado" — leer el de correcciones primero.
 
 ---
 

@@ -26,8 +26,9 @@ class BuildTaxonomyCanonicalConcepts extends Command
     protected $signature = 'taxonomy:build-canonical-concepts
         {--mode=audit : audit (default, solo lectura) es el único modo soportado fuera de --dry-run}
         {--dry-run : Corre además el Builder multi-signal (retrieval + scoring + tiers), sin persistir nada}
-        {--apply : Phase C - materializa las propuestas del dry-run en las colas de revisión (NUNCA publica en taxonomy_term_concepts). Implica --dry-run}
-        {--max-writes= : Phase C - tope de filas a crear en una corrida de --apply (default 500). Un plan mayor aborta sin escribir nada}
+        {--apply : Phase C1 - materializa las propuestas del dry-run en las colas de revisión (NUNCA publica en taxonomy_term_concepts). Implica --dry-run}
+        {--authorized-by= : OBLIGATORIO con --apply (TASK-0003, hallazgo 2) - quién autorizó esta escritura real contra este ambiente. "Autorización para desarrollar Phase C" no es lo mismo que autorización para una corrida real - queda en el audit log}
+        {--max-writes= : Phase C1 - tope de filas a crear en una corrida de --apply (default 500). Un plan mayor aborta sin escribir nada}
         {--limit= : Tope de términos a procesar en --dry-run (para corridas rápidas de verificación)}
         {--skip-audit : Phase 3.1 - omite AUDIT_EXISTING para medir --dry-run de forma aislada (diagnóstico de performance)}
         {--save-snapshot= : Phase 3.1 - vuelca el dry-run completo (all_results + instrumentación) a un JSON, para result-equivalence antes/después de un refactor}';
@@ -73,8 +74,16 @@ class BuildTaxonomyCanonicalConcepts extends Command
 
         if ($this->option('apply')) {
             $this->newLine();
-            $this->info('APPLY (Phase C) - materializando propuestas en las colas de REVISIÓN...');
+            $this->info('APPLY (Phase C1: '.CanonicalConceptApplyService::PHASE_LABEL.') - materializando propuestas en las colas de REVISIÓN...');
             $this->warn('Recordatorio: --apply NUNCA publica en taxonomy_term_concepts. Todo queda en estado pending/candidate esperando aprobación humana.');
+            $this->warn('Esto NO es Phase C2 (aplicación de un payload ya revisado, inmutable) - ver docblock de CanonicalConceptApplyService.');
+
+            $authorizedBy = trim((string) $this->option('authorized-by'));
+            if ($authorizedBy === '') {
+                $this->error('--apply requiere --authorized-by="<quién autoriza esta escritura real>" (TASK-0003, hallazgo 2). No se ejecutó nada.');
+
+                return self::FAILURE;
+            }
 
             $maxWrites = $this->option('max-writes') !== null
                 ? (int) $this->option('max-writes')
@@ -88,7 +97,7 @@ class BuildTaxonomyCanonicalConcepts extends Command
                 ['TOTAL', $plan['total_writes']],
             ]);
 
-            $apply = $applier->apply($dryRun, $maxWrites);
+            $apply = $applier->apply($dryRun, $authorizedBy, $maxWrites);
             $result['apply'] = $apply;
 
             if ($apply['result'] !== CanonicalConceptApplyService::RESULT_APPLIED) {
@@ -117,6 +126,7 @@ class BuildTaxonomyCanonicalConcepts extends Command
                 collect($apply['before'])->map(fn ($count, $table) => [$table, $count, $apply['after'][$table] ?? '?'])->values()->all()
             );
             $this->info("Fingerprint estampado en cada candidato: {$apply['fingerprint']}");
+            $this->info("Autorizado por: {$apply['authorized_by']}");
         }
 
         if ($this->option('save-snapshot')) {

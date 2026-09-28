@@ -564,6 +564,10 @@ class CanonicalConceptBuilderService
             // parte del contrato mínimo que Phase C (--apply) debe consumir para no persistir un
             // candidato ya obsoleto. Ver CanonicalConceptBuilderService::conceptGraphFingerprint().
             'concept_graph_fingerprint' => self::conceptGraphFingerprint(),
+            // TASK-0003, hallazgo 4: el fingerprint que --apply debe usar para su guarda de
+            // obsolescencia - cubre todos los insumos de dryRun(), no solo el grafo publicado.
+            // Ver CanonicalConceptBuilderService::dryRunInputFingerprint().
+            'dry_run_input_fingerprint' => self::dryRunInputFingerprint(),
             'embedding_calls_made' => 0,
             'db_queries' => $queryCount,
             'queries_per_term' => $termsProcessed > 0 ? round($queryCount / $termsProcessed, 2) : 0.0,
@@ -1022,6 +1026,64 @@ class CanonicalConceptBuilderService
         );
     }
 
+    /**
+     * TASK-0003, hallazgo 4 (contrato de estado obsoleto): `conceptGraphFingerprint()` solo cubre
+     * las 2 tablas del grafo publicado, pero `dryRun()` también depende de `taxonomy_terms` (el
+     * pool de términos elegibles y sus atributos), `taxonomy_term_aliases` (retrieval +
+     * alias_overlap), `taxonomy_term_cpv_relations` (elegibilidad del término vía
+     * `whereDoesntHave('cpvRelations', approved)` + señales shared_cpv/cpv_specificity/
+     * cpv_mapping_quality), `taxonomy_term_embeddings` (embedding_similarity + candidate
+     * retrieval vectorial), `taxonomy_term_service_relations` (legacy_service_overlap),
+     * `taxonomy_term_source_bindings` (source_evidence), `taxonomy_settings` (los pesos
+     * `concept_builder.*`/`concept_relations.*` que determinan tier/score directamente - cambiar
+     * un peso cambia la propuesta sin tocar ninguna tabla "de datos"), y `taxonomy_concept_relations`
+     * (dedup de `proposeConceptRelations()`). Este método es el fingerprint real del contrato de
+     * `dryRun()` - el que `CanonicalConceptApplyService::apply()` debe usar para decidir
+     * obsolescencia, no `conceptGraphFingerprint()` solo.
+     *
+     * Costo: un hash de contenido completo (`tableFingerprint()`, `SELECT *`) de las tablas
+     * grandes (`taxonomy_term_cpv_relations` ronda las 9.7k filas) sería caro en cada `--apply`
+     * dada la latencia de red documentada hacia Supabase en este proyecto. Se opta explícitamente
+     * por la alternativa que el propio hallazgo ofrece ("or explicitly version each dependency"):
+     * `tableVersionSignal()` (COUNT + MAX(updated_at), todas las tablas de esta lista tienen esa
+     * columna - verificado en sus migraciones) para las tablas grandes, y se reserva el hash de
+     * contenido completo (vía `conceptGraphFingerprint()`) para las 2 tablas chicas y más críticas
+     * (el grafo publicado, ≤~230 filas combinadas). Trade-off documentado, no asumido: un UPDATE
+     * que deliberadamente no toque `updated_at` no se detecta acá.
+     */
+    public static function dryRunInputFingerprint(): string
+    {
+        $parts = [self::conceptGraphFingerprint()];
+
+        foreach ([
+            'taxonomy_terms',
+            'taxonomy_term_aliases',
+            'taxonomy_term_cpv_relations',
+            'taxonomy_term_embeddings',
+            'taxonomy_term_service_relations',
+            'taxonomy_term_source_bindings',
+            'taxonomy_settings',
+            'taxonomy_concept_relations',
+        ] as $table) {
+            $parts[] = self::tableVersionSignal($table);
+        }
+
+        return hash('sha256', implode('|', $parts));
+    }
+
+    /**
+     * Señal barata de versión de una tabla - COUNT(*) + MAX(updated_at), no un hash de contenido
+     * completo. Detecta inserts/deletes (vía count) y updates que tocan `updated_at`. Público
+     * porque `CanonicalConceptApplyService` la reutiliza para las tablas protegidas grandes
+     * (hallazgo 5) - un solo mecanismo de "detección de drift barata", no dos.
+     */
+    public static function tableVersionSignal(string $table): string
+    {
+        $row = DB::connection('pgsql')->table($table)->selectRaw('COUNT(*) AS c, MAX(updated_at) AS m')->first();
+
+        return "{$table}:{$row->c}:{$row->m}";
+    }
+
     /** @return array<string, float> Solo las claves `concept_builder.*`, valor real de taxonomy_settings o default. */
     public function settings(): array
     {
@@ -1377,7 +1439,12 @@ class CanonicalConceptBuilderService
     // =====================================================================================
 
     /** @return array{valid:bool, reason:?string, possible_duplicate_of:?array} */
-    public function validateConceptRelationProposal(int $sourceConceptId, int $targetConceptId, string $relationType): array
+    /**
+     * TASK-0003, hallazgo 6: `$excludeId` deja revalidar una fila EXISTENTE (ej. al aprobarla)
+     * sin que se detecte a sí misma como "duplicado exacto". `null` (default) es el caso original
+     * - proponer una relación nueva, nada que excluir.
+     */
+    public function validateConceptRelationProposal(int $sourceConceptId, int $targetConceptId, string $relationType, ?int $excludeId = null): array
     {
         if ($sourceConceptId === $targetConceptId) {
             return ['valid' => false, 'reason' => 'SELF_RELATION_NOT_ALLOWED', 'possible_duplicate_of' => null];
@@ -1393,6 +1460,7 @@ class CanonicalConceptBuilderService
             ->where('source_concept_id', $sourceConceptId)
             ->where('target_concept_id', $targetConceptId)
             ->where('relation_type', $relationType)
+            ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
             ->first();
         if ($exact) {
             return ['valid' => false, 'reason' => 'DUPLICATE', 'possible_duplicate_of' => (array) $exact];
@@ -1404,6 +1472,7 @@ class CanonicalConceptBuilderService
                 ->where('source_concept_id', $targetConceptId)
                 ->where('target_concept_id', $sourceConceptId)
                 ->where('relation_type', $relationType)
+                ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
                 ->first();
             if ($reverse) {
                 return ['valid' => false, 'reason' => 'DUPLICATE_VIA_SYMMETRY', 'possible_duplicate_of' => (array) $reverse];
@@ -1416,6 +1485,7 @@ class CanonicalConceptBuilderService
                 ->where('source_concept_id', $targetConceptId)
                 ->where('target_concept_id', $sourceConceptId)
                 ->where('relation_type', $type->inverse_relation_code)
+                ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
                 ->first();
             if ($viaInverse) {
                 return ['valid' => false, 'reason' => 'DUPLICATE_VIA_INVERSE', 'possible_duplicate_of' => (array) $viaInverse];

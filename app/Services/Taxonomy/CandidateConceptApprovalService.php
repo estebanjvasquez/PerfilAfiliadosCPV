@@ -120,22 +120,28 @@ class CandidateConceptApprovalService
     }
 
     /**
-     * Phase B.1 (sección 9 del pedido): ¿el candidato fue generado contra un estado del grafo de
-     * conceptos distinto del actual? Ver `CanonicalConceptBuilderService::conceptGraphFingerprint()`.
+     * Phase B.1 (sección 9 del pedido): ¿el candidato fue generado contra un estado distinto del
+     * actual? Ver `CanonicalConceptBuilderService::dryRunInputFingerprint()`.
      * Solo lectura, sin efectos secundarios - la UI de revisión la llama antes de mostrar el
      * formulario de decisión, nunca dentro de la transacción de escritura (esa sigue siendo la
      * autoridad real vía re-chequeo de `status`, no de fingerprint - el fingerprint es informativo
      * para el humano, no una segunda salvaguarda de concurrencia).
      *
-     * `tracked=false` (fingerprint NULL) es el caso de HOY para el 100% de los candidatos, porque
-     * ningún proceso los estampa todavía (Phase C no existe) - se reporta como "no rastreado", nunca
-     * como una falsa alarma de "obsoleto".
+     * TASK-0003, hallazgo 4 (corrección): antes comparaba solo contra
+     * `conceptGraphFingerprint()` (el grafo publicado), lo cual describía "sin cambios" incluso si
+     * cambiaron los términos, CPV, embeddings, settings de scoring, etc. que también determinan la
+     * propuesta - ver `CanonicalConceptBuilderService::dryRunInputFingerprint()`. Se corrigió para
+     * usar el fingerprint amplio. Método renombrado de `conceptGraphStaleness` a
+     * `proposalStaleness` para no seguir describiendo esto como "solo el grafo".
+     *
+     * `tracked=false` (fingerprint NULL) es el caso de los candidatos generados antes de Phase C -
+     * se reporta como "no rastreado", nunca como una falsa alarma de "obsoleto".
      *
      * @return array{tracked:bool, stale:bool, current_fingerprint:string, stored_fingerprint:?string}
      */
-    public function conceptGraphStaleness(TaxonomyCandidateConceptLink $candidate): array
+    public function proposalStaleness(TaxonomyCandidateConceptLink $candidate): array
     {
-        $current = CanonicalConceptBuilderService::conceptGraphFingerprint();
+        $current = CanonicalConceptBuilderService::dryRunInputFingerprint();
         $stored = $candidate->taxonomy_state_fingerprint;
 
         return [

@@ -455,7 +455,7 @@ class CandidateConceptApprovalServiceTest extends TestCase
     }
 
     // =========================================================================================
-    // Phase B.1 (sección 9 del pedido): conceptGraphStaleness() - protección de stale dry-run.
+    // Phase B.1 (sección 9 del pedido): proposalStaleness() - protección de stale dry-run.
     // =========================================================================================
 
     #[Test]
@@ -464,7 +464,7 @@ class CandidateConceptApprovalServiceTest extends TestCase
         $candidate = $this->newConceptCandidate();
         $this->assertNull($candidate->taxonomy_state_fingerprint, 'Ningún proceso puebla esta columna todavía (Phase C no existe).');
 
-        $staleness = (new CandidateConceptApprovalService())->conceptGraphStaleness($candidate);
+        $staleness = (new CandidateConceptApprovalService())->proposalStaleness($candidate);
 
         $this->assertFalse($staleness['tracked']);
         $this->assertFalse($staleness['stale'], 'No rastreado nunca debe reportarse como obsoleto (falsa alarma).');
@@ -476,10 +476,13 @@ class CandidateConceptApprovalServiceTest extends TestCase
     public function concept_graph_staleness_is_not_stale_when_the_stamped_fingerprint_still_matches(): void
     {
         $candidate = $this->newConceptCandidate();
-        $currentFingerprint = CanonicalConceptBuilderService::conceptGraphFingerprint();
+        // TASK-0003, hallazgo 4: proposalStaleness() compara contra dryRunInputFingerprint() (el
+        // amplio), no contra conceptGraphFingerprint() (el angosto) - hay que estampar el mismo que
+        // se va a comparar.
+        $currentFingerprint = CanonicalConceptBuilderService::dryRunInputFingerprint();
         $candidate->update(['taxonomy_state_fingerprint' => $currentFingerprint]);
 
-        $staleness = (new CandidateConceptApprovalService())->conceptGraphStaleness($candidate->fresh());
+        $staleness = (new CandidateConceptApprovalService())->proposalStaleness($candidate->fresh());
 
         $this->assertTrue($staleness['tracked']);
         $this->assertFalse($staleness['stale']);
@@ -494,7 +497,7 @@ class CandidateConceptApprovalServiceTest extends TestCase
         // tanto).
         $candidate->update(['taxonomy_state_fingerprint' => hash('sha256', 'deliberately-stale-fingerprint')]);
 
-        $staleness = (new CandidateConceptApprovalService())->conceptGraphStaleness($candidate->fresh());
+        $staleness = (new CandidateConceptApprovalService())->proposalStaleness($candidate->fresh());
 
         $this->assertTrue($staleness['tracked']);
         $this->assertTrue($staleness['stale']);

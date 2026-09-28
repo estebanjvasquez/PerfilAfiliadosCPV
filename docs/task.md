@@ -474,11 +474,24 @@ esta entrega); `provenance`/`conflict` explícitos del dry-run (documentado, no 
 
 ---
 
-# 6quater — Phase C: `--apply` (modo escritura)
+# 6quater — Phase C1: `--apply` (materialización de cola)
 
-**Status: DONE / VERIFIED (2026-09-28) — primera población controlada ejecutada**
+**Status: CORRECTIONS_REQUIRED → EN CORRECCIÓN (2026-09-28)** — el orquestador revisó esta fase
+(Issue #2, comentario `5872689869`) y encontró 7 hallazgos antes de aprobarla. **No representar
+esta fase como aprobada/terminada** hasta que TASK-0003 (ver
+`docs/orquestador/tasks/0003-phase-c-corrections.md` y
+`audit/phase3_c1_corrections_2026-09-28.md`) llegue a `READY_FOR_REVIEW` y el orquestador la
+apruebe. Lo de abajo describe la primera implementación (ya corregida en TASK-0003); no es una luz
+verde.
 
-Ver `audit/phase3_phase_c_apply.md` para el detalle completo. Resumen:
+**Corrección de nombre (hallazgo 1):** esto es **Phase C1 (materialización de cola)**, no "Phase C"
+completa. El contrato originalmente acordado (REVIEWED_PROPOSAL → payload inmutable con fingerprint
+→ APPLY(payload) → VALIDATE → COMMIT/ROLLBACK) es **Phase C2, todavía no implementada.** Ver el
+docblock de `CanonicalConceptApplyService` para el detalle de la distinción.
+
+Ver `audit/phase3_phase_c_apply.md` (implementación original) y
+`audit/phase3_c1_corrections_2026-09-28.md` (correcciones de TASK-0003) para el detalle completo.
+Resumen de la implementación original:
 
 - **`--apply` ya no es un `return self::FAILURE`.** Está implementado en
   `app/Services/Taxonomy/CanonicalConceptApplyService.php` (nuevo) y conectado al comando
@@ -536,17 +549,24 @@ autenticado y Shield resueltos, cero mutaciones de taxonomía.
 sección "6ter" arriba y `audit/phase3_phase_b1_review_workflow.md`. Un revisor humano ya puede usar
 las 3 decisiones (MAP_TO_EXISTING/CREATE_NEW/REJECT) desde el panel de Filament.
 
-**Fase C (`--apply`) está IMPLEMENTADA (2026-09-28)** — ver sección "6quater" arriba y
-`audit/phase3_phase_c_apply.md`. Incluye el productor de `taxonomy_state_fingerprint` y
-`resolver_version`, que eran el gap identificado en Phase B.1.
+**Fase C1 (`--apply`, materialización de cola) fue implementada (2026-09-28) pero el orquestador la
+devolvió con CORRECTIONS_REQUIRED** — ver sección "6quater" arriba,
+`docs/orquestador/tasks/0003-phase-c-corrections.md` y `audit/phase3_c1_corrections_2026-09-28.md`.
+No está aprobada. Incluye el productor de `taxonomy_state_fingerprint` y `resolver_version`, que
+eran el gap identificado en Phase B.1 — eso sigue siendo válido, lo que falta son las correcciones
+de seguridad/concurrencia/nomenclatura de TASK-0003.
 
-La primera población controlada ya se ejecutó (10 candidatos + 2 relaciones, ver sección 6quater).
-El siguiente paso real es **revisión humana en Filament** de esos 10 candidatos de concepto nuevo,
-usando las 3 decisiones de Phase B.1 (MAP_TO_EXISTING / CREATE_NEW / REJECT). Recién cuando un
-revisor apruebe, el grafo publicado crece y el buscador cambia.
+La primera población controlada ya se ejecutó (10 candidatos + 2 relaciones, ver sección 6quater) y
+**sigue sin tocarse** — el orquestador pidió explícitamente no borrar ni resolver esas 10 filas/2
+relaciones. El siguiente paso real, una vez que TASK-0003 esté aprobada, sigue siendo **revisión
+humana en Filament** de esos 10 candidatos de concepto nuevo, usando las 3 decisiones de Phase B.1
+(MAP_TO_EXISTING / CREATE_NEW / REJECT). Recién cuando un revisor apruebe, el grafo publicado crece
+y el buscador cambia.
 
-Después de eso, decidir si se corre `--apply` sin `--limit` (la corrida completa encolaría bastante
-más; el tope `--max-writes` está para que una corrida grande aborte en vez de sorprender).
+**No correr `--apply` de nuevo sin autorización humana explícita para esa corrida específica**
+(hallazgo 2 de TASK-0003) - "autorización para desarrollar Phase C1" no es lo mismo que
+"autorización para una escritura real contra un ambiente real". El comando ahora exige
+`--authorized-by` para reforzarlo.
 
 **Nota importante sobre expectativas:** poblar la cola con `--apply` **no cambia por sí solo lo que
 devuelve el buscador**. El buscador consume el grafo publicado (`taxonomy_term_concepts`,

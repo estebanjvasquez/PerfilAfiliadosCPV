@@ -8,9 +8,20 @@ use App\Services\TaxonomyAuditLogger;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Phase C: modo escritura (`--apply`) del Canonical Concept Builder.
+ * Phase C1: MATERIALIZACIÓN DE COLA (`--apply`) del Canonical Concept Builder.
  *
- * QUÉ ESCRIBE Y QUÉ NO (la decisión de diseño central de esta fase):
+ * TASK-0003, hallazgo 1 (corrección de contrato - LEER ANTES DE USAR ESTA CLASE):
+ *
+ * El contrato de Phase C originalmente acordado era REVIEWED_PROPOSAL -> PAYLOAD INMUTABLE Y CON
+ * FINGERPRINT -> APPLY(payload) -> VALIDATE -> COMMIT/ROLLBACK, con el invariante "APPLY(resultado
+ * de un dry-run) nunca recalcula ni sustituye una propuesta distinta después de la aprobación
+ * humana". Esta clase NO implementa ese contrato. Lo que hace es tomar un dry-run del Builder y
+ * encolarlo en las colas de revisión - un paso previo útil (**Phase C1: QUEUE_MATERIALIZATION**),
+ * pero no la aplicación de un payload ya revisado por un humano (**Phase C2: no implementada
+ * todavía**). No describir esta clase como "Phase C completa" en ningún doc/handoff - ver
+ * `docs/orquestador/tasks/0003-phase-c-corrections.md` y `audit/phase3_c1_corrections_2026-09-28.md`.
+ *
+ * QUÉ ESCRIBE Y QUÉ NO (la decisión de diseño central de esta fase, esto SÍ sigue siendo cierto):
  *
  * `--apply` materializa las propuestas del dry-run en las DOS COLAS DE REVISIÓN, nunca en el grafo
  * publicado:
@@ -24,30 +35,57 @@ use Illuminate\Support\Facades\DB;
  * aprobación manual, nunca bulk-apply)". Un tier `AUTO_ACCEPT` acá NO significa "publicar solo",
  * significa "encolar con alta confianza para que el revisor lo despache rápido".
  *
- * Tampoco toca jamás `taxonomy_term_cpv_relations` (las 9.749 filas protegidas) - se verifica con un
- * conteo antes/después dentro de la misma transacción, y se aborta si cambió.
+ * Tampoco toca jamás `taxonomy_term_cpv_relations` (las 9.749 filas protegidas) - se verifica antes/
+ * después dentro de la misma transacción (conteo Y fingerprint de contenido, hallazgo 5), y se
+ * aborta si cambió.
  *
  * PROPIEDADES DE SEGURIDAD (las mismas que ya tiene el camino manual, no un segundo estándar):
  *   1. Transacción única - o entra todo o no entra nada.
- *   2. Idempotencia explícita - `taxonomy_candidate_concept_links` NO tiene índice único sobre
- *      (suggested_term_id, suggested_concept_id), así que re-correr `--apply` duplicaría la cola si
- *      no se chequea a mano. Se chequea.
- *   3. Guarda de obsolescencia - el fingerprint del grafo se re-calcula DENTRO de la transacción y
- *      se compara con el que traía el dry-run. Si alguien tocó conceptos/vínculos entre el scoring
- *      y la escritura, se aborta: las propuestas se calcularon contra un estado que ya no existe.
+ *   2. Idempotencia CONCURRENCY-SAFE (TASK-0003, hallazgo 3) - `taxonomy_candidate_concept_links`
+ *      tiene ahora índices únicos parciales (migración
+ *      `2026_09_28_165653_add_unique_constraints_to_taxonomy_candidate_concept_links`) sobre
+ *      (suggested_term_id, suggested_concept_id) y sobre suggested_term_id cuando
+ *      suggested_concept_id es NULL. `taxonomy_concept_relations` YA tenía
+ *      `UNIQUE(source_concept_id, target_concept_id, relation_type)` desde su creación. Las
+ *      escrituras usan `insertOrIgnore()` (compila a `INSERT ... ON CONFLICT DO NOTHING` en
+ *      Postgres) - la base decide atómicamente si la fila ya existe, no una lectura-luego-escritura
+ *      de la aplicación (el `exists()` que había antes era un TOCTOU real entre dos corridas
+ *      concurrentes).
+ *   3. Guarda de obsolescencia AMPLIADA (TASK-0003, hallazgo 4) - el fingerprint que se recalcula
+ *      DENTRO de la transacción y se compara con el del dry-run ya no es solo el grafo publicado
+ *      (`conceptGraphFingerprint()`); es `CanonicalConceptBuilderService::dryRunInputFingerprint()`,
+ *      que cubre todos los insumos reales del scoring (términos, CPV, embeddings, settings, etc. -
+ *      ver el docblock de ese método). Si cualquiera de esos insumos cambió entre el scoring y la
+ *      escritura, se aborta: las propuestas se calcularon contra un estado que ya no existe.
  *   4. Tope de escrituras - un plan más grande que `maxWrites` aborta antes de escribir nada.
- *   5. Audit log por cada fila creada (`actor_type=system` + `algorithm_version`), nunca silencioso.
- *   6. Provenance - cada candidato queda estampado con `taxonomy_state_fingerprint` (Phase C es el
+ *   5. Autorización humana explícita (TASK-0003, hallazgo 2) - `apply()` exige un `$authorizedBy`
+ *      no vacío. Sin él, ni siquiera compila la llamada (parámetro obligatorio, no una bandera
+ *      opcional que se pueda olvidar). Queda registrado en cada fila de audit log - "development
+ *      authorization" (poder desarrollar Phase C) nunca implica "production write authorization"
+ *      (poder correr `--apply` contra un ambiente real) - son autorizaciones distintas.
+ *   6. Audit log por cada fila creada (`actor_type=system` + `algorithm_version` + quién autorizó
+ *      la corrida), nunca silencioso.
+ *   7. Provenance - cada candidato queda estampado con `taxonomy_state_fingerprint` (Phase C1 es el
  *      "productor" que faltaba del contrato de Phase B.1, sección 16 de su auditoría).
+ *   8. Protección estructural de tablas protegidas (TASK-0003, hallazgo 5) - esta clase no tiene
+ *      NINGÚN camino de escritura hacia `taxonomy_term_concepts`, `taxonomy_canonical_concepts` ni
+ *      `taxonomy_term_cpv_relations` (verificable leyendo el archivo: los únicos `create()`/
+ *      `insertOrIgnore()` de esta clase son hacia `taxonomy_candidate_concept_links` y
+ *      `taxonomy_concept_relations`). El chequeo antes/después ya no es solo conteo (que no prueba
+ *      ausencia de UPDATE in-place) - suma un fingerprint de contenido de esas 3 tablas. Los
+ *      conteos siguen ahí como diagnóstico legible, no como la garantía real.
  */
 class CanonicalConceptApplyService
 {
+    /** Ver el docblock de la clase - esto es Phase C1 (materialización de cola), no Phase C2. */
+    public const PHASE_LABEL = 'PHASE_C1_QUEUE_MATERIALIZATION';
+
     /**
      * Versión del resolutor que produjo estas filas. Queda en el audit log de cada escritura para
      * poder responder "¿qué algoritmo generó este candidato?" meses después - el otro campo que la
      * auditoría de Phase B.1 marcó como faltante para el contrato de Phase C.
      */
-    public const ALGORITHM_VERSION = 'canonical-concept-builder/phase-c-v1';
+    public const ALGORITHM_VERSION = 'canonical-concept-builder/phase-c1-v1';
 
     /** Tope por defecto de filas a crear en una sola corrida. Conservador a propósito. */
     public const DEFAULT_MAX_WRITES = 500;
@@ -136,7 +174,10 @@ class CanonicalConceptApplyService
             'new_concept_candidates' => $newConceptCandidates,
             'concept_relations' => $conceptRelations,
             'total_writes' => count($termConceptCandidates) + count($newConceptCandidates) + count($conceptRelations),
-            'source_fingerprint' => $dryRun['concept_graph_fingerprint'] ?? null,
+            // TASK-0003, hallazgo 4: preferí el fingerprint amplio; si un dry-run viejo (sin la
+            // clave nueva) llegara acá, cae al angosto antes que a null - null desactivaría la
+            // guarda de obsolescencia por completo, peor que una guarda parcial.
+            'source_fingerprint' => $dryRun['dry_run_input_fingerprint'] ?? $dryRun['concept_graph_fingerprint'] ?? null,
         ];
     }
 
@@ -146,10 +187,20 @@ class CanonicalConceptApplyService
      * @param  array  $dryRun  Resultado de `dryRun()` - se usa el MISMO objeto que produjo el scoring,
      *                         nunca una corrida nueva, para que el fingerprint estampado corresponda
      *                         al estado contra el que se calcularon las propuestas.
+     * @param  string  $authorizedBy  TASK-0003, hallazgo 2: quién autorizó ESTA corrida contra ESTE
+     *                                ambiente - obligatorio, sin default, para que sea estructuralmente
+     *                                imposible invocar `apply()` sin una autorización explícita
+     *                                registrada. "Autorización para desarrollar Phase C" (la que ya
+     *                                dio el usuario) no es lo mismo que "autorización para esta
+     *                                escritura real" - queda una por corrida, en el audit log.
      * @return array{result:string, created:array, skipped:array, plan:array, before:array, after:array, fingerprint:?string}
      */
-    public function apply(array $dryRun, int $maxWrites = self::DEFAULT_MAX_WRITES): array
+    public function apply(array $dryRun, string $authorizedBy, int $maxWrites = self::DEFAULT_MAX_WRITES): array
     {
+        if (trim($authorizedBy) === '') {
+            throw new \InvalidArgumentException('apply() requiere $authorizedBy no vacío - quién autorizó esta escritura real (TASK-0003, hallazgo 2). No es opcional.');
+        }
+
         $plan = $this->planFrom($dryRun);
 
         if ($plan['total_writes'] === 0) {
@@ -162,14 +213,16 @@ class CanonicalConceptApplyService
             ]);
         }
 
-        return DB::connection('pgsql')->transaction(function () use ($plan, $dryRun) {
+        return DB::connection('pgsql')->transaction(function () use ($plan, $authorizedBy) {
             $before = $this->counts();
+            $protectedBefore = $this->protectedTableSignature();
 
-            // Guarda de obsolescencia (propiedad 3): el dry-run pudo haber corrido hace rato.
-            $currentFingerprint = CanonicalConceptBuilderService::conceptGraphFingerprint();
+            // Guarda de obsolescencia (propiedad 3, hallazgo 4): el dry-run pudo haber corrido hace
+            // rato - se compara contra TODOS los insumos de dryRun(), no solo el grafo publicado.
+            $currentFingerprint = CanonicalConceptBuilderService::dryRunInputFingerprint();
             if ($plan['source_fingerprint'] !== null && $plan['source_fingerprint'] !== $currentFingerprint) {
                 return $this->outcome(self::RESULT_ABORTED_STALE_FINGERPRINT, $plan, [
-                    'note' => 'El grafo de conceptos cambió entre el dry-run y la escritura - las propuestas se calcularon contra un estado que ya no existe. No se escribió nada. Volvé a correr el dry-run.',
+                    'note' => 'El estado usado para generar las propuestas (grafo de conceptos, términos, CPV, settings de scoring, etc.) cambió entre el dry-run y la escritura - las propuestas se calcularon contra un estado que ya no existe. No se escribió nada. Volvé a correr el dry-run.',
                     'before' => $before,
                     'expected_fingerprint' => $plan['source_fingerprint'],
                     'current_fingerprint' => $currentFingerprint,
@@ -180,61 +233,65 @@ class CanonicalConceptApplyService
             $skipped = ['term_concept_candidates' => 0, 'new_concept_candidates' => 0, 'concept_relations' => 0];
 
             foreach ($plan['term_concept_candidates'] as $candidate) {
-                // Idempotencia (propiedad 2): si ya existe un candidato para ese par NO se crea otro,
-                // sin importar en qué estado esté. Un `rejected` previo es una decisión humana
-                // explícita - volver a encolarlo sería pedirle al revisor que la repita.
-                $exists = TaxonomyCandidateConceptLink::query()
-                    ->where('suggested_term_id', $candidate['suggested_term_id'])
-                    ->where('suggested_concept_id', $candidate['suggested_concept_id'])
-                    ->exists();
+                // Idempotencia concurrency-safe (propiedad 2, hallazgo 3): la base decide vía el
+                // índice único parcial (migración add_unique_constraints...), no una lectura previa
+                // de la aplicación. `insertOrIgnore()` compila a `INSERT ... ON CONFLICT DO NOTHING`
+                // en Postgres - atómico, no TOCTOU. Un `rejected` previo sigue bloqueando el reintento
+                // (el índice es por (term_id, concept_id) sin importar el status).
+                $affected = DB::connection('pgsql')->table('taxonomy_candidate_concept_links')->insertOrIgnore([
+                    'suggested_term_id' => $candidate['suggested_term_id'],
+                    'suggested_concept_id' => $candidate['suggested_concept_id'],
+                    'signals' => json_encode($candidate['signals']),
+                    'confidence' => $candidate['confidence'],
+                    'tier' => $candidate['tier'],
+                    'status' => TaxonomyCandidateConceptLink::STATUS_PENDING,
+                    'taxonomy_state_fingerprint' => $currentFingerprint,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
 
-                if ($exists) {
+                if ($affected === 0) {
                     $skipped['term_concept_candidates']++;
 
                     continue;
                 }
 
-                $row = TaxonomyCandidateConceptLink::create([
-                    'suggested_term_id' => $candidate['suggested_term_id'],
-                    'suggested_concept_id' => $candidate['suggested_concept_id'],
-                    'signals' => $candidate['signals'],
-                    'confidence' => $candidate['confidence'],
-                    'tier' => $candidate['tier'],
-                    'status' => TaxonomyCandidateConceptLink::STATUS_PENDING,
-                    'taxonomy_state_fingerprint' => $currentFingerprint,
-                ]);
+                $row = TaxonomyCandidateConceptLink::where('suggested_term_id', $candidate['suggested_term_id'])
+                    ->where('suggested_concept_id', $candidate['suggested_concept_id'])
+                    ->firstOrFail();
 
-                $this->audit($row->id, "Candidato término→concepto encolado por --apply (term_id={$candidate['suggested_term_id']}, concept_id={$candidate['suggested_concept_id']}, tier={$candidate['tier']}, confidence={$candidate['confidence']})");
+                $this->audit($row->id, "Candidato término→concepto encolado por --apply (term_id={$candidate['suggested_term_id']}, concept_id={$candidate['suggested_concept_id']}, tier={$candidate['tier']}, confidence={$candidate['confidence']}, autorizado_por={$authorizedBy})");
                 $created['term_concept_candidates']++;
             }
 
             foreach ($plan['new_concept_candidates'] as $candidate) {
-                $exists = TaxonomyCandidateConceptLink::query()
-                    ->where('suggested_term_id', $candidate['suggested_term_id'])
-                    ->whereNull('suggested_concept_id')
-                    ->exists();
-
-                if ($exists) {
-                    $skipped['new_concept_candidates']++;
-
-                    continue;
-                }
-
-                $row = TaxonomyCandidateConceptLink::create([
+                $affected = DB::connection('pgsql')->table('taxonomy_candidate_concept_links')->insertOrIgnore([
                     'suggested_term_id' => $candidate['suggested_term_id'],
                     'suggested_concept_id' => null,
                     'suggested_new_concept_name' => $candidate['suggested_new_concept_name'],
                     // Los "posibles duplicados" que el Builder ya evaluó viajan como señales para que
                     // el revisor los vea sin tener que recalcular el scoring en el momento.
-                    'signals' => ['possible_existing_concepts' => $candidate['possible_existing_concepts']],
+                    'signals' => json_encode(['possible_existing_concepts' => $candidate['possible_existing_concepts']]),
                     'confidence' => 0.0,
                     'tier' => TaxonomyCandidateConceptLink::TIER_REVIEW,
                     'status' => TaxonomyCandidateConceptLink::STATUS_PENDING,
                     'review_notes' => $candidate['reason'],
                     'taxonomy_state_fingerprint' => $currentFingerprint,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
 
-                $this->audit($row->id, "Propuesta de concepto NUEVO encolada por --apply (term_id={$candidate['suggested_term_id']}, nombre sugerido=\"{$candidate['suggested_new_concept_name']}\")");
+                if ($affected === 0) {
+                    $skipped['new_concept_candidates']++;
+
+                    continue;
+                }
+
+                $row = TaxonomyCandidateConceptLink::where('suggested_term_id', $candidate['suggested_term_id'])
+                    ->whereNull('suggested_concept_id')
+                    ->firstOrFail();
+
+                $this->audit($row->id, "Propuesta de concepto NUEVO encolada por --apply (term_id={$candidate['suggested_term_id']}, nombre sugerido=\"{$candidate['suggested_new_concept_name']}\", autorizado_por={$authorizedBy})");
                 $created['new_concept_candidates']++;
             }
 
@@ -254,7 +311,12 @@ class CanonicalConceptApplyService
                     continue;
                 }
 
-                $row = TaxonomyConceptRelation::create([
+                // Idempotencia concurrency-safe (hallazgo 3): esta tabla YA tenía
+                // UNIQUE(source_concept_id, target_concept_id, relation_type) desde su creación -
+                // insertOrIgnore() la aprovecha en vez de dejar que una violación de esa constraint
+                // reviente toda la transacción de --apply si dos corridas compiten por el mismo par
+                // exacto entre la validación de arriba y el insert.
+                $affected = DB::connection('pgsql')->table('taxonomy_concept_relations')->insertOrIgnore([
                     'source_concept_id' => $relation['source_concept_id'],
                     'target_concept_id' => $relation['target_concept_id'],
                     'relation_type' => $relation['relation_type'],
@@ -262,12 +324,26 @@ class CanonicalConceptApplyService
                     // `status=candidate`, NUNCA `approved`: una relación concepto↔concepto sigue
                     // necesitando aprobación humana igual que antes de Phase C.
                     'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
-                    'provenance' => $relation['provenance'] + [
+                    'provenance' => json_encode($relation['provenance'] + [
                         'algorithm_version' => self::ALGORITHM_VERSION,
                         'taxonomy_state_fingerprint' => $currentFingerprint,
                         'evidence' => $relation['evidence'],
-                    ],
+                        'authorized_by' => $authorizedBy,
+                    ]),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
+
+                if ($affected === 0) {
+                    $skipped['concept_relations']++;
+
+                    continue;
+                }
+
+                $row = TaxonomyConceptRelation::where('source_concept_id', $relation['source_concept_id'])
+                    ->where('target_concept_id', $relation['target_concept_id'])
+                    ->where('relation_type', $relation['relation_type'])
+                    ->firstOrFail();
 
                 TaxonomyAuditLogger::record(
                     entityType: TaxonomyConceptRelation::class,
@@ -275,7 +351,7 @@ class CanonicalConceptApplyService
                     field: 'status',
                     oldValue: null,
                     newValue: $row->status,
-                    reason: "Relación concepto↔concepto propuesta por --apply ({$relation['source_concept_id']} -{$relation['relation_type']}-> {$relation['target_concept_id']}, confidence={$relation['confidence']})",
+                    reason: "Relación concepto↔concepto propuesta por --apply ({$relation['source_concept_id']} -{$relation['relation_type']}-> {$relation['target_concept_id']}, confidence={$relation['confidence']}, autorizado_por={$authorizedBy})",
                     actorType: TaxonomyAuditLogger::ACTOR_SYSTEM,
                     algorithmVersion: self::ALGORITHM_VERSION,
                 );
@@ -283,13 +359,17 @@ class CanonicalConceptApplyService
             }
 
             $after = $this->counts();
+            $protectedAfter = $this->protectedTableSignature();
 
             // Propiedad "no migración destructiva" (salvaguarda global 1 de docs/task.md): ni las
-            // relaciones CPV protegidas ni el grafo publicado pueden haber cambiado acá. Si
-            // cambiaron, algo escribió lo que no debía - se revierte TODO.
+            // relaciones CPV protegidas ni el grafo publicado pueden haber cambiado acá. TASK-0003
+            // hallazgo 5: el conteo NO prueba ausencia de UPDATE in-place - por eso se suma un
+            // fingerprint de contenido (`protectedTableSignature()`). Si cualquiera de los dos
+            // cambió, algo escribió lo que no debía - se revierte TODO.
             if ($after['taxonomy_term_cpv_relations'] !== $before['taxonomy_term_cpv_relations']
                 || $after['taxonomy_term_concepts'] !== $before['taxonomy_term_concepts']
-                || $after['taxonomy_canonical_concepts'] !== $before['taxonomy_canonical_concepts']) {
+                || $after['taxonomy_canonical_concepts'] !== $before['taxonomy_canonical_concepts']
+                || $protectedAfter !== $protectedBefore) {
                 throw new \RuntimeException(
                     'ABORTADO: --apply modificó una tabla protegida (taxonomy_term_cpv_relations / '.
                     'taxonomy_term_concepts / taxonomy_canonical_concepts). Transacción revertida. '.
@@ -303,13 +383,34 @@ class CanonicalConceptApplyService
                 'before' => $before,
                 'after' => $after,
                 'fingerprint' => $currentFingerprint,
+                'authorized_by' => $authorizedBy,
             ]);
         });
     }
 
     /**
+     * TASK-0003, hallazgo 5: fingerprint de CONTENIDO (no solo conteo) de las 3 tablas protegidas -
+     * las 2 chicas (grafo) con hash completo vía `tableFingerprint()`, la grande
+     * (`taxonomy_term_cpv_relations`, ~9.7k filas) con la señal barata COUNT+MAX(updated_at) vía
+     * `tableVersionSignal()` (mismo mecanismo del hallazgo 4, no uno nuevo) - hashear 9.7k filas dos
+     * veces por cada `--apply` sería caro dada la latencia documentada hacia Supabase.
+     */
+    private function protectedTableSignature(): string
+    {
+        return hash('sha256', implode('|', [
+            CanonicalConceptBuilderService::tableFingerprint('taxonomy_term_concepts'),
+            CanonicalConceptBuilderService::tableFingerprint('taxonomy_canonical_concepts'),
+            CanonicalConceptBuilderService::tableVersionSignal('taxonomy_term_cpv_relations'),
+        ]));
+    }
+
+    /**
      * Conteos de las tablas que importan para el before/after de cualquier corrida de escritura -
-     * las que Phase C SÍ toca y las protegidas que NO debe tocar.
+     * las que Phase C1 SÍ toca y las protegidas que NO debe tocar.
+     *
+     * TASK-0003, hallazgo 5: esto es DIAGNÓSTICO/legible-para-humano, no la garantía real de que
+     * las tablas protegidas no se tocaron - un UPDATE in-place no cambia un conteo. La garantía
+     * real es `protectedTableSignature()` (fingerprint de contenido), comparada en `apply()`.
      *
      * @return array<string, int>
      */
