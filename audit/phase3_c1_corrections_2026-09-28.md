@@ -293,32 +293,61 @@ la mutación de esquema explícitamente reconocida (ver `audit/orchestrator_hand
 gate 2 abajo), con el mismo criterio: reconocida explícitamente, no descrita como "sin mutaciones".
 Ningún rollback fue pedido para ninguna de las dos.
 
-### Gate 1 — Regresión de 32 queries: BLOCKED (no re-corrida)
+### Gate 1 — Regresión de 32 queries: PASS (corrida real, después de rotar `DEBUG_TOKEN`)
 
-**No se pudo ejecutar.** La suite (`perfilafiliados-mcp/scripts/regression-suite.mjs` contra el
+**Bloqueo inicial (mismo que documentó `audit/regression_2026-09-22.md`/`regression_2026-09-23.md`
+en la sesión anterior):** la suite (`perfilafiliados-mcp/scripts/regression-suite.mjs` contra el
 fixture congelado `perfilafiliados-mcp/scripts/fixtures/regression-cases.json`, 32 casos) necesita
 `DEBUG_TOKEN` del Worker de Cloudflare desplegado, para autenticar contra `POST /debug-search`.
+Verificado en esta sesión: `DEBUG_TOKEN`/`MCP_TOKEN`/`MCP_EMBED_TOKEN`/`MCP_EMBED_URL` no existían
+en el `.env` de staging (vía SSH), y esta sesión no arrancó con credenciales de Cloudflare.
 
-Verificado en esta sesión (no asumido, mismo método que la auditoría del 2026-09-23):
-- `DEBUG_TOKEN`/`MCP_TOKEN`/`MCP_EMBED_TOKEN`/`MCP_EMBED_URL` no existen en el `.env` de staging
-  (`/opt/perfilafiliados/.env`, verificado solo existencia de clave, nunca valor, vía SSH).
-- No hay credenciales de Cloudflare (`wrangler`, variables de entorno `CLOUDFLARE_*`/`CF_API_*`)
-  disponibles en esta sesión.
-- `DEBUG_TOKEN` es un secreto de Worker - no se puede leer una vez seteado, solo rotar.
+**Desbloqueo:** se le preguntó a Esteban cómo proceder (dar el valor viejo, autorizar rotarlo, o
+dejarlo documentado como bloqueado). Primero eligió dejarlo bloqueado; después, en un mensaje
+posterior, autorizó explícitamente rotar `DEBUG_TOKEN` y proveyó un token de API de Cloudflare
+scopeado (`Account → Workers Scripts → Edit`, verificado activo vía
+`GET /user/tokens/verify` antes de usarlo). Con eso:
 
-Es el **mismo bloqueo exacto** que documentó `audit/regression_2026-09-22.md`/
-`regression_2026-09-23.md` en la sesión anterior, que en ese momento se resolvió con autorización
-EXPLÍCITA del usuario para rotar el token. Se le preguntó a Esteban cómo proceder (dar el valor,
-autorizar una rotación, o dejar el gate documentado como bloqueado) - **eligió dejarlo documentado
-como bloqueado por ahora**, sin rotar ningún secreto ni intentar adivinar/recuperar el valor.
+1. Se generó un `DEBUG_TOKEN` nuevo, criptográficamente aleatorio (32 bytes,
+   `RNGCryptoServiceProvider`, no el `RandomNumberGenerator.Fill()` que en este entorno falló
+   silenciosamente y habría dejado 32 bytes en cero sin el chequeo posterior que lo detectó).
+2. Seteado vía la API de Cloudflare (`PUT /accounts/{id}/workers/scripts/perfilafiliados-mcp/secrets`,
+   `type: secret_text`) - mismo efecto que `wrangler secret put`, sin necesitar `wrangler` instalado
+   localmente. Confirmado `success: true`.
+3. El token de API de Cloudflare se usó solo para ese PUT y se borró del scratchpad de la sesión
+   inmediatamente después - no vive en ningún archivo del repo ni se registró en ningún log.
+4. `DEBUG_TOKEN` nuevo usado UNA vez para correr la suite completa, después descartado del
+   scratchpad de la sesión (mismo criterio de "nunca vive en un archivo" que el diseño original del
+   Worker - ver `src/index.ts:114-119`). El valor se le compartió a Esteban directamente en el chat
+   (quien lo generó/autorizó), no se commiteó en ningún lado.
 
-**Estado: BLOCKED — AUTH CREDENTIAL REQUIRED**, con causa exacta documentada, igual que la vez
-anterior. No se debe interpretar como fallo de búsqueda ni como señal de que el código de esta
-tarea rompió algo - **ningún cambio de TASK-0002/TASK-0003 toca el código de resolución de
-búsqueda** (Worker `perfilafiliados-mcp`, `hybrid-search.ts`) ni el grafo publicado que ese motor
-lee (`taxonomy_term_concepts`, `empresa_taxonomy_category` - ninguno de los dos cambió, ver
-invariantes arriba). Es una inferencia razonable de por qué no debería haber regresión, no un
-sustituto de la corrida real - queda pendiente hasta que el usuario decida desbloquearlo.
+**Qué NO se rompió por rotar el token (verificado, no asumido):** `DEBUG_TOKEN` protege
+EXCLUSIVAMENTE `POST /debug-search` (confirmado leyendo `src/index.ts` - es el único archivo de
+todo el repo `perfilafiliados-mcp` que lo referencia). El propio comentario del código dice
+explícitamente que existe "para poder revocarlo/rotarlo sin afectar `/mcp`/`/embed`" - los caminos
+reales de producción (n8n/CIRA) usan `MCP_TOKEN`/el secreto de `/embed`, sin relación con
+`DEBUG_TOKEN`. El único consumidor real es el modo DEBUG manual de `public/cira-test/index.html`.
+
+**Resultado de la corrida (2026-09-29), guardado en
+`audit/regression_run_2026-09-29.json`, diffeado contra `audit/regression_baseline_2026-09-23.json`
+(la línea base aceptada):**
+
+```
+queries evaluadas: 32
+grupos: {"A_baseline":8,"B_regional":14,"C_intent_x_subject":10}
+errores HTTP: 0
+sin cambios respecto al baseline: true
+```
+
+**32/32 queries respondieron sin error, y CERO diferencias en ningún campo comparado** contra la
+línea base aceptada (`candidates_after_dedup`, `direct_company_count`, `detected_intent`,
+`regional_terms`, `canonical_concepts`, `cpv_relations`, `diagnostic_flags`, `top_empresa_ids`,
+`top_evidence_strengths`, para las 32 queries de los 3 grupos: `A_baseline`, `B_regional`,
+`C_intent_x_subject`). No hardcodeada, no fixture tocado - el mismo `regression-cases.json`
+congelado desde 2026-09-23.
+
+**Estado: PASS.** Confirma en vivo lo que en la ronda anterior era solo una inferencia razonable:
+ningún cambio de TASK-0002/TASK-0003 afectó el motor de búsqueda ni el grafo publicado que consume.
 
 ### Gate 2 — Referencia de autorización + ambiente objetivo: CERRADO
 

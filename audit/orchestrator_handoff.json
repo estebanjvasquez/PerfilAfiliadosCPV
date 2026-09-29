@@ -114,7 +114,7 @@
           "orchestrator_comment": "5877665979",
           "verdict": "CORRECTIONS_REQUIRED (narrow) - findings 1/3/4/5/6 accepted as-is; 2 gates left: (1) re-run the 32-query search regression, (2) strengthen authorization record to a structured reference + auto-detected target environment, and qualify 'zero production mutations' as 'zero data mutations' given the schema-only migration",
           "our_commit": "1fb8a5af2a996609f04360fca591285241d1f23c",
-          "gate_1_32_query_regression": "BLOCKED - needs perfilafiliados-mcp's Cloudflare Worker DEBUG_TOKEN, which exists in no reachable environment (re-verified via SSH against staging's .env, same result as audit/regression_2026-09-22.md) and no Cloudflare credentials are available in this session to rotate it. Asked the user how to proceed (provide the token / authorize rotating it / leave documented as blocked) - they chose to leave it blocked rather than rotate a shared secret. Not re-run.",
+          "gate_1_32_query_regression": "PASS - initially reported BLOCKED (DEBUG_TOKEN unreachable in this session), then the user explicitly authorized rotating it and provided a scoped Cloudflare API token (Account -> Workers Scripts -> Edit). Rotated DEBUG_TOKEN via the Cloudflare API (verified token active first via /user/tokens/verify), ran the full 32-query suite against the deployed Worker, diffed against the accepted audit/regression_baseline_2026-09-23.json: 32/32 queries responded with 0 HTTP errors and 0 field differences across every compared field. Result saved to audit/regression_run_2026-09-29.json. Both the Cloudflare API token and the new DEBUG_TOKEN value were deleted from the session scratchpad after use - neither is stored in this repo.",
           "gate_2_authorization_target_env": "CLOSED - see findings_response.2_production_write_authorization below (updated for this round)."
         }
       ],
@@ -145,7 +145,7 @@
         },
         "7_test_evidence_gate": {
           "taxonomy_suite": "150/150 PASS (495 assertions) after round 2 - includes 12 new tests total across findings 2/3/4/5/6 plus the gate-2 closure tests",
-          "search_regression_32_queries": "STILL BLOCKED after round 2 - see re_audit_rounds[1].gate_1_32_query_regression above. The orchestrator explicitly required this be actually re-run, not reasoned about; it was not silently skipped, it is an acknowledged open item pending a Cloudflare credential decision from the user.",
+          "search_regression_32_queries": "PASS - see re_audit_rounds[1].gate_1_32_query_regression above. Actually re-run (not reasoned about), 32/32 queries, 0 errors, 0 diffs against the accepted baseline. Result: audit/regression_run_2026-09-29.json.",
           "docs_updated": ["audit/phase3_phase_c_apply.md", "docs/task.md", "docs/implementation_plan.md", "audit/orchestrator_handoff.json", "audit/phase3_c1_corrections_2026-09-28.md"]
         }
       },
@@ -167,7 +167,9 @@
       },
       "notes": [
         "Process note: the first version of the two new hallazgo-6 tests failed for an unrelated reason (the test scenario itself tried to create two rows violating a pre-existing unique constraint) - corrected before reporting green, not left as a false pass. See the 'Nota de proceso' in audit/phase3_c1_corrections_2026-09-28.md.",
-        "Process note (round 2): rather than unilaterally rotating the Worker's DEBUG_TOKEN to unblock the 32-query regression (as a prior session did with explicit authorization), the user was asked how to proceed and explicitly chose to leave gate 1 blocked. Credential rotation stayed a human-authorization gate, not something decided unilaterally under review pressure.",
+        "Process note (round 2): rather than unilaterally rotating the Worker's DEBUG_TOKEN to unblock the 32-query regression, the user was asked how to proceed first. They initially chose to leave gate 1 blocked; in a later message they explicitly authorized rotating DEBUG_TOKEN and supplied a scoped Cloudflare API token themselves. Credential rotation only happened after that explicit authorization, never unilaterally under review pressure.",
+        "Process note (round 2, secret handling): the Cloudflare API token and the newly-rotated DEBUG_TOKEN both lived only in the session scratchpad (never the repo), were deleted immediately after use, and neither value appears in any committed file, log, or this handoff.",
+        "Process note (round 2, self-caught bug): the first attempt to generate the new random DEBUG_TOKEN used [System.Security.Cryptography.RandomNumberGenerator]::Fill(), which failed silently in this PowerShell version and would have produced 32 zero bytes (a predictable, non-random secret) if used as-is. Caught before it was set on the Worker by checking the output wasn't all zeros; regenerated correctly with RNGCryptoServiceProvider.GetBytes() instead.",
         "Do not begin reviewing the 10 candidates / 2 relations - out of scope for this task."
       ]
     }
