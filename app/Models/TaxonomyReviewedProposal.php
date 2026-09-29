@@ -28,6 +28,16 @@ class TaxonomyReviewedProposal extends Model
 
     public const DECISION_PUBLISH_RELATION = 'PUBLISH_RELATION';
 
+    /**
+     * TASK-0004, re-audit correction C (Issue #2 comentario `5892711739`): cuarto desenlace de
+     * revisión para TERM_CONCEPT_LINK - término/candidato válido en el dominio pero
+     * insuficientemente específico por sí solo para sostener un mapeo directo producto/servicio/CPV
+     * ("generic but valid terms"). Distinto de REJECT: el candidato sigue siendo evidencia
+     * contextual/de búsqueda válida, no descartado. `apply()` para esta decisión NUNCA escribe
+     * `taxonomy_term_concepts` ni crea un concepto - ver `ReviewedProposalService::applyCandidateLinkDecision()`.
+     */
+    public const DECISION_CONTEXT_REQUIRED = 'CONTEXT_REQUIRED';
+
     public const STATUS_PENDING_APPLY = 'PENDING_APPLY';
 
     public const STATUS_APPLIED = 'APPLIED';

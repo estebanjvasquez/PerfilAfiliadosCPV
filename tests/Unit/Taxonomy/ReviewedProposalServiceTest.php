@@ -296,7 +296,9 @@ class ReviewedProposalServiceTest extends TestCase
         $candidate = $this->newConceptCandidate();
         $user = $this->authorizedUser();
         $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
-        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user);
+        // TASK-0004, re-audit correction A: `new_concept_name` ya no se completa implícitamente
+        // desde `suggested_new_concept_name` - freeze() exige que el llamador lo pase explícito.
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user, ['new_concept_name' => $candidate->suggested_new_concept_name]);
 
         $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
 
@@ -520,7 +522,7 @@ class ReviewedProposalServiceTest extends TestCase
         $candidate = $this->newConceptCandidate();
         $user = $this->authorizedUser();
         $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
-        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user);
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user, ['new_concept_name' => $candidate->suggested_new_concept_name]);
 
         $candidate->update(['suggested_new_concept_name' => 'nombre editado después de freeze '.uniqid()]);
 
@@ -543,9 +545,157 @@ class ReviewedProposalServiceTest extends TestCase
         $originalName = $candidate->suggested_new_concept_name;
         $user = $this->authorizedUser();
 
-        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user);
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user, ['new_concept_name' => $originalName]);
 
         $this->assertSame($originalName, $frozen['proposal']->decision_payload['new_concept_name'], 'freeze() debe congelar el nombre YA en ese instante.');
+    }
+
+    #[Test]
+    public function freeze_create_new_rejects_when_new_concept_name_is_missing_from_the_payload(): void
+    {
+        // TASK-0004, re-audit correction A (Issue #2 comentario `5892711739`): la ronda anterior
+        // movió el fallback mutable de apply() a freeze() (`?? $candidate->suggested_new_concept_name`),
+        // pero seguía siendo un fallback implícito - el hallazgo pide que freeze() RECHACE en vez de
+        // completar el nombre por su cuenta.
+        $candidate = $this->newConceptCandidate();
+        $user = $this->authorizedUser();
+
+        $outcome = (new ReviewedProposalService())->freeze(
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id,
+            TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user,
+            [], // sin new_concept_name explícito
+        );
+
+        $this->assertSame(ReviewedProposalService::RESULT_VALIDATION_FAILED, $outcome['result']);
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('candidate_link_id', $candidate->id)->count());
+    }
+
+    #[Test]
+    public function freeze_create_new_rejects_a_blank_new_concept_name(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $user = $this->authorizedUser();
+
+        $outcome = (new ReviewedProposalService())->freeze(
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id,
+            TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user,
+            ['new_concept_name' => '   '],
+        );
+
+        $this->assertSame(ReviewedProposalService::RESULT_VALIDATION_FAILED, $outcome['result']);
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('candidate_link_id', $candidate->id)->count());
+    }
+
+    // =========================================================================================
+    // APPLY - CONTEXT_REQUIRED (TASK-0004, re-audit correction C, Issue #2 comentario
+    // `5892711739`): cuarto desenlace de revisión - término/candidato válido pero insuficientemente
+    // específico para un mapeo directo producto/servicio/CPV. Distinto de REJECT (sigue siendo
+    // evidencia contextual/de búsqueda válida). Nunca escribe taxonomy_term_concepts ni crea un
+    // concepto. Fixtures propios exclusivamente - ningún candidato/relación real de TASK-0001 se
+    // toca acá.
+    // =========================================================================================
+
+    #[Test]
+    public function freeze_context_required_rejects_when_the_reason_is_missing_from_the_payload(): void
+    {
+        [$candidate] = $this->mapCandidate();
+        $user = $this->authorizedUser();
+
+        $outcome = (new ReviewedProposalService())->freeze(
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id,
+            TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED, $user,
+            [], // sin context_reason explícito
+        );
+
+        $this->assertSame(ReviewedProposalService::RESULT_VALIDATION_FAILED, $outcome['result']);
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('candidate_link_id', $candidate->id)->count());
+    }
+
+    #[Test]
+    public function freeze_context_required_rejects_a_blank_reason(): void
+    {
+        [$candidate] = $this->mapCandidate();
+        $user = $this->authorizedUser();
+
+        $outcome = (new ReviewedProposalService())->freeze(
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id,
+            TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED, $user,
+            ['context_reason' => '   '],
+        );
+
+        $this->assertSame(ReviewedProposalService::RESULT_VALIDATION_FAILED, $outcome['result']);
+    }
+
+    #[Test]
+    public function freeze_context_required_works_for_a_candidate_that_already_suggests_an_existing_concept(): void
+    {
+        // CONTEXT_REQUIRED no está restringido a candidatos PROPOSE_NEW_CONCEPT (a diferencia de
+        // CREATE_NEW) - un término puede ser demasiado genérico sin importar si el Builder ya sugirió
+        // un concepto destino o no.
+        [$candidate] = $this->mapCandidate();
+        $user = $this->authorizedUser();
+
+        $outcome = (new ReviewedProposalService())->freeze(
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id,
+            TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED, $user,
+            ['context_reason' => 'Término genérico del dominio - no sostiene un mapeo directo por sí solo.'],
+        );
+
+        $this->assertSame(ReviewedProposalService::RESULT_FROZEN, $outcome['result']);
+    }
+
+    #[Test]
+    public function apply_context_required_marks_the_candidate_and_writes_zero_taxonomy_mappings(): void
+    {
+        [$candidate, $concept] = $this->mapCandidate();
+        $user = $this->authorizedUser();
+        $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
+        $reason = 'Término genérico del dominio - no sostiene un mapeo directo por sí solo.';
+        $frozen = (new ReviewedProposalService())->freeze(
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id,
+            TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED, $user,
+            ['context_reason' => $reason],
+        );
+
+        $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
+
+        $this->assertSame(ReviewedProposalService::RESULT_APPLIED, $outcome['result']);
+        $this->assertSame('CONTEXT_REQUIRED', $outcome['application_result']['outcome']);
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED, $candidate->fresh()->status);
+        $this->assertNotSame(TaxonomyCandidateConceptLink::STATUS_REJECTED, $candidate->fresh()->status, 'CONTEXT_REQUIRED es distinto de REJECTED - el candidato no se descarta.');
+        $this->assertSame($reason, $candidate->fresh()->review_notes, 'El motivo del revisor debe preservarse.');
+        $this->assertNull($candidate->fresh()->published_term_concept_id, 'No debe quedar ningún link publicado.');
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_term_concepts')
+            ->where('term_id', $candidate->suggested_term_id)->count(), 'CONTEXT_REQUIRED nunca escribe taxonomy_term_concepts.');
+        $this->assertSame($conceptCountBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(), 'CONTEXT_REQUIRED nunca inventa un concepto nuevo.');
+    }
+
+    #[Test]
+    public function apply_refuses_a_context_required_proposal_tampered_into_map_to_existing(): void
+    {
+        // TASK-0004, re-audit correction C: "source drift/tamper must not be able to turn it into
+        // MAP_TO_EXISTING/CREATE_NEW" - el fingerprint de tamper-detection YA cubre esto genéricamente
+        // (incluye el campo `decision`), este test lo prueba explícitamente para este escenario.
+        [$candidate, $concept] = $this->mapCandidate();
+        $user = $this->authorizedUser();
+        $frozen = (new ReviewedProposalService())->freeze(
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id,
+            TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED, $user,
+            ['context_reason' => 'Término genérico del dominio.'],
+        );
+
+        DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $frozen['proposal']->id)
+            ->update([
+                'decision' => TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                'decision_payload' => json_encode(['term_id' => $candidate->suggested_term_id, 'target_concept_id' => $concept->id]),
+            ]);
+
+        $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
+
+        $this->assertSame(ReviewedProposalService::RESULT_ABORTED, $outcome['result']);
+        $this->assertSame(ReviewedProposalService::ABORT_TAMPER_DETECTED, $outcome['abort_reason']);
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_term_concepts')->where('term_id', $candidate->suggested_term_id)->count());
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status);
     }
 
     #[Test]
@@ -559,6 +709,44 @@ class ReviewedProposalServiceTest extends TestCase
         // Edición directa (no hay UI que reasigne source/target de una relación ya creada, pero el
         // guard no depende de que exista una).
         DB::connection('pgsql')->table('taxonomy_concept_relations')->where('id', $relation->id)->update(['source_concept_id' => $otherConcept->id]);
+
+        $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
+
+        $this->assertSame(ReviewedProposalService::RESULT_ABORTED, $outcome['result']);
+        $this->assertSame(ReviewedProposalService::ABORT_SOURCE_DRIFT, $outcome['abort_reason']);
+        $this->assertSame(TaxonomyConceptRelation::STATUS_CANDIDATE, DB::connection('pgsql')->table('taxonomy_concept_relations')->where('id', $relation->id)->value('status'));
+    }
+
+    #[Test]
+    public function apply_aborts_with_zero_writes_when_the_relations_target_concept_id_drifted_after_freeze(): void
+    {
+        // TASK-0004, re-audit correction B (Issue #2 comentario `5892711739`): la matriz de tests de
+        // drift estaba incompleta - solo `source_concept_id` tenía mutation test. El hallazgo pide
+        // explícitamente mutar CADA campo fuente decision-relevante por separado y probar abort con
+        // cero escrituras para cada uno.
+        [$relation] = $this->candidateRelation();
+        $otherConcept = $this->concept('zzz_c2_drift_target_'.uniqid());
+        $user = $this->authorizedUser();
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_CONCEPT_RELATION, $relation->id, TaxonomyReviewedProposal::DECISION_PUBLISH_RELATION, $user);
+
+        DB::connection('pgsql')->table('taxonomy_concept_relations')->where('id', $relation->id)->update(['target_concept_id' => $otherConcept->id]);
+
+        $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
+
+        $this->assertSame(ReviewedProposalService::RESULT_ABORTED, $outcome['result']);
+        $this->assertSame(ReviewedProposalService::ABORT_SOURCE_DRIFT, $outcome['abort_reason']);
+        $this->assertSame(TaxonomyConceptRelation::STATUS_CANDIDATE, DB::connection('pgsql')->table('taxonomy_concept_relations')->where('id', $relation->id)->value('status'));
+    }
+
+    #[Test]
+    public function apply_aborts_with_zero_writes_when_the_relations_relation_type_drifted_after_freeze(): void
+    {
+        // TASK-0004, re-audit correction B: mismo criterio, para relation_type.
+        [$relation] = $this->candidateRelation();
+        $user = $this->authorizedUser();
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_CONCEPT_RELATION, $relation->id, TaxonomyReviewedProposal::DECISION_PUBLISH_RELATION, $user);
+
+        DB::connection('pgsql')->table('taxonomy_concept_relations')->where('id', $relation->id)->update(['relation_type' => 'PART_OF']);
 
         $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
 

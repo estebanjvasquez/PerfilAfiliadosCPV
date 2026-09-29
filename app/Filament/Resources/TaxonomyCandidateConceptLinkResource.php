@@ -85,6 +85,7 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                         'gray' => TaxonomyCandidateConceptLink::STATUS_PENDING,
                         'success' => [TaxonomyCandidateConceptLink::STATUS_APPROVED, TaxonomyCandidateConceptLink::STATUS_PUBLISHED],
                         'danger' => TaxonomyCandidateConceptLink::STATUS_REJECTED,
+                        'warning' => TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED,
                     ]),
                 Tables\Columns\TextColumn::make('reviewedBy.name')->label('Revisado por')->placeholder('—')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('reviewed_at')->label('Revisado el')->dateTime()->placeholder('—')->toggleable(isToggledHiddenByDefault: true),
@@ -101,6 +102,7 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                     TaxonomyCandidateConceptLink::STATUS_APPROVED => 'Aprobado',
                     TaxonomyCandidateConceptLink::STATUS_REJECTED => 'Rechazado',
                     TaxonomyCandidateConceptLink::STATUS_PUBLISHED => 'Publicado',
+                    TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED => 'Contexto requerido (sin mapeo directo)',
                 ]),
             ])
             ->actions([

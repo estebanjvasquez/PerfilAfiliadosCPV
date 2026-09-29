@@ -189,3 +189,141 @@ no divulgado.
   (2 fixtures a INSERT crudo, 1 dividido en dos, 1 aislado con `withC2PublicationContext()`).
 - `tests/Unit/Taxonomy/CanonicalConceptApplyServiceTest.php` — 1 fixture a INSERT crudo (sin cambio
   de comportamiento bajo prueba).
+
+---
+---
+
+# Ronda 3 — correcciones del re-audit (Issue #2, comentario `5892711739`)
+
+**Revisado en:** HEAD `f64bbe5` (TASK-0004 ronda 2, READY_FOR_REVIEW)
+**Verdict:** `CORRECTIONS_REQUIRED (narrow)` — acota explícitamente a los puntos A/B/C, más el gate D
+(documentado, sin acción de código). Confirma como aceptadas/inherited: Phase C1 (`ce11d36`), la
+regresión de 32 queries (heredada, sin rerun), los invariantes de DB, HIGH-1/HIGH-2 (sustancialmente
+mejorados), y el ledger de gates heredados.
+
+Texto verbatim del comentario verificado vía la API de GitHub antes de tocar código (mismo protocolo:
+no asumir contenido no leído textualmente). Materializado también en
+`docs/orquestador/tasks/0004-phase-c2-immutable-apply.md`.
+
+---
+
+## A — CREATE_NEW seguía sin cumplir el contrato de revisión explícita
+
+**Hallazgo:** la ronda 2 corrigió el momento (de `apply()` a `freeze()`) pero no la naturaleza del
+fallback: `freezeCandidateLink()` seguía haciendo
+`$decisionPayload['new_concept_name'] ?? $candidate->suggested_new_concept_name` - un candidato
+"revisado" con CREATE_NEW y ningún `new_concept_name` explícito terminaba congelando el valor
+generado por el sistema como si un humano lo hubiera elegido, sin que nadie lo eligiera realmente.
+
+**Corrección:**
+
+- `freeze()` ahora exige `decision_payload['new_concept_name']` explícito y no vacío (tras `trim()`)
+  para CREATE_NEW. Si falta o está en blanco, devuelve `RESULT_VALIDATION_FAILED` sin congelar nada
+  (cero filas en `taxonomy_reviewed_proposals`) - nunca lo completa desde
+  `suggested_new_concept_name`, que queda disponible solo como sugerencia para que la UI la muestre.
+- El chequeo de drift en `apply()` (ronda 2, sin cambios de comportamiento) sigue comparando el
+  nombre congelado contra `suggested_new_concept_name` EN VIVO - eso sigue siendo válido: sigue
+  detectando si alguien editó el candidato después de `freeze()`, independientemente de que ahora el
+  valor congelado provenga de una elección explícita en vez de un fallback implícito.
+- **Tests nuevos:** `freeze_create_new_rejects_when_new_concept_name_is_missing_from_the_payload`,
+  `freeze_create_new_rejects_a_blank_new_concept_name`. Los tests existentes que dependían del
+  fallback implícito (`apply_create_new_creates_a_concept_and_publishes_the_link`,
+  `apply_aborts_with_zero_writes_when_the_candidates_new_concept_name_drifted_after_freeze`,
+  `freeze_snapshots_the_new_concept_name_so_apply_never_reads_the_live_candidate_field`) se
+  actualizaron para pasar `new_concept_name` explícito - mismo comportamiento bajo prueba, ya no
+  dependen de una omisión que el contrato ya no permite.
+
+---
+
+## B — Matriz de tests de drift de relación incompleta
+
+**Hallazgo:** la implementación comparaba los tres campos fuente de una relación
+(`source_concept_id`/`target_concept_id`/`relation_type`), pero solo había mutation test para
+`source_concept_id`.
+
+**Corrección:** 2 tests nuevos, mismo patrón que el existente:
+
+- `apply_aborts_with_zero_writes_when_the_relations_target_concept_id_drifted_after_freeze`
+- `apply_aborts_with_zero_writes_when_the_relations_relation_type_drifted_after_freeze`
+
+Sin cambios de código de producción - el chequeo de drift para estos tres campos ya escribía
+correctamente desde la ronda 2 (`ReviewedProposalService::applyConceptRelationDecision()`); lo que
+faltaba era la cobertura de test explícita para cada campo individual.
+
+---
+
+## C — Nuevo desenlace de revisión: CONTEXT_REQUIRED (términos válidos pero demasiado genéricos)
+
+**Hallazgo:** revisión humana de dominio encontró términos válidos de oil & gas demasiado
+genéricos/inespecíficos para sostener un mapeo directo producto/servicio/CPV. Forzarlos a
+MAP_TO_EXISTING, CREATE_NEW o REJECT perdería/distorsionaría esa señal. Explícito: no hardcodear los
+10 términos actuales - la solución debe ser un mecanismo genérico.
+
+**Corrección:** cuarto desenlace para `TERM_CONCEPT_LINK`:
+
+- `TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED` (`'CONTEXT_REQUIRED'`).
+- `TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED` (`'context_required'`) - status NUEVO,
+  distinto de `rejected` (el candidato no se descarta, sigue siendo evidencia contextual/de búsqueda
+  válida) y distinto de `published` (nunca se creó ningún link).
+- `freeze()` exige `decision_payload['context_reason']` explícito no vacío (mismo criterio que
+  `new_concept_name` en la corrección A) - `RESULT_VALIDATION_FAILED` si falta. Permitido para
+  CUALQUIER candidato pending (proponga concepto nuevo o ya tenga uno sugerido por el Builder) - el
+  problema es la especificidad del TÉRMINO, no el tipo de candidato.
+- `apply()` para CONTEXT_REQUIRED: **cero** escrituras a `taxonomy_term_concepts`, **cero** conceptos
+  nuevos creados. Solo transiciona `status -> context_required` y preserva el motivo del revisor en
+  `review_notes`. No depende de ningún campo fuente congelado que determine un destino de escritura
+  (mismo criterio de diseño que REJECT), así que no se le exige el chequeo de drift de `term_id`.
+- **Participación en el contrato C2 completo:** freeze con fingerprint + taxonomy_state_fingerprint,
+  apply con re-validación de status/lock, audit log de revisión Y de ejecución (mismo mecanismo que
+  el resto de decisiones) - no es un camino paralelo.
+- **Resistencia a tamper hacia MAP_TO_EXISTING/CREATE_NEW:** el fingerprint de tamper-detection YA
+  incluye el campo `decision` (genérico a todas las decisiones desde el diseño original de Phase C2),
+  así que mutar `decision` de `CONTEXT_REQUIRED` a `MAP_TO_EXISTING` directamente en la fila rompe el
+  fingerprint y aborta con `ABORT_TAMPER_DETECTED`, cero escrituras - no hizo falta un mecanismo
+  nuevo, solo un test que lo pruebe explícitamente para este escenario
+  (`apply_refuses_a_context_required_proposal_tampered_into_map_to_existing`).
+- **Auditoría de consumidores de búsqueda/índice** (pedido explícito: "audit search/index consumers
+  so retaining this state cannot leak an arbitrary direct CPV association"): el único comando que
+  construye documentos de búsqueda a partir de taxonomía publicada
+  (`app/Console/Commands/BuildEmpresaSearchDocuments.php`) hace JOIN exclusivamente contra
+  `taxonomy_term_concepts` (los links REALMENTE publicados) - nunca lee `status` de
+  `taxonomy_candidate_concept_links`. Como CONTEXT_REQUIRED nunca escribe esa tabla, es estructuralmente
+  imposible que este estado llegue al índice de búsqueda como una asociación CPV directa - por
+  construcción, no por convención. Verificado con `grep` recursivo del nombre de esa tabla/columna
+  contra el archivo del comando.
+- **UI:** `TaxonomyCandidateConceptLinkResource` (badge color + filtro de `status`) actualizado para
+  mostrar el estado nuevo de forma legible - no hay wiring de UI para disparar `freeze()`/CONTEXT_REQUIRED
+  desde el panel todavía (mismo alcance que el resto del flujo C2 - fuera de esta ronda, sin UI de
+  freeze/apply en ninguna decisión).
+- **Tests nuevos** (todos con fixtures propios - ningún candidato/relación real de TASK-0001 tocado):
+  `freeze_context_required_rejects_when_the_reason_is_missing_from_the_payload`,
+  `freeze_context_required_rejects_a_blank_reason`,
+  `freeze_context_required_works_for_a_candidate_that_already_suggests_an_existing_concept`,
+  `apply_context_required_marks_the_candidate_and_writes_zero_taxonomy_mappings`,
+  `apply_refuses_a_context_required_proposal_tampered_into_map_to_existing`.
+
+---
+
+## D — Gate de suite completa: sigue bloqueado por entorno, no por código C2
+
+Sin cambios de código para este punto (correctamente, el propio comentario pide explícitamente "do
+not let this trigger unrelated code changes"). Ver `docs/orquestador/current_task.md` para el
+resultado actualizado de esta ronda. Docker Desktop sigue sin estar disponible en esta sesión (el
+CLI `docker` ni siquiera resuelve en el PATH de esta terminal); se mantiene la clasificación de
+"entorno bloqueado" sin reintentar activamente, tal como pide el comentario.
+
+---
+
+## Archivos tocados en esta ronda 3
+
+- `app/Services/Taxonomy/ReviewedProposalService.php` — `RESULT_VALIDATION_FAILED`; validación
+  explícita no vacía de `new_concept_name` (CREATE_NEW) y `context_reason` (CONTEXT_REQUIRED) en
+  `freeze()`; rama `applyCandidateLinkDecision()` para CONTEXT_REQUIRED.
+- `app/Models/TaxonomyReviewedProposal.php` — `DECISION_CONTEXT_REQUIRED`.
+- `app/Models/TaxonomyCandidateConceptLink.php` — `STATUS_CONTEXT_REQUIRED`.
+- `app/Filament/Resources/TaxonomyCandidateConceptLinkResource.php` — badge color + filtro para el
+  status nuevo.
+- `tests/Unit/Taxonomy/ReviewedProposalServiceTest.php` — 2 tests nuevos (corrección A), 2 tests
+  nuevos (corrección B), 5 tests nuevos (corrección C), 3 tests existentes actualizados para pasar
+  `new_concept_name` explícito. Total del archivo: 39/39 PASS (108 assertions), verificado en
+  aislamiento antes de correr la suite completa.

@@ -38,6 +38,15 @@ class TaxonomyCandidateConceptLink extends Model
 
     public const STATUS_PUBLISHED = 'published';
 
+    /**
+     * TASK-0004, re-audit correction C (Issue #2 comentario `5892711739`): resultado de la decisión
+     * CONTEXT_REQUIRED de `ReviewedProposalService` - término/candidato válido pero insuficientemente
+     * específico para un mapeo directo. Distinto de `STATUS_REJECTED` (el candidato NO se descarta,
+     * sigue siendo evidencia contextual/de búsqueda) y distinto de `STATUS_PUBLISHED` (nunca se creó
+     * ningún link en `taxonomy_term_concepts` para esta fila).
+     */
+    public const STATUS_CONTEXT_REQUIRED = 'context_required';
+
     protected $fillable = [
         'suggested_term_id',
         'suggested_concept_id',

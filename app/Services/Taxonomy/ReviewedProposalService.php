@@ -69,6 +69,28 @@ use Illuminate\Support\Facades\DB;
  * status bloqueada. `reject()` no se ve afectado (nunca escribió una tabla protegida). Este NO es
  * un servicio "aditivo y paralelo" en el sentido de TASK-0004 original - la corrección de este
  * re-audit cierra deliberadamente ese bypass.
+ *
+ * TASK-0004, re-audit ronda 3, corrección A (Issue #2 comentario `5892711739`): CREATE_NEW exige
+ * `new_concept_name` EXPLÍCITO y no vacío en el payload de decisión pasado a `freeze()` -
+ * `RESULT_VALIDATION_FAILED` si falta o está en blanco. La ronda anterior movió el fallback mutable
+ * de `apply()` a `freeze()`, pero seguía siendo un fallback implícito
+ * (`?? $candidate->suggested_new_concept_name`) - eso permitía que el valor generado por el sistema
+ * se convirtiera en "el nombre revisado por un humano" sin que ningún humano lo eligiera realmente.
+ * Ahora `freeze()` no completa ese campo por ningún camino; `suggested_new_concept_name` queda
+ * disponible solo como sugerencia para que la UI la muestre.
+ *
+ * TASK-0004, re-audit ronda 3, corrección C (Issue #2 comentario `5892711739`): cuarto desenlace de
+ * revisión para TERM_CONCEPT_LINK, `DECISION_CONTEXT_REQUIRED` - un término puede ser válido en el
+ * vocabulario del dominio pero demasiado genérico/inespecífico para sostener un mapeo directo
+ * producto/servicio/CPV (hallazgo de revisión humana de dominio, no hardcodeado a los 10 candidatos
+ * reales actuales). Igual que CREATE_NEW, exige un `context_reason` explícito no vacío. `apply()`
+ * NUNCA escribe `taxonomy_term_concepts` ni crea un concepto para esta decisión - el candidato pasa a
+ * `TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED` (distinto de `STATUS_REJECTED`: sigue
+ * siendo evidencia contextual/de búsqueda válida, no descartada) preservando el motivo del revisor en
+ * `review_notes`. El fingerprint de tamper-detection (que incluye el campo `decision`) ya cubría
+ * genéricamente que nadie pueda mutar una decisión congelada de CONTEXT_REQUIRED hacia
+ * MAP_TO_EXISTING/CREATE_NEW sin que `apply()` lo detecte y aborte con cero escrituras - no fue
+ * necesario un mecanismo nuevo para eso, solo un test que lo pruebe explícitamente.
  */
 class ReviewedProposalService
 {
@@ -91,6 +113,14 @@ class ReviewedProposalService
     public const RESULT_ALREADY_PROCESSED = 'ALREADY_PROCESSED';
 
     public const RESULT_ABORTED = 'ABORTED';
+
+    /**
+     * TASK-0004, re-audit correction A (Issue #2 comentario `5892711739`): `freeze()` rechaza una
+     * decisión cuyo payload explícito no trae un campo requerido no vacío (ej. `new_concept_name`
+     * en CREATE_NEW, `context_reason` en CONTEXT_REQUIRED) - nunca lo completa implícitamente desde
+     * un campo mutable del candidato. No crea ninguna fila de `taxonomy_reviewed_proposals`.
+     */
+    public const RESULT_VALIDATION_FAILED = 'VALIDATION_FAILED';
 
     public const ABORT_TAMPER_DETECTED = 'TAMPER_DETECTED';
 
@@ -190,6 +220,7 @@ class ReviewedProposalService
             TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
             TaxonomyReviewedProposal::DECISION_CREATE_NEW,
             TaxonomyReviewedProposal::DECISION_REJECT,
+            TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED,
         ], true)) {
             throw new \InvalidArgumentException("Decisión no soportada para TERM_CONCEPT_LINK: {$decision}");
         }
@@ -224,16 +255,44 @@ class ReviewedProposalService
                 throw new \InvalidArgumentException('CREATE_NEW solo aplica a candidatos que proponen un concepto nuevo (suggested_concept_id NULL).');
             }
 
+            // TASK-0004, re-audit correction A (Issue #2 comentario `5892711739`): CREATE_NEW exige
+            // el nombre revisado EXPLÍCITO en el payload de decisión - "no mutable fallback" (ya
+            // corregido en apply() desde el re-audit anterior, ahora también en freeze()). Si el
+            // payload no trae `new_concept_name` no vacío, freeze() rechaza sin congelar nada; NUNCA
+            // lo completa con `suggested_new_concept_name` (que queda disponible solo como sugerencia
+            // para que la UI la muestre, no como fuente de verdad implícita).
+            $explicitNewConceptName = null;
+            if ($decision === TaxonomyReviewedProposal::DECISION_CREATE_NEW) {
+                $explicitNewConceptName = trim((string) ($decisionPayload['new_concept_name'] ?? ''));
+                if ($explicitNewConceptName === '') {
+                    return ['result' => self::RESULT_VALIDATION_FAILED, 'proposal' => null];
+                }
+            }
+
+            // TASK-0004, re-audit correction C (Issue #2 comentario `5892711739`): CONTEXT_REQUIRED
+            // (término/candidato válido pero insuficientemente específico para un mapeo directo)
+            // exige igualmente un motivo explícito no vacío - mismo criterio que `new_concept_name`
+            // arriba, nunca inferido.
+            $explicitContextReason = null;
+            if ($decision === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED) {
+                $explicitContextReason = trim((string) ($decisionPayload['context_reason'] ?? ''));
+                if ($explicitContextReason === '') {
+                    return ['result' => self::RESULT_VALIDATION_FAILED, 'proposal' => null];
+                }
+            }
+
             // TASK-0004, re-audit HIGH-1: congela TODOS los campos fuente decision-relevantes DENTRO
             // del payload, leídos UNA sola vez acá (bajo el lock, en el instante de la revisión) -
             // `apply()` nunca vuelve a leer `suggested_term_id`/`suggested_new_concept_name` de la
             // fila viva para decidir QUÉ escribir, solo para revalidar que no cambiaron (ver
-            // `applyCandidateLinkDecision`). `new_concept_name` se resuelve acá también si el
-            // llamador no lo pasó explícito - nunca se difiere esa resolución a apply().
+            // `applyCandidateLinkDecision`).
             $snapshot = $decisionPayload;
             $snapshot['term_id'] = $candidate->suggested_term_id;
             if ($decision === TaxonomyReviewedProposal::DECISION_CREATE_NEW) {
-                $snapshot['new_concept_name'] = $decisionPayload['new_concept_name'] ?? $candidate->suggested_new_concept_name;
+                $snapshot['new_concept_name'] = $explicitNewConceptName;
+            }
+            if ($decision === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED) {
+                $snapshot['context_reason'] = $explicitContextReason;
             }
 
             return $this->insertFrozenProposal(
@@ -477,6 +536,33 @@ class ReviewedProposalService
             return $this->markApplied($proposal, $authorizationReference, $targetEnvironment, [
                 'candidate_link_id' => $candidate->id,
                 'outcome' => 'REJECTED',
+            ]);
+        }
+
+        if ($proposal->decision === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED) {
+            // TASK-0004, re-audit correction C (Issue #2 comentario `5892711739`): "generic but
+            // valid terms" - válido en la taxonomía pero insuficientemente específico para un mapeo
+            // directo producto/servicio/CPV. Invariante central: CERO escrituras a
+            // `taxonomy_term_concepts` y CERO conceptos nuevos - nunca inventa una categoría
+            // específica. Como REJECT arriba, no depende de ningún campo fuente congelado que
+            // determine UN destino de escritura, así que tampoco se exige el chequeo de drift de
+            // term_id para este caso. El motivo del revisor se preserva en `review_notes` -
+            // `context_required` es un status DISTINTO de `rejected`: el candidato sigue siendo
+            // evidencia contextual/de búsqueda válida, no descartado. Auditado (comentario
+            // `5892711739`, sección C): `BuildEmpresaSearchDocuments` (el único consumidor de
+            // índice/búsqueda que lee taxonomía publicada) solo lee `taxonomy_term_concepts` - nunca
+            // el status del candidato - así que este estado no puede filtrar una asociación CPV
+            // directa hacia el índice de búsqueda por construcción, no por convención.
+            $candidate->update([
+                'status' => TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED,
+                'reviewed_by' => $proposal->reviewer_id,
+                'reviewed_at' => $proposal->reviewed_at,
+                'review_notes' => $decisionPayload['context_reason'] ?? $candidate->review_notes,
+            ]);
+
+            return $this->markApplied($proposal, $authorizationReference, $targetEnvironment, [
+                'candidate_link_id' => $candidate->id,
+                'outcome' => 'CONTEXT_REQUIRED',
             ]);
         }
 

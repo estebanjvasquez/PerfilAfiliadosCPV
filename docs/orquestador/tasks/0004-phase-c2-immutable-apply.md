@@ -199,8 +199,76 @@ Corrige ÚNICAMENTE la interpretación de GATE 3 del comentario anterior. Texto 
 >
 > Stop again at READY_FOR_REVIEW with exact HEAD and evidence.
 
+## Re-audit — comentario [`5892711739`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5892711739) (2026-09-29T14:51:38Z) — CORRECTIONS_REQUIRED (narrow)
+
+> [ORCHESTRATOR RE-AUDIT — TASK-0004 / PHASE C2 — CORRECTIONS_REQUIRED (narrow)]
+>
+> Reviewed READY_FOR_REVIEW at HEAD `f64bbe5` against prior review HEAD `5bcf561`, preserving the continuity rule from comment 5890195271.
+>
+> INHERITED EVIDENCE / CONTINUITY
+> - Phase C1 remains APPROVED at `ce11d36`.
+> - The frozen 32-query regression remains inherited APPROVED evidence (32/32, 0 errors, 0 diffs). This diff does not touch live search/ranking or published taxonomy data, so NO rerun is required.
+> - DB invariants remain reported/reverified at 10 candidate links / 2 candidate relations / 142 term concepts / 79 canonical concepts / 9749 TERM→CPV / 0 reviewed proposals.
+> - No real C2 freeze/apply, candidate decision, publication, or main merge occurred.
+> - Sibling `perfilafiliados-mcp` audit is now reproducible at branch `master`, SHA `29de993c12fbdadf0577c3630cc07611af020a46`; deployed Worker SHA remains unverified and must continue to be qualified as such.
+>
+> ACCEPTED FROM THE PREVIOUS FINDINGS
+> 1. HIGH-1 is substantially improved: term_id and relation source/target/type are frozen, APPLY writes from the frozen snapshot, and source drift aborts rather than silently changing the reviewed decision.
+> 2. HIGH-2 publication bypass is materially closed for the identified legacy paths by model-level guards around candidate `published` and relation `approved` transitions; Filament/service regression coverage was updated.
+> 3. The inherited-gates ledger is present and correctly separates inherited/new/not-applicable evidence.
+>
+> REMAINING CORRECTIONS
+>
+> A. CREATE_NEW STILL DOES NOT MEET THE EXPLICIT-REVIEW CONTRACT.
+> The previous review required: "CREATE_NEW must require the reviewed new concept name explicitly in the frozen payload; no mutable fallback." At `f64bbe5`, `freezeCandidateLink()` still does:
+> `$decisionPayload['new_concept_name'] ?? $candidate->suggested_new_concept_name`.
+> Moving the fallback from APPLY to FREEZE fixes post-freeze drift but still allows the system-generated candidate value to become the human-reviewed name without an explicit reviewer choice.
+>
+> Required:
+> - CREATE_NEW must reject/return validation failure when `new_concept_name` is absent/blank from the human decision payload.
+> - Never fill it implicitly from `suggested_new_concept_name`.
+> - Keep the candidate suggestion available to the UI as a suggestion only.
+> - Add a test proving CREATE_NEW without explicit nonblank `new_concept_name` cannot freeze.
+>
+> B. SOURCE-DRIFT TEST MATRIX IS INCOMPLETE.
+> The implementation compares relation source/target/type, but the test suite only has a mutation test for `source_concept_id`; the other test only verifies that endpoints/type were snapshotted. The prior gate explicitly required mutation of EACH decision-relevant source field after freeze and proof of abort + zero taxonomy writes.
+>
+> Add dedicated post-freeze mutation tests for:
+> - relation `target_concept_id`;
+> - relation `relation_type`;
+> and retain the existing candidate term/name drift tests.
+>
+> C. NEW DOMAIN-GOVERNANCE REQUIREMENT — GENERIC BUT VALID TERMS.
+> Human domain review found that some valid oil & gas terms are too generic/underspecified to support a direct product/service/CPV mapping. Do NOT force those into MAP_TO_EXISTING, CREATE_NEW, or REJECT and do NOT hardcode the current 10 terms.
+>
+> Add a fourth candidate-review semantic outcome, recommended canonical decision `CONTEXT_REQUIRED`:
+> - meaning: valid domain term/concept, but insufficiently specific by itself for a direct product/service/CPV association;
+> - distinct from REJECT;
+> - must preserve reviewer reason/provenance and remain usable as contextual/search evidence;
+> - must create ZERO direct TERM→CPV mapping and must not invent a specific product/service/category;
+> - must participate in the immutable C2 freeze/apply/audit contract;
+> - APPLY must preserve the "no direct mapping" semantic;
+> - source drift/tamper must not be able to turn it into MAP_TO_EXISTING/CREATE_NEW;
+> - audit search/index consumers so retaining this state cannot leak an arbitrary direct CPV association;
+> - tests must use fixtures only. DO NOT review/freeze/apply/alter the existing 10 real candidates.
+>
+> D. TAXONOMY SUITE GATE REMAINS ENVIRONMENT-BLOCKED, NOT A C2 CODE FAILURE.
+> Current evidence is 179/180 PASS (572 assertions), with the same pre-existing `ext-intl` environment failure. Do not manufacture green or alter/skip the test. Keep this explicitly classified as an environment-blocked closure gate. If exact-head CI or a valid environment becomes available, provide the clean full-suite evidence. Do not let this trigger unrelated code changes.
+>
+> SAFETY / SCOPE
+> - No production/shared candidate decisions, freeze/apply, publication, bulk operations, destructive migrations, or merge to main.
+> - Preserve the real 10 candidate links + 2 candidate relations untouched.
+> - Do not hardcode any of those terms or benchmark queries.
+> - Do not rerun the 32-query regression unless a subsequent correction actually changes live search/ranking/published taxonomy or another dependency that invalidates the inherited evidence.
+> - Keep the inherited-gates ledger authoritative and update it only when a gate is genuinely invalidated.
+>
+> STATUS: TASK-0004 / Phase C2 remains CORRECTIONS_REQUIRED, now narrowed to A/B/C plus the documented environment test gate D.
+>
+> Update code/tests/docs/handoff and STOP at READY_FOR_REVIEW with exact HEAD.
+
 ## Estado
 
 Ver `docs/orquestador/current_task.md` para el estado vigente, el ledger de gates heredados, y la
-máquina de estados exacta implementada (documentada en `audit/phase4_c2_immutable_apply.md` y
-`audit/phase4_c2_corrections_2026-09-29.md`).
+máquina de estados exacta implementada (documentada en `audit/phase4_c2_immutable_apply.md`,
+`audit/phase4_c2_corrections_2026-09-29.md` — incluye la sección "Ronda 3" para el comentario
+`5892711739`).
