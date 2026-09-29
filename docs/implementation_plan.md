@@ -121,9 +121,16 @@ esto como parte de su propio diseño, no como tarea separada.
 > revisión (lo que este documento describía como el objetivo), no el contrato de "payload inmutable
 > revisado → apply → validate → commit/rollback" que originalmente se acordó acá. Esa
 > implementación se re-etiquetó **Phase C1 (materialización de cola)**; lo que este documento
-> describe como el contrato completo queda como **Phase C2, todavía sin implementar**. Ver
+> describe como el contrato completo es **Phase C2**. Ver
 > `docs/orquestador/tasks/0003-phase-c-corrections.md` y `audit/phase3_c1_corrections_2026-09-28.md`
-> para el detalle de qué se corrigió de Phase C1 y qué sigue pendiente de Phase C2.
+> para el detalle de qué se corrigió de Phase C1.
+>
+> **Actualización (2026-09-29):** Phase C1 está `APPROVED` (Issue #2 comentario `5886125405`).
+> **Phase C2 (TASK-0004) está implementada** — `ReviewedProposalService::freeze()`/`apply()`, tabla
+> `taxonomy_reviewed_proposals`, 25/25 tests PASS. Ver `audit/phase4_c2_immutable_apply.md` para el
+> contrato exacto (el diseño real difiere en algunos detalles de lo que la sección de abajo
+> proyectaba en 2026-09-2x, escrita antes de que existiera el código - queda como registro histórico
+> de la intención original, no como spec vinculante).
 
 **Objetivo:** implementar desde cero el modo de escritura de
 `taxonomy:build-canonical-concepts --apply` — hoy es un guard clause sin código detrás.

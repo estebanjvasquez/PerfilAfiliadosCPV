@@ -537,6 +537,53 @@ Revertir, si hiciera falta, es borrar esas filas — nada se publicó. Ver
 
 ---
 
+# 6quinquies — Phase C2: reviewed immutable payload application (TASK-0004)
+
+**Status: IMPLEMENTED, tests PASS, esperando revisión del orquestador (2026-09-29)** — no
+representar esta fase como aprobada hasta que el orquestador la revise (Issue #2, TASK-0004
+abierta en el comentario `5886148283`, HEAD previo `ce11d36` APPROVED en `5886125405`).
+
+Implementa el contrato REVIEWED_PROPOSAL → payload inmutable con fingerprint → APPLY(payload) →
+VALIDATE server-side → COMMIT/ROLLBACK → AUDIT que Phase C1 dejó explícitamente pendiente. Ver
+`audit/phase4_c2_immutable_apply.md` para el detalle completo del state machine, y
+`docs/orquestador/tasks/0004-phase-c2-immutable-apply.md` para el texto verbatim del pedido.
+
+- **Dos pasos separados**: `ReviewedProposalService::freeze()` congela una decisión de revisión
+  humana (MAP_TO_EXISTING/CREATE_NEW/REJECT sobre un candidato, o PUBLISH_RELATION/REJECT sobre una
+  relación candidata) en una fila inmutable de `taxonomy_reviewed_proposals`, con
+  `payload_fingerprint` (tamper detection) y `taxonomy_state_fingerprint` (obsolescencia) - nunca
+  publica nada. `ReviewedProposalService::apply()` toma un payload YA congelado, con una
+  `authorization_reference` de EJECUCIÓN separada de quién revisó, revalida todo contra el estado
+  REAL (tamper, staleness, existencia de entidades, semántica de relación) y recién ahí escribe,
+  transaccionalmente.
+- **Tabla nueva**: `taxonomy_reviewed_proposals` (migración
+  `2026_09_29_193000_create_taxonomy_reviewed_proposals_table`), con dos índices únicos parciales
+  (`WHERE status='PENDING_APPLY'`) como salvaguarda DB-enforced contra doble-congelamiento
+  concurrente - mismo criterio que los índices de TASK-0003.
+- **Idempotencia**: replay de `apply()` sobre un payload ya `APPLIED` no escribe nada de nuevo
+  (verificado por test, conteo de audit log idéntico antes/después). Doble `freeze()` del mismo
+  candidato/relación bloqueado por el índice único parcial.
+- **No modifica ningún código de Phase C1/B3** - es aditivo. Los 10 candidatos/2 relaciones de
+  TASK-0001 siguen sin tocarse (no se corrió `apply()` real contra ninguno).
+- **Comando CLI**: `taxonomy:apply-reviewed-proposal {id} --authorized-by=`, equivalente operativo
+  al `--apply` de Phase C1 pero para este segundo paso.
+- **Auditado (no modificado)**: tanto el comando Laravel que construye el índice de búsqueda
+  (`BuildEmpresaSearchDocuments`) como el Worker sibling `perfilafiliados-mcp` - ninguno de los dos
+  referencia `taxonomy_candidate_concept_links` ni `taxonomy_concept_relations` en ningún punto;
+  solo leen `taxonomy_term_concepts` (cuya sola existencia como fila ya es la señal de "publicado").
+  Las filas candidate/pending no pueden filtrarse a búsqueda por construcción de tablas, no por una
+  columna de status compartida.
+- **25/25 tests PASS (68 assertions)** en `tests/Unit/Taxonomy/ReviewedProposalServiceTest.php` -
+  payload inmutable, tamper detection, staleness, replay idempotente, concurrencia (candidato
+  resuelto por otra vía, entidad borrada entre freeze/apply), las 4 decisiones soportadas,
+  rollback transaccional real, y la distinción auditoría-de-revisión vs auditoría-de-ejecución.
+- **Fuera de alcance de esta ronda (documentado)**: wiring de UI de Filament para que un humano
+  dispare `freeze()` desde el panel (hoy solo invocable por servicio/comando/tinker - el modo de
+  ejecución pedido fue "DESIGN + IMPLEMENT + TEST", sin mandato de UI). Ninguna aplicación real
+  autorizada contra datos compartidos/producción.
+
+---
+
 # 16 — Immediate next action
 
 **Fase A (verificación/estabilización) está PASS y cerrada (2026-09-23)** — regresión, MCP
@@ -549,12 +596,13 @@ autenticado y Shield resueltos, cero mutaciones de taxonomía.
 sección "6ter" arriba y `audit/phase3_phase_b1_review_workflow.md`. Un revisor humano ya puede usar
 las 3 decisiones (MAP_TO_EXISTING/CREATE_NEW/REJECT) desde el panel de Filament.
 
-**Fase C1 (`--apply`, materialización de cola) fue implementada (2026-09-28) pero el orquestador la
-devolvió con CORRECTIONS_REQUIRED** — ver sección "6quater" arriba,
+**Fase C1 (`--apply`, materialización de cola) está APPROVED (2026-09-29, Issue #2 comentario
+`5886125405`)** tras las correcciones de TASK-0003 — ver sección "6quater" arriba,
 `docs/orquestador/tasks/0003-phase-c-corrections.md` y `audit/phase3_c1_corrections_2026-09-28.md`.
-No está aprobada. Incluye el productor de `taxonomy_state_fingerprint` y `resolver_version`, que
-eran el gap identificado en Phase B.1 — eso sigue siendo válido, lo que falta son las correcciones
-de seguridad/concurrencia/nomenclatura de TASK-0003.
+
+**Fase C2 (payload inmutable revisado → apply autorizado, TASK-0004) está IMPLEMENTADA con tests
+PASS, esperando revisión del orquestador (2026-09-29)** — ver sección "6quinquies" arriba y
+`audit/phase4_c2_immutable_apply.md`. No representar como aprobada todavía.
 
 La primera población controlada ya se ejecutó (10 candidatos + 2 relaciones, ver sección 6quater) y
 **sigue sin tocarse** — el orquestador pidió explícitamente no borrar ni resolver esas 10 filas/2
