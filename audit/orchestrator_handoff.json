@@ -1,11 +1,12 @@
 {
-  "current_task": "TASK-0003",
-  "current_status": "IN_PROGRESS",
+  "current_task": "TASK-0004",
+  "current_status": "READY_FOR_REVIEW",
   "checkpoints": [
     {
       "task_id": "TASK-0001",
-      "status": "CORRECTIONS_REQUIRED",
-      "status_correction_note": "Was incorrectly written as APPROVED in this file. That reflected the user's blanket authorization to DEVELOP Phase C, not the orchestrator's review verdict. The orchestrator's Issue #2 comment 5872689869 (posted before this file's previous version was written, but not read until TASK-0003) explicitly set Phase C to CHANGES_REQUIRED. Corrected here. See TASK-0003 checkpoint below for the correction work.",
+      "status": "APPROVED",
+      "approved_via": "Issue #2 comment 5886125405 - \"PHASE C1 / TASK-0001 + TASK-0003 APPROVED\", reviewed HEAD ce11d36.",
+      "status_correction_note": "Was incorrectly written as APPROVED before TASK-0003 corrections existed. That earlier note reflected the user's blanket authorization to DEVELOP Phase C, not the orchestrator's review verdict. The orchestrator's Issue #2 comment 5872689869 set it to CHANGES_REQUIRED, then comment 5886125405 (after TASK-0003's corrections) set it to APPROVED for real. See TASK-0003 checkpoint for the correction work.",
       "phase": "PHASE_C",
       "repository": "estebanjvasquez/PerfilAfiliadosCPV",
       "branch": "feature/upgrade-filament-v3",
@@ -95,7 +96,8 @@
     },
     {
       "task_id": "TASK-0003",
-      "status": "READY_FOR_REVIEW",
+      "status": "APPROVED",
+      "approved_via": "Issue #2 comment 5886125405 - \"PHASE C1 / TASK-0001 + TASK-0003 APPROVED\", reviewed HEAD ce11d36.",
       "phase": "PHASE_C_CORRECTIONS",
       "task_definition": "docs/orquestador/tasks/0003-phase-c-corrections.md",
       "source": "Issue #2 comment 5872689869 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5872689869)",
@@ -171,6 +173,63 @@
         "Process note (round 2, secret handling): the Cloudflare API token and the newly-rotated DEBUG_TOKEN both lived only in the session scratchpad (never the repo), were deleted immediately after use, and neither value appears in any committed file, log, or this handoff.",
         "Process note (round 2, self-caught bug): the first attempt to generate the new random DEBUG_TOKEN used [System.Security.Cryptography.RandomNumberGenerator]::Fill(), which failed silently in this PowerShell version and would have produced 32 zero bytes (a predictable, non-random secret) if used as-is. Caught before it was set on the Worker by checking the output wasn't all zeros; regenerated correctly with RNGCryptoServiceProvider.GetBytes() instead.",
         "Do not begin reviewing the 10 candidates / 2 relations - out of scope for this task."
+      ]
+    },
+    {
+      "task_id": "TASK-0004",
+      "status": "READY_FOR_REVIEW",
+      "phase": "PHASE_C2_REVIEWED_IMMUTABLE_APPLY",
+      "task_definition": "docs/orquestador/tasks/0004-phase-c2-immutable-apply.md",
+      "source": "Issue #2 comment 5886148283 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5886148283)",
+      "audit": "audit/phase4_c2_immutable_apply.md",
+      "review_base_sha": "ce11d36213c5d9177ec476a2ce739064b8a8a64a",
+      "review_head_sha": "c00565f",
+      "handoff_commit_sha": "SEE_HEAD_OF_PUSH - a commit cannot contain its own hash; this file's commit is the HEAD reported in the final READY_FOR_REVIEW response for TASK-0004",
+      "execution_mode": "DESIGN + IMPLEMENT + TEST only, as instructed by the orchestrator when opening this task - no live apply authorization was granted or used.",
+      "contract_implemented": {
+        "freeze": "ReviewedProposalService::freeze() - congeals a human review decision (MAP_TO_EXISTING/CREATE_NEW/REJECT on a taxonomy_candidate_concept_links row, or PUBLISH_RELATION/REJECT on a taxonomy_concept_relations row) into an immutable taxonomy_reviewed_proposals row with payload_fingerprint (tamper detection) and taxonomy_state_fingerprint (staleness detection, same CanonicalConceptBuilderService::dryRunInputFingerprint() as Phase C1). Never rediscovers or recomputes the proposal - never calls dryRun()/scoredCandidatesForTerm(). Never writes to taxonomy_term_concepts/taxonomy_canonical_concepts/taxonomy_concept_relations. Never touches the source candidate/relation's status.",
+        "apply": "ReviewedProposalService::apply(proposalId, authorizationReference) - authorizationReference required, non-empty, must contain a digit (same format convention as CanonicalConceptApplyService::apply()); target_environment auto-captured via app()->environment(), never caller-supplied. Inside one DB transaction: lockForUpdate() the payload row (idempotent replay if already APPLIED/ABORTED, no new writes), recompute and compare payload_fingerprint (tamper), recompute and compare taxonomy_state_fingerprint (staleness), lockForUpdate() and re-verify the real candidate/relation entity's current status (server-side, independent of the frozen payload), re-run validateConceptRelationProposal() with excludeId for PUBLISH_RELATION (same mechanism as TASK-0003 finding 6), only then write and mark the payload APPLIED - or write an explicit ABORTED status with a specific reason if any check fails. Every apply()/abort() outcome is audited via TaxonomyAuditLogger with authorization_reference/target_environment populated (actor_type=system) - distinct from freeze()'s review-time audit entry, which deliberately has neither field populated (actor_type=user).",
+        "idempotency_mechanism": "DB-enforced, not check-then-act: two partial unique indexes (taxonomy_reviewed_proposals_one_pending_per_candidate / _relation, WHERE status='PENDING_APPLY') via insertOrIgnore() block concurrent double-freeze of the same candidate/relation; lockForUpdate() + status re-check inside apply()'s transaction blocks double-apply (a second apply() of an already-APPLIED payload returns ALREADY_APPLIED with zero new writes, verified by test asserting audit_log row count is unchanged after a replay).",
+        "supported_decisions": ["MAP_TO_EXISTING", "CREATE_NEW", "REJECT (candidate)", "PUBLISH_RELATION", "REJECT (relation)"],
+        "not_implemented": "No Filament UI wiring for a reviewer to trigger freeze() from the panel - out of scope for this task's requested execution mode (DESIGN + IMPLEMENT + TEST, no UI mandate). freeze()/apply() are invocable today via service call, tinker, or the new taxonomy:apply-reviewed-proposal artisan command (apply() only)."
+      },
+      "search_leak_audit": {
+        "laravel": "app/Console/Commands/BuildEmpresaSearchDocuments.php (the command that builds the search index) only JOINs taxonomy_term_concepts (unconditionally - that table has no status column, its row existence IS the publish signal) and taxonomy_term_cpv_relations WHERE status='approved'. Zero references to taxonomy_candidate_concept_links, taxonomy_concept_relations, or taxonomy_reviewed_proposals anywhere in app/ outside the taxonomy review/service files themselves (grep verified).",
+        "perfilafiliados_mcp": "Sibling repo at C:\\Proyectos\\GitHub\\perfilafiliados-mcp (branch not checked this session - audit only, no changes). src/canonical-expansion.ts, src/taxonomy-tools.ts, src/debug-search.ts only reference taxonomy_term_concepts/taxonomy_term_cpv_relations (approved). Zero references to taxonomy_candidate_concept_links or taxonomy_concept_relations in src/ (grep verified, no matches).",
+        "conclusion": "Candidate/pending rows cannot leak into live search by table separation (they live in tables neither search-index consumer ever reads), not by a shared status column that could be misfiltered."
+      },
+      "tests": {
+        "ReviewedProposalServiceTest": "25/25 PASS (68 assertions), DatabaseTransactions",
+        "taxonomy_suite_full": "174/174 PASS (562 assertions) + 1 environment-only failure, see notes"
+      },
+      "database": {
+        "taxonomy_candidate_concept_links": { "before": 10, "after": 10, "note": "untouched, verified after the full suite run, not just this task's own suite" },
+        "taxonomy_concept_relations": { "before": 2, "after": 2 },
+        "taxonomy_term_concepts": { "before": 142, "after": 142, "protected": true },
+        "taxonomy_canonical_concepts": { "before": 79, "after": 79, "protected": true },
+        "taxonomy_term_cpv_relations": { "before": 9749, "after": 9749, "protected": true },
+        "taxonomy_reviewed_proposals": { "before": 0, "after": 0, "note": "new table - zero real rows; every freeze()/apply() exercised by tests ran inside DatabaseTransactions and was rolled back" },
+        "verified_by": "direct tinker query against the shared Supabase instance, after the full 174-test suite run completed"
+      },
+      "production_mutations": {
+        "published_taxonomy": 0,
+        "candidate_decisions": 0,
+        "apply_runs_against_real_rows": 0,
+        "data_mutations": 0,
+        "schema_mutations": 1,
+        "note": "One additive, nullable-column-free schema-only migration (CREATE TABLE taxonomy_reviewed_proposals, new table, no ALTER of any existing table) applied against the shared Supabase instance. Zero data/taxonomy mutations. No freeze()/apply() ran against any of the 10 real candidates or 2 real relations."
+      },
+      "search_regression_32_queries": {
+        "status": "NOT_RE_RUN",
+        "reason": "No DEBUG_TOKEN available in this session (by design, never persisted to any file per TASK-0003's established convention) and no Cloudflare API token available to rotate it again (the one used in TASK-0003 was deleted from scratchpad immediately after that rotation, as intended).",
+        "justification_for_safety": "See search_leak_audit above - TASK-0004 added one new, empty, unreferenced table and zero code paths that either search consumer reads. The last real regression run (audit/regression_run_2026-09-29.json, part of TASK-0003's gate closure) remains the accepted, current baseline result and was not invalidated by this task.",
+        "escalation": "If the orchestrator requires an actual re-run as evidence regardless, it needs a new explicit human authorization to rotate DEBUG_TOKEN again (same gate as TASK-0003) - not something this task unilaterally decided to skip without disclosure."
+      },
+      "notes": [
+        "Environment note: this session's tool environment had no php binary and Docker Desktop's engine could not start (Virtual Machine Platform/WSL2 not enabled, requires admin elevation this session does not have and cannot self-elevate). With explicit user authorization, PHP 8.2.34 NTS was downloaded directly from windows.php.net and configured locally (C:\\Users\\esteb\\php82) - all required extensions loaded except intl, which a Windows Application Control policy blocked from loading (php_intl.dll specifically) and could not be resolved without admin. This caused exactly one unrelated pre-existing test (a TASK-0002 page using Number::format(), which requires ext-intl) to fail - not a code regression from this task.",
+        "Process note (self-caught bug 1): the initial tamper-detection fingerprint used reviewed_at formatted with microsecond precision on both the freeze-time and apply-time sides, but Laravel's query builder binds a DateTime to Postgres using the grammar's date format, which does not preserve microseconds - so every apply(), even an untouched one, failed as a false-positive TAMPER_DETECTED. Caught by the first, simplest test failing unexpectedly; fixed by using second precision (matching what actually round-trips) on both sides.",
+        "Process note (self-caught bug 2): one test (the relation-revalidation abort scenario) created its 'waiting for review' relation row before its 'already approved symmetric duplicate' row - the reverse of the order TaxonomyConceptRelationValidationTest (TASK-0003) already documented as required, because TaxonomyConceptRelation::booted()'s guard checks for a symmetric duplicate regardless of the other row's status. This made the guard fire during the test's own fixture setup instead of during apply()'s intended revalidation. Fixed by swapping the creation order, mirroring the precedent already established in the approved suite.",
+        "Do not begin reviewing/publishing the 10 candidates / 2 relations - out of scope for this task. No live apply authorization was granted by opening this phase."
       ]
     }
   ]
