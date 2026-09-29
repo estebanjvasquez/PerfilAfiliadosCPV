@@ -54,8 +54,21 @@ State machine completo: `audit/phase4_c2_immutable_apply.md`.
   2 tests nuevos (corrección B), 5 tests nuevos (corrección C); 3 tests existentes actualizados para
   pasar `new_concept_name` explícito (sin cambio de lo que prueban). Verificado en aislamiento antes
   de correr la suite completa.
-- **[B] Suite de taxonomía completa (`--filter=Taxonomy`)**: <<PENDIENTE — corriendo en background
-  contra la instancia compartida de Supabase, ver actualización en el commit de handoff>>.
+- **[B] Suite de taxonomía completa (`--filter=Taxonomy`)**: **187/189 PASS (595 assertions),
+  5619.25s (~93.7 min)**, local PHP 8.2.34 contra la instancia compartida real de Supabase. 2 fallos:
+  1. `TaxonomyCandidateConceptLinkReviewTest::viewing_a_propose_new_concept_candidate_with_duplicate_signals_does_not_500`
+     - el mismo gap de `ext-intl` ya documentado en rondas anteriores (stack trace idéntico, ajeno a
+     esta corrección).
+  2. `ReviewedProposalServiceTest::apply_aborts_with_zero_writes_when_the_relations_target_concept_id_drifted_after_freeze`
+     (test NUEVO de esta ronda, corrección B) - falló por
+     `SQLSTATE[HY000]: General error: 7 server closed the connection unexpectedly` de Supabase EN UNA
+     QUERY NO RELACIONADA (carga de roles/permisos del fixture `authorizedUser()`, no en ninguna
+     lógica de `freeze()`/`apply()` bajo prueba) - un corte de conexión transitorio del pooler
+     compartido tras ~93 minutos de sesión continua, no un defecto de código. Confirmado
+     re-ejecutando ÚNICAMENTE ese test dos veces más, aislado: PASS ambas veces (28.40s y en la
+     corrida aislada de 39/39 de más arriba, 27.35s) - mismo código, mismo test, sin cambios entre
+     corridas. No se alteró ni se ocultó el fallo - reportado tal cual ocurrió, con la evidencia de
+     no-reproducibilidad adjunta.
 - **[A] `CandidateConceptApprovalServiceTest`, `TaxonomyConceptRelationValidationTest`,
   `TaxonomyCandidateConceptLinkReviewTest`, `CanonicalConceptApplyServiceTest`**: sin cambios de
   código en esta ronda (ninguno de los archivos que tocan corrección A/B/C) - se re-verifican como

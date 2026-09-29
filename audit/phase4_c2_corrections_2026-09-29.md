@@ -307,10 +307,23 @@ MAP_TO_EXISTING, CREATE_NEW o REJECT perdería/distorsionaría esa señal. Expl�
 ## D — Gate de suite completa: sigue bloqueado por entorno, no por código C2
 
 Sin cambios de código para este punto (correctamente, el propio comentario pide explícitamente "do
-not let this trigger unrelated code changes"). Ver `docs/orquestador/current_task.md` para el
-resultado actualizado de esta ronda. Docker Desktop sigue sin estar disponible en esta sesión (el
-CLI `docker` ni siquiera resuelve en el PATH de esta terminal); se mantiene la clasificación de
-"entorno bloqueado" sin reintentar activamente, tal como pide el comentario.
+not let this trigger unrelated code changes"). Docker Desktop sigue sin estar disponible en esta
+sesión (el CLI `docker` ni siquiera resuelve en el PATH de esta terminal); se mantiene la
+clasificación de "entorno bloqueado" sin reintentar activamente, tal como pide el comentario.
+
+**Resultado de esta ronda: 187/189 PASS (595 assertions), 5619.25s (~93.7 min).** Dos fallos, ninguno
+un defecto de código de esta corrección:
+
+1. `TaxonomyCandidateConceptLinkReviewTest::viewing_a_propose_new_concept_candidate_with_duplicate_signals_does_not_500`
+   - gap de `ext-intl` idéntico a rondas anteriores (misma excepción, misma página de TASK-0002).
+2. `ReviewedProposalServiceTest::apply_aborts_with_zero_writes_when_the_relations_target_concept_id_drifted_after_freeze`
+   (test nuevo de la corrección B) - falló por un corte de conexión transitorio del pooler de Supabase
+   en una query de fixture no relacionada (`server closed the connection unexpectedly` cargando
+   roles/permisos), no en la lógica bajo prueba. Re-ejecutado dos veces más de forma aislada
+   inmediatamente después (una vez como parte de la corrida de 39/39 del archivo completo, y una vez
+   solo): PASS las dos veces, sin ningún cambio de código entre corridas - confirma que es
+   flakiness de infraestructura de una sesión de ~93 minutos contra un pooler compartido, no una
+   regresión real.
 
 ---
 

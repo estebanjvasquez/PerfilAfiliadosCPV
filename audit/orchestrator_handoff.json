@@ -183,7 +183,7 @@
       "source": "Issue #2 comment 5886148283 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5886148283)",
       "audit": "audit/phase4_c2_immutable_apply.md",
       "review_base_sha": "ce11d36213c5d9177ec476a2ce739064b8a8a64a",
-      "review_head_sha": "c8d0803",
+      "review_head_sha": "b207361",
       "handoff_commit_sha": "SEE_HEAD_OF_PUSH - a commit cannot contain its own hash; this file's commit is the HEAD reported in the final READY_FOR_REVIEW response for TASK-0004",
       "execution_mode": "DESIGN + IMPLEMENT + TEST only, as instructed by the orchestrator when opening this task - no live apply authorization was granted or used.",
       "re_audit_rounds": [
@@ -196,6 +196,11 @@
           "orchestrator_comment": "5890195271",
           "verdict": "CLARIFICATION - corrects/supersedes ONLY the GATE 3 interpretation from 5890113782; all other findings remain in force. Establishes the audit continuity rule (inherited approved gates are not auto-invalidated) and requires an inherited-gates ledger in this handoff plus an explicit A/B/C/D evidence classification in the READY_FOR_REVIEW report.",
           "supersedes": "gate_3 interpretation only"
+        },
+        {
+          "orchestrator_comment": "5892711739",
+          "verdict": "CORRECTIONS_REQUIRED (narrow) - A (CREATE_NEW still allowed an implicit fallback for new_concept_name), B (relation source-drift test matrix incomplete - only source_concept_id had a mutation test), C (new CONTEXT_REQUIRED decision required for generic-but-valid terms), D (taxonomy suite gate stays environment-blocked, explicitly no unrelated code changes). Confirmed as inherited/accepted: Phase C1, the 32-query regression, DB invariants, HIGH-1/HIGH-2 substantially improved, the inherited-gates ledger.",
+          "reviewed_head": "f64bbe5"
         }
       ],
       "corrections_audit": "audit/phase4_c2_corrections_2026-09-29.md",
@@ -210,9 +215,9 @@
           "evidence_class": "A"
         },
         "gate_taxonomy_suite": {
-          "last_approved_comment": "N/A - first full-green report was this round",
-          "approved_head": "c8d0803",
-          "evidence": "179/180 PASS (572 assertions), 5228.69s, local PHP 8.2.34; 1 pre-existing ext-intl environment failure unrelated to any C2 code, confirmed by identical stack trace to the previous round",
+          "last_approved_comment": "N/A - still not fully green, classified explicitly as environment-blocked per comment 5892711739 gate D, not withheld",
+          "approved_head": "b207361",
+          "evidence": "187/189 PASS (595 assertions), 5619.25s (~93.7 min), local PHP 8.2.34 against the real shared Supabase instance. 2 failures: (1) the same pre-existing ext-intl gap as every prior round, identical stack trace; (2) ReviewedProposalServiceTest::apply_aborts_with_zero_writes_when_the_relations_target_concept_id_drifted_after_freeze (a NEW test added this round for correction B) failed once under the ~93-minute full-suite run with 'SQLSTATE[HY000]: General error: 7 server closed the connection unexpectedly' from Supabase's pooler on an UNRELATED fixture query (loading roles/permissions for authorizedUser()), not in any freeze()/apply() logic under test - re-run twice more in isolation immediately after (once as part of the file's own 39/39 run, once standalone) and PASSED both times with zero code changes in between, confirming transient pooler flakiness under long-session load, not a regression.",
           "invalidated_by_current_changes": "N/A - this IS the current-round evidence",
           "rerun_required": "N/A - already rerun this round",
           "evidence_class": "B"
@@ -273,29 +278,33 @@
         "supported_decisions": ["MAP_TO_EXISTING", "CREATE_NEW", "REJECT (candidate)", "PUBLISH_RELATION", "REJECT (relation)"],
         "not_implemented": "No Filament UI wiring for a reviewer to trigger freeze() from the panel - out of scope for this task's requested execution mode (DESIGN + IMPLEMENT + TEST, no UI mandate). freeze()/apply() are invocable today via service call, tinker, or the new taxonomy:apply-reviewed-proposal artisan command (apply() only).",
         "source_drift_protection_round2": "freeze() snapshots term_id/new_concept_name (candidates) and source_concept_id/target_concept_id/relation_type (relations) into decision_payload at review time - apply() writes exclusively from these frozen values and aborts (ABORT_SOURCE_DRIFT) if the live row no longer matches, per HIGH-1 of comment 5890113782.",
-        "c2_bypass_closed_round2": "ReviewedProposalService::isApplyingC2Publication()/withC2PublicationContext() gate the two publication-constituting writes; new/extended model guards on TaxonomyCandidateConceptLink and TaxonomyConceptRelation block those transitions outside that context, closing CandidateConceptApprovalService and the direct Filament edit path as live publication routes, per HIGH-2 of comment 5890113782. See audit/phase4_c2_corrections_2026-09-29.md."
+        "c2_bypass_closed_round2": "ReviewedProposalService::isApplyingC2Publication()/withC2PublicationContext() gate the two publication-constituting writes; new/extended model guards on TaxonomyCandidateConceptLink and TaxonomyConceptRelation block those transitions outside that context, closing CandidateConceptApprovalService and the direct Filament edit path as live publication routes, per HIGH-2 of comment 5890113782. See audit/phase4_c2_corrections_2026-09-29.md.",
+        "explicit_review_contract_round3": "freeze() now requires new_concept_name (CREATE_NEW) explicit and non-blank in the decision payload - RESULT_VALIDATION_FAILED if missing/blank, never falls back to the mutable suggested_new_concept_name field (round 2 only moved that fallback from apply() to freeze(), it was still implicit). Per correction A of comment 5892711739.",
+        "context_required_decision_round3": "New fourth outcome for TERM_CONCEPT_LINK candidates, TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED / TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED - a term can be valid domain vocabulary but too generic/underspecified for a direct product/service/CPV mapping. freeze() requires an explicit non-blank context_reason. apply() never writes taxonomy_term_concepts or creates a concept for this decision (zero writes), preserves the reviewer's reason in review_notes, participates in the full freeze/apply/fingerprint/audit contract. Tamper-into-MAP_TO_EXISTING/CREATE_NEW is caught by the existing fingerprint mechanism (decision is a fingerprinted field) - verified with a dedicated test. Per correction C of comment 5892711739. No hardcoded reference to any of the 10 real candidates or their terms."
       },
       "search_leak_audit": {
         "laravel": "app/Console/Commands/BuildEmpresaSearchDocuments.php (the command that builds the search index) only JOINs taxonomy_term_concepts (unconditionally - that table has no status column, its row existence IS the publish signal) and taxonomy_term_cpv_relations WHERE status='approved'. Zero references to taxonomy_candidate_concept_links, taxonomy_concept_relations, or taxonomy_reviewed_proposals anywhere in app/ outside the taxonomy review/service files themselves (grep verified).",
+        "round3_context_required_audit": "Re-verified specifically for the new CONTEXT_REQUIRED decision (comment 5892711739 correction C, 'audit search/index consumers so retaining this state cannot leak an arbitrary direct CPV association'): BuildEmpresaSearchDocuments.php is still the only real search-index consumer and still reads exclusively taxonomy_term_concepts - never candidate status. Since apply() never writes taxonomy_term_concepts for CONTEXT_REQUIRED, this state is structurally unreachable from the search index, not merely unreachable by convention.",
         "perfilafiliados_mcp": "Sibling repo at C:\\Proyectos\\GitHub\\perfilafiliados-mcp, branch master, HEAD 29de993c12fbdadf0577c3630cc07611af020a46 (2026-09-28T16:25:12+02:00), clean working tree - recorded per MEDIUM-5 of comment 5890113782. src/canonical-expansion.ts, src/taxonomy-tools.ts, src/debug-search.ts only reference taxonomy_term_concepts/taxonomy_term_cpv_relations (approved). Zero references to taxonomy_candidate_concept_links, taxonomy_concept_relations, or taxonomy_reviewed_proposals in src/ at this exact SHA (grep verified, no matches). Not verified: which commit is actually DEPLOYED to the live Cloudflare Worker right now - no wrangler/Cloudflare API access in this session; this is a code-level audit at the given SHA, disclosed as such.",
         "conclusion": "Candidate/pending rows cannot leak into live search by table separation (they live in tables neither search-index consumer ever reads), not by a shared status column that could be misfiltered."
       },
       "tests": {
-        "ReviewedProposalServiceTest": "30/30 PASS (82 assertions), DatabaseTransactions - includes 5 new source-drift/snapshot tests from round 2",
-        "CandidateConceptApprovalServiceTest": "27/27 PASS - 6 tests updated round 2 to assert the closed C2 bypass instead of successful publication",
-        "TaxonomyConceptRelationValidationTest": "10/10 PASS - 1 test split in two, 1 isolated via withC2PublicationContext() to keep proving the pre-existing semantic guard independently of the new bypass guard",
-        "TaxonomyCandidateConceptLinkReviewTest": "9/10 PASS through the real Filament panel via Livewire - 4 tests updated round 2; the 1 failure is the pre-existing unrelated ext-intl gap",
-        "CanonicalConceptApplyServiceTest": "21/21 PASS - 1 fixture switched to a raw DB insert (TASK-0003 suite, no behavior change)",
-        "taxonomy_suite_full": "179/180 PASS (572 assertions), 5228.69s, local PHP 8.2.34 - 1 environment-only failure (same ext-intl gap as round 1, confirmed identical stack trace, unrelated TASK-0002 page), see notes. Docker Desktop attempted per GATE-4's 'valid environment' option but its engine returned HTTP 500 on every endpoint for the whole session despite WSL2 being enabled and the machine rebooted - documented as a real blocker."
+        "ReviewedProposalServiceTest": "39/39 PASS (108 assertions), DatabaseTransactions, verified in isolation - includes 5 new source-drift/snapshot tests from round 2, plus 9 new round-3 tests (2 correction A, 2 correction B, 5 correction C)",
+        "CandidateConceptApprovalServiceTest": "27/27 PASS - 6 tests updated round 2 to assert the closed C2 bypass instead of successful publication; untouched round 3 (no code path it exercises changed)",
+        "TaxonomyConceptRelationValidationTest": "10/10 PASS - 1 test split in two, 1 isolated via withC2PublicationContext() to keep proving the pre-existing semantic guard independently of the new bypass guard; untouched round 3",
+        "TaxonomyCandidateConceptLinkReviewTest": "9/10 PASS through the real Filament panel via Livewire - 4 tests updated round 2; the 1 failure is the pre-existing unrelated ext-intl gap; untouched round 3",
+        "CanonicalConceptApplyServiceTest": "21/21 PASS - 1 fixture switched to a raw DB insert (TASK-0003 suite, no behavior change); untouched round 3",
+        "taxonomy_suite_full_round3": "187/189 PASS (595 assertions), 5619.25s (~93.7 min), local PHP 8.2.34 against the real shared Supabase instance. 2 failures: (1) the same pre-existing ext-intl gap as every prior round, identical stack trace; (2) the new relation target_concept_id drift test (correction B) failed ONCE under this ~93-minute run with a transient Supabase pooler connection drop ('server closed the connection unexpectedly') on an unrelated fixture query (role/permission lookup, not freeze()/apply() logic) - re-run twice more in isolation immediately after with zero code changes and PASSED both times, confirming infrastructure flakiness under long-session load, not a regression. Docker Desktop still unavailable this session (docker CLI does not even resolve on PATH) - kept classified as environment-blocked per comment 5892711739's explicit instruction not to let gate D trigger unrelated code changes.",
+        "taxonomy_suite_full_round2_prior": "179/180 PASS (572 assertions), 5228.69s, local PHP 8.2.34 - kept for history, see round3 result above for the current evidence"
       },
       "database": {
-        "taxonomy_candidate_concept_links": { "before": 10, "after": 10, "note": "untouched, verified after the full suite run, not just this task's own suite" },
+        "taxonomy_candidate_concept_links": { "before": 10, "after": 10, "note": "untouched, verified after the full round-3 suite run via a standalone Laravel-bootstrap script (not the test run's own output)" },
         "taxonomy_concept_relations": { "before": 2, "after": 2 },
         "taxonomy_term_concepts": { "before": 142, "after": 142, "protected": true },
         "taxonomy_canonical_concepts": { "before": 79, "after": 79, "protected": true },
         "taxonomy_term_cpv_relations": { "before": 9749, "after": 9749, "protected": true },
-        "taxonomy_reviewed_proposals": { "before": 0, "after": 0, "note": "new table - zero real rows; every freeze()/apply() exercised by tests ran inside DatabaseTransactions and was rolled back" },
-        "verified_by": "direct tinker query against the shared Supabase instance, after the full 179/180-test suite run of round 2 completed (also reverified identically after round 1's 174-test run)"
+        "taxonomy_reviewed_proposals": { "before": 0, "after": 0, "note": "new table - zero real rows; every freeze()/apply() exercised by tests (including the new CONTEXT_REQUIRED decision) ran inside DatabaseTransactions and was rolled back" },
+        "verified_by": "direct query against the shared Supabase instance (standalone script bootstrapping Laravel's container, not tinker/not the test run's own output) after the full 187/189-test suite run of round 3 completed - unchanged from every prior checkpoint"
       },
       "production_mutations": {
         "published_taxonomy": 0,
@@ -303,7 +312,7 @@
         "apply_runs_against_real_rows": 0,
         "data_mutations": 0,
         "schema_mutations": 1,
-        "note": "One additive, nullable-column-free schema-only migration (CREATE TABLE taxonomy_reviewed_proposals, new table, no ALTER of any existing table) applied against the shared Supabase instance in round 1. No new migration in round 2 (corrections only - model guards and payload snapshot logic, no schema change). Zero data/taxonomy mutations across both rounds. No freeze()/apply() ran against any of the 10 real candidates or 2 real relations."
+        "note": "One additive, nullable-column-free schema-only migration (CREATE TABLE taxonomy_reviewed_proposals, new table, no ALTER of any existing table) applied against the shared Supabase instance in round 1. No new migration in round 2 or round 3 (both correction-only rounds - model guards, payload snapshot logic, and the new CONTEXT_REQUIRED decision all reuse existing VARCHAR columns with no CHECK constraint, so no schema change was needed for the new decision/status values). Zero data/taxonomy mutations across all three rounds. No freeze()/apply() ran against any of the 10 real candidates or 2 real relations - all CONTEXT_REQUIRED coverage uses fixtures created and rolled back inside tests."
       },
       "search_regression_32_queries": {
         "status": "NOT_RE_RUN",
@@ -317,7 +326,9 @@
         "Process note (self-caught bug 1, round 1): the initial tamper-detection fingerprint used reviewed_at formatted with microsecond precision on both the freeze-time and apply-time sides, but Laravel's query builder binds a DateTime to Postgres using the grammar's date format, which does not preserve microseconds - so every apply(), even an untouched one, failed as a false-positive TAMPER_DETECTED. Caught by the first, simplest test failing unexpectedly; fixed by using second precision (matching what actually round-trips) on both sides.",
         "Process note (self-caught bug 2, round 1): one test (the relation-revalidation abort scenario) created its 'waiting for review' relation row before its 'already approved symmetric duplicate' row - the reverse of the order TaxonomyConceptRelationValidationTest (TASK-0003) already documented as required, because TaxonomyConceptRelation::booted()'s guard checks for a symmetric duplicate regardless of the other row's status. This made the guard fire during the test's own fixture setup instead of during apply()'s intended revalidation. Fixed by swapping the creation order, mirroring the precedent already established in the approved suite.",
         "Process note (round 2): closing HIGH-2 required several pre-existing tests across 3 files (CandidateConceptApprovalServiceTest, TaxonomyConceptRelationValidationTest, TaxonomyCandidateConceptLinkReviewTest, plus one fixture in CanonicalConceptApplyServiceTest) to change their expected outcome, because the reviewed correction deliberately changes what those code paths do (they now block publication instead of performing it). Each change is commented in place explaining why the behavior legitimately changed, per this task's own re-audit mandate; none of it is the kind of 'alter/skip to manufacture green' GATE-4 warned against - that warning was honored by leaving the one genuinely unrelated ext-intl failure exactly as-is and reporting it plainly (179/180, not 180/180).",
-        "Do not begin reviewing/publishing the 10 candidates / 2 relations - out of scope for this task. No live apply authorization was granted by opening this phase."
+        "Process note (round 3): comment 5892711739 asked for a narrower set of corrections (A/B/C plus documented gate D) and explicitly reconfirmed HIGH-1/HIGH-2 as substantially improved and the inherited-gates ledger as correct - no changes were made to any round-2 code/guards, only additive changes for the new explicit-review requirement (A), the missing test matrix (B), and the new CONTEXT_REQUIRED decision (C). CandidateConceptApprovalServiceTest, TaxonomyConceptRelationValidationTest, TaxonomyCandidateConceptLinkReviewTest, and CanonicalConceptApplyServiceTest were NOT re-touched or re-run in isolation this round because no round-3 change modifies any code path they exercise - they were re-verified as part of the full suite run instead.",
+        "Process note (round 3, environment flake, self-caught and re-verified): the new relation target_concept_id drift test failed once during the ~93-minute full-suite run with a Supabase pooler connection drop on an unrelated fixture query. Rather than either hiding this or reporting a false all-green, it was re-run twice more in isolation immediately after (zero code changes in between) and passed both times - reported as-is (187/189, not 189/189) with the reproduction evidence attached, per this task's own 'do not manufacture green' discipline (gate D of comment 5892711739).",
+        "Do not begin reviewing/publishing the 10 candidates / 2 relations - out of scope for this task. No live apply authorization was granted by opening this phase. CONTEXT_REQUIRED, like every other C2 decision, has no Filament UI wiring yet - freeze()/apply() remain invocable only via service call, tinker, or the existing artisan command."
       ]
     }
   ]
