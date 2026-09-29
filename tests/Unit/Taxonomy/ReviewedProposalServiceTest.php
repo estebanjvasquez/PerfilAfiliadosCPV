@@ -405,13 +405,17 @@ class ReviewedProposalServiceTest extends TestCase
         $otherConceptId = $otherConcept->id;
         $otherConcept->delete();
 
+        // El payload nuevo debe seguir trayendo `term_id` correcto (freeze() lo auto-snapshotea
+        // desde TASK-0004 HIGH-1) - si no, el chequeo de drift de term_id abortaría PRIMERO y esto
+        // dejaría de aislar específicamente la re-verificación de existencia del concepto destino.
+        $newPayload = ['term_id' => $candidate->suggested_term_id, 'target_concept_id' => $otherConceptId];
         DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $frozen['proposal']->id)
-            ->update(['decision_payload' => json_encode(['target_concept_id' => $otherConceptId])]);
+            ->update(['decision_payload' => json_encode($newPayload)]);
         $refreshed = TaxonomyReviewedProposal::find($frozen['proposal']->id);
         $recomputed = ReviewedProposalService::computePayloadFingerprint([
             'proposal_type' => $refreshed->proposal_type, 'candidate_link_id' => $refreshed->candidate_link_id,
             'concept_relation_id' => $refreshed->concept_relation_id, 'decision' => $refreshed->decision,
-            'decision_payload' => ['target_concept_id' => $otherConceptId], 'payload_version' => $refreshed->payload_version,
+            'decision_payload' => $newPayload, 'payload_version' => $refreshed->payload_version,
             'taxonomy_state_fingerprint' => $refreshed->taxonomy_state_fingerprint, 'reviewer_id' => $refreshed->reviewer_id,
             'reviewed_at' => $refreshed->reviewed_at->format('Y-m-d H:i:s'),
         ]);
@@ -483,6 +487,101 @@ class ReviewedProposalServiceTest extends TestCase
     }
 
     // =========================================================================================
+    // APPLY - detección de drift de campos fuente (TASK-0004, re-audit HIGH-1, Issue #2 comentario
+    // `5890113782`): el payload congela term_id/new_concept_name/source-target-relation_type al
+    // congelar - si la fila VIVA referenciada cambia después, apply() debe abortar sin escribir
+    // nada, nunca publicar en silencio con el valor viejo congelado.
+    // =========================================================================================
+
+    #[Test]
+    public function apply_aborts_with_zero_writes_when_the_candidates_term_id_drifted_after_freeze(): void
+    {
+        [$candidate, $concept] = $this->mapCandidate();
+        $otherTerm = $this->term();
+        $user = $this->authorizedUser();
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING, $user, ['target_concept_id' => $concept->id]);
+
+        // Edición directa del campo fuente DESPUÉS de freeze() - no hay UI para esto hoy (el
+        // candidato no es editable una vez creado), pero el guard no depende de que exista una UI.
+        $candidate->update(['suggested_term_id' => $otherTerm->id]);
+
+        $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
+
+        $this->assertSame(ReviewedProposalService::RESULT_ABORTED, $outcome['result']);
+        $this->assertSame(ReviewedProposalService::ABORT_SOURCE_DRIFT, $outcome['abort_reason']);
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_term_concepts')
+            ->where('concept_id', $concept->id)->count(), 'No debe publicarse nada - ni con el term_id viejo (congelado) ni con el nuevo (drifteado).');
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status);
+    }
+
+    #[Test]
+    public function apply_aborts_with_zero_writes_when_the_candidates_new_concept_name_drifted_after_freeze(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $user = $this->authorizedUser();
+        $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user);
+
+        $candidate->update(['suggested_new_concept_name' => 'nombre editado después de freeze '.uniqid()]);
+
+        $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
+
+        $this->assertSame(ReviewedProposalService::RESULT_ABORTED, $outcome['result']);
+        $this->assertSame(ReviewedProposalService::ABORT_SOURCE_DRIFT, $outcome['abort_reason']);
+        $this->assertSame($conceptCountBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(), 'No debe crearse ningún concepto - ni con el nombre viejo (congelado) ni con el nuevo (drifteado).');
+    }
+
+    #[Test]
+    public function freeze_snapshots_the_new_concept_name_so_apply_never_reads_the_live_candidate_field(): void
+    {
+        // TASK-0004, re-audit HIGH-1: "CREATE_NEW must require the reviewed new concept name
+        // explicitly in the frozen payload; do not fall back at apply time to a mutable candidate
+        // field" - se prueba explícitamente que el nombre PUBLICADO es el que estaba congelado en
+        // el momento de freeze(), no el que la fila tiene ahora (aunque acá ambos casos
+        // deliberadamente NO haya drift, para separar esta prueba de la de arriba).
+        $candidate = $this->newConceptCandidate();
+        $originalName = $candidate->suggested_new_concept_name;
+        $user = $this->authorizedUser();
+
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user);
+
+        $this->assertSame($originalName, $frozen['proposal']->decision_payload['new_concept_name'], 'freeze() debe congelar el nombre YA en ese instante.');
+    }
+
+    #[Test]
+    public function apply_aborts_with_zero_writes_when_the_relations_source_concept_id_drifted_after_freeze(): void
+    {
+        [$relation] = $this->candidateRelation();
+        $otherConcept = $this->concept('zzz_c2_drift_source_'.uniqid());
+        $user = $this->authorizedUser();
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_CONCEPT_RELATION, $relation->id, TaxonomyReviewedProposal::DECISION_PUBLISH_RELATION, $user);
+
+        // Edición directa (no hay UI que reasigne source/target de una relación ya creada, pero el
+        // guard no depende de que exista una).
+        DB::connection('pgsql')->table('taxonomy_concept_relations')->where('id', $relation->id)->update(['source_concept_id' => $otherConcept->id]);
+
+        $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
+
+        $this->assertSame(ReviewedProposalService::RESULT_ABORTED, $outcome['result']);
+        $this->assertSame(ReviewedProposalService::ABORT_SOURCE_DRIFT, $outcome['abort_reason']);
+        $this->assertSame(TaxonomyConceptRelation::STATUS_CANDIDATE, DB::connection('pgsql')->table('taxonomy_concept_relations')->where('id', $relation->id)->value('status'));
+    }
+
+    #[Test]
+    public function freeze_snapshots_relation_endpoints_and_type_so_apply_never_rediscovers_them_live(): void
+    {
+        [$relation, $a, $b] = $this->candidateRelation();
+        $user = $this->authorizedUser();
+
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_CONCEPT_RELATION, $relation->id, TaxonomyReviewedProposal::DECISION_PUBLISH_RELATION, $user);
+
+        $payload = $frozen['proposal']->decision_payload;
+        $this->assertSame($a->id, $payload['source_concept_id']);
+        $this->assertSame($b->id, $payload['target_concept_id']);
+        $this->assertSame('RELATED_TO', $payload['relation_type']);
+    }
+
+    // =========================================================================================
     // APPLY - CONCEPT_RELATION (PUBLISH_RELATION / REJECT)
     // =========================================================================================
 
@@ -510,9 +609,13 @@ class ReviewedProposalServiceTest extends TestCase
         // revalidación en `apply()`, que es lo que este test necesita aislar.
         $a = $this->concept('zzz_c2_rel_a_'.uniqid());
         $b = $this->concept('zzz_c2_rel_b_'.uniqid());
-        TaxonomyConceptRelation::create([
+        // INSERT crudo (no ::create()) - TASK-0004 hallazgo HIGH-2 bloquea crear vía Eloquent con
+        // status=approved fuera del apply() autorizado de Phase C2; esto es solo fixture de "ya
+        // existe aprobada", no la acción bajo prueba.
+        DB::connection('pgsql')->table('taxonomy_concept_relations')->insert([
             'source_concept_id' => $b->id, 'target_concept_id' => $a->id, 'relation_type' => 'RELATED_TO',
             'weight' => 0.5, 'confidence' => 0.9, 'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+            'created_at' => now(), 'updated_at' => now(),
         ]);
         // $relation ("esperando revisión") se crea DESPUÉS, directo por Eloquent con
         // status=candidate - no dispara el guard (que solo revisa transiciones hacia `approved`).

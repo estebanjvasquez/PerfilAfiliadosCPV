@@ -49,10 +49,26 @@ use Illuminate\Support\Facades\DB;
  * `freeze()` concurrente del MISMO candidato/relación, la salvaguarda es el índice único parcial de
  * la migración (`WHERE status = 'PENDING_APPLY'`), no una lectura previa de la aplicación.
  *
- * Este servicio es ADITIVO: no reemplaza ni modifica `CandidateConceptApprovalService` (que sigue
- * siendo el camino de aprobación inmediata ya aprobado y en uso por Filament para los 10
- * candidatos/2 relaciones existentes de TASK-0001). Ambos pueden coexistir; cuál usa cada punto de
- * entrada es una decisión de UI fuera del alcance de TASK-0004 (ver docs/orquestador/tasks/0004-*).
+ * TASK-0004, re-audit HIGH-1 (Issue #2 comentario `5890113782`): el payload congelado incluye TODOS
+ * los campos fuente decision-relevantes (`term_id`, `new_concept_name`/`target_concept_id` para
+ * candidatos; `source_concept_id`/`target_concept_id`/`relation_type` para relaciones), leídos UNA
+ * sola vez al congelar. `apply()` nunca redescubre estos valores de la fila viva para decidir QUÉ
+ * escribir - solo relee la fila viva para IDENTIDAD/status/compatibilidad, comparando cada campo
+ * decision-relevante contra su snapshot congelado y abortando (`ABORT_SOURCE_DRIFT`) si drifearon,
+ * en vez de publicar en silencio con un valor desactualizado.
+ *
+ * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): las DOS escrituras que constituyen
+ * "publicación" (`taxonomy_candidate_concept_links.status -> published`,
+ * `taxonomy_concept_relations.status -> approved`) están bloqueadas a nivel de MODELO
+ * (`TaxonomyCandidateConceptLink::booted()`/`TaxonomyConceptRelation::booted()`) para cualquier
+ * camino que no encienda `isApplyingC2Publication()` - que SOLO este servicio enciende, y
+ * únicamente alrededor de esas dos escrituras específicas. `CandidateConceptApprovalService`
+ * (Phase 3.1/B3, aprobado en TASK-0001) sigue existiendo como código/tests históricos, pero
+ * `approve()`/`resolveNewConceptProposal()` (MAP_TO_EXISTING/CREATE_NEW) ya NO pueden publicar de
+ * verdad - la transacción que los contiene revierte en el momento en que intentan la transición de
+ * status bloqueada. `reject()` no se ve afectado (nunca escribió una tabla protegida). Este NO es
+ * un servicio "aditivo y paralelo" en el sentido de TASK-0004 original - la corrección de este
+ * re-audit cierra deliberadamente ese bypass.
  */
 class ReviewedProposalService
 {
@@ -87,6 +103,58 @@ class ReviewedProposalService
     public const ABORT_RELATION_ALREADY_RESOLVED = 'RELATION_ALREADY_RESOLVED';
 
     public const ABORT_RELATION_INVALID_AT_APPLY_TIME = 'RELATION_INVALID_AT_APPLY_TIME';
+
+    /**
+     * TASK-0004, re-audit HIGH-1 (Issue #2 comentario `5890113782`): un campo fuente
+     * decision-relevante (ej. `suggested_term_id`, `suggested_new_concept_name`, o los
+     * source/target/relation_type de una relación) cambió en la fila viva DESPUÉS de `freeze()` -
+     * el payload congelado ya no describe la misma realidad que un humano revisó. Distinto de
+     * `ABORT_STALE_TAXONOMY_STATE` (que cubre el ESTADO GLOBAL de la taxonomía) - este cubre
+     * específicamente la fila fuente individual referenciada por ESTE payload.
+     */
+    public const ABORT_SOURCE_DRIFT = 'SOURCE_FIELD_DRIFTED';
+
+    /**
+     * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): bandera de contexto que SOLO
+     * `apply()` enciende, alrededor de las dos únicas escrituras que constituyen "publicación" real
+     * (`taxonomy_candidate_concept_links.status -> published`,
+     * `taxonomy_concept_relations.status -> approved`). Los guards de
+     * `TaxonomyCandidateConceptLink::booted()`/`TaxonomyConceptRelation::booted()` exigen que esta
+     * bandera esté encendida para permitir esas transiciones específicas - así que
+     * `CandidateConceptApprovalService`/una edición directa de Filament que intente esa MISMA
+     * transición por fuera de `apply()` la ve apagada y aborta con excepción (y la transacción que
+     * la contiene revierte todo, incluida cualquier escritura previa en la misma transacción - ver
+     * `docs/orquestador/tasks/0004-phase-c2-immutable-apply.md`, hallazgo HIGH-2). No es
+     * thread-local (PHP-FPM es single-threaded por request) - correcto para este propósito.
+     */
+    private static bool $applyingC2Publication = false;
+
+    public static function isApplyingC2Publication(): bool
+    {
+        return self::$applyingC2Publication;
+    }
+
+    /**
+     * Enciende la bandera de contexto alrededor de `$callback` y la apaga siempre al salir (incluso
+     * si `$callback` lanza). Único punto donde `$applyingC2Publication` se manipula - tanto
+     * `applyCandidateLinkDecision()`/`applyConceptRelationDecision()` (uso real) como los tests que
+     * necesitan aislar OTRO guard distinto del de bypass (ej. probar que el guard semántico de
+     * `TaxonomyConceptRelation::booted()` sigue funcionando de forma independiente) pasan por acá -
+     * nunca escriben la propiedad privada directamente. Público a propósito para que
+     * `ReviewedProposalServiceTest`/`TaxonomyConceptRelationValidationTest` puedan aislar el guard
+     * semántico de `TaxonomyConceptRelation::booted()` de este guard de bypass en sus propios tests
+     * dirigidos - no es una puerta de escape de producción (nada fuera de tests reales la usa para
+     * publicar de verdad; sigue siendo SOLO un flag de contexto, no autorización).
+     */
+    public static function withC2PublicationContext(\Closure $callback): mixed
+    {
+        self::$applyingC2Publication = true;
+        try {
+            return $callback();
+        } finally {
+            self::$applyingC2Publication = false;
+        }
+    }
 
     // =====================================================================================
     // PASO 1: FREEZE - congela una decisión de revisión humana ya tomada. Nunca publica nada.
@@ -156,13 +224,25 @@ class ReviewedProposalService
                 throw new \InvalidArgumentException('CREATE_NEW solo aplica a candidatos que proponen un concepto nuevo (suggested_concept_id NULL).');
             }
 
+            // TASK-0004, re-audit HIGH-1: congela TODOS los campos fuente decision-relevantes DENTRO
+            // del payload, leídos UNA sola vez acá (bajo el lock, en el instante de la revisión) -
+            // `apply()` nunca vuelve a leer `suggested_term_id`/`suggested_new_concept_name` de la
+            // fila viva para decidir QUÉ escribir, solo para revalidar que no cambiaron (ver
+            // `applyCandidateLinkDecision`). `new_concept_name` se resuelve acá también si el
+            // llamador no lo pasó explícito - nunca se difiere esa resolución a apply().
+            $snapshot = $decisionPayload;
+            $snapshot['term_id'] = $candidate->suggested_term_id;
+            if ($decision === TaxonomyReviewedProposal::DECISION_CREATE_NEW) {
+                $snapshot['new_concept_name'] = $decisionPayload['new_concept_name'] ?? $candidate->suggested_new_concept_name;
+            }
+
             return $this->insertFrozenProposal(
                 proposalType: TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK,
                 candidateLinkId: $candidateId,
                 conceptRelationId: null,
                 decision: $decision,
                 reviewer: $reviewer,
-                decisionPayload: $decisionPayload,
+                decisionPayload: $snapshot,
             );
         });
     }
@@ -191,13 +271,22 @@ class ReviewedProposalService
                 return ['result' => self::RESULT_ALREADY_PROCESSED, 'proposal' => null];
             }
 
+            // TASK-0004, re-audit HIGH-1: mismo criterio que freezeCandidateLink() - congela los
+            // campos fuente decision-relevantes de la relación (source/target/relation_type) DENTRO
+            // del payload, leídos una sola vez acá bajo el lock. `apply()` nunca redescubre estos
+            // valores de la fila viva para decidir qué publicar.
+            $snapshot = $decisionPayload;
+            $snapshot['source_concept_id'] = $relation->source_concept_id;
+            $snapshot['target_concept_id'] = $relation->target_concept_id;
+            $snapshot['relation_type'] = $relation->relation_type;
+
             return $this->insertFrozenProposal(
                 proposalType: TaxonomyReviewedProposal::TYPE_CONCEPT_RELATION,
                 candidateLinkId: null,
                 conceptRelationId: $relationId,
                 decision: $decision,
                 reviewer: $reviewer,
-                decisionPayload: $decisionPayload,
+                decisionPayload: $snapshot,
             );
         });
     }
@@ -375,6 +464,9 @@ class ReviewedProposalService
         $decisionPayload = $proposal->decision_payload ?? [];
 
         if ($proposal->decision === TaxonomyReviewedProposal::DECISION_REJECT) {
+            // REJECT no publica nada determinado por un campo fuente congelado - no hay nada que
+            // pueda "driftear" hacia una publicación incorrecta, así que no se exige el snapshot de
+            // term_id acá (freeze() igual lo guarda, pero apply() no depende de él para este caso).
             $candidate->update([
                 'status' => TaxonomyCandidateConceptLink::STATUS_REJECTED,
                 'reviewed_by' => $proposal->reviewer_id,
@@ -388,6 +480,19 @@ class ReviewedProposalService
             ]);
         }
 
+        // TASK-0004, re-audit HIGH-1: re-verifica que el campo fuente congelado (term_id) siga
+        // coincidiendo con la fila VIVA antes de publicar nada - si alguien editó el candidato
+        // después de freeze() (directamente en la base, no hay UI para esto hoy, pero el guard no
+        // depende de que exista una UI), el payload ya no describe lo que un humano revisó.
+        $frozenTermId = $decisionPayload['term_id'] ?? null;
+        if ($frozenTermId === null || (int) $frozenTermId !== (int) $candidate->suggested_term_id) {
+            return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
+                'note' => 'suggested_term_id del candidato cambió desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
+                'frozen_term_id' => $frozenTermId,
+                'current_term_id' => $candidate->suggested_term_id,
+            ]);
+        }
+
         if ($proposal->decision === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING) {
             $targetConceptId = $decisionPayload['target_concept_id'] ?? null;
 
@@ -397,14 +502,14 @@ class ReviewedProposalService
                 ]);
             }
 
-            $termConceptId = $this->publishTermConceptLink($candidate->suggested_term_id, (int) $targetConceptId);
+            $termConceptId = $this->publishTermConceptLink((int) $frozenTermId, (int) $targetConceptId);
 
-            $candidate->update([
+            self::withC2PublicationContext(fn () => $candidate->update([
                 'status' => TaxonomyCandidateConceptLink::STATUS_PUBLISHED,
                 'reviewed_by' => $proposal->reviewer_id,
                 'reviewed_at' => $proposal->reviewed_at,
                 'published_term_concept_id' => $termConceptId,
-            ]);
+            ]));
 
             return $this->markApplied($proposal, $authorizationReference, $targetEnvironment, [
                 'candidate_link_id' => $candidate->id,
@@ -414,24 +519,41 @@ class ReviewedProposalService
             ]);
         }
 
-        // DECISION_CREATE_NEW
-        $term = $candidate->term;
-        $newConceptName = $decisionPayload['new_concept_name'] ?? $candidate->suggested_new_concept_name;
+        // DECISION_CREATE_NEW - el nombre viene ÚNICAMENTE del payload congelado (nunca de
+        // `$candidate->suggested_new_concept_name` en vivo - hallazgo HIGH-1: "CREATE_NEW must
+        // require the reviewed new concept name explicitly in the frozen payload; do not fall back
+        // at apply time to a mutable candidate field"). Si la fila viva cambió su nombre sugerido
+        // desde freeze(), eso también es drift y debe abortar, no publicarse en silencio con el
+        // valor viejo.
+        $frozenNewConceptName = $decisionPayload['new_concept_name'] ?? null;
+        if ($frozenNewConceptName === null || $frozenNewConceptName !== $candidate->suggested_new_concept_name) {
+            return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
+                'note' => 'suggested_new_concept_name del candidato cambió desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
+                'frozen_new_concept_name' => $frozenNewConceptName,
+                'current_new_concept_name' => $candidate->suggested_new_concept_name,
+            ]);
+        }
 
+        $term = $candidate->term;
+
+        // La creación del concepto en sí no está guardada (`TaxonomyCanonicalConcept` tiene su
+        // propio recurso de administración directa, sin relación con la revisión de candidatos - ver
+        // audit/phase4_c2_immutable_apply.md) - solo la transición del CANDIDATO a `published` lo
+        // está, así que el contexto se enciende recién para esa escritura puntual.
         $concept = TaxonomyCanonicalConcept::query()->create([
-            'canonical_name_es' => $term?->language === 'en' ? null : ($newConceptName ?? $term?->canonical_term),
-            'canonical_name_en' => $term?->language === 'en' ? ($newConceptName ?? $term?->canonical_term) : null,
+            'canonical_name_es' => $term?->language === 'en' ? null : ($frozenNewConceptName ?? $term?->canonical_term),
+            'canonical_name_en' => $term?->language === 'en' ? ($frozenNewConceptName ?? $term?->canonical_term) : null,
             'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE,
         ]);
 
-        $termConceptId = $this->publishTermConceptLink($candidate->suggested_term_id, $concept->id);
+        $termConceptId = $this->publishTermConceptLink((int) $frozenTermId, $concept->id);
 
-        $candidate->update([
+        self::withC2PublicationContext(fn () => $candidate->update([
             'status' => TaxonomyCandidateConceptLink::STATUS_PUBLISHED,
             'reviewed_by' => $proposal->reviewer_id,
             'reviewed_at' => $proposal->reviewed_at,
             'published_term_concept_id' => $termConceptId,
-        ]);
+        ]));
 
         return $this->markApplied($proposal, $authorizationReference, $targetEnvironment, [
             'candidate_link_id' => $candidate->id,
@@ -470,13 +592,33 @@ class ReviewedProposalService
             ]);
         }
 
+        // TASK-0004, re-audit HIGH-1: los campos fuente congelados (source/target/relation_type)
+        // deben seguir coincidiendo con la fila VIVA - si drifearon desde freeze(), el payload ya no
+        // describe lo que se revisó. Comparados ANTES de re-validar/publicar, no después.
+        $decisionPayload = $proposal->decision_payload ?? [];
+        $frozenSourceId = $decisionPayload['source_concept_id'] ?? null;
+        $frozenTargetId = $decisionPayload['target_concept_id'] ?? null;
+        $frozenRelationType = $decisionPayload['relation_type'] ?? null;
+
+        if ((int) $frozenSourceId !== (int) $relation->source_concept_id
+            || (int) $frozenTargetId !== (int) $relation->target_concept_id
+            || $frozenRelationType !== $relation->relation_type) {
+            return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
+                'note' => 'source_concept_id/target_concept_id/relation_type de la relación cambiaron desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
+                'frozen' => ['source_concept_id' => $frozenSourceId, 'target_concept_id' => $frozenTargetId, 'relation_type' => $frozenRelationType],
+                'current' => ['source_concept_id' => $relation->source_concept_id, 'target_concept_id' => $relation->target_concept_id, 'relation_type' => $relation->relation_type],
+            ]);
+        }
+
         // DECISION_PUBLISH_RELATION: re-validación server-side completa contra el estado REAL
         // (duplicado exacto, simétrico, vía inverso, ciclos) - hallazgo 3 de TASK-0004, mismo
-        // mecanismo que TASK-0003 hallazgo 6 (validateConceptRelationProposal con excludeId).
+        // mecanismo que TASK-0003 hallazgo 6 (validateConceptRelationProposal con excludeId). Usa
+        // los valores CONGELADOS (que ya se verificaron arriba como idénticos a los vivos), no
+        // relee la fila viva de nuevo - "APPLY must write from the frozen payload".
         $validation = app(CanonicalConceptBuilderService::class)->validateConceptRelationProposal(
-            $relation->source_concept_id,
-            $relation->target_concept_id,
-            $relation->relation_type,
+            (int) $frozenSourceId,
+            (int) $frozenTargetId,
+            $frozenRelationType,
             excludeId: $relation->id,
         );
 
@@ -486,14 +628,16 @@ class ReviewedProposalService
             ]);
         }
 
-        // `TaxonomyConceptRelation::booted()` (guard de TASK-0003 hallazgo 6) revalida esto MISMO
-        // otra vez dentro de `save()` - redundante a propósito (defensa en profundidad), no un
-        // desperdicio: vale para cualquier punto de entrada, no solo este servicio.
-        $relation->update([
+        // `TaxonomyConceptRelation::booted()` (guard de TASK-0003 hallazgo 6, extendido en TASK-0004
+        // hallazgo HIGH-2) revalida esto MISMO otra vez dentro de `save()` Y exige que
+        // `isApplyingC2Publication()` esté encendida - redundante a propósito (defensa en
+        // profundidad), no un desperdicio: vale para cualquier punto de entrada, no solo este
+        // servicio.
+        self::withC2PublicationContext(fn () => $relation->update([
             'status' => TaxonomyConceptRelation::STATUS_APPROVED,
             'reviewed_by' => $proposal->reviewer_id,
             'reviewed_at' => $proposal->reviewed_at,
-        ]);
+        ]));
 
         return $this->markApplied($proposal, $authorizationReference, $targetEnvironment, [
             'concept_relation_id' => $relation->id,

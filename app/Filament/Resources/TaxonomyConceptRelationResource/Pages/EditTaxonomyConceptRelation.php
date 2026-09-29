@@ -4,6 +4,7 @@ namespace App\Filament\Resources\TaxonomyConceptRelationResource\Pages;
 
 use App\Filament\Resources\TaxonomyConceptRelationResource;
 use App\Services\Taxonomy\CanonicalConceptBuilderService;
+use App\Services\Taxonomy\ReviewedProposalService;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -48,6 +49,23 @@ class EditTaxonomyConceptRelation extends EditRecord
         // aprobar" si se compara contra $record->status acá. Revalidar un approved sin cambios es
         // barato e inofensivo (se excluye a sí mismo, siempre pasa) - no hace falta la comparación.
         $approving = $data['status'] === $record::STATUS_APPROVED;
+
+        // TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): aprobar (publicar) una
+        // relación ya NO es posible desde esta página - el guard de
+        // `TaxonomyConceptRelation::booted()` lo bloquearía de todos modos al llegar a
+        // `$record->update()`, pero se corta ACÁ con un mensaje legible en vez de dejar que una
+        // `RuntimeException` cruda llegue hasta Livewire. La publicación real ahora exige
+        // `ReviewedProposalService::freeze()` + `apply()` con autorización de ejecución explícita
+        // (Phase C2).
+        if ($approving && ! ReviewedProposalService::isApplyingC2Publication()) {
+            Notification::make()
+                ->title('No se pudo aprobar la relación')
+                ->body('Aprobar (publicar) una relación ya no se hace desde esta página - requiere el flujo autorizado de Phase C2 (freeze + apply con referencia de autorización explícita).')
+                ->danger()
+                ->send();
+
+            throw new Halt();
+        }
 
         if (! $endpointsUnchanged || $approving) {
             $validation = app(CanonicalConceptBuilderService::class)->validateConceptRelationProposal(

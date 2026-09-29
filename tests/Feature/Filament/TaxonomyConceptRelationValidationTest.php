@@ -7,6 +7,7 @@ use App\Filament\Resources\TaxonomyConceptRelationResource\Pages\EditTaxonomyCon
 use App\Models\TaxonomyCanonicalConcept;
 use App\Models\TaxonomyConceptRelation;
 use App\Models\User;
+use App\Services\Taxonomy\ReviewedProposalService;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -136,13 +137,17 @@ class TaxonomyConceptRelationValidationTest extends TestCase
         $b = $this->concept('zzz_rel_cycle_b_'.uniqid());
         $c = $this->concept('zzz_rel_cycle_c_'.uniqid());
         // A PART_OF B, B PART_OF C ya existen - proponer C PART_OF A cerraría el ciclo A->B->C->A.
-        TaxonomyConceptRelation::create([
-            'source_concept_id' => $a->id, 'target_concept_id' => $b->id, 'relation_type' => 'PART_OF',
-            'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_APPROVED,
-        ]);
-        TaxonomyConceptRelation::create([
-            'source_concept_id' => $b->id, 'target_concept_id' => $c->id, 'relation_type' => 'PART_OF',
-            'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+        // INSERT crudo (no ::create()) - TASK-0004 hallazgo HIGH-2 bloquea crear/guardar vía
+        // Eloquent con status=approved fuera del apply() autorizado de Phase C2; esto es solo
+        // fixture de "ya existen aprobadas", no la acción bajo prueba (que es la creación vía
+        // Filament de la relación que CERRARÍA el ciclo).
+        DB::connection('pgsql')->table('taxonomy_concept_relations')->insert([
+            ['source_concept_id' => $a->id, 'target_concept_id' => $b->id, 'relation_type' => 'PART_OF',
+                'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+                'created_at' => now(), 'updated_at' => now()],
+            ['source_concept_id' => $b->id, 'target_concept_id' => $c->id, 'relation_type' => 'PART_OF',
+                'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+                'created_at' => now(), 'updated_at' => now()],
         ]);
         $countBefore = DB::connection('pgsql')->table('taxonomy_concept_relations')->count();
 
@@ -215,7 +220,7 @@ class TaxonomyConceptRelationValidationTest extends TestCase
     }
 
     #[Test]
-    public function editing_a_relation_without_changing_its_endpoints_or_type_still_saves(): void
+    public function editing_a_relation_without_changing_its_endpoints_type_or_status_still_saves(): void
     {
         $a = $this->concept('zzz_rel_noop_a_'.uniqid());
         $b = $this->concept('zzz_rel_noop_b_'.uniqid());
@@ -230,15 +235,49 @@ class TaxonomyConceptRelationValidationTest extends TestCase
                 'source_concept_id' => $a->id,
                 'target_concept_id' => $b->id,
                 'relation_type' => 'RELATED_TO',
-                'weight' => 0.75, // solo cambia el peso, no los endpoints/tipo
+                'weight' => 0.75, // solo cambia el peso, no los endpoints/tipo/status
                 'confidence' => 0.5,
-                'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+                'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertSame(0.75, (float) $relation->fresh()->weight);
-        $this->assertSame(TaxonomyConceptRelation::STATUS_APPROVED, $relation->fresh()->status);
+        $this->assertSame(TaxonomyConceptRelation::STATUS_CANDIDATE, $relation->fresh()->status);
+    }
+
+    /**
+     * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): esta página ya NO puede
+     * aprobar/publicar una relación - eso ahora exige el flujo autorizado de Phase C2
+     * (`ReviewedProposalService::freeze()` + `apply()`). Reemplaza al viejo
+     * `editing_a_relation_without_changing_its_endpoints_or_type_still_saves`, que probaba
+     * justamente el camino que este hallazgo pidió cerrar.
+     */
+    #[Test]
+    public function editing_a_relation_to_approve_it_is_blocked_publication_requires_phase_c2(): void
+    {
+        $a = $this->concept('zzz_rel_c2gate_a_'.uniqid());
+        $b = $this->concept('zzz_rel_c2gate_b_'.uniqid());
+        $relation = TaxonomyConceptRelation::create([
+            'source_concept_id' => $a->id, 'target_concept_id' => $b->id, 'relation_type' => 'RELATED_TO',
+            'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
+        ]);
+
+        Livewire::actingAs($this->authorizedUser())
+            ->test(EditTaxonomyConceptRelation::class, ['record' => $relation->getRouteKey()])
+            ->fillForm([
+                'source_concept_id' => $a->id,
+                'target_concept_id' => $b->id,
+                'relation_type' => 'RELATED_TO',
+                'weight' => 0.75,
+                'confidence' => 0.5,
+                'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+            ])
+            ->call('save');
+
+        $fresh = $relation->fresh();
+        $this->assertSame(TaxonomyConceptRelation::STATUS_CANDIDATE, $fresh->status, 'No debe quedar aprobada.');
+        $this->assertSame(0.5, (float) $fresh->weight, 'Ningún campo de este submit debe persistir - se corta antes del update.');
     }
 
     /**
@@ -261,10 +300,12 @@ class TaxonomyConceptRelationValidationTest extends TestCase
         // La simétrica inversa (B->A) ya estaba aprobada ANTES de que $waiting se creara - orden
         // deliberado: si se creara al revés, el propio guard del modelo (hallazgo 6) ya bloquearía
         // esta creación como duplicado, lo cual probaría otra cosa (creación), no la revalidación al
-        // aprobar, que es lo que este test necesita aislar.
-        TaxonomyConceptRelation::create([
+        // aprobar, que es lo que este test necesita aislar. INSERT crudo - TASK-0004 hallazgo HIGH-2
+        // bloquea crear vía Eloquent con status=approved fuera del apply() autorizado de Phase C2.
+        DB::connection('pgsql')->table('taxonomy_concept_relations')->insert([
             'source_concept_id' => $b->id, 'target_concept_id' => $a->id, 'relation_type' => 'RELATED_TO',
             'weight' => 0.5, 'confidence' => 0.9, 'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+            'created_at' => now(), 'updated_at' => now(),
         ]);
 
         // $waiting se crea DESPUÉS y directo por Eloquent (no por la página de Filament, que sí
@@ -275,6 +316,12 @@ class TaxonomyConceptRelationValidationTest extends TestCase
             'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
         ]);
 
+        // TASK-0004, re-audit HIGH-2: desde esta corrección, intentar aprobar por esta página queda
+        // bloqueado INCONDICIONALMENTE (ver `editing_a_relation_to_approve_it_is_blocked_publication_requires_phase_c2`)
+        // - el gate de Phase C2 corta ANTES de siquiera llegar a la revalidación semántica que este
+        // test originalmente aislaba. El resultado esperado (sigue candidate, no se aprueba) se
+        // mantiene igual - más estricto, no menos - así que el escenario se conserva como
+        // regresión, aunque el guard que efectivamente lo bloquea ya no sea el mismo.
         Livewire::actingAs($this->authorizedUser())
             ->test(EditTaxonomyConceptRelation::class, ['record' => $waiting->getRouteKey()])
             ->fillForm([
@@ -290,21 +337,29 @@ class TaxonomyConceptRelationValidationTest extends TestCase
         $this->assertSame(
             TaxonomyConceptRelation::STATUS_CANDIDATE,
             $waiting->fresh()->status,
-            'No debe poder aprobarse - ya existe una relación equivalente aprobada.'
+            'No debe poder aprobarse - ya existe una relación equivalente aprobada (y, además, la publicación por esta página ya está bloqueada de por sí).'
         );
     }
 
-    /** Hallazgo 6, capa de modelo: el guard de `TaxonomyConceptRelation::booted()` protege incluso fuera de esta página de Filament. */
+    /**
+     * Hallazgo 6, capa de modelo: el guard de `TaxonomyConceptRelation::booted()` protege incluso
+     * fuera de esta página de Filament. TASK-0004, re-audit HIGH-2: el guard de modelo ahora TAMBIÉN
+     * exige `ReviewedProposalService::isApplyingC2Publication()` - este test envuelve el `update()`
+     * en `withC2PublicationContext()` para aislar específicamente que el chequeo SEMÁNTICO (el que
+     * este test siempre probó) sigue funcionando de forma independiente del gate de bypass nuevo,
+     * no para simular una publicación real autorizada.
+     */
     #[Test]
     public function the_model_itself_refuses_to_be_saved_as_approved_when_no_longer_valid(): void
     {
         $a = $this->concept('zzz_rel_model_guard_a_'.uniqid());
         $b = $this->concept('zzz_rel_model_guard_b_'.uniqid());
 
-        // Orden deliberado - ver el comentario del test anterior.
-        TaxonomyConceptRelation::create([
+        // Orden deliberado - ver el comentario del test anterior. INSERT crudo por el mismo motivo.
+        DB::connection('pgsql')->table('taxonomy_concept_relations')->insert([
             'source_concept_id' => $b->id, 'target_concept_id' => $a->id, 'relation_type' => 'RELATED_TO',
             'weight' => 0.5, 'confidence' => 0.9, 'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+            'created_at' => now(), 'updated_at' => now(),
         ]);
         $waiting = TaxonomyConceptRelation::create([
             'source_concept_id' => $a->id, 'target_concept_id' => $b->id, 'relation_type' => 'RELATED_TO',
@@ -313,6 +368,8 @@ class TaxonomyConceptRelationValidationTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
 
-        $waiting->update(['status' => TaxonomyConceptRelation::STATUS_APPROVED]);
+        ReviewedProposalService::withC2PublicationContext(
+            fn () => $waiting->update(['status' => TaxonomyConceptRelation::STATUS_APPROVED])
+        );
     }
 }

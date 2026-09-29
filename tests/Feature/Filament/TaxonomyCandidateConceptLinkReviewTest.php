@@ -156,8 +156,14 @@ class TaxonomyCandidateConceptLinkReviewTest extends TestCase
             ->assertTableActionVisible('view', $candidate);
     }
 
+    /**
+     * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): esta acción de panel ya NO
+     * publica - reemplaza al viejo `resolve_new_concept_action_maps_to_an_existing_concept_via_the_panel`,
+     * que probaba justo el camino que este hallazgo pidió cerrar. La acción sigue visible/invocable
+     * (no se ocultó el botón), pero termina en un mensaje de bloqueo, no en una publicación real.
+     */
     #[Test]
-    public function resolve_new_concept_action_maps_to_an_existing_concept_via_the_panel(): void
+    public function resolve_new_concept_action_map_to_existing_no_longer_publishes_blocked_by_c2_gate(): void
     {
         $candidate = $this->newConceptCandidate();
         $existingConcept = TaxonomyCanonicalConcept::create([
@@ -176,14 +182,14 @@ class TaxonomyCandidateConceptLinkReviewTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $fresh = $candidate->fresh();
-        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PUBLISHED, $fresh->status);
-        $this->assertSame($conceptCountBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(), 'MAP_TO_EXISTING no debe crear ningún concepto.');
-        $this->assertSame(1, DB::connection('pgsql')->table('taxonomy_term_concepts')
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $fresh->status, 'No debe publicarse - Phase C2 lo bloquea.');
+        $this->assertSame($conceptCountBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count());
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_term_concepts')
             ->where('term_id', $candidate->suggested_term_id)->where('concept_id', $existingConcept->id)->count());
     }
 
     #[Test]
-    public function resolve_new_concept_action_creates_a_new_concept_via_the_panel(): void
+    public function resolve_new_concept_action_create_new_no_longer_publishes_blocked_by_c2_gate(): void
     {
         $candidate = $this->newConceptCandidate();
         $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
@@ -197,8 +203,8 @@ class TaxonomyCandidateConceptLinkReviewTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $fresh = $candidate->fresh();
-        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PUBLISHED, $fresh->status);
-        $this->assertSame($conceptCountBefore + 1, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count());
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $fresh->status, 'No debe publicarse - Phase C2 lo bloquea.');
+        $this->assertSame($conceptCountBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(), 'El concepto que se hubiera creado también debe revertirse.');
     }
 
     #[Test]
@@ -220,30 +226,41 @@ class TaxonomyCandidateConceptLinkReviewTest extends TestCase
         $this->assertSame('[DUPLICATE] Duplicado de un concepto/relación ya existente', $fresh->review_notes);
     }
 
+    /**
+     * TASK-0004, re-audit HIGH-2: reemplaza al viejo
+     * `resolve_new_concept_action_does_not_duplicate_on_a_second_call_already_processed`. Esa
+     * premisa (primer intento publica, la Action se oculta, segundo intento no duplica) ya no
+     * aplica - el candidato NUNCA queda publicado desde acá, así que la Action sigue visible en
+     * ambos intentos (sigue pending) y ninguno de los dos crea un concepto.
+     */
     #[Test]
-    public function resolve_new_concept_action_does_not_duplicate_on_a_second_call_already_processed(): void
+    public function resolve_new_concept_action_stays_blocked_on_repeated_calls_never_publishes(): void
     {
         $candidate = $this->newConceptCandidate();
         $reviewer = $this->authorizedReviewer();
         $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
 
-        $component = Livewire::actingAs($reviewer)->test(ListTaxonomyCandidateConceptLinks::class);
+        foreach ([1, 2] as $attempt) {
+            Livewire::actingAs($reviewer)->test(ListTaxonomyCandidateConceptLinks::class)
+                ->callTableAction('resolveNewConcept', $candidate->fresh(), data: [
+                    'decision' => CandidateConceptApprovalService::DECISION_CREATE_NEW,
+                    'notes' => null,
+                ])
+                ->assertHasNoTableActionErrors();
 
-        $component->callTableAction('resolveNewConcept', $candidate, data: [
-            'decision' => CandidateConceptApprovalService::DECISION_CREATE_NEW,
-            'notes' => null,
-        ])->assertHasNoTableActionErrors();
+            $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status, "Intento {$attempt}: no debe publicarse.");
+        }
 
-        // Segunda invocación (doble click) - la Action ya no debería estar visible (status ya no
-        // es pending), consistente con el resto del panel (approve/reject se ocultan igual).
-        $component = Livewire::actingAs($reviewer)->test(ListTaxonomyCandidateConceptLinks::class);
-        $component->assertTableActionHidden('resolveNewConcept', $candidate->fresh());
-
-        $this->assertSame($conceptCountBefore + 1, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(), 'Un segundo intento no debe crear un segundo concepto.');
+        $this->assertSame($conceptCountBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(), 'Ningún intento debe crear un concepto.');
     }
 
+    /**
+     * TASK-0004, re-audit HIGH-2: reemplaza al viejo
+     * `approve_action_still_works_end_to_end_through_the_panel_regression`, que probaba justo el
+     * camino de publicación directa que este hallazgo pidió cerrar.
+     */
     #[Test]
-    public function approve_action_still_works_end_to_end_through_the_panel_regression(): void
+    public function approve_action_no_longer_publishes_end_to_end_through_the_panel_blocked_by_c2_gate(): void
     {
         $candidate = $this->mappableCandidate();
 
@@ -253,8 +270,8 @@ class TaxonomyCandidateConceptLinkReviewTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $fresh = $candidate->fresh();
-        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PUBLISHED, $fresh->status);
-        $this->assertSame(1, DB::connection('pgsql')->table('taxonomy_term_concepts')
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $fresh->status, 'No debe publicarse - Phase C2 lo bloquea.');
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_term_concepts')
             ->where('term_id', $candidate->suggested_term_id)->where('concept_id', $candidate->suggested_concept_id)->count());
     }
 

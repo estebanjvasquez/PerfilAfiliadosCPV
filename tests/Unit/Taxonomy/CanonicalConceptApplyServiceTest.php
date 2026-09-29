@@ -564,12 +564,17 @@ class CanonicalConceptApplyServiceTest extends TestCase
         $source = $this->concept();
         $target = $this->concept();
 
-        // Alguien ya creó esa misma relación entre el dry-run y la escritura.
-        TaxonomyConceptRelation::create([
+        // Alguien ya creó esa misma relación entre el dry-run y la escritura. INSERT crudo (no
+        // TaxonomyConceptRelation::create()) - TASK-0004 hallazgo HIGH-2 bloquea crear/guardar vía
+        // Eloquent con status=approved fuera del apply() autorizado de Phase C2; esto es solo un
+        // fixture de "ya existe", no la acción bajo prueba.
+        DB::connection('pgsql')->table('taxonomy_concept_relations')->insert([
             'source_concept_id' => $source->id,
             'target_concept_id' => $target->id,
             'relation_type' => 'RELATED_TO',
             'status' => TaxonomyConceptRelation::STATUS_APPROVED,
+            'weight' => 0, 'confidence' => 0,
+            'created_at' => now(), 'updated_at' => now(),
         ]);
 
         $outcome = $this->service()->apply($this->fakeDryRun([

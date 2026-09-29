@@ -1,74 +1,93 @@
 # Tarea activa
 
-**TASK-0004** — Phase C2: Reviewed Immutable Payload Application (Issue #2 comentario `5886148283`)
+**TASK-0004** — Phase C2: Reviewed Immutable Payload Application (Issue #2 comentario `5886148283`),
+**correcciones del re-audit** (comentarios `5890113782` + `5890195271`)
 
-Archivo: [`tasks/0004-phase-c2-immutable-apply.md`](tasks/0004-phase-c2-immutable-apply.md)
+Archivo: [`tasks/0004-phase-c2-immutable-apply.md`](tasks/0004-phase-c2-immutable-apply.md) (incluye
+el texto verbatim de ambos comentarios del re-audit)
 
 **Estado:** READY_FOR_REVIEW
 
 Ver `PROTOCOL.md` antes de tocar esta tarea. Precondición verificada: Phase C1 (TASK-0001 +
-TASK-0003) está `APPROVED` (comentario `5886125405`, HEAD revisado `ce11d36`).
+TASK-0003) sigue `APPROVED` (comentario `5886125405`, HEAD revisado `ce11d36`) — no invalidada por
+esta ronda.
 
-## Qué se implementó
+## Qué pidió el re-audit y qué se corrigió
 
-Contrato `REVIEWED_PROPOSAL -> payload inmutable con fingerprint -> APPLY(payload) -> VALIDATE
-server-side -> COMMIT/ROLLBACK -> AUDIT`, en `app/Services/Taxonomy/ReviewedProposalService.php`
-(`freeze()` + `apply()`) sobre una tabla nueva (`taxonomy_reviewed_proposals`). Detalle completo del
-state machine, motivos de aborto, idempotencia/concurrencia, y auditoría de la invariante de
-no-filtración a búsqueda: `audit/phase4_c2_immutable_apply.md`.
+- **HIGH 1 (payload no congelaba todos los campos fuente)**: corregido. `freeze()` ahora congela
+  `term_id`/`new_concept_name` (candidatos) y `source_concept_id`/`target_concept_id`/`relation_type`
+  (relaciones) dentro del payload inmutable. `apply()` usa EXCLUSIVAMENTE esos valores para escribir,
+  y aborta (`ABORT_SOURCE_DRIFT`) si la fila viva ya no coincide con lo congelado. 5 tests nuevos,
+  incluidos los 4 escenarios "mutate each source field, prove apply aborts with zero writes" que el
+  hallazgo pidió explícitamente.
+- **HIGH 2 (camino de publicación legacy evade C2)**: corregido. Bloqueo a nivel de MODELO
+  (`TaxonomyCandidateConceptLink::booted()` nuevo, `TaxonomyConceptRelation::booted()` extendido) -
+  ninguna transición hacia `status=published`/`status=approved` puede ocurrir fuera del `apply()`
+  autorizado de `ReviewedProposalService`. `CandidateConceptApprovalService::approve()`/
+  `resolveNewConceptProposal()` (MAP_TO_EXISTING/CREATE_NEW) y el guardado directo de
+  `EditTaxonomyConceptRelation` ahora fallan/revierten en vez de publicar. UI actualizada para
+  mostrar un mensaje legible en vez de una excepción cruda. 9 tests nuevos/actualizados prueban
+  explícitamente el cierre del bypass, a nivel de servicio Y a través del panel real de Filament
+  (Livewire).
+- **GATE 3 (regresión de 32 queries)**: el propio comentario `5890195271` corrigió esto - la
+  regresión aceptada en `ce11d36` (comentario `5886125405`) es evidencia HEREDADA válida, no
+  invalidada por esta ronda (ninguna corrección toca un consumidor de búsqueda, ranking, o datos de
+  taxonomía publicados - ver ledger abajo). No se re-corrió, consistente con ese criterio explícito.
+- **GATE 4 (suite completa verde en entorno válido)**: intentado con Docker Desktop (autorizado
+  explícitamente por el usuario, con Virtual Machine Platform habilitado y la máquina reiniciada
+  desde la ronda anterior) - el motor de Docker devolvió error 500 en TODOS los endpoints durante
+  todo el tiempo disponible en esta sesión (múltiples reintentos, incluida una espera larga),
+  genuinamente no disponible, no solo lento. Ver evidencia real obtenida abajo.
+- **MEDIUM 5 (SHA exacto del Worker sibling)**: registrado - `perfilafiliados-mcp` branch `master`,
+  HEAD `29de993c12fbdadf0577c3630cc07611af020a46`, working tree limpio. Re-verificado en ese SHA
+  exacto (grep sin resultados sobre `taxonomy_candidate_concept_links`/`taxonomy_concept_relations`/
+  `taxonomy_reviewed_proposals` en `src/`).
 
-**No modifica ningún código de Phase C1/B3 existente** - es aditivo.
+Detalle completo de cada corrección: `audit/phase4_c2_corrections_2026-09-29.md`. State machine
+completo (sin cambios de fondo, solo el contrato de snapshot/drift): `audit/phase4_c2_immutable_apply.md`.
 
-## Evidencia
+## Evidencia (distinguida per lo que pide el comentario `5890195271`: A=heredada, B=nueva, C=invalidada-y-recorrida, D=no aplica)
 
-- **`tests/Unit/Taxonomy/ReviewedProposalServiceTest.php`: 25/25 PASS (68 assertions).**
-- **Suite de taxonomía completa: 174/174 PASS** (562 assertions) **+ 1 fallo ajeno.** El único
-  fallo (`TaxonomyCandidateConceptLinkReviewTest::viewing_a_propose_new_concept_candidate...`, una
-  página de TASK-0002 ya aprobada, sin relación alguna con TASK-0004) es un artefacto del entorno de
-  esta sesión: la instalación local ad-hoc de PHP 8.2 (ver nota de entorno abajo) no pudo cargar la
-  extensión `intl` porque una política de Application Control de Windows bloqueó específicamente
-  `php_intl.dll` (`Get-MpPreference`/unblock no la destraban sin privilegios de administrador, que
-  esta sesión no tiene). El error es exactamente `"The intl PHP extension is required to use the
-  [format] method"` en `Illuminate\Support\Number::format()` - nada que TASK-0004 escribió toca esa
-  ruta de código. No se oculta ni se cuenta como PASS: **174 passed, 1 failed (562 assertions)** es
-  el resultado real y completo de la corrida.
-- **Invariantes de DB (antes = después, verificado con consulta directa después de la corrida
-  completa):** `taxonomy_candidate_concept_links=10`, `taxonomy_concept_relations=2`,
+- **[B] `ReviewedProposalServiceTest`: 30/30 PASS (82 assertions)** — 5 tests nuevos de drift/snapshot.
+- **[B] `CandidateConceptApprovalServiceTest`: 27/27 PASS** — 6 tests actualizados para el bypass cerrado.
+- **[B] `TaxonomyConceptRelationValidationTest`: 10/10 PASS** — 1 test dividido en 2, 1 aislado con `withC2PublicationContext()`.
+- **[B] `TaxonomyCandidateConceptLinkReviewTest`: 9/10 PASS** — 4 tests actualizados; el único fallo
+  es el gap de `intl` ya documentado en la ronda anterior (ajeno, ver abajo).
+- **[B] `CanonicalConceptApplyServiceTest`: 21/21 PASS** — sin cambio de comportamiento, solo 1 fixture a INSERT crudo.
+- **[B] Suite de taxonomía completa: 179/180 PASS (572 assertions), 5228.69s (~87 min).** El único
+  fallo es exactamente el mismo gap de `intl` documentado en la ronda anterior
+  (`TaxonomyCandidateConceptLinkReviewTest::viewing_a_propose_new_concept_candidate_with_duplicate_signals_does_not_500`,
+  misma excepción exacta, misma página de TASK-0002, ajena a esta corrección). No se alteró ni se
+  saltó ningún test para forzar verde - el número real completo es 179/180, no 180/180.
+- **[A] DB invariants**: `taxonomy_candidate_concept_links=10`, `taxonomy_concept_relations=2`,
   `taxonomy_term_concepts=142`, `taxonomy_canonical_concepts=79`, `taxonomy_term_cpv_relations=9749`,
-  `taxonomy_reviewed_proposals=0` (la tabla nueva - cero filas reales, todo lo que la corrieron los
-  tests fue revertido por `DatabaseTransactions`). Los 10 candidatos/2 relaciones de TASK-0001 **no
-  se tocaron**.
-- **Migración `2026_09_29_193000_create_taxonomy_reviewed_proposals_table` corrió contra la
-  instancia compartida de Supabase** (confirmado con `migrate:status`) - tabla nueva, aditiva, sin
-  tocar ninguna fila existente.
-- **Regresión de 32 queries: NO re-corrida en esta ronda.** No quedó guardado ningún `DEBUG_TOKEN`
-  del Worker en ningún archivo (por diseño, ver TASK-0003) y esta sesión no tiene el token de
-  Cloudflare API para rotarlo de nuevo. Justificación de por qué es seguro no re-correrla: TASK-0004
-  auditó (sin modificar) tanto el comando Laravel que construye el índice de búsqueda como el Worker
-  `perfilafiliados-mcp` - ninguno de los dos lee `taxonomy_candidate_concept_links` ni
-  `taxonomy_concept_relations` ni la tabla nueva `taxonomy_reviewed_proposals`; solo
-  `taxonomy_term_concepts`/`taxonomy_term_cpv_relations`, ambas verificadas sin cambios de conteo. No
-  se ejecutó ningún `apply()` real. El único cambio persistente es una tabla nueva y vacía. Si el
-  orquestador considera esto insuficiente y pide una re-corrida real, hace falta autorización
-  explícita para rotar `DEBUG_TOKEN` de nuevo (mismo gate de TASK-0003).
+  `taxonomy_reviewed_proposals=0` — verificado de nuevo por consulta directa después de esta ronda de
+  cambios, sin cambios respecto a la ronda anterior.
+- **[A] Regresión de 32 queries**: heredada de `ce11d36`/comentario `5886125405` (32/32, 0 errores, 0
+  diffs), no invalidada — ver justificación en la sección GATE 3 de arriba.
+- **[A] Phase C1 (`CanonicalConceptApplyService`)**: `APPROVED`, no tocada por esta ronda.
+- **[A] TASK-0002**: `APPROVED`, no tocada por esta ronda.
+- **[D] Migraciones de esquema**: sin migraciones nuevas en esta ronda de correcciones (la única
+  migración de TASK-0004, `create_taxonomy_reviewed_proposals_table`, ya corrió en la ronda anterior
+  y sigue sin cambios de esquema).
 
-## Nota de entorno (transparencia de proceso)
+## Nota de entorno (continuación de la ronda anterior)
 
-Esta sesión (VSCode extension) no tenía `php` accesible (no en PATH, sin Herd/XAMPP/Laragon). Se
-intentó primero con Docker Desktop (autorizado por el usuario) pero el motor no arrancó por falta de
-"Virtual Machine Platform" de Windows (WSL2), que requiere privilegios de administrador que esta
-sesión no tiene - no se pudo elevar. El usuario autorizó explícitamente instalar PHP directamente:
-se descargó PHP 8.2.34 NTS oficial desde `windows.php.net` a `C:\Users\esteb\php82`, configurado con
-`pdo_pgsql`/`pgsql`/`bcmath`/`gd`/`zip`/`mbstring` (todos cargan correctamente) - solo `intl` quedó
-bloqueada por una política de Application Control de Windows, sin poder resolverlo sin admin. Todo
-lo demás (migración real, dos corridas completas de test contra Supabase) corrió con esta instalación
-sin problema.
+Docker Desktop, con Virtual Machine Platform habilitado y la máquina reiniciada (autorizado por el
+usuario en la ronda anterior), sigue sin poder levantar su motor en esta sesión - devuelve
+`500 Internal Server Error` en cada endpoint (`/version`, `/info`, `/containers/json`) de forma
+consistente durante todo el tiempo disponible, incluida una espera de ~200s adicional. No es un
+problema de "todavía está arrancando" - el log del backend muestra reintentos repetidos fallando de
+la misma forma. Se documenta como bloqueo real de esta sesión, no como omisión. La suite se corrió
+igual con la instalación local de PHP 8.2.34 (autorizada explícitamente por el usuario, ver ronda
+anterior) - el único fallo confirmado en toda la suite (ambas rondas) es el mismo gap de `intl`
+(política de Application Control de Windows, sin admin para resolverla), en una página de TASK-0002
+que ninguna corrección de esta tarea toca.
 
 ## Fuera de alcance de esta ronda (documentado, no oculto)
 
-- Wiring de UI de Filament para que un humano dispare `freeze()` desde el panel (hoy solo invocable
-  por servicio/comando `taxonomy:apply-reviewed-proposal`/tinker). Modo de ejecución pedido:
-  "DESIGN + IMPLEMENT + TEST", sin mandato de UI.
+- Wiring de UI de Filament para que un humano dispare `freeze()` desde el panel (sigue igual que la
+  ronda anterior - fuera del modo de ejecución pedido).
 - Ninguna aplicación real autorizada contra los 10 candidatos/2 relaciones ni contra ningún dato
   compartido/producción.
 
@@ -83,4 +102,5 @@ manos del orquestador.
 | TASK-0001 | APPROVED | (Fase C1, sin archivo de tarea propio - ver `audit/phase3_phase_c_apply.md`) |
 | TASK-0002 | APPROVED | [`tasks/0002-review-503.md`](tasks/0002-review-503.md) |
 | TASK-0003 | APPROVED | [`tasks/0003-phase-c-corrections.md`](tasks/0003-phase-c-corrections.md) |
-| TASK-0004 | READY_FOR_REVIEW | [`tasks/0004-phase-c2-immutable-apply.md`](tasks/0004-phase-c2-immutable-apply.md) |
+| TASK-0004 (ronda 1) | CORRECTIONS_REQUIRED | [`tasks/0004-phase-c2-immutable-apply.md`](tasks/0004-phase-c2-immutable-apply.md) |
+| TASK-0004 (ronda 2, correcciones) | READY_FOR_REVIEW | mismo archivo, sección "Re-audit" |

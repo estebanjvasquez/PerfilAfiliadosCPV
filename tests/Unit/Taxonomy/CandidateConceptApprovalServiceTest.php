@@ -87,42 +87,30 @@ class CandidateConceptApprovalServiceTest extends TestCase
         $this->assertSame(CandidateConceptApprovalService::RESULT_UNAUTHORIZED, $outcome['result']);
     }
 
+    /**
+     * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): este test se llamaba
+     * `approve_publishes_the_link_and_marks_the_candidate_published` y probaba justo lo que ese
+     * hallazgo pidió cerrar - `approve()` ya NO puede publicar, en ningún caso, fuera del `apply()`
+     * autorizado de Phase C2 (`ReviewedProposalService`). El guard vive en
+     * `TaxonomyCandidateConceptLink::booted()`; la transacción de `approve()` revierte por completo
+     * (incluido el INSERT en `taxonomy_term_concepts` que ya había corrido antes en la misma
+     * transacción).
+     */
     #[Test]
-    public function approve_publishes_the_link_and_marks_the_candidate_published(): void
+    public function approve_no_longer_publishes_anything_it_is_blocked_by_the_c2_bypass_guard(): void
     {
         $candidate = $this->pendingCandidate();
+        $countBefore = DB::connection('pgsql')->table('taxonomy_term_concepts')->count();
 
-        $outcome = (new CandidateConceptApprovalService())->approve($candidate->id, $this->authorizedUser());
+        try {
+            (new CandidateConceptApprovalService())->approve($candidate->id, $this->authorizedUser());
+            $this->fail('Se esperaba que approve() lanzara RuntimeException - la publicación directa debe estar bloqueada (TASK-0004 hallazgo HIGH-2).');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Phase C2', $e->getMessage());
+        }
 
-        $this->assertSame(CandidateConceptApprovalService::RESULT_APPROVED, $outcome['result']);
-        $fresh = $candidate->fresh();
-        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PUBLISHED, $fresh->status);
-        $this->assertNotNull($fresh->published_term_concept_id);
-        $this->assertNotNull($fresh->reviewed_at);
-
-        $this->assertSame(1, DB::connection('pgsql')->table('taxonomy_term_concepts')
-            ->where('term_id', $candidate->suggested_term_id)
-            ->where('concept_id', $candidate->suggested_concept_id)
-            ->count());
-    }
-
-    #[Test]
-    public function approve_is_idempotent_a_second_call_does_not_duplicate_the_link(): void
-    {
-        $candidate = $this->pendingCandidate();
-        $user = $this->authorizedUser();
-
-        $first = (new CandidateConceptApprovalService())->approve($candidate->id, $user);
-        $second = (new CandidateConceptApprovalService())->approve($candidate->id, $user);
-
-        $this->assertSame(CandidateConceptApprovalService::RESULT_APPROVED, $first['result']);
-        $this->assertSame(CandidateConceptApprovalService::RESULT_ALREADY_PROCESSED, $second['result']);
-        $this->assertSame($first['term_concept_id'], $second['term_concept_id']);
-
-        $this->assertSame(1, DB::connection('pgsql')->table('taxonomy_term_concepts')
-            ->where('term_id', $candidate->suggested_term_id)
-            ->where('concept_id', $candidate->suggested_concept_id)
-            ->count(), 'Doble aprobación (doble click) NO debe duplicar el link término->concepto.');
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status, 'El candidato debe seguir pending - la transacción completa debe revertirse.');
+        $this->assertSame($countBefore, DB::connection('pgsql')->table('taxonomy_term_concepts')->count(), 'El INSERT en taxonomy_term_concepts (que corrió antes en la misma transacción) también debe revertirse.');
     }
 
     #[Test]
@@ -136,10 +124,16 @@ class CandidateConceptApprovalServiceTest extends TestCase
         $existingId = DB::connection('pgsql')->table('taxonomy_term_concepts')
             ->where('term_id', $candidate->suggested_term_id)->where('concept_id', $candidate->suggested_concept_id)->value('id');
 
-        $outcome = (new CandidateConceptApprovalService())->approve($candidate->id, $this->authorizedUser());
-
-        $this->assertSame(CandidateConceptApprovalService::RESULT_APPROVED, $outcome['result']);
-        $this->assertSame($existingId, $outcome['term_concept_id'], 'Debe reusar el link existente, no intentar duplicarlo.');
+        // TASK-0004, re-audit HIGH-2: incluso con un link ya existente para reusar (el escenario que
+        // este test originalmente probaba como éxito), approve() sigue bloqueado - el guard corre
+        // sobre la transición de STATUS del candidato, no sobre si el link se creó o se reusó.
+        try {
+            (new CandidateConceptApprovalService())->approve($candidate->id, $this->authorizedUser());
+            $this->fail('Se esperaba RuntimeException - approve() sigue bloqueado aunque el link ya exista (TASK-0004 hallazgo HIGH-2).');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Phase C2', $e->getMessage());
+        }
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status);
     }
 
     #[Test]
@@ -216,17 +210,25 @@ class CandidateConceptApprovalServiceTest extends TestCase
         $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status);
     }
 
+    /**
+     * TASK-0004, re-audit HIGH-2: como approve() ya no llega a publicar (lanza antes de terminar su
+     * transacción), tampoco llega a escribir su propia fila de auditoría de "aprobado" - se
+     * verifica explícitamente que NO quede un registro fantasma de una publicación que en realidad
+     * nunca sucedió.
+     */
     #[Test]
-    public function approve_writes_an_audit_log_entry(): void
+    public function approve_writes_no_audit_log_entry_since_it_no_longer_publishes(): void
     {
         $candidate = $this->pendingCandidate();
         $user = $this->authorizedUser();
-        // TaxonomyAuditLogger::record() usa Auth::id() ambiental (TAXV2-9, no un actor explícito) -
-        // en producción esto siempre coincide con el usuario de la request de Filament; en el test
-        // hay que autenticar la sesión explícitamente para reproducir esa misma condición real.
         $this->actingAs($user);
 
-        (new CandidateConceptApprovalService())->approve($candidate->id, $user);
+        try {
+            (new CandidateConceptApprovalService())->approve($candidate->id, $user);
+            $this->fail('Se esperaba RuntimeException.');
+        } catch (\RuntimeException) {
+            // esperado
+        }
 
         $logRow = DB::connection('pgsql')->table('taxonomy_audit_log')
             ->where('entity_type', TaxonomyCandidateConceptLink::class)
@@ -234,10 +236,7 @@ class CandidateConceptApprovalServiceTest extends TestCase
             ->where('field', 'status')
             ->first();
 
-        $this->assertNotNull($logRow, 'Approve debe dejar un registro en taxonomy_audit_log (TaxonomyAuditLogger).');
-        $this->assertSame((string) $user->id, (string) $logRow->user_id);
-        $this->assertSame('pending', $logRow->old_value);
-        $this->assertSame('published', $logRow->new_value);
+        $this->assertNull($logRow, 'No debe quedar auditoría de una publicación que en realidad se revirtió.');
     }
 
     #[Test]
@@ -346,40 +345,51 @@ class CandidateConceptApprovalServiceTest extends TestCase
         $this->assertSame(CandidateConceptApprovalService::RESULT_NOT_APPLICABLE, $outcome['result']);
     }
 
+    /**
+     * TASK-0004, re-audit HIGH-2: `resolveNewConceptProposal(..., DECISION_CREATE_NEW)` intentaba
+     * publicar directamente (crear el concepto + el link + marcar el candidato published) - ahora
+     * el guard de modelo bloquea la última de esas escrituras y revierte toda la transacción,
+     * incluido el concepto recién creado.
+     */
     #[Test]
-    public function resolve_new_concept_proposal_creates_a_new_concept_and_links_the_term(): void
+    public function resolve_new_concept_proposal_create_new_no_longer_publishes_blocked_by_c2_guard(): void
     {
         $candidate = $this->newConceptCandidate('Concepto Genuinamente Nuevo '.uniqid());
         $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
 
-        $outcome = (new CandidateConceptApprovalService())->resolveNewConceptProposal(
-            $candidate->id, $this->authorizedUser(), CandidateConceptApprovalService::DECISION_CREATE_NEW
-        );
+        try {
+            (new CandidateConceptApprovalService())->resolveNewConceptProposal(
+                $candidate->id, $this->authorizedUser(), CandidateConceptApprovalService::DECISION_CREATE_NEW
+            );
+            $this->fail('Se esperaba RuntimeException (TASK-0004 hallazgo HIGH-2).');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Phase C2', $e->getMessage());
+        }
 
-        $this->assertSame(CandidateConceptApprovalService::RESULT_CREATED_NEW_CONCEPT, $outcome['result']);
-        $this->assertNotNull($outcome['concept_id']);
-        $this->assertSame($conceptCountBefore + 1, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count());
-        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PUBLISHED, $candidate->fresh()->status);
-        $this->assertSame(1, DB::connection('pgsql')->table('taxonomy_term_concepts')
-            ->where('term_id', $candidate->suggested_term_id)->where('concept_id', $outcome['concept_id'])->count());
+        $this->assertSame($conceptCountBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(), 'El concepto nuevo creado antes en la misma transacción también debe revertirse.');
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status);
     }
 
     #[Test]
-    public function resolve_new_concept_proposal_maps_to_an_existing_concept_instead_of_creating_one(): void
+    public function resolve_new_concept_proposal_map_to_existing_no_longer_publishes_blocked_by_c2_guard(): void
     {
         $candidate = $this->newConceptCandidate();
         $existingConcept = TaxonomyCanonicalConcept::create([
             'canonical_name_es' => 'zzz_phaseb_existing_'.uniqid(), 'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE,
         ]);
-        $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
 
-        $outcome = (new CandidateConceptApprovalService())->resolveNewConceptProposal(
-            $candidate->id, $this->authorizedUser(), CandidateConceptApprovalService::DECISION_MAP_TO_EXISTING, targetConceptId: $existingConcept->id
-        );
+        try {
+            (new CandidateConceptApprovalService())->resolveNewConceptProposal(
+                $candidate->id, $this->authorizedUser(), CandidateConceptApprovalService::DECISION_MAP_TO_EXISTING, targetConceptId: $existingConcept->id
+            );
+            $this->fail('Se esperaba RuntimeException (TASK-0004 hallazgo HIGH-2).');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Phase C2', $e->getMessage());
+        }
 
-        $this->assertSame(CandidateConceptApprovalService::RESULT_MAPPED_TO_EXISTING, $outcome['result']);
-        $this->assertSame($existingConcept->id, $outcome['concept_id']);
-        $this->assertSame($conceptCountBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(), 'MAP_TO_EXISTING no debe crear ningun concepto nuevo.');
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status);
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_term_concepts')
+            ->where('term_id', $candidate->suggested_term_id)->where('concept_id', $existingConcept->id)->count());
     }
 
     #[Test]
@@ -395,26 +405,37 @@ class CandidateConceptApprovalServiceTest extends TestCase
     }
 
     #[Test]
-    public function resolve_new_concept_proposal_is_idempotent(): void
+    public function resolve_new_concept_proposal_is_blocked_the_same_way_on_every_repeated_call(): void
     {
         $candidate = $this->newConceptCandidate();
         $user = $this->authorizedUser();
+        $service = new CandidateConceptApprovalService();
 
-        $first = (new CandidateConceptApprovalService())->resolveNewConceptProposal($candidate->id, $user, CandidateConceptApprovalService::DECISION_CREATE_NEW);
-        $second = (new CandidateConceptApprovalService())->resolveNewConceptProposal($candidate->id, $user, CandidateConceptApprovalService::DECISION_CREATE_NEW);
+        foreach ([1, 2] as $attempt) {
+            try {
+                $service->resolveNewConceptProposal($candidate->id, $user, CandidateConceptApprovalService::DECISION_CREATE_NEW);
+                $this->fail("Intento {$attempt}: se esperaba RuntimeException.");
+            } catch (\RuntimeException) {
+                // esperado en ambos intentos - nunca llega a ALREADY_PROCESSED porque nunca llega a publicar.
+            }
+        }
 
-        $this->assertSame(CandidateConceptApprovalService::RESULT_CREATED_NEW_CONCEPT, $first['result']);
-        $this->assertSame(CandidateConceptApprovalService::RESULT_ALREADY_PROCESSED, $second['result']);
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status);
     }
 
     #[Test]
-    public function resolve_new_concept_proposal_writes_an_audit_log_entry(): void
+    public function resolve_new_concept_proposal_writes_no_audit_log_entry_since_it_no_longer_publishes(): void
     {
         $candidate = $this->newConceptCandidate();
         $user = $this->authorizedUser();
         $this->actingAs($user);
 
-        (new CandidateConceptApprovalService())->resolveNewConceptProposal($candidate->id, $user, CandidateConceptApprovalService::DECISION_CREATE_NEW);
+        try {
+            (new CandidateConceptApprovalService())->resolveNewConceptProposal($candidate->id, $user, CandidateConceptApprovalService::DECISION_CREATE_NEW);
+            $this->fail('Se esperaba RuntimeException.');
+        } catch (\RuntimeException) {
+            // esperado
+        }
 
         $logRow = DB::connection('pgsql')->table('taxonomy_audit_log')
             ->where('entity_type', TaxonomyCandidateConceptLink::class)
@@ -422,8 +443,7 @@ class CandidateConceptApprovalServiceTest extends TestCase
             ->where('field', 'status')
             ->first();
 
-        $this->assertNotNull($logRow);
-        $this->assertSame('published', $logRow->new_value);
+        $this->assertNull($logRow, 'No debe quedar auditoría de una publicación que en realidad se revirtió.');
     }
 
     // =========================================================================================

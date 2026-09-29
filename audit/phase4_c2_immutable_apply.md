@@ -5,6 +5,15 @@
 `docs/orquestador/tasks/0004-phase-c2-immutable-apply.md`.
 **Precondición:** Phase C1 (TASK-0001 + TASK-0003) `APPROVED` en el comentario `5886125405`, HEAD revisado `ce11d36`.
 
+**Actualización (2026-09-29, re-audit):** este documento describe el diseño ORIGINAL de TASK-0004
+(HEAD `5bcf561`), devuelto con `CORRECTIONS_REQUIRED` (Issue #2 comentario `5890113782`). El
+contrato de payload inmutable descrito abajo se corrigió para congelar TODOS los campos fuente
+decision-relevantes (no solo los explícitos del payload de decisión) y el bypass de publicación
+legacy se cerró - ver `audit/phase4_c2_corrections_2026-09-29.md` para el detalle completo de qué
+cambió y por qué. Las secciones de abajo siguen siendo correctas en su mayoría (el state machine de
+dos pasos, la idempotencia, la auditoría de revisión-vs-ejecución) - donde el contrato cambió, la
+corrección lo señala explícitamente.
+
 ## 1. Qué implementa esto
 
 El contrato que `CanonicalConceptApplyService` (Phase C1) dejó explícitamente pendiente en su

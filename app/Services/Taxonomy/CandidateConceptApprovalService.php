@@ -34,6 +34,18 @@ use Illuminate\Support\Facades\DB;
  *   proyecto para decisiones de aprobar/rechazar - no se inventa un mecanismo paralelo.
  * - **reviewed_by/reviewed_at/published_term_concept_id**: se siguen poblando, ahora dentro de la
  *   misma transacción.
+ *
+ * **BLOQUEADO COMO CAMINO DE PUBLICACIÓN DESDE TASK-0004 (Issue #2 comentario `5890113782`,
+ * hallazgo HIGH-2 - "legacy immediate publication path bypasses C2").** `approve()` y
+ * `resolveNewConceptProposal()` con MAP_TO_EXISTING/CREATE_NEW siguen aquí (código/tests históricos
+ * de TASK-0001, ver `CandidateConceptApprovalServiceTest`), pero la transición
+ * `taxonomy_candidate_concept_links.status -> published` que ambos intentan ahora está bloqueada a
+ * nivel de modelo (`TaxonomyCandidateConceptLink::booted()`) fuera del `apply()` autorizado de
+ * `ReviewedProposalService` (Phase C2) - cualquier llamada real a estos dos métodos revierte su
+ * transacción completa con una excepción, sin publicar nada. `reject()` NO está afectado (nunca
+ * escribió una tabla protegida). Este es el mecanismo elegido para "no debe quedar alcanzable como
+ * camino de publicación de producción" sin reescribir esta clase - ver
+ * `audit/phase4_c2_immutable_apply.md` para el detalle completo y el razonamiento.
  */
 class CandidateConceptApprovalService
 {

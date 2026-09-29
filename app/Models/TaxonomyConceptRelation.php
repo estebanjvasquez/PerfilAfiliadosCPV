@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\Taxonomy\CanonicalConceptBuilderService;
+use App\Services\Taxonomy\ReviewedProposalService;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -69,12 +70,28 @@ class TaxonomyConceptRelation extends Model
      * que la fila no se detecte a sí misma como su propio duplicado exacto al revalidarse. Solo
      * corre cuando `status` efectivamente cambia hacia `approved` (creación directa como approved,
      * o transición desde candidate) - no en cada guardado irrelevante.
+     *
+     * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): además de la revalidación
+     * semántica de arriba (que sigue corriendo igual), esta transición ahora exige que
+     * `ReviewedProposalService::isApplyingC2Publication()` esté encendida - "approved" para esta
+     * tabla ES "publicado" (mismo criterio que `taxonomy_candidate_concept_links.status=published`),
+     * así que cualquier camino que intente esta transición por fuera del `apply()` autorizado de
+     * Phase C2 (ej. editar la relación a mano desde `EditTaxonomyConceptRelation`) debe fallar acá,
+     * no solo ser válida semánticamente.
      */
     protected static function booted(): void
     {
         static::saving(function (self $relation) {
             if (! $relation->isDirty('status') || $relation->status !== self::STATUS_APPROVED) {
                 return;
+            }
+
+            if (! ReviewedProposalService::isApplyingC2Publication()) {
+                throw new \RuntimeException(
+                    'No se puede aprobar (status=approved) una relación fuera del apply() autorizado de Phase C2 '.
+                    '(ReviewedProposalService::apply()) - ver TASK-0004, hallazgo HIGH-2. Congelá una decisión con '.
+                    'freeze() y aplicala con una referencia de autorización explícita.'
+                );
             }
 
             $validation = app(CanonicalConceptBuilderService::class)->validateConceptRelationProposal(

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Taxonomy\ReviewedProposalService;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -11,6 +12,11 @@ use Illuminate\Database\Eloquent\Model;
  *
  * `suggested_concept_id === null` representa una propuesta de concepto NUEVO
  * (`suggested_new_concept_name` lleva el nombre sugerido) - ver `isProposingNewConcept()`.
+ *
+ * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): `status -> published` es la
+ * transición que CONSTITUYE "publicación" para esta fila (junto con la creación del link real en
+ * `taxonomy_term_concepts`, que sucede en la misma transacción vía `ReviewedProposalService`) - ver
+ * `booted()` abajo, que la bloquea fuera del `apply()` autorizado de Phase C2.
  */
 class TaxonomyCandidateConceptLink extends Model
 {
@@ -74,5 +80,32 @@ class TaxonomyCandidateConceptLink extends Model
     public function reviewedBy()
     {
         return $this->belongsTo(UserPgsql::class, 'reviewed_by');
+    }
+
+    /**
+     * TASK-0004, re-audit HIGH-2: bloquea CUALQUIER guardado (Filament, `CandidateConceptApprovalService`,
+     * tinker, lo que sea) que deje `status=published` por fuera del `apply()` autorizado de Phase C2
+     * - mismo criterio que el guard de `TaxonomyConceptRelation::booted()` (TASK-0003 hallazgo 6).
+     * `ReviewedProposalService::apply()` enciende `isApplyingC2Publication()` únicamente alrededor
+     * de sus propias dos escrituras de publicación (candidato + relación) - cualquier otro camino
+     * que intente esta MISMA transición la ve apagada y aborta acá, revirtiendo toda la transacción
+     * que lo contenga (incluida, por ejemplo, la fila que `CandidateConceptApprovalService::approve()`
+     * ya insertó en `taxonomy_term_concepts` en la misma transacción antes de este punto).
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (self $candidate) {
+            if (! $candidate->isDirty('status') || $candidate->status !== self::STATUS_PUBLISHED) {
+                return;
+            }
+
+            if (! ReviewedProposalService::isApplyingC2Publication()) {
+                throw new \RuntimeException(
+                    'No se puede publicar (status=published) un candidato fuera del apply() autorizado de Phase C2 '.
+                    '(ReviewedProposalService::apply()) - ver TASK-0004, hallazgo HIGH-2. Congelá una decisión con '.
+                    'freeze() y aplicala con una referencia de autorización explícita.'
+                );
+            }
+        });
     }
 }

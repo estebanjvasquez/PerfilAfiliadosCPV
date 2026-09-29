@@ -125,11 +125,23 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                     ->requiresConfirmation()
                     ->modalDescription(fn (TaxonomyCandidateConceptLink $record) => self::impactAndStalenessSummary($record))
                     ->action(function (TaxonomyCandidateConceptLink $record) {
-                        $outcome = app(CandidateConceptApprovalService::class)->approve($record->id, Auth::user());
+                        // TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): publicar
+                        // desde acá ya no es posible - el guard de `TaxonomyCandidateConceptLink::booted()`
+                        // bloquea la transición fuera del apply() autorizado de Phase C2 y lanza
+                        // RuntimeException (revirtiendo toda la transacción de approve()). Se
+                        // atrapa acá para mostrar un mensaje legible en vez de un error crudo.
+                        try {
+                            $outcome = app(CandidateConceptApprovalService::class)->approve($record->id, Auth::user());
+                        } catch (\RuntimeException $e) {
+                            Notification::make()
+                                ->title('Aprobar (publicar) un candidato ya no se hace desde acá')
+                                ->body('Requiere el flujo autorizado de Phase C2 (freeze + apply con referencia de autorización explícita).')
+                                ->danger()->send();
+
+                            return;
+                        }
 
                         match ($outcome['result']) {
-                            CandidateConceptApprovalService::RESULT_APPROVED => Notification::make()
-                                ->title("Candidato aprobado y publicado en taxonomy_term_concepts#{$outcome['term_concept_id']}")->success()->send(),
                             CandidateConceptApprovalService::RESULT_ALREADY_PROCESSED => Notification::make()
                                 ->title('Este candidato ya fue procesado (doble click o ya revisado por otro admin) - no se creó ningún link nuevo.')->warning()->send(),
                             CandidateConceptApprovalService::RESULT_NOT_SUPPORTED => Notification::make()
@@ -194,19 +206,27 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                             ? CandidateConceptApprovalService::composeReviewReason($data['reject_reason_category'], $data['notes'] ?? null)
                             : ($data['notes'] ?? null);
 
-                        $outcome = app(CandidateConceptApprovalService::class)->resolveNewConceptProposal(
-                            $record->id,
-                            Auth::user(),
-                            $data['decision'],
-                            $data['target_concept_id'] ?? null,
-                            $notes,
-                        );
+                        // TASK-0004, re-audit HIGH-2: MAP_TO_EXISTING/CREATE_NEW ya no pueden
+                        // publicar desde acá - mismo guard/mismo criterio que la acción `approve` de
+                        // arriba. REJECT no está afectado (nunca escribió una tabla protegida).
+                        try {
+                            $outcome = app(CandidateConceptApprovalService::class)->resolveNewConceptProposal(
+                                $record->id,
+                                Auth::user(),
+                                $data['decision'],
+                                $data['target_concept_id'] ?? null,
+                                $notes,
+                            );
+                        } catch (\RuntimeException $e) {
+                            Notification::make()
+                                ->title('Publicar (mapear/crear concepto) desde acá ya no está disponible')
+                                ->body('Requiere el flujo autorizado de Phase C2 (freeze + apply con referencia de autorización explícita).')
+                                ->danger()->send();
+
+                            return;
+                        }
 
                         match ($outcome['result']) {
-                            CandidateConceptApprovalService::RESULT_MAPPED_TO_EXISTING => Notification::make()
-                                ->title("Mapeado a concepto existente #{$outcome['concept_id']} -> taxonomy_term_concepts#{$outcome['term_concept_id']}")->success()->send(),
-                            CandidateConceptApprovalService::RESULT_CREATED_NEW_CONCEPT => Notification::make()
-                                ->title("Concepto nuevo creado #{$outcome['concept_id']} -> taxonomy_term_concepts#{$outcome['term_concept_id']}")->success()->send(),
                             CandidateConceptApprovalService::RESULT_REJECTED => Notification::make()->title('Candidato rechazado')->success()->send(),
                             CandidateConceptApprovalService::RESULT_ALREADY_PROCESSED => Notification::make()
                                 ->title('Este candidato ya fue procesado (doble click o ya revisado por otro admin) - no se hizo ningún cambio.')->warning()->send(),
