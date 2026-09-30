@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TaxonomyReviewedProposalResource\Pages;
 use App\Models\TaxonomyReviewedProposal;
+use App\Policies\TaxonomyReviewedProposalPolicy;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -11,6 +12,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -26,10 +28,15 @@ use Illuminate\Support\Facades\Auth;
  * esta tarea: la autorización de ejecución sigue siendo un paso separado y explícito, fuera del
  * alcance de esta UI de revisión).
  *
- * Sin Policy propia - reusa los permisos `view_any`/`view` YA existentes de
- * `TaxonomyCandidateConceptLinkPolicy`/`TaxonomyConceptRelationPolicy` (cualquiera de los dos
- * alcanza, ya que toda propuesta pertenece a una entidad de uno de esos dos tipos) en vez de
+ * La autorización vive en `TaxonomyReviewedProposalPolicy`, que reusa los permisos `view_any`/`view`
+ * YA sembrados de `TaxonomyCandidateConceptLinkPolicy`/`TaxonomyConceptRelationPolicy` en vez de
  * requerir un permiso Shield nuevo sin sembrar.
+ *
+ * TASK-0005 re-audit (comentario `5917275454`, corrección 1): el listado era GLOBAL, así que un
+ * usuario con permiso para UN solo tipo de origen veía filas de AMBOS tipos. `getEloquentQuery()`
+ * ahora restringe las filas a los tipos que el usuario puede ver. Como `ViewRecord` resuelve el
+ * registro contra ese mismo query, esto también cierra el acceso por URL directa al detalle (da 404
+ * en lugar de filtrar la fila), además del 403 que devuelve la policy `view()` por tipo.
  */
 class TaxonomyReviewedProposalResource extends Resource
 {
@@ -49,13 +56,26 @@ class TaxonomyReviewedProposalResource extends Resource
 
     public static function canAccess(): bool
     {
-        return (Auth::user()?->can('view_any_taxonomy::candidate::concept::link') ?? false)
-            || (Auth::user()?->can('view_any_taxonomy::concept::relation') ?? false);
+        return TaxonomyReviewedProposalPolicy::visibleProposalTypes(Auth::user()) !== [];
     }
 
     public static function canCreate(): bool
     {
         return false;
+    }
+
+    /**
+     * TASK-0005 re-audit (comentario `5917275454`, corrección 1): filtra las filas por tipo de
+     * origen según lo que el usuario puede ver. Un usuario con permiso solo de candidatos no ve
+     * propuestas de relación y viceversa; con ambos permisos ve todo. Sin permisos la lista de tipos
+     * queda vacía y `whereIn` compila a `0 = 1` (cero filas).
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->whereIn(
+            'proposal_type',
+            TaxonomyReviewedProposalPolicy::visibleProposalTypes(Auth::user()),
+        );
     }
 
     public static function table(Table $table): Table

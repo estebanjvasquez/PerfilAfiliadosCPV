@@ -70,6 +70,28 @@ class TaxonomyConceptRelation extends Model
     }
 
     /**
+     * TASK-0005 re-audit (comentario `5917275454`, corrección 2): ¿esta fila participa del ciclo de
+     * revisión gobernado C2? Es la definición ÚNICA que usan tanto el CRUD de Filament
+     * (`TaxonomyConceptRelationResource::canEdit()`/`canDelete()`) como el guard de borrado de abajo,
+     * para que no puedan divergir.
+     *
+     * Dos casos, no uno: `status=candidate` es la población que Phase C1 (`--apply`) encola para
+     * revisión, y una propuesta `PENDING_APPLY` marca una decisión ya congelada esperando ejecución
+     * (que podría existir sobre una fila que ya no esté en `candidate`). En ambos casos la fila es
+     * evidencia/estado fuente del flujo de revisión y no puede mutarse ni borrarse por fuera de él.
+     */
+    public function isUnderC2Review(): bool
+    {
+        if ($this->status === self::STATUS_CANDIDATE) {
+            return true;
+        }
+
+        return $this->reviewedProposals()
+            ->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)
+            ->exists();
+    }
+
+    /**
      * TASK-0003, hallazgo 6: bloquea CUALQUIER guardado (Filament, tinker, lo que sea) que deje
      * `status=approved` sin volver a pasar `validateConceptRelationProposal()` en ese momento -
      * mismas reglas que al proponer (duplicado exacto, simétrico, vía inverso, ciclos),
@@ -113,6 +135,28 @@ class TaxonomyConceptRelation extends Model
                     "No se puede aprobar: la relación ya no es válida ({$validation['reason']}). ".
                     'Puede que otra relación equivalente se haya aprobado mientras esta esperaba revisión. '.
                     'Revisar de nuevo antes de decidir.'
+                );
+            }
+        });
+
+        /**
+         * TASK-0005 re-audit (comentario `5917275454`, corrección 2): borrar una relación que
+         * participa del ciclo C2 destruiría el estado fuente/evidencia de la revisión en lugar de
+         * producir una decisión REJECT congelada. El rechazo es una decisión revisada
+         * (`DECISION_REJECT` vía `freeze()` + `apply()`), nunca un borrado.
+         *
+         * A nivel de MODELO y no solo del recurso de Filament, con el mismo criterio que el guard de
+         * publicación de arriba: vale para cualquier punto de entrada (panel, tinker, una futura
+         * API). `apply()` nunca borra relaciones, así que no hay ningún camino legítimo que este
+         * guard necesite dejar pasar - por eso es incondicional, sin escape por contexto C2.
+         */
+        static::deleting(function (self $relation) {
+            if ($relation->isUnderC2Review()) {
+                throw new \RuntimeException(
+                    'No se puede borrar una relación que participa del ciclo de revisión C2 '.
+                    '(status=candidate o con una propuesta congelada pendiente de aplicación) - ver TASK-0005, '.
+                    'corrección 2 del comentario 5917275454. Rechazar es una decisión revisada '.
+                    '(freeze() con DECISION_REJECT), no un borrado.'
                 );
             }
         });

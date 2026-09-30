@@ -193,6 +193,77 @@ durante esta tarea.
 >
 > The orchestrator will inspect the actual diff/code/tests/deployment evidence before authorizing any human review of the real queue.
 
+## Re-audit — comentario `5917275454` (CORRECTIONS_REQUIRED)
+
+**Fuente:** Issue #2, comentario [`5917275454`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5917275454),
+autor `estebanjvasquez`, 2026-09-30T18:29:17Z. HEAD revisado: `9d96587165a698e2ceee9290589023f61b089ea2`.
+
+### Texto verbatim
+
+> [ORCHESTRATOR RE-AUDIT — TASK-0005 — CORRECTIONS_REQUIRED]
+>
+> Reviewed HEAD `9d96587165a698e2ceee9290589023f61b089ea2` against baseline `63cf811` and TASK-0005 contract in comment `5914793857`.
+>
+> ACCEPTED
+> - Candidate C2 UI is correctly wired to `ReviewedProposalService::freeze()`; MAP_TO_EXISTING / CREATE_NEW / CONTEXT_REQUIRED / REJECT are represented and no APPLY action is exposed.
+> - CREATE_NEW preserves explicit reviewer input; Builder suggestion is evidence only.
+> - Candidate REJECT uses structured reason composition.
+> - Relation freeze path uses C2 and does not approve/publish.
+> - New reviewed-proposal UI is read-only at the Resource/page level.
+> - Legacy C2 publication guards remain intact.
+> - Deploy trigger hardening with `paths-ignore: docs/**, audit/**, **.md` is conservative and the docs-only follow-up push correctly did not redeploy staging.
+> - Targeted evidence is acceptable: new UI suite 24/25 with the single known local ext-intl limitation; related regression suite 99/99. No unsafe full-suite run on live staging bind mounts.
+> - Staging runtime code at `b92e8739e27bc8ab8fa2d4caa15579e5c55d253d` deployed successfully; branch HEAD is documentation descendant `9d965871...`, which is expected under the new path filter.
+> - DB invariants remained 10 / 2 / 142 / 79 / 9749 / 0; real 10/2 untouched.
+> - 32-query regression remains inherited; this diff does not change search/ranking/published taxonomy.
+>
+> TWO CORRECTIONS REQUIRED
+>
+> 1. REVIEWED-PROPOSAL AUTHORIZATION LEAK ACROSS SOURCE TYPES
+> Current `TaxonomyReviewedProposalPolicy` uses OR semantics:
+> - a user allowed to view candidate links can also `view()` a relation proposal;
+> - a user allowed to view relations can also view a candidate-link proposal.
+> More importantly, `viewAny()` plus the unscoped Resource table means a user with permission for only ONE source type can list proposals belonging to BOTH types.
+>
+> Fix authorization according to the proposal's source type:
+> - TERM_CONCEPT_LINK proposal requires candidate-link view permission;
+> - CONCEPT_RELATION proposal requires relation view permission.
+> - Scope the list/query so a user with only one permission cannot see rows of the other proposal type.
+> - A user with both permissions may see both.
+> - Preserve super-admin behavior through the project's normal permission model; do not add a bypass that weakens policy.
+> Add tests for candidate-only viewer, relation-only viewer, both-permissions viewer, and unauthorized viewer, covering BOTH list visibility and direct detail URL access.
+>
+> 2. RELATION REVIEW RESOURCE STILL EXPOSES MUTATING LEGACY EDIT/DELETE DURING THE C2 REVIEW WORKFLOW
+> `TaxonomyConceptRelationResource` currently exposes:
+> - `freezeReview`
+> - `EditAction`
+> - `DeleteAction`
+> and still exposes create/edit pages.
+>
+> Publication-via-edit is guarded, but an ordinary reviewer can still mutate or delete a candidate relation independently of the immutable C2 review workflow. In particular, deleting a source relation after/before review bypasses the intended governed review lifecycle and can destroy review evidence/source state rather than produce a C2 REJECT decision.
+>
+> For candidate relations participating in C2 review:
+> - do not expose direct Edit/Delete actions that can bypass the review decision workflow;
+> - do not allow direct edit/delete of a relation with a pending reviewed proposal;
+> - REJECT must remain a C2 reviewed decision, not deletion;
+> - if generic CRUD must remain for separately governed/manual relations, explicitly separate it by status/authorization and prove that C2 candidate rows cannot be mutated/deleted through those routes.
+> - Existing server-side publication guard must remain.
+> Add tests proving a C2 candidate relation cannot be edited/deleted around the freeze workflow, while any intentionally retained administrative CRUD behavior is narrowly scoped and documented.
+>
+> Do not touch the real 10 candidates / 2 relations while fixing these issues. Fixtures/transactions only. No real freeze/apply/reject.
+>
+> CONTINUITY
+> TASK-0004 remains CLOSED/APPROVED. Staging deployment evidence remains accepted. The operational test-isolation hardening requirement remains open for future full-suite execution but is not a blocker for these two corrections. No 32-query rerun is required unless the correction changes search/ranking/published taxonomy.
+>
+> After corrections:
+> - run focused TASK-0005 UI/policy tests and relevant C2/guard regression tests in the safe environment;
+> - deploy the runtime correction to staging through the hardened workflow;
+> - smoke the relevant admin routes without acting on real rows;
+> - recheck 10/2/142/79/9749/0;
+> - update handoff/audit and STOP.
+>
+> STATUS: TASK-0005 = CORRECTIONS_REQUIRED.
+
 ## Estado
 
-Ver `docs/orquestador/current_task.md` para el estado vigente y `audit/phase5_task0005_c2_review_ui_2026-09-30.md` para el detalle completo de implementación, tests, hardening del workflow, despliegue y evidencia.
+Ver `docs/orquestador/current_task.md` para el estado vigente y `audit/phase5_task0005_c2_review_ui_2026-09-30.md` para el detalle completo de implementación, tests, hardening del workflow, despliegue y evidencia (sección 10 para las dos correcciones de este re-audit).

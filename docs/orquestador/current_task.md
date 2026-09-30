@@ -3,8 +3,29 @@
 **TASK-0005** — UI de revisión humana C2 en Filament + hardening del trigger de despliegue
 (Issue #2 comentario `5914793857`). Abierta desde HEAD `63cf811`.
 
-**Estado:** READY_FOR_REVIEW — implementación, tests seguros, hardening del workflow, despliegue a
-staging y smoke completados. Detalle completo en
+**Estado:** READY_FOR_REVIEW (ronda 2) — el re-audit del comentario `5917275454` devolvió
+`CORRECTIONS_REQUIRED` con dos hallazgos, ambos corregidos:
+
+1. **Fuga de autorización entre tipos de origen** en las propuestas revisadas: la policy usaba OR,
+   así que quien veía candidatos podía abrir propuestas de relación y viceversa, y el listado no
+   estaba filtrado. Ahora `view()` resuelve por `proposal_type` y `getEloquentQuery()` filtra las
+   filas por los tipos que el usuario puede ver (lo que también cierra la URL directa, porque
+   `ViewRecord` resuelve contra ese mismo query). Super-admin sin bypass, por el modelo de permisos
+   normal.
+2. **Edit/Delete legacy sobre relaciones en revisión C2**: un revisor podía mutar o borrar una
+   relación candidata al margen del ciclo inmutable, destruyendo evidencia en lugar de producir un
+   REJECT congelado. Nuevo predicado `isUnderC2Review()` usado por `canEdit()`/`canDelete()` (cierra
+   acción **y** ruta `/edit` con 403) más un guard `deleting` a nivel de modelo. El CRUD
+   administrativo se conserva acotado a filas cuyo ciclo ya terminó.
+
+**Tests del re-audit: 138 passed, 1 failed** (el fallo es el gap local preexistente de `ext-intl`,
+verde en staging). Incluye 4 tests preexistentes de `TaxonomyConceptRelationValidationTest`
+actualizados porque codificaban el comportamiento que la corrección 2 pidió cerrar — cada uno
+preservando la propiedad que protege, documentado en el archivo. Invariantes 10/2/142/79/9749/0 sin
+cambios.
+
+Detalle completo de ambas correcciones en la sección 10 del audit. Estado de la ronda 1
+(implementación, hardening del workflow, despliegue y smoke iniciales) en
 [`audit/phase5_task0005_c2_review_ui_2026-09-30.md`](../../audit/phase5_task0005_c2_review_ui_2026-09-30.md);
 texto verbatim de la tarea en
 [`tasks/0005-c2-human-review-ui.md`](tasks/0005-c2-human-review-ui.md).

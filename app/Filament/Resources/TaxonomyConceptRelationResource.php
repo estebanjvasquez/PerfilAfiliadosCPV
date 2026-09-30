@@ -14,6 +14,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -26,11 +27,26 @@ use Illuminate\Support\Facades\Auth;
  *
  * TASK-0005 (Issue #2 comentario `5914793857`), sección B: agrega `freezeReview`, el camino de
  * revisión C2 real para relaciones candidatas - llama a `ReviewedProposalService::freeze()`
- * (PUBLISH_RELATION/REJECT), nunca publica/aprueba. El Select de `status` del formulario de
- * `edit()` de abajo sigue existiendo (CRUD genérico heredado), pero la transición hacia `approved`
- * desde ahí sigue bloqueada por `EditTaxonomyConceptRelation::handleRecordUpdate()` +
- * `TaxonomyConceptRelation::booted()` (TASK-0004, HIGH-2) - esta acción nueva es el único camino
- * real para avanzar una relación candidata hacia una decisión de revisión.
+ * (PUBLISH_RELATION/REJECT), nunca publica/aprueba.
+ *
+ * TASK-0005 re-audit (comentario `5917275454`, corrección 2): antes este recurso exponía
+ * `EditAction` + `DeleteAction` sobre CUALQUIER fila, incluidas las candidatas en revisión C2.
+ * La publicación-vía-edit ya estaba bloqueada (TASK-0004 HIGH-2), pero un revisor común todavía
+ * podía mutar o BORRAR una relación candidata al margen del ciclo inmutable de revisión - y borrar
+ * la fila fuente destruye la evidencia/estado de la revisión en lugar de producir un REJECT
+ * congelado.
+ *
+ * El CRUD administrativo genérico se conserva, pero SEPARADO por estado: `canEdit()`/`canDelete()`
+ * devuelven false para toda fila con `isUnderC2Review()` (status=candidate, o con una propuesta
+ * `PENDING_APPLY`). Eso cierra a la vez la acción de tabla y la ruta `/{record}/edit`, porque
+ * `EditRecord::authorizeAccess()` consulta `canEdit()` del recurso. El borrado además está bloqueado
+ * a nivel de modelo (`TaxonomyConceptRelation::booted()`), así que tampoco pasa por tinker/API.
+ *
+ * Lo que SÍ sigue disponible, deliberadamente y de forma acotada: crear relaciones nuevas, y
+ * editar/borrar relaciones cuyo ciclo de revisión ya terminó (`approved`/`rejected` sin propuesta
+ * pendiente). Crear no puede rodear ninguna revisión - una fila nueva en `candidate` queda
+ * inmediatamente gobernada por C2, y la transición directa a `approved` sigue bloqueada por el guard
+ * de publicación del modelo.
  */
 class TaxonomyConceptRelationResource extends Resource
 {
@@ -47,6 +63,24 @@ class TaxonomyConceptRelationResource extends Resource
     protected static ?string $pluralModelLabel = 'Relaciones entre conceptos';
 
     protected static ?int $navigationSort = 16;
+
+    /**
+     * TASK-0005 re-audit (comentario `5917275454`, corrección 2): una relación en revisión C2 no se
+     * edita ni se borra por el CRUD genérico. Filament consulta estos dos métodos tanto para las
+     * acciones de tabla como para autorizar la ruta de la página de edición
+     * (`EditRecord::authorizeAccess()`), así que cierran la UI y la ruta de una sola vez. El permiso
+     * normal del modelo de permisos del proyecto sigue siendo condición necesaria - esto solo agrega
+     * la restricción de ciclo de vida encima, nunca la reemplaza.
+     */
+    public static function canEdit(Model $record): bool
+    {
+        return parent::canEdit($record) && ! $record->isUnderC2Review();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return parent::canDelete($record) && ! $record->isUnderC2Review();
+    }
 
     public static function form(Form $form): Form
     {
@@ -173,8 +207,14 @@ class TaxonomyConceptRelationResource extends Resource
                             default => Notification::make()->title('No se pudo congelar la decisión.')->danger()->send(),
                         };
                     }),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                // TASK-0005 re-audit, corrección 2: explícitas y redundantes a propósito respecto de
+                // `canEdit()`/`canDelete()` - no dependen de qué hook interno de Filament consulte
+                // cada versión, y dejan el CRUD administrativo visible SOLO para filas cuyo ciclo de
+                // revisión ya terminó.
+                Tables\Actions\EditAction::make()
+                    ->visible(fn (TaxonomyConceptRelation $record) => self::canEdit($record)),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn (TaxonomyConceptRelation $record) => self::canDelete($record)),
             ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Filament\Resources\TaxonomyConceptRelationResource;
 use App\Filament\Resources\TaxonomyConceptRelationResource\Pages\CreateTaxonomyConceptRelation;
 use App\Filament\Resources\TaxonomyConceptRelationResource\Pages\EditTaxonomyConceptRelation;
 use App\Models\TaxonomyCanonicalConcept;
@@ -53,6 +54,29 @@ class TaxonomyConceptRelationValidationTest extends TestCase
         return TaxonomyCanonicalConcept::create([
             'canonical_name_es' => $name,
             'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE,
+        ]);
+    }
+
+    /**
+     * TASK-0005 re-audit (comentario `5917275454`, corrección 2): una relación cuyo ciclo de revisión
+     * C2 YA TERMINÓ, o sea editable por el CRUD administrativo acotado que se conservó.
+     *
+     * Hace falta porque desde esa corrección las relaciones `candidate` ya no son editables en
+     * absoluto (`TaxonomyConceptRelationResource::canEdit()` devuelve false y
+     * `EditRecord::authorizeAccess()` corta con 403), así que los tests de esta suite que prueban la
+     * VALIDACIÓN de la página de edición necesitan una fila que la página todavía sirva. Se usa
+     * `rejected` y no `approved`: el guard de publicación de TASK-0004 impide crear/guardar
+     * `approved` vía Eloquent fuera del `apply()` autorizado, y además editar una relación publicada
+     * es otra discusión (ver la observación registrada en el audit de esta corrección).
+     */
+    private function relationWithReviewCycleOver(string $prefix): TaxonomyConceptRelation
+    {
+        return TaxonomyConceptRelation::create([
+            'source_concept_id' => $this->concept($prefix.'_src_'.uniqid())->id,
+            'target_concept_id' => $this->concept($prefix.'_tgt_'.uniqid())->id,
+            'relation_type' => 'RELATED_TO',
+            'weight' => 0.5, 'confidence' => 0.5,
+            'status' => TaxonomyConceptRelation::STATUS_REJECTED,
         ]);
     }
 
@@ -189,85 +213,115 @@ class TaxonomyConceptRelationValidationTest extends TestCase
         $this->assertSame($countBefore + 1, DB::connection('pgsql')->table('taxonomy_concept_relations')->count());
     }
 
+    /**
+     * TASK-0005 re-audit (corrección 2): el escenario es el mismo de siempre - editar los endpoints
+     * hasta duplicar otra relación existente debe rechazarse - pero ahora corre sobre una fila cuyo
+     * ciclo de revisión ya terminó, porque una `candidate` ni siquiera abre la página de edición.
+     * La propiedad que este test protege (la página REVALIDA al cambiar endpoints, no guarda a
+     * ciegas) se sigue ejercitando de verdad; lo que cambió es sobre qué fila puede ejercitarse.
+     */
     #[Test]
     public function editing_a_relation_to_duplicate_another_existing_one_is_rejected(): void
     {
-        $a = $this->concept('zzz_rel_edit_a_'.uniqid());
-        $b = $this->concept('zzz_rel_edit_b_'.uniqid());
-        $c = $this->concept('zzz_rel_edit_c_'.uniqid());
+        $toEdit = $this->relationWithReviewCycleOver('zzz_rel_edit');
+        $a = $toEdit->source_concept_id;
+        $c = $toEdit->target_concept_id;
+        $b = $this->concept('zzz_rel_edit_dup_'.uniqid())->id;
+
+        // La relación A->B que el submit intentará duplicar.
         TaxonomyConceptRelation::create([
-            'source_concept_id' => $a->id, 'target_concept_id' => $b->id, 'relation_type' => 'RELATED_TO',
-            'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
-        ]);
-        $toEdit = TaxonomyConceptRelation::create([
-            'source_concept_id' => $a->id, 'target_concept_id' => $c->id, 'relation_type' => 'RELATED_TO',
+            'source_concept_id' => $a, 'target_concept_id' => $b, 'relation_type' => 'RELATED_TO',
             'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
         ]);
 
         Livewire::actingAs($this->authorizedUser())
             ->test(EditTaxonomyConceptRelation::class, ['record' => $toEdit->getRouteKey()])
             ->fillForm([
-                'source_concept_id' => $a->id,
-                'target_concept_id' => $b->id, // ahora duplica la relación A->B ya existente
+                'source_concept_id' => $a,
+                'target_concept_id' => $b, // ahora duplica la relación A->B ya existente
                 'relation_type' => 'RELATED_TO',
                 'weight' => 0.5,
                 'confidence' => 0.5,
-                'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
+                'status' => TaxonomyConceptRelation::STATUS_REJECTED,
             ])
             ->call('save');
 
-        $this->assertSame($c->id, $toEdit->fresh()->target_concept_id, 'El registro editado NO debe haberse guardado con el destino duplicado.');
+        $this->assertSame($c, $toEdit->fresh()->target_concept_id, 'El registro editado NO debe haberse guardado con el destino duplicado.');
     }
 
+    /**
+     * TASK-0005 re-audit (corrección 2): mismo motivo que el test anterior - la edición benigna
+     * (solo el peso) se prueba sobre una fila fuera del ciclo C2. El caso "candidata" ya no es
+     * "guarda igual" sino "no se puede editar", y eso se prueba explícitamente en
+     * `a_candidate_relation_cannot_even_open_the_edit_page` más abajo.
+     */
     #[Test]
     public function editing_a_relation_without_changing_its_endpoints_type_or_status_still_saves(): void
     {
-        $a = $this->concept('zzz_rel_noop_a_'.uniqid());
-        $b = $this->concept('zzz_rel_noop_b_'.uniqid());
-        $relation = TaxonomyConceptRelation::create([
-            'source_concept_id' => $a->id, 'target_concept_id' => $b->id, 'relation_type' => 'RELATED_TO',
-            'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
-        ]);
+        $relation = $this->relationWithReviewCycleOver('zzz_rel_noop');
 
         Livewire::actingAs($this->authorizedUser())
             ->test(EditTaxonomyConceptRelation::class, ['record' => $relation->getRouteKey()])
             ->fillForm([
-                'source_concept_id' => $a->id,
-                'target_concept_id' => $b->id,
+                'source_concept_id' => $relation->source_concept_id,
+                'target_concept_id' => $relation->target_concept_id,
                 'relation_type' => 'RELATED_TO',
                 'weight' => 0.75, // solo cambia el peso, no los endpoints/tipo/status
                 'confidence' => 0.5,
-                'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
+                'status' => TaxonomyConceptRelation::STATUS_REJECTED,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertSame(0.75, (float) $relation->fresh()->weight);
-        $this->assertSame(TaxonomyConceptRelation::STATUS_CANDIDATE, $relation->fresh()->status);
+        $this->assertSame(TaxonomyConceptRelation::STATUS_REJECTED, $relation->fresh()->status);
+    }
+
+    /**
+     * TASK-0005 re-audit (comentario `5917275454`, corrección 2): el caso que antes estaba implícito
+     * en los dos tests de arriba y ahora es una propiedad por derecho propio - una relación que
+     * participa del ciclo C2 no abre siquiera la página de edición.
+     */
+    #[Test]
+    public function a_candidate_relation_cannot_even_open_the_edit_page(): void
+    {
+        $a = $this->concept('zzz_rel_c2locked_a_'.uniqid());
+        $b = $this->concept('zzz_rel_c2locked_b_'.uniqid());
+        $candidate = TaxonomyConceptRelation::create([
+            'source_concept_id' => $a->id, 'target_concept_id' => $b->id, 'relation_type' => 'RELATED_TO',
+            'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
+        ]);
+
+        $this->actingAs($this->authorizedUser())
+            ->get(TaxonomyConceptRelationResource::getUrl('edit', ['record' => $candidate]))
+            ->assertForbidden();
+
+        $fresh = $candidate->fresh();
+        $this->assertSame(TaxonomyConceptRelation::STATUS_CANDIDATE, $fresh->status);
+        $this->assertSame(0.5, (float) $fresh->weight, 'Nada debe haber cambiado.');
     }
 
     /**
      * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): esta página ya NO puede
      * aprobar/publicar una relación - eso ahora exige el flujo autorizado de Phase C2
-     * (`ReviewedProposalService::freeze()` + `apply()`). Reemplaza al viejo
-     * `editing_a_relation_without_changing_its_endpoints_or_type_still_saves`, que probaba
-     * justamente el camino que este hallazgo pidió cerrar.
+     * (`ReviewedProposalService::freeze()` + `apply()`).
+     *
+     * TASK-0005 re-audit (corrección 2): corre sobre una fila fuera del ciclo C2 a propósito. Para
+     * una `candidate` el bloqueo ahora ocurre ANTES (403 al abrir la página, ver
+     * `a_candidate_relation_cannot_even_open_the_edit_page`), lo que dejaría sin ejercitar el guard
+     * HIGH-2 de `handleRecordUpdate()`, que sigue existiendo y debe seguir probado. Con una fila
+     * editable se alcanza ese guard de verdad: la publicación se corta ahí, no por la ruta.
      */
     #[Test]
     public function editing_a_relation_to_approve_it_is_blocked_publication_requires_phase_c2(): void
     {
-        $a = $this->concept('zzz_rel_c2gate_a_'.uniqid());
-        $b = $this->concept('zzz_rel_c2gate_b_'.uniqid());
-        $relation = TaxonomyConceptRelation::create([
-            'source_concept_id' => $a->id, 'target_concept_id' => $b->id, 'relation_type' => 'RELATED_TO',
-            'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
-        ]);
+        $relation = $this->relationWithReviewCycleOver('zzz_rel_c2gate');
 
         Livewire::actingAs($this->authorizedUser())
             ->test(EditTaxonomyConceptRelation::class, ['record' => $relation->getRouteKey()])
             ->fillForm([
-                'source_concept_id' => $a->id,
-                'target_concept_id' => $b->id,
+                'source_concept_id' => $relation->source_concept_id,
+                'target_concept_id' => $relation->target_concept_id,
                 'relation_type' => 'RELATED_TO',
                 'weight' => 0.75,
                 'confidence' => 0.5,
@@ -276,7 +330,7 @@ class TaxonomyConceptRelationValidationTest extends TestCase
             ->call('save');
 
         $fresh = $relation->fresh();
-        $this->assertSame(TaxonomyConceptRelation::STATUS_CANDIDATE, $fresh->status, 'No debe quedar aprobada.');
+        $this->assertSame(TaxonomyConceptRelation::STATUS_REJECTED, $fresh->status, 'No debe quedar aprobada.');
         $this->assertSame(0.5, (float) $fresh->weight, 'Ningún campo de este submit debe persistir - se corta antes del update.');
     }
 
@@ -316,28 +370,25 @@ class TaxonomyConceptRelationValidationTest extends TestCase
             'weight' => 0.5, 'confidence' => 0.5, 'status' => TaxonomyConceptRelation::STATUS_CANDIDATE,
         ]);
 
-        // TASK-0004, re-audit HIGH-2: desde esta corrección, intentar aprobar por esta página queda
-        // bloqueado INCONDICIONALMENTE (ver `editing_a_relation_to_approve_it_is_blocked_publication_requires_phase_c2`)
-        // - el gate de Phase C2 corta ANTES de siquiera llegar a la revalidación semántica que este
-        // test originalmente aislaba. El resultado esperado (sigue candidate, no se aprueba) se
-        // mantiene igual - más estricto, no menos - así que el escenario se conserva como
-        // regresión, aunque el guard que efectivamente lo bloquea ya no sea el mismo.
-        Livewire::actingAs($this->authorizedUser())
-            ->test(EditTaxonomyConceptRelation::class, ['record' => $waiting->getRouteKey()])
-            ->fillForm([
-                'source_concept_id' => $a->id,
-                'target_concept_id' => $b->id,
-                'relation_type' => 'RELATED_TO', // endpoints/tipo SIN cambiar
-                'weight' => 0.5,
-                'confidence' => 0.5,
-                'status' => TaxonomyConceptRelation::STATUS_APPROVED, // pero SÍ se intenta aprobar
-            ])
-            ->call('save');
+        // TASK-0004, re-audit HIGH-2: intentar aprobar por esta página quedó bloqueado
+        // INCONDICIONALMENTE - el gate de Phase C2 corta ANTES de llegar a la revalidación semántica
+        // que este test originalmente aislaba.
+        //
+        // TASK-0005 re-audit (corrección 2): ahora se corta incluso antes - `$waiting` es
+        // `candidate`, o sea participa del ciclo C2, así que la página de edición devuelve 403 y el
+        // submit no existe como camino. El resultado esperado del escenario es el mismo (sigue
+        // candidate, no se aprueba), más estricto, no menos, así que se conserva como regresión.
+        // La revalidación semántica en sí (el objeto original del hallazgo 6 de TASK-0003) sigue
+        // probada de forma aislada y directa en
+        // `the_model_itself_refuses_to_be_saved_as_approved_when_no_longer_valid`, más abajo.
+        $this->actingAs($this->authorizedUser())
+            ->get(TaxonomyConceptRelationResource::getUrl('edit', ['record' => $waiting]))
+            ->assertForbidden();
 
         $this->assertSame(
             TaxonomyConceptRelation::STATUS_CANDIDATE,
             $waiting->fresh()->status,
-            'No debe poder aprobarse - ya existe una relación equivalente aprobada (y, además, la publicación por esta página ya está bloqueada de por sí).'
+            'No debe poder aprobarse - ya existe una relación equivalente aprobada, y la edición de una fila en revisión C2 está cerrada de por sí.'
         );
     }
 

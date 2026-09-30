@@ -402,7 +402,168 @@ la contraseña. No se rotó ninguna credencial ni token.
 
 ---
 
-## 10. Condiciones STOP — ninguna alcanzada
+## 10. Re-audit — comentario `5917275454` (dos correcciones)
+
+El orquestador revisó HEAD `9d96587` y devolvió `CORRECTIONS_REQUIRED` con exactamente dos
+hallazgos, aceptando todo el resto (UI de candidatos, CREATE_NEW explícito, REJECT estructurado,
+camino de freeze de relaciones, solo-lectura del recurso de propuestas, guardas legacy, hardening del
+trigger, evidencia de tests, despliegue de staging, invariantes, regresión de 32 queries heredada).
+Se corrigieron **únicamente** esos dos hallazgos.
+
+Texto verbatim del comentario: ver `docs/orquestador/tasks/0005-c2-human-review-ui.md`.
+
+### Corrección 1 — fuga de autorización entre tipos de origen
+
+**Defecto real.** `TaxonomyReviewedProposalPolicy` usaba semántica OR: quien podía ver candidatos
+podía abrir el detalle de una propuesta de RELACIÓN y viceversa. Y como el listado no estaba
+filtrado, un usuario con permiso para UN solo tipo veía filas de AMBOS.
+
+**Arreglo.**
+
+| Pieza | Cambio |
+|---|---|
+| `TaxonomyReviewedProposalPolicy::view()` | Resuelve por `proposal_type`: `TYPE_TERM_CONCEPT_LINK` exige `view_taxonomy::candidate::concept::link`, `TYPE_CONCEPT_RELATION` exige `view_taxonomy::concept::relation`. Se eliminó el OR. Un `proposal_type` desconocido devuelve `false` (default cerrado) |
+| `TaxonomyReviewedProposalPolicy::viewAny()` | Sigue siendo OR **a propósito**: es el permiso de ENTRAR al listado, y quien puede ver al menos un tipo debe poder abrirlo. No es lo que evita la fuga |
+| `TaxonomyReviewedProposalPolicy::visibleProposalTypes()` | Nuevo helper: los tipos que el usuario puede listar. Devuelve `[]` sin permisos (y `whereIn(..., [])` compila a `0 = 1`, o sea cero filas — sin tipo centinela) |
+| `TaxonomyReviewedProposalResource::getEloquentQuery()` | Nuevo override que filtra `proposal_type` por esos tipos. **Esto es lo que cierra la fuga del listado** |
+| `TaxonomyReviewedProposalResource::canAccess()` | Reescrito sobre el mismo helper, para que no pueda divergir de la policy |
+
+**Por qué el filtrado del query también cubre la URL directa:** `ViewRecord` resuelve el registro
+contra `getEloquentQuery()`, así que una propuesta de otro tipo no resuelve (404) además del 403 que
+daría la policy `view()`. Defensa en dos capas, verificado en los tests con ambos códigos aceptados
+como "denegado".
+
+**Super-admin:** sin tratamiento especial ni bypass. Se hereda del modelo de permisos normal del
+proyecto (Shield concede todos los permisos al rol `super_admin`), así que ambos chequeos dan
+verdadero por la vía habitual.
+
+**Tests (9, todos en verde):** viewer solo-candidatos, viewer solo-relaciones, viewer con ambos
+permisos y viewer sin permisos, cubriendo visibilidad del listado **y** acceso por URL directa al
+detalle, más un test del query filtrado por persona y otro de identidad exacta de filas.
+
+**Nota metodológica sobre el nivel de aserción (no es una concesión).** Los tres tests de visibilidad
+del listado se aseveran sobre el query de la página, no sobre el HTML renderizado
+(`assertCanSeeTableRecords`), por una limitación real del entorno local:
+
+1. `AdminPanelProvider::boot()` aplica `Table::configureUsing(fn ($t) => $t->deferLoading())` a
+   TODAS las tablas del panel, así que el mount inicial solo renderiza la carcasa y las filas llegan
+   en un segundo request (`wire:init="loadTable"`). Sin disparar esa carga, cualquier
+   `assertCanNotSeeTableRecords` pasaría trivialmente sobre una tabla vacía.
+2. Pero disparar la carga renderiza la vista de paginación de Filament, que llama `Number::format()`
+   y por lo tanto exige `ext-intl` — ausente en este entorno local Windows (la misma limitación
+   preexistente que bloquea un test de TASK-0002; en el runtime real de staging sí está).
+
+Por eso se asevera sobre `ListRecords::getTableQuery()`, que devuelve **textualmente**
+`static::getResource()::getEloquentQuery()` y es la única fuente de filas de la tabla — y el propio
+test comprueba esa equivalencia (SQL + bindings), de modo que si alguien override-ara
+`getTableQuery()` en la página el test falla en vez de quedar obsoleto en silencio. Es identidad
+exacta de filas por persona, no presencia de markup: evidencia más fuerte, no más débil.
+
+Esto explica retroactivamente el `wire:init` observado en staging en la ronda anterior: era el
+`deferLoading()` del panel, no un problema.
+
+### Corrección 2 — Edit/Delete legacy sobre relaciones en revisión C2
+
+**Defecto real.** `TaxonomyConceptRelationResource` exponía `EditAction` + `DeleteAction` sobre
+cualquier fila y mantenía páginas de create/edit. La publicación-vía-edit ya estaba bloqueada
+(TASK-0004 HIGH-2), pero un revisor común todavía podía **mutar o borrar** una relación candidata al
+margen del ciclo inmutable — y borrar la fila fuente destruye la evidencia/estado de la revisión en
+lugar de producir un REJECT congelado.
+
+**Definición única de "gobernada por C2":** nuevo `TaxonomyConceptRelation::isUnderC2Review()` —
+`status === candidate` **o** existe una propuesta `PENDING_APPLY`. Dos condiciones y no una: la
+primera es la población que Phase C1 encola para revisión; la segunda cubre una decisión ya congelada
+esperando ejecución sobre una fila que ya no esté en `candidate`. El resource y el guard de modelo
+usan ese mismo predicado, así que no pueden divergir.
+
+**Arreglo, en tres capas:**
+
+| Capa | Cambio | Qué cierra |
+|---|---|---|
+| Recurso | `canEdit()`/`canDelete()` devuelven false para filas bajo revisión C2, además del permiso normal | La acción de tabla **y la ruta**: verificado en el código de Filament que `EditRecord::authorizeAccess()` hace `abort_unless(canEdit($record), 403)` |
+| UI | `->visible()` explícito en `EditAction`/`DeleteAction` sobre el mismo predicado | Redundante a propósito: no depende de qué hook interno consulte cada versión de Filament |
+| Modelo | Nuevo guard `deleting` en `booted()`, incondicional | Cualquier punto de entrada (panel, tinker, futura API). `apply()` nunca borra relaciones, así que no hay camino legítimo que necesite pasar |
+
+**CRUD administrativo conservado, acotado y documentado:** crear relaciones nuevas, y editar/borrar
+relaciones cuyo ciclo de revisión ya terminó (`approved`/`rejected` sin propuesta pendiente). Crear
+no puede rodear ninguna revisión: una fila nueva en `candidate` queda inmediatamente gobernada por
+C2, y la transición directa a `approved` sigue bloqueada por el guard de publicación del modelo.
+
+**Hallazgo de diseño que condicionó el arreglo.** Un guard de modelo sobre `update` habría sido la
+opción obvia, pero rompe TASK-0004: el `apply()` de REJECT en relaciones
+(`ReviewedProposalService`, ~línea 720) muta la relación **fuera** de `withC2PublicationContext()` —
+solo el camino de aprobación corre dentro. Un guard de `saving` que exigiera ese contexto habría
+invalidado el camino de rechazo ya aprobado. Por eso la restricción de **edición** vive en la capa de
+recurso/ruta, y solo el **borrado** (la operación destructiva, que `apply()` nunca hace) se bloquea a
+nivel de modelo. `ReviewedProposalService` no se tocó en absoluto.
+
+**Tests (14, todos en verde):** acción de tabla oculta, ruta `/edit` con 403, fila con propuesta
+`PENDING_APPLY` aunque no sea `candidate`, guard de modelo contra el borrado, rechazo como decisión
+C2 que nunca elimina la fila fuente, CRUD administrativo que sí funciona para filas fuera del ciclo,
+y el guard de publicación de TASK-0004 todavía vigente.
+
+### Tests preexistentes actualizados (comportamiento deliberadamente cambiado)
+
+Cuatro tests de `TaxonomyConceptRelationValidationTest` (evidencia de TASK-0003 hallazgo 6) fallaron
+tras la corrección 2, **y el fallo era correcto**: los cuatro abrían la página de edición de una
+relación `candidate`, que ahora devuelve 403. Codificaban el comportamiento que esta corrección pidió
+cerrar. Mismo precedente que TASK-0004 ronda 2, cuando cerrar HIGH-2 obligó a actualizar 6 tests en
+3 archivos.
+
+Ninguna aserción se debilitó ni se saltó: en cada caso se preservó la propiedad que el test protege,
+moviéndola a una fila donde la operación sigue siendo alcanzable, y se documentó en el propio archivo.
+
+| Test | Qué protegía | Cómo se preservó |
+|---|---|---|
+| `editing_a_relation_to_duplicate_another_existing_one_is_rejected` | La página revalida al cambiar endpoints, no guarda a ciegas | Corre sobre una fila fuera del ciclo C2 (`rejected`); la revalidación se sigue ejercitando de verdad |
+| `editing_a_relation_without_changing_its_endpoints_type_or_status_still_saves` | Una edición benigna sí guarda | Igual, sobre fila fuera del ciclo |
+| `editing_a_relation_to_approve_it_is_blocked_publication_requires_phase_c2` | Guard HIGH-2 en `handleRecordUpdate()` | Corre sobre fila editable **a propósito**: con una `candidate` el 403 cortaría antes y dejaría ese guard sin ejercitar. Así se alcanza el guard real |
+| `approving_a_relation_that_became_a_duplicate_while_it_waited_for_review_is_rejected` | Revalidación por obsolescencia al aprobar | Se conserva el escenario y su resultado (sigue `candidate`), ahora vía 403. La revalidación semántica en sí sigue probada de forma aislada y directa en `the_model_itself_refuses_to_be_saved_as_approved_when_no_longer_valid` |
+
+Se agregó además `a_candidate_relation_cannot_even_open_the_edit_page`, que convierte en propiedad
+explícita lo que antes estaba implícito. Resultado: **11/11** en ese archivo (antes 10).
+
+### Observación adyacente registrada, NO corregida (disciplina de alcance)
+
+Editar los endpoints de una relación ya `approved` mutaría taxonomía publicada, y el guard de
+`booted()` solo dispara cuando `status` **cambia hacia** `approved` (`isDirty('status')`), así que no
+cubre ese caso. Es un hueco **preexistente**, ajeno a los dos hallazgos de este re-audit y no
+introducido por esta corrección. El comentario pide corregir únicamente los dos hallazgos indicados,
+así que se deja registrado acá para que el orquestador decida, en lugar de ampliar el alcance por
+cuenta propia. Por el mismo motivo, el helper de tests usa `rejected` y no `approved` para
+representar "ciclo de revisión terminado".
+
+### Resultados de tests del re-audit
+
+Entorno local seguro (PHP 8.2.34 contra la instancia compartida de Supabase), fixtures desechables
+dentro de `DatabaseTransactions`. **No** se reusó el procedimiento de contenedor efímero sobre los
+bind mounts de staging.
+
+| Archivo | Resultado | Rol |
+|---|---|---|
+| `TaxonomyReviewedProposalResourceTest` | **11/11 PASS** | Corrección 1 (policy por tipo + query filtrado + URL directa) |
+| `TaxonomyConceptRelationReviewTest` | **14/14 PASS** | Corrección 2 (edit/delete bloqueados, guard de modelo, CRUD acotado) |
+| `TaxonomyConceptRelationValidationTest` | **11/11 PASS** | TASK-0003 hallazgo 6 + TASK-0004 HIGH-2, con los 4 tests de edición actualizados y 1 nuevo |
+| `ReviewedProposalServiceTest` | **41/41 PASS** | Contrato C2 de TASK-0004 — sin regresión |
+| `CandidateConceptApprovalServiceTest` | **27/27 PASS** | El camino legacy sigue sin poder publicar rodeando C2 |
+| `CanonicalConceptApplyServiceTest` | **21/21 PASS** | Phase C1 — sin regresión |
+| `TaxonomyCandidateConceptLinkReviewTest` | **13/14** | UI de candidatos (no modificada en este re-audit) |
+
+**Total: 138 passed, 1 failed.** El único fallo es
+`viewing_a_propose_new_concept_candidate_with_duplicate_signals_does_not_500` — el mismo gap
+preexistente de `ext-intl` en Windows local documentado en todas las rondas de esta sesión, verde en
+el runtime real de staging (evidencia de TASK-0004 ronda 6). Se reporta tal cual, sin alterar ni
+saltar ninguna aserción.
+
+**Invariantes:** 10/2/142/79/9749/0 antes y después de las corridas. Los 10 candidatos y 2 relaciones
+reales nunca se tocaron: ningún `freeze`/`apply`/`reject`/`context-resolve` corrió contra ellos, y
+`taxonomy_reviewed_proposals` sigue en 0 filas.
+
+### Sin migraciones
+
+Ninguna de las dos correcciones necesitó cambio de esquema.
+
+## 11. Condiciones STOP — ninguna alcanzada
 
 Nada de lo siguiente ocurrió ni fue necesario: despliegue a producción, merge a `main`, migración
 destructiva, rotación de credenciales/tokens, cambio de taxonomía publicada, procesar/congelar/
