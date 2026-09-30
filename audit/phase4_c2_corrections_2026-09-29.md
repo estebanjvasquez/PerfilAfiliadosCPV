@@ -458,3 +458,81 @@ correction; doing so would invalidate the inherited search regression and broade
 - `tests/Unit/Taxonomy/ReviewedProposalServiceTest.php` — 1 test nuevo (defecto 1, nombre revisado
   distinto del sugerido, sin drift), 1 test nuevo (defecto 2, drift de term_id en CONTEXT_REQUIRED),
   1 aserción adicional en un test existente, fraseo de comentario de sección corregido.
+
+---
+---
+
+# Ronda 5 — evidencia de entorno (Issue #2, comentario `5913324183`)
+
+**Revisado en:** HEAD `571c55a` (TASK-0004 ronda 4, READY_FOR_REVIEW)
+**Verdict:** `TASK-0004 C2 IMPLEMENTATION = PASS; FINAL CLOSURE = ENVIRONMENT_GATE_PENDING`. Este
+comentario NO pidió ningún cambio de código - confirmó explícitamente que los 2 defectos semánticos
+de la ronda 4 están cerrados correctamente y que HIGH-1/HIGH-2/GATE-3/las correcciones A/B/C de la
+ronda 3 siguen vigentes sin cambios. Lo único pendiente para el cierre final es evidencia limpia de
+la suite completa en un entorno válido/CI, sin tocar la semántica C2.
+
+**Esta ronda NO modificó ningún código de producción ni de tests** - es puramente investigación de
+entorno y documentación, por decisión explícita del usuario tras presentarle las opciones (ver abajo).
+
+## Investigación de entorno
+
+Se investigó por qué Docker Desktop viene fallando de forma persistente desde la ronda 2 (motor
+devolviendo error 500 en cada endpoint) - hasta ahora diagnosticado solo como "el motor no arranca",
+sin causa raíz confirmada. Esta ronda encontró la causa raíz real:
+
+```
+> wsl --status
+WSL2 is unable to start since virtualisation is not enabled on this machine.
+Please ensure the "Virtual Machine Platform" optional component is enabled and
+virtualisation is turned on in your computer's firmware settings.
+
+> wsl --list --verbose
+Windows Subsystem for Linux has no installed distributions.
+```
+
+**La virtualización de hardware está deshabilitada a nivel de firmware/BIOS en esta máquina.** Esto
+explica por completo el patrón observado en las rondas 2-4 (Docker Desktop con sus procesos corriendo
+pero el motor inalcanzable) - Docker Desktop en Windows necesita un backend WSL2 O Hyper-V para
+arrancar su motor, y NINGUNO de los dos puede iniciar sin virtualización de hardware habilitada en el
+firmware. La nota de la ronda 2 ("el usuario habilitó Virtual Machine Platform/WSL2 y reinició la
+máquina") describía correctamente haber habilitado el COMPONENTE OPCIONAL de Windows, pero eso por sí
+solo no alcanza si la virtualización sigue apagada en el firmware/BIOS - son dos interruptores
+distintos, y sin el segundo el primero no tiene efecto. Esto **no es corregible desde esta sesión**
+(ni con privilegios de administrador de Windows) - requiere acceso físico a la máquina para entrar al
+firmware/BIOS y cambiar esa configuración, más un reinicio.
+
+Procesos de Docker Desktop encontrados corriendo (y varios procesos "Docker Desktop Installer") con
+fecha de inicio del 2026-09-28/29 - es decir, de sesiones/intentos anteriores, no de un arranque nuevo
+en esta sesión - consistentes con procesos zombie que nunca pudieron completar su arranque real por la
+misma causa raíz.
+
+## Camino alternativo evaluado: GitHub Actions CI
+
+El propio comentario `5913324183` autoriza explícitamente agregar "environment/CI configuration
+needed to execute it" (sin tocar semántica C2) como camino de cierre. Un workflow de GitHub Actions
+(`ubuntu-latest` + PHP con `intl` vía `shivammathur/setup-php`) resolvería LOS DOS problemas de una
+vez (el gap de `ext-intl` Y el bloqueo de Docker/WSL2 local), corriendo contra la misma instancia
+compartida real de Supabase.
+
+**Requiere agregar las credenciales de conexión a Supabase (`DB_PGSQL_*` de `.env`) como secretos
+nuevos del repositorio de GitHub** - una acción sobre configuración/credenciales compartidas de CI/CD,
+fuera del alcance de lo que esta sesión debe decidir unilateralmente.
+
+## Decisión del usuario
+
+Presentadas 3 opciones (configurar CI de GitHub Actions con secretos nuevos; que el usuario habilite
+virtualización en firmware/BIOS él mismo y se reintente Docker; o documentar el hallazgo y detenerse
+sin cambios adicionales de entorno), **el usuario eligió explícitamente la tercera: documentar el
+estado actual y detenerse.** No se configuró CI, no se tocaron secretos del repositorio, no se
+reintentó Docker más allá de la verificación de diagnóstico de arriba.
+
+## Estado del gate de entorno tras esta ronda
+
+Sin cambios respecto a la ronda 3/4: **187/189 PASS (595 assertions)** sigue siendo la última
+evidencia real de la suite completa (ronda 3, HEAD `b207361`/`835fdae`), con el gap de `ext-intl` ya
+documentado y el corte transitorio de conexión a Supabase ya confirmado no-reproducible. La evidencia
+DIRECTAMENTE afectada por los cambios de las rondas 3/4/5 (`ReviewedProposalServiceTest`) está limpia
+en HEAD `d3638bf`/`571c55a`: **41/41 PASS (120 assertions)**. La causa raíz del bloqueo de entorno
+ahora está identificada con precisión (virtualización de firmware deshabilitada) en vez de solo
+"Docker no arranca" - eso no cambia el resultado (sigue bloqueado), pero deja un diagnóstico accionable
+para cuando el usuario decida resolverlo (en firmware) o autorizar CI.

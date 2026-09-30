@@ -325,9 +325,61 @@ Corrige ÚNICAMENTE la interpretación de GATE 3 del comentario anterior. Texto 
 >
 > STOP at READY_FOR_REVIEW with exact HEAD.
 
+## Re-audit — comentario [`5913324183`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5913324183) (2026-09-30T14:28:12Z) — IMPLEMENTATION PASS, ENVIRONMENT GATE REMAINS
+
+> [ORCHESTRATOR RE-AUDIT — TASK-0004 / PHASE C2 — IMPLEMENTATION PASS, ENVIRONMENT GATE REMAINS]
+>
+> Reviewed READY_FOR_REVIEW at HEAD `571c55a` against prior review HEAD `835fdae`, preserving the continuity ledger and prior accepted gates.
+>
+> RESULT
+> The two semantic defects from comment `5909267134` are correctly closed.
+>
+> 1. CREATE_NEW — PASS
+> - `freeze()` now preserves two independent values:
+>   - `new_concept_name`: explicit human-reviewed publication value.
+>   - `source_suggested_new_concept_name`: source/Builder snapshot used only for drift detection.
+> - `apply()` compares the live candidate suggestion against `source_suggested_new_concept_name`, not against the human-reviewed name.
+> - Publication uses the frozen reviewed `new_concept_name`.
+> - This correctly permits Builder X → reviewer Y without false SOURCE_DRIFT while still detecting a real post-freeze X → Z source mutation.
+> - Directed test evidence: `ReviewedProposalServiceTest` 41/41 PASS, 120 assertions, including the required reviewer-X/Y case and retained real-drift case.
+>
+> 2. CONTEXT_REQUIRED term identity — PASS
+> - frozen `term_id` is revalidated before the CONTEXT_REQUIRED branch.
+> - post-freeze `suggested_term_id` mutation now aborts `SOURCE_FIELD_DRIFTED`.
+> - CONTEXT_REQUIRED still performs zero direct taxonomy mapping/concept creation.
+> - dedicated drift test is present and included in the clean 41/41 directed suite.
+>
+> 3. Search-evidence wording — PASS
+> Documentation now correctly states that the term/reviewer reason is preserved for POSSIBLE FUTURE contextual use and that no current search consumer reads this state. No search consumer was added, so the inherited frozen search regression remains valid.
+>
+> CONTINUITY / INHERITED GATES
+> - Phase C1 remains APPROVED at `ce11d36`.
+> - TASK-0002 remains APPROVED.
+> - Frozen 32-query regression remains inherited APPROVED evidence: 32/32, 0 HTTP errors, 0 compared-field diffs. Current diff does not modify live search/ranking/published taxonomy, so rerun is NOT required.
+> - DB invariants remain reported unchanged: 10 candidate links / 2 candidate relations / 142 term concepts / 79 canonical concepts / 9749 TERM→CPV / 0 reviewed proposals.
+> - Existing real 10/2 review rows remain untouched.
+> - No live C2 freeze/apply, candidate decision, taxonomy publication, main merge, or new schema migration occurred in this round.
+> - No hardcoded treatment of the 10 real terms was introduced.
+> - Sibling search-consumer audit remains inherited from the prior reproducible check at `estebanjvasquez/perfilafiliados-mcp` branch `master`, SHA `29de993c12fbdadf0577c3630cc07611af020a46`; deployed Worker SHA remains unverified as previously qualified.
+>
+> ENVIRONMENT GATE
+> The full taxonomy-suite gate remains ENVIRONMENT_BLOCKED rather than a known C2 code failure. Last full-suite evidence remains 187/189 PASS with the established missing `ext-intl` environment issue and one transient Supabase pooler disconnect that subsequently passed on isolated reruns. The directly affected `ReviewedProposalServiceTest` is now clean at this HEAD (41/41, 120 assertions).
+>
+> Therefore:
+> - TASK-0004 implementation/code review: PASS.
+> - TASK-0004 final closure: BLOCKED ONLY by the previously documented clean-full-suite environment gate.
+> Do not modify unrelated production code or skip/alter tests to manufacture closure. The appropriate closure evidence is a clean full taxonomy suite at this exact implementation (or a descendant containing only environment/CI configuration needed to execute it) in a valid PHP environment with required extensions.
+>
+> No authorization is granted by this PASS to review/freeze/apply/publish the existing 10 candidates or 2 relations, merge to main, or deploy to production.
+>
+> NEXT ACTION
+> Obtain clean full taxonomy-suite evidence in a valid environment/CI without changing C2 semantics. Then STOP at READY_FOR_REVIEW with exact HEAD and test evidence. If that run is clean and no substantive code/search/data change occurred, no 32-query rerun is required.
+>
+> STATUS: TASK-0004 C2 IMPLEMENTATION = PASS; FINAL CLOSURE = ENVIRONMENT_GATE_PENDING.
+
 ## Estado
 
 Ver `docs/orquestador/current_task.md` para el estado vigente, el ledger de gates heredados, y la
 máquina de estados exacta implementada (documentada en `audit/phase4_c2_immutable_apply.md`,
 `audit/phase4_c2_corrections_2026-09-29.md` — incluye las secciones "Ronda 3" (comentario
-`5892711739`) y "Ronda 4" (comentario `5909267134`)).
+`5892711739`), "Ronda 4" (comentario `5909267134`) y "Ronda 5" (comentario `5913324183`)).
