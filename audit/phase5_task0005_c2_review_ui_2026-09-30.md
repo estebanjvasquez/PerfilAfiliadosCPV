@@ -294,7 +294,101 @@ pendientes/context-required/revisados-pero-no-aplicados por **separación de tab
 
 ## 8. Sección I — despliegue a staging y smoke
 
-Ver sección "Despliegue y validación" más abajo, completada tras el push del commit de código.
+### Mecanismo y HEAD desplegado
+
+El despliegue ocurrió por el mecanismo existente (ya corregido por la sección G): el push del commit
+de código disparó el workflow, que no matchea ningún patrón de `paths-ignore` porque incluye
+`app/**`, `tests/**` y `.github/workflows/**`.
+
+| Dato | Valor |
+|---|---|
+| Commit de código | `b92e8739e27bc8ab8fa2d4caa15579e5c55d253d` |
+| Base | `63cf811112e8baff87c7382528ecac42b7a07c6e` |
+| Run de GitHub Actions | `36749145662` — `conclusion: success`, 2026-09-30T17:07:27Z → 17:08:03Z |
+| HEAD verificado en el servidor | `git rev-parse HEAD` = `b92e8739e27bc8ab8fa2d4caa15579e5c55d253d` (coincidencia exacta) |
+| Contenedores | `app running`, `nginx running` |
+| Migraciones pendientes | ninguna (`migrate:status` sin filas `Pending`) — esta tarea no introdujo ninguna migración |
+
+**Nota sobre el push de documentación (evidencia en vivo de la sección G):** el segundo commit de
+esta tarea toca exclusivamente `audit/**` y `docs/**`, así que **no dispara despliegue** — es la
+primera comprobación real del hardening. Por eso el HEAD de la rama es ese commit de documentación
+mientras staging corre `b92e873`: no es drift, es el comportamiento buscado. Todo el runtime de
+TASK-0005 está en `b92e873`, que es exactamente lo que está desplegado y validado.
+
+Como contraste, el checkpoint `63cf811` de TASK-0004 (solo documentación) **sí** había disparado un
+rebuild+redeploy completo (run `36738959012`) — el desperdicio que la sección G corrige.
+
+### Smoke HTTP público (sin autenticar)
+
+| URL | Resultado |
+|---|---|
+| `https://pruebas.camarapetrolera.app/` | **200** |
+| `https://pruebas.camarapetrolera.app/admin/login` | **200** |
+| `/admin/taxonomy-candidate-concept-links` | **302** → login (esperado sin sesión) |
+| `/admin/taxonomy-concept-relations` | **302** → login |
+| `/admin/taxonomy-reviewed-proposals` | **302** → login |
+
+Cero 500 y cero 503. El **302** (no 404) en `/admin/taxonomy-reviewed-proposals` ya prueba por sí
+solo que la ruta del resource nuevo quedó registrada en el código desplegado.
+
+### Render autenticado de las páginas de revisión
+
+Ejecutado dentro del contenedor desplegado vía el HTTP kernel real de Laravel, actuando como el
+usuario revisor real (id 3, rol `super_admin` — el mismo cuya sesión originó el incidente de
+TASK-0002). **Solo peticiones GET**: abrir una página de Filament nunca muta un candidato
+(establecido en TASK-0002), y no se invocó ninguna acción.
+
+| Página | Resultado |
+|---|---|
+| `/admin/taxonomy-candidate-concept-links` | **HTTP 200**, 183 741 bytes |
+| `/admin/taxonomy-concept-relations` | **HTTP 200**, 171 156 bytes |
+| `/admin/taxonomy-reviewed-proposals` | **HTTP 200**, 180 973 bytes |
+
+Los labels de las acciones/columnas **no** aparecen en ese HTML inicial, y eso es correcto, no un
+fallo: el HTML contiene `wire:init`, o sea que Filament v3 renderiza la tabla de forma diferida en
+una petición Livewire posterior cuya firma/snapshot no es sintetizable a mano desde tinker. Por eso
+la visibilidad de la UI se evidenció estructuralmente (abajo) en lugar de por scraping de HTML.
+
+### Verificación estructural sobre el código DESPLEGADO
+
+Introspección de las definiciones reales de tabla/resource en el contenedor de staging:
+
+| Comprobación | Resultado |
+|---|---|
+| Acciones de tabla en candidatos | `view` \| `freezeReview` — las legacy `approve`/`reject`/`resolveNewConcept` ya no existen |
+| Acciones de tabla en relaciones | `freezeReview` \| `edit` \| `delete` (las dos últimas preexistentes; `edit` sigue bloqueando aprobar-vía-edit) |
+| Acciones de tabla en propuestas revisadas | `view` únicamente |
+| Columna de estado C2 (`reviewed_proposal_state`) | presente en candidatos **y** relaciones |
+| `TaxonomyReviewedProposalResource::canViewAny()` | `true` para el revisor real |
+| `TaxonomyReviewedProposalResource::canCreate()` | `false` |
+| Páginas del resource de propuestas | `index`, `view` — sin `create`/`edit`/`delete` |
+| Acción `apply`/`publish` alcanzable | **ninguna, en ningún resource** |
+| Policy del revisor sobre un candidato pendiente real (id 266) | `can('update')` = `true`, o sea la acción de freeze sería visible y usable |
+
+Esto satisface "verify the new review UI is visible/usable" **sin ejecutar un freeze real** — la
+tarea prohíbe explícitamente hacer un freeze solo para demostrar la UI, y no se hizo ninguno.
+
+### Invariantes y filas reales después del despliegue
+
+| Tabla | Valor |
+|---|---|
+| `taxonomy_candidate_concept_links` | 10 |
+| `taxonomy_concept_relations` | 2 |
+| `taxonomy_term_concepts` | 142 |
+| `taxonomy_canonical_concepts` | 79 |
+| `taxonomy_term_cpv_relations` | 9749 |
+| `taxonomy_reviewed_proposals` | 0 |
+
+Además, verificación explícita de que ninguna decisión se tomó:
+
+- estados de candidatos: `pending:10` (los 10, sin excepción);
+- estados de relaciones: `candidate:2`;
+- candidatos con `reviewed_at` no nulo: **0**.
+
+**No se re-corrió la suite completa contra los bind mounts compartidos del contenedor en vivo** — el
+requerimiento de `5914592664`, reiterado en `5914793857`, se honró. Tampoco se modificó la topología
+de compose ni se creó ningún contenedor efímero, así que el incidente de TASK-0004 ronda 6 no tuvo
+ninguna posibilidad de repetirse.
 
 ---
 
