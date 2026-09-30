@@ -377,9 +377,104 @@ Corrige ÚNICAMENTE la interpretación de GATE 3 del comentario anterior. Texto 
 >
 > STATUS: TASK-0004 C2 IMPLEMENTATION = PASS; FINAL CLOSURE = ENVIRONMENT_GATE_PENDING.
 
+## Autorización de despliegue — comentario [`5913574545`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5913574545) (2026-09-30T14:42:20Z) — OPEN DEPLOYMENT / STAGING VALIDATION TASK
+
+> [ORCHESTRATOR — OPEN DEPLOYMENT / STAGING VALIDATION TASK]
+>
+> Supersedes the prior instruction to stop after TASK-0004 and the local-Docker/environment-validation path.
+>
+> TASK-0004 / Phase C2 remains CLOSED / APPROVED at HEAD `4f1b02e`. The next authorized activity is a CONTROLLED STAGING DEPLOYMENT and integration validation using the existing Contabo + Supabase architecture. Docker local is NOT a prerequisite and should not block progress.
+>
+> TARGET / SCOPE
+> - Deploy the approved C2 implementation to the existing STAGING environment on Contabo (`pruebas.camarapetrolera.app` / corresponding staging application), using the existing Supabase PostgreSQL project and existing Worker/Hyperdrive integration as applicable.
+> - This authorization is for STAGING deployment/validation only. It is NOT authorization to deploy to production, merge to `main`, publish taxonomy, or process the existing review queue.
+> - Preserve the existing 10 `taxonomy_candidate_concept_links` + 2 candidate `taxonomy_concept_relations` untouched.
+> - Do NOT freeze/apply/approve/reject those real rows during deployment tests. Use test fixtures/transactions only.
+>
+> MANDATORY PRE-DEPLOY CHECKPOINT
+> Before changing staging:
+> 1. Identify and record exact source HEAD/branch and exact current staging deployed HEAD/version.
+> 2. Record current Contabo application path, PHP/runtime version/extensions, Laravel environment, queue/scheduler/service state relevant to the app. Never print secrets.
+> 3. Verify DB target is the intended Supabase project/environment; do not touch unrelated databases.
+> 4. Record pre-deploy DB invariants:
+>    - candidate links = expected 10
+>    - candidate relations = expected 2
+>    - term concepts = expected 142
+>    - canonical concepts = expected 79
+>    - TERM→CPV = expected 9749
+>    - reviewed proposals = expected 0
+>    If counts differ, STOP and report before deployment.
+> 5. Determine migrations pending on staging. Review them before execution; no destructive migration is authorized.
+> 6. Establish rollback point/procedure for application code/config. Do not expose/copy secrets into repo or audit files.
+>
+> DEPLOYMENT
+> - Deploy the approved branch/HEAD (or a descendant containing only deployment/environment documentation/configuration necessary for this task) to STAGING on Contabo.
+> - Do not merge to `main` merely to deploy staging.
+> - Preserve environment-specific configuration and secrets.
+> - Run only reviewed additive/non-destructive pending migrations required by the approved implementation against the intended Supabase DB.
+> - Run Laravel cache/config/view maintenance appropriate to the deployment.
+> - Ensure the server PHP environment has the extensions required by the application, specifically including `intl`; install/enable only what is required and document runtime changes.
+> - Do not rotate credentials/tokens unless separately authorized.
+>
+> VALIDATION ON CONTABO/STAGING
+> After deployment:
+> 1. Confirm Laravel boots normally and staging returns expected HTTP responses.
+> 2. Confirm Filament/admin authentication and taxonomy review pages load without 500/503.
+> 3. Run the FULL taxonomy test suite from the valid server/runtime environment with `ext-intl`. Record exact command, HEAD, test count/assertions/failures and timestamp.
+> 4. Run the directed C2 `ReviewedProposalServiceTest` as confirmation.
+> 5. Verify C2 schema/table availability and migration status.
+> 6. Perform C2 smoke/integration validation ONLY with disposable fixtures inside rollback-capable transactions/test mechanisms. Do not use the 10/2 real review rows.
+> 7. Verify candidate/pending/CONTEXT_REQUIRED data cannot leak into published search mappings.
+> 8. Verify Worker/Hyperdrive/Supabase connectivity required by staging without changing search/ranking semantics.
+> 9. Recheck DB invariants after all tests. The protected/live counts and real 10/2 queue must remain unchanged; `taxonomy_reviewed_proposals` must have no persistent test residue.
+>
+> SEARCH REGRESSION
+> The accepted frozen 32-query regression remains inherited evidence. Do NOT rerun it solely because code was deployed if the deployed source/search logic/published taxonomy is unchanged. If deployment reveals a change to live search/ranking/Worker code or published taxonomy that invalidates that evidence, STOP and report before broadening scope.
+>
+> ROLLBACK / STOP CONDITIONS
+> Immediately stop and rollback application deployment where appropriate if:
+> - wrong DB/environment is detected;
+> - a destructive/unexpected migration is pending;
+> - protected taxonomy counts change unexpectedly;
+> - real 10/2 rows are modified;
+> - staging cannot boot after deployment;
+> - tests reveal a substantive C2/taxonomy regression;
+> - deployment would require credential rotation, production change, main merge, or destructive DB operation not authorized here.
+>
+> EVIDENCE / HANDOFF
+> Update Issue #2 / audit handoff with:
+> - deployed source HEAD and staging previous/new version;
+> - Contabo runtime/PHP extension evidence;
+> - migrations executed;
+> - full taxonomy-suite result;
+> - directed C2-suite result;
+> - HTTP/Filament smoke results;
+> - Worker/Hyperdrive/Supabase connectivity result;
+> - DB before/after invariants;
+> - any server/runtime configuration changes;
+> - explicit confirmation that 10 candidates + 2 relations were untouched;
+> - rollback status/rollback point;
+> - any remaining blockers.
+>
+> Do not record secrets.
+>
+> AUTHORIZATION BOUNDARY
+> AUTHORIZED: controlled deployment of approved C2 code to existing STAGING on Contabo, required additive approved migrations on the intended Supabase environment, server runtime configuration needed to run the app/tests, and non-destructive staging validation.
+>
+> NOT AUTHORIZED: production deployment, merge to main, destructive migrations, credential/token rotation, bulk taxonomy operations, publication, or review/freeze/apply/reject of the existing 10 candidates or 2 relations.
+>
+> STOP when staging deployment and validation are complete and report only:
+> READY_FOR_REVIEW
+> Issue #2
+> HEAD <exact-sha>
+>
+> The orchestrator will audit deployment evidence before authorizing any real human-review workflow or production step.
+
 ## Estado
 
 Ver `docs/orquestador/current_task.md` para el estado vigente, el ledger de gates heredados, y la
 máquina de estados exacta implementada (documentada en `audit/phase4_c2_immutable_apply.md`,
 `audit/phase4_c2_corrections_2026-09-29.md` — incluye las secciones "Ronda 3" (comentario
-`5892711739`), "Ronda 4" (comentario `5909267134`) y "Ronda 5" (comentario `5913324183`)).
+`5892711739`), "Ronda 4" (comentario `5909267134`) y "Ronda 5" (comentario `5913324183`)). El
+despliegue/validación a staging autorizado por el comentario `5913574545` está documentado en
+`audit/phase5_staging_deployment_2026-09-30.md` (incluye el incidente real y su corrección).
