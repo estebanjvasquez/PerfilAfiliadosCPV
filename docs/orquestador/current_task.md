@@ -1,10 +1,11 @@
 # Tarea activa
 
 **TASK-0004** — Phase C2: Reviewed Immutable Payload Application (Issue #2 comentario `5886148283`),
-**correcciones del re-audit, ronda 3** (comentarios `5890113782` + `5890195271` + `5892711739`)
+**correcciones del re-audit, ronda 4** (comentarios `5890113782` + `5890195271` + `5892711739` +
+`5909267134`)
 
 Archivo: [`tasks/0004-phase-c2-immutable-apply.md`](tasks/0004-phase-c2-immutable-apply.md) (incluye
-el texto verbatim de los tres comentarios del re-audit)
+el texto verbatim de los cuatro comentarios del re-audit)
 
 **Estado:** READY_FOR_REVIEW
 
@@ -12,101 +13,90 @@ Ver `PROTOCOL.md` antes de tocar esta tarea. Precondición verificada: Phase C1 
 TASK-0003) sigue `APPROVED` (comentario `5886125405`, HEAD revisado `ce11d36`) — no invalidada por
 esta ronda.
 
-## Qué pidió el re-audit (ronda 3, comentario `5892711739`) y qué se corrigió
+## Qué pidió el re-audit (ronda 4, comentario `5909267134`) y qué se corrigió
 
-El comentario acotó explícitamente el alcance a A/B/C más el gate D (documentado, sin acción de
-código) — confirmó como aceptadas/heredadas: Phase C1, la regresión de 32 queries, los invariantes de
-DB, HIGH-1/HIGH-2 (sustancialmente mejorados) y el ledger de gates heredados de la ronda 2.
+El comentario reconfirmó A/B/C/D de la ronda 3 como correctos (nada de eso se reabrió) y acotó el
+alcance a exactamente 2 defectos semánticos sobre esas mismas correcciones, más una aclaración de
+fraseo en documentación (sin cambio de comportamiento).
 
-- **A (CREATE_NEW seguía sin cumplir el contrato de revisión explícita)**: corregido. La ronda 2 movió
-  el fallback mutable de `apply()` a `freeze()`, pero seguía siendo un fallback implícito
-  (`?? $candidate->suggested_new_concept_name`). `freeze()` ahora exige `new_concept_name` EXPLÍCITO y
-  no vacío en el payload de decisión - `RESULT_VALIDATION_FAILED` si falta o está en blanco, sin
-  congelar nada. Nunca lo completa desde el campo sugerido, que queda disponible solo como sugerencia
-  para la UI. 2 tests nuevos + 3 tests existentes actualizados para pasar el nombre explícito.
-- **B (matriz de tests de drift de relación incompleta)**: corregido. 2 tests nuevos
-  (`target_concept_id`, `relation_type`) - mismo patrón que el test existente de `source_concept_id`.
-  Sin cambios de código de producción (el chequeo ya escribía correctamente desde la ronda 2); solo
-  faltaba la cobertura de test explícita por campo.
-- **C (nuevo desenlace de revisión CONTEXT_REQUIRED)**: implementado. Cuarto desenlace para
-  candidatos término→concepto, para términos válidos del dominio pero demasiado genéricos/
-  inespecíficos para un mapeo directo producto/servicio/CPV (sin hardcodear los 10 términos reales).
-  `TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED` +
-  `TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED` (nuevo, distinto de `rejected` y de
-  `published`). `freeze()` exige `context_reason` explícito no vacío. `apply()` nunca escribe
-  `taxonomy_term_concepts` ni crea un concepto - cero escrituras, preserva el motivo del revisor en
-  `review_notes`, participa del contrato C2 completo (fingerprint, audit log de revisión y de
-  ejecución). Resistencia a tamper hacia MAP_TO_EXISTING/CREATE_NEW verificada explícitamente (el
-  fingerprint ya cubría esto genéricamente vía el campo `decision`). Auditados los consumidores de
-  búsqueda/índice: `BuildEmpresaSearchDocuments` (único consumidor real) lee exclusivamente
-  `taxonomy_term_concepts`, nunca el status del candidato - estructuralmente imposible que este estado
-  filtre una asociación CPV directa. 5 tests nuevos, todos con fixtures propios.
-- **D (gate de suite completa)**: sin acción de código (el propio comentario lo pide explícitamente:
-  "do not let this trigger unrelated code changes"). Sigue clasificado como bloqueo de entorno, no
-  como falla de código C2 - ver nota de entorno abajo.
+- **Defecto 1 (CREATE_NEW conflaba el nombre revisado con el nombre sugerido)**: corregido.
+  `freeze()` ahora congela DOS campos con roles distintos para CREATE_NEW: `new_concept_name` (el
+  valor REVISADO/elegido por el humano - lo único que `apply()` publica) y
+  `source_suggested_new_concept_name` (snapshot de la sugerencia del Builder en el instante de
+  `freeze()` - lo único que `apply()` compara contra la fila viva para detectar drift de la fuente).
+  Antes, `apply()` comparaba el nombre revisado contra la sugerencia viva, lo cual hacía imposible
+  que un revisor corrigiera/normalizara legítimamente el nombre sugerido (Builder sugiere "X",
+  humano aprueba "Y" -> abortaba tratando "Y != X" como drift de fuente, aunque "X" nunca cambió).
+  1 test nuevo (revisor elige un nombre distinto al sugerido, sin mutación de la fuente -> `apply()`
+  publica el nombre revisado), 1 test retenido sin cambios de intención (la fuente SÍ cambia después
+  de `freeze()` -> aborta con cero escrituras), 1 aserción reforzada en un test existente.
+- **Defecto 2 (CONTEXT_REQUIRED saltaba la revalidación de identidad del término)**: corregido. El
+  chequeo de drift de `term_id` (compartido con MAP_TO_EXISTING/CREATE_NEW) se movió para correr
+  ANTES de la rama CONTEXT_REQUIRED - antes corría después, y esa rama retornaba temprano sin pasar
+  por ese chequeo. CONTEXT_REQUIRED es una decisión semántica SOBRE un término particular (a
+  diferencia de REJECT, que no resuelve semánticamente ningún término), así que si
+  `suggested_term_id` cambia después de `freeze()`, ahora aborta `SOURCE_FIELD_DRIFTED` con cero
+  escrituras en vez de resolver un término distinto al revisado. 1 test nuevo: freeze CONTEXT_REQUIRED
+  para el término A, muta `suggested_term_id` a B, `apply()` -> abort, candidato permanece pending,
+  cero mapeos escritos.
+- **Aclaración de fraseo (evidencia de búsqueda de CONTEXT_REQUIRED)**: la documentación decía que el
+  candidato "sigue siendo evidencia contextual/de búsqueda válida", una redacción que sugiere uso
+  activo por algún consumidor real. Corregido en todos los docblocks/comentarios: el término/motivo
+  queda preservado para un POSIBLE uso FUTURO como evidencia contextual, aclarando explícitamente que
+  ningún consumidor de búsqueda lo lee hoy. Sin cambios de código ni de comportamiento - y,
+  siguiendo la instrucción explícita del comentario, NO se agregó ningún consumidor de búsqueda
+  nuevo (eso habría invalidado la regresión de búsqueda heredada y ampliado el alcance).
 
-Detalle completo de cada corrección: `audit/phase4_c2_corrections_2026-09-29.md` (sección "Ronda 3").
+Detalle completo de cada corrección: `audit/phase4_c2_corrections_2026-09-29.md` (sección "Ronda 4").
 State machine completo: `audit/phase4_c2_immutable_apply.md`.
 
 ## Evidencia (A=heredada, B=nueva, C=invalidada-y-recorrida, D=no aplica)
 
-- **[B] `ReviewedProposalServiceTest`: 39/39 PASS (108 assertions)** — 2 tests nuevos (corrección A),
-  2 tests nuevos (corrección B), 5 tests nuevos (corrección C); 3 tests existentes actualizados para
-  pasar `new_concept_name` explícito (sin cambio de lo que prueban). Verificado en aislamiento antes
-  de correr la suite completa.
-- **[B] Suite de taxonomía completa (`--filter=Taxonomy`)**: **187/189 PASS (595 assertions),
-  5619.25s (~93.7 min)**, local PHP 8.2.34 contra la instancia compartida real de Supabase. 2 fallos:
-  1. `TaxonomyCandidateConceptLinkReviewTest::viewing_a_propose_new_concept_candidate_with_duplicate_signals_does_not_500`
-     - el mismo gap de `ext-intl` ya documentado en rondas anteriores (stack trace idéntico, ajeno a
-     esta corrección).
-  2. `ReviewedProposalServiceTest::apply_aborts_with_zero_writes_when_the_relations_target_concept_id_drifted_after_freeze`
-     (test NUEVO de esta ronda, corrección B) - falló por
-     `SQLSTATE[HY000]: General error: 7 server closed the connection unexpectedly` de Supabase EN UNA
-     QUERY NO RELACIONADA (carga de roles/permisos del fixture `authorizedUser()`, no en ninguna
-     lógica de `freeze()`/`apply()` bajo prueba) - un corte de conexión transitorio del pooler
-     compartido tras ~93 minutos de sesión continua, no un defecto de código. Confirmado
-     re-ejecutando ÚNICAMENTE ese test dos veces más, aislado: PASS ambas veces (28.40s y en la
-     corrida aislada de 39/39 de más arriba, 27.35s) - mismo código, mismo test, sin cambios entre
-     corridas. No se alteró ni se ocultó el fallo - reportado tal cual ocurrió, con la evidencia de
-     no-reproducibilidad adjunta.
+- **[B] `ReviewedProposalServiceTest`: 41/41 PASS (120 assertions)** — 2 tests nuevos (1 por
+  defecto), incluidos ambos escenarios que el comentario pidió explícitamente ("candidate suggestion
+  = X, reviewer explicitly chooses Y ... apply succeeds and creates Y" y "freeze CONTEXT_REQUIRED for
+  term A, mutate ... to term B, apply → ABORT_SOURCE_DRIFT"), más el test retenido sin cambios de
+  intención y la aserción reforzada. Verificado en aislamiento.
+- **[A] Suite de taxonomía completa**: no re-corrida completa esta ronda - ninguna corrección de
+  ronda 4 toca código fuera de `ReviewedProposalService`/sus modelos relacionados/sus propios tests,
+  y el gate de suite completa quedó explícitamente clasificado como bloqueo de entorno (no de código
+  C2) en la ronda 3 con evidencia real (187/189 PASS, 595 assertions, 5619.25s) - el propio
+  comentario `5909267134` reconfirma esa clasificación como vigente y no pide una re-corrida
+  completa, solo que el archivo de test directamente afectado quede verde.
 - **[A] `CandidateConceptApprovalServiceTest`, `TaxonomyConceptRelationValidationTest`,
   `TaxonomyCandidateConceptLinkReviewTest`, `CanonicalConceptApplyServiceTest`**: sin cambios de
-  código en esta ronda (ninguno de los archivos que tocan corrección A/B/C) - se re-verifican como
-  parte de la corrida completa de arriba, no se relanzan aislados de nuevo (ya se corrieron
-  aislados y en verde en la ronda 2, y esta ronda no modificó ningún comportamiento que ejerciten).
+  código en esta ronda - ninguno de estos archivos toca `ReviewedProposalService` ni fue modificado.
 - **[A] DB invariants**: `taxonomy_candidate_concept_links=10`, `taxonomy_concept_relations=2`,
   `taxonomy_term_concepts=142`, `taxonomy_canonical_concepts=79`, `taxonomy_term_cpv_relations=9749`,
   `taxonomy_reviewed_proposals=0` — sin cambios respecto a la ronda anterior (ningún candidato/relación
-  real fue tocado por esta ronda; los tests de corrección A/B/C usan fixtures propios exclusivamente).
+  real fue tocado por esta ronda; los tests de los defectos 1/2 usan fixtures propios exclusivamente).
 - **[A] Regresión de 32 queries**: heredada de `ce11d36`/comentario `5886125405` (32/32, 0 errores, 0
   diffs), no invalidada — ninguna corrección de esta ronda toca un consumidor de búsqueda, ranking, o
-  datos de taxonomía publicados (de hecho, la corrección C audita explícitamente el único consumidor
-  real y confirma que no puede leer el estado nuevo).
+  datos de taxonomía publicados (y, per la aclaración de fraseo, se confirma explícitamente que no se
+  agregó ningún consumidor nuevo).
 - **[A] Phase C1 (`CanonicalConceptApplyService`)**: `APPROVED`, no tocada.
 - **[A] TASK-0002**: `APPROVED`, no tocada.
-- **[D] Migraciones de esquema**: ninguna nueva - `status`/`decision` son `VARCHAR` sin `CHECK`
-  constraint en ambas tablas relevantes (`taxonomy_candidate_concept_links.status` VARCHAR(20),
-  `taxonomy_reviewed_proposals.decision` VARCHAR(30)), así que los valores nuevos
-  (`context_required`/`CONTEXT_REQUIRED`) no requirieron alterar el esquema.
+- **[D] Migraciones de esquema**: ninguna nueva - `source_suggested_new_concept_name` es una clave
+  más dentro del JSONB `decision_payload` (sin esquema propio), no una columna nueva.
 
 ## Nota de entorno (continuación de rondas anteriores)
 
-Docker Desktop sigue sin estar disponible en esta sesión - el CLI `docker` ni siquiera resuelve en el
-PATH de esta terminal (rondas anteriores ya habían encontrado el motor devolviendo error 500 en todo
-endpoint). Consistente con el pedido explícito del comentario `5892711739` ("do not let this trigger
-unrelated code changes"), no se reintentó activamente esta ronda - se mantiene la clasificación de
-"entorno bloqueado, no falla de código C2". La suite se corre igual con la instalación local de PHP
-8.2.34 (autorizada explícitamente por el usuario en una ronda anterior) contra la instancia compartida
-de Supabase real.
+Sin cambios esta ronda - el comentario `5909267134` reconfirma explícitamente que el bloqueo de
+entorno de Docker Desktop / el gap de `ext-intl` sigue vigente y no pide una re-corrida completa de
+la suite ("keep the full-suite environment blocker explicitly documented"). Ver la sección GATE 4 de
+la ronda 3 en `audit/phase4_c2_corrections_2026-09-29.md` para la evidencia completa (187/189 PASS,
+595 assertions, 5619.25s, con el fallo transitorio de conexión a Supabase confirmado no-reproducible).
 
 ## Fuera de alcance de esta ronda (documentado, no oculto)
 
 - Wiring de UI de Filament para que un humano dispare `freeze()`/CONTEXT_REQUIRED desde el panel
-  (sigue igual que rondas anteriores - fuera del modo de ejecución pedido). Solo se actualizó el badge
-  color/filtro de `status` para mostrar el estado nuevo de forma legible si llegara a existir en la
-  tabla.
+  (sigue igual que rondas anteriores - fuera del modo de ejecución pedido).
+- Ningún consumidor de búsqueda nuevo para CONTEXT_REQUIRED (instrucción explícita del comentario:
+  agregarlo invalidaría la regresión de búsqueda heredada y ampliaría el alcance).
 - Ninguna aplicación real autorizada contra los 10 candidatos/2 relaciones ni contra ningún dato
   compartido/producción. Todos los tests de esta ronda usan fixtures propios.
+- Ninguna re-corrida de la suite completa de taxonomía (el comentario no la pidió; el gate de entorno
+  ya está documentado con evidencia real de la ronda anterior).
 
 **STOP.** No se llamó `freeze()`/`apply()` contra ningún candidato/relación real, no se tocaron los
 10 candidatos/2 relaciones de TASK-0001, no se mergeó a `main`. La decisión de APPROVED queda en manos
@@ -121,4 +111,5 @@ del orquestador.
 | TASK-0003 | APPROVED | [`tasks/0003-phase-c-corrections.md`](tasks/0003-phase-c-corrections.md) |
 | TASK-0004 (ronda 1) | CORRECTIONS_REQUIRED | [`tasks/0004-phase-c2-immutable-apply.md`](tasks/0004-phase-c2-immutable-apply.md) |
 | TASK-0004 (ronda 2, correcciones) | CORRECTIONS_REQUIRED (narrow, ronda 3) | mismo archivo, sección "Re-audit" |
-| TASK-0004 (ronda 3, correcciones A/B/C) | READY_FOR_REVIEW | mismo archivo, sección "Re-audit — comentario `5892711739`" |
+| TASK-0004 (ronda 3, correcciones A/B/C) | CORRECTIONS_REQUIRED (final semantic defects, ronda 4) | mismo archivo, sección "Re-audit — comentario `5892711739`" |
+| TASK-0004 (ronda 4, defectos 1/2) | READY_FOR_REVIEW | mismo archivo, sección "Re-audit — comentario `5909267134`" |

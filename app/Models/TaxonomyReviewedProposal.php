@@ -32,9 +32,13 @@ class TaxonomyReviewedProposal extends Model
      * TASK-0004, re-audit correction C (Issue #2 comentario `5892711739`): cuarto desenlace de
      * revisión para TERM_CONCEPT_LINK - término/candidato válido en el dominio pero
      * insuficientemente específico por sí solo para sostener un mapeo directo producto/servicio/CPV
-     * ("generic but valid terms"). Distinto de REJECT: el candidato sigue siendo evidencia
-     * contextual/de búsqueda válida, no descartado. `apply()` para esta decisión NUNCA escribe
-     * `taxonomy_term_concepts` ni crea un concepto - ver `ReviewedProposalService::applyCandidateLinkDecision()`.
+     * ("generic but valid terms"). Distinto de REJECT: el candidato NO se descarta, y el
+     * término/motivo del revisor se preserva para un POSIBLE uso futuro como evidencia contextual -
+     * sin que eso implique que algún consumidor de búsqueda lo lea hoy (ninguno lo hace, aclarado en
+     * la ronda 4 del re-audit, Issue #2 comentario `5909267134`). `apply()` para esta decisión NUNCA
+     * escribe `taxonomy_term_concepts` ni crea un concepto, y revalida el `term_id` congelado contra
+     * la fila viva antes de resolverla (ronda 4, defecto 2) - ver
+     * `ReviewedProposalService::applyCandidateLinkDecision()`.
      */
     public const DECISION_CONTEXT_REQUIRED = 'CONTEXT_REQUIRED';
 

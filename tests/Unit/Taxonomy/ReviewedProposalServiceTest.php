@@ -548,6 +548,38 @@ class ReviewedProposalServiceTest extends TestCase
         $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user, ['new_concept_name' => $originalName]);
 
         $this->assertSame($originalName, $frozen['proposal']->decision_payload['new_concept_name'], 'freeze() debe congelar el nombre YA en ese instante.');
+        $this->assertSame($originalName, $frozen['proposal']->decision_payload['source_suggested_new_concept_name'], 'freeze() también debe congelar la sugerencia del Builder por separado (ronda 4, defecto 1), aunque acá ambos valores coincidan.');
+    }
+
+    #[Test]
+    public function apply_create_new_publishes_the_reviewers_chosen_name_even_when_it_differs_from_the_builders_suggestion(): void
+    {
+        // TASK-0004, re-audit ronda 4 (Issue #2 comentario `5909267134`, defecto 1): el Builder
+        // sugiere "X", el humano aprueba explícitamente "Y" en freeze() (una corrección/normalización
+        // legítima del nombre) - la fila fuente (`suggested_new_concept_name`) NUNCA cambia después
+        // de freeze(), así que esto NO debe abortar por drift. Antes de esta corrección, comparar el
+        // nombre revisado contra la sugerencia viva hacía esto imposible.
+        $candidate = $this->newConceptCandidate();
+        $suggestedName = $candidate->suggested_new_concept_name;
+        $reviewerChosenName = 'nombre normalizado por el revisor '.uniqid('', true);
+        $user = $this->authorizedUser();
+        $conceptCountBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
+
+        $frozen = (new ReviewedProposalService())->freeze(TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id, TaxonomyReviewedProposal::DECISION_CREATE_NEW, $user, ['new_concept_name' => $reviewerChosenName]);
+        $this->assertSame(ReviewedProposalService::RESULT_FROZEN, $frozen['result']);
+        $this->assertSame($suggestedName, $frozen['proposal']->decision_payload['source_suggested_new_concept_name']);
+        $this->assertSame($reviewerChosenName, $frozen['proposal']->decision_payload['new_concept_name']);
+
+        $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
+
+        $this->assertSame(ReviewedProposalService::RESULT_APPLIED, $outcome['result'], 'Una corrección legítima del revisor (nombre distinto al sugerido, sin que la fuente cambie) no debe abortar por drift.');
+        $this->assertSame($conceptCountBefore + 1, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count());
+        $newConcept = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->latest('id')->first();
+        $this->assertTrue(
+            $newConcept->canonical_name_es === $reviewerChosenName || $newConcept->canonical_name_en === $reviewerChosenName,
+            'El concepto creado debe usar el nombre REVISADO por el humano, no el sugerido por el Builder.'
+        );
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PUBLISHED, $candidate->fresh()->status);
     }
 
     #[Test]
@@ -588,11 +620,13 @@ class ReviewedProposalServiceTest extends TestCase
 
     // =========================================================================================
     // APPLY - CONTEXT_REQUIRED (TASK-0004, re-audit correction C, Issue #2 comentario
-    // `5892711739`): cuarto desenlace de revisión - término/candidato válido pero insuficientemente
-    // específico para un mapeo directo producto/servicio/CPV. Distinto de REJECT (sigue siendo
-    // evidencia contextual/de búsqueda válida). Nunca escribe taxonomy_term_concepts ni crea un
-    // concepto. Fixtures propios exclusivamente - ningún candidato/relación real de TASK-0001 se
-    // toca acá.
+    // `5892711739`, defecto 2 cerrado en la ronda 4, comentario `5909267134`): cuarto desenlace de
+    // revisión - término/candidato válido pero insuficientemente específico para un mapeo directo
+    // producto/servicio/CPV. Distinto de REJECT: el candidato NO se descarta, el motivo queda
+    // preservado para un posible uso futuro como evidencia contextual (sin que hoy exista ningún
+    // consumidor que lo lea). Nunca escribe taxonomy_term_concepts ni crea un concepto, y SÍ
+    // revalida el term_id congelado contra la fila viva antes de resolverse. Fixtures propios
+    // exclusivamente - ningún candidato/relación real de TASK-0001 se toca acá.
     // =========================================================================================
 
     #[Test]
@@ -696,6 +730,34 @@ class ReviewedProposalServiceTest extends TestCase
         $this->assertSame(ReviewedProposalService::ABORT_TAMPER_DETECTED, $outcome['abort_reason']);
         $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_term_concepts')->where('term_id', $candidate->suggested_term_id)->count());
         $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status);
+    }
+
+    #[Test]
+    public function apply_context_required_aborts_with_zero_writes_when_the_candidates_term_id_drifted_after_freeze(): void
+    {
+        // TASK-0004, re-audit ronda 4 (Issue #2 comentario `5909267134`, defecto 2): CONTEXT_REQUIRED
+        // es una decisión semántica SOBRE un término particular - si `suggested_term_id` cambió desde
+        // freeze(), aplicar la decisión "necesita contexto" al candidato mutado resolvería un término
+        // DISTINTO del que el humano revisó. Antes de esta corrección, la rama CONTEXT_REQUIRED
+        // corría ANTES del chequeo de drift de term_id y lo saltaba explícitamente.
+        [$candidate] = $this->mapCandidate();
+        $otherTerm = $this->term();
+        $user = $this->authorizedUser();
+        $frozen = (new ReviewedProposalService())->freeze(
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK, $candidate->id,
+            TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED, $user,
+            ['context_reason' => 'Término genérico del dominio - no sostiene un mapeo directo por sí solo.'],
+        );
+
+        $candidate->update(['suggested_term_id' => $otherTerm->id]);
+
+        $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0004 test-suite');
+
+        $this->assertSame(ReviewedProposalService::RESULT_ABORTED, $outcome['result']);
+        $this->assertSame(ReviewedProposalService::ABORT_SOURCE_DRIFT, $outcome['abort_reason']);
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status, 'El candidato debe permanecer pending - CONTEXT_REQUIRED no debe resolverse sobre un término distinto al revisado.');
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_term_concepts')
+            ->whereIn('term_id', [$candidate->suggested_term_id, $otherTerm->id])->count(), 'No debe escribirse ningún mapeo de taxonomía.');
     }
 
     #[Test]

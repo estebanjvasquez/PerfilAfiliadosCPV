@@ -266,9 +266,68 @@ Corrige ÚNICAMENTE la interpretación de GATE 3 del comentario anterior. Texto 
 >
 > Update code/tests/docs/handoff and STOP at READY_FOR_REVIEW with exact HEAD.
 
+## Re-audit — comentario [`5909267134`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5909267134) (2026-09-30T10:19:59Z) — CORRECTIONS_REQUIRED (final semantic defects)
+
+> [ORCHESTRATOR RE-AUDIT — TASK-0004 / PHASE C2 — CORRECTIONS_REQUIRED (final semantic defects)]
+>
+> Reviewed READY_FOR_REVIEW at HEAD `835fdae` against prior review HEAD `f64bbe5`.
+>
+> Continuity:
+> - Phase C1 remains APPROVED at `ce11d36`.
+> - Frozen 32-query regression remains inherited APPROVED evidence; this diff does not invalidate it.
+> - Existing real rows remain reported unchanged: 10 candidate links / 2 candidate relations / 142 term concepts / 79 canonical concepts / 9749 TERM→CPV / 0 reviewed proposals.
+> - No real C2 freeze/apply, publication, candidate decision, or main merge reported.
+> - Environment gate remains honestly reported: full taxonomy suite is not clean because of the established ext-intl environment issue; the additional transient Supabase connection failure passed on isolated reruns. Do not alter tests to manufacture green.
+>
+> ACCEPTED
+> A. CREATE_NEW now requires explicit nonblank `new_concept_name` at freeze; implicit fallback is removed.
+> B. Dedicated post-freeze drift tests now exist for relation source, target and relation_type.
+> C. CONTEXT_REQUIRED exists as a distinct reviewed decision/status, requires explicit reason, is fingerprinted/audited, and performs zero direct taxonomy mapping writes.
+> D. No hardcoded handling of the current 10 real terms was introduced.
+>
+> TWO SEMANTIC DEFECTS REMAIN
+>
+> 1. CREATE_NEW conflates the HUMAN-REVIEWED NAME with the SOURCE-SUGGESTED NAME.
+> At freeze, `decision_payload.new_concept_name` is now correctly the explicit reviewer-selected name. But at apply, the service compares that reviewed value directly to the live `$candidate->suggested_new_concept_name` and aborts SOURCE_DRIFT when they differ.
+>
+> That makes a legitimate reviewer correction/normalization of the suggested name impossible: if the Builder suggested "X" and the reviewer explicitly approves CREATE_NEW as "Y", freeze succeeds but apply later treats "Y != X" as source drift even though X never changed after freeze.
+>
+> Required correction:
+> - Freeze TWO distinct values/roles:
+>   - the explicit reviewed publication value, e.g. `new_concept_name`;
+>   - the source snapshot used only for drift detection, e.g. `source_suggested_new_concept_name`.
+> - APPLY must create/write from the reviewed `new_concept_name`.
+> - Drift detection must compare live `candidate.suggested_new_concept_name` against frozen `source_suggested_new_concept_name`, NOT against the reviewer-selected publication name.
+> - Add test: candidate suggestion = X, reviewer explicitly chooses Y, no source mutation after freeze → apply succeeds and creates Y.
+> - Retain test: candidate suggestion = X at freeze, then source changes to Z → apply aborts with zero taxonomy writes, regardless of reviewed publication name Y.
+>
+> 2. CONTEXT_REQUIRED incorrectly skips source term identity drift.
+> The frozen proposal includes `term_id`, but `applyCandidateLinkDecision()` handles CONTEXT_REQUIRED before the term-id drift check and explicitly says drift need not be checked. This violates the immutable reviewed-proposal rule: CONTEXT_REQUIRED is a semantic decision ABOUT a particular term. If `suggested_term_id` changes after freeze, applying the reviewed "needs context" decision to the mutated candidate means the system is resolving a different term than the human reviewed.
+>
+> Required correction:
+> - CONTEXT_REQUIRED must revalidate frozen `term_id` against live `suggested_term_id` before changing status.
+> - On mismatch abort `SOURCE_FIELD_DRIFTED` with zero candidate resolution/publication/taxonomy writes.
+> - Add dedicated test: freeze CONTEXT_REQUIRED for term A, mutate candidate suggested_term_id to term B, apply → ABORT_SOURCE_DRIFT; candidate remains pending and no taxonomy mapping is written.
+>
+> SEARCH-EVIDENCE CLARIFICATION
+> The current implementation safely prevents CONTEXT_REQUIRED from leaking an arbitrary direct CPV mapping because search consumers do not read the candidate table. That satisfies the immediate safety requirement. However, documentation should not claim it is currently consumed as contextual search evidence unless an actual consumer exists. Phrase it precisely: the state PRESERVES the term/reason for future/contextual evidence use while creating no direct CPV association. Do not add a search consumer in this correction; doing so would invalidate the inherited search regression and broaden scope.
+>
+> CLOSURE
+> After these two code/test corrections:
+> - run `ReviewedProposalServiceTest` clean;
+> - reverify DB invariants and 10/2 untouched;
+> - update audit/handoff;
+> - keep the full-suite environment blocker explicitly documented;
+> - no 32-query rerun unless search/ranking/published taxonomy is changed;
+> - no real freeze/apply, candidate decisions, publication, main merge, or hardcoded term handling.
+>
+> STATUS: TASK-0004 / Phase C2 remains CORRECTIONS_REQUIRED, narrowed to the two semantic defects above plus the already-documented environment test gate.
+>
+> STOP at READY_FOR_REVIEW with exact HEAD.
+
 ## Estado
 
 Ver `docs/orquestador/current_task.md` para el estado vigente, el ledger de gates heredados, y la
 máquina de estados exacta implementada (documentada en `audit/phase4_c2_immutable_apply.md`,
-`audit/phase4_c2_corrections_2026-09-29.md` — incluye la sección "Ronda 3" para el comentario
-`5892711739`).
+`audit/phase4_c2_corrections_2026-09-29.md` — incluye las secciones "Ronda 3" (comentario
+`5892711739`) y "Ronda 4" (comentario `5909267134`)).

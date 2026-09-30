@@ -85,12 +85,34 @@ use Illuminate\Support\Facades\DB;
  * producto/servicio/CPV (hallazgo de revisión humana de dominio, no hardcodeado a los 10 candidatos
  * reales actuales). Igual que CREATE_NEW, exige un `context_reason` explícito no vacío. `apply()`
  * NUNCA escribe `taxonomy_term_concepts` ni crea un concepto para esta decisión - el candidato pasa a
- * `TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED` (distinto de `STATUS_REJECTED`: sigue
- * siendo evidencia contextual/de búsqueda válida, no descartada) preservando el motivo del revisor en
- * `review_notes`. El fingerprint de tamper-detection (que incluye el campo `decision`) ya cubría
- * genéricamente que nadie pueda mutar una decisión congelada de CONTEXT_REQUIRED hacia
- * MAP_TO_EXISTING/CREATE_NEW sin que `apply()` lo detecte y aborte con cero escrituras - no fue
- * necesario un mecanismo nuevo para eso, solo un test que lo pruebe explícitamente.
+ * `TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED` (distinto de `STATUS_REJECTED`: el
+ * candidato NO se descarta, y el término/motivo del revisor queda preservado en `review_notes` para
+ * un POSIBLE uso futuro como evidencia contextual - sin que eso implique que algún consumidor de
+ * búsqueda lo lea hoy; ninguno lo hace, ver auditoría de consumidores más abajo). El fingerprint de
+ * tamper-detection (que incluye el campo `decision`) ya cubría genéricamente que nadie pueda mutar
+ * una decisión congelada de CONTEXT_REQUIRED hacia MAP_TO_EXISTING/CREATE_NEW sin que `apply()` lo
+ * detecte y aborte con cero escrituras - no fue necesario un mecanismo nuevo para eso, solo un test
+ * que lo pruebe explícitamente.
+ *
+ * TASK-0004, re-audit ronda 4 (Issue #2 comentario `5909267134`): dos defectos semánticos cerrados
+ * sobre las correcciones de la ronda 3, sin tocar HIGH-1/HIGH-2/GATE-3/GATE-4/MEDIUM-5 (reconfirmados
+ * como correctos por ese mismo comentario):
+ *
+ * 1. CREATE_NEW conflaba el nombre REVISADO por el humano con el nombre SUGERIDO por el Builder al
+ *    validar drift en `apply()` - comparaba `new_concept_name` (revisado) contra
+ *    `$candidate->suggested_new_concept_name` (vivo), lo cual hacía imposible que un revisor
+ *    corrigiera/normalizara legítimamente el nombre sugerido (Builder sugiere "X", humano aprueba
+ *    "Y" -> abortaba tratando la discrepancia REVISOR-VS-SUGERENCIA como si fuera DRIFT DE LA
+ *    FUENTE). `freeze()` ahora congela DOS campos con roles distintos: `new_concept_name` (lo que se
+ *    publica) y `source_suggested_new_concept_name` (snapshot de la sugerencia, usado
+ *    EXCLUSIVAMENTE para comparar contra la fila viva). `apply()` publica desde el primero y
+ *    detecta drift comparando el segundo.
+ * 2. CONTEXT_REQUIRED se resolvía ANTES del chequeo de drift de `term_id` compartido, así que un
+ *    candidato cuyo `suggested_term_id` cambió después de `freeze()` podía terminar con la decisión
+ *    "necesita contexto" aplicada al término NUEVO, nunca revisado por el humano - violando la misma
+ *    regla de inmutabilidad que ya protegía a MAP_TO_EXISTING/CREATE_NEW. El chequeo de `term_id` se
+ *    movió para correr ANTES de la rama CONTEXT_REQUIRED (sigue corriendo DESPUÉS de REJECT, la única
+ *    decisión que genuinamente no resuelve ningún término específico).
  */
 class ReviewedProposalService
 {
@@ -289,7 +311,17 @@ class ReviewedProposalService
             $snapshot = $decisionPayload;
             $snapshot['term_id'] = $candidate->suggested_term_id;
             if ($decision === TaxonomyReviewedProposal::DECISION_CREATE_NEW) {
+                // TASK-0004, re-audit ronda 4 (Issue #2 comentario `5909267134`, defecto 1): DOS
+                // valores distintos, nunca uno solo - `new_concept_name` es el valor REVISADO/elegido
+                // por el humano (lo que `apply()` efectivamente publica), `source_suggested_new_concept_name`
+                // es la SUGERENCIA del Builder en el instante de freeze() (usada EXCLUSIVAMENTE para
+                // detectar drift de la fila fuente, nunca para publicar). Antes de esta corrección,
+                // `apply()` comparaba el valor revisado contra la sugerencia viva - eso hacía
+                // imposible que un revisor corrigiera/normalizara el nombre sugerido: si el Builder
+                // sugirió "X" y el humano aprobó explícitamente "Y", drift-detection abortaba
+                // incorrectamente comparando "Y" contra "X" como si "X" hubiera cambiado.
                 $snapshot['new_concept_name'] = $explicitNewConceptName;
+                $snapshot['source_suggested_new_concept_name'] = $candidate->suggested_new_concept_name;
             }
             if ($decision === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED) {
                 $snapshot['context_reason'] = $explicitContextReason;
@@ -539,20 +571,40 @@ class ReviewedProposalService
             ]);
         }
 
+        // TASK-0004, re-audit HIGH-1: re-verifica que el campo fuente congelado (term_id) siga
+        // coincidiendo con la fila VIVA antes de publicar nada - si alguien editó el candidato
+        // después de freeze() (directamente en la base, no hay UI para esto hoy, pero el guard no
+        // depende de que exista una UI), el payload ya no describe lo que un humano revisó.
+        //
+        // TASK-0004, re-audit ronda 4 (Issue #2 comentario `5909267134`, defecto 2): este chequeo
+        // ahora corre ANTES de la rama CONTEXT_REQUIRED (antes corría después, y esa rama retornaba
+        // temprano sin pasar por acá). CONTEXT_REQUIRED es una decisión semántica SOBRE un término
+        // particular - si `suggested_term_id` cambió desde freeze(), aplicar la decisión "necesita
+        // contexto" al candidato mutado resolvería un término DISTINTO del que el humano revisó, lo
+        // cual viola la misma regla de inmutabilidad que ya protegía a MAP_TO_EXISTING/CREATE_NEW.
+        // REJECT sigue siendo la única excepción deliberada (no determina NINGÚN destino de
+        // escritura ni resuelve semánticamente un término específico).
+        $frozenTermId = $decisionPayload['term_id'] ?? null;
+        if ($frozenTermId === null || (int) $frozenTermId !== (int) $candidate->suggested_term_id) {
+            return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
+                'note' => 'suggested_term_id del candidato cambió desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
+                'frozen_term_id' => $frozenTermId,
+                'current_term_id' => $candidate->suggested_term_id,
+            ]);
+        }
+
         if ($proposal->decision === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED) {
-            // TASK-0004, re-audit correction C (Issue #2 comentario `5892711739`): "generic but
-            // valid terms" - válido en la taxonomía pero insuficientemente específico para un mapeo
-            // directo producto/servicio/CPV. Invariante central: CERO escrituras a
-            // `taxonomy_term_concepts` y CERO conceptos nuevos - nunca inventa una categoría
-            // específica. Como REJECT arriba, no depende de ningún campo fuente congelado que
-            // determine UN destino de escritura, así que tampoco se exige el chequeo de drift de
-            // term_id para este caso. El motivo del revisor se preserva en `review_notes` -
-            // `context_required` es un status DISTINTO de `rejected`: el candidato sigue siendo
-            // evidencia contextual/de búsqueda válida, no descartado. Auditado (comentario
-            // `5892711739`, sección C): `BuildEmpresaSearchDocuments` (el único consumidor de
-            // índice/búsqueda que lee taxonomía publicada) solo lee `taxonomy_term_concepts` - nunca
-            // el status del candidato - así que este estado no puede filtrar una asociación CPV
-            // directa hacia el índice de búsqueda por construcción, no por convención.
+            // TASK-0004, re-audit correction C (Issue #2 comentario `5892711739`) + ronda 4 defecto 2
+            // (comentario `5909267134`): "generic but valid terms" - válido en la taxonomía pero
+            // insuficientemente específico para un mapeo directo producto/servicio/CPV. Invariante
+            // central: CERO escrituras a `taxonomy_term_concepts` y CERO conceptos nuevos - nunca
+            // inventa una categoría específica. El motivo del revisor se preserva en `review_notes` -
+            // `context_required` es un status DISTINTO de `rejected`: el candidato NO se descarta, y
+            // el término/motivo queda preservado para un posible uso futuro como evidencia
+            // contextual - sin que eso implique que algún consumidor de búsqueda lo lea hoy (ninguno
+            // lo hace; ver auditoría de consumidores en el docblock de la clase). No se agrega ningún
+            // consumidor nuevo en esta corrección - eso ampliaría el alcance de esta tarea e
+            // invalidaría la regresión de búsqueda heredada.
             $candidate->update([
                 'status' => TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED,
                 'reviewed_by' => $proposal->reviewer_id,
@@ -563,19 +615,6 @@ class ReviewedProposalService
             return $this->markApplied($proposal, $authorizationReference, $targetEnvironment, [
                 'candidate_link_id' => $candidate->id,
                 'outcome' => 'CONTEXT_REQUIRED',
-            ]);
-        }
-
-        // TASK-0004, re-audit HIGH-1: re-verifica que el campo fuente congelado (term_id) siga
-        // coincidiendo con la fila VIVA antes de publicar nada - si alguien editó el candidato
-        // después de freeze() (directamente en la base, no hay UI para esto hoy, pero el guard no
-        // depende de que exista una UI), el payload ya no describe lo que un humano revisó.
-        $frozenTermId = $decisionPayload['term_id'] ?? null;
-        if ($frozenTermId === null || (int) $frozenTermId !== (int) $candidate->suggested_term_id) {
-            return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
-                'note' => 'suggested_term_id del candidato cambió desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
-                'frozen_term_id' => $frozenTermId,
-                'current_term_id' => $candidate->suggested_term_id,
             ]);
         }
 
@@ -605,18 +644,30 @@ class ReviewedProposalService
             ]);
         }
 
-        // DECISION_CREATE_NEW - el nombre viene ÚNICAMENTE del payload congelado (nunca de
-        // `$candidate->suggested_new_concept_name` en vivo - hallazgo HIGH-1: "CREATE_NEW must
-        // require the reviewed new concept name explicitly in the frozen payload; do not fall back
-        // at apply time to a mutable candidate field"). Si la fila viva cambió su nombre sugerido
-        // desde freeze(), eso también es drift y debe abortar, no publicarse en silencio con el
-        // valor viejo.
-        $frozenNewConceptName = $decisionPayload['new_concept_name'] ?? null;
-        if ($frozenNewConceptName === null || $frozenNewConceptName !== $candidate->suggested_new_concept_name) {
+        // DECISION_CREATE_NEW - TASK-0004, re-audit ronda 4 (Issue #2 comentario `5909267134`,
+        // defecto 1): DOS valores distintos del payload congelado, con roles distintos - nunca se
+        // mezclan:
+        // - `new_concept_name`: el valor REVISADO/elegido explícitamente por el humano en freeze()
+        //   (hallazgo HIGH-1/corrección A) - esto, y SOLO esto, es lo que se publica abajo.
+        // - `source_suggested_new_concept_name`: la sugerencia del Builder congelada en el instante
+        //   de freeze() - esto, y SOLO esto, es lo que se compara contra la fila VIVA para detectar
+        //   drift de la fuente. Antes de esta corrección, `apply()` comparaba el nombre REVISADO
+        //   contra la sugerencia VIVA, lo cual hacía imposible una corrección/normalización legítima
+        //   del revisor (Builder sugiere "X", humano aprueba explícitamente "Y" -> abortaba tratando
+        //   "Y != X" como si "X" hubiera cambiado, cuando en realidad nunca cambió).
+        $frozenSourceSuggestedName = $decisionPayload['source_suggested_new_concept_name'] ?? null;
+        if ($frozenSourceSuggestedName === null || $frozenSourceSuggestedName !== $candidate->suggested_new_concept_name) {
             return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
                 'note' => 'suggested_new_concept_name del candidato cambió desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
-                'frozen_new_concept_name' => $frozenNewConceptName,
+                'frozen_source_suggested_new_concept_name' => $frozenSourceSuggestedName,
                 'current_new_concept_name' => $candidate->suggested_new_concept_name,
+            ]);
+        }
+
+        $frozenNewConceptName = $decisionPayload['new_concept_name'] ?? null;
+        if ($frozenNewConceptName === null || trim((string) $frozenNewConceptName) === '') {
+            return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
+                'note' => 'El payload congelado no trae un new_concept_name revisado válido - no se puede publicar.',
             ]);
         }
 

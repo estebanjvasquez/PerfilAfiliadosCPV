@@ -340,3 +340,121 @@ un defecto de código de esta corrección:
   nuevos (corrección B), 5 tests nuevos (corrección C), 3 tests existentes actualizados para pasar
   `new_concept_name` explícito. Total del archivo: 39/39 PASS (108 assertions), verificado en
   aislamiento antes de correr la suite completa.
+
+---
+---
+
+# Ronda 4 — correcciones del re-audit (Issue #2, comentario `5909267134`)
+
+**Revisado en:** HEAD `835fdae` (TASK-0004 ronda 3, READY_FOR_REVIEW)
+**Verdict:** `CORRECTIONS_REQUIRED (final semantic defects)` — acota a 2 defectos semánticos sobre
+las correcciones A/B/C de la ronda 3 (reconfirmadas como correctas: A, B, C y D todas aceptadas tal
+cual), más una aclaración de fraseo en documentación (no de código). Confirma como heredado/vigente:
+Phase C1, la regresión de 32 queries, los invariantes de DB, y el bloqueo de entorno del gate de
+suite completa (incluyendo que el fallo transitorio de conexión a Supabase de la ronda 3 pasó limpio
+en las re-corridas aisladas).
+
+**Nota importante sobre la sección "Ronda 3 — C" de arriba:** el texto de esa sección describe
+correctamente lo que se implementó en su momento, pero UNA frase ("sigue siendo evidencia
+contextual/de búsqueda válida") quedó imprecisa según la aclaración de este comentario - ver la
+sección "Aclaración de fraseo" más abajo. No se reescribe la sección de la ronda 3 (registro
+histórico), se corrige acá y en el código/docblocks vigentes.
+
+---
+
+## Defecto 1 — CREATE_NEW conflaba el nombre REVISADO con el nombre SUGERIDO
+
+**Hallazgo:** en la ronda 3, `freeze()` ya congelaba correctamente `new_concept_name` como el valor
+EXPLÍCITO elegido por el humano (corrección A). Pero `apply()` seguía comparando ese mismo valor
+revisado contra `$candidate->suggested_new_concept_name` EN VIVO para detectar drift. Eso trata
+CUALQUIER discrepancia entre "lo que el humano eligió" y "lo que el Builder sugirió" como si fuera
+"la fuente cambió después de freeze()" - aunque la fila fuente nunca haya cambiado. Consecuencia
+directa: un revisor que corrige/normaliza legítimamente el nombre sugerido (Builder sugiere "X",
+humano aprueba explícitamente "Y") nunca podría completar `apply()` - siempre abortaría por
+`SOURCE_DRIFT`, aunque nada haya driftado en realidad.
+
+**Corrección:**
+
+- `freeze()` ahora congela DOS campos con roles distintos para CREATE_NEW, nunca uno solo:
+  - `new_concept_name`: el valor REVISADO/elegido explícitamente por el humano - esto, y SOLO esto,
+    es lo que `apply()` publica.
+  - `source_suggested_new_concept_name`: snapshot de `$candidate->suggested_new_concept_name` EN EL
+    INSTANTE de `freeze()` - esto, y SOLO esto, es lo que `apply()` compara contra la fila viva para
+    detectar drift de la FUENTE.
+- `apply()` ya NUNCA compara el nombre revisado contra el campo mutable del candidato. Compara
+  `source_suggested_new_concept_name` (congelado) contra `suggested_new_concept_name` (vivo) para
+  drift, y usa `new_concept_name` (congelado) exclusivamente para escribir.
+- **Test nuevo** (el que el hallazgo pidió explícitamente): "candidate suggestion = X, reviewer
+  explicitly chooses Y, no source mutation after freeze → apply succeeds and creates Y" -
+  `apply_create_new_publishes_the_reviewers_chosen_name_even_when_it_differs_from_the_builders_suggestion`.
+- **Test retenido** (el hallazgo pidió explícitamente mantenerlo, sin cambios de intención):
+  `apply_aborts_with_zero_writes_when_the_candidates_new_concept_name_drifted_after_freeze` - sigue
+  probando que un cambio real de la fuente después de `freeze()` aborta con cero escrituras,
+  independientemente del nombre revisado.
+- `freeze_snapshots_the_new_concept_name_so_apply_never_reads_the_live_candidate_field` reforzado con
+  una aserción adicional sobre `source_suggested_new_concept_name`.
+
+---
+
+## Defecto 2 — CONTEXT_REQUIRED saltaba la revalidación de identidad del término fuente
+
+**Hallazgo:** el payload congelado de CONTEXT_REQUIRED SÍ incluye `term_id` (congelado por la lógica
+compartida de `freezeCandidateLink()`), pero `applyCandidateLinkDecision()` resolvía la rama
+CONTEXT_REQUIRED ANTES del chequeo de drift de `term_id` compartido con MAP_TO_EXISTING/CREATE_NEW -
+y el comentario en código de la ronda 3 justificaba explícitamente esa omisión. Eso viola la regla
+central de inmutabilidad del payload revisado: CONTEXT_REQUIRED es una decisión semántica SOBRE un
+término particular, no una decisión "sin objeto" como REJECT. Si `suggested_term_id` cambia después
+de `freeze()`, aplicar la decisión "necesita contexto" al candidato mutado resuelve un término
+DISTINTO del que el humano efectivamente revisó.
+
+**Corrección:**
+
+- El chequeo de drift de `term_id` (antes ubicado DESPUÉS de la rama CONTEXT_REQUIRED, alcanzando
+  solo a MAP_TO_EXISTING/CREATE_NEW) se movió para correr ANTES de esa rama. REJECT sigue siendo la
+  única excepción deliberada - no determina ningún destino de escritura ni resuelve semánticamente
+  ningún término específico.
+- **Test nuevo** (el que el hallazgo pidió explícitamente): "freeze CONTEXT_REQUIRED for term A,
+  mutate candidate suggested_term_id to term B, apply → ABORT_SOURCE_DRIFT; candidate remains
+  pending and no taxonomy mapping is written" -
+  `apply_context_required_aborts_with_zero_writes_when_the_candidates_term_id_drifted_after_freeze`.
+- Los tests existentes de CONTEXT_REQUIRED (freeze/apply exitoso, tamper hacia MAP_TO_EXISTING) no
+  cambiaron de comportamiento - ninguno mutaba `term_id`, así que el chequeo nuevo no les afecta.
+
+---
+
+## Aclaración de fraseo — evidencia de búsqueda de CONTEXT_REQUIRED
+
+**Hallazgo:** la documentación (docblocks, comentarios de test, doc de correcciones) describía
+CONTEXT_REQUIRED como que el candidato "sigue siendo evidencia contextual/de búsqueda válida" - una
+redacción que sugiere que ALGÚN consumidor real lee y usa ese estado como evidencia hoy. Eso no es
+cierto: la auditoría de la ronda 3 ya había confirmado que `BuildEmpresaSearchDocuments.php` (el
+único consumidor real de índice/búsqueda) no lee absolutamente nada de
+`taxonomy_candidate_concept_links` - ni siquiera su `status`. La seguridad (que este estado no puede
+filtrar una asociación CPV directa) sigue siendo válida y sigue demostrada; lo que estaba mal
+fraseado es la implicación de uso activo.
+
+**Corrección (solo documentación/comentarios, sin cambios de comportamiento):** toda referencia se
+reescribió para decir que el término/motivo del revisor queda PRESERVADO para un POSIBLE uso futuro
+como evidencia contextual, aclarando explícitamente que ningún consumidor de búsqueda lo lee hoy.
+Actualizado en: docblock de clase de `ReviewedProposalService`, comentario inline de la rama
+CONTEXT_REQUIRED en `applyCandidateLinkDecision()`, docblock de
+`TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED`, docblock de
+`TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED`, y el comentario de sección de
+`ReviewedProposalServiceTest`. **No se agregó ningún consumidor de búsqueda nuevo** - el propio
+comentario del orquestador pidió explícitamente no hacerlo ("Do not add a search consumer in this
+correction; doing so would invalidate the inherited search regression and broaden scope").
+
+---
+
+## Archivos tocados en esta ronda 4
+
+- `app/Services/Taxonomy/ReviewedProposalService.php` — `freeze()`: congela
+  `source_suggested_new_concept_name` además de `new_concept_name` para CREATE_NEW. `apply()`:
+  compara `source_suggested_new_concept_name` (no `new_concept_name`) contra la fila viva para
+  drift; el chequeo de drift de `term_id` se movió antes de la rama CONTEXT_REQUIRED; fraseo de
+  comentarios/docblock corregido.
+- `app/Models/TaxonomyReviewedProposal.php` — fraseo de docblock corregido.
+- `app/Models/TaxonomyCandidateConceptLink.php` — fraseo de docblock corregido.
+- `tests/Unit/Taxonomy/ReviewedProposalServiceTest.php` — 1 test nuevo (defecto 1, nombre revisado
+  distinto del sugerido, sin drift), 1 test nuevo (defecto 2, drift de term_id en CONTEXT_REQUIRED),
+  1 aserción adicional en un test existente, fraseo de comentario de sección corregido.
