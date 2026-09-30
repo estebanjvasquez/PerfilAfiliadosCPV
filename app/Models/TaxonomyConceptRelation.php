@@ -62,6 +62,13 @@ class TaxonomyConceptRelation extends Model
         return $this->belongsTo(TaxonomyCanonicalConcept::class, 'target_concept_id');
     }
 
+    // TASK-0005 (Issue #2 comentario `5914793857`): visibilidad de la propuesta congelada C2 desde
+    // la UI de la relación - `freeze()` NUNCA toca `status`/`reviewed_at` de esta fila.
+    public function reviewedProposals()
+    {
+        return $this->hasMany(TaxonomyReviewedProposal::class, 'concept_relation_id');
+    }
+
     /**
      * TASK-0003, hallazgo 6: bloquea CUALQUIER guardado (Filament, tinker, lo que sea) que deje
      * `status=approved` sin volver a pasar `validateConceptRelationProposal()` en ese momento -

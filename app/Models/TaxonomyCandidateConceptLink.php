@@ -92,6 +92,15 @@ class TaxonomyCandidateConceptLink extends Model
         return $this->belongsTo(UserPgsql::class, 'reviewed_by');
     }
 
+    // TASK-0005 (Issue #2 comentario `5914793857`): visibilidad de la propuesta congelada C2 desde
+    // la UI del candidato - `freeze()` NUNCA toca `status`/`reviewed_at` de esta fila, así que sin
+    // esta relación no habría forma de saber desde la grilla/vista que un candidato "pending" ya
+    // tiene una decisión congelada esperando aplicación.
+    public function reviewedProposals()
+    {
+        return $this->hasMany(TaxonomyReviewedProposal::class, 'candidate_link_id');
+    }
+
     /**
      * TASK-0004, re-audit HIGH-2: bloquea CUALQUIER guardado (Filament, `CandidateConceptApprovalService`,
      * tinker, lo que sea) que deje `status=published` por fuera del `apply()` autorizado de Phase C2

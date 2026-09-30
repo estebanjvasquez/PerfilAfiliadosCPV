@@ -5,8 +5,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TaxonomyCandidateConceptLinkResource\Pages;
 use App\Models\TaxonomyCandidateConceptLink;
 use App\Models\TaxonomyCanonicalConcept;
+use App\Models\TaxonomyReviewedProposal;
 use App\Services\Taxonomy\CandidateConceptApprovalService;
 use App\Services\Taxonomy\CanonicalConceptBuilderService;
+use App\Services\Taxonomy\ReviewedProposalService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -31,6 +33,18 @@ use Illuminate\Support\Facades\Auth;
  * recurso existe para cuando el Builder (en una fase posterior, con `--apply` habilitado) empiece a
  * insertar candidatos reales. Las acciones están implementadas y funcionales, pero no tienen ninguna
  * fila sobre la que operar en esta entrega.
+ *
+ * TASK-0005 (Issue #2 comentario `5914793857`): las acciones `approve`/`resolveNewConcept` de abajo
+ * (que desde TASK-0004 HIGH-2 solo mostraban "esto ya no se puede hacer desde acá") se reemplazan
+ * por UNA sola acción (`freezeReview`) que llama a `ReviewedProposalService::freeze()` - el camino
+ * real y funcional de revisión C2. `freeze()` NUNCA publica/aplica nada (no toca
+ * `taxonomy_term_concepts` ni el `status` del candidato) - solo congela una decisión inmutable de
+ * revisión (`taxonomy_reviewed_proposals`, `status=PENDING_APPLY`) pendiente de un paso de
+ * `apply()` separado y explícitamente autorizado, que esta UI deliberadamente NO expone (ver
+ * `TaxonomyReviewedProposalResource`, de solo lectura). `reject()` directo de
+ * `CandidateConceptApprovalService` (el único camino legacy que nunca escribió una tabla protegida)
+ * se retira de la UI para no tener dos caminos distintos hacia la misma decisión - REJECT ahora
+ * también pasa por `freeze()`, quedando igual de auditado/inmutable que las otras 3 decisiones.
  */
 class TaxonomyCandidateConceptLinkResource extends Resource
 {
@@ -87,6 +101,30 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                         'danger' => TaxonomyCandidateConceptLink::STATUS_REJECTED,
                         'warning' => TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED,
                     ]),
+                // TASK-0005: freeze() NUNCA toca `status`/`reviewed_at` de esta fila - sin esta
+                // columna no habría forma de ver desde la grilla que un candidato "pending" ya tiene
+                // una decisión de revisión C2 congelada, esperando aplicación separada.
+                Tables\Columns\BadgeColumn::make('reviewed_proposal_state')
+                    ->label('Propuesta C2')
+                    ->getStateUsing(function (TaxonomyCandidateConceptLink $record) {
+                        $latest = $record->reviewedProposals->sortByDesc('id')->first();
+                        if (! $latest) {
+                            return 'SIN_REVISAR';
+                        }
+
+                        return match ($latest->status) {
+                            TaxonomyReviewedProposal::STATUS_PENDING_APPLY => 'CONGELADA_PENDIENTE',
+                            TaxonomyReviewedProposal::STATUS_APPLIED => 'APLICADA',
+                            TaxonomyReviewedProposal::STATUS_ABORTED => 'ABORTADA',
+                            default => $latest->status,
+                        };
+                    })
+                    ->colors([
+                        'gray' => 'SIN_REVISAR',
+                        'info' => 'CONGELADA_PENDIENTE',
+                        'success' => 'APLICADA',
+                        'danger' => 'ABORTADA',
+                    ]),
                 Tables\Columns\TextColumn::make('reviewedBy.name')->label('Revisado por')->placeholder('—')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('reviewed_at')->label('Revisado el')->dateTime()->placeholder('—')->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -107,138 +145,60 @@ class TaxonomyCandidateConceptLinkResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                // Phase 3.1 (sección 9 del pedido): la lógica real (autorización, re-chequeo de
-                // status con lock, transacción, idempotencia, audit log) vive en
-                // CandidateConceptApprovalService - este Action solo llama al servicio e informa el
-                // resultado. `visible()` incluye el chequeo de permiso (Filament no lo aplica solo
-                // automáticamente a Actions custom) - es UX, no la salvaguarda real: la salvaguarda
-                // real está en el servicio, que se re-verifica sin importar qué mostró la UI.
+                // TASK-0005 (Issue #2 comentario `5914793857`): ÚNICA acción de revisión para
+                // candidatos pending - reemplaza `approve`/`reject`/`resolveNewConcept` (todas
+                // ahora colapsadas en las 4 decisiones C2: MAP_TO_EXISTING/CREATE_NEW (esta última
+                // solo si `isProposingNewConcept()`)/CONTEXT_REQUIRED/REJECT). La autorización/
+                // idempotencia/transacción/fingerprint reales viven en
+                // `ReviewedProposalService::freeze()` - este Action solo construye el payload
+                // explícito de la decisión y muestra el resultado. `visible()` es UX (la
+                // salvaguarda real de autorización está en el servicio, vía la misma policy
+                // `update` que ya gobernaba `approve`/`reject`/`resolveNewConcept`).
                 //
-                // Phase B.1: solo para candidatos con concepto sugerido por el algoritmo (no
-                // PROPOSE_NEW_CONCEPT - esos van por `resolveNewConcept` abajo). Antes de confirmar
-                // muestra impacto predicho + estado del grafo (secciones 5/11 del pedido).
-                Tables\Actions\Action::make('approve')
-                    ->label('Aprobar y publicar')
-                    ->icon('heroicon-o-check')
-                    ->color('success')
+                // CRÍTICO: esto NUNCA llama a `apply()` - "Congelar revisión" congela una decisión
+                // inmutable pendiente de aplicación, nunca publica. Ver `TaxonomyReviewedProposalResource`
+                // (de solo lectura) para inspeccionar el estado de la propuesta congelada.
+                Tables\Actions\Action::make('freezeReview')
+                    ->label('Revisar (congelar decisión C2)')
+                    ->icon('heroicon-o-lock-closed')
+                    ->color('primary')
                     ->visible(fn (TaxonomyCandidateConceptLink $record) => $record->status === TaxonomyCandidateConceptLink::STATUS_PENDING
-                        && ! $record->isProposingNewConcept()
                         && Auth::user()?->can('update', $record))
-                    ->requiresConfirmation()
-                    ->modalDescription(fn (TaxonomyCandidateConceptLink $record) => self::impactAndStalenessSummary($record))
-                    ->action(function (TaxonomyCandidateConceptLink $record) {
-                        // TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): publicar
-                        // desde acá ya no es posible - el guard de `TaxonomyCandidateConceptLink::booted()`
-                        // bloquea la transición fuera del apply() autorizado de Phase C2 y lanza
-                        // RuntimeException (revirtiendo toda la transacción de approve()). Se
-                        // atrapa acá para mostrar un mensaje legible en vez de un error crudo.
-                        try {
-                            $outcome = app(CandidateConceptApprovalService::class)->approve($record->id, Auth::user());
-                        } catch (\RuntimeException $e) {
-                            Notification::make()
-                                ->title('Aprobar (publicar) un candidato ya no se hace desde acá')
-                                ->body('Requiere el flujo autorizado de Phase C2 (freeze + apply con referencia de autorización explícita).')
-                                ->danger()->send();
-
-                            return;
-                        }
-
-                        match ($outcome['result']) {
-                            CandidateConceptApprovalService::RESULT_ALREADY_PROCESSED => Notification::make()
-                                ->title('Este candidato ya fue procesado (doble click o ya revisado por otro admin) - no se creó ningún link nuevo.')->warning()->send(),
-                            CandidateConceptApprovalService::RESULT_NOT_SUPPORTED => Notification::make()
-                                ->title('PROPOSE_NEW_CONCEPT no se puede aprobar desde acá todavía.')->danger()->send(),
-                            CandidateConceptApprovalService::RESULT_UNAUTHORIZED => Notification::make()
-                                ->title('No tenés permiso para aprobar candidatos.')->danger()->send(),
-                            default => Notification::make()->title('El candidato ya no existe.')->danger()->send(),
-                        };
-                    }),
-                // Phase B.1 (sección 7 del pedido): rechazo simple, ahora con motivo estructurado
-                // obligatorio (antes no pedía ningún motivo). Solo para candidatos NO
-                // PROPOSE_NEW_CONCEPT - los de concepto nuevo se rechazan vía `resolveNewConcept`
-                // (decisión REJECT), un solo camino por tipo de candidato, sin dos botones que hagan
-                // lo mismo con distinta UI.
-                Tables\Actions\Action::make('reject')
-                    ->label('Rechazar')
-                    ->icon('heroicon-o-x-mark')
-                    ->color('danger')
-                    ->visible(fn (TaxonomyCandidateConceptLink $record) => $record->status === TaxonomyCandidateConceptLink::STATUS_PENDING
-                        && ! $record->isProposingNewConcept()
-                        && Auth::user()?->can('update', $record))
-                    ->form([
-                        Forms\Components\Select::make('reject_reason_category')
-                            ->label('Motivo de rechazo')
-                            ->options(CandidateConceptApprovalService::REJECT_REASON_LABELS)
-                            ->native(false)
-                            ->required(),
-                        Forms\Components\Textarea::make('notes')
-                            ->label('Nota (opcional salvo motivo "Otro")')
-                            ->rows(2)
-                            ->required(fn (Get $get) => $get('reject_reason_category') === CandidateConceptApprovalService::REJECT_REASON_OTHER),
-                    ])
+                    ->form(fn (TaxonomyCandidateConceptLink $record) => self::freezeReviewForm($record))
                     ->action(function (TaxonomyCandidateConceptLink $record, array $data) {
-                        $notes = CandidateConceptApprovalService::composeReviewReason($data['reject_reason_category'], $data['notes'] ?? null);
-                        $outcome = app(CandidateConceptApprovalService::class)->reject($record->id, Auth::user(), $notes);
-
-                        match ($outcome['result']) {
-                            CandidateConceptApprovalService::RESULT_REJECTED => Notification::make()->title('Candidato rechazado')->success()->send(),
-                            CandidateConceptApprovalService::RESULT_ALREADY_PROCESSED => Notification::make()
-                                ->title('Este candidato ya fue procesado (doble click o ya revisado por otro admin).')->warning()->send(),
-                            CandidateConceptApprovalService::RESULT_UNAUTHORIZED => Notification::make()
-                                ->title('No tenés permiso para rechazar candidatos.')->danger()->send(),
-                            default => Notification::make()->title('El candidato ya no existe.')->danger()->send(),
+                        $decision = $data['decision'];
+                        $payload = match ($decision) {
+                            TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING => ['target_concept_id' => $data['target_concept_id'] ?? null],
+                            TaxonomyReviewedProposal::DECISION_CREATE_NEW => ['new_concept_name' => $data['new_concept_name'] ?? null],
+                            TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED => ['context_reason' => $data['context_reason'] ?? null],
+                            TaxonomyReviewedProposal::DECISION_REJECT => ['notes' => CandidateConceptApprovalService::composeReviewReason($data['reject_reason_category'], $data['notes'] ?? null)],
+                            default => [],
                         };
-                    }),
-                // Phase B.1 (objetivo principal de esta entrega): resuelve candidatos
-                // PROPOSE_NEW_CONCEPT (`suggested_concept_id === null`) con las 3 decisiones que
-                // `CandidateConceptApprovalService::resolveNewConceptProposal()` ya soporta desde
-                // Phase B, pero que hasta ahora ningún botón invocaba. Igual que arriba: la
-                // autorización/idempotencia/transacción reales viven en el servicio, este Action
-                // solo las invoca e informa el resultado.
-                Tables\Actions\Action::make('resolveNewConcept')
-                    ->label('Resolver propuesta de concepto nuevo')
-                    ->icon('heroicon-o-scale')
-                    ->color('warning')
-                    ->visible(fn (TaxonomyCandidateConceptLink $record) => $record->status === TaxonomyCandidateConceptLink::STATUS_PENDING
-                        && $record->isProposingNewConcept()
-                        && Auth::user()?->can('update', $record))
-                    ->form(fn (TaxonomyCandidateConceptLink $record) => self::resolveNewConceptForm($record))
-                    ->action(function (TaxonomyCandidateConceptLink $record, array $data) {
-                        $notes = $data['decision'] === CandidateConceptApprovalService::DECISION_REJECT
-                            ? CandidateConceptApprovalService::composeReviewReason($data['reject_reason_category'], $data['notes'] ?? null)
-                            : ($data['notes'] ?? null);
 
-                        // TASK-0004, re-audit HIGH-2: MAP_TO_EXISTING/CREATE_NEW ya no pueden
-                        // publicar desde acá - mismo guard/mismo criterio que la acción `approve` de
-                        // arriba. REJECT no está afectado (nunca escribió una tabla protegida).
-                        try {
-                            $outcome = app(CandidateConceptApprovalService::class)->resolveNewConceptProposal(
-                                $record->id,
-                                Auth::user(),
-                                $data['decision'],
-                                $data['target_concept_id'] ?? null,
-                                $notes,
-                            );
-                        } catch (\RuntimeException $e) {
-                            Notification::make()
-                                ->title('Publicar (mapear/crear concepto) desde acá ya no está disponible')
-                                ->body('Requiere el flujo autorizado de Phase C2 (freeze + apply con referencia de autorización explícita).')
-                                ->danger()->send();
-
-                            return;
-                        }
+                        $outcome = app(ReviewedProposalService::class)->freeze(
+                            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK,
+                            $record->id,
+                            $decision,
+                            Auth::user(),
+                            $payload,
+                        );
 
                         match ($outcome['result']) {
-                            CandidateConceptApprovalService::RESULT_REJECTED => Notification::make()->title('Candidato rechazado')->success()->send(),
-                            CandidateConceptApprovalService::RESULT_ALREADY_PROCESSED => Notification::make()
-                                ->title('Este candidato ya fue procesado (doble click o ya revisado por otro admin) - no se hizo ningún cambio.')->warning()->send(),
-                            CandidateConceptApprovalService::RESULT_UNAUTHORIZED => Notification::make()
-                                ->title('No tenés permiso para resolver este candidato.')->danger()->send(),
-                            CandidateConceptApprovalService::RESULT_NOT_FOUND => Notification::make()
+                            ReviewedProposalService::RESULT_FROZEN => Notification::make()
+                                ->title('Decisión de revisión congelada')
+                                ->body('Esto NO publicó ni cambió el candidato - queda como una propuesta inmutable pendiente de un paso de aplicación separado y explícitamente autorizado.')
+                                ->success()->send(),
+                            ReviewedProposalService::RESULT_UNAUTHORIZED => Notification::make()
+                                ->title('No tenés permiso para revisar este candidato.')->danger()->send(),
+                            ReviewedProposalService::RESULT_ALREADY_PROCESSED => Notification::make()
+                                ->title('Este candidato ya fue procesado (doble click o ya revisado por otro admin) - no se congeló nada nuevo.')->warning()->send(),
+                            ReviewedProposalService::RESULT_ALREADY_HAS_PENDING_PROPOSAL => Notification::make()
+                                ->title('Ya existe una propuesta de revisión congelada pendiente de aplicación para este candidato.')->warning()->send(),
+                            ReviewedProposalService::RESULT_VALIDATION_FAILED => Notification::make()
+                                ->title('Falta un campo explícito requerido para esta decisión (nombre nuevo/motivo de contexto no puede quedar vacío ni inferirse).')->danger()->send(),
+                            ReviewedProposalService::RESULT_NOT_FOUND => Notification::make()
                                 ->title('El concepto destino seleccionado ya no existe, o el candidato ya no existe.')->danger()->send(),
-                            CandidateConceptApprovalService::RESULT_NOT_APPLICABLE => Notification::make()
-                                ->title('Este candidato ya no es una propuesta de concepto nuevo (refrescá la página).')->danger()->send(),
-                            default => Notification::make()->title('No se pudo procesar la decisión.')->danger()->send(),
+                            default => Notification::make()->title('No se pudo congelar la decisión.')->danger()->send(),
                         };
                     }),
             ]);
@@ -246,9 +206,9 @@ class TaxonomyCandidateConceptLinkResource extends Resource
 
     /**
      * Phase B.1 (seguimiento 2026-09-25): texto compartido de impacto predicho, con el desglose
-     * confirmado/sugerido de `predictAffectedCompanies()` - reusado por el modal de `approve`, el
-     * formulario de `resolveNewConcept` y la vista de detalle, para no repetir 3 veces la misma
-     * lógica de formato con el riesgo de que se desincronicen entre sí.
+     * confirmado/sugerido de `predictAffectedCompanies()` - reusado por el formulario de
+     * `freezeReview` (TASK-0005) y la vista de detalle, para no repetir la misma lógica de formato
+     * con el riesgo de que se desincronicen entre sí.
      *
      * "Confirmado" = `empresa_taxonomy_category.origen = self_declared` (la empresa lo declaró ella
      * misma). "Sugerido" = `origen = suggested` (viene de `taxonomy:homologate-empresas`, un mapeo
@@ -278,28 +238,26 @@ class TaxonomyCandidateConceptLinkResource extends Resource
         return implode("\n", $lines);
     }
 
-    /** Phase B.1 (secciones 5/11 del pedido): texto de impacto + estado del grafo mostrado antes de confirmar `approve`. */
-    private static function impactAndStalenessSummary(TaxonomyCandidateConceptLink $record): string
-    {
-        $lines = [];
-
-        if ($record->concept) {
-            $impact = app(CanonicalConceptBuilderService::class)->predictedImpactForConcept($record->concept);
-            $lines[] = self::formatImpactSummary($impact);
-        }
-
-        $staleness = app(CandidateConceptApprovalService::class)->proposalStaleness($record);
-        $lines[] = match (true) {
-            ! $staleness['tracked'] => 'Estado del grafo de conceptos: no rastreado (candidato generado antes de Phase C).',
-            $staleness['stale'] => 'ADVERTENCIA: el grafo de conceptos cambió desde que se generó este candidato - revisar de nuevo antes de aprobar.',
-            default => 'Estado del grafo de conceptos: sin cambios desde que se generó este candidato.',
-        };
-
-        return implode("\n", $lines);
-    }
-
-    /** Phase B.1 (secciones 5/6/7/10/11 del pedido): formulario de decisión para candidatos PROPOSE_NEW_CONCEPT. */
-    private static function resolveNewConceptForm(TaxonomyCandidateConceptLink $record): array
+    /**
+     * TASK-0005 (Issue #2 comentario `5914793857`), sección A: formulario único de revisión C2
+     * para CUALQUIER candidato pending. Reemplaza `resolveNewConceptForm()` (solo cubría
+     * PROPOSE_NEW_CONCEPT con el flujo legacy). Las 4 decisiones que soporta
+     * `ReviewedProposalService::freeze()` para TERM_CONCEPT_LINK están todas acá:
+     * - MAP_TO_EXISTING: siempre disponible (mapear a un concepto existente, sea o no la sugerencia
+     *   original del Builder - el revisor elige explícitamente el destino, `target_concept_id`).
+     * - CREATE_NEW: solo si `isProposingNewConcept()` (mismo criterio que `freeze()` exige - un
+     *   candidato con concepto ya sugerido se resuelve con MAP_TO_EXISTING, nunca creando uno
+     *   paralelo). El campo `new_concept_name` NUNCA se prellena con `suggested_new_concept_name` -
+     *   la sugerencia del Builder se muestra en un `Placeholder` de solo evidencia/referencia (ver
+     *   hallazgo de ronda 4 de TASK-0004: "no implicit fallback").
+     * - CONTEXT_REQUIRED: siempre disponible (un término puede ser válido pero demasiado genérico
+     *   sin importar si el Builder sugirió un concepto existente o propuso uno nuevo).
+     * - REJECT: siempre disponible, mismo motivo estructurado que ya usaba el flujo legacy
+     *   (`CandidateConceptApprovalService::REJECT_REASON_LABELS`/`composeReviewReason()` - motivo
+     *   textual reutilizado, la ESCRITURA real ahora es 100% vía `freeze()`, nunca
+     *   `CandidateConceptApprovalService::reject()`).
+     */
+    private static function freezeReviewForm(TaxonomyCandidateConceptLink $record): array
     {
         $service = app(CandidateConceptApprovalService::class);
         $builder = app(CanonicalConceptBuilderService::class);
@@ -310,6 +268,9 @@ class TaxonomyCandidateConceptLinkResource extends Resource
         $duplicateOptions = collect($duplicates)->mapWithKeys(fn (array $d) => [
             $d['concept_id'] => "{$d['concept_name']} (score {$d['score']}, tier {$d['tier']})",
         ])->all();
+        if ($record->suggested_concept_id !== null && ! isset($duplicateOptions[$record->suggested_concept_id])) {
+            $duplicateOptions[$record->suggested_concept_id] = $record->concept?->display_name ?? "#{$record->suggested_concept_id}";
+        }
 
         $stalenessText = match (true) {
             ! $staleness['tracked'] => 'No rastreado (candidato generado antes de Phase C, sin fingerprint estampado).',
@@ -321,6 +282,15 @@ class TaxonomyCandidateConceptLinkResource extends Resource
             ? 'Ninguno - ningún concepto existente corroboró lo suficiente (mismo pipeline de scoring del Builder).'
             : collect($duplicates)->map(fn (array $d) => "#{$d['concept_id']} {$d['concept_name']} — score {$d['score']}, tier {$d['tier']}")->implode(' | ');
 
+        $decisionOptions = [
+            TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING => 'Mapear a un concepto existente',
+        ];
+        if ($record->isProposingNewConcept()) {
+            $decisionOptions[TaxonomyReviewedProposal::DECISION_CREATE_NEW] = 'Crear concepto nuevo';
+        }
+        $decisionOptions[TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED] = 'Término genérico - requiere contexto (sin mapeo directo)';
+        $decisionOptions[TaxonomyReviewedProposal::DECISION_REJECT] = 'Rechazar';
+
         return [
             Forms\Components\Placeholder::make('term_summary')
                 ->label('Término candidato')
@@ -331,9 +301,11 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                     $record->term?->term_type ?? '—',
                     is_array($record->term?->region ?? null) ? implode(', ', $record->term->region) : '—',
                 )),
-            Forms\Components\Placeholder::make('proposed_name')
-                ->label('Nombre de concepto propuesto')
-                ->content($record->suggested_new_concept_name ?: ($record->term?->canonical_term ?? '—')),
+            Forms\Components\Placeholder::make('builder_suggestion')
+                ->label('Sugerencia del Builder (solo evidencia/referencia - nunca se usa implícitamente)')
+                ->content($record->isProposingNewConcept()
+                    ? ('Concepto NUEVO propuesto: "'.($record->suggested_new_concept_name ?: '—').'"')
+                    : ('Concepto existente sugerido: '.($record->concept?->display_name ?? "#{$record->suggested_concept_id}"))),
             Forms\Components\Placeholder::make('duplicates_summary')
                 ->label('Posibles conceptos existentes (evitar duplicado)')
                 ->content($duplicatesText),
@@ -341,36 +313,43 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                 ->label('Estado del grafo de conceptos')
                 ->content($stalenessText),
             Forms\Components\Radio::make('decision')
-                ->label('Decisión')
-                ->options([
-                    CandidateConceptApprovalService::DECISION_MAP_TO_EXISTING => 'Mapear a un concepto existente',
-                    CandidateConceptApprovalService::DECISION_CREATE_NEW => 'Crear concepto nuevo',
-                    CandidateConceptApprovalService::DECISION_REJECT => 'Rechazar',
-                ])
+                ->label('Decisión de revisión (C2 - solo congela, no publica)')
+                ->options($decisionOptions)
                 ->required()
                 ->live(),
             Forms\Components\Select::make('target_concept_id')
                 ->label('Concepto destino')
+                ->helperText('Elegí explícitamente el concepto destino - no se asume la sugerencia del Builder aunque coincida.')
                 ->options($duplicateOptions)
                 ->searchable()
                 ->getSearchResultsUsing(fn (string $search) => TaxonomyCanonicalConcept::query()
                     ->where(fn ($q) => $q->where('canonical_name_en', 'ilike', "%{$search}%")->orWhere('canonical_name_es', 'ilike', "%{$search}%"))
                     ->limit(20)->get()->mapWithKeys(fn (TaxonomyCanonicalConcept $c) => [$c->id => $c->display_name])->all())
                 ->getOptionLabelUsing(fn ($value) => TaxonomyCanonicalConcept::find($value)?->display_name)
-                ->required(fn (Get $get) => $get('decision') === CandidateConceptApprovalService::DECISION_MAP_TO_EXISTING)
-                ->visible(fn (Get $get) => $get('decision') === CandidateConceptApprovalService::DECISION_MAP_TO_EXISTING)
+                ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING)
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING)
                 ->live(),
+            Forms\Components\TextInput::make('new_concept_name')
+                ->label('Nombre del concepto nuevo (elegido explícitamente por el revisor)')
+                ->helperText('Nunca se completa solo con la sugerencia del Builder de arriba - escribilo o copialo a propósito.')
+                ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW)
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW),
+            Forms\Components\Textarea::make('context_reason')
+                ->label('Motivo (por qué necesita contexto, sin mapeo directo)')
+                ->rows(2)
+                ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED)
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED),
             Forms\Components\Placeholder::make('impact_preview')
                 ->label('Impacto predicho (empresas)')
                 ->content(function (Get $get) use ($record, $builder) {
-                    if ($get('decision') === CandidateConceptApprovalService::DECISION_MAP_TO_EXISTING) {
+                    if ($get('decision') === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING) {
                         $targetConceptId = $get('target_concept_id');
                         $concept = $targetConceptId ? TaxonomyCanonicalConcept::find($targetConceptId) : null;
                         if (! $concept) {
                             return 'Elegí un concepto destino para ver el impacto predicho.';
                         }
                         $impact = $builder->predictedImpactForConcept($concept);
-                    } elseif ($get('decision') === CandidateConceptApprovalService::DECISION_CREATE_NEW) {
+                    } elseif ($get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW) {
                         $categoryIds = $builder->conceptApprovedCategoryIds([$record->suggested_term_id]);
                         $impact = $builder->predictAffectedCompanies($categoryIds);
                     } else {
@@ -380,20 +359,21 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                     return self::formatImpactSummary($impact);
                 })
                 ->visible(fn (Get $get) => in_array($get('decision'), [
-                    CandidateConceptApprovalService::DECISION_MAP_TO_EXISTING,
-                    CandidateConceptApprovalService::DECISION_CREATE_NEW,
+                    TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                    TaxonomyReviewedProposal::DECISION_CREATE_NEW,
                 ], true)),
             Forms\Components\Select::make('reject_reason_category')
                 ->label('Motivo de rechazo')
                 ->options(CandidateConceptApprovalService::REJECT_REASON_LABELS)
                 ->native(false)
-                ->required(fn (Get $get) => $get('decision') === CandidateConceptApprovalService::DECISION_REJECT)
-                ->visible(fn (Get $get) => $get('decision') === CandidateConceptApprovalService::DECISION_REJECT),
+                ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_REJECT)
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_REJECT),
             Forms\Components\Textarea::make('notes')
                 ->label('Nota')
                 ->rows(2)
-                ->required(fn (Get $get) => $get('decision') === CandidateConceptApprovalService::DECISION_REJECT
-                    && $get('reject_reason_category') === CandidateConceptApprovalService::REJECT_REASON_OTHER),
+                ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_REJECT
+                    && $get('reject_reason_category') === CandidateConceptApprovalService::REJECT_REASON_OTHER)
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_REJECT),
         ];
     }
 

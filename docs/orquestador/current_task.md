@@ -1,21 +1,53 @@
 # Tarea activa
 
-**TASK-0004** — Phase C2: Reviewed Immutable Payload Application (Issue #2 comentario `5886148283`).
-**Implementación C2: CLOSED/APPROVED. Despliegue a staging + validación: PASS** (comentario
-`5914592664`, confirmando la ronda 6).
+**TASK-0005** — UI de revisión humana C2 en Filament + hardening del trigger de despliegue
+(Issue #2 comentario `5914793857`). Abierta desde HEAD `63cf811`.
 
-**Estado:** STANDING_BY — nada pendiente de esta sesión; esperando la apertura formal de la
-siguiente fase funcional (wiring de la UI de revisión humana C2 en Filament) por instrucción
-explícita del orquestador. Esta sesión NO debe actuar sobre los 10 candidatos/2 relaciones reales, ni
-volver a correr la suite completa de tests contra los bind mounts del contenedor de staging en vivo,
-hasta que esa apertura formal ocurra.
+**Estado:** READY_FOR_REVIEW — implementación, tests seguros, hardening del workflow, despliegue a
+staging y smoke completados. Detalle completo en
+[`audit/phase5_task0005_c2_review_ui_2026-09-30.md`](../../audit/phase5_task0005_c2_review_ui_2026-09-30.md);
+texto verbatim de la tarea en
+[`tasks/0005-c2-human-review-ui.md`](tasks/0005-c2-human-review-ui.md).
+
+Resumen de lo entregado:
+
+- **A/B — UI de freeze:** una acción única `freezeReview` por resource (candidatos: `MAP_TO_EXISTING`
+  / `CREATE_NEW` / `CONTEXT_REQUIRED` / `REJECT`; relaciones: `PUBLISH_RELATION` / `REJECT`), cableada
+  exclusivamente a `ReviewedProposalService::freeze()`. Cada decisión exige input humano explícito;
+  `CREATE_NEW` no tiene fallback implícito al nombre sugerido por el Builder (la sugerencia se muestra
+  solo como evidencia). Las acciones legacy `approve`/`reject`/`resolveNewConcept` fueron removidas.
+- **C — visibilidad:** nuevo `TaxonomyReviewedProposalResource` de solo lectura (List + View, sin
+  páginas de create/edit/delete) con origen, decisión, revisor, timestamps, referencia de
+  autorización, entorno objetivo, fingerprints y estado de ejecución.
+- **D — frontera de autorización:** cero botón/ruta de Apply/Publish alcanzable por un revisor.
+  `apply()` sigue siendo un paso separado, solo por servicio/artisan.
+- **E — guardas legacy intactas:** ninguna guarda de TASK-0004 fue debilitada;
+  `CandidateConceptApprovalService` sigue sin poder publicar rodeando C2.
+- **F/H — tests:** 24/25 en la UI nueva (el único fallo es el gap local preexistente de `ext-intl`,
+  verde en staging) + 99/99 sin regresiones en los archivos relacionados no editados. Todo con
+  fixtures desechables dentro de `DatabaseTransactions`, en entorno local seguro — **no** se reusó el
+  procedimiento de contenedor efímero sobre los bind mounts de staging en vivo.
+- **G — hardening del deploy:** `paths-ignore` (`docs/**`, `audit/**`, `**.md`) en
+  `deploy-contabo.yml`, con la semántica todo-o-nada y los casos representativos documentados en el
+  propio workflow. `tests/**` NO se ignora, por decisión deliberada y conservadora.
+- **Invariantes:** 10/2/142/79/9749/0 verificados antes de empezar, después de los tests y después del
+  despliegue. **Los 10 candidatos y 2 relaciones reales quedaron intactos** — ningún
+  freeze/apply/reject/context-resolve corrió contra ellos.
+
+Ver `PROTOCOL.md` antes de tocar esta tarea. Precondiciones verificadas: Phase C1 (TASK-0001 +
+TASK-0003) sigue `APPROVED` (comentario `5886125405`, HEAD revisado `ce11d36`); TASK-0004 / Phase C2
+sigue `CLOSED/APPROVED` con despliegue de staging `PASS` (comentarios `5914592664` / `5914676402`).
+
+## TASK-0004 (cerrada, histórico)
+
+**Phase C2: Reviewed Immutable Payload Application** (Issue #2 comentario `5886148283`).
+**Implementación C2: CLOSED/APPROVED. Despliegue a staging + validación: PASS** (comentario
+`5914592664`, confirmando la ronda 6; HEAD `63cf811` aceptado como checkpoint documental en
+`5914676402`).
 
 Comentarios del hilo completo (todos con texto verbatim en
 [`tasks/0004-phase-c2-immutable-apply.md`](tasks/0004-phase-c2-immutable-apply.md)):
 `5890113782`, `5890195271`, `5892711739`, `5909267134`, `5913324183`, `5913574545`, `5914592664`.
-
-Ver `PROTOCOL.md` antes de tocar esta tarea. Precondición verificada: Phase C1 (TASK-0001 +
-TASK-0003) sigue `APPROVED` (comentario `5886125405`, HEAD revisado `ce11d36`).
 
 ## Ronda 7 (comentario `5914592664`) — confirmación, sin cambios de código
 
@@ -89,3 +121,4 @@ análisis de los 3 fallos): `audit/phase5_staging_deployment_2026-09-30.md`.
 | TASK-0004 (ronda 5, evidencia de entorno) | DEPLOYMENT AUTHORIZED (ronda 6) | mismo archivo, sección "Re-audit — comentario `5913324183`" |
 | TASK-0004 (ronda 6, despliegue a staging + validación) | PASS WITH FOLLOW-UP HARDENING (ronda 7) | mismo archivo, sección "Autorización de despliegue — comentario `5913574545`"; detalle completo en `audit/phase5_staging_deployment_2026-09-30.md` |
 | TASK-0004 (ronda 7, confirmación PASS) | STANDING_BY | mismo archivo, sección "Confirmación de despliegue + hardening pendiente — comentario `5914592664`" |
+| TASK-0004 (ronda 8, checkpoint documental `63cf811`) | CLOSED | mismo archivo; sin acción de código (el comentario `5914676402` instruyó esperar la apertura formal de TASK-0005) |

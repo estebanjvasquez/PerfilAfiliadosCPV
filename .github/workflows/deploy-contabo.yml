@@ -2,10 +2,44 @@ name: Deploy a Contabo
 
 # Dispara en push a la rama de despliegue. Cambiar 'feature/upgrade-filament-v3' por la rama
 # definitiva cuando se decida (ver docs/arquitectura_final_contabo_cloudflare.md).
+#
+# TASK-0005 (Issue #2 comentario `5914793857`, sección G): `paths-ignore` evita redeployar staging
+# cuando un push toca EXCLUSIVAMENTE archivos que no pueden afectar el runtime - encontrado en vivo
+# en TASK-0004 ronda 7 (comentario `5914676402`): cada commit solo-documentación disparaba un
+# rebuild+redeploy completo innecesario.
+#
+# Semántica exacta de `paths-ignore` de GitHub Actions (todo-o-nada sobre el PUSH completo, no
+# archivo por archivo): el workflow se SALTA solo si TODOS los archivos cambiados en el push
+# matchean alguno de los patrones de abajo. Si UN SOLO archivo cambiado no matchea ninguno (ej. un
+# commit mixto docs+código), el workflow SÍ dispara igual - conservador por diseño, nunca al revés.
+#
+# Casos representativos (documentados, no solo declarados):
+# - Push que SOLO toca `docs/**`, `audit/**`, o `*.md`/`**.md` sueltos (ej. checkpoints del
+#   orquestador, notas de arquitectura) -> NO dispara deploy. Ninguno de estos archivos se lee en
+#   ningún momento por el runtime de Laravel/PHP - ni siquiera se copian a una imagen Docker
+#   "servida" de forma distinta (el `git reset --hard` del script los trae igual, simplemente no
+#   hace falta rebuildear/reiniciar nada por ellos).
+# - Push que toca `app/**`, `resources/**`, `routes/**`, `database/migrations/**`,
+#   `composer.json`/`composer.lock`, `Dockerfile`, `docker-compose.yml`, `docker/**`,
+#   `.github/workflows/**`, o cualquier archivo de configuración/runtime -> SIGUE disparando deploy
+#   sin cambios (no matchea ningún patrón de `paths-ignore`).
+# - Push que toca `tests/**` ÚNICAMENTE (sin ningún cambio de `app/`/runtime en el mismo commit):
+#   decisión deliberada de esta tarea, `tests/**` NO se agrega a `paths-ignore` a propósito. Los
+#   tests no corren en el contenedor de staging como parte de servir tráfico (no afectan el
+#   comportamiento real), así que técnicamente sería seguro ignorarlos también - pero el pedido
+#   explícito de esta tarea es "be conservative... do not create a filter broad enough to suppress
+#   a legitimate deployment", y un commit que solo toca tests, aunque no *necesite* redeploy para
+#   corrección, tampoco es un caso que valga la pena optimizar a costa de ampliar el filtro - se
+#   prefiere errar redesplegando de más (inofensivo, ~lo mismo que ya pasaba antes de esta tarea)
+#   que de menos.
 on:
   push:
     branches:
       - feature/upgrade-filament-v3
+    paths-ignore:
+      - 'docs/**'
+      - 'audit/**'
+      - '**.md'
   workflow_dispatch: {}
 
 jobs:
