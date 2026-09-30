@@ -1,30 +1,49 @@
 # Tarea activa
 
-**TASK-0004** — Phase C2: Reviewed Immutable Payload Application (Issue #2 comentario `5886148283`),
-**ronda 6: despliegue controlado a staging + validación** (comentarios `5890113782` + `5890195271` +
-`5892711739` + `5909267134` + `5913324183` + `5913574545`)
+**TASK-0004** — Phase C2: Reviewed Immutable Payload Application (Issue #2 comentario `5886148283`).
+**Implementación C2: CLOSED/APPROVED. Despliegue a staging + validación: PASS** (comentario
+`5914592664`, confirmando la ronda 6).
 
-Archivo: [`tasks/0004-phase-c2-immutable-apply.md`](tasks/0004-phase-c2-immutable-apply.md) (incluye
-el texto verbatim de los seis comentarios del re-audit/despliegue)
+**Estado:** STANDING_BY — nada pendiente de esta sesión; esperando la apertura formal de la
+siguiente fase funcional (wiring de la UI de revisión humana C2 en Filament) por instrucción
+explícita del orquestador. Esta sesión NO debe actuar sobre los 10 candidatos/2 relaciones reales, ni
+volver a correr la suite completa de tests contra los bind mounts del contenedor de staging en vivo,
+hasta que esa apertura formal ocurra.
 
-**Estado:** READY_FOR_REVIEW
+Comentarios del hilo completo (todos con texto verbatim en
+[`tasks/0004-phase-c2-immutable-apply.md`](tasks/0004-phase-c2-immutable-apply.md)):
+`5890113782`, `5890195271`, `5892711739`, `5909267134`, `5913324183`, `5913574545`, `5914592664`.
 
 Ver `PROTOCOL.md` antes de tocar esta tarea. Precondición verificada: Phase C1 (TASK-0001 +
-TASK-0003) sigue `APPROVED` (comentario `5886125405`, HEAD revisado `ce11d36`) — no invalidada por
-esta ronda. TASK-0004/Phase C2 sigue `CLOSED/APPROVED` (comentario `5913324183`) — esta ronda no
-tocó ningún código.
+TASK-0003) sigue `APPROVED` (comentario `5886125405`, HEAD revisado `ce11d36`).
 
-## Qué pidió el re-audit (ronda 6, comentario `5913574545`) y qué se hizo
+## Ronda 7 (comentario `5914592664`) — confirmación, sin cambios de código
 
-Autorización explícita para despliegue CONTROLADO a STAGING (Contabo, `pruebas.camarapetrolera.app`)
-+ validación no destructiva, con pre-checks/invariantes/límites obligatorios detallados. Docker local
-dejó de ser requisito. **Ningún cambio de código de la aplicación se hizo esta ronda** - es
-despliegue + validación puros.
+El comentario confirma `PASS` para el despliegue/validación de staging de la ronda 6 (ningún cambio
+adicional de código ni de evidencia requerido) y dos instrucciones para más adelante, ninguna abierta
+todavía:
+
+1. **Hardening operacional del procedimiento de test-en-staging** (no reabre TASK-0004): antes de
+   volver a correr la suite completa contra el host compartido de staging, hace falta un camino de
+   ejecución de tests que no pueda escribir en los bind mounts de la app en vivo (`bootstrap/cache`,
+   `storage`, etc.), forzar `APP_ENV=testing` a nivel de proceso/contenedor, no correr scripts de
+   `package:discover` contra el filesystem del contenedor que sirve tráfico, y agregar guardas de
+   smoke-test antes/después + limpieza automática de contenedores efímeros. **No implementado en esta
+   ronda** - es trabajo operacional para cuando se vuelva a necesitar correr tests en staging, no algo
+   pedido para ejecutar ahora.
+2. **Próxima fase funcional (wiring de la UI de revisión humana C2 en Filament):** el propio
+   comentario dice explícitamente que solo se abre "awaiting/opened only by explicit orchestrator
+   instruction" - **todavía no está abierta**. El usuario, en su mensaje de esta ronda, instruyó
+   exactamente lo mismo: detenerse y esperar esa apertura formal, sin actuar sobre los 10
+   candidatos/2 relaciones reales.
+
+**Ninguna acción de código, despliegue, ni de servidor se tomó en esta ronda** - es puramente de
+reconocimiento/registro del comentario y actualización de este documento.
+
+## Resumen de la ronda 6 (comentario `5913574545`) — despliegue a staging + validación
 
 Detalle completo (checkpoint pre-despliegue, despliegue, validación 1-9, incidente y corrección,
 análisis de los 3 fallos): `audit/phase5_staging_deployment_2026-09-30.md`.
-
-### Resumen
 
 - **Despliegue:** ya había ocurrido automáticamente vía el workflow existente de GitHub Actions
   (dispara en cada push a `feature/upgrade-filament-v3`) - verificado que el run para HEAD `4f1b02e`
@@ -32,15 +51,16 @@ análisis de los 3 fallos): `audit/phase5_staging_deployment_2026-09-30.md`.
 - **Checkpoint pre-despliegue:** todos los invariantes de DB coincidieron exactamente (10/2/142/79/
   9749/0), sin migraciones pendientes, target de DB confirmado como la misma instancia compartida de
   Supabase, `ext-intl` confirmado cargado en el servidor.
-- **Incidente real (causado y corregido en esta ronda):** un contenedor efímero de pruebas
-  (necesario para tener PHPUnit disponible, ausente en la imagen `--no-dev` de staging) sobrescribió,
-  vía un bind mount compartido (`bootstrap/cache/`), la caché de auto-discovery de paquetes del
-  contenedor REAL que sirve tráfico - staging quedó caído (HTTP 500) unos minutos. Diagnosticado y
-  corregido de inmediato (regenerar la caché desde el propio `vendor/` del contenedor real) - **el
-  usuario fue informado de forma transparente e inmediata y autorizó explícitamente la corrección
-  antes de que se ejecutara** (el clasificador de auto-modo de esta sesión bloqueó la escritura
-  remota pidiendo esa confirmación). Staging restaurado y verificado en HTTP 200. Ningún código,
-  dato, ni fila real fue tocado por el incidente ni su corrección.
+- **Incidente real (causado y corregido en esa ronda):** un contenedor efímero de pruebas (necesario
+  para tener PHPUnit disponible, ausente en la imagen `--no-dev` de staging) sobrescribió, vía un
+  bind mount compartido (`bootstrap/cache/`), la caché de auto-discovery de paquetes del contenedor
+  REAL que sirve tráfico - staging quedó caído (HTTP 500) unos minutos. Diagnosticado y corregido de
+  inmediato (regenerar la caché desde el propio `vendor/` del contenedor real) - el usuario fue
+  informado de forma transparente e inmediata y autorizó explícitamente la corrección antes de que se
+  ejecutara. Staging restaurado y verificado en HTTP 200. Ningún código, dato, ni fila real fue
+  tocado por el incidente ni su corrección. El comentario `5914592664` confirmó que esto NO invalida
+  la implementación C2, pero exige el hardening operacional listado arriba antes de reutilizar el
+  procedimiento.
 - **Suite completa de taxonomía en el servidor real (`ext-intl`, HEAD `4f1b02e`): 188/191 PASS (605
   assertions), 275.45s.** El test bloqueado en TODAS las rondas anteriores por el gap de `ext-intl`
   ahora pasa limpio. `ReviewedProposalServiceTest` (evidencia C2 directa): **41/41 PASS**, sin
@@ -48,46 +68,12 @@ análisis de los 3 fallos): `audit/phase5_staging_deployment_2026-09-30.md`.
 - **Los 3 fallos restantes** tienen causa raíz precisa e identificada (precedencia de `APP_ENV` entre
   la variable de entorno real del contenedor y el `<env>` no forzado de `phpunit.xml`) - ninguno es
   una regresión de C2/taxonomía, los 3 están en archivos de TASK-0003 no tocados por ninguna ronda de
-  TASK-0004. Un segundo intento de corrida limpia (autorizado por el usuario) tropezó con un problema
-  distinto y las siguientes acciones de escritura remota fueron bloqueadas repetidamente por el
-  clasificador - se aceptó la evidencia real ya obtenida en vez de seguir pidiendo autorización
-  repetida por un número perfecto.
+  TASK-0004. El comentario `5914592664` confirmó explícitamente esta lectura.
 - **Invariantes de DB después de toda la suite: sin cambios** (10/2/142/79/9749/0) - los 10
   candidatos/2 relaciones reales permanecieron intactos durante todo el despliegue y validación.
 - **Búsqueda:** re-verificado sobre el código REALMENTE DESPLEGADO que `BuildEmpresaSearchDocuments`
   no lee ninguna tabla de candidatos/propuestas. Worker verificado accesible (health check público,
-  sin tokens). No se re-corrió la regresión de 32 queries (el comentario lo exime explícitamente si
-  no hay cambio de código/búsqueda/datos publicados - no lo hay).
-
-## Evidencia
-
-- **[B] Suite completa de taxonomía (servidor real, Contabo, `ext-intl`): 188/191 PASS (605
-  assertions), 275.45s** - ver análisis completo de los 3 fallos (causa raíz no-C2) en
-  `audit/phase5_staging_deployment_2026-09-30.md`.
-- **[B] `ReviewedProposalServiceTest` (servidor real): 41/41 PASS** - limpio.
-- **[A] DB invariants antes y después: 10/2/142/79/9749/0** - sin cambios, verificado por SSH de
-  solo lectura antes y después de toda la suite.
-- **[A] Regresión de 32 queries:** heredada, no invalidada (sin cambio de búsqueda/ranking/datos
-  publicados en esta ronda).
-- **[A] Phase C1, TASK-0002, TASK-0004 (implementación C2):** `APPROVED`/`CLOSED`, no tocadas.
-- **[D] Migraciones de esquema:** ninguna nueva - todas ya habían corrido.
-
-## Fuera de alcance de esta ronda (documentado, no oculto)
-
-- Producción, merge a `main`, rotación de credenciales, operaciones masivas de taxonomía,
-  publicación, o cualquier freeze/apply/review/reject de los 10 candidatos/2 relaciones reales -
-  explícitamente NO autorizado por el comentario, y no se hizo.
-- Verificación completa Worker→Hyperdrive→Supabase con `/mcp`/`/debug-search` (requeriría
-  `MCP_TOKEN`/`DEBUG_TOKEN`, cuya rotación no está autorizada por separado) - solo se verificó el
-  health check público del Worker.
-- Un segundo intento de corrida de suite "perfectamente limpia" - autorizado parcialmente por el
-  usuario, pero se aceptó la evidencia ya obtenida en vez de seguir pidiendo autorización repetida
-  para acciones de escritura remota adicionales sobre el servidor compartido.
-
-**STOP.** No se llamó `freeze()`/`apply()` contra ningún candidato/relación real, no se tocaron los
-10 candidatos/2 relaciones de TASK-0001, no se mergeó a `main`, no se desplegó a producción, no se
-rotó ningún secreto. La decisión de autorizar el flujo real de revisión humana o el siguiente paso de
-producción queda en manos del orquestador/usuario.
+  sin tokens). No se re-corrió la regresión de 32 queries (heredada, no invalidada).
 
 ## Tareas anteriores (histórico, no activas)
 
@@ -101,4 +87,5 @@ producción queda en manos del orquestador/usuario.
 | TASK-0004 (ronda 3, correcciones A/B/C) | CORRECTIONS_REQUIRED (final semantic defects, ronda 4) | mismo archivo, sección "Re-audit — comentario `5892711739`" |
 | TASK-0004 (ronda 4, defectos 1/2) | IMPLEMENTATION PASS / ENVIRONMENT_GATE_PENDING (ronda 5) | mismo archivo, sección "Re-audit — comentario `5909267134`" |
 | TASK-0004 (ronda 5, evidencia de entorno) | DEPLOYMENT AUTHORIZED (ronda 6) | mismo archivo, sección "Re-audit — comentario `5913324183`" |
-| TASK-0004 (ronda 6, despliegue a staging + validación) | READY_FOR_REVIEW | mismo archivo, sección "Autorización de despliegue — comentario `5913574545`"; detalle completo en `audit/phase5_staging_deployment_2026-09-30.md` |
+| TASK-0004 (ronda 6, despliegue a staging + validación) | PASS WITH FOLLOW-UP HARDENING (ronda 7) | mismo archivo, sección "Autorización de despliegue — comentario `5913574545`"; detalle completo en `audit/phase5_staging_deployment_2026-09-30.md` |
+| TASK-0004 (ronda 7, confirmación PASS) | STANDING_BY | mismo archivo, sección "Confirmación de despliegue + hardening pendiente — comentario `5914592664`" |

@@ -470,6 +470,60 @@ Corrige ÚNICAMENTE la interpretación de GATE 3 del comentario anterior. Texto 
 >
 > The orchestrator will audit deployment evidence before authorizing any real human-review workflow or production step.
 
+## Confirmación de despliegue + hardening pendiente — comentario [`5914592664`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5914592664) (2026-09-30T15:39:35Z) — PASS WITH FOLLOW-UP HARDENING
+
+> [ORCHESTRATOR RE-AUDIT — STAGING DEPLOYMENT / VALIDATION — PASS WITH FOLLOW-UP HARDENING]
+>
+> Reviewed READY_FOR_REVIEW at HEAD `307d3d8` against deployment authorization comment `5913574545` and approved C2 baseline `4f1b02e`.
+>
+> VERDICT
+> CONTROLLED STAGING DEPLOYMENT + C2 INTEGRATION VALIDATION: PASS.
+>
+> The deployed application itself is HEAD `4f1b02e`; HEAD `307d3d8` contains the deployment/audit documentation produced after validation. No application/C2 semantic change was introduced by this round.
+>
+> ACCEPTED EVIDENCE
+> - Staging: `pruebas.camarapetrolera.app`, Contabo `/opt/perfilafiliados`.
+> - Existing GitHub Actions deployment for `4f1b02e` completed successfully; rollback point recorded as `571c55a`.
+> - PHP 8.2.34 with `ext-intl` confirmed on staging.
+> - Laravel staging and `/admin/login` ultimately return HTTP 200.
+> - No pending migrations; C2 reviewed-proposals schema is present.
+> - Directed C2 suite: `ReviewedProposalServiceTest` 41/41 PASS.
+> - Full taxonomy suite actually executed on Contabo with intl: 188/191 PASS, 605 assertions. The historical intl blocker is therefore RESOLVED in the staging runtime.
+> - The three remaining failures are not evidence of a C2 regression: one is demonstrably an APP_ENV expectation mismatch; two are inherited TASK-0003 Livewire/validation tests observed under APP_ENV=staging. They must remain documented rather than being hidden or converted to a false green.
+> - DB invariants before/after: 10 / 2 / 142 / 79 / 9749 / 0. Existing 10 candidates + 2 candidate relations untouched; no persistent reviewed-proposal test residue.
+> - Deployed search-index builder still does not consume candidate/reviewed-proposal tables.
+> - Worker public health endpoint is reachable. Full authenticated Worker→Hyperdrive→Supabase path was not re-exercised because token rotation/use was outside authorization; this limitation is correctly disclosed.
+> - Frozen 32-query regression remains inherited and uninvalidated: no search/ranking/published-taxonomy change in this deployment-validation round.
+>
+> INCIDENT REVIEW
+> A staging outage occurred during validation because an ephemeral `docker compose run` test container shared the host-mounted `bootstrap/cache` directory with the live app and `composer install`/package discovery rewrote the live package manifest. The incident was transparently recorded, staging was restored, and no taxonomy/data mutation occurred.
+>
+> This does not invalidate the C2 implementation, but it reveals a deployment/test-isolation weakness that MUST be fixed before this test procedure is reused.
+>
+> FOLLOW-UP HARDENING REQUIREMENT — NEXT TASK
+> Before another full test-suite execution on the shared staging host:
+> 1. Create a dedicated test execution path that cannot write to live app bind mounts (`bootstrap/cache`, storage/runtime artifacts, vendor, etc.). Prefer an isolated compose profile/service or CI runner with separate volumes/filesystem.
+> 2. Force `APP_ENV=testing` at process/container level for PHPUnit, rather than relying on non-forced phpunit.xml env when Docker already injects staging.
+> 3. Test execution must not run package-discovery scripts against any filesystem mounted by the traffic-serving container.
+> 4. Add a pre/post HTTP smoke guard and automatic cleanup of ephemeral test containers/artifacts.
+> 5. Do not change production/C2 semantics merely to make environment-sensitive tests green.
+> This hardening is operational work and does not reopen TASK-0004.
+>
+> NEXT FUNCTIONAL TASK
+> The precondition from the prior approval remains: wire the Filament human-review UI to the approved C2 workflow. Review actions must allow MAP_TO_EXISTING / CREATE_NEW / CONTEXT_REQUIRED / REJECT and create/freeze the immutable reviewed proposal WITHOUT publishing it. APPLY remains a separate, explicitly authorized execution step.
+>
+> Do not act on the real 10 candidates or 2 relations while implementing/testing this UI. Use fixtures only. The user's domain conclusion that the current 10 appear valid-but-generic may later guide human review, but MUST NOT be hardcoded or auto-applied.
+>
+> AUTHORIZATION STATUS
+> Still NOT authorized: production deployment, merge to main, credential rotation, destructive migration, bulk taxonomy mutation, or review/freeze/apply/publish/reject of the existing 10 candidates / 2 relations.
+>
+> STATUS:
+> - TASK-0004 / Phase C2 implementation: CLOSED / APPROVED.
+> - Staging deployment + integration validation: PASS.
+> - Local/ext-intl environment gate: superseded by real staging evidence; intl confirmed operational.
+> - Operational test-isolation hardening: required before reusing full-suite-on-staging procedure.
+> - Next functional phase: C2 human-review UI wiring, awaiting/opened only by explicit orchestrator instruction.
+
 ## Estado
 
 Ver `docs/orquestador/current_task.md` para el estado vigente, el ledger de gates heredados, y la
@@ -477,4 +531,9 @@ máquina de estados exacta implementada (documentada en `audit/phase4_c2_immutab
 `audit/phase4_c2_corrections_2026-09-29.md` — incluye las secciones "Ronda 3" (comentario
 `5892711739`), "Ronda 4" (comentario `5909267134`) y "Ronda 5" (comentario `5913324183`)). El
 despliegue/validación a staging autorizado por el comentario `5913574545` está documentado en
-`audit/phase5_staging_deployment_2026-09-30.md` (incluye el incidente real y su corrección).
+`audit/phase5_staging_deployment_2026-09-30.md` (incluye el incidente real y su corrección),
+confirmado PASS por el comentario `5914592664`, que además deja pendiente un hardening operacional
+(no reabre TASK-0004) y dice explícitamente que la fase de UI de revisión humana C2 solo se abre con
+una instrucción explícita futura del orquestador - **esta sesión se detiene acá y espera esa
+apertura formal**, sin tocar los 10 candidatos/2 relaciones reales ni volver a correr tests contra
+los bind mounts del contenedor activo.
