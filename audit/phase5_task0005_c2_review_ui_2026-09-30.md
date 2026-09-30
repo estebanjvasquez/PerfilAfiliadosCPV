@@ -559,6 +559,66 @@ saltar ninguna aserción.
 reales nunca se tocaron: ningún `freeze`/`apply`/`reject`/`context-resolve` corrió contra ellos, y
 `taxonomy_reviewed_proposals` sigue en 0 filas.
 
+### Despliegue y validación en staging del re-audit
+
+| Dato | Valor |
+|---|---|
+| Commit de las correcciones | `95abe61a942954264bddfd6e33dc28379e52deaf` |
+| Base | `9d96587165a698e2ceee9290589023f61b089ea2` |
+| Run de GitHub Actions | `95abe61` — `conclusion: success`, 2026-09-30T20:07:13Z → 20:07:48Z |
+| HEAD verificado en el servidor | `git rev-parse HEAD` = `95abe61a942954264bddfd6e33dc28379e52deaf` (coincidencia exacta) |
+| Contenedores | `app running`, `nginx running` |
+
+**Smoke HTTP:** `/` → **200**, `/admin/login` → **200**, y las tres páginas de revisión → **302** a
+login (esperado sin sesión). Cero 500, cero 503, verificado antes y después de la validación.
+
+**Verificación de la corrección 1 sobre el código desplegado** (solo lectura; deliberadamente NO se
+crearon usuarios de prueba en staging, porque la base es la instancia compartida y eso sería una
+escritura persistente en datos reales):
+
+| Comprobación | Resultado |
+|---|---|
+| `getEloquentQuery()` filtra por `proposal_type` | **sí** |
+| `visibleProposalTypes()` para el revisor real (super-admin) | `TERM_CONCEPT_LINK+CONCEPT_RELATION` — ve ambos por el modelo de permisos normal |
+| `visibleProposalTypes(null)` (sin usuario) | `[]` — cero filas |
+| `view()` sobre una propuesta de candidato / de relación | ambos `true` para quien tiene ambos permisos |
+| `view()` sobre un `proposal_type` desconocido | `false` — default cerrado |
+
+Los casos negativos por persona (solo-candidatos / solo-relaciones) se prueban en el entorno local
+con fixtures y rollback, que es donde corresponde: exigirían crear usuarios con permisos recortados,
+y hacerlo en la base compartida sería una escritura persistente que esta tarea no autoriza.
+
+**Verificación de la corrección 2 sobre el código desplegado, contra las relaciones candidatas
+REALES** (ids 61 y 62). Todo es evaluación de autorización y lectura — cero escrituras, cero
+mutaciones; un 403 no escribe nada:
+
+| Comprobación | Relación 61 | Relación 62 |
+|---|---|---|
+| `status` | `candidate` | `candidate` |
+| `isUnderC2Review()` | **true** | **true** |
+| `canEdit()` | **false** | **false** |
+| `canDelete()` | **false** | **false** |
+| Ruta `/{id}/edit` autenticado como el revisor real | **HTTP 403** | — |
+
+Guards de modelo registrados en el código desplegado: `eloquent.deleting` **sí**, `eloquent.saving`
+**sí** (el de publicación de TASK-0004, intacto).
+
+**Nota de proceso — falsa alarma detectada en el propio sondeo (tercera vez con este patrón).** Una
+comprobación intermedia pareció mostrar `deleting_guard_registered=no`, lo que habría sido un defecto
+real. Era un artefacto del script: los listeners de `booted()` se registran de forma perezosa, al
+instanciarse el modelo por primera vez, y esa línea corría antes de que el modelo se booteara.
+Re-verificado en el orden correcto: `before_boot=no`, `after_boot_deleting=YES`. Se registra acá en
+lugar de descartarlo en silencio, porque la primera lectura parecía un bug genuino — igual que la
+falsa alarma de `canViewAny()` de la ronda 1, y por la misma causa raíz: aseverar sobre algo que
+depende de estado que el propio sondeo todavía no había establecido.
+
+**Invariantes después del despliegue:** 10/2/142/79/9749/0, idénticos. Prueba explícita de que no se
+tomó ninguna decisión: candidatos `pending:10`, relaciones `candidate:2`, candidatos con `reviewed_at`
+no nulo = **0**.
+
+No se re-corrió la suite completa contra los bind mounts compartidos, no se creó ningún contenedor
+efímero y no se modificó la topología de compose.
+
 ### Sin migraciones
 
 Ninguna de las dos correcciones necesitó cambio de esquema.
