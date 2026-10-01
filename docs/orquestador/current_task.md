@@ -1,7 +1,58 @@
 # Tarea activa
 
-**TASK-0006A** — Explorador de conceptos para revisión humana + diagnóstico de mapeo
+**TASK-0006** — Revisión humana de la cola real, reanudada (Issue #2 comentario `5933152293`).
+Base HEAD `d532a0b`.
+
+**Estado:** READY_FOR_REVIEW. **4 decisiones congeladas, 4 ítems reportados sin decidir.** Cero
+APPLY, cero publicación, cero cambios de código. Detalle completo en
+[`audit/phase6_task0006_queue_review_2026-10-01.md`](../../audit/phase6_task0006_queue_review_2026-10-01.md).
+
+| Ítem | Resultado |
+|---|---|
+| 266 `exploration` | **CONGELADO** `CONTEXT_REQUIRED` → propuesta #492 |
+| 267 `upstream` | **CONGELADO** `CONTEXT_REQUIRED` → propuesta #493 |
+| 268 `midstream` | **CONGELADO** `CONTEXT_REQUIRED` → propuesta #494 |
+| 269 `downstream` | **CONGELADO** `CONTEXT_REQUIRED` → propuesta #495 |
+| 270 `refinery` + 271 `refinería` | **SIN DECIDIR** — par bilingüe no expresable en C2 |
+| Relaciones 61 y 62 | **SIN DECIDIR** — falta política de curación |
+
+Los cuatro términos congelados (`exploration`, `upstream`, `midstream`, `downstream`) son fases o
+segmentos de la cadena de valor, no productos/servicios mapeables: sus relaciones CPV están todas en
+`needs_review` y dispersas entre familias sin relación (o ausentes, en `midstream`). Es el caso exacto
+para el que se creó `CONTEXT_REQUIRED`, y es la decisión más conservadora disponible: congela cero
+mapeos y cero conceptos.
+
+**270/271 no se adivinaron:** son un par bilingüe (`refinería` es `translation_alias` de `refinery`) y
+**ambos proponen el mismo nombre de concepto**. Congelar `CREATE_NEW` en los dos crearía conceptos
+duplicados, y `apply()` dejaría `canonical_name_es='refinery'` (palabra inglesa en campo español);
+tampoco puede congelarse `MAP_TO_EXISTING` apuntando a un concepto que solo existiría tras un APPLY no
+autorizado. Hace falta decidir el nombre canónico ES/EN y el orden de resolución.
+
+**Relaciones 61/62 no se adivinaron:** ambas son propuestas léxicas débiles por una palabra genérica
+compartida, con `term_or_alias_overlap=0`. Admitir o rechazar aristas `RELATED_TO` débiles es política
+de curación y no hay umbral declarado en el proyecto.
+
+**Atribución (relevante para auditoría):** las 4 propuestas nuevas las decidió el **agente** por
+instrucción explícita del operador y se congelaron bajo la cuenta de revisor **#3**, porque todas las
+cuentas con permiso son personas nombradas y no existe cuenta de servicio (la cuenta del operador, #14,
+no tiene el permiso). La atribución quedó escrita **dentro del propio `context_reason`** de cada
+propuesta, para que el registro en base sea autodescriptivo. Las propuestas #420/#421/#422/#491 sí las
+decidió el revisor humano.
+
+**Estado protegido tras la ronda:** candidatos 10, relaciones 2, `term_concepts` 142,
+`canonical_concepts` 81, `TERM→CPV` 9749, propuestas revisadas **8**, **aplicadas 0**. Las 4
+propuestas preexistentes intactas; 270/271 en `pending` con 0 propuestas; relaciones 61/62 en
+`candidate` con 0 propuestas.
+
+**Sigue NO autorizado:** APPLY/publicación (TASK-0007 sin abrir), producción, merge a `main`.
+
+## TASK-0006A (cerrada, histórico)
+
+**Explorador de conceptos para revisión humana + diagnóstico de mapeo**
 (Issue #2 comentario `5929287629`). Abierta desde HEAD `a4d8b2f`.
+
+**Estado: CLOSED / APPROVED** (comentario `5933152293`, HEAD revisado `d532a0b`). Ambas correcciones
+del re-audit `5930560603` quedaron `PASS`.
 
 **Contexto:** TASK-0006 (revisión humana de la cola real) está EN CURSO y quedó **pausada** para los
 candidatos sin resolver, porque el revisor encontró una limitación real de UX/diagnóstico revisando

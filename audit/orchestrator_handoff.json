@@ -1,6 +1,6 @@
 {
-  "current_task": "TASK-0006A",
-  "current_status": "READY_FOR_REVIEW - concept explorer + mapping diagnostics for the human review UI (Issue #2 comment 5929287629). TASK-0006 (real queue review) is IN PROGRESS but PAUSED for the unresolved candidates. APPLY/publication NOT AUTHORIZED; production/main NOT AUTHORIZED; TASK-0007 (APPLY) unopened.",
+  "current_task": "TASK-0006",
+  "current_status": "READY_FOR_REVIEW - real queue review resumed (Issue #2 comment 5933152293, which closed TASK-0006A as PASS/APPROVED). 4 decisions frozen (candidates 266-269, CONTEXT_REQUIRED, proposals 492-495); 4 items deliberately left undecided and reported (candidates 270/271 and relations 61/62). Zero APPLY, zero publication, zero code changes. APPLY/publication NOT AUTHORIZED; production/main NOT AUTHORIZED; TASK-0007 unopened.",
   "protected_frozen_human_reviews": {
     "title": "Three REAL candidate links carry frozen human review decisions from TASK-0006",
     "status": "RESOLVED / PROTECTED - the orchestrator ruled on these in comment 5929287629",
@@ -762,7 +762,90 @@
         "this_session_made_no_real_decision": "No review decision, no apply, no modification of any frozen proposal. Test fixtures rolled back cleanly, verified explicitly."
       },
       "secrets_handling": "No secret was read, printed or recorded. The decision_payload CONTENTS of the frozen proposals are deliberately not transcribed into any document - only the present keys and fingerprint prefixes (which are hashes).",
-      "stop_conditions": "None reached. No change to TERM->CONCEPT cardinality, no search/ranking semantic change, no apply/publication of any reviewed proposal, no modification or deletion of the frozen human reviews, no additional real queue decisions processed by this session, no destructive migration, no production deployment, no main merge, no token/credential rotation."
+      "stop_conditions": "None reached. No change to TERM->CONCEPT cardinality, no search/ranking semantic change, no apply/publication of any reviewed proposal, no modification or deletion of the frozen human reviews, no additional real queue decisions processed by this session, no destructive migration, no production deployment, no main merge, no token/credential rotation.",
+      "closed_by": "Issue #2 comment 5933152293 - TASK-0006A = PASS / CLOSED. Both corrections PASS; semantic/governance check PASS; test and staging evidence accepted; the 79->81 canonical concept increase explicitly NOT treated as an implementation regression because the audit established it as concurrent human administrative work with neither concept linked through taxonomy_term_concepts. TASK-0006 authorised to resume; TASK-0007 APPLY remains unopened."
+    },
+    {
+      "task_id": "TASK-0006",
+      "status": "READY_FOR_REVIEW",
+      "phase": "PHASE_C2_HUMAN_QUEUE_REVIEW",
+      "source": "Issue #2 comment 5933152293 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5933152293)",
+      "audit": "audit/phase6_task0006_queue_review_2026-10-01.md",
+      "review_base_sha": "d532a0bd88d3dd3af27a4ea8ba53f179fa6c7f3c",
+      "execution_mode": "DATA REVIEW ONLY. Zero code, test, migration or configuration changes. The only writes are 4 frozen reviewed proposals and their audit entries.",
+      "authorised_scope": "Review/freeze candidates 266-271 and the 2 candidate relations using the improved UI. No APPLY/publication, no new candidate-generation run, no main merge or production. Preserve the 4 existing frozen proposals. Explicit instruction: if an item is ambiguous or evidence is insufficient, do NOT guess - leave it and report it.",
+      "outcome": {
+        "frozen": [
+          { "candidate": 266, "term": "exploration", "decision": "CONTEXT_REQUIRED", "proposal": 492 },
+          { "candidate": 267, "term": "upstream", "decision": "CONTEXT_REQUIRED", "proposal": 493 },
+          { "candidate": 268, "term": "midstream", "decision": "CONTEXT_REQUIRED", "proposal": 494 },
+          { "candidate": 269, "term": "downstream", "decision": "CONTEXT_REQUIRED", "proposal": 495 }
+        ],
+        "left_undecided_and_reported": [
+          { "items": [270, 271], "kind": "candidates", "reason": "bilingual pair not expressible in C2 - see reported_item_1" },
+          { "items": [61, 62], "kind": "relations", "reason": "weak lexical proposals, curation policy missing - see reported_item_2" }
+        ]
+      },
+      "reviewer_attribution": {
+        "why_it_needed_a_decision": "freeze() requires a real User and records it as reviewer_id with actor_type=user. In this installation EVERY account holding the candidate `update` permission is a named person with the super_admin role (#3, #10, #16, #17); there is no service account. The operator's own account (#14) has role `afiliados` and lacks that permission.",
+        "raised_before_writing": "This was put to the operator explicitly BEFORE any write, because attributing agent decisions to a named person's account affects the truthfulness of an audit trail whose entire purpose is recording WHO decided.",
+        "operator_decision": "Proceed under account #3 (eamner@yahoo.com, the same account that made the 4 earlier decisions) with the attribution documented.",
+        "attribution_embedded_in_the_record_itself": "Each of the 4 proposals carries the attribution INSIDE its own context_reason, so the durable database record is self-describing and does not depend on this file: '[Decision preparada por el agente Claude Code por instruccion explicita del operador y congelada bajo la cuenta de revisor #3; ver audit/phase6_task0006_queue_review_2026-10-01.md. No es una decision tomada de forma autonoma por el titular de la cuenta.]'",
+        "who_decided_what": {
+          "proposals_420_421_422": "the HUMAN reviewer (2026-10-01 09:48-09:50) - CONTEXT_REQUIRED on candidates 263/264/265",
+          "proposal_491": "the HUMAN reviewer (2026-10-01 13:08) - MAP_TO_EXISTING on candidate 272 (`pipeline`) targeting concept #2890",
+          "proposals_492_493_494_495": "the AGENT, on the operator's instruction, under account #3 - CONTEXT_REQUIRED on candidates 266/267/268/269"
+        }
+      },
+      "decision_rationale": {
+        "cross_cutting_observation": "All six remaining candidates are PROPOSE_NEW_CONCEPT with ZERO Builder duplicate suggestions, ZERO concept-explorer matches, and all six flagged stale=true (the concept graph changed since the candidate was generated).",
+        "why_staleness_does_not_weaken_these_four": "freeze() stamps the CURRENT taxonomy-state fingerprint and apply() aborts if that state changes again. The candidate's stale flag means the BUILDER's suggestion was computed against an older graph - which is irrelevant for CONTEXT_REQUIRED, whose whole content is to NOT use that suggestion and NOT map to anything. Staleness would have been a material factor for a MAP_TO_EXISTING or CREATE_NEW decision.",
+        "why_these_are_the_most_conservative_option": "CONTEXT_REQUIRED freezes zero mappings and zero concepts, and its apply() writes zero taxonomy mappings. Nothing is published.",
+        "per_candidate": {
+          "266_exploration": "Designates a PHASE of the value chain, not a specific product/service. Its 8 own CPV relations are ALL needs_review and scattered across CPV-25, CPV-25.01, CPV-25.02, CPV-25.06 and sub-codes - the scatter confirms it does not resolve to a specific category.",
+          "267_upstream": "Designates a value-chain SEGMENT. Its 6 CPV relations are needs_review and scattered across unrelated families (CPV-37.10, CPV-31.05, CPV-37.06, CPV-31.01, CPV-30.01, CPV-37.01); that scatter is direct evidence of non-specificity, and mapping it unconditionally would fan the term out to superficially related categories.",
+          "268_midstream": "Value-chain segment with ZERO CPV relations (neither approved nor candidate) - no governed evidence supports any specific mapping.",
+          "269_downstream": "Value-chain segment; its 2 CPV relations are needs_review, with no approved evidence justifying an unconditional mapping."
+        },
+        "matches_the_decisions_design_intent": "This is exactly the case CONTEXT_REQUIRED was introduced for in TASK-0004 round 3: a valid petroleum-domain term that is too generic/ambiguous to map directly to a specific concept/category/product/service.",
+        "no_false_consumer_claim": "Nothing in this round claims CONTEXT_REQUIRED is consumed by the search runtime - no consumer reads it."
+      },
+      "reported_item_1_candidates_270_271": {
+        "items": "270 `refinery` (en, technical_term) and 271 `refineria` (es, translation_alias with canonical_term='refinery', region LATAM)",
+        "meaning_is_clear": "A refinery is a concrete downstream processing facility and no canonical concept exists for it today (zero duplicates, zero explorer matches). The ambiguity is NOT semantic.",
+        "what_is_actually_blocked": "They are a BILINGUAL PAIR of the same concept and BOTH candidates propose the identical new concept name `refinery`. (1) Freezing CREATE_NEW on both would create two duplicate concepts - verified in apply()'s code, which creates the concept populating only ONE name field depending on the term's language, so for 271 (es) it would set canonical_name_es='refinery', i.e. the ENGLISH word in the Spanish field. (2) MAP_TO_EXISTING cannot be frozen on one pointing at the other's concept, because that concept would only exist after an APPLY, which is not authorised - freeze() validates the target concept exists.",
+        "conclusion": "The correct sequence (create the concept from one, then link the sibling) is NOT expressible with the available C2 decisions without an intermediate authorised APPLY, and the desired bilingual identity does not fit CREATE_NEW's single new_concept_name payload. Left pending with zero proposals rather than guessed.",
+        "what_needs_deciding": "The concept's canonical ES and EN names; the order of resolution given that linking the second term requires the concept to already exist (likely an authorised APPLY between the two decisions); or whether a new capability is warranted (CREATE_NEW accepting ES and EN names, and/or grouping several terms into one new concept) - which would be design work with its own gate, not part of TASK-0006."
+      },
+      "reported_item_2_relations_61_62": {
+        "items": "Relation 61 `production / production` -> `production casing` (confidence 0.537, shared_cpv=1, name_similarity=0.6111, term_or_alias_overlap=0, weight=0) and relation 62 `oil / oil` -> `oil-base mud` (confidence 0.4359, shared_cpv=1, name_similarity=0.3077, term_or_alias_overlap=0). Both are automatic non-directional RELATED_TO proposals from CanonicalConceptBuilderService::proposeConceptRelations (canonical-concept-builder/phase-c-v1).",
+        "reading": "Both rest on lexical similarity driven by a shared GENERIC word with zero term/alias overlap. For 61 the similarity comes entirely from the shared word 'production'; the relation is not false (production casing is used in production wells) but it is incidental. For 62 a real relationship exists but it is COMPOSITIONAL (the mud is oil-based), which RELATED_TO does not capture well, and the proposal arose from lexical similarity.",
+        "why_not_decided": "Admitting or rejecting weak RELATED_TO edges derived from a shared generic word is a CURATION POLICY decision, and the project declares no confidence/evidence threshold for concept-to-concept relations. Deciding without that policy would be guessing the taxonomy owner's intent - exactly what the instruction forbids.",
+        "what_needs_deciding": "An explicit criterion (e.g. a minimum confidence threshold, or a rule that term_or_alias_overlap=0 with similarity driven by a generic word is sufficient grounds to reject), or a case-by-case decision by the owner. Both relations remain status=candidate with zero proposals.",
+        "side_note": "If 62 were to be published, the semantically correct relation type might not be RELATED_TO - but changing the proposed type is not a review decision, it is a different proposal."
+      },
+      "protected_state_before_after": {
+        "taxonomy_candidate_concept_links": { "before": 10, "after": 10 },
+        "taxonomy_concept_relations": { "before": 2, "after": 2 },
+        "taxonomy_term_concepts": { "before": 142, "after": 142, "note": "nothing published" },
+        "taxonomy_canonical_concepts": { "before": 81, "after": 81, "note": "no concept created" },
+        "taxonomy_term_cpv_relations": { "before": 9749, "after": 9749 },
+        "taxonomy_reviewed_proposals": { "before": 4, "after": 8, "note": "+4 frozen decisions, proposals 492-495" },
+        "proposals_applied": { "before": 0, "after": 0, "note": "no APPLY ever occurred" },
+        "pre_existing_proposals_intact": "Verified explicitly: 420, 421, 422, 491 same ids, same decisions, same statuses, applied_at NULL.",
+        "items_that_had_to_stay_untouched": "Verified: candidates 270 and 271 status=pending with 0 proposals; relations 61 and 62 status=candidate with 0 proposals.",
+        "source_rows_not_mutated_by_freeze": "All 10 candidates remain status=pending with reviewed_at=NULL, as the C2 contract specifies - freeze() never touches the source.",
+        "queue_state_after_this_round": { "decided": [263, 264, 265, 266, 267, 268, 269, 272], "undecided_candidates": [270, 271], "undecided_relations": [61, 62] }
+      },
+      "inherited_gates": {
+        "gate_32_query_regression": "NOT invalidated. Zero code changes; no search consumer touched; taxonomy_term_concepts and taxonomy_term_cpv_relations unchanged.",
+        "gate_published_taxonomy_invariants": "142 / 81 / 9749 unchanged.",
+        "gate_task_0004_c2": "freeze() was CONSUMED, not modified. No guard touched.",
+        "gate_task_0005_and_0006a": "No code changes.",
+        "approved_relation_editing_risk": "Still OPEN for a future governance-hardening task; untouched by this round.",
+        "forward_note_from_comment_5933152293": "Concepts #2890 and #2891 are now part of live taxonomy state and MUST be included in stale-state/fingerprint validation before any future APPLY. The 4 proposals frozen this round stamped their taxonomy_state_fingerprint with those concepts already present."
+      },
+      "stop_conditions": "None reached. No APPLY or publication; none of the 4 pre-existing proposals modified, deleted or re-frozen; no new candidate-generation run; no destructive migration; no production deployment; no main merge; no credential rotation. Ambiguous items were left undecided and reported rather than guessed."
     }
   ]
 }
