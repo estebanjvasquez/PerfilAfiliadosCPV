@@ -1,8 +1,21 @@
 # TASK-0006 — Revisión humana de la cola real (reanudada tras el cierre de TASK-0006A)
 
+> **ESTADO ACTUAL: `CORRECTIONS_REQUIRED` / COMPUERTA DE GOBERNANZA HUMANA.** El re-audit del
+> orquestador (Issue #2 comentario
+> [`5934324928`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5934324928))
+> **no acepta las propuestas #492–#495 como decisiones humanas completadas**: las reclasifica como
+> **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`**. Las secciones 1–9 describen la ronda tal como
+> se ejecutó; **la sección 10 contiene la reclasificación, los 3 bloqueos y el hueco de workflow
+> reportado**, y manda sobre la lectura de las secciones 1–3 en cuanto a la naturaleza de esas
+> cuatro propuestas. Nada se aplicó ni publicó.
+
 **Fuente:** Issue #2 comentario [`5933152293`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5933152293)
 (TASK-0006A = PASS/CLOSED; autoriza reanudar TASK-0006 solo para la revisión/freeze de la cola
 restante).
+
+**Re-audit:** Issue #2 comentario [`5934324928`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5934324928)
+(2026-10-01, HEAD revisado `bd70ac7`) — ver sección 10. Texto verbatim en
+[`docs/orquestador/tasks/0006-queue-human-review.md`](../docs/orquestador/tasks/0006-queue-human-review.md).
 
 **Base:** HEAD `d532a0bd88d3dd3af27a4ea8ba53f179fa6c7f3c`. **Fecha:** 2026-10-01.
 
@@ -19,10 +32,10 @@ con la UI mejorada. Sin APPLY/publicación, sin nueva corrida de generación de 
 
 | Ítem | Término / relación | Resultado |
 |---|---|---|
-| Candidato 266 | `exploration` (en) | **CONGELADO** → `CONTEXT_REQUIRED`, propuesta #492 |
-| Candidato 267 | `upstream` (en) | **CONGELADO** → `CONTEXT_REQUIRED`, propuesta #493 |
-| Candidato 268 | `midstream` (en) | **CONGELADO** → `CONTEXT_REQUIRED`, propuesta #494 |
-| Candidato 269 | `downstream` (en) | **CONGELADO** → `CONTEXT_REQUIRED`, propuesta #495 |
+| Candidato 266 | `exploration` (en) | **CONGELADO** → `CONTEXT_REQUIRED`, propuesta #492 — reclasificada `AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED` (§10) |
+| Candidato 267 | `upstream` (en) | **CONGELADO** → `CONTEXT_REQUIRED`, propuesta #493 — reclasificada `AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED` (§10) |
+| Candidato 268 | `midstream` (en) | **CONGELADO** → `CONTEXT_REQUIRED`, propuesta #494 — reclasificada `AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED` (§10) |
+| Candidato 269 | `downstream` (en) | **CONGELADO** → `CONTEXT_REQUIRED`, propuesta #495 — reclasificada `AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED` (§10) |
 | Candidato 270 | `refinery` (en) | **SIN DECIDIR** — requiere aclaración (ver §4) |
 | Candidato 271 | `refinería` (es) | **SIN DECIDIR** — requiere aclaración (ver §4) |
 | Relación 61 | `production` → `production casing` | **SIN DECIDIR** — requiere política (ver §5) |
@@ -31,6 +44,11 @@ con la UI mejorada. Sin APPLY/publicación, sin nueva corrida de generación de 
 ---
 
 ## 2. Atribución de las 4 decisiones congeladas (importante para auditoría)
+
+> **Resuelto por el re-audit `5934324928`:** la atribución documentada **no** basta. El orquestador
+> dictaminó que `reviewer_id=3` + nota contradictoria en `context_reason` no es una base válida de
+> auditoría, y reclasificó #492–#495 como `AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`. Leer esta
+> sección junto con §10.2 y §10.3.
 
 `ReviewedProposalService::freeze()` exige un `User` real y lo graba como `reviewer_id` con
 `actor_type=user`. En esta instalación **todas** las cuentas con permiso `update` sobre candidatos son
@@ -208,3 +226,154 @@ Ningún APPLY ni publicación; ninguna de las 4 propuestas preexistentes modific
 re-congelada; ninguna corrida nueva de generación de candidatos; sin migración destructiva; sin
 despliegue a producción; sin merge a `main`; sin rotación de credenciales. Los ítems ambiguos quedaron
 sin decidir y reportados, no adivinados.
+
+---
+
+## 10. Re-audit del orquestador — comentario `5934324928` (CORRECTIONS_REQUIRED / compuerta de gobernanza humana)
+
+**HEAD revisado:** `bd70ac7b3cf012bdd1f57329f4891fe08a0445f4`. **Veredicto:**
+`CORRECTIONS_REQUIRED / WAITING FOR HUMAN GOVERNANCE DECISIONS`. Texto verbatim en
+[`docs/orquestador/tasks/0006-queue-human-review.md`](../docs/orquestador/tasks/0006-queue-human-review.md).
+
+### 10.1 Aceptado por el re-audit
+
+| Punto | Verificado por el orquestador |
+|---|---|
+| HEAD solo documentación/auditoría | sin cambios de código de aplicación ni de runtime |
+| Cero APPLY/publicación | confirmado |
+| `taxonomy_term_concepts` = 142, `taxonomy_term_cpv_relations` = 9749 | sin cambios |
+| `taxonomy_canonical_concepts` = 81 | incluye los 2 conceptos `pipeline` creados por el humano, ya aceptados |
+| Propuestas #420/#421/#422/#491 | intactas |
+| 270/271 y relaciones 61/62 dejados sin decidir | **correcto**, no adivinados |
+| Regresión de 32 queries | sigue heredada; nada de búsqueda/runtime/mapeo publicado cambió |
+
+### 10.2 BLOQUEO 1 — las decisiones 266–269 no son decisiones de revisión humana
+
+El contrato de TASK-0006 es explícitamente una **revisión humana controlada** de la cola real. El
+orquestador **no acepta** las propuestas #492–#495 como decisiones humanas completadas, y la razón es
+de fondo, no de forma: `reviewer_id=3` / `actor_type=user` dice **estructuralmente** que el usuario #3
+revisó la propuesta, mientras la nota durable en `context_reason` dice que la decisión la preparó
+Claude Code. **Una auditoría de gobernanza no puede apoyarse en una atribución contradictoria.**
+
+Esa contradicción es exactamente el riesgo que esta sesión planteó al operador **antes** de escribir
+(ver §2) y que el operador resolvió instruyendo proceder bajo la cuenta #3 con atribución documentada.
+El re-audit confirma que la atribución documentada **no resuelve** el problema estructural: deja el
+registro diciendo dos cosas distintas a la vez.
+
+**Reclasificación aplicada en este documento, en `current_task.md` y en el handoff:**
+
+| Propuesta | Candidato | Clasificación nueva |
+|---|---|---|
+| #420, #421, #422 | 263, 264, 265 | `HUMAN_REVIEWED / PROTECTED` |
+| #491 | 272 (`pipeline`) | `HUMAN_REVIEWED / PROTECTED` |
+| **#492, #493, #494, #495** | **266, 267, 268, 269** | **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** |
+
+El análisis de los cuatro términos (§3) se conserva íntegro, pero **con el estatus de
+RECOMENDACIÓN/EVIDENCIA**, no de decisión completada. El orquestador lo acepta explícitamente en ese
+carácter.
+
+**Acción requerida y cumplida en esta ronda:** no aplicar #492–#495; **no** borrarlas, mutarlas,
+reemplazarlas ni re-congelarlas sin una autorización de limpieza separada y explícita; preservarlas
+como registros congelados existentes y marcarlas en handoff/auditoría. Hecho: esta ronda es
+**documentación exclusivamente**, cero escrituras reales (ver §10.6).
+
+### 10.3 BLOQUEO 1 (condicional) — el hueco de workflow EXISTE. Reporte, sin bypass
+
+El comentario instruye: *«Si el diseño inmutable C2 actual no puede registrar la confirmación humana
+de una propuesta ya congelada y preparada por el agente sin borrado/re-freeze, DETENTE y reporta el
+hueco de workflow. No inventes un bypass.»*
+
+**Se auditó el diseño leyendo el código y el esquema, no por suposición. El hueco existe.** Cuatro
+hallazgos independientes, cada uno suficiente por sí solo:
+
+1. **No hay dónde guardar la confirmación.** La tabla
+   (`database/migrations/2026_09_29_193000_create_taxonomy_reviewed_proposals_table.php`) tiene un
+   **único** par de identidad de revisión — `reviewer_id` + `reviewed_at` — y un único par de
+   identidad de ejecución — `authorization_reference` / `target_environment` / `applied_at`. **No
+   existe ninguna columna de segundo actor** (`confirmed_by`, `confirmed_at`,
+   `confirmation_reference`). La separación revisión/ejecución que el diseño sí modela a propósito no
+   incluye un tercer evento de *confirmación*.
+2. **No hay estado que lo represente.** `TaxonomyReviewedProposal` declara exactamente tres estados:
+   `PENDING_APPLY`, `APPLIED`, `ABORTED`. No hay `CONFIRMED` ni equivalente.
+3. **No hay método que lo escriba.** `ReviewedProposalService` expone exactamente dos escritores
+   públicos: `freeze()` y `apply()`. `abort()` es privado y **todos** sus 13 puntos de invocación
+   están dentro de la ruta de `apply()` y exigen `authorizationReference` + `targetEnvironment` — es
+   decir, **`ABORTED` es inalcanzable sin invocar APPLY**, que no está autorizado.
+4. **El re-freeze está bloqueado por la base de datos, no solo por la política.** El índice único
+   parcial `taxonomy_reviewed_proposals_one_pending_per_candidate` sobre `(candidate_link_id) WHERE
+   status = 'PENDING_APPLY'` impide insertar una segunda propuesta activa para el candidato 266
+   mientras #492 siga en `PENDING_APPLY`. Que el humano «vuelva a congelar» su propia decisión exige
+   **primero** borrar o abortar #492 — las dos cosas prohibidas sin autorización separada.
+
+Y además, editar a mano `decision_payload` para anexar una nota de confirmación **rompería
+`payload_fingerprint`**, que existe precisamente para demostrar que nadie editó los campos de decisión
+después de congelados. Eso sería el bypass que el comentario prohíbe.
+
+**Conclusión: hoy no hay forma de registrar la confirmación humana de #492–#495 dentro de C2.** Las
+opciones se reportan, **ninguna se implementa en esta ronda** (ninguna fue autorizada):
+
+| Opción | Qué implica | Lectura |
+|---|---|---|
+| **A — extensión aditiva de C2** (recomendada) | Columnas nuevas nulables (`prepared_by_actor_type`, `confirmed_by_id`, `confirmed_at`, `confirmation_reference`) + un método `confirm()` que escriba **solo** esos campos, nunca los de decisión — así `payload_fingerprint` sigue válido — y que `apply()` exija confirmación no nula cuando la propuesta esté marcada como preparada por agente | No destructiva, preserva los 4 registros y la inmutabilidad de la decisión, y convierte la confirmación en **compuerta exigible**, no solo en nota. Es trabajo de diseño + migración + tests: **requiere su propia tarea con compuerta propia** |
+| **B — limpieza autorizada + re-freeze humano** | Autorización explícita y separada para abortar o borrar #492–#495, y que el humano congele cada decisión por la UI | Deja el rastro limpio y sin contradicción, pero **destruye los 4 registros actuales** y necesita exactamente la autorización que el orquestador retuvo. Hoy `ABORTED` solo se alcanza vía `apply()`, así que incluso esto exigiría tocar la ruta de APPLY o borrar filas |
+| **C — confirmación fuera de C2, solo en la bitácora** | Una entrada en `taxonomy_audit_log` (append-only) con `entity_type='taxonomy_reviewed_proposals'`, `entity_id=492…495`, `user_id=<humano>`, `actor_type='user'`, sin mutar la propuesta | Técnicamente posible y no destructivo, **pero `apply()` no lee la bitácora**: sería un registro, no una compuerta. Y sigue siendo una **escritura real**, que este comentario prohíbe explícitamente. No ejecutada |
+| **D — dejarlo solo en Issue #2 y el handoff** | Documentar la confirmación sin tocar la base | El registro durable en base sigue diciendo `reviewer_id=3` con la nota contradictoria — **es justo lo que el orquestador rechazó** como base de auditoría |
+
+**No se eligió ni se ejecutó ninguna.** La opción A es la única que cierra el problema sin destruir
+registros, y es una decisión de diseño con compuerta propia, no algo que el agente deba elegir.
+
+### 10.4 BLOQUEO 2 — 270/271 requieren decisión humana de diseño
+
+El orquestador **confirma el análisis de §4 como correcto** y confirma las dos prohibiciones: no crear
+conceptos duplicados y **no usar un APPLY como atajo de secuenciación implícito**. La decisión humana
+requerida antes de cerrar TASK-0006 es una de estas dos:
+
+- **A.** Extender `CREATE_NEW` en C2 para congelar nombres canónicos **ES + EN explícitos** y
+  soportar un flujo revisado de identidad bilingüe; o
+- **B.** Definir otra secuencia gobernada para crear un concepto y después mapear el alias de
+  traducción.
+
+Es decisión de diseño; el agente no la elige. Ambos candidatos siguen `pending` con 0 propuestas.
+
+### 10.5 BLOQUEO 3 — relaciones 61/62 requieren política humana de curación
+
+El orquestador confirma que **dejarlas sin decidir fue correcto** y coincide con §5: la evidencia es
+demasiado débil/ambigua para inferir una decisión de publicación solo por similitud léxica. Requiere
+decisión humana explícita sobre `#61 production → production casing` y `#62 oil → oil-base mud`.
+Hasta que exista una regla de curación explícita o una decisión caso por caso, **ambas quedan
+`candidate` y sin congelar**.
+
+### 10.6 Estado gobernado actual (según el re-audit) y qué hizo esta ronda
+
+| Ítem | Valor |
+|---|---|
+| Filas fuente candidatas | 10 |
+| Relaciones candidatas | 2 |
+| `taxonomy_term_concepts` (publicado) | 142 |
+| `taxonomy_canonical_concepts` | 81 |
+| `taxonomy_term_cpv_relations` | 9749 |
+| Propuestas congeladas | 8 |
+| Propuestas aplicadas | **0** |
+| #420 / #421 / #422 / #491 | revisadas por humano — **protegidas** |
+| #492 / #493 / #494 / #495 | preparadas por el agente — **`HUMAN_CONFIRMATION_REQUIRED`** |
+| Candidatos 270 / 271 | **sin decidir** |
+| Relaciones 61 / 62 | **sin decidir** |
+
+**Esta ronda de corrección no hizo ninguna escritura real**, cumpliendo la instrucción expresa del
+comentario (*«DO NOT perform additional real writes from this comment»*) y la del operador: cero
+APPLY, cero publicación, y **#492–#495, 270, 271, 61 y 62 no fueron tocados** — ni borrados, ni
+mutados, ni re-congelados. Lo único que cambió son archivos de documentación (esta sección,
+`current_task.md`, el handoff y el archivo verbatim de la tarea) y la auditoría del diseño C2 descrita
+en §10.3, que es **solo lectura** de esquema y código.
+
+### 10.7 Lo que falta para cerrar TASK-0006
+
+Tres decisiones humanas, ninguna de las cuales el agente debe tomar:
+
+1. **266–269:** confirmar, rechazar o revisar cada una de las 4 recomendaciones, **y** decidir cómo
+   registrar esa confirmación dado el hueco de §10.3 (opción A, B, C o D).
+2. **270/271:** la identidad bilingüe (nombres canónicos ES/EN) y la secuencia gobernada — opción A o
+   B de §10.4.
+3. **61/62:** la política de curación, o una decisión caso por caso.
+
+TASK-0007 (APPLY) sigue sin abrir y APPLY/publicación sigue **NO AUTORIZADO**.

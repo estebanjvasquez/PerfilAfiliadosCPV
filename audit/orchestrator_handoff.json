@@ -1,6 +1,26 @@
 {
   "current_task": "TASK-0006",
-  "current_status": "READY_FOR_REVIEW - real queue review resumed (Issue #2 comment 5933152293, which closed TASK-0006A as PASS/APPROVED). 4 decisions frozen (candidates 266-269, CONTEXT_REQUIRED, proposals 492-495); 4 items deliberately left undecided and reported (candidates 270/271 and relations 61/62). Zero APPLY, zero publication, zero code changes. APPLY/publication NOT AUTHORIZED; production/main NOT AUTHORIZED; TASK-0007 unopened.",
+  "current_status": "CORRECTIONS_REQUIRED / WAITING FOR HUMAN GOVERNANCE DECISIONS (Issue #2 re-audit comment 5934324928, reviewed HEAD bd70ac7). The orchestrator does NOT accept proposals 492-495 as completed human decisions and reclassified them AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED; the agent's analysis of candidates 266-269 is accepted as RECOMMENDATION/EVIDENCE only. Candidates 270/271 need a human design decision on bilingual identity; relations 61/62 need a human curation policy. The conditional workflow-gap check in BLOCKER 1 was performed and THE GAP IS REAL - reported, no bypass invented (see workflow_gap_c2_human_confirmation). This correction round made ZERO real writes, as the comment expressly forbade them: 492-495, 270, 271 and relations 61/62 were not touched. APPLY/publication NOT AUTHORIZED; production/main NOT AUTHORIZED; cleanup/delete/re-freeze of 492-495 NOT AUTHORIZED; TASK-0007 unopened.",
+  "workflow_gap_c2_human_confirmation": {
+    "title": "C2 cannot record human confirmation of an already-frozen, agent-prepared proposal without deletion or re-freeze",
+    "status": "OPEN - REPORTED, deliberately not implemented and not worked around",
+    "mandated_by": "Issue #2 comment 5934324928, BLOCKER 1: 'If the current immutable C2 design cannot record human confirmation of an already-frozen agent-prepared proposal without deletion/re-freeze, STOP and report the workflow gap. Do not invent a bypass.'",
+    "determination": "THE GAP IS REAL. Audited read-only against the schema and the service code, not assumed.",
+    "evidence": {
+      "no_second_actor_column": "database/migrations/2026_09_29_193000_create_taxonomy_reviewed_proposals_table.php defines a single review-identity pair (reviewer_id, reviewed_at) and a single execution-identity triple (authorization_reference, target_environment, applied_at). There is NO confirmed_by / confirmed_at / confirmation_reference column. The design deliberately separates REVIEW from EXECUTION but models no third CONFIRMATION event.",
+      "no_status_for_it": "TaxonomyReviewedProposal declares exactly three statuses: PENDING_APPLY, APPLIED, ABORTED. There is no CONFIRMED or equivalent.",
+      "no_method_for_it": "ReviewedProposalService exposes exactly two public writers: freeze() and apply(). abort() is private and all 13 of its call sites (lines ~515-763) are inside the apply() path and require authorizationReference + targetEnvironment - so ABORTED is UNREACHABLE without invoking APPLY, which is not authorised.",
+      "re_freeze_is_db_blocked": "The partial unique index taxonomy_reviewed_proposals_one_pending_per_candidate on (candidate_link_id) WHERE status = 'PENDING_APPLY' prevents inserting a second active proposal for candidate 266 while 492 is still PENDING_APPLY. A human re-freeze of the same decision would therefore require deleting or aborting 492 first - both forbidden without separate authorisation.",
+      "hand_editing_is_tamper": "Appending a confirmation note to decision_payload by hand would break payload_fingerprint, which exists precisely to prove nobody edited the decision fields after freezing. That would be the bypass the comment forbids."
+    },
+    "options_reported_none_implemented": {
+      "A_additive_c2_extension": "RECOMMENDED. New nullable columns (prepared_by_actor_type, confirmed_by_id, confirmed_at, confirmation_reference) plus a confirm() method writing ONLY those fields - never the decision fields, so payload_fingerprint stays valid - and apply() requiring a non-null confirmation when the proposal is flagged agent-prepared. Non-destructive, preserves all 4 records and the immutability of the decision, and makes confirmation an ENFORCEABLE GATE rather than a note. It is design + migration + test work and NEEDS ITS OWN TASK AND GATE.",
+      "B_authorised_cleanup_and_human_re_freeze": "Explicit separate authorisation to abort or delete 492-495 so the human can freeze each decision through the UI. Leaves a clean, non-contradictory trail but DESTROYS the four current records and needs exactly the authorisation the orchestrator withheld. Note that ABORTED is today only reachable via apply(), so even this would require touching the APPLY path or deleting rows.",
+      "C_audit_log_only": "An append-only taxonomy_audit_log entry (entity_type='taxonomy_reviewed_proposals', entity_id=492..495, user_id=<human>, actor_type='user') without mutating the proposal. Technically possible and non-destructive, BUT apply() does not read the audit log, so it would be a record and not a gate - and it is still a REAL WRITE, which this comment expressly forbids. Not executed.",
+      "D_documentation_only": "Record the confirmation only in Issue #2 and this handoff. The durable DB record would still read reviewer_id=3 with the contradictory note - exactly what the orchestrator rejected as an audit basis."
+    },
+    "action_taken": "NONE beyond reporting. No option was chosen or executed: none is authorised and the choice is a design/governance decision, not the agent's. Detail in section 10.3 of audit/phase6_task0006_queue_review_2026-10-01.md."
+  },
   "protected_frozen_human_reviews": {
     "title": "Three REAL candidate links carry frozen human review decisions from TASK-0006",
     "status": "RESOLVED / PROTECTED - the orchestrator ruled on these in comment 5929287629",
@@ -767,26 +787,29 @@
     },
     {
       "task_id": "TASK-0006",
-      "status": "READY_FOR_REVIEW",
+      "status": "CORRECTIONS_REQUIRED / WAITING FOR HUMAN GOVERNANCE DECISIONS (Issue #2 re-audit comment 5934324928, reviewed HEAD bd70ac7)",
       "phase": "PHASE_C2_HUMAN_QUEUE_REVIEW",
       "source": "Issue #2 comment 5933152293 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5933152293)",
+      "task_definition": "docs/orquestador/tasks/0006-queue-human-review.md",
       "audit": "audit/phase6_task0006_queue_review_2026-10-01.md",
       "review_base_sha": "d532a0bd88d3dd3af27a4ea8ba53f179fa6c7f3c",
       "execution_mode": "DATA REVIEW ONLY. Zero code, test, migration or configuration changes. The only writes are 4 frozen reviewed proposals and their audit entries.",
       "authorised_scope": "Review/freeze candidates 266-271 and the 2 candidate relations using the improved UI. No APPLY/publication, no new candidate-generation run, no main merge or production. Preserve the 4 existing frozen proposals. Explicit instruction: if an item is ambiguous or evidence is insufficient, do NOT guess - leave it and report it.",
       "outcome": {
         "frozen": [
-          { "candidate": 266, "term": "exploration", "decision": "CONTEXT_REQUIRED", "proposal": 492 },
-          { "candidate": 267, "term": "upstream", "decision": "CONTEXT_REQUIRED", "proposal": 493 },
-          { "candidate": 268, "term": "midstream", "decision": "CONTEXT_REQUIRED", "proposal": 494 },
-          { "candidate": 269, "term": "downstream", "decision": "CONTEXT_REQUIRED", "proposal": 495 }
+          { "candidate": 266, "term": "exploration", "decision": "CONTEXT_REQUIRED", "proposal": 492, "classification": "AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED (re-audit 5934324928)" },
+          { "candidate": 267, "term": "upstream", "decision": "CONTEXT_REQUIRED", "proposal": 493, "classification": "AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED (re-audit 5934324928)" },
+          { "candidate": 268, "term": "midstream", "decision": "CONTEXT_REQUIRED", "proposal": 494, "classification": "AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED (re-audit 5934324928)" },
+          { "candidate": 269, "term": "downstream", "decision": "CONTEXT_REQUIRED", "proposal": 495, "classification": "AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED (re-audit 5934324928)" }
         ],
+        "frozen_classification_note": "These four are NOT completed human review decisions. The orchestrator accepts the agent's analysis of the four terms as RECOMMENDATION/EVIDENCE only. They are preserved exactly as frozen records and must NOT be applied, deleted, mutated, replaced or re-frozen without separate explicit cleanup authorisation. The human reviewer must inspect and confirm/reject/revise each of 266-269 before TASK-0006 can close - see re_audit_round_5934324928 and workflow_gap_c2_human_confirmation at the top of this file.",
         "left_undecided_and_reported": [
           { "items": [270, 271], "kind": "candidates", "reason": "bilingual pair not expressible in C2 - see reported_item_1" },
           { "items": [61, 62], "kind": "relations", "reason": "weak lexical proposals, curation policy missing - see reported_item_2" }
         ]
       },
       "reviewer_attribution": {
+        "RESOLVED_BY_RE_AUDIT": "Issue #2 comment 5934324928 ruled that the documented attribution is NOT sufficient. reviewer_id=3 / actor_type=user structurally states that user #3 reviewed the proposal while the durable context_reason note states Claude Code prepared the decision, and a governance audit must not rely on contradictory attribution. Proposals 492-495 are therefore reclassified AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED. The risk recorded below was raised to the operator BEFORE any write; the re-audit confirms that documenting it did not neutralise it. Read this block together with re_audit_round_5934324928 and workflow_gap_c2_human_confirmation.",
         "why_it_needed_a_decision": "freeze() requires a real User and records it as reviewer_id with actor_type=user. In this installation EVERY account holding the candidate `update` permission is a named person with the super_admin role (#3, #10, #16, #17); there is no service account. The operator's own account (#14) has role `afiliados` and lacks that permission.",
         "raised_before_writing": "This was put to the operator explicitly BEFORE any write, because attributing agent decisions to a named person's account affects the truthfulness of an audit trail whose entire purpose is recording WHO decided.",
         "operator_decision": "Proceed under account #3 (eamner@yahoo.com, the same account that made the 4 earlier decisions) with the attribution documented.",
@@ -845,7 +868,58 @@
         "approved_relation_editing_risk": "Still OPEN for a future governance-hardening task; untouched by this round.",
         "forward_note_from_comment_5933152293": "Concepts #2890 and #2891 are now part of live taxonomy state and MUST be included in stale-state/fingerprint validation before any future APPLY. The 4 proposals frozen this round stamped their taxonomy_state_fingerprint with those concepts already present."
       },
-      "stop_conditions": "None reached. No APPLY or publication; none of the 4 pre-existing proposals modified, deleted or re-frozen; no new candidate-generation run; no destructive migration; no production deployment; no main merge; no credential rotation. Ambiguous items were left undecided and reported rather than guessed."
+      "stop_conditions": "None reached. No APPLY or publication; none of the 4 pre-existing proposals modified, deleted or re-frozen; no new candidate-generation run; no destructive migration; no production deployment; no main merge; no credential rotation. Ambiguous items were left undecided and reported rather than guessed.",
+      "re_audit_round_5934324928": {
+        "orchestrator_comment": "5934324928 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5934324928)",
+        "reviewed_head": "bd70ac7b3cf012bdd1f57329f4891fe08a0445f4",
+        "verdict": "CORRECTIONS_REQUIRED / HUMAN GOVERNANCE GATE - WAITING FOR HUMAN GOVERNANCE DECISIONS",
+        "accepted": [
+          "HEAD is documentation/audit only; no application/runtime code changed.",
+          "No APPLY/publication occurred.",
+          "taxonomy_term_concepts=142 and taxonomy_term_cpv_relations=9749 unchanged.",
+          "taxonomy_canonical_concepts=81, including the two human-created pipeline concepts already accepted.",
+          "Proposals 420/421/422/491 intact.",
+          "Candidates 270/271 and relations 61/62 correctly left undecided rather than guessed.",
+          "32-query regression remains inherited - no search/runtime/published mapping changed."
+        ],
+        "blocker_1_266_to_269_not_human_decisions": {
+          "ruling": "The TASK-0006 contract is explicitly a CONTROLLED HUMAN REVIEW. Proposals 492-495 were decided by the AGENT and merely frozen under human account #3, which is not equivalent to a human taxonomy decision and creates a contradictory-attribution problem a governance audit cannot rely on. The agent's analysis of the four terms is accepted as RECOMMENDATIONS/EVIDENCE, not as completed human decisions.",
+          "required_action": "Do not APPLY 492-495. Do not delete, mutate, replace or re-freeze them during this correction without separate explicit cleanup authorisation. Preserve them as existing frozen records and mark them AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED in handoff/audit. The HUMAN reviewer must explicitly inspect and confirm or reject/revise each of 266-269 before TASK-0006 can close.",
+          "conditional_requirement": "If the immutable C2 design cannot record human confirmation of an already-frozen agent-prepared proposal without deletion/re-freeze, STOP and report the workflow gap; do not invent a bypass.",
+          "conditional_outcome": "CHECK PERFORMED, GAP IS REAL, REPORTED. See workflow_gap_c2_human_confirmation at the top of this file and section 10.3 of the audit. No bypass was invented and no option was implemented or chosen.",
+          "compliance": "DONE - the four proposals were marked in this file, in the audit (section 10.2) and in docs/orquestador/current_task.md, and were NOT touched in any way."
+        },
+        "blocker_2_candidates_270_271": {
+          "ruling": "The agent's analysis is sound. refinery and refineria are one bilingual concept, but current CREATE_NEW freezes only one publication name and cannot safely create one bilingual concept and attach both terms before an APPLY. Do not create duplicate concepts and do not use an APPLY as an implicit sequencing workaround.",
+          "human_decision_required": "A. extend C2 CREATE_NEW to freeze explicit ES + EN canonical names and support a reviewed bilingual identity flow; or B. define another governed sequence for creating one concept and subsequently mapping the translation alias. This is a design decision, not the agent's to choose.",
+          "state": "Both candidates remain status=pending with zero proposals. Untouched."
+        },
+        "blocker_3_relations_61_62": {
+          "ruling": "Leaving them undecided was CORRECT. Their evidence is too weak/semantically ambiguous to infer a publication decision solely from lexical similarity.",
+          "human_decision_required": "Explicit decision on relation 61 (production -> production casing) and relation 62 (oil -> oil-base mud), or a declared curation rule. Until then leave both candidate/unfrozen.",
+          "state": "Both relations remain status=candidate with zero proposals. Untouched."
+        },
+        "current_governed_state_per_the_orchestrator": {
+          "candidate_source_rows": 10,
+          "candidate_relations": 2,
+          "published_term_concept_rows": 142,
+          "canonical_concepts": 81,
+          "term_cpv_rows": 9749,
+          "frozen_reviewed_proposals": 8,
+          "applied_proposals": 0,
+          "human_reviewed_protected": [420, 421, 422, 491],
+          "agent_prepared_human_confirmation_required": [492, 493, 494, 495],
+          "undecided_candidates": [270, 271],
+          "undecided_relations": [61, 62]
+        },
+        "action_taken_this_round": "DOCUMENTATION ONLY - ZERO REAL WRITES, per the comment's explicit instruction ('DO NOT perform additional real writes from this comment') and the operator's matching instruction. Changed only: section 10 of audit/phase6_task0006_queue_review_2026-10-01.md (plus reclassification markers in its header, section 1 and section 2), the new verbatim file docs/orquestador/tasks/0006-queue-human-review.md, docs/orquestador/current_task.md, and this file. Proposals 492-495, candidates 270/271 and relations 61/62 were NOT touched - not deleted, not mutated, not re-frozen. No APPLY, no publication, no migration, no production, no main merge. The C2 design audit for the conditional requirement was READ-ONLY inspection of the migration, the model and the service.",
+        "what_remains_to_close_task_0006": [
+          "266-269: the human must confirm, reject or revise each of the four recommendations, AND the governance decision on HOW to record that confirmation given the workflow gap (option A, B, C or D in workflow_gap_c2_human_confirmation).",
+          "270/271: the bilingual identity (canonical ES/EN names) and the governed sequence - option A or B of blocker 2.",
+          "61/62: the curation policy, or a case-by-case decision."
+        ],
+        "still_not_authorised": "APPLY/publication (TASK-0007 unopened), production, main merge, and any cleanup/deletion/re-freeze of proposals 492-495."
+      }
     }
   ]
 }

@@ -1,50 +1,58 @@
 # Tarea activa
 
-**TASK-0006** — Revisión humana de la cola real, reanudada (Issue #2 comentario `5933152293`).
-Base HEAD `d532a0b`.
+**TASK-0006** — Revisión humana de la cola real (Issue #2 comentarios `5933152293` → re-audit
+`5934324928`). HEAD revisado `bd70ac7`.
 
-**Estado:** READY_FOR_REVIEW. **4 decisiones congeladas, 4 ítems reportados sin decidir.** Cero
-APPLY, cero publicación, cero cambios de código. Detalle completo en
-[`audit/phase6_task0006_queue_review_2026-10-01.md`](../../audit/phase6_task0006_queue_review_2026-10-01.md).
+**Estado: `CORRECTIONS_REQUIRED` / COMPUERTA DE GOBERNANZA HUMANA — ESPERANDO DECISIONES HUMANAS.**
+Cero APPLY, cero publicación, cero cambios de código, y **cero escrituras reales en esta ronda de
+corrección** (el comentario lo prohíbe expresamente). Detalle completo —tres bloqueos y el hueco de
+workflow reportado— en la **sección 10** de
+[`audit/phase6_task0006_queue_review_2026-10-01.md`](../../audit/phase6_task0006_queue_review_2026-10-01.md);
+texto verbatim en [`tasks/0006-queue-human-review.md`](tasks/0006-queue-human-review.md).
 
-| Ítem | Resultado |
+| Ítem | Estado gobernado actual |
 |---|---|
-| 266 `exploration` | **CONGELADO** `CONTEXT_REQUIRED` → propuesta #492 |
-| 267 `upstream` | **CONGELADO** `CONTEXT_REQUIRED` → propuesta #493 |
-| 268 `midstream` | **CONGELADO** `CONTEXT_REQUIRED` → propuesta #494 |
-| 269 `downstream` | **CONGELADO** `CONTEXT_REQUIRED` → propuesta #495 |
-| 270 `refinery` + 271 `refinería` | **SIN DECIDIR** — par bilingüe no expresable en C2 |
-| Relaciones 61 y 62 | **SIN DECIDIR** — falta política de curación |
+| 266 `exploration` | propuesta #492 — **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** |
+| 267 `upstream` | propuesta #493 — **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** |
+| 268 `midstream` | propuesta #494 — **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** |
+| 269 `downstream` | propuesta #495 — **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** |
+| 270 `refinery` + 271 `refinería` | **SIN DECIDIR** — requiere decisión humana de diseño (bloqueo 2) |
+| Relaciones 61 y 62 | **SIN DECIDIR** — requiere política humana de curación (bloqueo 3) |
+| #420 / #421 / #422 / #491 | revisadas por humano — **protegidas** |
 
-Los cuatro términos congelados (`exploration`, `upstream`, `midstream`, `downstream`) son fases o
-segmentos de la cadena de valor, no productos/servicios mapeables: sus relaciones CPV están todas en
-`needs_review` y dispersas entre familias sin relación (o ausentes, en `midstream`). Es el caso exacto
-para el que se creó `CONTEXT_REQUIRED`, y es la decisión más conservadora disponible: congela cero
-mapeos y cero conceptos.
+**BLOQUEO 1 — las decisiones 266–269 no son decisiones humanas.** El orquestador no las acepta como
+tales: `reviewer_id=3` / `actor_type=user` dice estructuralmente que el usuario #3 revisó, mientras la
+nota durable en `context_reason` dice que la preparó el agente, y **una auditoría de gobernanza no
+puede apoyarse en una atribución contradictoria**. El análisis de los cuatro términos se conserva
+**como recomendación/evidencia**, aceptado explícitamente en ese carácter. Las 4 propuestas se
+preservan intactas y marcadas; el revisor humano debe inspeccionar y confirmar, rechazar o revisar
+cada una antes de cerrar TASK-0006.
 
-**270/271 no se adivinaron:** son un par bilingüe (`refinería` es `translation_alias` de `refinery`) y
-**ambos proponen el mismo nombre de concepto**. Congelar `CREATE_NEW` en los dos crearía conceptos
-duplicados, y `apply()` dejaría `canonical_name_es='refinery'` (palabra inglesa en campo español);
-tampoco puede congelarse `MAP_TO_EXISTING` apuntando a un concepto que solo existiría tras un APPLY no
-autorizado. Hace falta decidir el nombre canónico ES/EN y el orden de resolución.
+**Hueco de workflow REPORTADO (condicional del bloqueo 1), sin bypass.** Auditado leyendo esquema y
+código: **hoy C2 no puede registrar la confirmación humana de una propuesta ya congelada sin borrado o
+re-freeze.** No hay columna de segundo actor (`confirmed_by`/`confirmed_at`); los estados son solo
+`PENDING_APPLY`/`APPLIED`/`ABORTED`; `ReviewedProposalService` solo expone `freeze()` y `apply()` y
+`abort()` es privado y solo alcanzable desde la ruta de APPLY; y el índice único parcial
+`one_pending_per_candidate` **impide por base de datos** un segundo `PENDING_APPLY` para el mismo
+candidato. Editar `decision_payload` a mano rompería `payload_fingerprint`. Se reportaron cuatro
+opciones (extensión aditiva con `confirm()` —la única no destructiva y exigible—; limpieza autorizada +
+re-freeze; entrada en `taxonomy_audit_log` sin compuerta; solo documental) y **ninguna se implementó ni
+se eligió**: ninguna está autorizada y es decisión de diseño. Ver sección 10.3 del audit.
 
-**Relaciones 61/62 no se adivinaron:** ambas son propuestas léxicas débiles por una palabra genérica
-compartida, con `term_or_alias_overlap=0`. Admitir o rechazar aristas `RELATED_TO` débiles es política
-de curación y no hay umbral declarado en el proyecto.
+**BLOQUEO 2 — 270/271.** El orquestador confirma el análisis y prohíbe crear conceptos duplicados y
+usar un APPLY como atajo de secuenciación. Decisión humana requerida: (A) extender `CREATE_NEW` para
+congelar nombres canónicos ES + EN explícitos con flujo de identidad bilingüe revisado, o (B) definir
+otra secuencia gobernada para crear el concepto y luego mapear el alias de traducción.
 
-**Atribución (relevante para auditoría):** las 4 propuestas nuevas las decidió el **agente** por
-instrucción explícita del operador y se congelaron bajo la cuenta de revisor **#3**, porque todas las
-cuentas con permiso son personas nombradas y no existe cuenta de servicio (la cuenta del operador, #14,
-no tiene el permiso). La atribución quedó escrita **dentro del propio `context_reason`** de cada
-propuesta, para que el registro en base sea autodescriptivo. Las propuestas #420/#421/#422/#491 sí las
-decidió el revisor humano.
+**BLOQUEO 3 — relaciones 61/62.** Dejarlas sin decidir fue correcto. Requieren decisión humana
+explícita o una regla de curación declarada; hasta entonces siguen `candidate` y sin congelar.
 
-**Estado protegido tras la ronda:** candidatos 10, relaciones 2, `term_concepts` 142,
-`canonical_concepts` 81, `TERM→CPV` 9749, propuestas revisadas **8**, **aplicadas 0**. Las 4
-propuestas preexistentes intactas; 270/271 en `pending` con 0 propuestas; relaciones 61/62 en
-`candidate` con 0 propuestas.
+**Estado protegido (sin cambios en esta ronda):** candidatos 10, relaciones 2, `term_concepts` 142,
+`canonical_concepts` 81, `TERM→CPV` 9749, propuestas revisadas **8**, **aplicadas 0**. No se tocaron
+#492–#495, 270, 271 ni las relaciones 61/62.
 
-**Sigue NO autorizado:** APPLY/publicación (TASK-0007 sin abrir), producción, merge a `main`.
+**Sigue NO autorizado:** APPLY/publicación (TASK-0007 sin abrir), producción, merge a `main`, y
+cualquier limpieza/borrado/re-freeze de #492–#495 sin autorización separada y explícita.
 
 ## TASK-0006A (cerrada, histórico)
 
@@ -114,17 +122,23 @@ no procesó los 7 candidatos restantes ni las 2 relaciones, y no ejecutó ningú
 ## Estado de la cola real (estado vivo)
 
 Las 10 filas fuente originales siguen existiendo (`263`–`272`), igual que las 2 relaciones candidatas
-(`61`, `62`). **Cuatro candidatos tienen una revisión humana congelada**, ninguna aplicada:
+(`61`, `62`). Hay **8 propuestas congeladas**, ninguna aplicada, de dos naturalezas distintas según el
+re-audit `5934324928`:
 
-| Propuesta | Candidato | Decisión | Estado | `applied_at` |
+| Propuesta | Candidato | Decisión | Naturaleza | `applied_at` |
 |---|---|---|---|---|
-| #420 | 263 | `CONTEXT_REQUIRED` | `PENDING_APPLY` | NULL |
-| #421 | 264 | `CONTEXT_REQUIRED` | `PENDING_APPLY` | NULL |
-| #422 | 265 | `CONTEXT_REQUIRED` | `PENDING_APPLY` | NULL |
-| #491 | 272 (`pipeline`) | `MAP_TO_EXISTING` → #2890 `oleoducto / oil pipeline` | `PENDING_APPLY` | NULL |
+| #420 | 263 | `CONTEXT_REQUIRED` | revisión **humana** — protegida | NULL |
+| #421 | 264 | `CONTEXT_REQUIRED` | revisión **humana** — protegida | NULL |
+| #422 | 265 | `CONTEXT_REQUIRED` | revisión **humana** — protegida | NULL |
+| #491 | 272 (`pipeline`) | `MAP_TO_EXISTING` → #2890 `oleoducto / oil pipeline` | revisión **humana** — protegida | NULL |
+| #492 | 266 (`exploration`) | `CONTEXT_REQUIRED` | **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** | NULL |
+| #493 | 267 (`upstream`) | `CONTEXT_REQUIRED` | **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** | NULL |
+| #494 | 268 (`midstream`) | `CONTEXT_REQUIRED` | **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** | NULL |
+| #495 | 269 (`downstream`) | `CONTEXT_REQUIRED` | **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** | NULL |
 
-Son **registros de revisión protegidos**: ningún paso de código, test o despliegue puede mutarlos,
-borrarlos ni re-congelarlos. Cola restante sin revisar: candidatos `266`–`271` (6) y las 2 relaciones.
+Las 8 son **registros congelados protegidos**: ningún paso de código, test o despliegue puede mutarlos,
+borrarlos ni re-congelarlos — y las cuatro `AGENT_PREPARED` tampoco, sin autorización de limpieza
+separada y explícita. Cola sin decidir: candidatos `270`/`271` y las 2 relaciones `61`/`62`.
 
 **La #491 la congeló el humano con la UI mejorada mientras se implementaba esta corrección**, y es la
 validación real del objetivo de TASK-0006A: `pipeline` era justamente el término polisémico que
@@ -142,12 +156,12 @@ de eso. Detalle en la sección 10 del audit.
 | `taxonomy_term_concepts` | 142 | sin cambios — **nada publicado** |
 | `taxonomy_canonical_concepts` | **81** | era 79; +2 conceptos creados por el humano, ninguno publicado en `taxonomy_term_concepts` (0 filas cada uno) |
 | `taxonomy_term_cpv_relations` | 9749 | sin cambios |
-| `taxonomy_reviewed_proposals` | **4** | era 3; +1 decisión congelada por el humano |
+| `taxonomy_reviewed_proposals` | **8** | 4 humanas protegidas + 4 `AGENT_PREPARED` pendientes de confirmación humana |
 | Propuestas aplicadas | **0** | ningún APPLY ocurrió nunca |
 
 **Siguen NO autorizados:** APPLY/publicación, producción, merge a `main`. TASK-0007 (APPLY) sigue sin
-abrir. Tras la aprobación de TASK-0006A, TASK-0006 se reanuda y el humano continúa revisando los
-candidatos restantes con la UI mejorada.
+abrir. TASK-0006 está en `CORRECTIONS_REQUIRED` esperando las tres decisiones humanas de gobernanza
+descritas arriba.
 
 ## TASK-0005 (cerrada, histórico)
 
@@ -313,3 +327,5 @@ análisis de los 3 fallos): `audit/phase5_staging_deployment_2026-09-30.md`.
 | TASK-0004 (ronda 8, checkpoint documental `63cf811`) | CLOSED | mismo archivo; sin acción de código (el comentario `5914676402` instruyó esperar la apertura formal de TASK-0005) |
 | TASK-0005 (ronda 1, implementación + hardening + staging) | CORRECTIONS_REQUIRED (ronda 2) | [`tasks/0005-c2-human-review-ui.md`](tasks/0005-c2-human-review-ui.md); detalle en `audit/phase5_task0005_c2_review_ui_2026-09-30.md` |
 | TASK-0005 (ronda 2, correcciones 1 y 2) | **CLOSED / APPROVED** (comentario `5928773263`) | mismo archivo, sección "Re-audit — comentario `5917275454`"; detalle en la sección 10 del audit |
+| TASK-0006A (rondas 1–2, explorador de conceptos) | **CLOSED / APPROVED** (comentario `5933152293`) | [`tasks/0006a-concept-explorer.md`](tasks/0006a-concept-explorer.md); detalle en `audit/phase6_task0006a_concept_explorer_2026-10-01.md` |
+| TASK-0006 (ronda 1, revisión de la cola) | CORRECTIONS_REQUIRED / compuerta de gobernanza humana (comentario `5934324928`) | [`tasks/0006-queue-human-review.md`](tasks/0006-queue-human-review.md); detalle en la sección 10 de `audit/phase6_task0006_queue_review_2026-10-01.md` |
