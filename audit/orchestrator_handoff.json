@@ -1,6 +1,45 @@
 {
-  "current_task": "TASK-0005",
-  "current_status": "CLOSED/APPROVED - STANDING_BY awaiting explicit orchestrator instruction to open the next phase. Real queue review NOT YET AUTHORIZED; APPLY/publication NOT AUTHORIZED; production/main NOT AUTHORIZED (Issue #2 comment 5928773263).",
+  "current_task": "TASK-0006A",
+  "current_status": "READY_FOR_REVIEW - concept explorer + mapping diagnostics for the human review UI (Issue #2 comment 5929287629). TASK-0006 (real queue review) is IN PROGRESS but PAUSED for the unresolved candidates. APPLY/publication NOT AUTHORIZED; production/main NOT AUTHORIZED; TASK-0007 (APPLY) unopened.",
+  "protected_frozen_human_reviews": {
+    "title": "Three REAL candidate links carry frozen human review decisions from TASK-0006",
+    "status": "RESOLVED / PROTECTED - the orchestrator ruled on these in comment 5929287629",
+    "orchestrator_ruling": "Comment 5929287629 states that 'Three of the original ten term candidates have already been reviewed by the human through the approved C2 UI as generic/context-dependent', instructs to 'Preserve those frozen reviewed proposals exactly as they are. DO NOT APPLY them and do not alter/recreate/delete them', and in section H notes the counts must be read from live state 'because the human has now legitimately frozen 3 decisions during TASK-0006'. They are therefore legitimate protected review records, not stray state.",
+    "supersedes_earlier_characterization": "This session first discovered the change during a routine invariant re-check right after the TASK-0005 closure push and, lacking context, raised it to the user as a possible unauthorized real-queue action; the user characterized it as exploratory. The orchestrator's ruling above supersedes that reading: the decisions are legitimate TASK-0006 output. No session ever applied, altered or deleted them, so nothing needed undoing.",
+    "rows": [
+      { "proposal_id": 420, "candidate_link_id": 263, "decision": "CONTEXT_REQUIRED", "status": "PENDING_APPLY", "reviewed_at": "2026-10-01 09:48:41" },
+      { "proposal_id": 421, "candidate_link_id": 264, "decision": "CONTEXT_REQUIRED", "status": "PENDING_APPLY", "reviewed_at": "2026-10-01 09:49:42" },
+      { "proposal_id": 422, "candidate_link_id": 265, "decision": "CONTEXT_REQUIRED", "status": "PENDING_APPLY", "reviewed_at": "2026-10-01 09:50:20" }
+    ],
+    "provenance": "taxonomy_audit_log 1100/1101/1102: user_id=3 (the real human reviewer), actor_type=user, algorithm_version=taxonomy-reviewed-proposal/c2-v1 - a human acting through the approved Filament review UI.",
+    "no_apply_occurred": "applied_at, authorization_reference and target_environment are NULL on all three; apply() is their only writer. Source candidates 263/264/265 remain status=pending with reviewed_at=NULL, exactly as the C2 freeze contract specifies. Published taxonomy unchanged (142/79/9749).",
+    "fingerprints_recorded": "payload_fingerprint prefixes b9e1ec92528f0b2e… / 8f985faeef75a78c… / 2202c6348e65c4dd…; taxonomy_state_fingerprint is identical (1d0eb041f6428696…) across all three, consistent with no published-taxonomy change between the three freezes. decision_payload keys are term_id + context_reason; the payload CONTENTS are deliberately not transcribed into any doc (human review data, per the comment's 'do not expose private payload').",
+    "incidental_observation": "This was the first real-world end-to-end exercise of the C2 freeze path through the UI by a real reviewer, and it behaved exactly as designed: an immutable proposal was frozen, the source candidate's status/reviewed_at were untouched, the apply-only audit fields stayed empty, and nothing was published."
+  },
+  "superseded_post_closure_note": {
+    "title": "Three REAL candidate links were frozen through the newly approved review UI after TASK-0005 closure",
+    "status": "SUPERSEDED by protected_frozen_human_reviews above - kept for audit continuity",
+    "discovered": "2026-10-01, by this session's routine read-only invariant re-check immediately after pushing the closure record (a4d8b2f). The protected invariant taxonomy_reviewed_proposals moved from 0 to 3.",
+    "what_exists_now": [
+      { "proposal_id": 420, "candidate_link_id": 263, "decision": "CONTEXT_REQUIRED", "status": "PENDING_APPLY", "reviewed_at": "2026-10-01 09:48:41" },
+      { "proposal_id": 421, "candidate_link_id": 264, "decision": "CONTEXT_REQUIRED", "status": "PENDING_APPLY", "reviewed_at": "2026-10-01 09:49:42" },
+      { "proposal_id": 422, "candidate_link_id": 265, "decision": "CONTEXT_REQUIRED", "status": "PENDING_APPLY", "reviewed_at": "2026-10-01 09:50:20" }
+    ],
+    "provenance": "Unambiguous from taxonomy_audit_log entries 1100/1101/1102: user_id=3 (the real human reviewer/super-admin account), actor_type=user, algorithm_version=taxonomy-reviewed-proposal/c2-v1, reason 'Decision de revision congelada: CONTEXT_REQUIRED (candidate_link_id=263/264/265)'. A human acting through the Filament review UI - not a test fixture, not a service/system call, and not this session: the last pre-commit invariant check in this session read 0, and no freeze() was ever invoked against a real row by this session at any point in TASK-0005.",
+    "characterized_by_user_as": "Exploratory use of the newly approved UI, NOT an intentional start of the authorized real-queue review.",
+    "nothing_was_applied_or_published": {
+      "applied_at": "NULL on all three",
+      "authorization_reference": "NULL on all three",
+      "target_environment": "NULL on all three",
+      "interpretation": "Consistent with freeze() only - apply() is the sole writer of those three fields, so no apply ran.",
+      "source_rows_untouched": "Candidate links 263/264/265 remain status=pending with reviewed_at=NULL, exactly as the C2 contract specifies (freeze never mutates the source row).",
+      "published_taxonomy_unchanged": "taxonomy_term_concepts=142, taxonomy_canonical_concepts=79, taxonomy_term_cpv_relations=9749 - all identical. Candidate links still 10, candidate relations still 2."
+    },
+    "timing_vs_authorization": "The closure comment 5928773263 was posted 2026-10-01T09:36:30Z and states explicitly 'Real queue review: NOT YET AUTHORIZED' and that the approval does not itself authorize freezing decisions on the 10 candidates or 2 relations. These three freezes occurred roughly 12-14 minutes later.",
+    "invariant_correction": "taxonomy_reviewed_proposals is now 3, not 0. The 0 figure recorded throughout TASK-0005's evidence remains accurate AS OF the reviewed HEAD dbd410a and the closure review itself; it no longer describes current state. Every other protected invariant is unchanged: 10 / 2 / 142 / 79 / 9749.",
+    "action_taken_by_this_session": "NONE beyond recording. The three rows were deliberately left intact: they are human review decisions and taxonomy_reviewed_proposals is immutable by design. Marking them ABORTED was also not done - that is an apply()-path action requiring an explicit authorization reference, and APPLY/publication is NOT AUTHORIZED.",
+    "resolution": "Resolved by Issue #2 comment 5929287629, which rules these are legitimate TASK-0006 human review decisions to be preserved exactly as they are. See protected_frozen_human_reviews above. No orchestrator decision remains open and nothing had to be undone, because this session never applied, altered or deleted them."
+  },
   "blocking_requirement_for_future_task": {
     "title": "Revalidation when editing an already-approved concept relation",
     "status": "OPEN - recorded, deliberately not implemented",
@@ -570,6 +609,84 @@
         "Process note (test count reported honestly): the new-UI run is reported as 24 passed / 1 failed rather than rounded to green. The single failure is the long-standing local ext-intl gap on a TASK-0002 test, already proven green on the staging runtime in TASK-0004 round 6. No assertion was altered, skipped, or weakened to manufacture a clean number - the explicit instruction in section F.",
         "The 10 candidates and 2 relations remain awaiting human review. TASK-0005 delivers the UI to freeze a decision; it grants no authorization to actually review them, and apply() remains a separately authorized execution step outside this UI."
       ]
+    },
+    {
+      "task_id": "TASK-0006A",
+      "status": "READY_FOR_REVIEW",
+      "phase": "PHASE_C2_HUMAN_REVIEW_CONCEPT_EXPLORER",
+      "task_definition": "docs/orquestador/tasks/0006a-concept-explorer.md",
+      "source": "Issue #2 comment 5929287629 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5929287629)",
+      "audit": "audit/phase6_task0006a_concept_explorer_2026-10-01.md",
+      "review_base_sha": "a4d8b2f0b514eafdd7ff56f6d59b832802f14867",
+      "context": "TASK-0006 (human review of the real queue) is IN PROGRESS and was PAUSED for the unresolved candidates because the reviewer hit a real UX/diagnostic limitation while reviewing the term `pipeline`: the MAP_TO_EXISTING selector only offered Builder duplicate suggestions plus the suggested concept, and remote search truncated to 20 results exposing only the display name - which can create false confidence that the few visible choices are the only valid mappings.",
+      "execution_mode": "Admin UI + read-only diagnostics only. No change to mapping cardinality, search semantics, published taxonomy or search consumers. No APPLY. The 3 frozen human reviews were not touched and the remaining real queue was not processed.",
+      "section_D_architecture_finding": {
+        "question": "Is a single term architecturally allowed to have multiple approved canonical-concept mappings, and if so how is context/disambiguation represented and consumed?",
+        "audited_before_implementing": true,
+        "schema_permits_it": "YES, physically. taxonomy_term_concepts (migration 2026_09_18_092000) declares UNIQUE (term_id, concept_id) - the constraint is on the PAIR, not on term_id alone - and TaxonomyTerm::concepts() is a belongsToMany.",
+        "but_no_context_representation_exists": "The pivot has exactly four columns: id, term_id, concept_id, created_at. There is NO context, condition, priority or disambiguation column - nowhere to express 'this concept applies in this context and that one in that other'. Context machinery does exist but only at TERM level (taxonomy_terms.context_required, positive_context, negative_context, context_window_words, minimum_supporting_terms, ambiguity_penalty), which cannot say WHICH of a term's N concepts applies in a given text.",
+        "search_consumer_behaviour": "BuildEmpresaSearchDocuments builds the index with three UNION branches; the third is concept-sibling expansion: a term with no approved direct CPV relations inherits the approved CPV categories of sibling terms sharing its concept (join taxonomy_term_concepts link on link.term_id = t.id, then sib_link on sib_link.concept_id = link.concept_id and sib_link.term_id != t.id, then approved taxonomy_term_cpv_relations). The join over `link` is NOT restricted to one concept and there is NO context gate in the query.",
+        "conclusion": "The architecture does NOT safely support multiple approved TERM->CONCEPT mappings. A polysemous term mapped to N concepts would unconditionally inherit the UNION of the CPV categories of every one of those concepts' sibling terms, with no context gate - precisely the outcome the comment forbids ('it must not automatically fan the term out to every superficially related CPV category').",
+        "decision_taken": "Following the branch the comment itself anticipated: TASK-0006A keeps the UI single-concept (MAP_TO_EXISTING with exactly one target_concept_id, plus CONTEXT_REQUIRED). No multi-select was added. Mapping cardinality was not touched.",
+        "recorded_as_future_design_task": "Multi-concept contextual mapping requires a NEW orchestrator gate because it would change search semantics and invalidate inherited search-regression evidence. Minimum it would need: a per-mapping context representation (new column/table on the pivot) AND a search consumer able to disambiguate - neither exists today."
+      },
+      "section_E_verified_queue_state": {
+        "original_source_rows_still_exist": "All 10 candidate link ids present: 263,264,265,266,267,268,269,270,271,272. Both candidate relations present: 61,62.",
+        "exactly_three_frozen": "263 -> proposal 420, 264 -> proposal 421, 265 -> proposal 422. All CONTEXT_REQUIRED / PENDING_APPLY / payload_version taxonomy-reviewed-proposal/c2-v1. See protected_frozen_human_reviews at the top of this file for fingerprints and provenance.",
+        "no_apply_occurred": "applied_at / authorization_reference / target_environment NULL on all three.",
+        "source_rows_untouched_by_freeze": "All 10 candidates remain status=pending with reviewed_at=NULL, as the C2 contract specifies.",
+        "remaining_unreviewed": "Candidates 266,267,268,269,270,271,272 (7) plus both candidate relations. NONE were processed by this task.",
+        "live_counts_recorded_not_assumed": "taxonomy_candidate_concept_links=10, taxonomy_concept_relations=2, taxonomy_term_concepts=142, taxonomy_canonical_concepts=79, taxonomy_term_cpv_relations=9749, taxonomy_reviewed_proposals=3. Per section H the reviewed-proposal count is read from live state and is no longer 0."
+      },
+      "changed_files": {
+        "new": [
+          "app/Services/Taxonomy/ConceptExplorerService.php - read-only discovery + diagnostics service, zero writes",
+          "tests/Feature/Filament/TaxonomyConceptExplorerTest.php",
+          "docs/orquestador/tasks/0006a-concept-explorer.md",
+          "audit/phase6_task0006a_concept_explorer_2026-10-01.md"
+        ],
+        "modified": [
+          "app/Filament/Resources/TaxonomyCandidateConceptLinkResource.php - concept selector rebuilt on the explorer; new concept_diagnostics panel; new polysemy_guidance; new inspect_concept_id (CONTEXT_REQUIRED, evidence only); new formatConceptDiagnostics()"
+        ],
+        "migrations": "NONE - no schema change; everything comes from tables and columns that already existed."
+      },
+      "section_A_concept_discovery": {
+        "before": "options() = Builder duplicates + suggested concept; remote search over canonical_name_en/es with limit(20) and no indication that anything was hidden; no status filter; label = display name only.",
+        "after": "options() keeps the same evidence set but explicitly labelled as recommendations; search covers the ENTIRE ACTIVE catalogue; cap raised to 50 and searchActiveConcepts() always returns total/shown/truncated so overflow is DECLARED rather than silent; an empty search returns the active catalogue ordered by name so the set can be BROWSED, not only blind-searched; matching covers Spanish name, English name, member term and member-term alias; labels carry name(s) + #id + type/domain so homonyms are distinguishable.",
+        "real_defect_fixed_along_the_way": "The previous selector had NO status filter, so it also offered `merged` concepts, which are not a valid mapping target. The explorer filters status=active. Covered by a dedicated test.",
+        "no_hardcoding": "The service contains no domain constant for `pipeline` or any benchmark term. Verified live that search('pipe') finds 3 active concepts (Pipeline Pig / Diablo-Cochino de Limpieza de Ductos, drill pipe, stuck pipe) through the general mechanism. Live active concept count: 79.",
+        "why_not_a_paginated_browser_widget": "Filament's Select has no pagination UI for getSearchResultsUsing results. Rather than invent one, discovery is made complete by (a) search that matches names/terms/aliases so any active concept is reachable, (b) an empty search that browses the catalogue, and (c) always reporting the real total and overflow so nothing can be lost silently. The orchestrator's constraint was 'no arbitrary top-20 truncation that can hide valid concepts' and 'without loading an unbounded dataset into the browser' - both satisfied."
+      },
+      "section_B_diagnostic_panel": {
+        "shows": "Concept identity (ES/EN names, #id, status, concept_type, domain); terms with approved identity and their count; aliases of member terms; CPV categories reachable through approved taxonomy semantics, each with code, level label (Grupo/Familia/Categoria) and full breadcrumb; predicted affected-company summary; provenance indicators (origin_type/display_source/language/term_type of member terms); explicit data-gap warnings.",
+        "governed_sources_only": "taxonomy_canonical_concepts; taxonomy_term_concepts (its row existence IS the publication signal - the table has no status column); taxonomy_term_aliases; taxonomy_term_cpv_relations WHERE status='approved'; taxonomy_categories + translations; and the already-approved CanonicalConceptBuilderService impact helpers (conceptApprovedCategoryIds / predictAffectedCompanies) with the pre-existing formatImpactSummary(). No relationship is invented.",
+        "semantic_boundary_respected": "No direct TERM->CPV path is exposed. The canonical-concept layer stays authoritative and the UI text frames CPV categories as a CONSEQUENCE of the concept, shown as evidence to evaluate before deciding.",
+        "no_silent_truncation": "The first 12 categories are listed in detail and the remainder is declared explicitly ('se listan 12 de N; quedan M sin listar') with the real total always visible. Covered by a test that asserts total=18, shown=12, overflow=6 and that the rendered HTML carries both numbers.",
+        "data_gap_warnings": "Concept not active; no member terms (no approved TERM->CONCEPT evidence backing its meaning); no approved CPV relations (so mapping here would reach no CPV category today via sibling expansion); incomplete bilingual identity; plus the impact's own data_gap_flags."
+      },
+      "section_C_polysemy_guidance": {
+        "explicit_contrast": "A polysemy_guidance placeholder above the decision radio states MAP_TO_EXISTING = one sufficiently specific unconditional canonical meaning, CONTEXT_REQUIRED = valid but too broad/polysemous/ambiguous to map unconditionally, and clarifies that mapping links TERM -> CANONICAL CONCEPT and is NOT 'pick every CPV category containing a similar word'.",
+        "context_required_unchanged_requirements": "The mandatory non-blank context_reason is untouched.",
+        "inspection_is_evidence_only": "A new inspect_concept_id select is offered for CONTEXT_REQUIRED so the reviewer can check whether an existing concept would be specific enough. It feeds the diagnostic panel and NEVER enters the frozen payload - the action's match() takes only context_reason for that decision. A dedicated test asserts the frozen payload has no inspect_concept_id and no target_concept_id, and that zero concepts and zero mappings were created.",
+        "no_automatic_rule": "Nothing forces broad terms to CONTEXT_REQUIRED; the final decision stays human.",
+        "no_false_consumer_claim": "No UI text claims CONTEXT_REQUIRED is consumed by the search runtime today - no consumer reads it."
+      },
+      "tests": {
+        "environment": "Safe local environment (PHP 8.2.34 against the shared Supabase instance), disposable fixtures prefixed zzz_task0006a_ inside DatabaseTransactions on connection pgsql. The unsafe shared-bind-mount staging procedure was not used.",
+        "fixture_safety_note": "CPV categories are referenced READ-ONLY from existing real rows rather than created, so no row is added to taxonomy_categories. Only the approved taxonomy_term_cpv_relations fixture rows are written, and they roll back with the transaction - the same pattern the existing suite already uses.",
+        "new_suite": "TaxonomyConceptExplorerTest: 16 passed (89 assertions), 433.35s. Covers: whole active catalogue discoverable beyond Builder suggestions; empty-search browsing reports the real total; >20 matches not silently lost (25 matches, 25 returned); overflow beyond the cap declared rather than hidden; ES and EN canonical-name search; discovery through member terms and aliases; merged concepts never offered; option labels distinguish homonyms; diagnostics expose governed CPV associations and the rendered HTML carries the code; a non-approved CPV relation is NOT presented as reachable; a large association set is not silently truncated; data-gap warnings; a concept outside the suggestion set can be found and frozen as MAP_TO_EXISTING freezing EXACTLY that one concept with nothing published; CONTEXT_REQUIRED still freezes zero mappings even after inspecting a concept; an already-frozen candidate stays idempotently protected; the form exposes no apply/publish action."
+      },
+      "inherited_gates": {
+        "gate_32_query_regression": "NOT invalidated, NOT rerun. The change is strictly admin UI plus read-only diagnostics: BuildEmpresaSearchDocuments was not touched, no search consumer was added or changed, mapping cardinality is unchanged and no published taxonomy row changed. This is the literal condition section H sets for not rerunning it.",
+        "gate_mapping_cardinality": "Unchanged - see section_D_architecture_finding.",
+        "gate_search_ranking_semantics": "Unchanged.",
+        "gate_task_0004_c2": "ReviewedProposalService untouched; freeze() remains the only writer.",
+        "gate_task_0005_authorization": "Policies and the canEdit/canDelete/getEloquentQuery boundaries untouched.",
+        "gate_published_taxonomy_invariants": "142 / 79 / 9749 unchanged.",
+        "task_0005_adjacent_risk": "Deliberately NOT broadened into this task, per section I. It remains recorded in blocking_requirement_for_future_task; this UI work does not depend on it."
+      },
+      "secrets_handling": "No secret was read, printed or recorded. The decision_payload CONTENTS of the three frozen proposals are deliberately not transcribed into any document - only the present keys and fingerprint prefixes (which are hashes).",
+      "stop_conditions": "None reached. No change to TERM->CONCEPT cardinality, no search/ranking semantic change, no apply/publication of any reviewed proposal, no modification or deletion of the 3 frozen human reviews, no additional real queue decisions processed, no destructive migration, no production deployment, no main merge, no token/credential rotation."
     }
   ]
 }

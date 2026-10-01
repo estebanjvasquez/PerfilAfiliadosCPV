@@ -1,22 +1,75 @@
 # Tarea activa
 
-**TASK-0005** — UI de revisión humana C2 en Filament + hardening del trigger de despliegue
+**TASK-0006A** — Explorador de conceptos para revisión humana + diagnóstico de mapeo
+(Issue #2 comentario `5929287629`). Abierta desde HEAD `a4d8b2f`.
+
+**Contexto:** TASK-0006 (revisión humana de la cola real) está EN CURSO y quedó **pausada** para los
+candidatos sin resolver, porque el revisor encontró una limitación real de UX/diagnóstico revisando
+el término `pipeline`: el selector de MAP_TO_EXISTING solo ofrecía los duplicados sugeridos por el
+Builder y truncaba la búsqueda a 20 sin avisar, lo que podía crear falsa confianza de que las pocas
+opciones visibles eran las únicas válidas.
+
+**Estado:** READY_FOR_REVIEW. Detalle completo en
+[`audit/phase6_task0006a_concept_explorer_2026-10-01.md`](../../audit/phase6_task0006a_concept_explorer_2026-10-01.md);
+texto verbatim en [`tasks/0006a-concept-explorer.md`](tasks/0006a-concept-explorer.md).
+
+Lo entregado:
+
+- **A — descubrimiento:** nuevo `ConceptExplorerService` (solo lectura). La búsqueda recorre los
+  **79 conceptos activos** completos por nombre ES, nombre EN, término miembro y alias; filtra
+  `status=active` (corrige un defecto real: antes se ofrecían conceptos `merged`); el tope pasó de 20
+  silencioso a 50 **informando siempre el total real y el overflow**; etiquetas con `#id` + tipo/
+  dominio para distinguir homónimos. Las recomendaciones del Builder siguen visibles, etiquetadas
+  como evidencia y distintas del catálogo buscable. Sin hardcoding de `pipeline`.
+- **B — diagnóstico:** panel de solo lectura con identidad del concepto, términos con identidad
+  aprobada, alias, categorías CPV alcanzables (código + Grupo/Familia/Categoría + breadcrumb),
+  impacto predicho de empresas, procedencia y advertencias de huecos de datos. Todo de datos ya
+  gobernados; nada inventado; nada truncado en silencio.
+- **C — polisemia:** guía explícita MAP_TO_EXISTING vs CONTEXT_REQUIRED, más un selector de
+  inspección solo para CONTEXT_REQUIRED que es **pura evidencia** y nunca entra al payload congelado.
+  Sin ninguna regla automática: la decisión sigue siendo humana.
+- **D — cardinalidad:** auditada ANTES de implementar. El esquema admite N conceptos por término,
+  pero el pivote no tiene dónde representar contexto y el índice de búsqueda expande por hermanos de
+  concepto sin compuerta de contexto, así que mapear a N conceptos haría un fan-out incondicional de
+  categorías CPV. **La arquitectura NO lo soporta de forma segura** → la UI queda de un solo
+  concepto y el mapeo contextual multi-concepto se registra como tarea futura con compuerta nueva.
+- **Sin migraciones ni cambios de esquema.** Cero cambios en semántica de búsqueda o taxonomía
+  publicada.
+
+**Lo que esta tarea NO hizo, por instrucción explícita:** no modificó las 3 revisiones ya congeladas,
+no procesó los 7 candidatos restantes ni las 2 relaciones, y no ejecutó ningún APPLY.
+
+## Estado de la cola real (verificado, sección E)
+
+Las 10 filas fuente originales siguen existiendo (`263`–`272`), igual que las 2 relaciones candidatas
+(`61`, `62`). **Exactamente 3 candidatos tienen una revisión humana congelada**, ninguna aplicada:
+
+| Propuesta | Candidato | Decisión | Estado | `applied_at` |
+|---|---|---|---|---|
+| #420 | 263 | `CONTEXT_REQUIRED` | `PENDING_APPLY` | NULL |
+| #421 | 264 | `CONTEXT_REQUIRED` | `PENDING_APPLY` | NULL |
+| #422 | 265 | `CONTEXT_REQUIRED` | `PENDING_APPLY` | NULL |
+
+Son **registros de revisión protegidos**: ningún paso de código, test o despliegue puede mutarlos,
+borrarlos ni re-congelarlos. Cola restante sin revisar: candidatos `266`–`272` (7) y las 2 relaciones.
+
+**Invariantes del estado vivo:** `taxonomy_term_concepts=142`, `taxonomy_canonical_concepts=79`,
+`taxonomy_term_cpv_relations=9749`, candidatos `10`, relaciones `2`, propuestas revisadas **`3`**
+(ya no 0 — las 3 decisiones que el humano congeló legítimamente durante TASK-0006).
+
+**Siguen NO autorizados:** APPLY/publicación, producción, merge a `main`. TASK-0007 (APPLY) sigue sin
+abrir. Tras la aprobación de TASK-0006A, TASK-0006 se reanuda y el humano continúa revisando los
+candidatos restantes con la UI mejorada.
+
+## TASK-0005 (cerrada, histórico)
+
+**UI de revisión humana C2 en Filament + hardening del trigger de despliegue**
 (Issue #2 comentario `5914793857`). Abierta desde HEAD `63cf811`.
 
 **Estado: CLOSED / APPROVED** (comentario `5928773263`, HEAD revisado
 `dbd410a3b5603bba8acc48091ebb0601f411f3bd`). Ambas correcciones del re-audit `5917275454` quedaron
 `PASS`; evidencia de tests y despliegue aceptada; invariantes y gates heredados confirmados sin
 invalidar.
-
-**STANDING_BY — nada pendiente de esta sesión.** La UI de revisión humana queda técnicamente lista
-para una revisión controlada de la cola real, pero esa revisión **NO está autorizada todavía**. Según
-el comentario de cierre y la instrucción explícita del usuario en esta ronda:
-
-- **Cola real: NO AUTORIZADA.** No procesar, congelar, rechazar ni resolver contexto sobre los 10
-  candidatos ni las 2 relaciones reales.
-- **APPLY / publicación: NO AUTORIZADO.**
-- **Producción / merge a `main`: NO AUTORIZADO.**
-- Esperar la apertura formal de la siguiente fase por instrucción explícita del orquestador.
 
 ## Riesgo adyacente registrado para una tarea futura (bloqueante antes de producción)
 

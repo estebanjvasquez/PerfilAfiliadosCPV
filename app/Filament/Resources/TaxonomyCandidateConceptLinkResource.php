@@ -5,9 +5,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TaxonomyCandidateConceptLinkResource\Pages;
 use App\Models\TaxonomyCandidateConceptLink;
 use App\Models\TaxonomyCanonicalConcept;
+use App\Models\TaxonomyCategory;
 use App\Models\TaxonomyReviewedProposal;
 use App\Services\Taxonomy\CandidateConceptApprovalService;
 use App\Services\Taxonomy\CanonicalConceptBuilderService;
+use App\Services\Taxonomy\ConceptExplorerService;
 use App\Services\Taxonomy\ReviewedProposalService;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,6 +19,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 
 /**
  * Phase 3 (secciones 7/20 del pedido): cola de revisión del Canonical Concept Builder. Mismo
@@ -239,6 +242,88 @@ class TaxonomyCandidateConceptLinkResource extends Resource
     }
 
     /**
+     * TASK-0006A (Issue #2 comentario `5929287629`), sección B: render de solo lectura del
+     * diagnóstico que arma `ConceptExplorerService::diagnostics()`.
+     *
+     * Las categorías CPV se muestran con su código, nivel (Grupo/Familia/Categoría) y breadcrumb
+     * completo, y cuando hay más de las que se listan se informa el TOTAL real y cuántas quedaron sin
+     * listar - nunca se truncan en silencio (sección B del comentario).
+     *
+     * @param  array<string, mixed>  $d
+     */
+    public static function formatConceptDiagnostics(array $d): HtmlString
+    {
+        $levelLabel = fn (?int $level) => match ($level) {
+            TaxonomyCategory::LEVEL_GROUP => 'Grupo',
+            TaxonomyCategory::LEVEL_FAMILY => 'Familia',
+            TaxonomyCategory::LEVEL_CATEGORY => 'Categoría',
+            default => 'nivel ?',
+        };
+
+        $e = fn (?string $v) => e((string) ($v ?? '—'));
+
+        $html = '<div class="text-sm space-y-2">';
+
+        $html .= '<div><strong>Identidad</strong><br>'
+            .'ES: '.$e($d['identity']['canonical_name_es']).'<br>'
+            .'EN: '.$e($d['identity']['canonical_name_en']).'<br>'
+            .'id #'.(int) $d['identity']['id']
+            .' · status '.$e($d['identity']['status'])
+            .' · tipo '.$e($d['identity']['concept_type'])
+            .' · dominio '.$e($d['identity']['domain'])
+            .'</div>';
+
+        $terms = $d['member_terms']->take(12)
+            ->map(fn ($t) => e($t->term).' <span class="text-gray-500">('.e($t->language ?? '—').', '.e($t->term_type ?? '—').')</span>')
+            ->implode(', ');
+        $termOverflow = max(0, $d['member_term_count'] - $d['member_terms']->take(12)->count());
+        $html .= '<div><strong>Términos con identidad aprobada: '.(int) $d['member_term_count'].'</strong>'
+            .($terms !== '' ? '<br>'.$terms : '')
+            .($termOverflow > 0 ? ' <span class="text-gray-500">y '.$termOverflow.' más</span>' : '')
+            .'</div>';
+
+        if ($d['alias_count'] > 0) {
+            $aliases = $d['aliases']->take(12)->map(fn ($a) => e($a->alias))->implode(', ');
+            $aliasOverflow = max(0, $d['alias_count'] - $d['aliases']->take(12)->count());
+            $html .= '<div><strong>Alias ('.(int) $d['alias_count'].')</strong><br>'.$aliases
+                .($aliasOverflow > 0 ? ' <span class="text-gray-500">y '.$aliasOverflow.' más</span>' : '')
+                .'</div>';
+        }
+
+        $html .= '<div><strong>Categorías CPV alcanzables por la taxonomía aprobada: '.(int) $d['category_total'].'</strong>';
+        if ($d['category_total'] === 0) {
+            $html .= '<br><span class="text-gray-500">Ninguna - ningún término miembro tiene relaciones CPV aprobadas.</span>';
+        } else {
+            $html .= '<ul class="list-disc ml-5">';
+            foreach ($d['categories'] as $cat) {
+                $html .= '<li><code>'.e($cat->code).'</code> · '.$levelLabel($cat->level).' · '.e($cat->displayName())
+                    .'<br><span class="text-gray-500">'.e($cat->breadcrumb('es')).'</span></li>';
+            }
+            $html .= '</ul>';
+            if ($d['category_overflow'] > 0) {
+                $html .= '<p class="text-gray-500">Se listan '.$d['categories']->count().' de '.(int) $d['category_total']
+                    .'; quedan '.(int) $d['category_overflow'].' sin listar (no se ocultan: el total de arriba es el real).</p>';
+            }
+        }
+        $html .= '</div>';
+
+        $html .= '<div><strong>Impacto predicho</strong><br>'
+            .nl2br(e(self::formatImpactSummary($d['impact']))).'</div>';
+
+        if ($d['warnings'] !== []) {
+            $html .= '<div><strong>Advertencias / huecos de datos</strong><ul class="list-disc ml-5">';
+            foreach ($d['warnings'] as $w) {
+                $html .= '<li>'.e($w).'</li>';
+            }
+            $html .= '</ul></div>';
+        }
+
+        $html .= '</div>';
+
+        return new HtmlString($html);
+    }
+
+    /**
      * TASK-0005 (Issue #2 comentario `5914793857`), sección A: formulario único de revisión C2
      * para CUALQUIER candidato pending. Reemplaza `resolveNewConceptForm()` (solo cubría
      * PROPOSE_NEW_CONCEPT con el flujo legacy). Las 4 decisiones que soporta
@@ -261,6 +346,9 @@ class TaxonomyCandidateConceptLinkResource extends Resource
     {
         $service = app(CandidateConceptApprovalService::class);
         $builder = app(CanonicalConceptBuilderService::class);
+        $explorer = app(ConceptExplorerService::class);
+
+        $activeConceptCount = $explorer->activeConceptCount();
 
         $duplicates = $service->findPossibleDuplicateConcepts($record);
         $staleness = $service->proposalStaleness($record);
@@ -312,22 +400,55 @@ class TaxonomyCandidateConceptLinkResource extends Resource
             Forms\Components\Placeholder::make('staleness_banner')
                 ->label('Estado del grafo de conceptos')
                 ->content($stalenessText),
+            // TASK-0006A, sección C: la distinción entre las dos decisiones tiene que ser explícita
+            // en la UI, no implícita. NO se agrega ninguna regla automática que mande un término
+            // amplio a CONTEXT_REQUIRED - la decisión final sigue siendo humana.
+            Forms\Components\Placeholder::make('polysemy_guidance')
+                ->label('Cómo elegir entre mapear y pedir contexto')
+                ->content(new HtmlString(
+                    '<div class="text-sm space-y-1">'
+                    .'<p><strong>MAP_TO_EXISTING</strong>: este término tiene UN significado canónico suficientemente específico e incondicional para este uso de la taxonomía.</p>'
+                    .'<p><strong>CONTEXT_REQUIRED</strong>: el término es válido pero demasiado amplio, polisémico o ambiguo para mapearlo sin contexto alrededor.</p>'
+                    .'<p class="text-gray-500">Mapear vincula TÉRMINO → CONCEPTO CANÓNICO. No es "elegir todas las categorías CPV que contengan una palabra parecida": '
+                    .'las categorías CPV del panel de abajo son consecuencia del concepto, mostradas como evidencia para que puedas evaluarla antes de decidir.</p>'
+                    .'</div>'
+                )),
             Forms\Components\Radio::make('decision')
                 ->label('Decisión de revisión (C2 - solo congela, no publica)')
                 ->options($decisionOptions)
                 ->required()
                 ->live(),
+            // TASK-0006A, sección A: el selector ya NO se limita a los duplicados sugeridos por el
+            // Builder ni trunca a 20 en silencio. `options()` sigue trayendo el conjunto de
+            // EVIDENCIA (duplicados + sugerencia) para que las recomendaciones estén a la vista sin
+            // tipear, pero la búsqueda recorre TODO el catálogo de conceptos ACTIVOS por nombre ES,
+            // nombre EN, término miembro y alias de término miembro - y cuando hay más
+            // coincidencias que el tope, el panel de abajo informa el total real en vez de ocultarlas.
             Forms\Components\Select::make('target_concept_id')
                 ->label('Concepto destino')
-                ->helperText('Elegí explícitamente el concepto destino - no se asume la sugerencia del Builder aunque coincida.')
+                ->helperText(sprintf(
+                    'Elegí explícitamente el concepto destino - no se asume la sugerencia del Builder aunque coincida. '
+                    .'La búsqueda recorre los %d conceptos activos del catálogo completo (nombre ES/EN, términos miembro y alias), no solo las recomendaciones de arriba.',
+                    $activeConceptCount,
+                ))
                 ->options($duplicateOptions)
                 ->searchable()
-                ->getSearchResultsUsing(fn (string $search) => TaxonomyCanonicalConcept::query()
-                    ->where(fn ($q) => $q->where('canonical_name_en', 'ilike', "%{$search}%")->orWhere('canonical_name_es', 'ilike', "%{$search}%"))
-                    ->limit(20)->get()->mapWithKeys(fn (TaxonomyCanonicalConcept $c) => [$c->id => $c->display_name])->all())
-                ->getOptionLabelUsing(fn ($value) => TaxonomyCanonicalConcept::find($value)?->display_name)
+                ->getSearchResultsUsing(fn (string $search) => $explorer->searchOptions($search))
+                ->getOptionLabelUsing(fn ($value) => ($c = TaxonomyCanonicalConcept::find($value)) ? $explorer->optionLabel($c) : null)
                 ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING)
                 ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING)
+                ->live(),
+            // TASK-0006A, sección C: para CONTEXT_REQUIRED se permite inspeccionar conceptos como
+            // EVIDENCIA, sin crear ningún mapeo. Este campo es puramente diagnóstico: alimenta el
+            // panel de abajo y NUNCA entra al payload congelado (ver el `match` de la acción, que
+            // para CONTEXT_REQUIRED solo toma `context_reason`).
+            Forms\Components\Select::make('inspect_concept_id')
+                ->label('Inspeccionar un concepto (solo evidencia - no crea ningún mapeo)')
+                ->helperText('Sirve para comprobar si algún concepto existente sería suficientemente específico. Elegir acá no mapea nada.')
+                ->searchable()
+                ->getSearchResultsUsing(fn (string $search) => $explorer->searchOptions($search))
+                ->getOptionLabelUsing(fn ($value) => ($c = TaxonomyCanonicalConcept::find($value)) ? $explorer->optionLabel($c) : null)
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED)
                 ->live(),
             Forms\Components\TextInput::make('new_concept_name')
                 ->label('Nombre del concepto nuevo (elegido explícitamente por el revisor)')
@@ -339,6 +460,32 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                 ->rows(2)
                 ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED)
                 ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED),
+            // TASK-0006A, sección B: panel de diagnóstico de solo lectura del concepto elegido (o
+            // inspeccionado). Todo sale de datos ya gobernados vía `ConceptExplorerService` - nada
+            // se inventa acá. Reacciona a `target_concept_id` (MAP_TO_EXISTING) o a
+            // `inspect_concept_id` (CONTEXT_REQUIRED, solo evidencia).
+            Forms\Components\Placeholder::make('concept_diagnostics')
+                ->label('Diagnóstico del concepto (identidad, términos, CPV alcanzable, impacto)')
+                ->content(function (Get $get) use ($explorer, $activeConceptCount) {
+                    $conceptId = $get('decision') === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED
+                        ? $get('inspect_concept_id')
+                        : $get('target_concept_id');
+
+                    $concept = $conceptId ? TaxonomyCanonicalConcept::find($conceptId) : null;
+
+                    if (! $concept) {
+                        return new HtmlString(sprintf(
+                            '<p class="text-sm text-gray-500">Elegí un concepto para ver su diagnóstico. El catálogo tiene %d conceptos activos y la búsqueda del selector los recorre todos.</p>',
+                            $activeConceptCount,
+                        ));
+                    }
+
+                    return self::formatConceptDiagnostics($explorer->diagnostics($concept));
+                })
+                ->visible(fn (Get $get) => in_array($get('decision'), [
+                    TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                    TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED,
+                ], true)),
             Forms\Components\Placeholder::make('impact_preview')
                 ->label('Impacto predicho (empresas)')
                 ->content(function (Get $get) use ($record, $builder) {
