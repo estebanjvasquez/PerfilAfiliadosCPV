@@ -279,7 +279,131 @@ ahora:
 
 ## 6. Sección F — las escrituras reales autorizadas, y nada más
 
-*(se completa con los ids reales en §6.1–§6.3 tras la ejecución)*
+Ejecutadas **después** de los tests y **después** de verificar el despliegue a staging (§6.5), por el
+camino de servicio gobernado (`confirm()` / `freeze()` / `freezeBilingualConceptGroup()`), **nunca por
+SQL directo sobre la decisión**. El script lleva guardas duras (`ALLOWED_CONFIRM_PROPOSALS`,
+`ALLOWED_BILINGUAL_CANDIDATES`, `ALLOWED_REJECT_RELATIONS`) que rechazan cualquier otro id, y aborta
+antes de escribir si el estado vivo no coincide en los 7 contadores. Fingerprint de taxonomía al
+inicio: `c236bc5159ae4421…`.
+
+### 6.1 Escritura 1 — confirmación humana de #492–#495
+
+| Propuesta | Candidato | Resultado | `confirmed_by` | Canal | Fingerprint | Decisión |
+|---|---|---|---|---|---|---|
+| #492 | 266 `exploration` | `CONFIRMED` | **3** | `console` | **intacto** | `CONTEXT_REQUIRED` |
+| #493 | 267 `upstream` | `CONFIRMED` | **3** | `console` | **intacto** | `CONTEXT_REQUIRED` |
+| #494 | 268 `midstream` | `CONFIRMED` | **3** | `console` | **intacto** | `CONTEXT_REQUIRED` |
+| #495 | 269 `downstream` | `CONFIRMED` | **3** | `console` | **intacto** | `CONTEXT_REQUIRED` |
+
+`confirmation_reference` = `Issue #2 comentario 5936206843` en las cuatro — la referencia apunta al
+registro autoritativo donde el dueño de la taxonomía tomó la decisión, así que la confirmación es
+**verificable contra su fuente** y no depende de este documento.
+
+**Atribución, dicha con precisión.** `confirmed_by_id = 3` es el revisor humano, como pidió la
+sección B («Use the real human reviewer identity/account… Do not attribute confirmation to Claude
+Code»). La decisión de confirmar es del dueño y está registrada en el comentario; el agente ejecutó el
+registro. Eso **no** se oculta: `confirmation_channel = 'console'` queda grabado automáticamente y
+dice la verdad sobre el canal. La diferencia material con el problema que el re-audit `5934324928`
+rechazó es que allí el **contenido de la decisión** lo había redactado el agente y el registro
+afirmaba dos cosas contradictorias; acá el contenido lo decidió el humano en una fuente citable y
+cada campo dice lo que realmente es.
+
+Las cuatro `decision_payload` siguen con las mismas 2 claves y la misma longitud de texto
+(728/709/534/525), y los 8 `payload_fingerprint` preexistentes quedaron **todos intactos** —
+verificado contra los prefijos registrados antes de empezar.
+
+### 6.2 Escritura 2 — revisión bilingüe agrupada 270 + 271
+
+Pre-chequeos: candidato #270 `pending`, término 22 `refinery` (`en`), 0 propuestas; candidato #271
+`pending`, término 23 `refinería` (`es`), 0 propuestas. Cero conceptos `refin*` preexistentes.
+
+**Grupo `043fce22-daf0-4fda-83ed-df666d89ace6`**, resultado `FROZEN`:
+
+| Propuesta | Candidato | Decisión | `canonical_name_es` | `canonical_name_en` |
+|---|---|---|---|---|
+| **#629** | 270 (`refinery`, en) | `CREATE_NEW` | `refinería` | `refinery` |
+| **#630** | 271 (`refinería`, es) | `CREATE_NEW` | `refinería` | `refinery` |
+
+Una sola identidad, dos filas enlazadas, **un solo concepto futuro**. Las dos comparten
+`taxonomy_state_fingerprint` y `reviewed_at`. El payload de cada una identifica el grupo completo
+(`grouped_candidate_link_ids` = [270, 271], `grouped_term_ids`, `grouped_source_suggested_names`,
+`grouped_term_languages`) y lleva `decision_source_reference` = `Issue #2 comentario 5936206843`.
+**Ningún concepto fue creado**: `taxonomy_canonical_concepts` sigue en 81.
+
+### 6.3 Escritura 3 — REJECT de las relaciones #61 y #62
+
+| Propuesta | Relación | Decisión | Estado |
+|---|---|---|---|
+| **#631** | #61 `production` → `production casing` | `REJECT` | `PENDING_APPLY` |
+| **#632** | #62 `oil` → `oil-base mud` | `REJECT` | `PENDING_APPLY` |
+
+Razón estructurada: `rejection_reason_category = INSUFFICIENT_EVIDENCE_LEXICAL_OR_COMPOSITIONAL`, más
+`notes` con la evidencia concreta de cada una — #61 con la similitud enteramente debida a la palabra
+genérica compartida «production» (`name_similarity` 0.6111, `term_or_alias_overlap` 0, `weight` 0), y
+#62 con una relación real pero **composicional** (el lodo tiene base de aceite) que `RELATED_TO` no
+captura, surgida de similitud léxica (`name_similarity` 0.3077, `term_or_alias_overlap` 0). Es
+exactamente el criterio que la sección E pidió consignar.
+
+**Las filas fuente no se borraron ni se tocaron:** relaciones #61 y #62 siguen `status=candidate`, con
+`reviewed_at` y `reviewed_by` en NULL. `freeze()` nunca muta el origen.
+
+### 6.4 Decisión de diseño declarada: las tres escrituras nuevas quedan `requires_human_confirmation = true`
+
+Las propuestas **#629–#632** se congelaron declarando `prepared_by_actor_type = agent`, así que
+**exigen confirmación humana antes de cualquier APPLY futuro**. Es una elección deliberada, y conviene
+que el orquestador la vea explícitamente:
+
+- el **contenido** de estas decisiones lo fijó íntegramente el dueño en el comentario `5936206843`
+  (nombres canónicos exactos, veredictos exactos) — no hay juicio del agente en ellas;
+- pero la **ejecución** del freeze la hizo el agente, y la lección completa del BLOQUEO 1 fue que una
+  escritura de revisión ejecutada por el agente no debe quedar registrada como si fuera una decisión
+  humana completada;
+- marcarlas **solo agrega una compuerta**: no puede causar pérdida de datos, no publica nada, y
+  TASK-0007 (APPLY) no está abierta, así que hoy no bloquea nada;
+- y si el orquestador prefiere tratarlas como decididas directamente por el humano, la resolución es
+  **aditiva y no destructiva**: un clic en «Confirmar decisión preparada» por la UI que esta misma
+  tarea construyó. **No hace falta borrar ni re-congelar nada** — que es precisamente el hueco que
+  TASK-0006B vino a cerrar.
+
+### 6.5 Sección I — despliegue a staging y smoke
+
+| Paso | Resultado |
+|---|---|
+| Migración aditiva aplicada (base Supabase compartida local/staging) | `2026_10_01_180000_…` → DONE (8s), 1 sola migración pendiente antes de correr |
+| HEAD desplegado | **`1617e72a428caf84232bbbd6081743162893db9d`** — run «Deploy a Contabo» `completed / success` (2026-10-01T18:57:29Z) para ese sha exacto |
+| `GET /` | **200** |
+| `GET /admin/login` | **200** |
+| `GET /admin/taxonomy-candidate-concept-links` | **302 → /admin/login (200)** |
+| `GET /admin/taxonomy-concept-relations` | **302 → /admin/login (200)** |
+| `GET /admin/taxonomy-reviewed-proposals` | **302 → /admin/login (200)** |
+| 500/503 | **ninguno** |
+
+El 302 es el comportamiento correcto para una página de admin sin sesión: prueba que la ruta existe y
+que la autorización actúa, y descarta 500/503.
+
+**Limitación declarada, no disimulada:** esta sesión **no** tiene clave SSH para el host de staging
+(`Permission denied (publickey)`), así que el HEAD desplegado se verificó **por el run del workflow
+para ese sha exacto** —que hace el checkout y corre `php artisan migrate --force`— y no por inspección
+directa del servidor. Tampoco se pudo abrir la pantalla de propuestas **autenticado** en staging por
+falta de credenciales de un revisor. No se buscaron ni se crearon credenciales (condición STOP).
+
+Lo que sí cubre ese hueco con evidencia real: el infolist de detalle que esta tarea modificó
+(sección «Confirmación humana») **se renderiza en test** — `TaxonomyReviewedProposalResourceTest` abre
+la página de detalle con `assertOk()` y pasó **11/11 después** del cambio —, y la acción y su modal se
+renderizan en los 7 tests nuevos de UI. El riesgo de un 500 en la pantalla autenticada está cubierto
+por tests, no por suposición.
+
+### 6.6 Ninguna otra escritura
+
+No se procesó ninguna otra fila de la cola. No se ejecutó ningún APPLY. No se publicó nada. Las
+propuestas #420/#421/#422/#491 quedaron exactamente como estaban (`requires_human_confirmation=false`,
+sin confirmación, `applied_at` NULL).
+
+**Nota sobre los ids:** las propuestas nuevas son #629–#632 y no #496–#499 porque la secuencia de
+`taxonomy_reviewed_proposals` avanzó con los fixtures de los tests. Las transacciones de test
+revirtieron las **filas**, pero una secuencia de Postgres no retrocede en un rollback: es el
+comportamiento normal del motor, no un rastro de datos de prueba. Verificado: cero filas `zzz_` en la
+tabla, y los 12 ids presentes son exactamente los esperados.
 
 ---
 
@@ -373,7 +497,35 @@ según el criterio del propio comentario (sección H).
 
 ---
 
-## 9. Condiciones STOP
+## 9. Sección J — post-state semántico requerido, verificado punto por punto
+
+| Requisito de la sección J | Verificado |
+|---|---|
+| 266–269: #492–#495 conservan sus decisiones inmutables y están estructuralmente `HUMAN_CONFIRMED` por el humano | **SÍ** — las 4 con `confirmed_at` no nulo, `confirmed_by_id = 3`, `decision = CONTEXT_REQUIRED`, `status = PENDING_APPLY`, fingerprints intactos |
+| 270/271: **UNA** revisión bilingüe gobernada apuntando a **UN** concepto futuro ES `refinería` / EN `refinery` | **SÍ** — 1 solo `proposal_group_id`, 2 miembros, **1 sola** variante de identidad: `refinería\|refinery` |
+| 270/271: sigue sin aplicar | **SÍ** — `applied_at` NULL en ambas |
+| Relaciones 61/62: revisiones `REJECT` congeladas | **SÍ** — #631 y #632, ambas `REJECT` |
+| Relaciones 61/62: siguen sin publicar | **SÍ** — ambas `status = candidate` |
+| `taxonomy_term_concepts` = 142 | **142** |
+| `taxonomy_canonical_concepts` = 81 (porque `CREATE_NEW` solo está congelado, no aplicado) | **81** |
+| TERM→CPV = 9749 | **9749** |
+| Propuestas aplicadas = 0 | **0** |
+| Ninguna fila fuente tratada falsamente como publicada | **SÍ** — cero candidatos `published`, cero relaciones `approved` |
+
+**Contadores finales:** candidatos 10, relaciones 2, `term_concepts` 142, `canonical_concepts` 81,
+TERM→CPV 9749, propuestas revisadas **8 → 12**, aplicadas **0**.
+
+**Sin residuo de tests:** 0 términos `zzz_`, 0 conceptos `zzz_`, 0 candidatos fuera del rango 263–272,
+0 relaciones fuera de 61/62, y los 12 ids de propuesta son exactamente los esperados
+(`420,421,422,491,492,493,494,495,629,630,631,632`).
+
+**Bitácora de confirmación** (`taxonomy_audit_log` #1380–#1383): `field=confirmed_at`,
+`actor_type=user`, `user_id=3`, y `authorization_reference`/`target_environment` en **NULL** — porque
+confirmar **no es ejecutar**. Es la señal que distingue estructuralmente los tres eventos del ciclo.
+
+---
+
+## 10. Condiciones STOP
 
 Ninguna alcanzada. Sin APPLY ni publicación; sin despliegue a producción; sin merge a `main`; sin
 migración destructiva (solo aditiva); sin rotación de credenciales; sin cambios de semántica de

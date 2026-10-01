@@ -1,5 +1,92 @@
 # Tarea activa
 
+**TASK-0006B** — Confirmación humana C2 + `CREATE_NEW` bilingüe + convergencia gobernada
+(Issue #2 comentario `5936206843`). Abierta desde HEAD `42d3c6b`.
+
+**Estado: READY_FOR_REVIEW.** Las tres decisiones humanas del dueño de la taxonomía quedaron
+representadas dentro de C2, con las **tres** escrituras reales que la sección F autorizó y **ninguna
+más**. Cero APPLY, cero publicación. Detalle completo en
+[`audit/phase6_task0006b_human_confirmation_2026-10-01.md`](../../audit/phase6_task0006b_human_confirmation_2026-10-01.md);
+texto verbatim en [`tasks/0006b-human-confirmation.md`](tasks/0006b-human-confirmation.md).
+
+| Decisión del dueño | Representación |
+|---|---|
+| 266–269 → **CONFIRMAR** `CONTEXT_REQUIRED` | #492–#495 **`HUMAN_CONFIRMED`** por el revisor #3, decisiones y fingerprints **intactos** |
+| 270/271 → un concepto, ES `refinería` / EN `refinery` (opción A) | grupo `043fce22…`: propuestas **#629** (cand. 270) + **#630** (cand. 271), una sola identidad bilingüe |
+| Relaciones #61 y #62 → **REJECT** | propuestas **#631** y **#632**, `PENDING_APPLY`, relaciones intactas en `candidate` |
+
+**Lo que se construyó (A–D):**
+
+- **A — confirmación humana exigible.** Migración **estrictamente aditiva** (columnas nulables + un
+  booleano `DEFAULT FALSE` + CHECK + 2 índices + trigger; cero `DROP`, cero `ALTER TYPE`). Nueva
+  operación `confirm()` que escribe **solo** las columnas de confirmación: `reviewer_id`,
+  `reviewed_at`, la decisión, el snapshot de fuente y los **dos** fingerprints quedan intactos — el
+  `payload_fingerprint` se computa sobre una lista fija de 9 campos de decisión que no incluye ninguna
+  columna nueva, así que confirmar **no puede** invalidar la tamper-detection (verificado en vivo: los
+  8 fingerprints reales idénticos). Idempotente, concurrency-safe, solo el usuario **autenticado** y
+  con el permiso `update` del tipo de origen, sin poder confirmar «en nombre de» otra cuenta, con el
+  canal **auto-capturado** (no falseable) y un evento de auditoría propio (`field=confirmed_at`) que
+  separa PREPARED/FROZEN → HUMAN_CONFIRMED → APPLIED. Un trigger de base de datos impide apagar el
+  marcador o sobrescribir una confirmación.
+- **Regla de compatibilidad (exacta):** `apply()` consulta **solo** `requires_human_confirmation`,
+  creado con `DEFAULT FALSE`, así que **toda** propuesta congelada antes de TASK-0006B sigue siendo
+  aplicable igual que antes — su procedencia de revisión original ya satisface el requisito de
+  revisión humana (#420/#421/#422/#491 sin tocar). Que `ReviewedProposalServiceTest` pase **41/41 sin
+  editar una línea** es la prueba. La compuerta **rechaza** en vez de abortar: abortar es terminal y
+  re-congelar está bloqueado por el índice único parcial, así que un `apply()` prematuro dejaría la
+  decisión humana irrecuperable.
+- **Backfill de #492–#495** determinístico y auto-validante (ids + marcador de atribución presente en
+  `context_reason` + `PENDING_APPLY`), auditable (4 filas de bitácora) y limitado a identificar el
+  requisito: **nunca** tocó una decisión.
+- **B — UX de confirmación** en Filament: muestra la decisión original, su payload y la procedencia
+  **real** (dice que la preparó un agente, sin presentar al titular de la cuenta como autor), exige
+  referencia de gobernanza + casilla deliberada, muestra confirmador y fecha, y **sigue sin ningún
+  botón de APPLY/Publicar**.
+- **C — `CREATE_NEW` bilingüe:** `canonical_name_es` **y** `canonical_name_en` explícitas, sin
+  traducción ni fallback (una identidad parcial se **rechaza**), sugerencia del Builder solo como
+  evidencia, fingerprint cubriendo **las dos** nombres, y compatibilidad hacia atrás **probada** para
+  los payloads monolingües históricos.
+- **D — convergencia:** el grupo es **una fila por candidato** unidas por `proposal_group_id`, no una
+  fila con una lista. Razón dura: con una sola fila el segundo candidato quedaría **fuera** del índice
+  único parcial y nada impediría congelarle otra propuesta en paralelo — la carrera de concepto
+  duplicado. `apply()` bloquea el grupo entero, crea **UN** concepto y adjunta los dos términos en una
+  transacción, reutilizando el concepto si un hermano ya se aplicó; el drift en **cualquiera** de los
+  dos orígenes aborta todo. **No** es un rediseño N:M: la cardinalidad TÉRMINO→CONCEPTO y la semántica
+  de búsqueda no cambian.
+- Las capacidades son **alcanzables desde la UI real** (lección del re-audit `5930560603`): selector
+  monolingüe/bilingüe, los dos campos de nombre, y un multi-select de convergencia que lista los demás
+  candidatos `pending` con su idioma y marca con `↔` los de igual `canonical_term` como **sugerencia,
+  no filtro**.
+
+**Decisión de diseño declarada:** las propuestas nuevas **#629–#632** quedaron
+`requires_human_confirmation = true` (preparadas por el agente). El **contenido** lo fijó el dueño en
+el comentario, pero la **ejecución** del freeze la hizo el agente, y marcarlas solo **agrega** una
+compuerta: no publica nada, no puede perder datos, y TASK-0007 no está abierta. Si el orquestador
+prefiere tratarlas como decididas directamente por el humano, la resolución es **aditiva**: un clic en
+«Confirmar decisión preparada». **No hace falta borrar ni re-congelar nada** — justo el hueco que esta
+tarea cerró.
+
+**Tests:** 34/34 nuevos de servicio (167 assertions) + 7/7 nuevos de UI, y las regresiones protegidas
+**sin editar**: `ReviewedProposalServiceTest` 41/41, `TaxonomyReviewedProposalResourceTest` 11/11,
+`TaxonomyConceptRelationValidationTest` 11/11, `TaxonomyConceptExplorerTest` 23/23,
+`TaxonomyConceptRelationReviewTest` 14/14, `TaxonomyCandidateConceptLinkResourceTest` 4/4,
+`TaxonomyCandidateConceptLinkReviewTest` 13/14. **El único fallo** es el gap local preexistente de
+`ext-intl` en la regresión de nested-signals de TASK-0002, verde en staging y ajeno a este diff.
+
+**Staging:** HEAD desplegado `1617e72` (run «Deploy a Contabo» `success` para ese sha exacto); smoke
+`/` 200, `/admin/login` 200, y las tres pantallas de taxonomía 302 → login 200. **Sin 500/503.** Esta
+sesión **no** tiene clave SSH al host, así que el HEAD se verificó por el run del workflow y no por
+inspección directa; el riesgo de 500 en la pantalla autenticada queda cubierto por los tests que
+abren la página de detalle con `assertOk()` (11/11 **después** del cambio de infolist).
+
+**Estado protegido:** candidatos 10, relaciones 2, `term_concepts` **142**, `canonical_concepts`
+**81**, TERM→CPV **9749**, propuestas revisadas **8 → 12**, **aplicadas 0**. Cero residuo de tests.
+
+**Sigue NO autorizado:** APPLY/publicación (TASK-0007 sin abrir), producción, merge a `main`, y
+cualquier borrado/re-freeze de #492–#495.
+
+## TASK-0006 (ronda previa, histórico)
+
 **TASK-0006** — Revisión humana de la cola real (Issue #2 comentarios `5933152293` → re-audit
 `5934324928`). HEAD revisado `bd70ac7`.
 
@@ -122,23 +209,30 @@ no procesó los 7 candidatos restantes ni las 2 relaciones, y no ejecutó ningú
 ## Estado de la cola real (estado vivo)
 
 Las 10 filas fuente originales siguen existiendo (`263`–`272`), igual que las 2 relaciones candidatas
-(`61`, `62`). Hay **8 propuestas congeladas**, ninguna aplicada, de dos naturalezas distintas según el
-re-audit `5934324928`:
+(`61`, `62`). Tras TASK-0006B hay **12 propuestas congeladas**, ninguna aplicada, y **la cola real ya
+no tiene ítems sin decidir**:
 
-| Propuesta | Candidato | Decisión | Naturaleza | `applied_at` |
+| Propuesta | Origen | Decisión | Confirmación humana | `applied_at` |
 |---|---|---|---|---|
-| #420 | 263 | `CONTEXT_REQUIRED` | revisión **humana** — protegida | NULL |
-| #421 | 264 | `CONTEXT_REQUIRED` | revisión **humana** — protegida | NULL |
-| #422 | 265 | `CONTEXT_REQUIRED` | revisión **humana** — protegida | NULL |
-| #491 | 272 (`pipeline`) | `MAP_TO_EXISTING` → #2890 `oleoducto / oil pipeline` | revisión **humana** — protegida | NULL |
-| #492 | 266 (`exploration`) | `CONTEXT_REQUIRED` | **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** | NULL |
-| #493 | 267 (`upstream`) | `CONTEXT_REQUIRED` | **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** | NULL |
-| #494 | 268 (`midstream`) | `CONTEXT_REQUIRED` | **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** | NULL |
-| #495 | 269 (`downstream`) | `CONTEXT_REQUIRED` | **`AGENT_PREPARED / HUMAN_CONFIRMATION_REQUIRED`** | NULL |
+| #420 | cand. 263 | `CONTEXT_REQUIRED` | no requiere (revisión humana original) | NULL |
+| #421 | cand. 264 | `CONTEXT_REQUIRED` | no requiere | NULL |
+| #422 | cand. 265 | `CONTEXT_REQUIRED` | no requiere | NULL |
+| #491 | cand. 272 (`pipeline`) | `MAP_TO_EXISTING` → #2890 `oleoducto / oil pipeline` | no requiere | NULL |
+| #492 | cand. 266 (`exploration`) | `CONTEXT_REQUIRED` | **CONFIRMADA** por #3 | NULL |
+| #493 | cand. 267 (`upstream`) | `CONTEXT_REQUIRED` | **CONFIRMADA** por #3 | NULL |
+| #494 | cand. 268 (`midstream`) | `CONTEXT_REQUIRED` | **CONFIRMADA** por #3 | NULL |
+| #495 | cand. 269 (`downstream`) | `CONTEXT_REQUIRED` | **CONFIRMADA** por #3 | NULL |
+| #629 | cand. 270 (`refinery`) | `CREATE_NEW` ES `refinería` / EN `refinery` — grupo `043fce22…` | pendiente | NULL |
+| #630 | cand. 271 (`refinería`) | `CREATE_NEW` ES `refinería` / EN `refinery` — grupo `043fce22…` | pendiente | NULL |
+| #631 | relación 61 | `REJECT` | pendiente | NULL |
+| #632 | relación 62 | `REJECT` | pendiente | NULL |
 
-Las 8 son **registros congelados protegidos**: ningún paso de código, test o despliegue puede mutarlos,
-borrarlos ni re-congelarlos — y las cuatro `AGENT_PREPARED` tampoco, sin autorización de limpieza
-separada y explícita. Cola sin decidir: candidatos `270`/`271` y las 2 relaciones `61`/`62`.
+Las 12 son **registros congelados protegidos**: ningún paso de código, test o despliegue puede
+mutarlos, borrarlos ni re-congelarlos sin autorización de limpieza separada y explícita.
+
+**#629 y #630 son UN grupo bilingüe**: `apply()` (en una tarea futura separadamente autorizada) creará
+**UN** solo concepto canónico y adjuntará los dos términos en una transacción — nunca un concepto por
+candidato.
 
 **La #491 la congeló el humano con la UI mejorada mientras se implementaba esta corrección**, y es la
 validación real del objetivo de TASK-0006A: `pipeline` era justamente el término polisémico que
@@ -156,12 +250,12 @@ de eso. Detalle en la sección 10 del audit.
 | `taxonomy_term_concepts` | 142 | sin cambios — **nada publicado** |
 | `taxonomy_canonical_concepts` | **81** | era 79; +2 conceptos creados por el humano, ninguno publicado en `taxonomy_term_concepts` (0 filas cada uno) |
 | `taxonomy_term_cpv_relations` | 9749 | sin cambios |
-| `taxonomy_reviewed_proposals` | **8** | 4 humanas protegidas + 4 `AGENT_PREPARED` pendientes de confirmación humana |
+| `taxonomy_reviewed_proposals` | **12** | 4 sin requisito + 4 confirmadas + 4 nuevas pendientes de confirmar |
 | Propuestas aplicadas | **0** | ningún APPLY ocurrió nunca |
 
 **Siguen NO autorizados:** APPLY/publicación, producción, merge a `main`. TASK-0007 (APPLY) sigue sin
-abrir. TASK-0006 está en `CORRECTIONS_REQUIRED` esperando las tres decisiones humanas de gobernanza
-descritas arriba.
+abrir. Las tres decisiones humanas de gobernanza que bloqueaban TASK-0006 llegaron en el comentario
+`5936206843` y quedaron representadas en TASK-0006B (ver arriba).
 
 ## TASK-0005 (cerrada, histórico)
 
@@ -328,4 +422,5 @@ análisis de los 3 fallos): `audit/phase5_staging_deployment_2026-09-30.md`.
 | TASK-0005 (ronda 1, implementación + hardening + staging) | CORRECTIONS_REQUIRED (ronda 2) | [`tasks/0005-c2-human-review-ui.md`](tasks/0005-c2-human-review-ui.md); detalle en `audit/phase5_task0005_c2_review_ui_2026-09-30.md` |
 | TASK-0005 (ronda 2, correcciones 1 y 2) | **CLOSED / APPROVED** (comentario `5928773263`) | mismo archivo, sección "Re-audit — comentario `5917275454`"; detalle en la sección 10 del audit |
 | TASK-0006A (rondas 1–2, explorador de conceptos) | **CLOSED / APPROVED** (comentario `5933152293`) | [`tasks/0006a-concept-explorer.md`](tasks/0006a-concept-explorer.md); detalle en `audit/phase6_task0006a_concept_explorer_2026-10-01.md` |
-| TASK-0006 (ronda 1, revisión de la cola) | CORRECTIONS_REQUIRED / compuerta de gobernanza humana (comentario `5934324928`) | [`tasks/0006-queue-human-review.md`](tasks/0006-queue-human-review.md); detalle en la sección 10 de `audit/phase6_task0006_queue_review_2026-10-01.md` |
+| TASK-0006 (ronda 1, revisión de la cola) | CORRECTIONS_REQUIRED / compuerta de gobernanza humana (comentario `5934324928`) → resuelta por las decisiones humanas del comentario `5936206843` | [`tasks/0006-queue-human-review.md`](tasks/0006-queue-human-review.md); detalle en la sección 10 de `audit/phase6_task0006_queue_review_2026-10-01.md` |
+| TASK-0006B (confirmación humana + bilingüe) | **READY_FOR_REVIEW** (tarea activa) | [`tasks/0006b-human-confirmation.md`](tasks/0006b-human-confirmation.md); detalle en `audit/phase6_task0006b_human_confirmation_2026-10-01.md` |
