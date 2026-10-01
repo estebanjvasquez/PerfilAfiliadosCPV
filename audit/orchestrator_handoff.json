@@ -1,6 +1,15 @@
 {
   "current_task": "TASK-0005",
-  "current_status": "READY_FOR_REVIEW",
+  "current_status": "CLOSED/APPROVED - STANDING_BY awaiting explicit orchestrator instruction to open the next phase. Real queue review NOT YET AUTHORIZED; APPLY/publication NOT AUTHORIZED; production/main NOT AUTHORIZED (Issue #2 comment 5928773263).",
+  "blocking_requirement_for_future_task": {
+    "title": "Revalidation when editing an already-approved concept relation",
+    "status": "OPEN - recorded, deliberately not implemented",
+    "mandated_by": "Issue #2 comment 5928773263, section 'ADJACENT PRE-EXISTING RISK — RECORD FOR FUTURE TASK'",
+    "detail": "Editing the endpoints/type of a relation that is already 'approved' may mutate published taxonomy, because TaxonomyConceptRelation::booted()'s guard only revalidates when status CHANGES TO approved (isDirty('status')) - it does not fire for an endpoint/type edit on a row that is already approved.",
+    "provenance": "Found and recorded by this session during TASK-0005's correction round as an adjacent observation, explicitly NOT fixed to respect the orchestrator's instruction to correct only the two reported findings. The closure comment then confirmed the observation and attached a gate to it.",
+    "gate": "MUST be addressed before opening general administrative editing of published relations, and before any production rollout of this taxonomy-governance UI. Does not block TASK-0005 closure.",
+    "note": "This is why TaxonomyConceptRelationValidationTest's helper uses 'rejected' rather than 'approved' to represent 'review cycle over' - using 'approved' would have implicitly sanctioned editing published rows."
+  },
   "checkpoints": [
     {
       "task_id": "TASK-0001",
@@ -389,7 +398,8 @@
     },
     {
       "task_id": "TASK-0005",
-      "status": "READY_FOR_REVIEW",
+      "status": "CLOSED/APPROVED",
+      "approved_via": "Issue #2 comment 5928773263 - \"TASK-0005 = PASS / CLOSED\", reviewed HEAD dbd410a3b5603bba8acc48091ebb0601f411f3bd. Both re-audit corrections PASS; test and deployment evidence accepted; DB invariants and inherited gates confirmed uninvalidated; TASK-0004 remains CLOSED/APPROVED. Explicitly NOT authorized by this approval: real queue review, APPLY/publication, production, main merge.",
       "phase": "PHASE_C2_HUMAN_REVIEW_UI",
       "task_definition": "docs/orquestador/tasks/0005-c2-human-review-ui.md",
       "source": "Issue #2 comment 5914793857 (https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5914793857)",
@@ -544,6 +554,14 @@
             "unsafe_procedure_avoided": "The full suite was not re-run against the live container's shared bind mounts, no ephemeral container was created, and the compose topology was not modified."
           },
           "process_note_third_false_alarm": "An intermediate staging probe appeared to show deleting_guard_registered=no, which would have been a real defect. It was a flaw in the probe script: booted() registers its listeners lazily, on first instantiation of the model, and that line ran before the model had been booted. Re-verified in the correct order: before_boot=no, after_boot_deleting=YES. Recorded rather than silently dropped because the first reading looked like a genuine bug - the same root cause as round 1's canViewAny() false alarm, and the same lesson: do not assert on something that depends on state the probe itself has not yet established. The same ordering trap was anticipated and avoided inside the new tests, which call actingAs() before any canEdit()/canDelete() assertion."
+        },
+        {
+          "orchestrator_comment": "5928773263",
+          "verdict": "PASS / CLOSED - TASK-0005 = CLOSED / APPROVED. Correction 1 (source-type authorization) PASS: view() authorizes by actual proposal_type with default-deny for unknown types, viewAny() intentionally broad only for list entry, getEloquentQuery() scopes rows and closes the cross-type list leak, all four personas plus direct-detail access covered by focused tests, no super-admin bypass introduced. Correction 2 (C2 relation edit/delete bypass) PASS: isUnderC2Review() centralizes the lifecycle predicate, canEdit()/canDelete() deny CRUD and therefore the candidate edit route, UI actions hidden, model-level deleting guard blocks non-Filament entry points, REJECT remains a C2 decision rather than deletion, generic CRUD narrowly available outside the lifecycle, TASK-0004 publication guard intact. Test evidence (138 PASS + 1 known local ext-intl failure, explicitly accepted as the inherited TASK-0002 rendering test and not a TASK-0005 regression) and deployment evidence accepted, including that documentation descendant HEAD dbd410a correctly did not require another deployment under the hardened trigger. DB invariants confirmed at 10/2/142/79/9749/0 with the real 10/2 untouched; 32-query regression inherited and uninvalidated.",
+          "reviewed_head": "dbd410a3b5603bba8acc48091ebb0601f411f3bd",
+          "next_gate": "The human-review UI is technically ready for a separately authorized controlled review of the real queue. This approval does NOT authorize freezing/applying decisions on the 10 candidates or 2 relations. Real queue review: NOT YET AUTHORIZED. APPLY/publication: NOT AUTHORIZED. Production/main: NOT AUTHORIZED.",
+          "adjacent_risk_gated": "See blocking_requirement_for_future_task at the top of this file - the orchestrator confirmed the already-approved-relation edit revalidation gap this session had recorded on its own initiative, and attached an explicit gate: it MUST be addressed before opening general administrative editing of published relations or before production rollout. It does not block this closure.",
+          "action_taken": "Acknowledgment and recording only - no code, deployment, or server action. The comment requests no change, and the user's own instruction this round was identical: do not process the 10 candidates or 2 relations, do not run APPLY, and wait for the formal opening of the next phase. Recorded the verbatim comment in docs/orquestador/tasks/0005-c2-human-review-ui.md, set docs/orquestador/current_task.md to CLOSED/APPROVED + STANDING_BY with the three explicit non-authorizations, and promoted the adjacent risk to a tracked blocking requirement in this file. Unlike the equivalent TASK-0004 round-7 acknowledgment - where a documentation-only commit was deliberately avoided because it would itself have triggered a wasteful staging redeploy - committing this record is now free: TASK-0005's own section G paths-ignore hardening means a docs-only push does not deploy, which was confirmed live twice during this task."
         }
       ],
       "notes": [

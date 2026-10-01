@@ -3,8 +3,35 @@
 **TASK-0005** — UI de revisión humana C2 en Filament + hardening del trigger de despliegue
 (Issue #2 comentario `5914793857`). Abierta desde HEAD `63cf811`.
 
-**Estado:** READY_FOR_REVIEW (ronda 2) — el re-audit del comentario `5917275454` devolvió
-`CORRECTIONS_REQUIRED` con dos hallazgos, ambos corregidos:
+**Estado: CLOSED / APPROVED** (comentario `5928773263`, HEAD revisado
+`dbd410a3b5603bba8acc48091ebb0601f411f3bd`). Ambas correcciones del re-audit `5917275454` quedaron
+`PASS`; evidencia de tests y despliegue aceptada; invariantes y gates heredados confirmados sin
+invalidar.
+
+**STANDING_BY — nada pendiente de esta sesión.** La UI de revisión humana queda técnicamente lista
+para una revisión controlada de la cola real, pero esa revisión **NO está autorizada todavía**. Según
+el comentario de cierre y la instrucción explícita del usuario en esta ronda:
+
+- **Cola real: NO AUTORIZADA.** No procesar, congelar, rechazar ni resolver contexto sobre los 10
+  candidatos ni las 2 relaciones reales.
+- **APPLY / publicación: NO AUTORIZADO.**
+- **Producción / merge a `main`: NO AUTORIZADO.**
+- Esperar la apertura formal de la siguiente fase por instrucción explícita del orquestador.
+
+## Riesgo adyacente registrado para una tarea futura (bloqueante antes de producción)
+
+El comentario de cierre confirmó la observación que esta sesión registró por cuenta propia y le puso
+un gate explícito: editar endpoints/tipo de una relación ya `approved` puede mutar taxonomía
+publicada, porque el guard de `TaxonomyConceptRelation::booted()` solo revalida cuando el status
+**pasa a** `approved` (`isDirty('status')`). Es **preexistente** y quedó fuera de las dos correcciones
+pedidas, así que no bloqueó el cierre de TASK-0005 — pero el orquestador indicó que **DEBE**
+resolverse antes de habilitar edición administrativa general de relaciones publicadas o antes de
+cualquier rollout a producción de esta UI de gobernanza de taxonomía. No implementado en esta ronda:
+no fue pedido y haría falta una tarea propia.
+
+## Historial del re-audit `5917275454` (ambas correcciones, ahora PASS)
+
+Los dos hallazgos corregidos fueron:
 
 1. **Fuga de autorización entre tipos de origen** en las propuestas revisadas: la policy usaba OR,
    así que quien veía candidatos podía abrir propuestas de relación y viceversa, y el listado no
@@ -143,3 +170,5 @@ análisis de los 3 fallos): `audit/phase5_staging_deployment_2026-09-30.md`.
 | TASK-0004 (ronda 6, despliegue a staging + validación) | PASS WITH FOLLOW-UP HARDENING (ronda 7) | mismo archivo, sección "Autorización de despliegue — comentario `5913574545`"; detalle completo en `audit/phase5_staging_deployment_2026-09-30.md` |
 | TASK-0004 (ronda 7, confirmación PASS) | STANDING_BY | mismo archivo, sección "Confirmación de despliegue + hardening pendiente — comentario `5914592664`" |
 | TASK-0004 (ronda 8, checkpoint documental `63cf811`) | CLOSED | mismo archivo; sin acción de código (el comentario `5914676402` instruyó esperar la apertura formal de TASK-0005) |
+| TASK-0005 (ronda 1, implementación + hardening + staging) | CORRECTIONS_REQUIRED (ronda 2) | [`tasks/0005-c2-human-review-ui.md`](tasks/0005-c2-human-review-ui.md); detalle en `audit/phase5_task0005_c2_review_ui_2026-09-30.md` |
+| TASK-0005 (ronda 2, correcciones 1 y 2) | **CLOSED / APPROVED** (comentario `5928773263`) | mismo archivo, sección "Re-audit — comentario `5917275454`"; detalle en la sección 10 del audit |

@@ -264,6 +264,70 @@ autor `estebanjvasquez`, 2026-09-30T18:29:17Z. HEAD revisado: `9d96587165a698e2c
 >
 > STATUS: TASK-0005 = CORRECTIONS_REQUIRED.
 
+## Cierre — comentario `5928773263` (PASS / CLOSED)
+
+**Fuente:** Issue #2, comentario [`5928773263`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5928773263),
+autor `estebanjvasquez`, 2026-10-01T09:36:30Z. HEAD revisado: `dbd410a3b5603bba8acc48091ebb0601f411f3bd`.
+
+### Texto verbatim
+
+> [ORCHESTRATOR RE-AUDIT — TASK-0005 — PASS / CLOSED]
+>
+> Reviewed HEAD `dbd410a3b5603bba8acc48091ebb0601f411f3bd` against the prior TASK-0005 review at `9d965871...` and corrections contract in comment `5917275454`.
+>
+> VERDICT
+> TASK-0005 = PASS / CLOSED.
+>
+> CORRECTION 1 — SOURCE-TYPE AUTHORIZATION: PASS
+> - `TaxonomyReviewedProposalPolicy::view()` now authorizes by actual `proposal_type`, default-deny for unknown types.
+> - `viewAny()` remains intentionally broad only for entry to the list.
+> - `TaxonomyReviewedProposalResource::getEloquentQuery()` scopes rows to proposal types the current user may list, closing the cross-type list leak.
+> - Candidate-only, relation-only, both-permissions, unauthorized, and direct-detail access are covered by focused tests.
+> - No super-admin bypass was introduced; normal permission semantics remain authoritative.
+>
+> CORRECTION 2 — C2 RELATION EDIT/DELETE BYPASS: PASS
+> - `TaxonomyConceptRelation::isUnderC2Review()` centralizes the lifecycle predicate: candidate OR pending reviewed proposal.
+> - Filament `canEdit()` / `canDelete()` deny CRUD for rows under C2 review; candidate edit route is therefore denied.
+> - UI actions are also hidden for those rows.
+> - Model-level `deleting` guard prevents destructive bypass through non-Filament entry points.
+> - REJECT remains a C2 decision rather than deletion.
+> - Generic CRUD remains narrowly available for rows outside the C2 review lifecycle.
+> - Existing TASK-0004 publication guard remains intact.
+>
+> TEST / DEPLOYMENT EVIDENCE ACCEPTED
+> - Focused/relevant tests: 138 PASS, 1 known local ext-intl failure. The remaining failure is the inherited TASK-0002 rendering test already proven green on staging with intl; it is not a TASK-0005 regression.
+> - Runtime correction commit `95abe61a942954264bddfd6e33dc28379e52deaf` deployed successfully to staging.
+> - Branch HEAD `dbd410a...` is a documentation descendant and correctly did not require another staging deployment under the hardened trigger.
+> - Staging smoke: homepage/admin login healthy; review routes registered; candidate relation edit denied for real candidate rows by read-only authorization checks.
+> - No unsafe full-suite execution on live shared bind mounts.
+>
+> INHERITED / PROTECTED STATE
+> - DB invariants remain exactly 10 / 2 / 142 / 79 / 9749 / 0.
+> - Existing 10 candidate links and 2 candidate relations remain untouched; no real freeze/apply/reject/context decision occurred.
+> - 32-query regression remains inherited and uninvalidated; no search/ranking/published-taxonomy semantic change occurred.
+> - TASK-0004 remains CLOSED/APPROVED.
+> - No production deployment, main merge, credential rotation, destructive migration, or taxonomy publication was authorized or performed.
+>
+> ADJACENT PRE-EXISTING RISK — RECORD FOR FUTURE TASK
+> The audit correctly notes that editing endpoints/type of an already `approved` relation may mutate published taxonomy while the current model guard only revalidates when status becomes approved. This was pre-existing and outside the two requested corrections, so it does NOT block TASK-0005 closure. It MUST be addressed before opening general administrative editing of published relations or before production rollout of this taxonomy-governance UI.
+>
+> NEXT GATE
+> The human-review UI is now technically ready for a separately authorized controlled review of the real queue. This approval does NOT itself authorize freezing/applying decisions on the 10 candidates or 2 relations.
+>
+> STATUS:
+> - TASK-0005: CLOSED / APPROVED.
+> - Real queue review: NOT YET AUTHORIZED.
+> - APPLY/publication: NOT AUTHORIZED.
+> - Production/main: NOT AUTHORIZED.
+
+### Acción tomada en esta ronda
+
+**Ninguna de código, despliegue, ni de servidor** — es puramente de reconocimiento/registro. El
+comentario no pide ningún cambio y la instrucción explícita del usuario en esta ronda fue no procesar
+los 10 candidatos ni las 2 relaciones, no ejecutar APPLY, y esperar la apertura formal de la siguiente
+fase. El riesgo adyacente que el comentario manda registrar (revalidación al editar una relación ya
+`approved`) queda anotado como requisito bloqueante para una tarea futura, no implementado acá.
+
 ## Estado
 
-Ver `docs/orquestador/current_task.md` para el estado vigente y `audit/phase5_task0005_c2_review_ui_2026-09-30.md` para el detalle completo de implementación, tests, hardening del workflow, despliegue y evidencia (sección 10 para las dos correcciones de este re-audit).
+Ver `docs/orquestador/current_task.md` para el estado vigente y `audit/phase5_task0005_c2_review_ui_2026-09-30.md` para el detalle completo de implementación, tests, hardening del workflow, despliegue y evidencia (sección 10 para las dos correcciones del re-audit).
