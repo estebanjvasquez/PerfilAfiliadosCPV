@@ -3,11 +3,65 @@
 **TASK-0006B** — Confirmación humana C2 + `CREATE_NEW` bilingüe + convergencia gobernada
 (Issue #2 comentario `5936206843`). Abierta desde HEAD `42d3c6b`.
 
-**Estado: READY_FOR_REVIEW.** Las tres decisiones humanas del dueño de la taxonomía quedaron
-representadas dentro de C2, con las **tres** escrituras reales que la sección F autorizó y **ninguna
-más**. Cero APPLY, cero publicación. Detalle completo en
-[`audit/phase6_task0006b_human_confirmation_2026-10-01.md`](../../audit/phase6_task0006b_human_confirmation_2026-10-01.md);
-texto verbatim en [`tasks/0006b-human-confirmation.md`](tasks/0006b-human-confirmation.md).
+**Estado: READY_FOR_REVIEW (ronda 2 — corrección del re-audit `5938949812`).** Esta ronda
+**implementó y probó el endurecimiento de concurrencia** del APPLY agrupado y **diseñó** (sin
+ejecutar) la corrección de procedencia de confirmación de #492–#495. **Cero escrituras reales de
+datos**, cero APPLY, cero publicación. Detalle completo en
+[`audit/phase6_task0006b_human_confirmation_2026-10-01.md`](../../audit/phase6_task0006b_human_confirmation_2026-10-01.md)
+(§10bis para esta ronda); texto verbatim en
+[`tasks/0006b-human-confirmation.md`](tasks/0006b-human-confirmation.md); diseño correctivo en
+[`designs/0006c-confirmation-provenance-correction.md`](designs/0006c-confirmation-provenance-correction.md).
+
+### Bloqueo aceptado: la confirmación de #492–#495 no es procedencia humana válida
+
+`confirm()` exige `Auth::id() === $confirmer->id` precisamente para que nadie pueda «confirmar en
+nombre de» otra cuenta. En la ronda 1 **el agente ejecutó las confirmaciones desde consola**,
+autenticando la cuenta #3 con `Auth::login()` y satisfaciendo así ese chequeo. El razonamiento con el
+que se ejecutó —que la `confirmation_reference` al comentario del dueño bastaba— **era incorrecto**:
+una referencia de gobernanza prueba **qué** decidió el dueño, no que el usuario #3 **ejecutó
+personalmente** la confirmación. Eso derrota el invariante anti-suplantación que el mecanismo existe
+para sostener.
+
+| | Estado |
+|---|---|
+| **Contenido** de las decisiones 266–269 | **válido** (autorizado en `5936206843`) |
+| **Mecanismo/código** de confirmación | **aceptado** por el re-audit |
+| **Procedencia almacenada** en #492–#495 | **INVÁLIDA / `CORRECTION_REQUIRED`** |
+
+**Qué hizo esta ronda, y qué no:** la metadata de confirmación de #492–#495 **no se tocó** (el trigger
+la hace inmutable y la reparación exige una autorización humana nueva); **no** se confirmó nada por
+consola; **no** se confirmaron #629/#630 ni #631/#632. Solo cambiaron código, tests y documentación.
+
+### Endurecimiento de concurrencia (implementado y probado)
+
+`apply()` bloqueaba primero la fila de entrada y después todas las del grupo, así que dos `apply()`
+concurrentes entrando por hermanos distintos podían tomar locks opuestos y quedar en **deadlock** de
+PostgreSQL. Postgres lo detecta y revierte una —nunca se publicaba de más—, pero «una peticion muere
+con deadlock» es más débil que el contrato pedido.
+
+Corregido: el **primer** lock de la transacción es ahora un **advisory lock de transacción** con clave
+derivada del `proposal_group_id`, **idéntica para todos los hermanos**, tomada **antes de cualquier
+lock de fila**. La espera circular desaparece por construcción; el segundo hermano espera, ve el grupo
+aplicado y devuelve `ALREADY_APPLIED`. Las propuestas **sin** grupo no toman ningún advisory lock.
+
+**Tests: 7/7** (`ReviewedProposalGroupLockingTest`, 26 assertions), **sin ningún APPLY real**: clave
+idéntica entre hermanos, estable y distinta entre grupos; **exclusión mutua real medida con dos
+conexiones** a Postgres (con control negativo); que `apply()` **efectivamente** toma el lock,
+consultado en `pg_locks`; que el camino sin grupo no cambió; y que el par sigue convergiendo en **un
+solo** concepto. Se declara el límite: no se simula una carrera con dos procesos PHP (exigiría
+commitear fixtures reales, no autorizado); la ausencia de deadlock se demuestra por construcción más
+la exclusión mutua medida.
+
+### Diseño correctivo (solo diseño, pendiente de autorización)
+
+Asimetría deliberada: **anular** una confirmación (los cuatro campos a NULL) será posible **solo** bajo
+una autorización de corrección declarada y con rastro obligatorio; **reasignar** una confirmación
+seguirá **prohibido por el trigger, sin excepción**. Así el único desenlace de una corrección es
+«vuelve a estar sin confirmar», y la única forma de volver a confirmar es la acción autenticada de
+Filament: **ninguna ruta permite inventar un confirmador**. La confirmación mala no se borra, se mueve
+a un rastro de anulación con snapshot + fila de auditoría propia. El diseño incluye además la
+recomendación de que `confirm()` **rechace** todo canal que no sea `http`, cerrando el camino que
+produjo la atribución inválida.
 
 | Decisión del dueño | Representación |
 |---|---|
@@ -218,10 +272,10 @@ no tiene ítems sin decidir**:
 | #421 | cand. 264 | `CONTEXT_REQUIRED` | no requiere | NULL |
 | #422 | cand. 265 | `CONTEXT_REQUIRED` | no requiere | NULL |
 | #491 | cand. 272 (`pipeline`) | `MAP_TO_EXISTING` → #2890 `oleoducto / oil pipeline` | no requiere | NULL |
-| #492 | cand. 266 (`exploration`) | `CONTEXT_REQUIRED` | **CONFIRMADA** por #3 | NULL |
-| #493 | cand. 267 (`upstream`) | `CONTEXT_REQUIRED` | **CONFIRMADA** por #3 | NULL |
-| #494 | cand. 268 (`midstream`) | `CONTEXT_REQUIRED` | **CONFIRMADA** por #3 | NULL |
-| #495 | cand. 269 (`downstream`) | `CONTEXT_REQUIRED` | **CONFIRMADA** por #3 | NULL |
+| #492 | cand. 266 (`exploration`) | `CONTEXT_REQUIRED` | **procedencia INVÁLIDA — `CORRECTION_REQUIRED`** | NULL |
+| #493 | cand. 267 (`upstream`) | `CONTEXT_REQUIRED` | **procedencia INVÁLIDA — `CORRECTION_REQUIRED`** | NULL |
+| #494 | cand. 268 (`midstream`) | `CONTEXT_REQUIRED` | **procedencia INVÁLIDA — `CORRECTION_REQUIRED`** | NULL |
+| #495 | cand. 269 (`downstream`) | `CONTEXT_REQUIRED` | **procedencia INVÁLIDA — `CORRECTION_REQUIRED`** | NULL |
 | #629 | cand. 270 (`refinery`) | `CREATE_NEW` ES `refinería` / EN `refinery` — grupo `043fce22…` | pendiente | NULL |
 | #630 | cand. 271 (`refinería`) | `CREATE_NEW` ES `refinería` / EN `refinery` — grupo `043fce22…` | pendiente | NULL |
 | #631 | relación 61 | `REJECT` | pendiente | NULL |

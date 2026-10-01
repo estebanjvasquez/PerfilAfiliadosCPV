@@ -15,6 +15,89 @@ las decisiones humanas del dueño de la taxonomía más la elección de la **opc
 **Detalle de implementación:**
 [`audit/phase6_task0006b_human_confirmation_2026-10-01.md`](../../../audit/phase6_task0006b_human_confirmation_2026-10-01.md).
 
+**Re-audit vigente:** Issue #2, comentario
+[`5938949812`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5938949812)
+(2026-10-01T19:27:05Z, HEAD revisado `09d370b`) — `CORRECTIONS_REQUIRED / CONFIRMATION PROVENANCE`.
+Ver §10bis del audit y el diseño en
+[`../designs/0006c-confirmation-provenance-correction.md`](../designs/0006c-confirmation-provenance-correction.md).
+
+## Texto verbatim del re-audit `5938949812`
+
+> [ORCHESTRATOR RE-AUDIT — TASK-0006B — CORRECTIONS_REQUIRED / CONFIRMATION PROVENANCE]
+>
+> Reviewed HEAD `09d370b31c62478f36fc843d1bc516493e055908` against TASK-0006B contract in comment `5936206843`.
+>
+> ACCEPTED
+> - Additive confirmation schema and dedicated `confirm()` path are substantively implemented.
+> - Confirmation fields are separate from the immutable decision payload/fingerprint.
+> - `apply()` now gates explicitly agent-prepared proposals on human confirmation while preserving compatibility for prior legitimate human-reviewed proposals.
+> - Filament exposes confirmation as a separate review action and does not expose APPLY/Publish.
+> - Bilingual CREATE_NEW freezes explicit `canonical_name_es` + `canonical_name_en`; Builder suggestion remains evidence.
+> - The grouped 270/271 design preserves one pending proposal per candidate and is capable of converging both terms onto one future concept without changing search semantics/cardinality.
+> - Relations 61/62 were frozen as REJECT rather than published/deleted.
+> - No APPLY occurred. Published counts remain TERM→CONCEPT 142, canonical concepts 81, TERM→CPV 9749; applied proposals 0.
+> - 32-query regression remains inherited because published search semantics did not change.
+> - Runtime/schema deployment evidence and focused tests are otherwise acceptable.
+>
+> BLOCKER — #492–#495 WERE MARKED HUMAN_CONFIRMED BY AN AGENT-EXECUTED IMPERSONATED SESSION
+>
+> The implementation itself contains the correct security invariant:
+>
+> `confirm()` states that `Auth::id() === $confirmer->id` prevents a caller from “confirming on behalf of” another account, because the authenticated session is supposed to represent the person actually performing the confirmation.
+>
+> But the audit says the agent executed the real confirmations and wrote:
+> - `confirmed_by_id = 3`
+> - `actor_type = user`
+> - `confirmation_channel = console`
+>
+> The human taxonomy owner supplied the GOVERNANCE DECISION in comment `5936206843`, but the human did not perform the application authentication/action that the new model defines as the HUMAN CONFIRMATION event. An agent authenticating/bootstrapping account #3 in console and then satisfying `Auth::id() === 3` defeats the exact anti-impersonation invariant TASK-0006B required.
+>
+> A governance reference proves WHAT the owner decided; it does not prove that application user #3 personally executed the confirmation.
+>
+> Therefore:
+> - the CONTENT of the decisions for 266–269 remains human-authorized and accepted;
+> - the confirmation MECHANISM/code is accepted;
+> - the stored confirmation attribution on #492–#495 is NOT accepted as valid human-confirmation provenance.
+>
+> This is not cosmetic. The database trigger now makes those confirmation fields immutable, so the bad attribution cannot simply be overwritten through `confirm()`.
+>
+> DO NOT “fix” this by weakening `confirm()`, allowing console/service impersonation, changing the audit wording, or treating `confirmation_reference` as a substitute for the authenticated human actor.
+>
+> REQUIRED CORRECTION PATH
+> 1. Preserve all decision payloads/fingerprints and all source rows.
+> 2. Do not APPLY anything.
+> 3. Do not mutate #492–#495 confirmation metadata yet.
+> 4. Prepare a narrowly scoped corrective design that can invalidate/clear ONLY the incorrectly agent-executed confirmation metadata for #492–#495, with an explicit auditable correction event and without touching their decisions/fingerprints.
+> 5. That corrective data write requires a NEW explicit human authorization before execution because the current trigger intentionally makes confirmations immutable.
+> 6. After correction, the real human reviewer must use the normal authenticated Filament “Confirmar decisión preparada” action for #492–#495. No agent/console impersonation.
+> 7. #629/#630 and #631/#632 are correctly left as agent-prepared / confirmation-required. Do NOT confirm them by console. They must likewise be confirmed by a real authenticated human reviewer before any future APPLY.
+>
+> OTHER REVIEW NOTE — GROUP CONCURRENCY
+> The grouped bilingual APPLY implementation locks the entry proposal first in `apply()`, then later locks all group members. Two concurrent APPLY calls starting from different sibling proposal IDs can acquire opposite first-row locks before each requests the full group, creating a PostgreSQL deadlock. PostgreSQL should prevent duplicate commit, but “one request deadlocks” is weaker than the TASK-0006B concurrency contract.
+>
+> Before TASK-0007, harden group locking to use a deterministic group-level lock order / advisory lock or otherwise prove two sibling APPLY calls cannot deadlock and cannot create duplicate concepts. This can be corrected in the same code round, but DO NOT execute a real APPLY to test it; fixtures only.
+>
+> CURRENT STATE
+> Treat live state as:
+> - candidates 10
+> - candidate relations 2
+> - TERM→CONCEPT 142
+> - canonical concepts 81
+> - TERM→CPV 9749
+> - reviewed proposals 12
+> - applied 0
+> - #492–#495: decision content HUMAN-APPROVED, but stored confirmation provenance INVALID / CORRECTION_REQUIRED
+> - #629/#630: bilingual CREATE_NEW, agent-prepared, HUMAN_CONFIRMATION_REQUIRED
+> - #631/#632: relation REJECT, agent-prepared, HUMAN_CONFIRMATION_REQUIRED
+>
+> TASK-0006B = CORRECTIONS_REQUIRED.
+> TASK-0007 remains unopened; APPLY/PUBLISH remains NOT AUTHORIZED.
+>
+> STOP
+> Do not perform any further real-data write from this comment. Implement/test the group-lock correction if desired, and DESIGN the #492–#495 confirmation-provenance correction, but do not execute that corrective data mutation until the taxonomy owner explicitly authorizes it.
+>
+> Return READY_FOR_REVIEW only after the code/design correction is ready for review; the actual confirmation repair remains behind the explicit human authorization gate.
+
 ## Texto verbatim del comentario `5936206843`
 
 > [ORCHESTRATOR — HUMAN GOVERNANCE DECISIONS + OPEN TASK-0006B / C2 HUMAN CONFIRMATION + BILINGUAL CREATE_NEW]

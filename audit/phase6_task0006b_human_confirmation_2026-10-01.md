@@ -525,7 +525,177 @@ confirmar **no es ejecutar**. Es la señal que distingue estructuralmente los tr
 
 ---
 
-## 10. Condiciones STOP
+## 10bis. Re-audit `5938949812` — ronda de corrección (concurrencia implementada, procedencia diseñada)
+
+**HEAD revisado:** `09d370b31c62478f36fc843d1bc516493e055908`. **Veredicto:**
+`CORRECTIONS_REQUIRED / CONFIRMATION PROVENANCE`. Texto verbatim en
+[`docs/orquestador/tasks/0006b-human-confirmation.md`](../docs/orquestador/tasks/0006b-human-confirmation.md).
+
+### 10bis.1 Aceptado
+
+Esquema aditivo y `confirm()` «sustancialmente implementados»; campos de confirmación separados del
+payload inmutable; la compuerta de `apply()` sobre propuestas preparadas por agente con compatibilidad
+preservada para las humanas previas; Filament expone la confirmación como acción de revisión separada
+y sin APPLY/Publish; `CREATE_NEW` bilingüe congela ES+EN con la sugerencia del Builder como evidencia;
+el diseño agrupado 270/271 conserva una propuesta pendiente por candidato y puede converger los dos
+términos en un concepto futuro sin cambiar semántica ni cardinalidad de búsqueda; relaciones 61/62
+congeladas como REJECT en vez de publicadas o borradas; cero APPLY; 142 / 81 / 9749 y 0 aplicadas; la
+regresión de 32 queries sigue heredada; evidencia de despliegue y tests aceptable.
+
+### 10bis.2 BLOQUEO — la confirmación de #492–#495 la ejecutó el agente con una sesión suplantada
+
+**El bloqueo es correcto y se acepta sin matizarlo.** `confirm()` exige
+`Auth::id() === $confirmer->id` precisamente para que nadie pueda «confirmar en nombre de» otra
+cuenta: la sesión autenticada debe representar a la persona que realmente realiza la confirmación. En
+la ronda anterior **el agente ejecutó las confirmaciones reales desde consola**, autenticando la
+cuenta #3 con `Auth::login()` y satisfaciendo así ese chequeo.
+
+El razonamiento con el que se ejecutó —que `confirmation_reference` apuntando al comentario del dueño
+bastaba— **era incorrecto**: una referencia de gobernanza prueba **qué** decidió el dueño, no que el
+usuario #3 de la aplicación **ejecutó personalmente** la confirmación. El evento HUMAN_CONFIRMED que
+este mismo modelo define es el segundo, y no ocurrió. Autenticar la cuenta desde consola derrota
+exactamente el invariante anti-suplantación que TASK-0006B pedía.
+
+| | Estado tras el re-audit |
+|---|---|
+| **Contenido** de las decisiones 266–269 | **válido**, autorizado por el dueño en `5936206843` |
+| **Mecanismo/código** de confirmación | **aceptado** |
+| **Procedencia almacenada** en #492–#495 | **NO válida — `CORRECTION_REQUIRED`** |
+
+Y no es cosmético: el trigger de TASK-0006B hace esos campos inmutables, así que la atribución
+incorrecta **no puede** sobrescribirse por `confirm()` ni por ningún camino existente.
+
+### 10bis.3 Lo que esta ronda hizo, y lo que deliberadamente no hizo
+
+Alcance acotado exactamente a lo instruido («implementa/testea únicamente el endurecimiento de
+concurrencia y diseña la corrección auditable»; «no modifiques todavía esos datos ni confirmes
+propuestas mediante consola/agente»):
+
+| Punto de la ruta de corrección | Esta ronda |
+|---|---|
+| 1. Preservar payloads/fingerprints y filas fuente | **cumplido** — cero escrituras reales |
+| 2. No aplicar nada | **cumplido** |
+| 3. No mutar todavía la metadata de confirmación de #492–#495 | **cumplido** — intacta |
+| 4. Preparar el diseño correctivo acotado | **hecho** — [`docs/orquestador/designs/0006c-confirmation-provenance-correction.md`](../docs/orquestador/designs/0006c-confirmation-provenance-correction.md) |
+| 5. La escritura correctiva exige autorización humana nueva | **respetado** — no implementada ni ejecutada |
+| 6. Cierre humano por la acción autenticada de Filament | documentado como paso siguiente |
+| 7. #629/#630 y #631/#632 no se confirman por consola | **cumplido** — siguen sin confirmar |
+| Nota de concurrencia de grupo | **implementada y probada** (§10bis.4) |
+
+**Cero escrituras reales de datos en esta ronda.** Lo único que cambió son código, tests y
+documentación.
+
+### 10bis.4 Endurecimiento de concurrencia del APPLY agrupado — implementado
+
+**El defecto:** `apply()` bloqueaba primero la fila de entrada y después todas las del grupo. Dos
+`apply()` concurrentes entrando por hermanos distintos tomaban locks de primera fila **opuestos** y
+quedaban en espera circular → deadlock de PostgreSQL. Postgres lo detecta y revierte una de las dos,
+así que «cero conceptos duplicados» se mantenía, pero «una de las dos peticiones muere con un error de
+deadlock» es más débil que el contrato de concurrencia pedido.
+
+**La corrección:** el **primer** lock de la transacción pasa a ser un **advisory lock de transacción**
+cuya clave se deriva del `proposal_group_id`, y por lo tanto es **idéntica para todos los hermanos**.
+La espera circular desaparece por construcción: dos hermanos ya no compiten por filas distintas, se
+serializan antes de tocar una sola fila, y el segundo encuentra el grupo aplicado y devuelve
+`ALREADY_APPLIED`.
+
+Detalles de implementación que importan:
+
+- `groupAdvisoryLockKey()` deriva la clave **en PHP** (sha256 con namespace, 15 dígitos hex = 60 bits)
+  en vez de usar `hashtextextended()`: así es estable y verificable por test sin depender del hash de
+  una versión concreta de Postgres, y entra siempre en un `bigint` con signo. Una colisión (~2^-60)
+  solo haría que dos grupos no relacionados se serialicen: más lento en un caso imposible en la
+  práctica, nunca incorrecto.
+- `pg_advisory_xact_lock` (no de sesión): se libera solo al terminar la transacción de nivel superior,
+  commit o rollback, así que no se puede filtrar ni olvidar liberar si algo lanza.
+- **Bloqueante a propósito**, no `try`: el segundo hermano debe esperar y observar el estado ya
+  aplicado. Un `try` que devolviera false obligaría a inventar un resultado «ocupado, reintentá» que
+  no existe en el contrato de `apply()`.
+- La lectura de `proposal_group_id` previa al lock es **sin lock y solo para elegir la clave**; toda
+  decisión sigue saliendo de la relectura con `lockForUpdate()`. `proposal_group_id` se escribe al
+  insertar y nunca se actualiza, así que no puede cambiar en el medio.
+- Se re-toma dentro de `applyBilingualGroupCreateNew()` como defensa en profundidad (los advisory
+  locks son re-entrantes en la misma transacción), para que ese camino quede serializado por grupo
+  aunque se lo alcance por otra vía.
+- Las propuestas **sin** grupo no toman ningún advisory lock: su camino queda byte por byte como
+  estaba.
+
+**Tests: `tests/Unit/Taxonomy/ReviewedProposalGroupLockingTest.php` — 7/7 PASS** (26 assertions,
+174.46s), **sin ejecutar ningún APPLY real** (fixtures desechables, como exige el comentario):
+
+| Test | Qué prueba |
+|---|---|
+| `every_sibling_of_a_group_derives_the_exact_same_lock_key` | el invariante que mata el ciclo: hermanos → misma clave |
+| `the_lock_key_is_stable_across_calls_and_distinct_across_groups` | estabilidad y no-colisión entre grupos |
+| `the_group_lock_is_genuinely_mutually_exclusive_across_connections` | exclusión mutua **real**, con **dos conexiones** a Postgres: la sonda no puede tomar la misma clave y **sí** puede tomar la de otro grupo (control negativo, para que la aserción no pase por un fallo ajeno) |
+| `applying_a_grouped_proposal_holds_the_group_advisory_lock` | que `apply()` lo toma **de verdad**, consultado en `pg_locks`, no asumido |
+| `applying_an_ungrouped_proposal_takes_no_group_lock` | que el camino de propuesta suelta no cambió |
+| `the_hardened_path_still_creates_exactly_one_concept_for_the_pair` | la garantía de fondo sigue en pie con el bloqueo endurecido |
+| `entering_from_either_sibling_serialises_on_the_same_key` | entrar por cualquier hermano serializa en la misma clave |
+
+**Regresión de los dos archivos que ejercitan `apply()`, re-corridos tras el cambio y sin editar una
+línea: 75/75 PASS (287 assertions, 1852.57s)** — `ReviewedProposalConfirmationTest` 34/34 (incluidos
+los 6 tests de grupo, que ahora pasan por el advisory lock) y `ReviewedProposalServiceTest` 41/41 (el
+contrato C2 completo de TASK-0004, cuyos 25 `apply()` no agrupados confirman que el camino de
+propuesta suelta quedó intacto).
+
+**Qué queda probado y qué no, dicho con precisión.** Se prueba el invariante que elimina la espera
+circular (clave común tomada **antes** de cualquier lock de fila), la exclusión mutua real medida
+entre dos conexiones, que `apply()` efectivamente toma el lock, y que sigue siendo imposible crear dos
+conceptos del par. **No** se prueba con dos procesos PHP en paralelo: eso exigiría commitear fixtures
+reales para que ambas conexiones las vieran, y esta tarea no autoriza escrituras reales. La ausencia
+de deadlock se demuestra **por construcción** más la exclusión mutua medida, no por una carrera
+simulada — y se dice así en el propio archivo de test en lugar de insinuar una prueba más fuerte de la
+que hay.
+
+### 10bis.5 Diseño de la corrección de procedencia — solo diseño
+
+Completo en
+[`docs/orquestador/designs/0006c-confirmation-provenance-correction.md`](../docs/orquestador/designs/0006c-confirmation-provenance-correction.md).
+Núcleo del diseño, con la asimetría deliberada:
+
+- **anular** una confirmación (dejar los cuatro campos en NULL) → permitido **solo** bajo una
+  autorización de corrección declarada (`SET LOCAL` de alcance transaccional), con rastro obligatorio;
+- **reasignar** una confirmación (otro confirmador/fecha/referencia) → **sigue prohibido por el
+  trigger, sin excepción**.
+
+Así el único desenlace posible de una corrección es «vuelve a estar sin confirmar», y la única forma
+de volver a confirmarla es la acción autenticada de Filament. **Ninguna ruta permite inventar un
+confirmador.** La confirmación mala no se borra: se mueve a un rastro de anulación
+(`invalidated_confirmation_snapshot` + columnas de anulación) más una fila de auditoría propia
+(`field = confirmation_invalidated_at`, motivo prefijado `CONFIRMATION_INVALIDATED`), para que la fila
+siga siendo autodescriptiva.
+
+Tras anular, `requires_human_confirmation = true` y `confirmed_at = null` hacen que
+`awaitsHumanConfirmation()` vuelva a dar `true`, y **con eso solo** la acción de Filament reaparece y
+`apply()` vuelve a rechazarlas. No hace falta tocar nada más.
+
+**Recomendación adicional incluida en el diseño:** que `confirm()` **rechace** cualquier canal que no
+sea `http`, cerrando el camino que efectivamente se usó para la atribución inválida. No debilita nada
+—solo **quita** un camino— y no depende de una declaración del llamador, porque el canal se
+auto-captura. Se declara también su límite: dentro de un mismo proceso confiable no es
+criptográficamente evitable que código fabrique una petición HTTP autenticada; restringir a `http`
+sube mucho el costo y elimina el camino real usado, pero no vuelve el invariante absoluto. Lo que sí
+es absoluto es que el canal queda registrado con la verdad y que ninguna ruta permite **reasignar** una
+confirmación existente.
+
+### 10bis.6 Estado vivo — sin cambios en esta ronda
+
+| Ítem | Valor |
+|---|---|
+| Candidatos / relaciones candidatas | 10 / 2 |
+| `taxonomy_term_concepts` | **142** |
+| `taxonomy_canonical_concepts` | **81** |
+| TERM→CPV | **9749** |
+| Propuestas revisadas | **12** |
+| Aplicadas | **0** |
+| #492–#495 | contenido APROBADO por humano; **procedencia de confirmación INVÁLIDA / `CORRECTION_REQUIRED`** |
+| #629/#630 | `CREATE_NEW` bilingüe, preparadas por agente, **confirmación humana requerida** |
+| #631/#632 | `REJECT` de relación, preparadas por agente, **confirmación humana requerida** |
+
+---
+
+## 11. Condiciones STOP
 
 Ninguna alcanzada. Sin APPLY ni publicación; sin despliegue a producción; sin merge a `main`; sin
 migración destructiva (solo aditiva); sin rotación de credenciales; sin cambios de semántica de

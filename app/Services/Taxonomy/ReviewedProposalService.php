@@ -659,6 +659,88 @@ class ReviewedProposalService
 
     private const GROUP_ROLLBACK_SENTINEL = 'BILINGUAL_GROUP_ROLLBACK:';
 
+    /**
+     * Prefijo de namespace del espacio de advisory locks. Va dentro del hash para que esta clave no
+     * pueda colisionar por accidente con un advisory lock que use otra parte del sistema.
+     */
+    private const GROUP_LOCK_NAMESPACE = 'taxonomy_reviewed_proposal_group:';
+
+    /**
+     * TASK-0006B re-audit (Issue #2 comentario `5938949812`, «OTHER REVIEW NOTE — GROUP
+     * CONCURRENCY»): clave determinística de advisory lock para un grupo bilingüe.
+     *
+     * El problema que resuelve: `apply()` bloqueaba PRIMERO la fila de entrada y DESPUÉS todas las
+     * filas del grupo. Dos `apply()` concurrentes que entran por hermanos distintos del mismo grupo
+     * tomaban locks de primera fila OPUESTOS antes de pedir el grupo completo, y quedaban en espera
+     * circular -> deadlock de PostgreSQL. Postgres lo detecta y revierte una de las dos, así que
+     * nunca se publicaba de más (la garantía de "cero duplicados" se mantenía), pero "una de las dos
+     * peticiones muere con un error de deadlock" es más débil que el contrato de concurrencia que
+     * TASK-0006B pedía.
+     *
+     * La corrección: el PRIMER lock que toma cualquier transacción que va a aplicar una propuesta
+     * agrupada es este advisory lock, derivado del `proposal_group_id` y por lo tanto IDÉNTICO para
+     * todos los hermanos. Con eso desaparece la espera circular por construcción: dos hermanos ya no
+     * compiten por filas distintas, se serializan acá antes de tocar una sola fila. El segundo en
+     * entrar encuentra el grupo ya aplicado y devuelve `ALREADY_APPLIED`.
+     *
+     * Por qué la clave se deriva en PHP y no con `hashtextextended()`: así es estable y verificable
+     * sin depender de la implementación de hash de una versión concreta de Postgres, y se puede
+     * probar por test que dos hermanos producen exactamente el mismo número. Se usan 15 dígitos
+     * hexadecimales (60 bits) para que el valor entre siempre en un `bigint` con signo sin desbordar.
+     * Una colisión (probabilidad ~2^-60) solo haría que dos grupos NO relacionados se serialicen
+     * entre sí: más lento en un caso imposible en la práctica, nunca incorrecto.
+     */
+    public static function groupAdvisoryLockKey(string $proposalGroupId): int
+    {
+        return (int) hexdec(substr(hash('sha256', self::GROUP_LOCK_NAMESPACE.$proposalGroupId), 0, 15));
+    }
+
+    /**
+     * Toma el advisory lock del grupo a NIVEL DE TRANSACCIÓN. `pg_advisory_xact_lock` se libera
+     * automáticamente al terminar la transacción de nivel superior (commit o rollback), así que no
+     * hay forma de olvidarse de liberarlo ni de filtrarlo si algo lanza - a diferencia de un
+     * advisory lock de sesión. Es re-entrante dentro de la misma transacción: llamarlo dos veces
+     * (ver `apply()` y `applyBilingualGroupCreateNew()`) es inofensivo.
+     *
+     * Bloqueante a propósito, no `try`: el segundo hermano DEBE esperar y recién entonces observar
+     * el estado ya aplicado. Un `pg_try_advisory_xact_lock` que devolviera false obligaría a inventar
+     * un resultado "ocupado, reintentá" que no existe en el contrato de `apply()`.
+     */
+    private static function acquireGroupAdvisoryLock(string $proposalGroupId): void
+    {
+        DB::connection('pgsql')->statement(
+            'SELECT pg_advisory_xact_lock(?)',
+            [self::groupAdvisoryLockKey($proposalGroupId)],
+        );
+    }
+
+    /**
+     * Diagnóstico de solo lectura: ¿esta sesión tiene tomado el advisory lock de este grupo? Existe
+     * para que un test pueda comprobar que `apply()` realmente lo tomó, en vez de confiar en que el
+     * código lo haga. No se usa para decidir nada en producción.
+     */
+    public static function holdsGroupAdvisoryLock(string $proposalGroupId): bool
+    {
+        $key = self::groupAdvisoryLockKey($proposalGroupId);
+
+        // Cómo guarda Postgres un advisory lock de UN bigint: `classid` son los 32 bits altos,
+        // `objid` los 32 bits bajos y `objsubid = 1` (la forma de dos enteros usa `objsubid = 2`).
+        // Se reconstruye el bigint y se filtra por `objsubid = 1` para no confundir las dos formas.
+        // Se cuenta en vez de devolver un booleano de Postgres, porque PDO puede entregarlo como
+        // `'t'`/`'f'` según configuración y un string `'f'` es truthy en PHP.
+        $row = DB::connection('pgsql')->selectOne(
+            "SELECT COUNT(*) AS n FROM pg_locks
+             WHERE locktype = 'advisory'
+               AND pid = pg_backend_pid()
+               AND granted
+               AND objsubid = 1
+               AND ((classid::bigint << 32) | objid::bigint) = ?",
+            [$key],
+        );
+
+        return ((int) ($row->n ?? 0)) > 0;
+    }
+
     private function insertFrozenProposal(
         string $proposalType,
         ?int $candidateLinkId,
@@ -933,7 +1015,24 @@ class ReviewedProposalService
         // Auto-capturado, nunca provisto por quien llama - mismo criterio que Phase C1.
         $targetEnvironment = app()->environment();
 
-        return DB::connection('pgsql')->transaction(function () use ($proposalId, $authorizationReference, $targetEnvironment) {
+        // TASK-0006B re-audit (Issue #2 comentario `5938949812`, nota de concurrencia de grupo):
+        // lectura SIN lock, usada EXCLUSIVAMENTE para elegir la clave de serialización antes de
+        // tomar cualquier lock de fila. No se decide nada con este valor - toda decisión sigue
+        // saliendo de la relectura CON lock de más abajo. `proposal_group_id` se escribe al insertar
+        // y nunca se actualiza, así que no puede cambiar entre esta lectura y el lock; y si la
+        // propuesta no existe, simplemente no hay advisory lock que tomar y la relectura con lock
+        // devuelve `NOT_FOUND` como siempre.
+        $proposalGroupId = TaxonomyReviewedProposal::query()->whereKey($proposalId)->value('proposal_group_id');
+
+        return DB::connection('pgsql')->transaction(function () use ($proposalId, $authorizationReference, $targetEnvironment, $proposalGroupId) {
+            // EL PRIMER LOCK DE LA TRANSACCIÓN, antes de cualquier `lockForUpdate()`. Es lo que
+            // elimina la espera circular: la clave se deriva del GRUPO, así que es idéntica para
+            // todos los hermanos y dos `apply()` que entren por hermanos distintos se serializan acá
+            // en vez de quedarse cada uno con el lock de la fila que el otro necesita.
+            if ($proposalGroupId !== null) {
+                self::acquireGroupAdvisoryLock($proposalGroupId);
+            }
+
             $proposal = TaxonomyReviewedProposal::query()->lockForUpdate()->find($proposalId);
 
             if (! $proposal) {
@@ -1276,13 +1375,20 @@ class ReviewedProposalService
      *
      * Garantías, en el orden en que se obtienen:
      *
-     * 1. BLOQUEO DEL GRUPO ENTERO (`lockForUpdate()` ordenado por id). Dos `apply()` concurrentes
-     *    sobre miembros distintos del mismo grupo se serializan: el segundo entra cuando el primero
-     *    ya commiteó y encuentra a todos los miembros en `APPLIED`, así que devuelve
-     *    `ALREADY_APPLIED` sin crear un segundo concepto. (El primer `lockForUpdate()` de `apply()`
-     *    ya tomó una fila del grupo; si dos transacciones empiezan por miembros distintos, Postgres
-     *    detecta el deadlock y revierte una de las dos - revertir es seguro por diseño, deja cero
-     *    escrituras.)
+     * 1. SERIALIZACIÓN POR GRUPO SIN DEADLOCK POSIBLE (corrección del re-audit `5938949812`). El
+     *    primer lock que toma la transacción es el ADVISORY LOCK DEL GRUPO
+     *    (`acquireGroupAdvisoryLock()`), cuya clave se deriva del `proposal_group_id` y por lo tanto
+     *    es IDÉNTICA para todos los hermanos - ver `groupAdvisoryLockKey()`. Recién después se toman
+     *    los locks de fila (`lockForUpdate()` ordenado por id). Dos `apply()` concurrentes que entran
+     *    por hermanos DISTINTOS ya no pueden quedarse cada uno con la fila que el otro necesita: se
+     *    serializan en el advisory lock antes de tocar una sola fila, y el segundo entra cuando el
+     *    primero ya commiteó, encuentra a todos los miembros en `APPLIED` y devuelve
+     *    `ALREADY_APPLIED` sin crear un segundo concepto.
+     *
+     *    La versión anterior bloqueaba primero la fila de entrada y después el grupo, lo que permitía
+     *    una espera circular. Postgres detectaba el deadlock y revertía una de las dos transacciones
+     *    -así que nunca se publicaba de más-, pero "una de las dos peticiones muere con un error de
+     *    deadlock" es más débil que el contrato de concurrencia pedido, y eso es lo que se corrigió.
      * 2. IDEMPOTENCIA REAL: si algún miembro ya está `APPLIED` con un `concept_id` registrado, se
      *    REUTILIZA ese concepto en vez de crear otro.
      * 3. DRIFT POR MIEMBRO: se revalida `term_id` y `source_suggested_new_concept_name` de CADA
@@ -1303,6 +1409,13 @@ class ReviewedProposalService
                 'note' => 'Una propuesta agrupada exige identidad bilingüe ES/EN explícita en el payload congelado y este payload no la trae.',
             ]);
         }
+
+        // TASK-0006B re-audit (comentario `5938949812`): defensa en profundidad. `apply()` ya lo tomó
+        // antes de cualquier lock de fila; re-tomarlo acá es inofensivo (los advisory locks son
+        // re-entrantes dentro de la misma transacción y se liberan una sola vez al terminarla) y
+        // garantiza que este camino quede serializado por grupo incluso si alguna vez se lo alcanza
+        // por otra vía. No depende de que el llamador se haya acordado.
+        self::acquireGroupAdvisoryLock($proposal->proposal_group_id);
 
         $members = TaxonomyReviewedProposal::query()
             ->where('proposal_group_id', $proposal->proposal_group_id)
