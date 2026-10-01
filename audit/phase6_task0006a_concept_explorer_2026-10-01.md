@@ -476,6 +476,63 @@ Más los tests de servicio actualizados a la API paginada: alcanzabilidad de las
 paginando, línea de estado con total y posición, acotado de página fuera de rango, alcanzabilidad de
 las 18 categorías paginando, y filtro que no oculta el total real.
 
+### Punto 4 — despliegue y validación en staging de la corrección
+
+| Dato | Valor |
+|---|---|
+| Commit de la corrección | `6986848af4268b070fb5a2447a6b16cbbe334068` |
+| Base | `b0d2d20d054e4319e314ee2049e38c87b0244014` |
+| Run de GitHub Actions | `conclusion: success`, 2026-10-01T13:45:46Z |
+| HEAD verificado en el servidor | `git rev-parse HEAD` = `6986848af4268b070fb5a2447a6b16cbbe334068` (coincidencia exacta) |
+| Contenedores | `app running`, `nginx running` |
+
+**Smoke:** `/` → 200, `/admin/login` → 200, la lista de revisión → 302 a login sin sesión. Páginas de
+revisión autenticadas dentro del contenedor desplegado como el revisor real (solo GET, ninguna
+acción invocada): listado → **HTTP 200**, detalle del candidato 266 → **HTTP 200**. Cero 500/503.
+
+**Demostración read-only del descubrimiento más allá de la primera página** (sobre el catálogo real,
+en el runtime desplegado):
+
+| Comprobación | Resultado |
+|---|---|
+| Coincidencias totales / páginas | **81** en **4** páginas, `has_more` en la 1 |
+| Línea de estado renderizada | "Mostrando 1-25 de 81 coincidencias (página 1 de 4). Usá "Página siguiente"/"Página anterior" para recorrer TODAS las coincidencias: ninguna queda oculta." |
+| Concepto fuera de la primera página | `drill collar / drill collar [#22]` |
+| ¿Está en las opciones de la página 1? | **no** |
+| ¿Está en las opciones de la página 2? | **sí** |
+| Conceptos alcanzables recorriendo todas las páginas | **81 de 81** |
+
+**Demostración read-only de la inspección de categorías CPV:** con `categoryPerPage: 1` sobre el
+concepto real con más relaciones aprobadas (#4), la línea de estado renderiza "Mostrando 1-1 de 1
+categorías CPV alcanzables (página 1 de 1)" y el recorrido por páginas alcanza la categoría
+`CPV-48.04`.
+
+**Limitación honesta de esta demostración:** en los datos reales ningún concepto tiene hoy más de
+**una** categoría CPV aprobada, así que el caso multi-página de CPV no puede demostrarse contra datos
+reales — solo el mecanismo. El comportamiento multi-página sí queda probado por los tests de nivel UI
+con 18 categorías de fixture (`the_review_ui_lets_the_reviewer_inspect_a_cpv_category_beyond_the_first_page`),
+que verifican que una categoría ausente del preview no se ve en la página 1 y sí en la 2.
+
+**Estado vivo después del despliegue:**
+
+| Comprobación | Valor |
+|---|---|
+| `taxonomy_candidate_concept_links` | 10 |
+| `taxonomy_concept_relations` | 2 |
+| `taxonomy_term_concepts` | 142 |
+| `taxonomy_canonical_concepts` | 81 |
+| `taxonomy_term_cpv_relations` | 9749 |
+| `taxonomy_reviewed_proposals` | 4 — ids **420, 421, 422, 491** |
+| Propuestas aplicadas | **0** |
+| Estados de candidatos | `pending:10` |
+| Candidatos con `reviewed_at` no nulo | **0** |
+| Residuo de fixtures (conceptos `zzz_`) | **0** |
+| Residuo de fixtures (relaciones CPV `task0006a_test_fixture`) | **0** |
+
+**Esta sesión no tomó ninguna decisión de revisión real** y no modificó ninguna de las 4 propuestas
+congeladas. No se re-corrió la suite completa contra los bind mounts compartidos, no se creó ningún
+contenedor efímero y no se modificó la topología de compose.
+
 ### Semántica sin cambios (punto 3 del re-audit)
 
 MAP_TO_EXISTING sigue siendo **un** concepto explícito; CONTEXT_REQUIRED sigue congelando **cero**
