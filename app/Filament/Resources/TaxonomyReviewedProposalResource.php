@@ -321,6 +321,28 @@ class TaxonomyReviewedProposalResource extends Resource
                         ->helperText('Las propuestas de un mismo grupo convergen en UN solo concepto canónico: apply() las aplica juntas, en una transacción, creando un único concepto.')
                         ->fontFamily('mono'),
                 ]),
+            // TASK-0006C (Issue #2 `5939903005`): rastro de una confirmación cuya procedencia resultó
+            // inválida y fue anulada. Se muestra solo cuando existe, para que la corrección sea
+            // auditable desde la propia pantalla y no haya que leer `taxonomy_audit_log`.
+            Section::make('Corrección de procedencia de confirmación (TASK-0006C)')
+                ->description('Esta propuesta tuvo una confirmación cuya procedencia NO era válida y fue ANULADA. La decisión original, su payload y sus fingerprints no se modificaron. La propuesta volvió a exigir confirmación humana y apply() la sigue rechazando hasta que un revisor la confirme por esta misma pantalla.')
+                ->visible(fn (TaxonomyReviewedProposal $record) => $record->hasInvalidatedConfirmation())
+                ->schema([
+                    TextEntry::make('confirmation_invalidated_at')->label('Anulada el')->dateTime(),
+                    TextEntry::make('confirmation_invalidation_actor_type')
+                        ->label('Anulada por')
+                        ->formatStateUsing(fn (?string $state, TaxonomyReviewedProposal $record) => match ($state) {
+                            TaxonomyReviewedProposal::ACTOR_AGENT => 'el AGENTE, por autorización explícita del dueño de la taxonomía (ninguna cuenta de persona ejecutó esta corrección)',
+                            TaxonomyReviewedProposal::ACTOR_HUMAN_REVIEWER => 'la persona '.($record->confirmationInvalidatedBy?->name ?? '#'.$record->confirmation_invalidated_by_id),
+                            default => '—',
+                        }),
+                    TextEntry::make('confirmation_invalidation_channel')->label('Canal de la corrección (auto-capturado)')->placeholder('—'),
+                    TextEntry::make('confirmation_invalidation_reference')->label('Referencia de gobernanza de la corrección')->placeholder('—')->columnSpanFull(),
+                    TextEntry::make('confirmation_invalidation_reason')->label('Motivo')->placeholder('—')->columnSpanFull(),
+                    KeyValueEntry::make('invalidated_confirmation_snapshot')
+                        ->label('Confirmación anulada (lo que decía antes)')
+                        ->columnSpanFull(),
+                ]),
             Section::make('Ejecución (apply) — fuera del alcance de esta UI')
                 ->description('Esta pantalla es de solo lectura. Aplicar/publicar esta propuesta requiere una autorización de ejecución explícita y separada, fuera de esta UI de revisión (ver ReviewedProposalService::apply()).')
                 ->schema([

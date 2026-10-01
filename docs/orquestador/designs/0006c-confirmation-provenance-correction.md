@@ -1,6 +1,17 @@
-# DISEÑO (no implementado) — Corrección de procedencia de confirmación de #492–#495
+# Corrección de procedencia de confirmación de #492–#495
 
-**Estado: DISEÑO PARA REVISIÓN. Nada de esto está implementado y nada se ejecutó.**
+> **ESTADO: APROBADO E IMPLEMENTADO.** El re-audit
+> [`5939882569`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5939882569)
+> dio `PASS FOR IMPLEMENTATION` a este diseño y fijó un contrato de 9 puntos; la autorización
+> explícita del dueño llegó en
+> [`5939903005`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5939903005).
+> Lo implementado y ejecutado se documenta en la **§12 del audit**
+> [`phase6_task0006b_human_confirmation_2026-10-01.md`](../../../audit/phase6_task0006b_human_confirmation_2026-10-01.md).
+> Este archivo se conserva como el diseño que se aprobó; donde el resultado final se desvió de lo
+> propuesto, se indica abajo en §8.
+
+**Estado original de este documento: DISEÑO PARA REVISIÓN (nada implementado).** Se mantiene el texto
+tal como se presentó para revisión, para que el diseño aprobado y lo construido se puedan comparar.
 
 **Fuente:** Issue #2 comentario
 [`5938949812`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5938949812)
@@ -227,6 +238,34 @@ Restringir a `http` **sube mucho el costo** de una suplantación accidental y el
 realmente se usó, pero no convierte el invariante en una garantía absoluta. Lo que sí es absoluto es
 que el canal queda registrado con la verdad y que ninguna ruta permite **reasignar** una confirmación
 existente.
+
+---
+
+## 8. Desviaciones de lo implementado respecto de este diseño
+
+Tres añadidos, ninguna renuncia. Se listan para que la comparación sea honesta:
+
+1. **Atribución del ejecutor de la corrección.** El diseño dejaba `confirmation_invalidated_by_id`
+   para «la persona que autoriza la corrección, si aplica». Al implementarlo se vio que ponerle la
+   cuenta #3 repetiría **exactamente** el defecto que se está reparando: atribuir a una persona una
+   acción que no realizó. Se añadieron por eso
+   `confirmation_invalidation_actor_type` (`agent` / `human_reviewer`) y
+   `confirmation_invalidation_channel` (auto-capturado), y cuando ejecuta el agente
+   `confirmation_invalidated_by_id` queda en **NULL**.
+2. **El camino privilegiado no puede colar un cambio de decisión.** El trigger, dentro de la rama de
+   excepción, exige además que `decision`, `decision_payload`, los dos fingerprints,
+   `payload_version`, `reviewer_id`, `reviewed_at`, el origen, el grupo, la procedencia de
+   preparación y `applied_at` queden **idénticos**; si alguno cambia en el mismo UPDATE, lanza. El
+   alcance del trigger en el camino **normal** sigue sin cubrir esas columnas (deliberado desde
+   TASK-0006B, para no volver inalcanzables los tests de tamper aprobados de TASK-0004).
+3. **El rastro de una anulación también es inmutable.** Se añadió una tercera regla al trigger: una
+   vez grabada, la anulación no se reescribe ni se borra.
+
+Y una precisión sobre §6 (restricción a canal HTTP), que se adoptó: el discriminante implementado no
+es `runningInConsole()` —que bajo PHPUnit da `true` incluso cuando la petición sí pasó por el router,
+medido empíricamente— sino **si hay una ruta resuelta en el contenedor**. En este despliegue (PHP-FPM,
+sin Octane) eso equivale a «se está sirviendo una petición HTTP». El límite queda escrito en el
+docblock de `currentChannel()`: en un servidor de proceso largo habría que revisarlo.
 
 ---
 

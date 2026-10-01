@@ -220,12 +220,91 @@ class TaxonomyReviewedProposalConfirmationUiTest extends TestCase
         $reviewer = $this->reviewer();
         $proposal = $this->agentPreparedProposal($reviewer);
 
-        $this->actingAs($reviewer);
-        (new ReviewedProposalService())->confirm($proposal->id, $reviewer, 'Issue #2 comentario 5936206843');
+        // TASK-0006C: la confirmación se hace por la ACCIÓN de la UI, no llamando al servicio desde
+        // consola - ese camino ahora se rechaza por canal (`RESULT_CHANNEL_NOT_HUMAN`), que es
+        // exactamente la corrección del re-audit `5938949812`.
+        Livewire::actingAs($reviewer)
+            ->test(ListTaxonomyReviewedProposals::class)
+            ->mountTableAction('confirmPreparedDecision', $proposal)
+            ->setTableActionData([
+                'confirmation_reference' => 'Issue #2 comentario 5936206843',
+                'deliberate' => true,
+            ])
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $this->assertTrue($proposal->fresh()->isHumanConfirmed());
 
         Livewire::actingAs($reviewer)
             ->test(ListTaxonomyReviewedProposals::class)
             ->assertTableActionHidden('confirmPreparedDecision', $proposal->fresh());
+    }
+
+    #[Test]
+    public function the_confirmation_action_becomes_available_again_after_the_provenance_correction(): void
+    {
+        // TASK-0006C (Issue #2 `5939903005`, «HUMAN UI FOLLOW-UP»): tras anular una confirmación con
+        // procedencia inválida, la propuesta tiene que volver a ser CONFIRMABLE por la UI - es la
+        // condición para que el dueño pueda cerrarla personalmente.
+        $reviewer = $this->reviewer();
+        $proposal = $this->agentPreparedProposal($reviewer);
+
+        // Confirmación legítima por la UI...
+        Livewire::actingAs($reviewer)
+            ->test(ListTaxonomyReviewedProposals::class)
+            ->mountTableAction('confirmPreparedDecision', $proposal)
+            ->setTableActionData([
+                'confirmation_reference' => 'Issue #2 comentario 5936206843',
+                'deliberate' => true,
+            ])
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $this->assertTrue($proposal->fresh()->isHumanConfirmed());
+
+        // ...anulada por la corrección de gobernanza...
+        (new ReviewedProposalService())->invalidateConfirmation(
+            $proposal->id,
+            'Issue #2 — explicit owner authorization following orchestrator comment 5939882569',
+            'procedencia de confirmación inválida',
+        );
+
+        // ...y la acción vuelve a estar disponible para un revisor autenticado.
+        Livewire::actingAs($reviewer)
+            ->test(ListTaxonomyReviewedProposals::class)
+            ->assertTableActionVisible('confirmPreparedDecision', $proposal->fresh());
+
+        $this->assertTrue($proposal->fresh()->awaitsHumanConfirmation());
+        $this->assertTrue($proposal->fresh()->hasInvalidatedConfirmation());
+    }
+
+    #[Test]
+    public function the_detail_page_surfaces_the_invalidated_confirmation_trail(): void
+    {
+        // La corrección tiene que ser auditable desde la propia pantalla, sin leer taxonomy_audit_log.
+        $reviewer = $this->reviewer();
+        $proposal = $this->agentPreparedProposal($reviewer);
+
+        Livewire::actingAs($reviewer)
+            ->test(ListTaxonomyReviewedProposals::class)
+            ->mountTableAction('confirmPreparedDecision', $proposal)
+            ->setTableActionData([
+                'confirmation_reference' => 'Issue #2 comentario 5936206843',
+                'deliberate' => true,
+            ])
+            ->callMountedTableAction();
+
+        (new ReviewedProposalService())->invalidateConfirmation(
+            $proposal->id,
+            'Issue #2 — explicit owner authorization following orchestrator comment 5939882569',
+            'procedencia de confirmación inválida',
+        );
+
+        $this->actingAs($reviewer)
+            ->get(TaxonomyReviewedProposalResource::getUrl('view', ['record' => $proposal->fresh()]))
+            ->assertOk()
+            ->assertSee('Corrección de procedencia de confirmación')
+            ->assertSee('ninguna cuenta de persona ejecutó esta corrección');
     }
 
     #[Test]

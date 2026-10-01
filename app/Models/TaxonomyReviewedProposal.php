@@ -88,6 +88,13 @@ class TaxonomyReviewedProposal extends Model
         'confirmation_channel',
         'confirmation_note',
         'proposal_group_id',
+        'confirmation_invalidated_at',
+        'confirmation_invalidated_by_id',
+        'confirmation_invalidation_actor_type',
+        'confirmation_invalidation_channel',
+        'confirmation_invalidation_reference',
+        'confirmation_invalidation_reason',
+        'invalidated_confirmation_snapshot',
     ];
 
     protected $casts = [
@@ -101,6 +108,9 @@ class TaxonomyReviewedProposal extends Model
         'applied_at' => 'datetime',
         'confirmed_at' => 'datetime',
         'requires_human_confirmation' => 'boolean',
+        'confirmation_invalidated_at' => 'datetime',
+        'confirmation_invalidated_by_id' => 'integer',
+        'invalidated_confirmation_snapshot' => 'array',
     ];
 
     /**
@@ -140,6 +150,22 @@ class TaxonomyReviewedProposal extends Model
     public function confirmedBy()
     {
         return $this->belongsTo(UserPgsql::class, 'confirmed_by_id');
+    }
+
+    /**
+     * TASK-0006C: esta propuesta tuvo una confirmación cuya procedencia resultó inválida y fue
+     * ANULADA. El rastro se conserva (`invalidated_confirmation_snapshot` + referencia + motivo), así
+     * que la fila sigue siendo autodescriptiva: se puede ver que hubo una confirmación inválida y
+     * cuál era, sin cruzar con `taxonomy_audit_log`.
+     */
+    public function hasInvalidatedConfirmation(): bool
+    {
+        return $this->confirmation_invalidated_at !== null;
+    }
+
+    public function confirmationInvalidatedBy()
+    {
+        return $this->belongsTo(UserPgsql::class, 'confirmation_invalidated_by_id');
     }
 
     /** Las otras filas del mismo grupo bilingüe (sin incluirse a sí misma). */

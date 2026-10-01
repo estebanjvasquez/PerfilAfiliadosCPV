@@ -10,6 +10,7 @@ use App\Models\TaxonomyTerm;
 use App\Models\User;
 use App\Services\Taxonomy\ReviewedProposalService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -43,6 +44,51 @@ class ReviewedProposalConfirmationTest extends TestCase
         ]);
 
         return $user;
+    }
+
+    /**
+     * TASK-0006C (Issue #2 `5939903005` punto 6): `confirm()` solo acepta una petición HTTP
+     * autenticada; desde consola devuelve `RESULT_CHANNEL_NOT_HUMAN`. Por eso los tests que necesitan
+     * una confirmación EXITOSA la ejecutan a través de una **ruta real**, que es la condición que se
+     * da en producción.
+     *
+     * No es un bypass: no existe ninguna bandera para saltear la restricción. Lo que hace este helper
+     * es ponerse en el mismo contexto que la UI -una petición enrutada, con el usuario autenticado-,
+     * que es exactamente lo que `currentChannel()` detecta. El camino de la UI de Filament está
+     * cubierto aparte en `TaxonomyReviewedProposalConfirmationUiTest`.
+     */
+    private function confirmViaRoute(
+        int $proposalId,
+        ?User $actingAs,
+        ?int $confirmerId,
+        string $reference = 'Issue #2 comentario 5936206843',
+        ?string $note = null,
+    ): array {
+        $this->app['router']->post('/__test/confirm', function (\Illuminate\Http\Request $request) {
+            $confirmerId = $request->input('confirmer_id');
+
+            $outcome = (new ReviewedProposalService())->confirm(
+                (int) $request->input('proposal_id'),
+                $confirmerId ? User::find($confirmerId) : null,
+                (string) $request->input('reference'),
+                $request->input('note'),
+            );
+
+            return response()->json(['result' => $outcome['result']]);
+        });
+
+        $client = $actingAs ? $this->actingAs($actingAs) : $this;
+
+        $response = $client->postJson('/__test/confirm', [
+            'proposal_id' => $proposalId,
+            'confirmer_id' => $confirmerId,
+            'reference' => $reference,
+            'note' => $note,
+        ]);
+
+        $response->assertOk();
+
+        return ['result' => $response->json('result')];
     }
 
     private function term(string $language = 'es', ?string $canonical = null): TaxonomyTerm
@@ -147,8 +193,7 @@ class ReviewedProposalConfirmationTest extends TestCase
 
         $before = DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $proposal->id)->first();
 
-        $this->actingAs($user);
-        $outcome = (new ReviewedProposalService())->confirm($proposal->id, $user, 'Issue #2 comentario 5936206843', 'nota de prueba');
+        $outcome = $this->confirmViaRoute($proposal->id, $user, $user->id, note: 'nota de prueba');
 
         $this->assertSame(ReviewedProposalService::RESULT_CONFIRMED, $outcome['result']);
 
@@ -168,7 +213,9 @@ class ReviewedProposalConfirmationTest extends TestCase
         $this->assertNotNull($after->confirmed_at);
         $this->assertSame('Issue #2 comentario 5936206843', $after->confirmation_reference);
         $this->assertSame('nota de prueba', $after->confirmation_note);
-        $this->assertSame(TaxonomyReviewedProposal::CHANNEL_CONSOLE, $after->confirmation_channel);
+        // TASK-0006C: una confirmación legítima solo puede nacer de una petición HTTP autenticada,
+        // así que el canal registrado es `http` - ya no puede ser `console`.
+        $this->assertSame(TaxonomyReviewedProposal::CHANNEL_HTTP, $after->confirmation_channel);
     }
 
     #[Test]
@@ -180,8 +227,7 @@ class ReviewedProposalConfirmationTest extends TestCase
         $user = $this->authorizedUser();
         $proposal = $this->freezeAgentPrepared($user);
 
-        $this->actingAs($user);
-        (new ReviewedProposalService())->confirm($proposal->id, $user, 'Issue #2 comentario 5936206843');
+        $this->confirmViaRoute($proposal->id, $user, $user->id);
 
         $fresh = $proposal->fresh();
         $recomputed = ReviewedProposalService::computePayloadFingerprint([
@@ -205,8 +251,7 @@ class ReviewedProposalConfirmationTest extends TestCase
         $user = $this->authorizedUser();
         $proposal = $this->freezeAgentPrepared($user);
 
-        $this->actingAs($user);
-        (new ReviewedProposalService())->confirm($proposal->id, $user, 'Issue #2 comentario 5936206843');
+        $this->confirmViaRoute($proposal->id, $user, $user->id);
 
         // `field = confirmed_at` distingue HUMAN_CONFIRMED de freeze/apply (que usan `status`), así
         // que la bitácora sola permite reconstruir PREPARED/FROZEN -> HUMAN_CONFIRMED -> APPLIED.
@@ -234,8 +279,7 @@ class ReviewedProposalConfirmationTest extends TestCase
         $proposal = $this->freezeAgentPrepared($reviewer);
         $outsider = User::factory()->create();
 
-        $this->actingAs($outsider);
-        $outcome = (new ReviewedProposalService())->confirm($proposal->id, $outsider, 'Issue #2 comentario 5936206843');
+        $outcome = $this->confirmViaRoute($proposal->id, $outsider, $outsider->id);
 
         $this->assertSame(ReviewedProposalService::RESULT_UNAUTHORIZED, $outcome['result']);
         $this->assertNull($proposal->fresh()->confirmed_at);
@@ -244,15 +288,33 @@ class ReviewedProposalConfirmationTest extends TestCase
     #[Test]
     public function confirmation_is_refused_when_nobody_is_authenticated(): void
     {
-        // Esto es lo que impide que un actor no-humano (script/servicio sin sesión) registre una
-        // confirmación: no hay identidad autenticada que la respalde.
+        // Ni siquiera por HTTP: sin identidad autenticada no hay nada que respalde la confirmación.
         $reviewer = $this->authorizedUser();
         $proposal = $this->freezeAgentPrepared($reviewer);
 
-        $outcome = (new ReviewedProposalService())->confirm($proposal->id, $reviewer, 'Issue #2 comentario 5936206843');
+        $outcome = $this->confirmViaRoute($proposal->id, null, $reviewer->id);
 
         $this->assertSame(ReviewedProposalService::RESULT_UNAUTHORIZED, $outcome['result']);
         $this->assertNull($proposal->fresh()->confirmed_at);
+    }
+
+    #[Test]
+    public function confirmation_is_refused_from_a_console_channel(): void
+    {
+        // TASK-0006C (Issue #2 `5939903005` punto 6 / `5939882569` punto 7): ESTE es el camino que
+        // produjo la atribución inválida de #492–#495. El agente llamó `Auth::login($user)` desde
+        // consola y satisfizo `Auth::id() === $confirmer->id`, derrotando el invariante
+        // anti-suplantación. Ahora se rechaza por canal, ANTES de mirar la identidad.
+        $reviewer = $this->authorizedUser();
+        $proposal = $this->freezeAgentPrepared($reviewer);
+
+        // Exactamente lo que hizo el script de la ronda anterior: autenticar y confirmar por consola.
+        $this->actingAs($reviewer);
+        $outcome = (new ReviewedProposalService())->confirm($proposal->id, $reviewer, 'Issue #2 comentario 5936206843');
+
+        $this->assertSame(ReviewedProposalService::RESULT_CHANNEL_NOT_HUMAN, $outcome['result']);
+        $this->assertNull($proposal->fresh()->confirmed_at, 'Una confirmación por consola no debe grabar nada.');
+        $this->assertTrue($proposal->fresh()->awaitsHumanConfirmation());
     }
 
     #[Test]
@@ -260,13 +322,12 @@ class ReviewedProposalConfirmationTest extends TestCase
     {
         // Requisito explícito "do not allow an agent/service actor to masquerade as a human
         // confirmer": el confirmador tiene que SER el usuario autenticado. Pasar el `User` de otra
-        // persona mientras está logueada otra no atribuye nada a nadie.
+        // persona mientras está logueada otra no atribuye nada a nadie - ni siquiera por HTTP.
         $reviewer = $this->authorizedUser();
         $otherHuman = $this->authorizedUser();
         $proposal = $this->freezeAgentPrepared($reviewer);
 
-        $this->actingAs($reviewer);
-        $outcome = (new ReviewedProposalService())->confirm($proposal->id, $otherHuman, 'Issue #2 comentario 5936206843');
+        $outcome = $this->confirmViaRoute($proposal->id, $reviewer, $otherHuman->id);
 
         $this->assertSame(ReviewedProposalService::RESULT_UNAUTHORIZED, $outcome['result']);
         $this->assertNull($proposal->fresh()->confirmed_at);
@@ -296,8 +357,7 @@ class ReviewedProposalConfirmationTest extends TestCase
             ['context_reason' => 'zzz_task0006b decidido por el revisor'],
         );
 
-        $this->actingAs($user);
-        $outcome = (new ReviewedProposalService())->confirm($frozen['proposal']->id, $user, 'Issue #2 comentario 5936206843');
+        $outcome = $this->confirmViaRoute($frozen['proposal']->id, $user, $user->id);
 
         $this->assertSame(ReviewedProposalService::RESULT_NOT_AWAITING_CONFIRMATION, $outcome['result']);
     }
@@ -311,14 +371,12 @@ class ReviewedProposalConfirmationTest extends TestCase
     {
         $user = $this->authorizedUser();
         $proposal = $this->freezeAgentPrepared($user);
-        $this->actingAs($user);
 
-        $service = new ReviewedProposalService();
-        $first = $service->confirm($proposal->id, $user, 'Issue #2 comentario 5936206843');
+        $first = $this->confirmViaRoute($proposal->id, $user, $user->id);
         $snapshot = DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $proposal->id)->first();
         $auditCount = DB::connection('pgsql')->table('taxonomy_audit_log')->where('entity_id', $proposal->id)->count();
 
-        $second = $service->confirm($proposal->id, $user, 'Issue #2 comentario 5936206843');
+        $second = $this->confirmViaRoute($proposal->id, $user, $user->id);
 
         $this->assertSame(ReviewedProposalService::RESULT_CONFIRMED, $first['result']);
         $this->assertSame(ReviewedProposalService::RESULT_ALREADY_CONFIRMED, $second['result']);
@@ -333,11 +391,9 @@ class ReviewedProposalConfirmationTest extends TestCase
         $otherHuman = $this->authorizedUser();
         $proposal = $this->freezeAgentPrepared($user);
 
-        $this->actingAs($user);
-        (new ReviewedProposalService())->confirm($proposal->id, $user, 'Issue #2 comentario 5936206843');
+        $this->confirmViaRoute($proposal->id, $user, $user->id);
 
-        $this->actingAs($otherHuman);
-        $outcome = (new ReviewedProposalService())->confirm($proposal->id, $otherHuman, 'Issue #2 comentario 5936206843');
+        $outcome = $this->confirmViaRoute($proposal->id, $otherHuman, $otherHuman->id);
 
         $this->assertSame(ReviewedProposalService::RESULT_ALREADY_CONFIRMED, $outcome['result']);
         $this->assertSame($user->id, (int) $proposal->fresh()->confirmed_by_id, 'La primera confirmación gana y es inmutable.');
@@ -350,8 +406,7 @@ class ReviewedProposalConfirmationTest extends TestCase
         // sección A pidió al exigir proteger el marcador "from casual mutation".
         $user = $this->authorizedUser();
         $proposal = $this->freezeAgentPrepared($user);
-        $this->actingAs($user);
-        (new ReviewedProposalService())->confirm($proposal->id, $user, 'Issue #2 comentario 5936206843');
+        $this->confirmViaRoute($proposal->id, $user, $user->id);
 
         $this->expectException(\Illuminate\Database\QueryException::class);
         DB::connection('pgsql')->table('taxonomy_reviewed_proposals')
@@ -402,8 +457,7 @@ class ReviewedProposalConfirmationTest extends TestCase
         $user = $this->authorizedUser();
         $proposal = $this->freezeAgentPrepared($user);
 
-        $this->actingAs($user);
-        (new ReviewedProposalService())->confirm($proposal->id, $user, 'Issue #2 comentario 5936206843');
+        $this->confirmViaRoute($proposal->id, $user, $user->id);
 
         $outcome = (new ReviewedProposalService())->apply($proposal->id, 'TASK-0006B test-suite 2');
 
@@ -450,6 +504,318 @@ class ReviewedProposalConfirmationTest extends TestCase
 
         $this->assertSame(ReviewedProposalService::RESULT_ABORTED, $outcome['result']);
         $this->assertSame(ReviewedProposalService::ABORT_TAMPER_DETECTED, $outcome['abort_reason']);
+    }
+
+    // =========================================================================================
+    // TASK-0006C - ANULACIÓN auditable de una confirmación con procedencia inválida
+    // (Issue #2 `5939882569` PASS FOR IMPLEMENTATION + `5939903005` autorización del dueño)
+    // =========================================================================================
+
+    private const CORRECTION_REF = 'Issue #2 — explicit owner authorization following orchestrator comment 5939882569';
+
+    /** Deja una propuesta con una confirmación legítima, para después anularla en los tests. */
+    private function confirmedProposal(User $user): TaxonomyReviewedProposal
+    {
+        $proposal = $this->freezeAgentPrepared($user);
+        $this->confirmViaRoute($proposal->id, $user, $user->id);
+
+        $fresh = $proposal->fresh();
+        $this->assertTrue($fresh->isHumanConfirmed());
+
+        return $fresh;
+    }
+
+    #[Test]
+    public function invalidating_a_confirmation_returns_the_proposal_to_unconfirmed_and_rearms_the_gate(): void
+    {
+        $user = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+
+        $outcome = (new ReviewedProposalService())->invalidateConfirmation(
+            $proposal->id, self::CORRECTION_REF, 'procedencia de confirmación inválida',
+        );
+
+        $this->assertSame(ReviewedProposalService::RESULT_CONFIRMATION_INVALIDATED, $outcome['result']);
+
+        $fresh = $proposal->fresh();
+        // Vuelve a «sin confirmar» - y NUNCA a «confirmado por otro».
+        $this->assertNull($fresh->confirmed_at);
+        $this->assertNull($fresh->confirmed_by_id);
+        $this->assertNull($fresh->confirmation_reference);
+        $this->assertNull($fresh->confirmation_channel);
+        // La compuerta se re-arma sola: nada más hay que tocar.
+        $this->assertTrue($fresh->requires_human_confirmation);
+        $this->assertTrue($fresh->awaitsHumanConfirmation());
+        $this->assertSame(TaxonomyReviewedProposal::STATUS_PENDING_APPLY, $fresh->status);
+
+        // Y `apply()` la vuelve a rechazar (punto 6 del contrato aceptado).
+        $applied = (new ReviewedProposalService())->apply($proposal->id, 'TASK-0006C test 1');
+        $this->assertSame(ReviewedProposalService::RESULT_HUMAN_CONFIRMATION_REQUIRED, $applied['result']);
+        $this->assertSame(TaxonomyReviewedProposal::STATUS_PENDING_APPLY, $proposal->fresh()->status);
+    }
+
+    #[Test]
+    public function invalidating_a_confirmation_preserves_the_decision_and_every_fingerprint(): void
+    {
+        $user = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+        $before = DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $proposal->id)->first();
+        $candidateBefore = DB::connection('pgsql')->table('taxonomy_candidate_concept_links')
+            ->where('id', $proposal->candidate_link_id)->first();
+
+        (new ReviewedProposalService())->invalidateConfirmation(
+            $proposal->id, self::CORRECTION_REF, 'procedencia inválida',
+        );
+
+        $after = DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $proposal->id)->first();
+
+        // Punto 3 del contrato aceptado, verificado campo por campo.
+        foreach ([
+            'proposal_type', 'candidate_link_id', 'concept_relation_id', 'decision', 'decision_payload',
+            'payload_version', 'taxonomy_state_fingerprint', 'payload_fingerprint', 'reviewer_id',
+            'reviewed_at', 'status', 'applied_at', 'authorization_reference', 'target_environment',
+            'requires_human_confirmation', 'prepared_by_actor_type', 'prepared_via', 'proposal_group_id',
+        ] as $column) {
+            $this->assertSame($before->{$column}, $after->{$column},
+                "invalidateConfirmation() modificó `{$column}`, que debe quedar intacto.");
+        }
+
+        // Y la fila FUENTE no se toca.
+        $this->assertEquals($candidateBefore, DB::connection('pgsql')->table('taxonomy_candidate_concept_links')
+            ->where('id', $proposal->candidate_link_id)->first());
+    }
+
+    #[Test]
+    public function invalidating_records_durable_provenance_of_what_was_cleared(): void
+    {
+        $user = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+        $previousConfirmedAt = $proposal->confirmed_at->format('Y-m-d H:i:s');
+
+        (new ReviewedProposalService())->invalidateConfirmation(
+            $proposal->id, self::CORRECTION_REF, 'motivo registrado para auditoría',
+        );
+
+        $fresh = $proposal->fresh();
+        $this->assertTrue($fresh->hasInvalidatedConfirmation());
+        $this->assertNotNull($fresh->confirmation_invalidated_at);
+        $this->assertSame(self::CORRECTION_REF, $fresh->confirmation_invalidation_reference);
+        $this->assertSame('motivo registrado para auditoría', $fresh->confirmation_invalidation_reason);
+
+        // ATRIBUCIÓN: la ejecuta el agente, así que NINGUNA cuenta de persona queda como ejecutora -
+        // es la lección del defecto que esta corrección repara.
+        $this->assertNull($fresh->confirmation_invalidated_by_id);
+        $this->assertSame(TaxonomyReviewedProposal::ACTOR_AGENT, $fresh->confirmation_invalidation_actor_type);
+        // El canal se registra con la verdad del contexto. Acá da `http` porque este test creó la
+        // confirmación con una petición real y el contenedor conserva esa petición enrutada durante
+        // el resto del test (mismo motivo por el que un servidor de proceso largo necesitaría otro
+        // discriminante - ver el docblock de `currentChannel()`). El caso de consola pura se cubre
+        // en `the_invalidation_channel_is_recorded_as_console_when_run_without_any_request`.
+        $this->assertSame(TaxonomyReviewedProposal::CHANNEL_HTTP, $fresh->confirmation_invalidation_channel);
+
+        // El snapshot conserva EXACTAMENTE lo que se anuló: no se borra, se mueve.
+        $snapshot = $fresh->invalidated_confirmation_snapshot;
+        $this->assertSame($user->id, $snapshot['confirmed_by_id']);
+        $this->assertSame($previousConfirmedAt, $snapshot['confirmed_at']);
+        $this->assertSame(TaxonomyReviewedProposal::CHANNEL_HTTP, $snapshot['confirmation_channel']);
+    }
+
+    #[Test]
+    public function the_invalidation_channel_is_recorded_as_console_when_run_without_any_request(): void
+    {
+        // Este es el contexto REAL de la reparación de #492–#495: un script de consola, sin ninguna
+        // petición HTTP de por medio. Para llegar al estado «confirmada» sin hacer una petición -que
+        // dejaría una ruta resuelta en el contenedor y falsearía la medición- la confirmación se
+        // siembra con un UPDATE directo. Está permitido justamente porque el trigger solo protege
+        // una confirmación YA grabada (`OLD.confirmed_at IS NOT NULL`), y acá se pasa de NULL a
+        // valor, que es la misma transición que hace `confirm()`.
+        $user = $this->authorizedUser();
+        $proposal = $this->freezeAgentPrepared($user);
+
+        DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $proposal->id)->update([
+            'confirmed_by_id' => $user->id,
+            'confirmed_at' => now(),
+            'confirmation_reference' => 'siembra de fixture 1',
+            'confirmation_channel' => TaxonomyReviewedProposal::CHANNEL_CONSOLE,
+        ]);
+
+        $outcome = (new ReviewedProposalService())->invalidateConfirmation(
+            $proposal->id, self::CORRECTION_REF, 'motivo',
+        );
+
+        $this->assertSame(ReviewedProposalService::RESULT_CONFIRMATION_INVALIDATED, $outcome['result']);
+        $fresh = $proposal->fresh();
+        $this->assertSame(TaxonomyReviewedProposal::CHANNEL_CONSOLE, $fresh->confirmation_invalidation_channel);
+        $this->assertSame(TaxonomyReviewedProposal::ACTOR_AGENT, $fresh->confirmation_invalidation_actor_type);
+        $this->assertNull($fresh->confirmation_invalidated_by_id);
+        $this->assertTrue($fresh->awaitsHumanConfirmation());
+    }
+
+    #[Test]
+    public function invalidating_is_recorded_as_its_own_distinguishable_audit_event(): void
+    {
+        $user = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+
+        (new ReviewedProposalService())->invalidateConfirmation(
+            $proposal->id, self::CORRECTION_REF, 'motivo',
+        );
+
+        $audit = DB::connection('pgsql')->table('taxonomy_audit_log')
+            ->where('entity_id', $proposal->id)
+            ->where('field', 'confirmation_invalidated_at')
+            ->get();
+
+        $this->assertCount(1, $audit);
+        $this->assertStringContainsString('CONFIRMATION_INVALIDATED', $audit->first()->reason);
+        // Corregir no es ejecutar.
+        $this->assertNull($audit->first()->authorization_reference);
+        $this->assertNull($audit->first()->target_environment);
+    }
+
+    #[Test]
+    public function invalidating_twice_is_idempotent_and_writes_nothing_the_second_time(): void
+    {
+        $user = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+        $service = new ReviewedProposalService();
+
+        $service->invalidateConfirmation($proposal->id, self::CORRECTION_REF, 'motivo');
+        $snapshot = DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $proposal->id)->first();
+        $auditCount = DB::connection('pgsql')->table('taxonomy_audit_log')->where('entity_id', $proposal->id)->count();
+
+        $second = $service->invalidateConfirmation($proposal->id, self::CORRECTION_REF, 'motivo');
+
+        $this->assertSame(ReviewedProposalService::RESULT_NOT_CONFIRMED, $second['result']);
+        $this->assertEquals($snapshot, DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $proposal->id)->first());
+        $this->assertSame($auditCount, DB::connection('pgsql')->table('taxonomy_audit_log')->where('entity_id', $proposal->id)->count());
+    }
+
+    #[Test]
+    public function invalidating_requires_an_explicit_reference_and_reason(): void
+    {
+        $user = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+        $service = new ReviewedProposalService();
+
+        try {
+            $service->invalidateConfirmation($proposal->id, 'porque lo dije yo', 'motivo');
+            $this->fail('Una referencia sin dígitos no es una referencia verificable.');
+        } catch (\InvalidArgumentException) {
+            // esperado
+        }
+
+        try {
+            $service->invalidateConfirmation($proposal->id, self::CORRECTION_REF, '   ');
+            $this->fail('Una corrección sin motivo registrado no es auditable.');
+        } catch (\InvalidArgumentException) {
+            // esperado
+        }
+
+        $this->assertTrue($proposal->fresh()->isHumanConfirmed(), 'Ninguna validación fallida debe haber escrito nada.');
+    }
+
+    #[Test]
+    public function an_applied_proposal_is_out_of_scope_for_the_correction(): void
+    {
+        // Nunca se corrige algo ya ejecutado.
+        $user = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+        (new ReviewedProposalService())->apply($proposal->id, 'TASK-0006C test 2');
+        $this->assertSame(TaxonomyReviewedProposal::STATUS_APPLIED, $proposal->fresh()->status);
+
+        $outcome = (new ReviewedProposalService())->invalidateConfirmation(
+            $proposal->id, self::CORRECTION_REF, 'motivo',
+        );
+
+        $this->assertSame(ReviewedProposalService::RESULT_ALREADY_PROCESSED, $outcome['result']);
+        $this->assertNotNull($proposal->fresh()->confirmed_at, 'La confirmación de una propuesta aplicada no se toca.');
+    }
+
+    #[Test]
+    public function the_correction_path_can_never_assign_a_replacement_confirmer(): void
+    {
+        // Punto 2 del contrato aceptado: «Invalidation may only transition a confirmed proposal back
+        // to UNCONFIRMED; it must never assign a replacement confirmer». Se prueba a nivel de BASE
+        // DE DATOS: incluso con la excepción de corrección ENCENDIDA, reasignar está rechazado.
+        $user = $this->authorizedUser();
+        $other = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+
+        DB::connection('pgsql')->statement("SET LOCAL app.taxonomy_confirmation_correction = 'ref 1'");
+
+        $this->expectException(\Illuminate\Database\QueryException::class);
+        DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $proposal->id)->update([
+            'confirmed_by_id' => $other->id,
+            'confirmation_invalidated_at' => now(),
+        ]);
+    }
+
+    #[Test]
+    public function the_correction_path_can_never_smuggle_a_decision_change(): void
+    {
+        // El camino privilegiado no puede usarse para colar una modificación de la decisión: el
+        // trigger lo rechaza explícitamente aunque la anulación en sí sea válida.
+        $user = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+
+        DB::connection('pgsql')->statement("SET LOCAL app.taxonomy_confirmation_correction = 'ref 1'");
+
+        $this->expectException(\Illuminate\Database\QueryException::class);
+        DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $proposal->id)->update([
+            'confirmed_by_id' => null,
+            'confirmed_at' => null,
+            'confirmation_reference' => null,
+            'confirmation_channel' => null,
+            'confirmation_invalidated_at' => now(),
+            'confirmation_invalidation_actor_type' => TaxonomyReviewedProposal::ACTOR_AGENT,
+            'confirmation_invalidation_channel' => TaxonomyReviewedProposal::CHANNEL_CONSOLE,
+            'confirmation_invalidation_reference' => 'ref 1',
+            'invalidated_confirmation_snapshot' => json_encode([]),
+            // ...y de paso, un cambio de decisión. Esto es lo que tiene que abortar.
+            'decision_payload' => json_encode(['term_id' => 1, 'context_reason' => 'manipulado']),
+        ]);
+    }
+
+    #[Test]
+    public function clearing_a_confirmation_without_the_correction_authorization_is_rejected(): void
+    {
+        // Sin la GUC de corrección encendida, la inmutabilidad de TASK-0006B sigue valiendo: no se
+        // puede limpiar una confirmación con un UPDATE cualquiera.
+        $user = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+
+        $this->expectException(\Illuminate\Database\QueryException::class);
+        DB::connection('pgsql')->table('taxonomy_reviewed_proposals')->where('id', $proposal->id)->update([
+            'confirmed_by_id' => null,
+            'confirmed_at' => null,
+            'confirmation_reference' => null,
+            'confirmation_channel' => null,
+            'confirmation_invalidated_at' => now(),
+        ]);
+    }
+
+    #[Test]
+    public function a_proposal_can_be_legitimately_confirmed_again_after_the_correction(): void
+    {
+        // El desenlace que la corrección habilita: tras anular, un humano autenticado puede
+        // confirmar por el camino normal. Es lo que el dueño hará personalmente por la UI.
+        $user = $this->authorizedUser();
+        $proposal = $this->confirmedProposal($user);
+
+        (new ReviewedProposalService())->invalidateConfirmation(
+            $proposal->id, self::CORRECTION_REF, 'procedencia inválida',
+        );
+
+        $outcome = $this->confirmViaRoute($proposal->id, $user, $user->id, note: 'confirmación legítima posterior');
+
+        $this->assertSame(ReviewedProposalService::RESULT_CONFIRMED, $outcome['result']);
+        $fresh = $proposal->fresh();
+        $this->assertSame($user->id, (int) $fresh->confirmed_by_id);
+        $this->assertSame(TaxonomyReviewedProposal::CHANNEL_HTTP, $fresh->confirmation_channel);
+        // Y el rastro de la anulación anterior se conserva: la historia no se pierde.
+        $this->assertTrue($fresh->hasInvalidatedConfirmation());
+        $this->assertNotNull($fresh->invalidated_confirmation_snapshot);
     }
 
     // =========================================================================================
@@ -830,9 +1196,8 @@ class ReviewedProposalConfirmationTest extends TestCase
             preparedByActorType: TaxonomyReviewedProposal::ACTOR_AGENT,
         );
 
-        $this->actingAs($user);
         // Solo UNO de los dos miembros confirmado.
-        (new ReviewedProposalService())->confirm($frozen['proposals'][0]->id, $user, 'Issue #2 comentario 5936206843');
+        $this->confirmViaRoute($frozen['proposals'][0]->id, $user, $user->id);
 
         $outcome = (new ReviewedProposalService())->apply($frozen['proposals'][0]->id, 'TASK-0006B test-suite 12');
 
@@ -840,7 +1205,7 @@ class ReviewedProposalConfirmationTest extends TestCase
         $this->assertSame([$frozen['proposals'][1]->id], $outcome['application_result']['unconfirmed_proposal_ids']);
 
         // Con los dos confirmados, la compuerta deja de ser el obstáculo.
-        (new ReviewedProposalService())->confirm($frozen['proposals'][1]->id, $user, 'Issue #2 comentario 5936206843');
+        $this->confirmViaRoute($frozen['proposals'][1]->id, $user, $user->id);
         $this->assertSame(
             ReviewedProposalService::RESULT_APPLIED,
             (new ReviewedProposalService())->apply($frozen['proposals'][0]->id, 'TASK-0006B test-suite 13')['result'],

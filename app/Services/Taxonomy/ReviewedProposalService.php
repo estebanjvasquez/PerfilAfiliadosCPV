@@ -159,6 +159,26 @@ class ReviewedProposalService
     public const RESULT_NOT_AWAITING_CONFIRMATION = 'NOT_AWAITING_CONFIRMATION';
 
     /**
+     * TASK-0006C (Issue #2 comentario `5939903005` punto 6, aprobado en `5939882569` punto 7):
+     * `confirm()` se intentó desde un canal que NO es una petición HTTP autenticada - consola,
+     * `tinker`, un comando de artisan o un job. Es el camino que produjo la atribución inválida de
+     * #492–#495: el agente autenticó la cuenta #3 con `Auth::login()` desde consola y satisfizo
+     * `Auth::id() === $confirmer->id` derrotando justamente el invariante anti-suplantación.
+     *
+     * Rechazar acá no debilita nada: solo QUITA un camino.
+     */
+    public const RESULT_CHANNEL_NOT_HUMAN = 'CHANNEL_NOT_HUMAN';
+
+    /**
+     * TASK-0006C: la confirmación inválida de una propuesta fue ANULADA (vuelve a estar sin
+     * confirmar). Nunca se reasigna a otro confirmador - ver `invalidateConfirmation()`.
+     */
+    public const RESULT_CONFIRMATION_INVALIDATED = 'CONFIRMATION_INVALIDATED';
+
+    /** No hay confirmación que anular: `invalidateConfirmation()` es idempotente. */
+    public const RESULT_NOT_CONFIRMED = 'NOT_CONFIRMED';
+
+    /**
      * TASK-0006B, sección A: `apply()` rechazó la propuesta porque exige confirmación humana y
      * todavía no la tiene. DELIBERADAMENTE **no** es un `ABORT`: abortar es terminal y quemaría la
      * propuesta para siempre (y re-congelar está bloqueado por el índice único parcial), así que un
@@ -845,17 +865,44 @@ class ReviewedProposalService
     }
 
     /**
-     * Canal de ejecución real, auto-capturado. No es autorización ni pretende impedir que código
-     * de la aplicación se haga pasar por un humano - dentro de un mismo proceso confiable eso no es
-     * criptográficamente evitable, y afirmar lo contrario sería falso. Lo que SÍ garantiza es que el
-     * canal quede registrado con la verdad: una confirmación hecha por consola queda marcada como
-     * `console` y no puede presentarse como si hubiera venido de la UI.
+     * Canal de ejecución real, auto-capturado y nunca provisto por quien llama - mismo criterio que
+     * `target_environment` en `apply()`.
+     *
+     * TASK-0006C (Issue #2 comentarios `5939882569` punto 7 y `5939903005` punto 6): el
+     * discriminante es **si hay una RUTA RESUELTA**, es decir si esto se está ejecutando mientras se
+     * sirve una petición HTTP enrutada. No se usa `runningInConsole()`, y la razón es concreta y
+     * verificada empíricamente, no una preferencia de estilo: `runningInConsole()` responde por el
+     * SAPI del proceso, así que bajo PHPUnit devuelve `true` incluso cuando la petición SÍ pasó por
+     * el router (medido: en un test HTTP y en un test de Livewire da `true`, mientras que
+     * `request()->route()` devuelve la ruta real). Usarlo habría rechazado el camino legítimo de la
+     * UI y aceptado... nada mejor.
+     *
+     * Con esta regla:
+     * - petición web real (incluida la UI de Filament/Livewire) -> hay ruta -> `http`;
+     * - script de consola, `tinker`, comando de artisan, job en cola -> no hay ruta -> `console`.
+     *
+     * Es exactamente la distinción que hace falta: "¿se invocó esto sirviendo una petición
+     * enrutada?".
+     *
+     * LÍMITE, dicho explícitamente en vez de dejarlo implícito: lo que se mide es si el contenedor
+     * tiene una petición con ruta resuelta. En este despliegue eso equivale a "se está sirviendo una
+     * petición HTTP", porque corre sobre PHP-FPM, donde cada petición vive en su propio ciclo de
+     * proceso y el contenedor se destruye al terminar (verificado: no hay Octane, no hay
+     * `config/octane.php`, el workflow de despliegue sirve con PHP-FPM). En un servidor de proceso
+     * largo (Octane/Swoole/RoadRunner) una petición ya servida podría quedar en el contenedor y
+     * hacer que trabajo posterior NO-HTTP del mismo proceso se viera como `http`; si alguna vez se
+     * adopta ese modelo, este discriminante hay que revisarlo. Dentro de un test ocurre lo mismo por
+     * la misma razón (el contenedor sobrevive entre la petición y el resto del test), y por eso el
+     * canal de una operación posterior a una petición se registra como `http` - que es la verdad
+     * sobre ese contexto, no un error.
      */
     private static function currentChannel(): string
     {
-        return app()->runningInConsole()
-            ? TaxonomyReviewedProposal::CHANNEL_CONSOLE
-            : TaxonomyReviewedProposal::CHANNEL_HTTP;
+        $hasRoutedRequest = app()->bound('request') && app('request')->route() !== null;
+
+        return $hasRoutedRequest
+            ? TaxonomyReviewedProposal::CHANNEL_HTTP
+            : TaxonomyReviewedProposal::CHANNEL_CONSOLE;
     }
 
     // =====================================================================================
@@ -914,6 +961,16 @@ class ReviewedProposalService
 
         if (! $confirmer) {
             return ['result' => self::RESULT_UNAUTHORIZED, 'proposal' => null];
+        }
+
+        // TASK-0006C (Issue #2 `5939903005` punto 6 / `5939882569` punto 7): SOLO por petición HTTP
+        // autenticada. Esta es la corrección del defecto real del re-audit `5938949812`: el chequeo
+        // `Auth::id() === $confirmer->id` de abajo es correcto pero insuficiente por sí solo, porque
+        // un script de consola puede llamar `Auth::login($user)` y satisfacerlo, que es exactamente
+        // cómo se produjo la atribución inválida de #492–#495. El canal se auto-captura (no lo
+        // declara quien llama), así que este rechazo no se puede sortear pasando un parámetro.
+        if (self::currentChannel() !== TaxonomyReviewedProposal::CHANNEL_HTTP) {
+            return ['result' => self::RESULT_CHANNEL_NOT_HUMAN, 'proposal' => null];
         }
 
         // El confirmador tiene que ser el usuario autenticado de esta sesión. Esto es lo que impide
@@ -991,6 +1048,140 @@ class ReviewedProposalService
             );
 
             return ['result' => self::RESULT_CONFIRMED, 'proposal' => $proposal->fresh()];
+        });
+    }
+
+    /**
+     * TASK-0006C (Issue #2 `5939882569` «PASS FOR IMPLEMENTATION» + `5939903005` autorización
+     * explícita del dueño): ANULA una confirmación cuya procedencia resultó inválida, devolviendo la
+     * propuesta al estado «sin confirmar». **Nunca** reasigna la confirmación a otro confirmador -
+     * punto 2 del contrato aceptado.
+     *
+     * Por qué hace falta una operación aparte y no alcanza `confirm()`: el trigger de TASK-0006B hace
+     * inmutables los campos de confirmación a propósito, así que la atribución incorrecta no se puede
+     * sobrescribir por ningún camino existente. Esta operación enciende, SOLO dentro de su propia
+     * transacción (`SET LOCAL`), la única excepción que el trigger reconoce - y esa excepción exige
+     * que los cuatro campos queden en NULL y que no cambie ningún campo de decisión.
+     *
+     * LO QUE NO TOCA (punto 3 del contrato, verificado por test campo por campo): `decision`,
+     * `decision_payload`, `payload_version`, `payload_fingerprint`, `taxonomy_state_fingerprint`,
+     * `reviewer_id`, `reviewed_at`, `requires_human_confirmation`, `prepared_by_actor_type`,
+     * `prepared_via`, `status`, ni la fila fuente (candidato o relación).
+     *
+     * ATRIBUCIÓN, con la lección del propio defecto que repara: si la corrección la ejecuta el
+     * agente, `confirmation_invalidated_by_id` queda **NULL**. Poner ahí la cuenta de una persona
+     * repetiría exactamente el error que se está corrigiendo. El actor queda registrado con la verdad
+     * en `confirmation_invalidation_actor_type` y el canal se auto-captura; la autorización del dueño
+     * vive en la referencia de gobernanza.
+     *
+     * DELIBERADAMENTE **no** está restringida a canal HTTP, al contrario que `confirm()`: es una
+     * operación de corrección de gobernanza que se ejecuta por consola bajo autorización explícita, y
+     * su resultado no puede ser nunca «alguien quedó como confirmador» - solo «ya nadie lo es».
+     *
+     * IDEMPOTENTE: si no hay confirmación que anular devuelve `RESULT_NOT_CONFIRMED` sin escribir
+     * nada. CONCURRENCY-SAFE: `lockForUpdate()` + re-chequeo dentro de la transacción.
+     *
+     * @param  string  $correctionReference  Referencia de gobernanza de ESTA corrección (no vacía y
+     *                con al menos un dígito, misma convención que `apply()`/`confirm()`).
+     * @param  User|null  $authorizedBy  La PERSONA que ejecuta la corrección, si la ejecuta una
+     *                persona autenticada. Si lo ejecuta el agente/un script, se deja en `null` a
+     *                propósito y el actor queda como `agent`.
+     * @return array{result:string, proposal:?TaxonomyReviewedProposal}
+     */
+    public function invalidateConfirmation(
+        int $proposalId,
+        string $correctionReference,
+        string $reason,
+        ?User $authorizedBy = null,
+    ): array {
+        if (trim($correctionReference) === '') {
+            throw new \InvalidArgumentException('invalidateConfirmation() requiere $correctionReference no vacía - la referencia de gobernanza de ESTA corrección.');
+        }
+
+        if (! preg_match('/\d/', $correctionReference)) {
+            throw new \InvalidArgumentException('invalidateConfirmation() requiere que $correctionReference sea una REFERENCIA (con al menos un dígito), no un nombre libre - mismo criterio que apply()/confirm().');
+        }
+
+        if (trim($reason) === '') {
+            throw new \InvalidArgumentException('invalidateConfirmation() requiere un $reason explícito no vacío - una corrección de procedencia sin motivo registrado no es auditable.');
+        }
+
+        // Si quien ejecuta declara una persona, tiene que ser la autenticada: mismo criterio
+        // anti-suplantación que `confirm()`. Si no declara ninguna, el actor es el agente y se
+        // registra como tal.
+        if ($authorizedBy !== null && (Auth::id() === null || (int) Auth::id() !== (int) $authorizedBy->id)) {
+            return ['result' => self::RESULT_UNAUTHORIZED, 'proposal' => null];
+        }
+
+        return DB::connection('pgsql')->transaction(function () use ($proposalId, $correctionReference, $reason, $authorizedBy) {
+            $proposal = TaxonomyReviewedProposal::query()->lockForUpdate()->find($proposalId);
+
+            if (! $proposal) {
+                return ['result' => self::RESULT_NOT_FOUND, 'proposal' => null];
+            }
+
+            // Nunca se corrige algo ya ejecutado: una propuesta aplicada o abortada queda fuera del
+            // alcance de esta operación por completo.
+            if ($proposal->status !== TaxonomyReviewedProposal::STATUS_PENDING_APPLY) {
+                return ['result' => self::RESULT_ALREADY_PROCESSED, 'proposal' => $proposal];
+            }
+
+            if (! $proposal->isHumanConfirmed()) {
+                return ['result' => self::RESULT_NOT_CONFIRMED, 'proposal' => $proposal];
+            }
+
+            $snapshot = [
+                'confirmed_by_id' => $proposal->confirmed_by_id,
+                'confirmed_at' => $proposal->confirmed_at?->format('Y-m-d H:i:s'),
+                'confirmation_reference' => $proposal->confirmation_reference,
+                'confirmation_channel' => $proposal->confirmation_channel,
+                'confirmation_note' => $proposal->confirmation_note,
+            ];
+            $invalidatedAt = now();
+
+            // Enciende la excepción del trigger SOLO para esta transacción. `SET LOCAL` se revierte
+            // al terminarla, así que no puede quedar habilitada para una transacción posterior.
+            DB::connection('pgsql')->statement(
+                'SET LOCAL app.taxonomy_confirmation_correction = '.DB::connection('pgsql')->getPdo()->quote($correctionReference)
+            );
+
+            $proposal->update([
+                // Vuelve a «sin confirmar». NUNCA a «confirmado por otro».
+                'confirmed_by_id' => null,
+                'confirmed_at' => null,
+                'confirmation_reference' => null,
+                'confirmation_channel' => null,
+                'confirmation_note' => null,
+                // Rastro durable de QUÉ se anuló, QUIÉN/QUÉ lo ejecutó, CUÁNDO y BAJO QUÉ autorización.
+                'confirmation_invalidated_at' => $invalidatedAt,
+                'confirmation_invalidated_by_id' => $authorizedBy?->id,
+                'confirmation_invalidation_actor_type' => $authorizedBy
+                    ? TaxonomyReviewedProposal::ACTOR_HUMAN_REVIEWER
+                    : TaxonomyReviewedProposal::ACTOR_AGENT,
+                'confirmation_invalidation_channel' => self::currentChannel(),
+                'confirmation_invalidation_reference' => $correctionReference,
+                'confirmation_invalidation_reason' => $reason,
+                'invalidated_confirmation_snapshot' => $snapshot,
+            ]);
+
+            // Evento de auditoría propio y distinguible: `field = confirmation_invalidated_at`, con
+            // el `confirmed_at` anulado como valor viejo. Sin `authorization_reference`/
+            // `target_environment`: corregir no es ejecutar.
+            TaxonomyAuditLogger::record(
+                entityType: TaxonomyReviewedProposal::class,
+                entityId: $proposal->id,
+                field: 'confirmation_invalidated_at',
+                oldValue: $snapshot['confirmed_at'],
+                newValue: $invalidatedAt->format('Y-m-d H:i:s'),
+                reason: 'CONFIRMATION_INVALIDATED: procedencia de confirmación anulada por corrección de gobernanza'
+                    .' (ref='.$correctionReference.', actor='.($authorizedBy ? 'human#'.$authorizedBy->id : 'agent')
+                    .', canal='.self::currentChannel().'). La decisión, su payload y sus fingerprints NO se modificaron;'
+                    .' la propuesta vuelve a exigir confirmación humana y apply() la sigue rechazando. Motivo: '.$reason,
+                actorType: $authorizedBy ? TaxonomyAuditLogger::ACTOR_USER : TaxonomyAuditLogger::ACTOR_SYSTEM,
+                algorithmVersion: self::PAYLOAD_VERSION,
+            );
+
+            return ['result' => self::RESULT_CONFIRMATION_INVALIDATED, 'proposal' => $proposal->fresh()];
         });
     }
 
