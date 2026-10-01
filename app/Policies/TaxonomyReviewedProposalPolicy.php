@@ -56,6 +56,33 @@ class TaxonomyReviewedProposalPolicy
         };
     }
 
+    /**
+     * TASK-0006B (Issue #2 comentario `5936206843`), sección B: confirmar una decisión preparada es
+     * un acto de REVISIÓN, no de lectura ni de ejecución. Por eso exige el permiso `update` del
+     * TIPO DE ORIGEN - el mismo que gobierna `freeze()` - resuelto por tipo, sin fuga entre
+     * candidatos y relaciones (misma corrección 1 del re-audit `5917275454` aplicada a esta
+     * habilidad nueva).
+     *
+     * No concede nada parecido a aplicar/publicar: `apply()` sigue siendo un paso separado, sin
+     * ningún botón en esta UI.
+     */
+    public function confirm(User $user, TaxonomyReviewedProposal $taxonomyReviewedProposal): bool
+    {
+        if (! $taxonomyReviewedProposal->awaitsHumanConfirmation()) {
+            return false;
+        }
+
+        if ($taxonomyReviewedProposal->status !== TaxonomyReviewedProposal::STATUS_PENDING_APPLY) {
+            return false;
+        }
+
+        return match ($taxonomyReviewedProposal->proposal_type) {
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK => $user->can('update_taxonomy::candidate::concept::link'),
+            TaxonomyReviewedProposal::TYPE_CONCEPT_RELATION => $user->can('update_taxonomy::concept::relation'),
+            default => false,
+        };
+    }
+
     public static function canListCandidateLinkProposals(User $user): bool
     {
         return $user->can('view_any_taxonomy::candidate::concept::link');

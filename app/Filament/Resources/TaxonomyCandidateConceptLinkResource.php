@@ -170,9 +170,28 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                     ->form(fn (TaxonomyCandidateConceptLink $record) => self::freezeReviewForm($record))
                     ->action(function (TaxonomyCandidateConceptLink $record, array $data) {
                         $decision = $data['decision'];
+                        $bilingual = $decision === TaxonomyReviewedProposal::DECISION_CREATE_NEW
+                            && ($data['new_concept_identity_mode'] ?? 'monolingual') === 'bilingual';
+
+                        // TASK-0006B, sección D: si el revisor eligió converger con otros
+                        // candidatos, se congela UNA revisión AGRUPADA (una fila por candidato,
+                        // unidas por `proposal_group_id`) en vez de varias independientes - es lo
+                        // que impide que `apply()` cree un concepto por candidato.
+                        $converge = array_values(array_filter(array_map('intval', $data['converge_candidate_ids'] ?? [])));
+                        if ($bilingual && $converge !== []) {
+                            self::freezeConvergedBilingualGroup($record, $converge, $data);
+
+                            return;
+                        }
+
                         $payload = match ($decision) {
                             TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING => ['target_concept_id' => $data['target_concept_id'] ?? null],
-                            TaxonomyReviewedProposal::DECISION_CREATE_NEW => ['new_concept_name' => $data['new_concept_name'] ?? null],
+                            TaxonomyReviewedProposal::DECISION_CREATE_NEW => $bilingual
+                                ? [
+                                    'canonical_name_es' => $data['canonical_name_es'] ?? null,
+                                    'canonical_name_en' => $data['canonical_name_en'] ?? null,
+                                ]
+                                : ['new_concept_name' => $data['new_concept_name'] ?? null],
                             TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED => ['context_reason' => $data['context_reason'] ?? null],
                             TaxonomyReviewedProposal::DECISION_REJECT => ['notes' => CandidateConceptApprovalService::composeReviewReason($data['reject_reason_category'], $data['notes'] ?? null)],
                             default => [],
@@ -205,6 +224,81 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                         };
                     }),
             ]);
+    }
+
+    /**
+     * TASK-0006B (Issue #2 comentario `5936206843`), sección D: candidatos con los que ESTE puede
+     * converger en un solo concepto - los demás `pending` que proponen concepto nuevo. Se muestra el
+     * idioma de cada término (el grupo tiene que abarcar ES y EN) y se marca con "↔" los que
+     * comparten `canonical_term` con este candidato, porque eso es la evidencia gobernada de que son
+     * el mismo concepto en otro idioma. La marca es SUGERENCIA, no filtro: la lista no se recorta a
+     * los coincidentes, así que el revisor nunca queda encerrado en lo que el dato ya sabía.
+     */
+    private static function convergenceCandidateOptions(TaxonomyCandidateConceptLink $record): array
+    {
+        $ownCanonical = $record->term?->canonical_term;
+
+        return TaxonomyCandidateConceptLink::query()
+            ->where('status', TaxonomyCandidateConceptLink::STATUS_PENDING)
+            ->whereNull('suggested_concept_id')
+            ->whereKeyNot($record->getKey())
+            ->with('term')
+            ->orderBy('id')
+            ->get()
+            ->mapWithKeys(function (TaxonomyCandidateConceptLink $other) use ($ownCanonical) {
+                $term = $other->term;
+                $sameConcept = $ownCanonical !== null && $term?->canonical_term === $ownCanonical;
+
+                return [$other->id => sprintf(
+                    '%s#%d  %s  [%s%s]  propone: %s',
+                    $sameConcept ? '↔ ' : '',
+                    $other->id,
+                    $term?->term ?? '—',
+                    $term?->language ?? '?',
+                    $term?->term_type ? ', '.$term->term_type : '',
+                    $other->suggested_new_concept_name ?: '—',
+                )];
+            })
+            ->all();
+    }
+
+    /**
+     * TASK-0006B, sección D: congela la revisión bilingüe AGRUPADA y traduce el resultado del
+     * servicio a una notificación. La autorización/validación/transacción reales viven en
+     * `ReviewedProposalService::freezeBilingualConceptGroup()` - acá solo se arma la lista de
+     * candidatos y se muestra el desenlace.
+     */
+    private static function freezeConvergedBilingualGroup(TaxonomyCandidateConceptLink $record, array $convergeIds, array $data): void
+    {
+        $outcome = app(ReviewedProposalService::class)->freezeBilingualConceptGroup(
+            array_merge([$record->id], $convergeIds),
+            (string) ($data['canonical_name_es'] ?? ''),
+            (string) ($data['canonical_name_en'] ?? ''),
+            Auth::user(),
+        );
+
+        match ($outcome['result']) {
+            ReviewedProposalService::RESULT_FROZEN => Notification::make()
+                ->title('Revisión bilingüe agrupada congelada')
+                ->body(sprintf(
+                    'Se congelaron %d decisiones unidas en un solo grupo. apply() creará UN concepto (ES/EN) y adjuntará todos los términos - nunca uno por candidato. Nada se publicó todavía.',
+                    count($outcome['proposals']),
+                ))
+                ->success()->send(),
+            ReviewedProposalService::RESULT_VALIDATION_FAILED => Notification::make()
+                ->title('Identidad bilingüe inválida')
+                ->body('Hacen falta los dos nombres (ES y EN) explícitos, el grupo tiene que abarcar español e inglés, y todos los candidatos tienen que proponer un concepto nuevo.')
+                ->danger()->send(),
+            ReviewedProposalService::RESULT_UNAUTHORIZED => Notification::make()
+                ->title('No tenés permiso para revisar alguno de los candidatos del grupo.')->danger()->send(),
+            ReviewedProposalService::RESULT_ALREADY_PROCESSED => Notification::make()
+                ->title('Alguno de los candidatos del grupo ya fue procesado - no se congeló nada (el grupo se revierte completo).')->warning()->send(),
+            ReviewedProposalService::RESULT_ALREADY_HAS_PENDING_PROPOSAL => Notification::make()
+                ->title('Alguno de los candidatos ya tiene una propuesta congelada pendiente - no se congeló nada (el grupo se revierte completo).')->warning()->send(),
+            ReviewedProposalService::RESULT_NOT_FOUND => Notification::make()
+                ->title('Alguno de los candidatos del grupo ya no existe.')->danger()->send(),
+            default => Notification::make()->title('No se pudo congelar la revisión agrupada.')->danger()->send(),
+        };
     }
 
     /**
@@ -511,11 +605,58 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                 ->getOptionLabelUsing(fn ($value) => ($c = TaxonomyCanonicalConcept::find($value)) ? $explorer->optionLabel($c) : null)
                 ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED)
                 ->live(),
+            // TASK-0006B (Issue #2 comentario `5936206843`), sección C: la identidad del concepto
+            // nuevo puede declararse MONOLINGÜE (como siempre) o BILINGÜE (ES + EN explícitas). La
+            // capacidad existe en `freeze()`, y tiene que ser ALCANZABLE desde esta UI - si el
+            // servicio la soportara y el formulario no la ofreciera, el revisor no podría usarla
+            // (es exactamente el defecto que el re-audit `5930560603` bloqueó en TASK-0006A).
+            Forms\Components\Radio::make('new_concept_identity_mode')
+                ->label('Identidad del concepto nuevo')
+                ->options([
+                    'monolingual' => 'Un solo nombre (idioma del término)',
+                    'bilingual' => 'Bilingüe: nombre ES y nombre EN explícitos',
+                ])
+                ->default('monolingual')
+                ->helperText('Usá "bilingüe" cuando el mismo concepto tenga nombre propio en español y en inglés. Nunca se traduce automáticamente: las dos se escriben a mano.')
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW)
+                ->live(),
             Forms\Components\TextInput::make('new_concept_name')
                 ->label('Nombre del concepto nuevo (elegido explícitamente por el revisor)')
                 ->helperText('Nunca se completa solo con la sugerencia del Builder de arriba - escribilo o copialo a propósito.')
-                ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW)
-                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW),
+                ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW
+                    && $get('new_concept_identity_mode') !== 'bilingual')
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW
+                    && $get('new_concept_identity_mode') !== 'bilingual'),
+            Forms\Components\TextInput::make('canonical_name_es')
+                ->label('Nombre canónico ES')
+                ->helperText('El nombre español del concepto. No se deriva del inglés ni del nombre sugerido.')
+                ->maxLength(255)
+                ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW
+                    && $get('new_concept_identity_mode') === 'bilingual')
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW
+                    && $get('new_concept_identity_mode') === 'bilingual'),
+            Forms\Components\TextInput::make('canonical_name_en')
+                ->label('Nombre canónico EN')
+                ->helperText('El nombre inglés del concepto. No se deriva del español ni del nombre sugerido.')
+                ->maxLength(255)
+                ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW
+                    && $get('new_concept_identity_mode') === 'bilingual')
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW
+                    && $get('new_concept_identity_mode') === 'bilingual'),
+            // TASK-0006B, sección D: convergencia gobernada - varios candidatos bilingües que
+            // resuelven a UN SOLO concepto. Sin esto, cada término del par recibiría su propio
+            // CREATE_NEW y `apply()` crearía DOS conceptos duplicados. La lista ofrece los demás
+            // candidatos `pending` que proponen concepto nuevo, con su idioma visible, y marca con
+            // una señal los que comparten `canonical_term` con este (evidencia de que son el mismo
+            // concepto en otro idioma) - la señal es sugerencia, no filtro: el revisor decide.
+            Forms\Components\Select::make('converge_candidate_ids')
+                ->label('Converger con otros candidatos en este MISMO concepto (opcional)')
+                ->helperText('Elegí el/los candidatos del otro idioma que designan el mismo concepto. Se congela UNA revisión agrupada: apply() creará un solo concepto y adjuntará todos los términos, nunca uno por candidato. El grupo tiene que abarcar español e inglés.')
+                ->multiple()
+                ->options(fn () => self::convergenceCandidateOptions($record))
+                ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CREATE_NEW
+                    && $get('new_concept_identity_mode') === 'bilingual')
+                ->live(),
             Forms\Components\Textarea::make('context_reason')
                 ->label('Motivo (por qué necesita contexto, sin mapeo directo)')
                 ->rows(2)
