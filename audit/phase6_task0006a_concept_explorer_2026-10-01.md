@@ -305,7 +305,89 @@ revisiones humanas protegidas. Cero residuo de fixtures.
 
 ## 8. Sección G — despliegue y validación en staging
 
-Completado tras el push del commit de código. Ver sección "Despliegue" más abajo.
+| Dato | Valor |
+|---|---|
+| Commit de código | `df32a069c49d7ec4680070db107220dbc1fd536f` |
+| Base | `a4d8b2f0b514eafdd7ff56f6d59b832802f14867` |
+| Run de GitHub Actions | `conclusion: success`, 2026-10-01T11:22:07Z → 11:22:48Z |
+| HEAD verificado en el servidor | `git rev-parse HEAD` = `df32a069c49d7ec4680070db107220dbc1fd536f` (coincidencia exacta) |
+| Contenedores | `app running`, `nginx running` |
+
+Desplegado por el mecanismo endurecido de siempre: el push incluye `app/**` y `tests/**`, que no
+matchean ningún patrón de `paths-ignore`.
+
+### Smoke HTTP
+
+| URL | Resultado |
+|---|---|
+| `/` | **200** |
+| `/admin/login` | **200** |
+| `/admin/taxonomy-candidate-concept-links` | **302** → login (esperado sin sesión) |
+| `/admin/taxonomy-reviewed-proposals` | **302** → login |
+
+Cero 500, cero 503, verificado antes y después de la validación.
+
+### Páginas de revisión autenticadas (solo GET, como el revisor real)
+
+Ejecutado dentro del contenedor desplegado vía el HTTP kernel real, actuando como el usuario revisor
+real (id 3). **Ninguna acción se invocó.**
+
+| Página | Resultado |
+|---|---|
+| `/admin/taxonomy-candidate-concept-links` (listado) | **HTTP 200** |
+| `/admin/taxonomy-candidate-concept-links/266` (detalle) | **HTTP 200** |
+
+### Descubrimiento de conceptos verificado en modo lectura sobre el código desplegado
+
+| Comprobación | Resultado |
+|---|---|
+| Catálogo activo | **79** conceptos |
+| Candidato real 266 (sin revisar) | `status=pending`, `reviewed_at=NULL` — intacto |
+| Tamaño del set de sugerencias del Builder para el candidato 266 | **0** |
+| Conceptos descubribles FUERA de ese set | **79** |
+| Un concepto de ejemplo fuera del set | `abandon [#37]` |
+| Ese mismo concepto encontrado por búsqueda real (no solo listando) | **sí** (needle `abando`) |
+| `search('pipe')` sobre datos reales | **3** coincidencias activas |
+
+**Este es el hallazgo que mejor justifica la tarea:** el set de sugerencias del Builder para el
+candidato 266 está **vacío**. Con el selector anterior, el revisor abría el formulario con **cero
+opciones** en el desplegable y solo podía buscar a ciegas con una truncación silenciosa a 20. Ahora
+los 79 conceptos activos son descubribles, y se demostró en el runtime desplegado que un concepto
+fuera del subconjunto original se encuentra por búsqueda.
+
+### Diagnóstico CPV renderizado sin error
+
+| Comprobación | Resultado |
+|---|---|
+| Concepto de prueba (con relaciones CPV aprobadas) | #10 |
+| Términos con identidad aprobada | 22 |
+| Categorías CPV alcanzables | 1 (overflow 0) |
+| HTML renderizado | 2 116 bytes, contiene un código `CPV-` |
+
+Sin 500 ni 503 en ningún momento.
+
+### Estado protegido después del despliegue
+
+| Comprobación | Valor |
+|---|---|
+| `taxonomy_candidate_concept_links` | 10 |
+| `taxonomy_concept_relations` | 2 |
+| `taxonomy_term_concepts` | 142 |
+| `taxonomy_canonical_concepts` | 79 |
+| `taxonomy_term_cpv_relations` | 9749 |
+| `taxonomy_reviewed_proposals` | 3 |
+| IDs de las propuestas | **420, 421, 422** — exactamente las mismas |
+| Propuestas aplicadas | **0** |
+| Estados de candidatos | `pending:10` |
+| Estados de relaciones | `candidate:2` |
+| Candidatos con `reviewed_at` no nulo | **0** |
+
+**Las 3 revisiones humanas congeladas quedaron exactamente como estaban:** mismos ids, ninguna
+aplicada, ninguna alterada, ninguna re-congelada. **No se tomó ninguna decisión nueva** sobre la cola
+real: los 7 candidatos restantes y las 2 relaciones siguen sin procesar.
+
+No se re-corrió la suite completa contra los bind mounts compartidos, no se creó ningún contenedor
+efímero y no se modificó la topología de compose.
 
 ---
 

@@ -685,6 +685,21 @@
         "gate_published_taxonomy_invariants": "142 / 79 / 9749 unchanged.",
         "task_0005_adjacent_risk": "Deliberately NOT broadened into this task, per section I. It remains recorded in blocking_requirement_for_future_task; this UI work does not depend on it."
       },
+      "review_head_sha": "df32a069c49d7ec4680070db107220dbc1fd536f",
+      "handoff_commit_sha": "SEE_HEAD_OF_PUSH - a commit cannot contain its own hash; this file's commit is the HEAD reported in the final READY_FOR_REVIEW response for TASK-0006A",
+      "staging_deployment": {
+        "mechanism": "The hardened deploy-contabo.yml workflow; the push includes app/** and tests/**, which match no paths-ignore pattern.",
+        "workflow_run": "conclusion: success, 2026-10-01T11:22:07Z to 11:22:48Z",
+        "deployed_head_verified": "git rev-parse HEAD on the server = df32a069c49d7ec4680070db107220dbc1fd536f (exact match); app and nginx both running.",
+        "http_smoke": "GET / -> 200, GET /admin/login -> 200; the review routes -> 302 to login without a session. Zero 500, zero 503, checked before and after validation.",
+        "authenticated_review_pages": "Executed inside the deployed container through Laravel's real HTTP kernel as the real reviewer (user id 3), GET only, no action invoked: /admin/taxonomy-candidate-concept-links -> HTTP 200 and /admin/taxonomy-candidate-concept-links/266 (detail) -> HTTP 200.",
+        "concept_discovery_verified_read_only": "Active catalogue = 79. Real unreviewed candidate 266 remains status=pending / reviewed_at=NULL. Its Builder suggestion set size is 0, so 79 concepts are discoverable OUTSIDE that set; a sample one (abandon [#37]) was confirmed findable by real search (needle 'abando'), not merely by listing everything. search('pipe') returns 3 active matches on real data.",
+        "most_telling_finding": "Candidate 266's Builder suggestion set is EMPTY. Under the previous selector the reviewer opened the form with ZERO options in the dropdown and could only search blind against a silent 20-row truncation. That is the concrete shape of the limitation the reviewer hit on `pipeline`, and it is now resolved: all 79 active concepts are discoverable and a concept outside the original subset was demonstrated discoverable on the deployed runtime.",
+        "diagnostic_render_verified": "Concept #10 (22 member terms, 1 reachable approved CPV category, overflow 0) rendered to 2116 bytes of HTML containing a CPV- code. No 500/503 at any point.",
+        "protected_state_after_deployment": "taxonomy_candidate_concept_links=10, taxonomy_concept_relations=2, taxonomy_term_concepts=142, taxonomy_canonical_concepts=79, taxonomy_term_cpv_relations=9749, taxonomy_reviewed_proposals=3 with ids exactly 420,421,422 and zero applied. Candidate statuses pending:10, relation statuses candidate:2, candidates with a non-null reviewed_at = 0.",
+        "frozen_reviews_untouched": "The 3 frozen human reviews are exactly as they were: same ids, none applied, none altered, none re-frozen. No new decision was made on the real queue - the 7 remaining candidates and both relations are still unprocessed.",
+        "unsafe_procedure_avoided": "No full-suite run against the live container's shared bind mounts, no ephemeral container, no compose topology change."
+      },
       "secrets_handling": "No secret was read, printed or recorded. The decision_payload CONTENTS of the three frozen proposals are deliberately not transcribed into any document - only the present keys and fingerprint prefixes (which are hashes).",
       "stop_conditions": "None reached. No change to TERM->CONCEPT cardinality, no search/ranking semantic change, no apply/publication of any reviewed proposal, no modification or deletion of the 3 frozen human reviews, no additional real queue decisions processed, no destructive migration, no production deployment, no main merge, no token/credential rotation."
     }
