@@ -185,9 +185,87 @@ completo verificado antes de implementar.
 >
 > After orchestrator approval, TASK-0006 resumes and the human can continue reviewing the remaining candidates using the improved UI. TASK-0007 APPLY remains unopened and unauthorized.
 
+## Re-audit — comentario `5930560603` (CORRECTIONS_REQUIRED)
+
+**Fuente:** Issue #2, comentario [`5930560603`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5930560603),
+autor `estebanjvasquez`, 2026-10-01T11:40:42Z. HEAD revisado: `b0d2d20d054e4319e314ee2049e38c87b0244014`.
+
+### Texto verbatim
+
+> [ORCHESTRATOR RE-AUDIT — TASK-0006A — CORRECTIONS_REQUIRED]
+>
+> Reviewed HEAD `b0d2d20d054e4319e314ee2049e38c87b0244014` against TASK-0006A contract in comment `5929287629` and the accepted TASK-0005/TASK-0006 state.
+>
+> ACCEPTED
+> - Scope discipline is correct: no APPLY/publication, no search/ranking/cardinality change, no migration, no production/main/token work.
+> - The 3 real frozen human reviews are preserved as protected C2 records; published taxonomy remains 142 / 79 / 9749 and live queue remains 10 candidates / 2 relations / 3 reviewed proposals.
+> - `ConceptExplorerService` is read-only and searches active canonical concepts by ES/EN canonical name, member term and alias; merged concepts are excluded.
+> - Builder suggestions remain evidence rather than an implicit target.
+> - Concept diagnostics use governed data and expose canonical identity, member terms/aliases, approved CPV reachability, hierarchy/breadcrumbs, predicted company impact and data-gap warnings.
+> - MAP_TO_EXISTING remains exactly one explicit canonical concept; CONTEXT_REQUIRED remains zero mappings and the inspection concept is not frozen into its payload.
+> - Architecture analysis correctly finds that the physical pivot permits N TERM→CONCEPT rows but the current search consumer has no per-mapping contextual disambiguation, so multi-concept UI/search semantics were correctly NOT introduced.
+> - Focused tests/deployment evidence is otherwise acceptable; known local ext-intl failure remains inherited and staging runtime is healthy.
+> - 32-query regression remains inherited because no published/search semantics changed.
+>
+> BLOCKER — A.3 / B NOT FULLY SATISFIED IN THE ACTUAL FILAMENT UI
+> The service now returns `total/shown/truncated`, but both real Filament controls call only:
+> `$explorer->searchOptions($search)`
+> for `target_concept_id` and `inspect_concept_id`.
+>
+> `searchOptions()` discards `total` and `truncated`. Therefore the reviewer receives at most 50 options with NO UI indication that more matches exist and no pagination/load-more mechanism. The audit statement that "the UI can tell the reviewer how many matches exist and ask to refine" is not implemented in the actual control.
+>
+> This matters because TASK-0006A explicitly required:
+> - no arbitrary truncation that can hide valid concepts;
+> - safe pagination/expanded search or equivalent complete discovery;
+> - if many results exist, no silent truncation.
+>
+> The new tests verify the SERVICE reports overflow, but they do not prove the FILAMENT UI surfaces that overflow. Thus they currently test a capability the reviewer cannot see.
+>
+> The same issue exists in the CPV diagnostic panel: showing first 12 + "N more" is no longer silent, which is an improvement, but the task required a searchable/collapsible/paginated diagnostic representation when there are many CPV categories. A reviewer still cannot inspect the omitted categories. For a review tool whose purpose is to decide whether a broad term such as `pipeline` is safe to map, knowing that hidden categories exist is insufficient; the reviewer needs a way to inspect them.
+>
+> REQUIRED CORRECTIONS
+> 1. CONCEPT DISCOVERY
+> - Make overflow/total visible in the actual Filament review UI, not only in the service return value.
+> - Provide a way to reach/inspect every matching active concept when matches exceed one response page. Preferred: explicit paginated/load-more concept explorer. An equivalent implementation is acceptable if it guarantees complete discoverability.
+> - Do not simply increase the cap to 79/current catalogue size; the design must remain valid as the catalogue grows.
+> - Preserve ES/EN/member-term/alias search and active-only filtering.
+> - Add UI-level tests proving >cap matches are not only reported by the service but are discoverable/inspectable by the reviewer.
+>
+> 2. CPV DIAGNOSTICS
+> - For a concept with > preview limit CPV categories, provide an actual way to inspect the remainder (pagination, expandable full list, searchable modal/table, etc.).
+> - Total + "N hidden" alone is not sufficient for this governance decision.
+> - Add a UI-level test proving a category beyond the initial preview can be inspected.
+>
+> 3. DO NOT CHANGE SEMANTICS
+> - Keep MAP_TO_EXISTING single-concept.
+> - Keep CONTEXT_REQUIRED as zero mappings.
+> - No direct TERM→CPV multi-select.
+> - No search/ranking/cardinality changes.
+> - No APPLY/publication.
+> - Preserve the 3 frozen proposals unchanged.
+>
+> 4. VALIDATION / STAGING
+> - Run focused disposable-fixture tests.
+> - Deploy runtime UI correction to staging through the hardened workflow.
+> - Verify exact deployed HEAD and smoke candidate review UI.
+> - Demonstrate, read-only, discovery of a concept beyond the first result page/cap and inspection of a CPV category beyond the initial diagnostic preview.
+> - Recheck live state: 10 candidate links, 2 candidate relations, 142 term concepts, 79 canonical concepts, 9749 TERM→CPV, 3 reviewed proposals; no new real review decisions.
+> - 32-query regression remains inherited if this stays admin/read-only only.
+>
+> AUDIT CONTINUITY
+> Inherited approved gates remain approved and are not reset. This correction does not reopen TASK-0004/TASK-0005. TASK-0006 remains paused for unresolved candidates until TASK-0006A passes. TASK-0007 APPLY remains unopened and unauthorized.
+>
+> STOP / COMPLETION
+> Do not process the 7 remaining real candidates or 2 relations while implementing this correction.
+>
+> Return only:
+> READY_FOR_REVIEW
+> Issue #2
+> HEAD <exact-sha>
+
 ## Estado
 
 Ver `docs/orquestador/current_task.md` para el estado vigente y
 `audit/phase6_task0006a_concept_explorer_2026-10-01.md` para el detalle completo: estado verificado
 de la cola real, hallazgo de arquitectura de la sección D, archivos cambiados, tests, despliegue y
-evidencia de staging.
+evidencia de staging (sección 9 para las correcciones de este re-audit).

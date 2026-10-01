@@ -9,7 +9,28 @@ el término `pipeline`: el selector de MAP_TO_EXISTING solo ofrecía los duplica
 Builder y truncaba la búsqueda a 20 sin avisar, lo que podía crear falsa confianza de que las pocas
 opciones visibles eran las únicas válidas.
 
-**Estado:** READY_FOR_REVIEW. Detalle completo en
+**Estado:** READY_FOR_REVIEW (ronda 2). El re-audit del comentario `5930560603` bloqueó por una razón
+correcta: el servicio informaba `total`/`truncated` pero **los controles reales de Filament llamaban
+solo a `searchOptions()`**, que los descartaba — el revisor veía como máximo N opciones sin señal de
+que hubiera más y sin forma de alcanzarlas, y lo mismo con las categorías CPV omitidas. Corregido:
+
+- **Explorador paginado real:** campo de búsqueda + acciones Página anterior/siguiente + línea de
+  estado **renderizada** ("Mostrando X-Y de N coincidencias, página P de T"). Se quitó
+  `->searchable()` del `Select` para no dejar un camino paralelo con tope silencioso; el `Select`
+  lista la página actual, así que toda coincidencia es alcanzable. El tamaño de página es 25 y
+  estable: **no** se subió al tamaño del catálogo, para que siga siendo correcto cuando crezca.
+- **Categorías CPV inspeccionables:** filtro por código/nombre + paginación propia. Se informan a la
+  vez el total alcanzable real y el que coincide con el filtro, así que filtrar no puede hacer
+  parecer que hay menos.
+- **4 tests de nivel UI** sobre el formulario real (`mountTableAction`/`setTableActionData`/
+  `callMountedTableAction`) que prueban lo que faltaba: que el total y la página se **renderizan**,
+  que un concepto solo presente en la página 2 se elige y se congela, y que una categoría fuera del
+  preview inicial se inspecciona paginando o filtrando. Suite: **23/23**.
+
+Semántica sin cambios: MAP_TO_EXISTING sigue siendo un concepto, CONTEXT_REQUIRED sigue en cero
+mapeos, sin multi-select TÉRMINO→CPV, sin cambios de búsqueda/ranking/cardinalidad, sin APPLY.
+
+Detalle completo en
 [`audit/phase6_task0006a_concept_explorer_2026-10-01.md`](../../audit/phase6_task0006a_concept_explorer_2026-10-01.md);
 texto verbatim en [`tasks/0006a-concept-explorer.md`](tasks/0006a-concept-explorer.md).
 
@@ -39,23 +60,39 @@ Lo entregado:
 **Lo que esta tarea NO hizo, por instrucción explícita:** no modificó las 3 revisiones ya congeladas,
 no procesó los 7 candidatos restantes ni las 2 relaciones, y no ejecutó ningún APPLY.
 
-## Estado de la cola real (verificado, sección E)
+## Estado de la cola real (estado vivo)
 
 Las 10 filas fuente originales siguen existiendo (`263`–`272`), igual que las 2 relaciones candidatas
-(`61`, `62`). **Exactamente 3 candidatos tienen una revisión humana congelada**, ninguna aplicada:
+(`61`, `62`). **Cuatro candidatos tienen una revisión humana congelada**, ninguna aplicada:
 
 | Propuesta | Candidato | Decisión | Estado | `applied_at` |
 |---|---|---|---|---|
 | #420 | 263 | `CONTEXT_REQUIRED` | `PENDING_APPLY` | NULL |
 | #421 | 264 | `CONTEXT_REQUIRED` | `PENDING_APPLY` | NULL |
 | #422 | 265 | `CONTEXT_REQUIRED` | `PENDING_APPLY` | NULL |
+| #491 | 272 (`pipeline`) | `MAP_TO_EXISTING` → #2890 `oleoducto / oil pipeline` | `PENDING_APPLY` | NULL |
 
 Son **registros de revisión protegidos**: ningún paso de código, test o despliegue puede mutarlos,
-borrarlos ni re-congelarlos. Cola restante sin revisar: candidatos `266`–`272` (7) y las 2 relaciones.
+borrarlos ni re-congelarlos. Cola restante sin revisar: candidatos `266`–`271` (6) y las 2 relaciones.
 
-**Invariantes del estado vivo:** `taxonomy_term_concepts=142`, `taxonomy_canonical_concepts=79`,
-`taxonomy_term_cpv_relations=9749`, candidatos `10`, relaciones `2`, propuestas revisadas **`3`**
-(ya no 0 — las 3 decisiones que el humano congeló legítimamente durante TASK-0006).
+**La #491 la congeló el humano con la UI mejorada mientras se implementaba esta corrección**, y es la
+validación real del objetivo de TASK-0006A: `pipeline` era justamente el término polisémico que
+originó la tarea. El revisor creó dos conceptos específicos (`oleoducto / oil pipeline` #2890 y
+`gasoducto / gas pipeline` #2891, vía el CRUD administrativo de conceptos, fuera de C2) y mapeó el
+término a uno de ellos, en lugar de forzarlo contra una opción inadecuada. Esta sesión no tocó nada
+de eso. Detalle en la sección 10 del audit.
+
+**Invariantes del estado vivo:**
+
+| Tabla | Valor | Nota |
+|---|---|---|
+| `taxonomy_candidate_concept_links` | 10 | sin cambios |
+| `taxonomy_concept_relations` | 2 | sin cambios |
+| `taxonomy_term_concepts` | 142 | sin cambios — **nada publicado** |
+| `taxonomy_canonical_concepts` | **81** | era 79; +2 conceptos creados por el humano, ninguno publicado en `taxonomy_term_concepts` (0 filas cada uno) |
+| `taxonomy_term_cpv_relations` | 9749 | sin cambios |
+| `taxonomy_reviewed_proposals` | **4** | era 3; +1 decisión congelada por el humano |
+| Propuestas aplicadas | **0** | ningún APPLY ocurrió nunca |
 
 **Siguen NO autorizados:** APPLY/publicación, producción, merge a `main`. TASK-0007 (APPLY) sigue sin
 abrir. Tras la aprobación de TASK-0006A, TASK-0006 se reanuda y el humano continúa revisando los

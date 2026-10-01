@@ -301,6 +301,21 @@ aserción.
 **Invariantes después de los tests:** `10 / 2 / 142 / 79 / 9749 / 3` — idénticos, incluidas las 3
 revisiones humanas protegidas. Cero residuo de fixtures.
 
+### Re-corrida tras el re-audit `5930560603`
+
+```
+php artisan test --filter="TaxonomyConceptExplorerTest"
+→ 23 passed (135 assertions)
+```
+
+De 16 a 23 tests: los 4 nuevos de nivel UI (ver sección 9) más los de paginación reemplazando a los
+que probaban el tope silencioso. **Cero fallos.**
+
+Verificado explícitamente que las fixtures no dejan residuo: cero conceptos/términos/alias con
+prefijo `zzz_`, cero relaciones CPV con `source='task0006a_test_fixture'`, y `taxonomy_term_concepts`
+/ `taxonomy_term_cpv_relations` en 142 / 9749. Ver sección 10 para el estado vivo, que cambió por
+trabajo concurrente del humano y no por los tests.
+
 ---
 
 ## 8. Sección G — despliegue y validación en staging
@@ -391,7 +406,145 @@ efímero y no se modificó la topología de compose.
 
 ---
 
-## 9. Sección H — gates heredados
+## 9. Re-audit — comentario `5930560603` (bloqueo A.3/B, corregido)
+
+El orquestador revisó HEAD `b0d2d20` y aceptó la disciplina de alcance, el servicio de solo lectura,
+el análisis de arquitectura de la sección D, la semántica C2 y la evidencia de despliegue — pero
+bloqueó por una razón correcta y concreta.
+
+### El bloqueo
+
+`ConceptExplorerService` devolvía `total`/`truncated`, pero **los dos controles reales de Filament
+llamaban solo a `searchOptions($search)`**, que descartaba ambos. Consecuencia: el revisor recibía
+como máximo N opciones **sin ninguna señal en la UI de que existieran más**, y sin mecanismo para
+alcanzarlas. La afirmación del audit de que "la UI puede decirle al revisor cuántas coincidencias
+existen" **no estaba implementada en el control**. Los tests verificaban que el SERVICIO informaba el
+overflow, o sea probaban una capacidad que el revisor no podía ver.
+
+Lo mismo en el panel CPV: "primeras 12 + N más" ya no era silencioso, pero el revisor **seguía sin
+poder inspeccionar las categorías omitidas** — insuficiente para una decisión de gobernanza sobre si
+un término amplio como `pipeline` es seguro de mapear.
+
+### Corrección 1 — explorador paginado de verdad
+
+| Antes | Ahora |
+|---|---|
+| `->searchable()` + `getSearchResultsUsing()` con tope, que descartaba `total`/`truncated` | Control explícito: campo de búsqueda + paginación + línea de estado **renderizada** |
+| Sin señal de overflow en la UI | `concept_explorer_status` muestra "Mostrando X-Y de N coincidencias (página P de T)" y, si hay más, avisa que se pagine |
+| Coincidencias más allá del tope inalcanzables | Acciones **Página anterior/siguiente**; el `Select` lista la página actual, así que **toda** coincidencia es alcanzable |
+| — | `searchActiveConcepts()` es paginado de punta a punta: `total`, `per_page`, `page`, `last_page`, `has_more`, `has_previous`, rango |
+
+Decisiones de diseño:
+
+- **No se subió el tope al tamaño del catálogo (79).** El re-audit lo prohíbe explícitamente y con
+  razón: el diseño tiene que seguir siendo correcto cuando el catálogo crezca. La página es de 25 y
+  estable.
+- **Se eliminó `->searchable()` del `Select`.** Dejarlo habría mantenido un camino paralelo con tope
+  silencioso — exactamente el defecto señalado. El descubrimiento ahora tiene un solo camino, y es
+  completo.
+- Las recomendaciones del Builder se **suman** a la página actual, así que siguen disponibles como
+  evidencia sin competir con el catálogo.
+- Se preservan la búsqueda ES/EN/término miembro/alias y el filtro `status=active`.
+- Un `page` fuera de rango se **acota** a la última página real en vez de devolver vacío.
+
+**Verificado en vivo:** las 4 páginas del catálogo activo devuelven exactamente los **79** conceptos
+distintos; pedir la página 999 acota a la 4.
+
+### Corrección 2 — categorías CPV inspeccionables
+
+| Antes | Ahora |
+|---|---|
+| Primeras 12 + "quedan N sin listar" | Página de 12 **más filtro de texto y paginación** |
+| Las omitidas no se podían ver | Acciones **CPV: página anterior/siguiente** y filtro por código o nombre traducido |
+| — | `category_total` (alcanzables reales) y `category_matching` (coinciden con el filtro) se informan **ambos**, así que un filtro no puede hacer parecer que hay menos categorías de las que hay |
+
+La línea de estado de categorías se renderiza dentro del panel, igual que la del explorador.
+
+### Tests de nivel UI (lo que faltaba)
+
+El re-audit señaló que los tests probaban el servicio, no la UI. Se agregaron cuatro que ejercitan el
+formulario real de Filament vía `mountTableAction`/`setTableActionData`/`callMountedTableAction`:
+
+| Test | Qué prueba |
+|---|---|
+| `the_review_ui_surfaces_the_match_total_and_page_position_to_the_reviewer` | Con 30 coincidencias, el formulario **renderiza** "de 30 coincidencias" y "página 1 de 2" |
+| `the_reviewer_can_page_to_a_concept_beyond_the_first_page_and_freeze_it` | Un concepto que **solo** existe en la página 2 se elige y se congela correctamente desde la UI |
+| `the_review_ui_lets_the_reviewer_inspect_a_cpv_category_beyond_the_first_page` | Una categoría ausente del preview inicial **no se ve** en página 1 y **sí se ve** en página 2 |
+| `the_review_ui_lets_the_reviewer_filter_cpv_categories_to_reach_a_hidden_one` | Filtrando por código se alcanza una categoría oculta, y el total real (18) se sigue declarando |
+
+Más los tests de servicio actualizados a la API paginada: alcanzabilidad de las 30 coincidencias
+paginando, línea de estado con total y posición, acotado de página fuera de rango, alcanzabilidad de
+las 18 categorías paginando, y filtro que no oculta el total real.
+
+### Semántica sin cambios (punto 3 del re-audit)
+
+MAP_TO_EXISTING sigue siendo **un** concepto explícito; CONTEXT_REQUIRED sigue congelando **cero**
+mapeos y el concepto inspeccionado sigue sin entrar a su payload; **no** se agregó multi-select
+TÉRMINO→CPV; cero cambios de búsqueda/ranking/cardinalidad; ningún APPLY/publicación; y las 3
+propuestas congeladas quedaron intactas.
+
+---
+
+## 10. Avance concurrente de TASK-0006 durante esta corrección (estado vivo actualizado)
+
+Mientras se implementaba esta corrección, **el revisor humano siguió trabajando TASK-0006 con la UI
+mejorada** y resolvió precisamente el término que originó TASK-0006A. Esta sesión **no tocó nada de
+esto**; se registra porque mueve dos de los números que el re-audit pide re-chequear.
+
+**Qué hizo el humano (procedencia verificada):**
+
+| Momento | Acción |
+|---|---|
+| 2026-10-01 13:07:11 | Creó el concepto canónico #2890 `oleoducto / oil pipeline` |
+| 2026-10-01 13:07:30 | Creó el concepto canónico #2891 `gasoducto / gas pipeline` |
+| 2026-10-01 13:08:21 | Congeló `MAP_TO_EXISTING` sobre el candidato real **272** (término **`pipeline`**) apuntando al concepto **#2890** |
+
+El audit log #1192 lo confirma: `user_id=3`, `actor_type=user`, razón "Decisión de revisión
+congelada: MAP_TO_EXISTING (candidate_link_id=272)". Los dos conceptos nuevos se crearon por el CRUD
+administrativo de conceptos canónicos, que es independiente del flujo C2.
+
+**Validación real del objetivo de la tarea.** El término `pipeline` es exactamente el caso que motivó
+TASK-0006A: polisémico, y con un set de sugerencias del Builder que no alcanzaba. Con el explorador
+nuevo el revisor pudo determinar que necesitaba conceptos específicos, crearlos, y mapear el término
+a `oleoducto / oil pipeline` en lugar de forzarlo contra una opción inadecuada o abanicarlo a
+categorías CPV superficialmente parecidas. Es la mejor evidencia de que la corrección sirve para lo
+que se pidió.
+
+**Nada se publicó ni se aplicó:**
+
+- `applied_at`, `authorization_reference` y `target_environment` siguen en NULL en las 4 propuestas;
+  **0 aplicadas**.
+- Los conceptos #2890 y #2891 tienen **0 filas** en `taxonomy_term_concepts`: no se publicó ninguna
+  identidad término→concepto.
+- El candidato 272 sigue en `status=pending` con `reviewed_at=NULL`, como manda el contrato C2.
+- `taxonomy_term_concepts` = 142 y `taxonomy_term_cpv_relations` = 9749 **sin cambios**.
+
+**Estado vivo (el que corresponde re-chequear, no el baseline):**
+
+| Tabla | Baseline del re-audit | Estado vivo | Causa de la diferencia |
+|---|---|---|---|
+| `taxonomy_candidate_concept_links` | 10 | **10** | — |
+| `taxonomy_concept_relations` | 2 | **2** | — |
+| `taxonomy_term_concepts` | 142 | **142** | — |
+| `taxonomy_canonical_concepts` | 79 | **81** | 2 conceptos nuevos creados por el humano (CRUD administrativo, fuera de C2). Ninguno publicado en `taxonomy_term_concepts` |
+| `taxonomy_term_cpv_relations` | 9749 | **9749** | — |
+| `taxonomy_reviewed_proposals` | 3 | **4** | 1 decisión nueva congelada por el humano sobre el candidato 272 |
+
+Candidatos con revisión congelada: **263, 264, 265, 272**. Sin revisar: **266, 267, 268, 269, 270,
+271** (6). Relaciones candidatas: 2, ninguna revisada.
+
+**Esta sesión no tomó ninguna decisión de revisión real**, no aplicó nada y no modificó ninguna de
+las 4 propuestas congeladas. Las fixtures de los tests revirtieron correctamente: cero conceptos,
+términos, alias o relaciones CPV con prefijo de fixture quedaron en la base (verificado
+explícitamente), y los dos totales de taxonomía publicada están intactos.
+
+Se señala para el orquestador que `taxonomy_canonical_concepts` pasó de 79 a 81, o sea uno de los
+números que el re-audit listó como invariante de taxonomía publicada cambió — por trabajo legítimo
+del humano, no por esta corrección, y sin que se publicara ninguna identidad término→concepto.
+
+---
+
+## 11. Sección H — gates heredados
 
 | Gate | Invalidado | Análisis |
 |---|---|---|
@@ -405,7 +558,7 @@ efímero y no se modificó la topología de compose.
 
 ---
 
-## 10. Manejo de secretos
+## 12. Manejo de secretos
 
 Ningún secreto fue leído, impreso ni registrado. El contenido de los `decision_payload` de las 3
 propuestas congeladas **no** se transcribe en este documento (son datos de revisión del humano); solo
@@ -413,7 +566,7 @@ se registran las claves presentes y los prefijos de los fingerprints, que son ha
 
 ---
 
-## 11. Condiciones STOP — ninguna alcanzada
+## 13. Condiciones STOP — ninguna alcanzada
 
 Nada de lo siguiente ocurrió ni fue necesario: cambiar la cardinalidad TÉRMINO→CONCEPTO, cambiar
 semántica de búsqueda/ranking, aplicar/publicar alguna propuesta revisada, modificar/borrar las 3

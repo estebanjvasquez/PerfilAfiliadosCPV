@@ -242,17 +242,35 @@ class TaxonomyCandidateConceptLinkResource extends Resource
     }
 
     /**
+     * Concepto que el panel de diagnóstico debe describir, según la decisión elegida: el destino de
+     * MAP_TO_EXISTING, o el que se esté inspeccionando como evidencia en CONTEXT_REQUIRED.
+     */
+    private static function conceptUnderInspection(Get $get): ?TaxonomyCanonicalConcept
+    {
+        $conceptId = $get('decision') === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED
+            ? $get('inspect_concept_id')
+            : $get('target_concept_id');
+
+        return $conceptId ? TaxonomyCanonicalConcept::find($conceptId) : null;
+    }
+
+    /**
      * TASK-0006A (Issue #2 comentario `5929287629`), sección B: render de solo lectura del
      * diagnóstico que arma `ConceptExplorerService::diagnostics()`.
      *
      * Las categorías CPV se muestran con su código, nivel (Grupo/Familia/Categoría) y breadcrumb
-     * completo, y cuando hay más de las que se listan se informa el TOTAL real y cuántas quedaron sin
-     * listar - nunca se truncan en silencio (sección B del comentario).
+     * completo.
+     *
+     * TASK-0006A re-audit (`5930560603`), corrección 2: la lista de categorías es una PÁGINA, y el
+     * render incluye la línea de estado con el total real y la posición - combinada con el filtro y
+     * los botones de paginación del formulario, el revisor puede inspeccionar TODAS, no solo saber
+     * que existen.
      *
      * @param  array<string, mixed>  $d
      */
-    public static function formatConceptDiagnostics(array $d): HtmlString
+    public static function formatConceptDiagnostics(array $d, ?ConceptExplorerService $explorer = null): HtmlString
     {
+        $explorer ??= app(ConceptExplorerService::class);
         $levelLabel = fn (?int $level) => match ($level) {
             TaxonomyCategory::LEVEL_GROUP => 'Grupo',
             TaxonomyCategory::LEVEL_FAMILY => 'Familia',
@@ -291,19 +309,14 @@ class TaxonomyCandidateConceptLinkResource extends Resource
         }
 
         $html .= '<div><strong>Categorías CPV alcanzables por la taxonomía aprobada: '.(int) $d['category_total'].'</strong>';
-        if ($d['category_total'] === 0) {
-            $html .= '<br><span class="text-gray-500">Ninguna - ningún término miembro tiene relaciones CPV aprobadas.</span>';
-        } else {
+        $html .= '<br><span class="text-gray-500">'.e($explorer->categoryStatusLine($d)).'</span>';
+        if ($d['categories']->isNotEmpty()) {
             $html .= '<ul class="list-disc ml-5">';
             foreach ($d['categories'] as $cat) {
                 $html .= '<li><code>'.e($cat->code).'</code> · '.$levelLabel($cat->level).' · '.e($cat->displayName())
                     .'<br><span class="text-gray-500">'.e($cat->breadcrumb('es')).'</span></li>';
             }
             $html .= '</ul>';
-            if ($d['category_overflow'] > 0) {
-                $html .= '<p class="text-gray-500">Se listan '.$d['categories']->count().' de '.(int) $d['category_total']
-                    .'; quedan '.(int) $d['category_overflow'].' sin listar (no se ocultan: el total de arriba es el real).</p>';
-            }
         }
         $html .= '</div>';
 
@@ -418,22 +431,69 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                 ->options($decisionOptions)
                 ->required()
                 ->live(),
-            // TASK-0006A, sección A: el selector ya NO se limita a los duplicados sugeridos por el
-            // Builder ni trunca a 20 en silencio. `options()` sigue trayendo el conjunto de
-            // EVIDENCIA (duplicados + sugerencia) para que las recomendaciones estén a la vista sin
-            // tipear, pero la búsqueda recorre TODO el catálogo de conceptos ACTIVOS por nombre ES,
-            // nombre EN, término miembro y alias de término miembro - y cuando hay más
-            // coincidencias que el tope, el panel de abajo informa el total real en vez de ocultarlas.
-            Forms\Components\Select::make('target_concept_id')
-                ->label('Concepto destino')
+            // TASK-0006A re-audit (comentario `5930560603`), corrección 1: EXPLORADOR PAGINADO.
+            //
+            // La versión anterior usaba `->searchable()` + `getSearchResultsUsing()`, que devolvía
+            // como máximo N opciones SIN mostrarle al revisor que existían más y sin forma de
+            // alcanzarlas - el servicio informaba el overflow pero la UI lo descartaba. Ahora el
+            // descubrimiento es un control explícito: campo de búsqueda + paginación + línea de
+            // estado visible. El `Select` lista la PÁGINA actual, así que toda coincidencia es
+            // alcanzable paginando, y no queda ningún camino con tope silencioso.
+            //
+            // El tamaño de página es chico y estable a propósito (no se subió al tamaño del catálogo
+            // actual): el diseño tiene que seguir siendo correcto cuando el catálogo crezca.
+            Forms\Components\TextInput::make('concept_search')
+                ->label('Buscar en el catálogo de conceptos')
                 ->helperText(sprintf(
-                    'Elegí explícitamente el concepto destino - no se asume la sugerencia del Builder aunque coincida. '
-                    .'La búsqueda recorre los %d conceptos activos del catálogo completo (nombre ES/EN, términos miembro y alias), no solo las recomendaciones de arriba.',
+                    'Busca sobre los %d conceptos ACTIVOS por nombre ES, nombre EN, término miembro y alias. Vacío = navegar el catálogo completo.',
                     $activeConceptCount,
                 ))
-                ->options($duplicateOptions)
-                ->searchable()
-                ->getSearchResultsUsing(fn (string $search) => $explorer->searchOptions($search))
+                ->live(debounce: 500)
+                ->afterStateUpdated(fn (Forms\Set $set) => $set('concept_page', 1))
+                ->visible(fn (Get $get) => in_array($get('decision'), [
+                    TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                    TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED,
+                ], true)),
+            Forms\Components\Hidden::make('concept_page')->default(1),
+            Forms\Components\Placeholder::make('concept_explorer_status')
+                ->label('Cobertura de la búsqueda')
+                ->content(fn (Get $get) => new HtmlString(
+                    '<p class="text-sm">'.e($explorer->explorerStatusLine(
+                        $explorer->searchActiveConcepts($get('concept_search'), page: (int) ($get('concept_page') ?: 1))
+                    )).'</p>'
+                ))
+                ->visible(fn (Get $get) => in_array($get('decision'), [
+                    TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                    TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED,
+                ], true)),
+            Forms\Components\Actions::make([
+                Forms\Components\Actions\Action::make('conceptPagePrevious')
+                    ->label('Página anterior')
+                    ->icon('heroicon-o-chevron-left')
+                    ->link()
+                    ->disabled(fn (Get $get) => ((int) ($get('concept_page') ?: 1)) <= 1)
+                    ->action(fn (Forms\Set $set, Get $get) => $set('concept_page', max(1, ((int) ($get('concept_page') ?: 1)) - 1))),
+                Forms\Components\Actions\Action::make('conceptPageNext')
+                    ->label('Página siguiente')
+                    ->icon('heroicon-o-chevron-right')
+                    ->link()
+                    ->disabled(fn (Get $get) => ! $explorer->searchActiveConcepts(
+                        $get('concept_search'), page: (int) ($get('concept_page') ?: 1)
+                    )['has_more'])
+                    ->action(fn (Forms\Set $set, Get $get) => $set('concept_page', ((int) ($get('concept_page') ?: 1)) + 1)),
+            ])
+                ->visible(fn (Get $get) => in_array($get('decision'), [
+                    TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                    TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED,
+                ], true)),
+            Forms\Components\Select::make('target_concept_id')
+                ->label('Concepto destino')
+                ->helperText('Elegí explícitamente el concepto destino - no se asume la sugerencia del Builder aunque coincida. Lista la página actual del explorador; paginá arriba para alcanzar cualquier coincidencia.')
+                // Las recomendaciones del Builder se mantienen SIEMPRE disponibles (evidencia), y se
+                // suman a la página actual del catálogo completo.
+                ->options(fn (Get $get) => $duplicateOptions + $explorer->searchOptions(
+                    $get('concept_search'), page: (int) ($get('concept_page') ?: 1)
+                ))
                 ->getOptionLabelUsing(fn ($value) => ($c = TaxonomyCanonicalConcept::find($value)) ? $explorer->optionLabel($c) : null)
                 ->required(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING)
                 ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING)
@@ -444,9 +504,10 @@ class TaxonomyCandidateConceptLinkResource extends Resource
             // para CONTEXT_REQUIRED solo toma `context_reason`).
             Forms\Components\Select::make('inspect_concept_id')
                 ->label('Inspeccionar un concepto (solo evidencia - no crea ningún mapeo)')
-                ->helperText('Sirve para comprobar si algún concepto existente sería suficientemente específico. Elegir acá no mapea nada.')
-                ->searchable()
-                ->getSearchResultsUsing(fn (string $search) => $explorer->searchOptions($search))
+                ->helperText('Sirve para comprobar si algún concepto existente sería suficientemente específico. Elegir acá no mapea nada. Lista la página actual del explorador.')
+                ->options(fn (Get $get) => $explorer->searchOptions(
+                    $get('concept_search'), page: (int) ($get('concept_page') ?: 1)
+                ))
                 ->getOptionLabelUsing(fn ($value) => ($c = TaxonomyCanonicalConcept::find($value)) ? $explorer->optionLabel($c) : null)
                 ->visible(fn (Get $get) => $get('decision') === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED)
                 ->live(),
@@ -467,25 +528,61 @@ class TaxonomyCandidateConceptLinkResource extends Resource
             Forms\Components\Placeholder::make('concept_diagnostics')
                 ->label('Diagnóstico del concepto (identidad, términos, CPV alcanzable, impacto)')
                 ->content(function (Get $get) use ($explorer, $activeConceptCount) {
-                    $conceptId = $get('decision') === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED
-                        ? $get('inspect_concept_id')
-                        : $get('target_concept_id');
-
-                    $concept = $conceptId ? TaxonomyCanonicalConcept::find($conceptId) : null;
+                    $concept = self::conceptUnderInspection($get);
 
                     if (! $concept) {
                         return new HtmlString(sprintf(
-                            '<p class="text-sm text-gray-500">Elegí un concepto para ver su diagnóstico. El catálogo tiene %d conceptos activos y la búsqueda del selector los recorre todos.</p>',
+                            '<p class="text-sm text-gray-500">Elegí un concepto para ver su diagnóstico. El catálogo tiene %d conceptos activos y el explorador de arriba los recorre todos, paginando.</p>',
                             $activeConceptCount,
                         ));
                     }
 
-                    return self::formatConceptDiagnostics($explorer->diagnostics($concept));
+                    return self::formatConceptDiagnostics($explorer->diagnostics(
+                        $concept,
+                        categoryPage: (int) ($get('cpv_page') ?: 1),
+                        categorySearch: $get('cpv_search'),
+                    ), $explorer);
                 })
                 ->visible(fn (Get $get) => in_array($get('decision'), [
                     TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
                     TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED,
                 ], true)),
+            // TASK-0006A re-audit (`5930560603`), corrección 2: declarar "y N más" no alcanzaba -
+            // el revisor necesita poder INSPECCIONAR las categorías omitidas para decidir si un
+            // término amplio es seguro de mapear. Filtro + paginación sobre las categorías CPV.
+            Forms\Components\TextInput::make('cpv_search')
+                ->label('Filtrar categorías CPV del diagnóstico')
+                ->helperText('Por código (ej. CPV-26) o por nombre traducido. Vacío = todas las alcanzables.')
+                ->live(debounce: 500)
+                ->afterStateUpdated(fn (Forms\Set $set) => $set('cpv_page', 1))
+                ->visible(fn (Get $get) => self::conceptUnderInspection($get) !== null),
+            Forms\Components\Hidden::make('cpv_page')->default(1),
+            Forms\Components\Actions::make([
+                Forms\Components\Actions\Action::make('cpvPagePrevious')
+                    ->label('CPV: página anterior')
+                    ->icon('heroicon-o-chevron-left')
+                    ->link()
+                    ->disabled(fn (Get $get) => ((int) ($get('cpv_page') ?: 1)) <= 1)
+                    ->action(fn (Forms\Set $set, Get $get) => $set('cpv_page', max(1, ((int) ($get('cpv_page') ?: 1)) - 1))),
+                Forms\Components\Actions\Action::make('cpvPageNext')
+                    ->label('CPV: página siguiente')
+                    ->icon('heroicon-o-chevron-right')
+                    ->link()
+                    ->disabled(function (Get $get) use ($explorer) {
+                        $concept = self::conceptUnderInspection($get);
+                        if (! $concept) {
+                            return true;
+                        }
+
+                        return ! $explorer->diagnostics(
+                            $concept,
+                            categoryPage: (int) ($get('cpv_page') ?: 1),
+                            categorySearch: $get('cpv_search'),
+                        )['category_has_more'];
+                    })
+                    ->action(fn (Forms\Set $set, Get $get) => $set('cpv_page', ((int) ($get('cpv_page') ?: 1)) + 1)),
+            ])
+                ->visible(fn (Get $get) => self::conceptUnderInspection($get) !== null),
             Forms\Components\Placeholder::make('impact_preview')
                 ->label('Impacto predicho (empresas)')
                 ->content(function (Get $get) use ($record, $builder) {

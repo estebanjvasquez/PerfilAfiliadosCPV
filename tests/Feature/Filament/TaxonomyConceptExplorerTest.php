@@ -166,36 +166,61 @@ class TaxonomyConceptExplorerTest extends TestCase
     }
 
     #[Test]
-    public function more_than_twenty_matching_concepts_are_not_silently_lost(): void
+    public function every_match_beyond_the_first_page_is_reachable_by_paginating(): void
     {
         $marker = 'zzz_task0006a_many'.substr(uniqid('', true), -8);
-        for ($i = 1; $i <= 25; $i++) {
+        for ($i = 1; $i <= 30; $i++) {
             $this->concept($marker.'_'.str_pad((string) $i, 2, '0', STR_PAD_LEFT));
         }
 
-        $result = $this->explorer()->searchActiveConcepts($marker);
+        // Con 30 coincidencias y páginas de 10, ninguna puede quedar fuera de alcance.
+        $seen = [];
+        $page = 1;
+        do {
+            $r = $this->explorer()->searchActiveConcepts($marker, perPage: 10, page: $page);
+            $this->assertSame(30, $r['total'], 'El total real se informa en cada página.');
+            foreach ($r['concepts'] as $c) {
+                $seen[$c->id] = true;
+            }
+            $page++;
+        } while ($r['has_more'] && $page <= 10);
 
-        // El viejo `limit(20)` habría devuelto 20 sin decir nada. Ahora: 25 coincidencias, 25
-        // devueltas, y `truncated` en false porque el tope (50) no se alcanzó.
-        $this->assertSame(25, $result['total']);
-        $this->assertSame(25, $result['shown']);
-        $this->assertFalse($result['truncated']);
-        $this->assertCount(25, $this->explorer()->searchOptions($marker));
+        $this->assertCount(30, $seen, 'Las 30 coincidencias deben ser alcanzables paginando.');
+        $this->assertSame(3, $r['last_page']);
     }
 
     #[Test]
-    public function when_matches_exceed_the_cap_the_overflow_is_reported_instead_of_hidden(): void
+    public function the_status_line_declares_the_total_and_the_position_so_overflow_is_never_silent(): void
     {
         $marker = 'zzz_task0006a_cap'.substr(uniqid('', true), -8);
         for ($i = 1; $i <= 12; $i++) {
             $this->concept($marker.'_'.str_pad((string) $i, 2, '0', STR_PAD_LEFT));
         }
 
-        $result = $this->explorer()->searchActiveConcepts($marker, cap: 5);
+        $result = $this->explorer()->searchActiveConcepts($marker, perPage: 5, page: 1);
+        $line = $this->explorer()->explorerStatusLine($result);
 
-        $this->assertSame(12, $result['total'], 'El total real se informa siempre.');
+        $this->assertSame(12, $result['total']);
         $this->assertSame(5, $result['shown']);
-        $this->assertTrue($result['truncated'], 'El overflow debe quedar declarado, no silencioso.');
+        $this->assertTrue($result['has_more']);
+        $this->assertStringContainsString('12', $line, 'La línea de estado debe declarar el total real.');
+        $this->assertStringContainsString('1 de 3', $line, 'Y la posición dentro de las páginas.');
+    }
+
+    #[Test]
+    public function requesting_a_page_past_the_end_clamps_instead_of_returning_nothing(): void
+    {
+        $marker = 'zzz_task0006a_clamp'.substr(uniqid('', true), -8);
+        for ($i = 1; $i <= 7; $i++) {
+            $this->concept($marker.'_'.str_pad((string) $i, 2, '0', STR_PAD_LEFT));
+        }
+
+        $result = $this->explorer()->searchActiveConcepts($marker, perPage: 5, page: 999);
+
+        $this->assertSame(2, $result['page'], 'Se acota a la última página real.');
+        $this->assertSame(2, $result['last_page']);
+        $this->assertSame(2, $result['shown']);
+        $this->assertFalse($result['has_more']);
     }
 
     #[Test]
@@ -284,7 +309,7 @@ class TaxonomyConceptExplorerTest extends TestCase
         $this->assertSame(1, $d['alias_count']);
         $this->assertSame(1, $d['category_total']);
         $this->assertSame($categoryId, (int) $d['categories']->first()->id);
-        $this->assertSame(0, $d['category_overflow']);
+        $this->assertFalse($d['category_has_more']);
         $this->assertArrayHasKey('total_unique_company_count', $d['impact']);
 
         // El render no debe explotar y debe mostrar el código CPV gobernado.
@@ -313,28 +338,76 @@ class TaxonomyConceptExplorerTest extends TestCase
         $this->assertSame(0, $d['category_total'], 'Solo las relaciones CPV aprobadas son taxonomía gobernada.');
     }
 
-    #[Test]
-    public function a_large_cpv_association_set_is_not_silently_truncated(): void
+    /** @return array{0: TaxonomyCanonicalConcept, 1: array<int>} */
+    private function conceptWithManyCategories(int $count): array
     {
         $concept = $this->concept('zzz_task0006a_many_cats_'.uniqid('', true));
         $term = $this->term('zzz_task0006a_manycatsterm_'.uniqid('', true));
         $this->linkTermToConcept($term, $concept);
 
-        $categoryIds = $this->existingCategoryIds(18);
-        $this->assertCount(18, $categoryIds, 'Precondición: hacen falta 18 categorías reales de referencia.');
+        $categoryIds = $this->existingCategoryIds($count);
+        $this->assertCount($count, $categoryIds, "Precondición: hacen falta {$count} categorías reales de referencia.");
         foreach ($categoryIds as $id) {
             $this->approveCpvRelation($term, $id);
         }
 
-        $d = $this->explorer()->diagnostics($concept, categoryPreviewLimit: 12);
+        return [$concept, $categoryIds];
+    }
 
-        $this->assertSame(18, $d['category_total'], 'El total real se informa completo.');
-        $this->assertCount(12, $d['categories'], 'Se listan solo las primeras 12 en detalle.');
-        $this->assertSame(6, $d['category_overflow'], 'Y las 6 restantes quedan declaradas explícitamente.');
+    #[Test]
+    public function every_cpv_category_beyond_the_preview_is_reachable_by_paginating(): void
+    {
+        [$concept, $categoryIds] = $this->conceptWithManyCategories(18);
 
-        $html = TaxonomyCandidateConceptLinkResource::formatConceptDiagnostics($d)->toHtml();
+        $seen = [];
+        $page = 1;
+        do {
+            $d = $this->explorer()->diagnostics($concept, categoryPerPage: 12, categoryPage: $page);
+            $this->assertSame(18, $d['category_total'], 'El total real se informa en cada página.');
+            foreach ($d['categories'] as $cat) {
+                $seen[(int) $cat->id] = true;
+            }
+            $page++;
+        } while ($d['category_has_more'] && $page <= 5);
+
+        $this->assertCount(18, $seen, 'Las 18 categorías deben poder inspeccionarse paginando, no solo contarse.');
+        $this->assertEqualsCanonicalizing($categoryIds, array_keys($seen));
+        $this->assertSame(2, $d['category_last_page']);
+    }
+
+    #[Test]
+    public function the_cpv_status_line_declares_the_total_and_position(): void
+    {
+        [$concept] = $this->conceptWithManyCategories(18);
+
+        $d = $this->explorer()->diagnostics($concept, categoryPerPage: 12, categoryPage: 1);
+        $line = $this->explorer()->categoryStatusLine($d);
+
+        $this->assertStringContainsString('18', $line);
+        $this->assertStringContainsString('1 de 2', $line);
+
+        $html = TaxonomyCandidateConceptLinkResource::formatConceptDiagnostics($d, $this->explorer())->toHtml();
         $this->assertStringContainsString('18', $html, 'El render debe mostrar el total real.');
-        $this->assertStringContainsString('6', $html, 'Y cuántas quedaron sin listar.');
+    }
+
+    #[Test]
+    public function cpv_categories_can_be_filtered_by_code_without_hiding_the_real_total(): void
+    {
+        [$concept, $categoryIds] = $this->conceptWithManyCategories(18);
+
+        $targetCode = (string) DB::connection('pgsql')->table('taxonomy_categories')
+            ->where('id', $categoryIds[0])->value('code');
+
+        $d = $this->explorer()->diagnostics($concept, categoryPerPage: 12, categoryPage: 1, categorySearch: $targetCode);
+
+        $this->assertTrue($d['category_filtered']);
+        $this->assertSame(18, $d['category_total'], 'El total alcanzable REAL se sigue informando aunque haya filtro.');
+        $this->assertGreaterThanOrEqual(1, $d['category_matching']);
+        $this->assertTrue(
+            $d['categories']->contains(fn ($cat) => (string) $cat->code === $targetCode),
+            'La categoría filtrada debe aparecer.',
+        );
+        $this->assertStringContainsString('18', $this->explorer()->categoryStatusLine($d));
     }
 
     #[Test]
@@ -439,6 +512,141 @@ class TaxonomyConceptExplorerTest extends TestCase
 
         $this->assertSame(1, TaxonomyReviewedProposal::where('candidate_link_id', $candidate->id)
             ->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)->count());
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Re-audit `5930560603` — pruebas a NIVEL DE UI: el overflow tiene que ser visible para el
+    // revisor en el control real, y cada coincidencia/categoría tiene que ser alcanzable desde ahí.
+    // Los tests de servicio de arriba no alcanzaban: probaban una capacidad que el revisor no veía.
+    // ---------------------------------------------------------------------------------------------
+
+    #[Test]
+    public function the_review_ui_surfaces_the_match_total_and_page_position_to_the_reviewer(): void
+    {
+        $marker = 'zzz_task0006a_uiov'.substr(uniqid('', true), -8);
+        for ($i = 1; $i <= 30; $i++) {
+            $this->concept($marker.'_'.str_pad((string) $i, 2, '0', STR_PAD_LEFT));
+        }
+        $candidate = $this->pendingCandidate($this->concept('zzz_task0006a_uisug_'.uniqid('', true)));
+
+        Livewire::actingAs($this->reviewer())
+            ->test(ListTaxonomyCandidateConceptLinks::class)
+            ->mountTableAction('freezeReview', $candidate)
+            ->setTableActionData([
+                'decision' => TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                'concept_search' => $marker,
+                'concept_page' => 1,
+            ])
+            // La línea de estado del explorador tiene que estar RENDERIZADA en el formulario, con el
+            // total real y la página - no solo existir en el valor de retorno del servicio.
+            ->assertSee('de 30 coincidencias')
+            ->assertSee('página 1 de 2');
+    }
+
+    #[Test]
+    public function the_reviewer_can_page_to_a_concept_beyond_the_first_page_and_freeze_it(): void
+    {
+        // 30 conceptos que coinciden, páginas de 25 => el último queda en la página 2. Antes de esta
+        // corrección era inalcanzable desde la UI.
+        $marker = 'zzz_task0006a_uipg'.substr(uniqid('', true), -8);
+        $created = [];
+        for ($i = 1; $i <= 30; $i++) {
+            $created[] = $this->concept($marker.'_'.str_pad((string) $i, 2, '0', STR_PAD_LEFT));
+        }
+        $onFirstPage = $this->explorer()->searchOptions($marker, page: 1);
+        $onSecondPage = $this->explorer()->searchOptions($marker, page: 2);
+
+        $this->assertCount(25, $onFirstPage);
+        $this->assertNotEmpty($onSecondPage);
+
+        $beyondFirstPage = (int) array_key_first($onSecondPage);
+        $this->assertArrayNotHasKey($beyondFirstPage, $onFirstPage, 'Precondición: este concepto NO está en la primera página.');
+
+        $candidate = $this->pendingCandidate($this->concept('zzz_task0006a_uipgsug_'.uniqid('', true)));
+
+        Livewire::actingAs($this->reviewer())
+            ->test(ListTaxonomyCandidateConceptLinks::class)
+            ->mountTableAction('freezeReview', $candidate)
+            ->setTableActionData([
+                'decision' => TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                'concept_search' => $marker,
+                'concept_page' => 2,
+                'target_concept_id' => $beyondFirstPage,
+            ])
+            ->callMountedTableAction()
+            ->assertHasNoTableActionErrors();
+
+        $proposal = TaxonomyReviewedProposal::where('candidate_link_id', $candidate->id)->sole();
+
+        $this->assertSame($beyondFirstPage, (int) $proposal->decision_payload['target_concept_id'],
+            'Un concepto que solo aparece en la segunda página debe poder elegirse y congelarse.');
+        $this->assertSame(TaxonomyReviewedProposal::STATUS_PENDING_APPLY, $proposal->status);
+        $this->assertSame(TaxonomyCandidateConceptLink::STATUS_PENDING, $candidate->fresh()->status);
+    }
+
+    #[Test]
+    public function the_review_ui_lets_the_reviewer_inspect_a_cpv_category_beyond_the_first_page(): void
+    {
+        [$concept, $categoryIds] = $this->conceptWithManyCategories(18);
+        $candidate = $this->pendingCandidate($concept);
+
+        $firstPageCodes = $this->explorer()
+            ->diagnostics($concept, categoryPage: 1)['categories']->pluck('code')->all();
+        $secondPage = $this->explorer()->diagnostics($concept, categoryPage: 2)['categories'];
+
+        $this->assertCount(12, $firstPageCodes);
+        $this->assertNotEmpty($secondPage);
+
+        $hiddenCode = (string) $secondPage->first()->code;
+        $this->assertNotContains($hiddenCode, $firstPageCodes, 'Precondición: esta categoría no está en el preview inicial.');
+
+        $component = Livewire::actingAs($this->reviewer())
+            ->test(ListTaxonomyCandidateConceptLinks::class)
+            ->mountTableAction('freezeReview', $candidate)
+            ->setTableActionData([
+                'decision' => TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                'target_concept_id' => $concept->id,
+                'cpv_page' => 1,
+            ]);
+
+        // En la página 1 la categoría oculta no se ve...
+        $component->assertDontSee($hiddenCode);
+
+        // ...y paginando el diagnóstico, sí. Eso es lo que el re-audit pedía: poder INSPECCIONARLA,
+        // no solo saber que existe.
+        $component
+            ->setTableActionData([
+                'decision' => TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                'target_concept_id' => $concept->id,
+                'cpv_page' => 2,
+            ])
+            ->assertSee($hiddenCode);
+    }
+
+    #[Test]
+    public function the_review_ui_lets_the_reviewer_filter_cpv_categories_to_reach_a_hidden_one(): void
+    {
+        [$concept, $categoryIds] = $this->conceptWithManyCategories(18);
+        $candidate = $this->pendingCandidate($concept);
+
+        $firstPageCodes = $this->explorer()
+            ->diagnostics($concept, categoryPage: 1)['categories']->pluck('code')->all();
+        $hidden = $this->explorer()->diagnostics($concept, categoryPage: 2)['categories']->first();
+        $hiddenCode = (string) $hidden->code;
+        $this->assertNotContains($hiddenCode, $firstPageCodes);
+
+        Livewire::actingAs($this->reviewer())
+            ->test(ListTaxonomyCandidateConceptLinks::class)
+            ->mountTableAction('freezeReview', $candidate)
+            ->setTableActionData([
+                'decision' => TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                'target_concept_id' => $concept->id,
+                'cpv_search' => $hiddenCode,
+                'cpv_page' => 1,
+            ])
+            ->assertSee($hiddenCode)
+            // El total alcanzable real se sigue declarando aunque el filtro acote la vista.
+            ->assertSee('18');
     }
 
     #[Test]

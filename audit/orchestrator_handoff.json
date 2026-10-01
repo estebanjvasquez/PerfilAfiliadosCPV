@@ -700,8 +700,57 @@
         "frozen_reviews_untouched": "The 3 frozen human reviews are exactly as they were: same ids, none applied, none altered, none re-frozen. No new decision was made on the real queue - the 7 remaining candidates and both relations are still unprocessed.",
         "unsafe_procedure_avoided": "No full-suite run against the live container's shared bind mounts, no ephemeral container, no compose topology change."
       },
-      "secrets_handling": "No secret was read, printed or recorded. The decision_payload CONTENTS of the three frozen proposals are deliberately not transcribed into any document - only the present keys and fingerprint prefixes (which are hashes).",
-      "stop_conditions": "None reached. No change to TERM->CONCEPT cardinality, no search/ranking semantic change, no apply/publication of any reviewed proposal, no modification or deletion of the 3 frozen human reviews, no additional real queue decisions processed, no destructive migration, no production deployment, no main merge, no token/credential rotation."
+      "re_audit_rounds": [
+        {
+          "orchestrator_comment": "5930560603",
+          "verdict": "CORRECTIONS_REQUIRED - blocker on A.3/B: the capability existed in the service but not in the UI. ACCEPTED in the same comment: scope discipline, the 3 protected frozen reviews, the read-only service and its ES/EN/term/alias/active-only search, Builder suggestions as evidence, governed diagnostics content, single-concept MAP_TO_EXISTING and zero-mapping CONTEXT_REQUIRED with the inspection concept not frozen, the section D architecture analysis, and the inherited 32-query regression.",
+          "reviewed_head": "b0d2d20d054e4319e314ee2049e38c87b0244014",
+          "blocker_as_stated": "ConceptExplorerService returned total/truncated, but BOTH real Filament controls (target_concept_id and inspect_concept_id) called only searchOptions($search), which discards them. So the reviewer got at most N options with NO UI indication that more matches existed and no pagination/load-more. The audit's claim that 'the UI can tell the reviewer how many matches exist' was not implemented in the control, and the new tests proved the SERVICE reported overflow - a capability the reviewer could not see. Same for the CPV panel: 'first 12 + N more' is not silent any more, but the reviewer still could not INSPECT the omitted categories, which is insufficient for deciding whether a broad term like `pipeline` is safe to map.",
+          "assessment": "The blocker is correct and was accepted without pushback - the previous round's audit overstated what the UI did.",
+          "correction_1_paginated_explorer": {
+            "what_changed": "Discovery is now an explicit control instead of a capped typeahead: a concept_search TextInput (live, debounced, resets the page), a concept_explorer_status Placeholder that RENDERS 'Mostrando X-Y de N coincidencias (pagina P de T)' plus an instruction to page when more exist, and Forms\\Components\\Actions with 'Pagina anterior'/'Pagina siguiente' driving a concept_page state. The Select lists the CURRENT PAGE, so every match is reachable by paging.",
+            "searchable_removed_deliberately": "->searchable()/getSearchResultsUsing() were REMOVED from both Selects. Keeping them would have left a parallel path with a silent cap - exactly the defect reported. Discovery now has a single, complete path.",
+            "cap_not_raised_to_catalogue_size": "Page size is 25 and stable. The re-audit explicitly forbade simply raising the cap to 79, and rightly: the design has to stay correct as the catalogue grows. Pagination scales; a bigger cap does not.",
+            "service_now_paginated_end_to_end": "searchActiveConcepts(search, perPage, page) returns total, per_page, page, last_page, shown, has_more, has_previous, first_index, last_index, concepts. explorerStatusLine() produces the human-facing line so the UI renders the same numbers the service computes. A page past the end CLAMPS to the last real page instead of returning empty.",
+            "preserved": "ES/EN canonical-name search, member-term and alias search, status=active filtering, Builder suggestions still merged into the options as evidence.",
+            "verified_live": "The 4 pages of the active catalogue return exactly the 79 distinct concepts; requesting page 999 clamps to page 4."
+          },
+          "correction_2_inspectable_cpv_categories": {
+            "what_changed": "The diagnostic category list is now a PAGE with its own filter and pagination: a cpv_search TextInput (by category code or translated name) and 'CPV: pagina anterior/siguiente' actions driving cpv_page. categoryStatusLine() renders position and totals inside the panel.",
+            "filter_cannot_hide_the_real_total": "diagnostics() reports BOTH category_total (the real reachable count, which is the governance figure) and category_matching (what the filter matched), so narrowing the view can never make it look like fewer categories are reachable.",
+            "why_total_plus_n_hidden_was_not_enough": "The re-audit is right that for this governance decision the reviewer needs to be able to INSPECT the omitted categories, not just know they exist."
+          },
+          "ui_level_tests_added": "The gap the re-audit identified was that tests proved the service, not the UI. Four tests now exercise the real Filament form via mountTableAction/setTableActionData/callMountedTableAction: (1) the_review_ui_surfaces_the_match_total_and_page_position_to_the_reviewer - with 30 matches the form RENDERS 'de 30 coincidencias' and 'pagina 1 de 2'; (2) the_reviewer_can_page_to_a_concept_beyond_the_first_page_and_freeze_it - a concept present ONLY on page 2 is selected and frozen successfully, which was impossible before; (3) the_review_ui_lets_the_reviewer_inspect_a_cpv_category_beyond_the_first_page - a category absent from the initial preview is NOT seen on page 1 and IS seen on page 2; (4) the_review_ui_lets_the_reviewer_filter_cpv_categories_to_reach_a_hidden_one - filtering by code reaches a hidden category while the real total is still declared.",
+          "tests_after_correction": "TaxonomyConceptExplorerTest: 23 passed (135 assertions), up from 16 - the 4 UI-level tests plus pagination tests replacing the ones that asserted the silent cap. Zero failures. Fixture residue explicitly verified absent: zero zzz_-prefixed concepts/terms/aliases, zero CPV relations with source='task0006a_test_fixture', and taxonomy_term_concepts/taxonomy_term_cpv_relations at 142/9749.",
+          "semantics_unchanged": "MAP_TO_EXISTING still exactly one explicit concept; CONTEXT_REQUIRED still zero mappings with the inspection concept still absent from its payload; no direct TERM->CPV multi-select; no search/ranking/cardinality change; no APPLY/publication; the frozen proposals untouched."
+        }
+      ],
+      "concurrent_task_0006_progress_during_this_correction": {
+        "note": "While this correction was being implemented the human reviewer continued TASK-0006 with the improved UI and resolved the very term that motivated TASK-0006A. This session touched none of it; it is recorded because it moves two of the figures the re-audit asks to recheck.",
+        "what_the_human_did": [
+          { "at": "2026-10-01 13:07:11", "action": "Created canonical concept #2890 `oleoducto / oil pipeline`" },
+          { "at": "2026-10-01 13:07:30", "action": "Created canonical concept #2891 `gasoducto / gas pipeline`" },
+          { "at": "2026-10-01 13:08:21", "action": "Froze MAP_TO_EXISTING on real candidate 272 (term `pipeline`) targeting concept #2890" }
+        ],
+        "provenance": "taxonomy_audit_log #1192: user_id=3, actor_type=user, reason 'Decision de revision congelada: MAP_TO_EXISTING (candidate_link_id=272)'. The two concepts were created through the separate canonical-concept admin CRUD, which is independent of the C2 flow.",
+        "why_this_validates_the_task": "`pipeline` is exactly the polysemous term that motivated TASK-0006A. With the new explorer the reviewer could determine it needed specific concepts, create them, and map the term to `oleoducto / oil pipeline` rather than forcing it against an inadequate option or fanning it out to superficially related CPV categories. This is the strongest real-world evidence that the correction serves its purpose.",
+        "nothing_published_or_applied": "applied_at / authorization_reference / target_environment are NULL on all 4 proposals; 0 applied. Concepts #2890 and #2891 have 0 rows each in taxonomy_term_concepts, so no term->concept identity was published. Candidate 272 remains status=pending with reviewed_at=NULL per the C2 freeze contract. taxonomy_term_concepts=142 and taxonomy_term_cpv_relations=9749 unchanged.",
+        "live_state_to_recheck_against": {
+          "taxonomy_candidate_concept_links": 10,
+          "taxonomy_concept_relations": 2,
+          "taxonomy_term_concepts": 142,
+          "taxonomy_canonical_concepts": 81,
+          "taxonomy_term_cpv_relations": 9749,
+          "taxonomy_reviewed_proposals": 4,
+          "proposals_applied": 0,
+          "reviewed_candidates": [263, 264, 265, 272],
+          "still_unreviewed_candidates": [266, 267, 268, 269, 270, 271]
+        },
+        "flagged_for_the_orchestrator": "taxonomy_canonical_concepts moved from 79 to 81 - one of the figures the re-audit listed as a published-taxonomy baseline invariant has changed. It changed through legitimate human work, not through this correction, and no term->concept identity was published (both new concepts have zero taxonomy_term_concepts rows). Raised explicitly rather than quietly reporting the stale baseline.",
+        "this_session_made_no_real_decision": "No review decision, no apply, no modification of any frozen proposal. Test fixtures rolled back cleanly, verified explicitly."
+      },
+      "secrets_handling": "No secret was read, printed or recorded. The decision_payload CONTENTS of the frozen proposals are deliberately not transcribed into any document - only the present keys and fingerprint prefixes (which are hashes).",
+      "stop_conditions": "None reached. No change to TERM->CONCEPT cardinality, no search/ranking semantic change, no apply/publication of any reviewed proposal, no modification or deletion of the frozen human reviews, no additional real queue decisions processed by this session, no destructive migration, no production deployment, no main merge, no token/credential rotation."
     }
   ]
 }
