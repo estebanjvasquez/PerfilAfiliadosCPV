@@ -3,10 +3,37 @@
 **TASK-0006B** — Confirmación humana C2 + `CREATE_NEW` bilingüe + convergencia gobernada
 (Issue #2 comentario `5936206843`). Abierta desde HEAD `42d3c6b`.
 
-**Estado: READY_FOR_REVIEW (ronda 2 — corrección del re-audit `5938949812`).** Esta ronda
-**implementó y probó el endurecimiento de concurrencia** del APPLY agrupado y **diseñó** (sin
-ejecutar) la corrección de procedencia de confirmación de #492–#495. **Cero escrituras reales de
-datos**, cero APPLY, cero publicación. Detalle completo en
+**Estado: READY_FOR_REVIEW (TASK-0006C — reparación de procedencia ejecutada).** El re-audit
+[`5939882569`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5939882569)
+dio **`CODE PASS`** a la ronda 2 y `PASS FOR IMPLEMENTATION` al diseño correctivo; la **autorización
+explícita del dueño** llegó en
+[`5939903005`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5939903005)
+y esta ronda la ejecutó. Detalle en la **§12 del audit**.
+
+| Lo ejecutado | Estado |
+|---|---|
+| Migración aditiva + excepción estrecha del trigger (solo ANULACIÓN) | hecho, cero filas tocadas por la migración |
+| `confirm()` restringido a canal HTTP/UI | hecho — consola devuelve `CHANNEL_NOT_HUMAN` |
+| Anulación de la procedencia inválida de **#492–#495** | hecho — las 4 vuelven a `UNCONFIRMED` / `HUMAN_CONFIRMATION_REQUIRED`, `PENDING_APPLY` |
+| Decisiones, payloads y fingerprints | **intactos** en las 4 |
+| #629–#632 | **no tocadas** (punto 10) |
+| Confirmación por el agente | **ninguna** (punto 9) |
+| APPLY / publicación / merge a `main` | **nada** |
+
+**Hallazgo a reportar:** #629–#632 **ya están confirmadas**, al contrario de lo que declaraban los dos
+comentarios. Se investigó la procedencia antes de reportar: es **legítima** — `confirmed_by_id=3`
+(Eric), **canal `http`**, referencia `5939903005`, `actor_type=user`, bitácora #1520–#1523, a las
+20:28 del 2026-10-01 (dos minutos después de la autorización, en orden descendente de id). Es decir:
+**el dueño las confirmó personalmente por la UI autenticada**, que es el «HUMAN UI FOLLOW-UP` que el
+propio comentario anunciaba, y la primera validación real del mecanismo de punta a punta. Esta
+reparación no las tocó, y esas confirmaciones **también son válidas bajo la regla nueva más estricta**,
+porque la UI es genuinamente una petición HTTP. Queda pendiente solo la confirmación humana de
+**#492–#495**.
+
+### Ronda 2 (previa, dentro de la misma tarea)
+
+Implementó y probó el **endurecimiento de concurrencia** del APPLY agrupado y **diseñó** la corrección
+de procedencia. Detalle completo en
 [`audit/phase6_task0006b_human_confirmation_2026-10-01.md`](../../audit/phase6_task0006b_human_confirmation_2026-10-01.md)
 (§10bis para esta ronda); texto verbatim en
 [`tasks/0006b-human-confirmation.md`](tasks/0006b-human-confirmation.md); diseño correctivo en
@@ -272,14 +299,18 @@ no tiene ítems sin decidir**:
 | #421 | cand. 264 | `CONTEXT_REQUIRED` | no requiere | NULL |
 | #422 | cand. 265 | `CONTEXT_REQUIRED` | no requiere | NULL |
 | #491 | cand. 272 (`pipeline`) | `MAP_TO_EXISTING` → #2890 `oleoducto / oil pipeline` | no requiere | NULL |
-| #492 | cand. 266 (`exploration`) | `CONTEXT_REQUIRED` | **procedencia INVÁLIDA — `CORRECTION_REQUIRED`** | NULL |
-| #493 | cand. 267 (`upstream`) | `CONTEXT_REQUIRED` | **procedencia INVÁLIDA — `CORRECTION_REQUIRED`** | NULL |
-| #494 | cand. 268 (`midstream`) | `CONTEXT_REQUIRED` | **procedencia INVÁLIDA — `CORRECTION_REQUIRED`** | NULL |
-| #495 | cand. 269 (`downstream`) | `CONTEXT_REQUIRED` | **procedencia INVÁLIDA — `CORRECTION_REQUIRED`** | NULL |
-| #629 | cand. 270 (`refinery`) | `CREATE_NEW` ES `refinería` / EN `refinery` — grupo `043fce22…` | pendiente | NULL |
-| #630 | cand. 271 (`refinería`) | `CREATE_NEW` ES `refinería` / EN `refinery` — grupo `043fce22…` | pendiente | NULL |
-| #631 | relación 61 | `REJECT` | pendiente | NULL |
-| #632 | relación 62 | `REJECT` | pendiente | NULL |
+| #492 | cand. 266 (`exploration`) | `CONTEXT_REQUIRED` | **anulada** → pendiente de confirmación humana | NULL |
+| #493 | cand. 267 (`upstream`) | `CONTEXT_REQUIRED` | **anulada** → pendiente de confirmación humana | NULL |
+| #494 | cand. 268 (`midstream`) | `CONTEXT_REQUIRED` | **anulada** → pendiente de confirmación humana | NULL |
+| #495 | cand. 269 (`downstream`) | `CONTEXT_REQUIRED` | **anulada** → pendiente de confirmación humana | NULL |
+| #629 | cand. 270 (`refinery`) | `CREATE_NEW` ES `refinería` / EN `refinery` — grupo `043fce22…` | **CONFIRMADA** por #3 vía UI (`http`) | NULL |
+| #630 | cand. 271 (`refinería`) | `CREATE_NEW` ES `refinería` / EN `refinery` — grupo `043fce22…` | **CONFIRMADA** por #3 vía UI (`http`) | NULL |
+| #631 | relación 61 | `REJECT` | **CONFIRMADA** por #3 vía UI (`http`) | NULL |
+| #632 | relación 62 | `REJECT` | **CONFIRMADA** por #3 vía UI (`http`) | NULL |
+
+**Acción «Confirmar decisión preparada» visible exactamente en #492–#495** y oculta en el resto
+(verificado contra las filas reales con la policy del revisor #3). Las 12 propuestas son descubribles
+en el resource; sigue sin existir ninguna acción de APPLY/Publicar.
 
 Las 12 son **registros congelados protegidos**: ningún paso de código, test o despliegue puede
 mutarlos, borrarlos ni re-congelarlos sin autorización de limpieza separada y explícita.

@@ -695,6 +695,174 @@ confirmación existente.
 
 ---
 
+## 12. TASK-0006C — reparación de procedencia de confirmación de #492–#495 (ejecutada)
+
+**Autorización:** Issue #2 comentario
+[`5939903005`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5939903005)
+(autorización explícita del dueño de la taxonomía), sobre el diseño aprobado en
+[`5939882569`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5939882569)
+(`PASS FOR IMPLEMENTATION`, contrato de 9 puntos). **HEAD implementado:** `3fe0422`.
+
+El re-audit de la ronda 2 dio **`CODE PASS`** al endurecimiento de concurrencia y al diseño; lo que
+faltaba era la operación correctiva gateada. Esto es esa operación.
+
+### 12.1 Lo construido (puntos 1 y 6 de la autorización)
+
+**Migración aditiva** `2026_10_01_210000_add_confirmation_invalidation_to_taxonomy_reviewed_proposals`:
+7 columnas nulables (`confirmation_invalidated_at`, `_by_id`, `_actor_type`, `_channel`,
+`_reference`, `_reason`, `invalidated_confirmation_snapshot`), un `CHECK` todo-o-nada, un índice
+parcial y un `CREATE OR REPLACE` de la función del trigger ya existente. **Cero `DROP`, cero
+`ALTER TYPE`, cero filas tocadas** — la migración no modifica ningún dato.
+
+**La asimetría es el diseño entero**, y está impuesta por la base de datos, no solo por el servicio:
+
+| Transición | Permitida |
+|---|---|
+| Confirmación → **NULL** (anular) | **sí**, y solo con la GUC de corrección presente, rastro escrito, `status=PENDING_APPLY` y `requires_human_confirmation=TRUE` |
+| Confirmación → **otro confirmador** (reasignar) | **NO, sin excepción** |
+
+Por eso el único desenlace posible de una corrección es «vuelve a estar sin confirmar», y la única
+forma de volver a confirmar es la acción autenticada de la UI. **Ninguna ruta permite inventar un
+confirmador**, y hay tres tests que lo prueban *a nivel de base de datos*.
+
+Dos endurecimientos que el diseño no traía: dentro de la rama de excepción el trigger exige además
+que `decision`, `decision_payload`, los dos fingerprints, `payload_version`, `reviewer_id`,
+`reviewed_at`, el origen, el grupo, la procedencia de preparación y `applied_at` queden **idénticos**
+(el camino privilegiado no puede colar un cambio de decisión); y el rastro de una anulación ya grabada
+es a su vez inmutable.
+
+**`confirm()` restringido a canal HTTP** (punto 6 de la autorización / punto 7 del contrato): devuelve
+`RESULT_CHANNEL_NOT_HUMAN` si no se ejecuta sirviendo una petición enrutada. Cierra el camino que
+produjo la atribución inválida. El discriminante es **una ruta resuelta**, no `runningInConsole()`, y
+esa elección se **midió** en vez de suponerse: `runningInConsole()` responde por el SAPI del proceso,
+así que bajo PHPUnit da `true` incluso cuando la petición **sí** pasó por el router — usarlo habría
+rechazado el camino legítimo de la UI. Medición: contexto unit puro → sin ruta; petición HTTP y test
+de Livewire → con ruta. El límite queda escrito en el docblock: esto equivale a «se está sirviendo una
+petición HTTP» en PHP-FPM (verificado: no hay Octane); un servidor de proceso largo exigiría
+revisarlo.
+
+**Atribución, aplicando la lección del propio defecto:** cuando la corrección la ejecuta el agente,
+`confirmation_invalidated_by_id` queda **NULL**. Escribir ahí la cuenta #3 repetiría exactamente el
+error que se repara. El actor se registra con la verdad (`agent`), el canal se auto-captura y la
+autorización del dueño vive en la referencia de gobernanza.
+
+### 12.2 La operación ejecutada (puntos 2–5, 7)
+
+Ejecutada **después** de los tests y **después** de verificar el despliegue: HEAD `3fe0422` desplegado
+(run «Deploy a Contabo» `success` para ese sha), smoke `/` 200, `/admin/login` 200 y las tres
+pantallas de taxonomía 302 → login 200, **sin 500/503**.
+
+Precondiciones verificadas antes de mutar (punto 5), con aborto si algo no cuadraba: los 7 contadores
+vivos, y por propuesta `status=PENDING_APPLY`, `requires_human_confirmation=true`,
+`prepared_by=agent`, `confirmed_by_id=3`, `confirmation_channel=console`, `applied_at` nulo,
+`decision=CONTEXT_REQUIRED` y sin anulación previa. **Las cuatro: todas OK.**
+
+| Propuesta | Resultado | `confirmed_at` | `requires` | Actor | Canal | Fingerprint | Payload |
+|---|---|---|---|---|---|---|---|
+| #492 | `CONFIRMATION_INVALIDATED` | **NULL** | `true` | `agent` | `console` | **intacto** | **intacto** |
+| #493 | `CONFIRMATION_INVALIDATED` | **NULL** | `true` | `agent` | `console` | **intacto** | **intacto** |
+| #494 | `CONFIRMATION_INVALIDATED` | **NULL** | `true` | `agent` | `console` | **intacto** | **intacto** |
+| #495 | `CONFIRMATION_INVALIDATED` | **NULL** | `true` | `agent` | `console` | **intacto** | **intacto** |
+
+Referencia de gobernanza grabada en las cuatro, textual del punto 5:
+`Issue #2 — explicit owner authorization following orchestrator comment 5939882569`.
+
+**El rastro conserva lo anulado** (punto 4), no lo borra —
+`invalidated_confirmation_snapshot` de cada una: `confirmed_by_id=3`, `confirmed_at` original
+(19:02:17 / 19:02:22 / 19:02:26 / 19:02:30) y `confirmation_channel='console'`, que es precisamente la
+evidencia de por qué esa procedencia no era válida.
+
+**Bitácora:** filas #1853–#1856, `field=confirmation_invalidated_at`, `actor_type=system`,
+`user_id=NULL`, y `authorization_reference`/`target_environment` en **NULL** porque corregir no es
+ejecutar.
+
+### 12.3 Post-estado verificado (punto 8)
+
+| Requisito | Verificado |
+|---|---|
+| #492–#495 `UNCONFIRMED` | **sí** — `confirmed_at`, `confirmed_by_id`, `confirmation_reference` y `confirmation_channel` en NULL |
+| #492–#495 `HUMAN_CONFIRMATION_REQUIRED` | **sí** — `requires_human_confirmation=true` y `awaitsHumanConfirmation()=true` |
+| #492–#495 siguen `PENDING_APPLY` | **sí** |
+| Decisiones y fingerprints preservados | **sí** — `payload_fingerprint` y `decision_payload` idénticos en las cuatro |
+| Filas fuente intactas | **sí** — candidatos 266–269 `pending`, `reviewed_at` NULL |
+| `apply()` las vuelve a rechazar | **sí** — `awaitsHumanConfirmation()=true` ⇒ `HUMAN_CONFIRMATION_REQUIRED` |
+| Publicado sin cambios | **142 / 81 / 9749**, aplicadas **0** |
+| Propuestas | **12**, sin altas ni bajas |
+
+**Descubribilidad y visibilidad de la acción** (requisito «HUMAN UI FOLLOW-UP»), comprobado sobre las
+filas REALES con la policy del revisor #3:
+
+- `getEloquentQuery()` devuelve las **12** propuestas → todas descubribles en el resource;
+- la acción «Confirmar decisión preparada» está visible **exactamente** en #492, #493, #494 y #495;
+- **oculta** en #629–#632 (ya confirmadas) y en #420/#421/#422/#491 (sin requisito);
+- el resource sigue con solo `index` y `view`, `canCreate()=false`, **sin ninguna acción de
+  APPLY/Publicar**.
+
+### 12.4 Hallazgo que hay que reportar: el dueño ya confirmó #629–#632 por la UI
+
+Al leer el estado para respetar el punto 10 apareció algo que **no** coincide con el estado declarado
+en los comentarios `5939882569` y `5939903005` («#629/#630 y #631/#632 remain unconfirmed»): **las
+cuatro ya están confirmadas**. Se investigó la procedencia antes de reportar nada, y es **legítima**:
+
+| Propuesta | `confirmed_by_id` | Canal | Referencia | `confirmed_at` |
+|---|---|---|---|---|
+| #632 (`REJECT`, relación 62) | **3** (Eric, `eamner@yahoo.com`) | **`http`** | `5939903005` | 2026-10-01 20:28:03 |
+| #631 (`REJECT`, relación 61) | **3** | **`http`** | `5939903005` | 20:28:22 |
+| #630 (`CREATE_NEW`, cand. 271) | **3** | **`http`** | `5939903005` | 20:28:33 |
+| #629 (`CREATE_NEW`, cand. 270) | **3** | **`http`** | `5939903005` | 20:28:42 |
+
+Bitácora #1520–#1523: `field=confirmed_at`, `actor_type=user`, `user_id=3`, motivo `HUMAN_CONFIRMED`.
+
+Lectura: **el dueño de la taxonomía las confirmó personalmente por la UI autenticada de Filament**,
+unos dos minutos después de publicar la autorización (20:26:03), en orden descendente de id — lo que
+se ve al ir bajando por el listado del admin. Es exactamente el «HUMAN UI FOLLOW-UP» que el comentario
+anunciaba, y es la **primera validación real del mecanismo de punta a punta**: canal `http`, identidad
+autenticada real, referencia de gobernanza escrita por la persona.
+
+Dos precisiones que importan:
+
+1. **El punto 10 se respetó**: esta reparación **no tocó** esas cuatro filas. Verificado explícitamente
+   antes y después: «SIN CAMBIOS» en `confirmed_at`, `confirmed_by_id`, `requires_human_confirmation`,
+   `confirmation_invalidated_at` y `payload_fingerprint`.
+2. Esas confirmaciones ocurrieron con `e18c806` desplegado, **antes** de que entrara la restricción a
+   canal HTTP. No cambia nada: el canal registrado es `http` porque la UI **es** una petición HTTP, así
+   que esas confirmaciones **también serían válidas bajo la regla nueva, más estricta**.
+
+Queda pendiente, por tanto, solo la confirmación humana de **#492–#495**, que es lo que el dueño hará
+personalmente ahora que la acción volvió a estar disponible para ellas.
+
+### 12.5 Tests (todos verdes)
+
+| Archivo | Resultado |
+|---|---|
+| `tests/Unit/Taxonomy/ReviewedProposalConfirmationTest.php` | **47/47** |
+| `tests/Feature/Filament/TaxonomyReviewedProposalConfirmationUiTest.php` | **9/9** |
+| `tests/Unit/Taxonomy/ReviewedProposalGroupLockingTest.php` | **7/7** |
+| `tests/Feature/Filament/TaxonomyReviewedProposalResourceTest.php` | **11/11** |
+| `tests/Unit/Taxonomy/ReviewedProposalServiceTest.php` | **41/41** |
+
+**115 pasados, 0 fallos** (528 assertions en la corrida conjunta de 114 + el test de UI corregido y
+re-corrido). Entre ellos, 12 tests nuevos de anulación: el re-armado de la compuerta, la preservación
+campo por campo, la procedencia durable, el evento de auditoría distinguible, la idempotencia, la
+validación de referencia y motivo, que una propuesta aplicada queda fuera de alcance, y **tres pruebas
+a nivel de base de datos** de que el camino de corrección no puede (a) asignar un confirmador
+sustituto, (b) colar un cambio de decisión, ni (c) funcionar sin la autorización encendida. Más un
+test que **reproduce el defecto original** (confirmar desde consola autenticando la cuenta) y verifica
+que ahora se rechaza.
+
+Los tests que confirmaban desde consola se movieron a una petición enrutada. **No es un bypass**: no
+existe ninguna bandera para saltear la restricción; simplemente corren en el mismo contexto que
+producción. El camino real de la UI está cubierto aparte por los 9 tests de Filament.
+
+### 12.6 Lo que esta ronda NO hizo
+
+Punto 9 de la autorización: **el agente no confirmó ninguna propuesta**. Las cuatro reparadas quedaron
+deliberadamente sin confirmar, esperando al revisor humano. Punto 10: #629–#632 no se tocaron. Y
+tampoco: ningún APPLY, ninguna publicación, ningún merge a `main`, ninguna escritura sobre otra fila de
+la cola, ninguna migración destructiva, ninguna rotación de credenciales.
+
+---
+
 ## 11. Condiciones STOP
 
 Ninguna alcanzada. Sin APPLY ni publicación; sin despliegue a producción; sin merge a `main`; sin
