@@ -1,41 +1,100 @@
 # Tarea activa
 
+**Ninguna.** TASK-0006, TASK-0006B y TASK-0006C quedaron **CLOSED / PASS** por el audit final
+(Issue #2 comentario
+[`5947549221`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5947549221)).
+**TASK-0007 sigue sin abrir y APPLY/PUBLICACIÓN sigue NO AUTORIZADO.** Esperando la apertura formal de
+la fase siguiente.
+
+## Cierre de la fase de revisión humana C2 (TASK-0006 / 0006B / 0006C)
+
+El audit final verificó, en modo solo lectura y tras las confirmaciones del dueño por Filament:
+
+| Ítem | Estado al cierre |
+|---|---|
+| #492–#495 | **confirmadas válidamente por humano** vía HTTP/Filament; siguen `PENDING_APPLY` |
+| #629–#632 | **confirmadas válidamente** y sin cambios |
+| Filas fuente candidatas | 10 |
+| Relaciones candidatas | 2 |
+| `taxonomy_term_concepts` | **142** |
+| `taxonomy_canonical_concepts` | **81** |
+| TERM→CPV | **9749** |
+| Propuestas revisadas | **12** |
+| Aplicadas | **0** |
+| Mutación de taxonomía publicada | **ninguna, en ninguna ronda** |
+
+**Lo que cerró el ciclo.** El dueño confirmó #492–#495 personalmente por la UI autenticada el
+2026-10-02 (07:36:55 – 07:37:52), con `confirmed_by_id=3` y **canal `http`**. Verificado también en
+esta ronda, de solo lectura: de las 12 propuestas, **8 están confirmadas por humano y las 8 llevan
+canal `http`; ninguna lleva `console`**, y **cero** quedan esperando confirmación. La restricción a
+canal HTTP se sostiene sobre el dataset real completo, no solo en los tests.
+
+**La reparación de TASK-0006C funcionó exactamente como se diseñó, y se puede comprobar en la propia
+fila:** cada una de las cuatro conserva **a la vez** el rastro de la anulación
+(`invalidated_confirmation_snapshot`, con la confirmación original y su `channel='console'` — la
+evidencia misma de por qué esa procedencia no era válida) **y** la confirmación nueva y legítima con
+`channel='http'`. La historia no se sobrescribió: la asimetría aguantó, porque la corrección solo
+podía **anular** y nunca **reasignar**, y la confirmación de reemplazo tuvo que venir de la UI
+autenticada. La bitácora sola reconstruye la secuencia completa por propuesta: filas #1380–#1383
+(confirmaciones originales inválidas), #1853–#1856 (`confirmation_invalidated_at`, la corrección) y
+#1857–#1860 (confirmaciones válidas del usuario #3).
+
+**Confirmar no es ejecutar:** las 12 siguen `PENDING_APPLY`. Las decisiones están en cola, no
+aplicadas.
+
+## Seguimiento ABIERTO y no bloqueante — UX de la tabla de candidatos
+
+Issue #2 comentario
+[`5947407519`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5947407519)
+reportó un defecto real **en código propio**, detectado mientras el dueño hacía la confirmación
+humana legítima: la tabla de candidatos **sigue ofreciendo** `Revisar (congelar decisión C2)` en las
+filas 266–269 **aunque cada una ya tiene una propuesta `PENDING_APPLY`** (#492–#495) y la propia tabla
+las etiqueta `CONGELADA_PENDIENTE`. Al entrar por ahí con `exploration` y llenar los campos bilingües
+salió «Identidad bilingüe inválida…», que **no** es evidencia de que #492 esté mal formada: es un
+camino de revisión alternativo y engañoso.
+
+**Causa raíz:** la visibilidad de `freezeReview` solo chequea que el candidato esté `pending` y que el
+usuario tenga permiso de `update`; **no** se oculta cuando ya existe una propuesta `PENDING_APPLY`
+viva. El candidato sigue `pending` **por diseño** (`freeze()` nunca muta la fila fuente), así que el
+chequeo confundió «sigue pending» con «sigue sin revisar». La corrección tiene que mirar la existencia
+de una propuesta viva, no el status del candidato.
+
+**Registrado para la próxima ronda de código** (no implementado acá, porque esta ronda se limitó a
+documentar el cierre sin cambios de runtime): ocultar o deshabilitar `freezeReview` cuando ya hay una
+propuesta `PENDING_APPLY`; preferentemente reemplazarlo por un enlace directo a esa propuesta;
+conservar la etiqueta `CONGELADA_PENDIENTE`; y agregar un test de regresión que pruebe que un
+candidato con propuesta pendiente activa **no puede** entrar a un segundo flujo de freeze desde la UI.
+
+El audit final confirma que este endurecimiento **no invalida** la reparación de TASK-0006C ni la
+compuerta de confirmación humana.
+
+---
+
+## TASK-0006B / TASK-0006C (histórico del cierre)
+
 **TASK-0006B** — Confirmación humana C2 + `CREATE_NEW` bilingüe + convergencia gobernada
-(Issue #2 comentario `5936206843`). Abierta desde HEAD `42d3c6b`.
+(Issue #2 comentario `5936206843`). Abierta desde HEAD `42d3c6b`. **CLOSED / PASS.**
 
-**Estado: READY_FOR_REVIEW (TASK-0006C — reparación de procedencia ejecutada).** El re-audit
-[`5939882569`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5939882569)
-dio **`CODE PASS`** a la ronda 2 y `PASS FOR IMPLEMENTATION` al diseño correctivo; la **autorización
-explícita del dueño** llegó en
-[`5939903005`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5939903005)
-y esta ronda la ejecutó. Detalle en la **§12 del audit**.
+**TASK-0006C** — Reparación de procedencia de confirmación de #492–#495
+(diseño `PASS FOR IMPLEMENTATION` en `5939882569`, autorización explícita del dueño en
+`5939903005`). **CLOSED / PASS.** Detalle en la **§11 del audit**.
 
-| Lo ejecutado | Estado |
+| Lo ejecutado en TASK-0006C | Estado |
 |---|---|
 | Migración aditiva + excepción estrecha del trigger (solo ANULACIÓN) | hecho, cero filas tocadas por la migración |
 | `confirm()` restringido a canal HTTP/UI | hecho — consola devuelve `CHANNEL_NOT_HUMAN` |
-| Anulación de la procedencia inválida de **#492–#495** | hecho — las 4 vuelven a `UNCONFIRMED` / `HUMAN_CONFIRMATION_REQUIRED`, `PENDING_APPLY` |
+| Anulación de la procedencia inválida de **#492–#495** | hecho — volvieron a `UNCONFIRMED` y el dueño las confirmó después por la UI |
 | Decisiones, payloads y fingerprints | **intactos** en las 4 |
 | #629–#632 | **no tocadas** (punto 10) |
 | Confirmación por el agente | **ninguna** (punto 9) |
 | APPLY / publicación / merge a `main` | **nada** |
-
-**Hallazgo a reportar:** #629–#632 **ya están confirmadas**, al contrario de lo que declaraban los dos
-comentarios. Se investigó la procedencia antes de reportar: es **legítima** — `confirmed_by_id=3`
-(Eric), **canal `http`**, referencia `5939903005`, `actor_type=user`, bitácora #1520–#1523, a las
-20:28 del 2026-10-01 (dos minutos después de la autorización, en orden descendente de id). Es decir:
-**el dueño las confirmó personalmente por la UI autenticada**, que es el «HUMAN UI FOLLOW-UP` que el
-propio comentario anunciaba, y la primera validación real del mecanismo de punta a punta. Esta
-reparación no las tocó, y esas confirmaciones **también son válidas bajo la regla nueva más estricta**,
-porque la UI es genuinamente una petición HTTP. Queda pendiente solo la confirmación humana de
-**#492–#495**.
 
 ### Ronda 2 (previa, dentro de la misma tarea)
 
 Implementó y probó el **endurecimiento de concurrencia** del APPLY agrupado y **diseñó** la corrección
 de procedencia. Detalle completo en
 [`audit/phase6_task0006b_human_confirmation_2026-10-01.md`](../../audit/phase6_task0006b_human_confirmation_2026-10-01.md)
-(§10bis para esta ronda); texto verbatim en
+(§10 para esta ronda); texto verbatim en
 [`tasks/0006b-human-confirmation.md`](tasks/0006b-human-confirmation.md); diseño correctivo en
 [`designs/0006c-confirmation-provenance-correction.md`](designs/0006c-confirmation-provenance-correction.md).
 
@@ -507,5 +566,6 @@ análisis de los 3 fallos): `audit/phase5_staging_deployment_2026-09-30.md`.
 | TASK-0005 (ronda 1, implementación + hardening + staging) | CORRECTIONS_REQUIRED (ronda 2) | [`tasks/0005-c2-human-review-ui.md`](tasks/0005-c2-human-review-ui.md); detalle en `audit/phase5_task0005_c2_review_ui_2026-09-30.md` |
 | TASK-0005 (ronda 2, correcciones 1 y 2) | **CLOSED / APPROVED** (comentario `5928773263`) | mismo archivo, sección "Re-audit — comentario `5917275454`"; detalle en la sección 10 del audit |
 | TASK-0006A (rondas 1–2, explorador de conceptos) | **CLOSED / APPROVED** (comentario `5933152293`) | [`tasks/0006a-concept-explorer.md`](tasks/0006a-concept-explorer.md); detalle en `audit/phase6_task0006a_concept_explorer_2026-10-01.md` |
-| TASK-0006 (ronda 1, revisión de la cola) | CORRECTIONS_REQUIRED / compuerta de gobernanza humana (comentario `5934324928`) → resuelta por las decisiones humanas del comentario `5936206843` | [`tasks/0006-queue-human-review.md`](tasks/0006-queue-human-review.md); detalle en la sección 10 de `audit/phase6_task0006_queue_review_2026-10-01.md` |
-| TASK-0006B (confirmación humana + bilingüe) | **READY_FOR_REVIEW** (tarea activa) | [`tasks/0006b-human-confirmation.md`](tasks/0006b-human-confirmation.md); detalle en `audit/phase6_task0006b_human_confirmation_2026-10-01.md` |
+| TASK-0006 (revisión humana de la cola) | **CLOSED / PASS** (comentario `5947549221`) — su compuerta `5934324928` quedó resuelta por las decisiones humanas de `5936206843` | [`tasks/0006-queue-human-review.md`](tasks/0006-queue-human-review.md); detalle en la sección 10 de `audit/phase6_task0006_queue_review_2026-10-01.md` |
+| TASK-0006B (confirmación humana + bilingüe) | **CLOSED / PASS** (comentario `5947549221`); ronda 1 `CORRECTIONS_REQUIRED` por `5938949812`, ronda 2 `CODE PASS` por `5939882569` | [`tasks/0006b-human-confirmation.md`](tasks/0006b-human-confirmation.md); detalle en `audit/phase6_task0006b_human_confirmation_2026-10-01.md` |
+| TASK-0006C (reparación de procedencia de confirmación) | **CLOSED / PASS** (comentario `5947549221`); diseño `PASS FOR IMPLEMENTATION` en `5939882569`, autorización del dueño en `5939903005` | mismo archivo de tarea; diseño en [`designs/0006c-confirmation-provenance-correction.md`](designs/0006c-confirmation-provenance-correction.md); detalle en la §11 del audit |

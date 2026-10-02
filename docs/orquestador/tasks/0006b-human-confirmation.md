@@ -15,11 +15,70 @@ las decisiones humanas del dueño de la taxonomía más la elección de la **opc
 **Detalle de implementación:**
 [`audit/phase6_task0006b_human_confirmation_2026-10-01.md`](../../../audit/phase6_task0006b_human_confirmation_2026-10-01.md).
 
-**Re-audit vigente:** Issue #2, comentario
+**ESTADO FINAL: `CLOSED / PASS`** — Issue #2 comentario
+[`5947549221`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5947549221)
+(2026-10-02T07:39:55Z). TASK-0006, TASK-0006B y TASK-0006C quedan cerradas. Detalle del cierre en la
+**§12 del audit**.
+
+**Seguimiento ABIERTO y no bloqueante:** comentario
+[`5947407519`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5947407519)
+(UX de `freezeReview` en la tabla de candidatos) — ver §12.3 del audit y
+`open_followup_candidate_freeze_ux` en el handoff.
+
+**Re-audit intermedio:** Issue #2, comentario
 [`5938949812`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5938949812)
 (2026-10-01T19:27:05Z, HEAD revisado `09d370b`) — `CORRECTIONS_REQUIRED / CONFIRMATION PROVENANCE`.
-Ver §10bis del audit y el diseño en
+Ver §10 del audit y el diseño en
 [`../designs/0006c-confirmation-provenance-correction.md`](../designs/0006c-confirmation-provenance-correction.md).
+
+## Texto verbatim del audit final `5947549221` (PASS)
+
+> [ORCHESTRATOR FINAL AUDIT — PASS]
+>
+> Verified read-only after the owner's Filament confirmations. TASK-0006, TASK-0006B and TASK-0006C are CLOSED/PASS. Proposals #492–#495 are now validly human-confirmed through HTTP/Filament and remain PENDING_APPLY; #629–#632 remain validly human-confirmed and unchanged. Live counts remain 10 candidate links / 2 candidate relations / 142 TERM→CONCEPT / 81 concepts / 9749 TERM→CPV / 12 reviewed proposals / 0 applied. No published taxonomy mutation occurred.
+>
+> TASK-0007 is not opened; no APPLY/PUBLISH is authorized. Follow-up UX hardening from comment 5947407519 remains open and non-blocking.
+
+## Texto verbatim del hallazgo de seguimiento `5947407519` (abierto, no bloqueante)
+
+> [ORCHESTRATOR FOLLOW-UP FINDING — TASK-0006C HUMAN UI / CANDIDATE-LIST UX]
+>
+> During the owner's legitimate human-confirmation step, a misleading UI path was observed.
+>
+> OBSERVED
+> On the Candidate Concept Links table, rows 266–269 still show the action `Revisar (congelar decisión C2)` even though each already has a `PENDING_APPLY` reviewed proposal (#492–#495) and the table itself labels them `CONGELADA_PENDIENTE`.
+>
+> For `exploration`, entering that action and filling bilingual fields triggered:
+> `Identidad bilingüe inválida — Hacen falta los dos nombres (ES y EN) explícitos...`
+>
+> DIAGNOSIS
+> This is the WRONG workflow for the current human gate:
+> - #492–#495 already have immutable frozen decisions = CONTEXT_REQUIRED.
+> - The owner must NOT freeze a new candidate decision.
+> - The required action lives in **Reviewed Proposals / Propuestas Revisadas**: `Confirmar decisión preparada`.
+>
+> Code inspection confirms the candidate-table action visibility currently checks only:
+> - source candidate status = pending;
+> - update permission.
+>
+> It does NOT hide/disable the review action when an active `PENDING_APPLY` reviewed proposal already exists, despite the adjacent badge showing `CONGELADA_PENDIENTE`.
+>
+> Therefore the bilingual validation message is not evidence that #492 is malformed. It is a misleading alternate review path reached from a candidate that already has a frozen proposal.
+>
+> IMMEDIATE GOVERNANCE
+> - Owner: do NOT use `Revisar` on exploration/upstream/midstream/downstream.
+> - Use **Propuestas Revisadas** and confirm #492–#495 there.
+> - Do not change ES/EN names for those four; their decision is CONTEXT_REQUIRED.
+> - NO APPLY/PUBLISH.
+>
+> FOLLOW-UP UX HARDENING
+> Record for next code round:
+> - hide or disable `freezeReview` when the candidate already has a live `PENDING_APPLY` reviewed proposal;
+> - preferably replace it with a direct affordance/link to the existing reviewed proposal;
+> - preserve the existing badge `CONGELADA_PENDIENTE`;
+> - add a regression test proving a candidate with an active pending reviewed proposal cannot enter a second freeze workflow from the UI.
+>
+> This UX hardening does not invalidate TASK-0006C repair or the current human-confirmation gate.
 
 ## Texto verbatim del re-audit `5938949812`
 

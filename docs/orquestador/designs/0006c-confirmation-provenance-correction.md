@@ -5,7 +5,7 @@
 > dio `PASS FOR IMPLEMENTATION` a este diseño y fijó un contrato de 9 puntos; la autorización
 > explícita del dueño llegó en
 > [`5939903005`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5939903005).
-> Lo implementado y ejecutado se documenta en la **§12 del audit**
+> Lo implementado y ejecutado se documenta en la **§11 del audit**
 > [`phase6_task0006b_human_confirmation_2026-10-01.md`](../../../audit/phase6_task0006b_human_confirmation_2026-10-01.md).
 > Este archivo se conserva como el diseño que se aprobó; donde el resultado final se desvió de lo
 > propuesto, se indica abajo en §8.

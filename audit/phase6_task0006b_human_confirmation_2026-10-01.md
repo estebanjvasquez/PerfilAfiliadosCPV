@@ -525,13 +525,13 @@ confirmar **no es ejecutar**. Es la señal que distingue estructuralmente los tr
 
 ---
 
-## 10bis. Re-audit `5938949812` — ronda de corrección (concurrencia implementada, procedencia diseñada)
+## 10. Re-audit `5938949812` — ronda de corrección (concurrencia implementada, procedencia diseñada)
 
 **HEAD revisado:** `09d370b31c62478f36fc843d1bc516493e055908`. **Veredicto:**
 `CORRECTIONS_REQUIRED / CONFIRMATION PROVENANCE`. Texto verbatim en
 [`docs/orquestador/tasks/0006b-human-confirmation.md`](../docs/orquestador/tasks/0006b-human-confirmation.md).
 
-### 10bis.1 Aceptado
+### 10.1 Aceptado
 
 Esquema aditivo y `confirm()` «sustancialmente implementados»; campos de confirmación separados del
 payload inmutable; la compuerta de `apply()` sobre propuestas preparadas por agente con compatibilidad
@@ -542,7 +542,7 @@ términos en un concepto futuro sin cambiar semántica ni cardinalidad de búsqu
 congeladas como REJECT en vez de publicadas o borradas; cero APPLY; 142 / 81 / 9749 y 0 aplicadas; la
 regresión de 32 queries sigue heredada; evidencia de despliegue y tests aceptable.
 
-### 10bis.2 BLOQUEO — la confirmación de #492–#495 la ejecutó el agente con una sesión suplantada
+### 10.2 BLOQUEO — la confirmación de #492–#495 la ejecutó el agente con una sesión suplantada
 
 **El bloqueo es correcto y se acepta sin matizarlo.** `confirm()` exige
 `Auth::id() === $confirmer->id` precisamente para que nadie pueda «confirmar en nombre de» otra
@@ -565,7 +565,7 @@ exactamente el invariante anti-suplantación que TASK-0006B pedía.
 Y no es cosmético: el trigger de TASK-0006B hace esos campos inmutables, así que la atribución
 incorrecta **no puede** sobrescribirse por `confirm()` ni por ningún camino existente.
 
-### 10bis.3 Lo que esta ronda hizo, y lo que deliberadamente no hizo
+### 10.3 Lo que esta ronda hizo, y lo que deliberadamente no hizo
 
 Alcance acotado exactamente a lo instruido («implementa/testea únicamente el endurecimiento de
 concurrencia y diseña la corrección auditable»; «no modifiques todavía esos datos ni confirmes
@@ -580,12 +580,12 @@ propuestas mediante consola/agente»):
 | 5. La escritura correctiva exige autorización humana nueva | **respetado** — no implementada ni ejecutada |
 | 6. Cierre humano por la acción autenticada de Filament | documentado como paso siguiente |
 | 7. #629/#630 y #631/#632 no se confirman por consola | **cumplido** — siguen sin confirmar |
-| Nota de concurrencia de grupo | **implementada y probada** (§10bis.4) |
+| Nota de concurrencia de grupo | **implementada y probada** (§10.4) |
 
 **Cero escrituras reales de datos en esta ronda.** Lo único que cambió son código, tests y
 documentación.
 
-### 10bis.4 Endurecimiento de concurrencia del APPLY agrupado — implementado
+### 10.4 Endurecimiento de concurrencia del APPLY agrupado — implementado
 
 **El defecto:** `apply()` bloqueaba primero la fila de entrada y después todas las del grupo. Dos
 `apply()` concurrentes entrando por hermanos distintos tomaban locks de primera fila **opuestos** y
@@ -648,7 +648,7 @@ de deadlock se demuestra **por construcción** más la exclusión mutua medida, 
 simulada — y se dice así en el propio archivo de test en lugar de insinuar una prueba más fuerte de la
 que hay.
 
-### 10bis.5 Diseño de la corrección de procedencia — solo diseño
+### 10.5 Diseño de la corrección de procedencia — solo diseño
 
 Completo en
 [`docs/orquestador/designs/0006c-confirmation-provenance-correction.md`](../docs/orquestador/designs/0006c-confirmation-provenance-correction.md).
@@ -679,7 +679,7 @@ sube mucho el costo y elimina el camino real usado, pero no vuelve el invariante
 es absoluto es que el canal queda registrado con la verdad y que ninguna ruta permite **reasignar** una
 confirmación existente.
 
-### 10bis.6 Estado vivo — sin cambios en esta ronda
+### 10.6 Estado vivo — sin cambios en esta ronda
 
 | Ítem | Valor |
 |---|---|
@@ -695,7 +695,7 @@ confirmación existente.
 
 ---
 
-## 12. TASK-0006C — reparación de procedencia de confirmación de #492–#495 (ejecutada)
+## 11. TASK-0006C — reparación de procedencia de confirmación de #492–#495 (ejecutada)
 
 **Autorización:** Issue #2 comentario
 [`5939903005`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5939903005)
@@ -706,7 +706,7 @@ confirmación existente.
 El re-audit de la ronda 2 dio **`CODE PASS`** al endurecimiento de concurrencia y al diseño; lo que
 faltaba era la operación correctiva gateada. Esto es esa operación.
 
-### 12.1 Lo construido (puntos 1 y 6 de la autorización)
+### 11.1 Lo construido (puntos 1 y 6 de la autorización)
 
 **Migración aditiva** `2026_10_01_210000_add_confirmation_invalidation_to_taxonomy_reviewed_proposals`:
 7 columnas nulables (`confirmation_invalidated_at`, `_by_id`, `_actor_type`, `_channel`,
@@ -746,7 +746,7 @@ revisarlo.
 error que se repara. El actor se registra con la verdad (`agent`), el canal se auto-captura y la
 autorización del dueño vive en la referencia de gobernanza.
 
-### 12.2 La operación ejecutada (puntos 2–5, 7)
+### 11.2 La operación ejecutada (puntos 2–5, 7)
 
 Ejecutada **después** de los tests y **después** de verificar el despliegue: HEAD `3fe0422` desplegado
 (run «Deploy a Contabo» `success` para ese sha), smoke `/` 200, `/admin/login` 200 y las tres
@@ -776,7 +776,7 @@ evidencia de por qué esa procedencia no era válida.
 `user_id=NULL`, y `authorization_reference`/`target_environment` en **NULL** porque corregir no es
 ejecutar.
 
-### 12.3 Post-estado verificado (punto 8)
+### 11.3 Post-estado verificado (punto 8)
 
 | Requisito | Verificado |
 |---|---|
@@ -798,7 +798,7 @@ filas REALES con la policy del revisor #3:
 - el resource sigue con solo `index` y `view`, `canCreate()=false`, **sin ninguna acción de
   APPLY/Publicar**.
 
-### 12.4 Hallazgo que hay que reportar: el dueño ya confirmó #629–#632 por la UI
+### 11.4 Hallazgo que hay que reportar: el dueño ya confirmó #629–#632 por la UI
 
 Al leer el estado para respetar el punto 10 apareció algo que **no** coincide con el estado declarado
 en los comentarios `5939882569` y `5939903005` («#629/#630 y #631/#632 remain unconfirmed»): **las
@@ -831,7 +831,7 @@ Dos precisiones que importan:
 Queda pendiente, por tanto, solo la confirmación humana de **#492–#495**, que es lo que el dueño hará
 personalmente ahora que la acción volvió a estar disponible para ellas.
 
-### 12.5 Tests (todos verdes)
+### 11.5 Tests (todos verdes)
 
 | Archivo | Resultado |
 |---|---|
@@ -854,7 +854,7 @@ Los tests que confirmaban desde consola se movieron a una petición enrutada. **
 existe ninguna bandera para saltear la restricción; simplemente corren en el mismo contexto que
 producción. El camino real de la UI está cubierto aparte por los 9 tests de Filament.
 
-### 12.6 Lo que esta ronda NO hizo
+### 11.6 Lo que esta ronda NO hizo
 
 Punto 9 de la autorización: **el agente no confirmó ninguna propuesta**. Las cuatro reparadas quedaron
 deliberadamente sin confirmar, esperando al revisor humano. Punto 10: #629–#632 no se tocaron. Y
@@ -863,7 +863,128 @@ la cola, ninguna migración destructiva, ninguna rotación de credenciales.
 
 ---
 
-## 11. Condiciones STOP
+## 12. CIERRE — audit final `5947549221` (PASS)
+
+**Issue #2 comentario
+[`5947549221`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5947549221)
+(2026-10-02): `[ORCHESTRATOR FINAL AUDIT — PASS]`.** Verificado en solo lectura tras las
+confirmaciones del dueño por Filament. **TASK-0006, TASK-0006B y TASK-0006C quedan CLOSED/PASS.**
+
+### 12.1 Lo que cerró el ciclo
+
+El dueño confirmó **#492–#495** personalmente por la UI autenticada el 2026-10-02:
+
+| Propuesta | Término | `confirmed_by_id` | Canal | Referencia | `confirmed_at` | Estado |
+|---|---|---|---|---|---|---|
+| #492 | `exploration` | **3** | **`http`** | `Issue #2 comentario 5936206843` | 07:36:55 | `PENDING_APPLY` |
+| #493 | `upstream` | **3** | **`http`** | `Issue #2 comentario 5936206843` | 07:37:15 | `PENDING_APPLY` |
+| #494 | `midstream` | **3** | **`http`** | `Issue #2 comentario 5936206843` | 07:37:31 | `PENDING_APPLY` |
+| #495 | `downstream` | **3** | **`http`** | `Issue #2 comentario 5936206843` | 07:37:52 | `PENDING_APPLY` |
+
+**La reparación funcionó exactamente como se diseñó, y se comprueba en la propia fila.** Cada una de
+las cuatro conserva **a la vez**:
+
+- el **rastro de la anulación** — `invalidated_confirmation_snapshot` con la confirmación original y
+  su `channel='console'`, que es la evidencia misma de por qué esa procedencia no era válida;
+- la **confirmación nueva y legítima**, con `channel='http'`.
+
+La historia **no se sobrescribió**. La asimetría del diseño aguantó en la práctica: la corrección solo
+podía **anular**, nunca **reasignar**, así que la confirmación de reemplazo tuvo que venir de la UI
+autenticada por la persona. Eso es precisamente lo que el re-audit `5938949812` exigía y lo que la
+ronda anterior no había logrado.
+
+**La bitácora sola reconstruye la secuencia completa** por propuesta, sin leer ninguna otra tabla:
+
+| Filas | Evento |
+|---|---|
+| #1380–#1383 | confirmaciones originales — **procedencia inválida** (2026-10-01 19:02, canal `console`) |
+| #1853–#1856 | `confirmation_invalidated_at` — la **corrección** (`actor_type=system`, `user_id` NULL) |
+| #1857–#1860 | confirmaciones **válidas** del usuario #3 (2026-10-02 07:36–07:37, `actor_type=user`) |
+
+### 12.2 Estado al cierre, verificado en solo lectura
+
+| Ítem | Declarado por el audit final | Verificado |
+|---|---|---|
+| Filas fuente candidatas | 10 | **10** ✅ |
+| Relaciones candidatas | 2 | **2** ✅ |
+| `taxonomy_term_concepts` | 142 | **142** ✅ |
+| `taxonomy_canonical_concepts` | 81 | **81** ✅ |
+| TERM→CPV | 9749 | **9749** ✅ |
+| Propuestas revisadas | 12 | **12** ✅ |
+| Aplicadas | 0 | **0** ✅ |
+| #629–#632 | válidamente confirmadas y sin cambios | canal `http`, usuario #3, 2026-10-01 20:28, nunca anuladas ✅ |
+| Mutación de taxonomía publicada | ninguna | **ninguna** ✅ |
+
+**Higiene de confirmaciones sobre el dataset real completo:** de las 12 propuestas, **8 están
+confirmadas por humano y las 8 llevan `channel='http'`; ninguna lleva `console`**, y **cero** quedan
+esperando confirmación. La restricción a canal HTTP introducida en TASK-0006C se sostiene sobre los
+datos reales, no solo en los tests.
+
+**Nada publicado:** 0 candidatos en `published`, 0 relaciones en `approved`, los 10 candidatos siguen
+`pending`.
+
+**Confirmar no es ejecutar:** las 12 propuestas siguen `PENDING_APPLY`. TASK-0007 sigue sin abrir y
+APPLY/PUBLICACIÓN sigue **NO AUTORIZADO**, así que las decisiones confirmadas están **en cola, no
+aplicadas**.
+
+### 12.3 Seguimiento ABIERTO y no bloqueante — UX de `freezeReview`
+
+Issue #2 comentario
+[`5947407519`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5947407519)
+reportó un defecto real **en código de estas tareas**, detectado mientras el dueño hacía la
+confirmación legítima.
+
+**Observado:** la tabla de candidatos **sigue ofreciendo** `Revisar (congelar decisión C2)` en las
+filas 266–269 aunque cada una ya tiene una propuesta `PENDING_APPLY` (#492–#495) y la propia tabla las
+etiqueta `CONGELADA_PENDIENTE`. Entrando por ahí con `exploration` y llenando los campos bilingües
+apareció «Identidad bilingüe inválida — Hacen falta los dos nombres (ES y EN) explícitos…».
+
+**Diagnóstico del orquestador, que conviene no malinterpretar:** ese mensaje **no** es evidencia de
+que #492 esté mal formada. Es un **camino de revisión alternativo y engañoso**, alcanzado desde un
+candidato que ya tiene su decisión congelada. El flujo correcto para la compuerta actual vive en
+*Propuestas Revisadas* → «Confirmar decisión preparada».
+
+**Causa raíz:** la visibilidad de `freezeReview` en `TaxonomyCandidateConceptLinkResource` chequea
+solo (a) que el candidato esté `pending` y (b) que el usuario tenga permiso de `update`. **No** se
+oculta cuando ya existe una propuesta `PENDING_APPLY` viva, pese a que la insignia adyacente ya
+muestra `CONGELADA_PENDIENTE`.
+
+**Por qué el candidato sigue `pending`:** por diseño — `freeze()` nunca muta la fila fuente, así que un
+candidato con decisión congelada legítimamente permanece `pending` hasta un `apply()` autorizado
+aparte. El chequeo de visibilidad confundió «sigue pending» con «sigue sin revisar». La corrección
+tiene que mirar la **existencia de una propuesta viva**, no el status del candidato.
+
+**Registrado para la próxima ronda de código** (no implementado en esta ronda, limitada a documentar
+el cierre sin cambios de runtime):
+
+- ocultar o deshabilitar `freezeReview` cuando el candidato ya tenga una propuesta `PENDING_APPLY` viva;
+- preferentemente reemplazarlo por un enlace directo a la propuesta existente;
+- conservar la insignia `CONGELADA_PENDIENTE`;
+- test de regresión que pruebe que un candidato con propuesta pendiente activa **no puede** entrar a un
+  segundo flujo de freeze desde la UI.
+
+La instrucción interina del comentario (que el dueño no usara `Revisar` sobre esos cuatro términos y
+confirmara desde *Propuestas Revisadas*, sin cambiar nombres ES/EN) **ya quedó satisfecha**: las cuatro
+confirmaciones de §12.1 se hicieron por el camino correcto.
+
+El audit final confirma que este endurecimiento **no invalida** la reparación de TASK-0006C ni la
+compuerta de confirmación humana.
+
+### 12.4 Qué hizo esta ronda de cierre
+
+**Solo documentación.** Cero cambios de runtime, de esquema y de datos; cero APPLY; cero publicación.
+Actualizados `audit/orchestrator_handoff.json` (estados `CLOSED / PASS`, evidencia de cierre
+verificada y el seguimiento abierto registrado como compuerta futura), `docs/orquestador/current_task.md`
+y esta sección. La verificación de estado fue **de solo lectura**.
+
+Corrección de consistencia detectada al pasar: el campo `status` del checkpoint **TASK-0006A** decía
+`READY_FOR_REVIEW` aunque su `closed_by` ya registraba el cierre del comentario `5933152293` — el campo
+nunca se actualizó al cerrarse la tarea. Se corrigió a `CLOSED / APPROVED` dejando constancia de la
+corrección; el veredicto en sí nunca cambió.
+
+---
+
+## 13. Condiciones STOP
 
 Ninguna alcanzada. Sin APPLY ni publicación; sin despliegue a producción; sin merge a `main`; sin
 migración destructiva (solo aditiva); sin rotación de credenciales; sin cambios de semántica de
