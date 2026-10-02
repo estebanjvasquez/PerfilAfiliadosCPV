@@ -21,6 +21,12 @@ seguimiento abierto del comentario
 [`../designs/0006d-stale-proposal-supersession.md`](../designs/0006d-stale-proposal-supersession.md)
 — **diseñado, no implementado, no ejecutado sobre datos reales.**
 
+**Re-audit (ronda 2):** Issue #2, comentario
+[`5952211890`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5952211890)
+(2026-10-02T12:20:09Z, HEAD revisado `f9caf15`) — `CORRECTIONS_REQUIRED / NARROW GROUP-INTEGRITY GATE`.
+Partes 1–5 **aceptadas**; corrección del gate de integridad de grupos bilingües y de la consistencia
+del diseño. Detalle en la **§11 del audit**. Texto verbatim más abajo.
+
 **TASK-0007 sigue SIN ABRIR. APPLY/PUBLISH NO AUTORIZADO.**
 
 ---
@@ -372,3 +378,135 @@ preflight viene a evitar.
 > D) not-applicable gates.
 >
 > TASK-0007 must remain unopened until this task is audited and any stale-review remediation is separately authorized.
+
+## Texto verbatim del re-audit `5952211890` (ronda 2, CORRECTIONS_REQUIRED)
+
+> [ORCHESTRATOR RE-AUDIT — TASK-0006D — CORRECTIONS_REQUIRED / NARROW GROUP-INTEGRITY GATE]
+>
+> Reviewed HEAD `f9caf1527afa74b15be39324a48b68e4705a686d` against TASK-0006D contract in comment `5949253156`.
+>
+> VERDICT
+> Most of TASK-0006D is ACCEPTED. One APPLY-safety defect remains in the grouped bilingual path and must be closed before TASK-0006D can PASS and before TASK-0007 may open.
+>
+> ACCEPTED
+>
+> 1. READ-ONLY PREFLIGHT
+> - `preflight()` / `preflightAll()` are implemented as non-writing diagnostics.
+> - Validation was extracted into shared `evaluateApplicability(..., lockRows)`; apply uses locks, preflight does not.
+> - The command has a DB-write detector and the real audit artifact records `write_statements_observed = 0`.
+> - Real 12-proposal result is accepted:
+>   - NEEDS_REVALIDATION: #420, #421, #422 = STALE_TAXONOMY_STATE.
+>   - READY_TO_APPLY snapshot: #491, #492–#495, #629/#630, #631/#632.
+>   - BLOCKED_FOR_OTHER_REASON: 0.
+> - This remains a snapshot only; it is not execution authorization.
+>
+> 2. CANDIDATE UX HARDENING
+> - `freezeReview` is now hidden when a live PENDING_APPLY reviewed proposal exists.
+> - `CONGELADA_PENDIENTE` is preserved.
+> - a safe read-only “Ver propuesta revisada” affordance is present.
+> - candidates with active proposals are removed from bilingual convergence options.
+> - source/service/DB defenses remain in place.
+> This closes the UX finding from comment `5947407519`.
+>
+> 3. STALE REVIEW DESIGN
+> - Option A / governed non-destructive supersession is accepted as the preferred architecture.
+> - For the three real stale rows (#420–#422), the recommendation “supersede without successor, then human re-review from current evidence” is accepted in principle.
+> - NO real supersession is authorized yet.
+> - Options that rewrite fingerprints, force stale apply, or erase history remain prohibited.
+>
+> 4. RELATION-EDITING RISK
+> - Accepted as non-blocking for this specific 12-proposal queue.
+> - It remains a separate admin/production hardening gate.
+>
+> 5. LIVE STATE
+> I re-counted the shared Supabase state read-only during this audit:
+> - candidates = 10, all 10 pending
+> - candidate relations = 2, both candidate
+> - TERM→CONCEPT = 142
+> - canonical concepts = 81
+> - TERM→CPV = 9749
+> - reviewed proposals = 12
+> - PENDING_APPLY = 12
+> - APPLIED = 0
+> - ABORTED = 0
+> No real proposal lifecycle mutation occurred in TASK-0006D.
+>
+> BLOCKER — GROUPED APPLY DOES NOT REVALIDATE EVERY MEMBER'S IMMUTABLE PAYLOAD
+>
+> The grouped path still validates the payload fingerprint only for the ENTRY proposal in `evaluateApplicability()`.
+>
+> Then `evaluateBilingualGroup()` loads every sibling and validates status, taxonomy fingerprint, source drift and bilingual identity, but it never calls `payloadFingerprintIsValid($member)` for each pending sibling.
+>
+> Finally, `writeBilingualGroupCreateNew()` publishes and marks APPLIED ALL pending siblings.
+>
+> Therefore a call such as `apply(#629)` can consume/write #630 without revalidating #630's own immutable payload fingerprint at execution time. The fact that `preflightAll()` separately evaluated #630 earlier does not close this gap: preflight is explicitly only a snapshot, and apply must revalidate everything it is about to write under locks.
+>
+> This contradicts the C2 immutable-payload contract and the TASK-0006D claim that apply “revalidates TODO otra vez con locks”.
+>
+> The current real #629/#630 payloads were reported valid in the read-only preflight, so this is NOT evidence of current data corruption. It is an execution-path safety defect that must be fixed before real APPLY.
+>
+> REQUIRED CORRECTION
+>
+> A. In the grouped applicability path, validate the payload fingerprint of EVERY pending member before using that member's payload or source data.
+> - A tampered sibling must cause a deterministic blocker such as TAMPER_DETECTED.
+> - Include the offending proposal id in the diagnostic detail.
+> - Entry by #629 or #630 must produce the same safety result for the same damaged group.
+>
+> B. Group-terminal failure semantics must be coherent.
+> Today a terminal blocker discovered in a sibling is routed through `applyOutcomeForBlocker($entryProposal,...)`, which aborts only the entry proposal. That can leave another sibling PENDING_APPLY inside a group that has already failed as a group.
+> Before TASK-0007, make the chosen behavior explicit and safe:
+> - preferred: terminal group blockers atomically transition all still-pending group members to the same terminal outcome/audit trail; OR
+> - implement another explicit group-terminal mechanism with equivalent auditability.
+> Do not leave a silently stranded PENDING_APPLY sibling after a group-wide terminal validation failure.
+> HUMAN_CONFIRMATION_REQUIRED remains non-terminal and must not abort the group.
+>
+> C. Tests, fixtures only:
+> - tamper sibling payload while entering through the other sibling → preflight(entry) detects TAMPER_DETECTED;
+> - same test entering through either sibling;
+> - apply fixture under transaction performs ZERO taxonomy publication when any sibling is tampered;
+> - terminal group blocker leaves group lifecycle state coherent according to the chosen rule;
+> - human-confirmation blocker remains non-terminal;
+> - existing source-drift, one-concept, advisory-lock and idempotency tests remain green.
+> NO real APPLY.
+>
+> D. Preflight report
+> Expose group-wide payload-integrity evidence, not only the entry row's `payload_fingerprint_valid`:
+> - per-member validity or a group-wide aggregate plus member ids.
+> Re-run read-only preflight on all 12 after the fix. Expected real classification remains 3 stale / 9 ready unless evidence says otherwise.
+>
+> E. Small design-doc consistency correction
+> The Option-A design makes a state diff mandatory for a successor and later names `supersession_state_delta JSONB`, but the proposed migration/schema list omits that column. Reconcile the design now: include the persisted delta field (or document an equally durable location) so the future implementation spec is internally consistent.
+>
+> DO NOT
+> - mutate #420–#422;
+> - mutate #629/#630;
+> - APPLY/PUBLISH anything;
+> - supersede/re-freeze real rows;
+> - merge main;
+> - deploy production.
+>
+> Runtime code/tests may be corrected and deployed to STAGING under the existing TASK-0006D authorization. Preserve all real counts.
+>
+> INHERITED GATES
+> A) Inherited approved and not invalidated:
+> - TASK-0001/C1, TASK-0002, TASK-0003, TASK-0004/C2, TASK-0005, TASK-0006A/B/C.
+> - 32-query search regression remains inherited because no published search semantics changed.
+> B) Newly executed evidence:
+> - 12-proposal read-only preflight.
+> - candidate UX correction.
+> - staging validation.
+> - live invariant recount.
+> C) Invalidated evidence:
+> - none of the earlier approved gates are reset.
+> - only TASK-0006D closure is blocked by the grouped execution-safety finding above.
+> D) Not applicable:
+> - real APPLY, publication, production deploy, main merge.
+>
+> TASK-0007 remains UNOPENED and APPLY/PUBLISH remains NOT AUTHORIZED.
+>
+> After corrections, STOP and return:
+> READY_FOR_REVIEW
+> Issue #2
+> HEAD <exact-sha>
+>
+

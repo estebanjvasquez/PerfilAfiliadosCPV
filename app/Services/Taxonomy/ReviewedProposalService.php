@@ -134,6 +134,22 @@ use Illuminate\Support\Facades\DB;
  * paridad la verifica bloqueo por bloqueo.
  *
  * `freeze()`, `confirm()` e `invalidateConfirmation()` no cambian en nada por esta tarea.
+ *
+ * TASK-0006D, re-audit (Issue #2 comentario `5952211890`): se cierran dos defectos de SEGURIDAD DE
+ * EJECUCIÓN del camino agrupado, ninguno de los cuales era visible en los datos reales pero los dos
+ * alcanzables:
+ *
+ * 1. El grupo bilingüe validaba el `payload_fingerprint` SOLO de la propuesta de entrada, mientras
+ *    `writeBilingualGroupCreateNew()` publicaba y marcaba `APPLIED` a TODOS los hermanos pendientes -
+ *    así que `apply(#629)` podía escribir #630 sin revalidar el payload inmutable de #630. Ahora el
+ *    fingerprint de CADA miembro pendiente se revalida como PRIMERA compuerta de ese miembro, antes de
+ *    leer un solo campo de su payload o de su fila fuente (ver `evaluateBilingualGroup()`). El defecto
+ *    venía del diseño original de la sección D de TASK-0006B; la extracción de TASK-0006D lo heredó.
+ * 2. Un bloqueo terminal detectado en un hermano abortaba únicamente la propuesta de ENTRADA, dejando
+ *    al hermano `PENDING_APPLY` dentro de un grupo que ya había fallado como grupo - un hermano varado
+ *    en silencio, aparentemente aplicable. Ahora todo bloqueo terminal de un grupo aborta el grupo
+ *    COMPLETO, atómicamente y con una fila de auditoría por miembro (ver `abortWholeGroup()`).
+ *    `HUMAN_CONFIRMATION_REQUIRED` sigue siendo NO terminal y no aborta nada.
  */
 class ReviewedProposalService
 {
@@ -1342,7 +1358,8 @@ class ReviewedProposalService
      *    `RESULT_HUMAN_CONFIRMATION_REQUIRED`. Cero escrituras, `status` intacto en `PENDING_APPLY`,
      *    la propuesta sigue siendo aplicable una vez confirmada.
      * 3. CUALQUIER OTRO BLOQUEO: `abort()` terminal, con la MISMA constante `ABORT_*` que escribía
-     *    la versión anterior de `apply()` y el mismo detalle en `application_result`.
+     *    la versión anterior de `apply()` y el mismo detalle en `application_result`. Si la propuesta
+     *    pertenece a un grupo bilingüe, el aborto es DE GRUPO - ver `abortWholeGroup()`.
      */
     private function applyOutcomeForBlocker(TaxonomyReviewedProposal $proposal, array $evaluation, string $authorizationReference, string $targetEnvironment): array
     {
@@ -1357,11 +1374,99 @@ class ReviewedProposalService
             return ['result' => self::RESULT_ALREADY_ABORTED, 'proposal' => $proposal, 'abort_reason' => $proposal->application_result['abort_reason'] ?? null, 'application_result' => $proposal->application_result];
         }
 
+        // TASK-0006D re-audit (comentario `5952211890`, punto B): la compuerta de confirmación humana
+        // sigue siendo NO TERMINAL y NO aborta el grupo. Cero escrituras: todos los miembros siguen
+        // `PENDING_APPLY` y el grupo sigue aplicable una vez confirmado.
         if ($blocker === self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED) {
             return ['result' => self::RESULT_HUMAN_CONFIRMATION_REQUIRED, 'proposal' => $proposal, 'abort_reason' => null, 'application_result' => $detail];
         }
 
-        return $this->abort($proposal, self::applyAbortReasonForBlocker($blocker, $proposal->proposal_type), $authorizationReference, $targetEnvironment, $detail);
+        $abortReason = self::applyAbortReasonForBlocker($blocker, $proposal->proposal_type);
+
+        if ($proposal->isGrouped()) {
+            return $this->abortWholeGroup($proposal, $abortReason, $authorizationReference, $targetEnvironment, $detail);
+        }
+
+        return $this->abort($proposal, $abortReason, $authorizationReference, $targetEnvironment, $detail);
+    }
+
+    /**
+     * TASK-0006D re-audit (Issue #2 comentario `5952211890`, punto B — «Group-terminal failure
+     * semantics must be coherent»): un bloqueo TERMINAL en un grupo bilingüe aborta el grupo COMPLETO,
+     * atómicamente y con rastro de auditoría por miembro.
+     *
+     * EL DEFECTO QUE CIERRA: antes, un bloqueo terminal descubierto en un HERMANO se enrutaba por
+     * `applyOutcomeForBlocker($entryProposal, ...)`, que abortaba únicamente la propuesta de ENTRADA.
+     * Eso dejaba al hermano en `PENDING_APPLY` dentro de un grupo que ya había fallado COMO GRUPO - un
+     * hermano varado en silencio, aparentemente aplicable, cuando aplicarlo solo crearía el concepto
+     * con un único término adjunto (exactamente el duplicado que la sección D de TASK-0006B prohíbe).
+     *
+     * POR QUÉ TODO BLOQUEO TERMINAL DE UN MIEMBRO DE GRUPO ES GRUPAL, sin excepciones: un grupo
+     * describe UNA convergencia indivisible - un concepto, varios términos. Si cualquier parte de esa
+     * descripción deja de ser válida (payload manipulado, estado obsoleto, fuente drifteada, entidad
+     * faltante, identidad incoherente), la convergencia entera dejó de ser aplicable. No hay un
+     * subconjunto del grupo que siga siendo correcto aplicar. Por eso no hace falta distinguir si el
+     * bloqueo se detectó en la entrada o en un hermano: el desenlace es el mismo, y eso es lo que hace
+     * que entrar por #629 o por #630 dé el MISMO resultado de seguridad.
+     *
+     * ATOMICIDAD: corre dentro de la transacción de `apply()`, que ya tomó el advisory lock del grupo
+     * como PRIMERA acción (antes de cualquier `lockForUpdate()`), así que ningún `apply()` concurrente
+     * de un hermano puede intercalarse. Se re-toma por defensa en profundidad, igual que en
+     * `evaluateBilingualGroup()`: es re-entrante dentro de la misma transacción.
+     *
+     * AUDITABILIDAD: cada miembro recibe su propia fila de `taxonomy_audit_log` vía `abort()`, con el
+     * mismo `abort_reason` y una referencia explícita a la propuesta donde se detectó el problema. Así
+     * la bitácora sola explica por qué un hermano sin ningún defecto propio quedó abortado.
+     *
+     * Los miembros que ya están `APPLIED` o `ABORTED` no se tocan: abortar algo ya ejecutado sería
+     * reescribir historia, y un `ABORTED` previo ya es terminal.
+     */
+    private function abortWholeGroup(
+        TaxonomyReviewedProposal $proposal,
+        string $abortReason,
+        string $authorizationReference,
+        string $targetEnvironment,
+        array $detail,
+    ): array {
+        self::acquireGroupAdvisoryLock($proposal->proposal_group_id);
+
+        $stillPending = TaxonomyReviewedProposal::query()
+            ->where('proposal_group_id', $proposal->proposal_group_id)
+            ->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get();
+
+        $abortedIds = $stillPending->pluck('id')->map(fn ($id) => (int) $id)->all();
+
+        $entryOutcome = null;
+        foreach ($stillPending as $member) {
+            $memberDetail = array_merge($detail, [
+                'group_terminal_failure' => true,
+                'proposal_group_id' => $proposal->proposal_group_id,
+                'detected_on_proposal_id' => (int) ($detail['tampered_proposal_id'] ?? $proposal->id),
+                'group_aborted_proposal_ids' => $abortedIds,
+                'group_abort_note' => $member->id === $proposal->id
+                    ? 'Bloqueo terminal en este grupo bilingüe: el grupo se aborta COMPLETO en la misma transacción.'
+                    : "Abortada como parte del grupo bilingüe {$proposal->proposal_group_id}: el grupo falló como grupo, así que ningún hermano queda aplicable por separado (aplicar solo uno crearía el concepto con un único término adjunto). El problema se detectó en la propuesta #".($detail['tampered_proposal_id'] ?? $proposal->id).'.',
+            ]);
+
+            $outcome = $this->abort($member, $abortReason, $authorizationReference, $targetEnvironment, $memberDetail);
+
+            if ((int) $member->id === (int) $proposal->id) {
+                $entryOutcome = $outcome;
+            }
+        }
+
+        // Si la propuesta de entrada no estaba entre las pendientes, su desenlace ya lo resolvió una
+        // compuerta anterior (`ALREADY_APPLIED`/`ALREADY_ABORTED`), así que este camino no se alcanza
+        // para ella. Se devuelve igual un resultado coherente en vez de `null`.
+        return $entryOutcome ?? [
+            'result' => self::RESULT_ABORTED,
+            'proposal' => $proposal->fresh(),
+            'abort_reason' => $abortReason,
+            'application_result' => array_merge($detail, ['group_aborted_proposal_ids' => $abortedIds]),
+        ];
     }
 
     /**
@@ -1554,9 +1659,10 @@ class ReviewedProposalService
 
         return [
             'payload_fingerprint' => $proposal->payload_fingerprint,
-            'payload_fingerprint_valid' => in_array($blocker, [self::PREFLIGHT_ALREADY_APPLIED, self::PREFLIGHT_ALREADY_ABORTED], true)
-                ? null
-                : $blocker !== self::PREFLIGHT_TAMPER_DETECTED,
+            // Evidencia registrada por la compuerta, NO deducida del bloqueo: en un grupo bilingüe el
+            // tamper puede estar en un hermano, y en ese caso el payload de ESTA fila sí es válido.
+            // Deducirlo de `blocker === TAMPER_DETECTED` reportaría como manipulada una fila intacta.
+            'payload_fingerprint_valid' => $context['entry_payload_valid'] ?? null,
             'taxonomy_state_fingerprint_frozen' => $proposal->taxonomy_state_fingerprint,
             'taxonomy_state_fingerprint_current' => $currentFingerprint,
             'stale' => $currentFingerprint === null ? null : $currentFingerprint !== $proposal->taxonomy_state_fingerprint,
@@ -1585,10 +1691,38 @@ class ReviewedProposalService
                     ? $blocker !== self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT
                     : ($blocker === self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT ? false : null),
                 'reuses_concept_id' => $context['group_reuse_concept_id'] ?? null,
+                // TASK-0006D re-audit (comentario `5952211890`, punto D): integridad del payload de
+                // TODO el grupo, no sólo de la fila de entrada. Mapa id => true|false|null, con la
+                // misma convención: `null` = no evaluado (una compuerta anterior cortó el recorrido),
+                // nunca "válido".
+                'member_payload_fingerprint_valid' => $context['group_member_payload_valid'] ?? null,
+                'tampered_member_ids' => isset($context['group_member_payload_valid'])
+                    ? array_map('intval', array_keys(array_filter($context['group_member_payload_valid'], fn ($v) => $v === false)))
+                    : null,
+                'all_member_payloads_valid' => self::aggregateMemberPayloadValidity($context['group_member_payload_valid'] ?? null),
             ] : null,
             'relation_validation' => $context['relation_validation'] ?? null,
             'checks_null_means' => 'null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa "pasó".',
         ];
+    }
+
+    /**
+     * TASK-0006D re-audit (comentario `5952211890`, punto D): agregado de la validez de payload de un
+     * grupo. `false` si CUALQUIER miembro resultó manipulado; `true` sólo si TODOS se verificaron y
+     * dieron válidos; `null` si quedó alguno sin evaluar - nunca se asume que un miembro no verificado
+     * esté bien.
+     */
+    private static function aggregateMemberPayloadValidity(?array $perMember): ?bool
+    {
+        if ($perMember === null || $perMember === []) {
+            return null;
+        }
+
+        if (in_array(false, $perMember, true)) {
+            return false;
+        }
+
+        return in_array(null, $perMember, true) ? null : true;
     }
 
     private static function preflightSourceLabel(TaxonomyReviewedProposal $proposal): string
@@ -1664,13 +1798,25 @@ class ReviewedProposalService
         $abortReason = self::applyAbortReasonForPreflightBlocker($blocker, $proposal->proposal_type);
 
         if ($abortReason !== null) {
+            // TASK-0006D re-audit (comentario `5952211890`, punto B): en un grupo bilingüe un bloqueo
+            // terminal aborta el grupo COMPLETO, así que el write-set NO son 2 filas sino 2 POR CADA
+            // miembro todavía pendiente. Decirlo mal haría parecer barato un apply() de prueba que en
+            // realidad quemaría varias decisiones humanas de una sola vez.
+            $terminalRows = $proposal->isGrouped()
+                ? max(1, TaxonomyReviewedProposal::query()
+                    ->where('proposal_group_id', $proposal->proposal_group_id)
+                    ->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)
+                    ->count())
+                : 1;
+
             return [
                 'expected_write_set' => [
-                    ['table' => 'taxonomy_reviewed_proposals', 'operation' => 'UPDATE', 'rows' => 1, 'description' => "status PENDING_APPLY -> ABORTED (terminal), con application_result.abort_reason = {$abortReason}"],
-                    ['table' => 'taxonomy_audit_log', 'operation' => 'INSERT', 'rows' => 1, 'description' => 'registro del intento de apply() abortado, con authorization_reference y target_environment'],
+                    ['table' => 'taxonomy_reviewed_proposals', 'operation' => 'UPDATE', 'rows' => $terminalRows, 'description' => "status PENDING_APPLY -> ABORTED (terminal), con application_result.abort_reason = {$abortReason}".($terminalRows > 1 ? " - en los {$terminalRows} miembros del grupo bilingüe que siguen pendientes, atómicamente" : '')],
+                    ['table' => 'taxonomy_audit_log', 'operation' => 'INSERT', 'rows' => $terminalRows, 'description' => 'registro del intento de apply() abortado, con authorization_reference y target_environment, uno por miembro abortado'],
                 ],
-                'expected_write_count' => 2,
-                'expected_write_set_note' => 'ATENCIÓN: pasar esta propuesta por apply() NO es una prueba inocua - la quemaría de forma terminal, y re-congelar está bloqueado por el índice único parcial. Cero publicación de taxonomía, pero la decisión humana quedaría irrecuperable.',
+                'expected_write_count' => $terminalRows * 2,
+                'expected_write_set_note' => 'ATENCIÓN: pasar esta propuesta por apply() NO es una prueba inocua - la quemaría de forma terminal, y re-congelar está bloqueado por el índice único parcial. Cero publicación de taxonomía, pero la decisión humana quedaría irrecuperable.'
+                    .($terminalRows > 1 ? " Y no sería una sola: el grupo falla como grupo, así que las {$terminalRows} propuestas pendientes del grupo quedarían abortadas juntas." : ''),
             ];
         }
 
@@ -1843,6 +1989,13 @@ class ReviewedProposalService
      * informa. Un preflight que tomara locks sería peor: serializaría lecturas de diagnóstico contra
      * la ejecución real.
      *
+     * «TODO» incluye, desde el re-audit `5952211890`, el `payload_fingerprint` de **cada miembro
+     * pendiente** de un grupo bilingüe, no sólo el de la fila de entrada - ver
+     * `evaluateBilingualGroup()`. Antes de esa corrección la afirmación era una sobre-afirmación para
+     * el camino agrupado: `apply(#629)` podía escribir #630 sin revalidar el payload de #630, y el
+     * hecho de que el preflight lo hubiera evaluado por separado no lo cubría, precisamente porque el
+     * preflight es sólo una foto.
+     *
      * @param  bool  $lockRows  `true` solo desde `apply()`.
      * @return array{blocker:?string, detail:array, context:array}
      */
@@ -1868,12 +2021,19 @@ class ReviewedProposalService
         if (! self::payloadFingerprintIsValid($proposal)) {
             return $this->blocker(self::PREFLIGHT_TAMPER_DETECTED, [
                 'note' => 'El payload congelado no coincide con su propio fingerprint - los campos de decisión fueron modificados después de freeze(). No se escribió nada.',
-            ]);
+                'tampered_proposal_id' => (int) $proposal->id,
+            ], ['entry_payload_valid' => false]);
         }
 
         // 2) Obsolescencia: el estado de la taxonomía cambió entre freeze() y apply()?
+        // `entry_payload_valid` se registra como EVIDENCIA, no se deduce después del bloqueo: en un
+        // grupo bilingüe el tamper puede estar en un HERMANO, y entonces el payload de ESTA fila es
+        // perfectamente válido. Inferirlo del bloqueo diría lo contrario (ver `preflightChecks()`).
         $currentTaxonomyFingerprint = CanonicalConceptBuilderService::dryRunInputFingerprint();
-        $context = ['current_taxonomy_fingerprint' => $currentTaxonomyFingerprint];
+        $context = [
+            'current_taxonomy_fingerprint' => $currentTaxonomyFingerprint,
+            'entry_payload_valid' => true,
+        ];
 
         if ($currentTaxonomyFingerprint !== $proposal->taxonomy_state_fingerprint) {
             return $this->blocker(self::PREFLIGHT_STALE_TAXONOMY_STATE, [
@@ -2121,10 +2281,63 @@ class ReviewedProposalService
         }
 
         $pending = [];
+        // TASK-0006D re-audit (Issue #2 comentario `5952211890`, BLOCKER): integridad del payload
+        // MIEMBRO POR MIEMBRO. `null` = todavía no se evaluó (una compuerta anterior cortó), nunca
+        // "válido" - misma convención de honestidad que el resto del informe.
+        $memberPayloadValid = [];
         foreach ($members as $member) {
             if ($member->status === TaxonomyReviewedProposal::STATUS_APPLIED) {
                 continue;
             }
+
+            $memberPayloadValid[(string) $member->id] = null;
+        }
+        $context['group_member_payload_valid'] = $memberPayloadValid;
+
+        foreach ($members as $member) {
+            if ($member->status === TaxonomyReviewedProposal::STATUS_APPLIED) {
+                continue;
+            }
+
+            // ========================================================================
+            // TASK-0006D re-audit (Issue #2 comentario `5952211890`, BLOCKER — «GROUPED APPLY DOES
+            // NOT REVALIDATE EVERY MEMBER'S IMMUTABLE PAYLOAD»): PRIMERA compuerta de cada miembro
+            // pendiente, antes de leer UN SOLO campo de su payload o de su fila fuente.
+            //
+            // EL DEFECTO QUE CIERRA, aceptado sin reservas: `evaluateApplicability()` valida el
+            // `payload_fingerprint` SOLO de la propuesta de entrada. Este bucle validaba del hermano
+            // su status, el fingerprint de estado, el drift de fuente y la identidad bilingüe - pero
+            // NUNCA su propio fingerprint de payload. Y `writeBilingualGroupCreateNew()` publica y
+            // marca `APPLIED` a TODOS los hermanos pendientes. Es decir: `apply(#629)` podía escribir
+            // #630 sin revalidar el payload inmutable de #630 en el momento de la ejecución.
+            //
+            // Que `preflightAll()` hubiera evaluado #630 por separado NO cerraba el hueco: el
+            // preflight es explícitamente una FOTO sin lock, y `apply()` tiene que revalidar bajo lock
+            // todo lo que está por escribir. El defecto venía del diseño original del grupo
+            // (TASK-0006B, sección D) y la extracción de TASK-0006D lo heredó sin corregirlo; además
+            // el audit afirmaba que `apply()` «revalida TODO otra vez con locks», lo cual era una
+            // sobre-afirmación. Las dos cosas se corrigen acá y en el audit.
+            //
+            // Va PRIMERO a propósito, y no es un detalle: `decision`, `proposal_type` y
+            // `taxonomy_state_fingerprint` -que las compuertas de abajo consultan- son TRES de los 9
+            // campos cubiertos por el fingerprint. Validarlas antes de comprobar que no fueron
+            // manipuladas sería decidir sobre datos de los que todavía no se sabe si son los que un
+            // humano revisó. Mismo orden que para la propuesta de entrada: tamper primero.
+            // ========================================================================
+            if (! self::payloadFingerprintIsValid($member)) {
+                $memberPayloadValid[(string) $member->id] = false;
+                $context['group_member_payload_valid'] = $memberPayloadValid;
+
+                return $this->blocker(self::PREFLIGHT_TAMPER_DETECTED, [
+                    'note' => "El payload congelado del miembro #{$member->id} del grupo bilingüe no coincide con su propio fingerprint - sus campos de decisión fueron modificados después de freeze(). No se escribió nada, y el grupo COMPLETO queda bloqueado: aplicar los hermanos sanos crearía el concepto con un solo término adjunto.",
+                    'tampered_proposal_id' => (int) $member->id,
+                    'entry_proposal_id' => (int) $proposal->id,
+                    'proposal_group_id' => $proposal->proposal_group_id,
+                ], $context);
+            }
+
+            $memberPayloadValid[(string) $member->id] = true;
+            $context['group_member_payload_valid'] = $memberPayloadValid;
 
             if ($member->status !== TaxonomyReviewedProposal::STATUS_PENDING_APPLY
                 || $member->decision !== TaxonomyReviewedProposal::DECISION_CREATE_NEW

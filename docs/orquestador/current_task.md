@@ -3,10 +3,68 @@
 **TASK-0006D — Preflight de aplicabilidad (solo lectura) + UX de candidatos + diseño de propuestas
 obsoletas** (Issue #2 comentario
 [`5949253156`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5949253156)).
-Abierta desde HEAD `510400a`. **Estado: READY_FOR_REVIEW.**
+Abierta desde HEAD `510400a`. **Estado: READY_FOR_REVIEW (ronda 2).**
 
 Existe para quitar la incertidumbre que queda **antes** de abrir TASK-0007. **TASK-0007 sigue sin
 abrir y APPLY/PUBLICACIÓN sigue NO AUTORIZADO.** Cero mutaciones de datos reales en esta ronda.
+
+## Ronda 2 — re-audit `5952211890`: gate de integridad de grupos bilingües
+
+El re-audit
+[`5952211890`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5952211890)
+(HEAD revisado `f9caf15`) **aceptó las partes 1 a 5** y bloqueó el cierre por **un defecto de seguridad
+de ejecución** en el camino agrupado. **El bloqueo se acepta sin reservas: es real y alcanzable.**
+
+**El defecto.** `evaluateApplicability()` validaba el `payload_fingerprint` **sólo de la propuesta de
+entrada**. `evaluateBilingualGroup()` le validaba a cada hermano status, fingerprint de estado, drift de
+fuente e identidad bilingüe — **pero nunca su propio `payload_fingerprint`**. Y
+`writeBilingualGroupCreateNew()` publica y marca `APPLIED` a **todos** los hermanos pendientes. O sea:
+`apply(#629)` podía escribir #630 **sin revalidar el payload inmutable de #630** en el momento de la
+ejecución. Que el preflight hubiera evaluado #630 por separado no cerraba el hueco, por la razón exacta
+que da el orquestador: el preflight es **una foto**, y `apply()` tiene que revalidar bajo lock todo lo
+que está por escribir.
+
+Dos aclaraciones de procedencia que **no** atenúan el defecto: no es corrupción de datos actual (los
+payloads reales de #629/#630 estaban y siguen válidos), y el hueco venía del **diseño original** del
+grupo (sección D de TASK-0006B) — la extracción de TASK-0006D lo heredó sin corregirlo, y encima el
+audit de la ronda 1 afirmó que `apply()` «revalida TODO otra vez con locks», lo cual para el camino
+agrupado **era falso**. Se corrigen las dos cosas.
+
+**Lo corregido:**
+
+- **A — integridad por miembro.** El fingerprint de **cada miembro pendiente** se revalida como
+  **primera** compuerta de ese miembro, antes de leer un solo campo de su payload o de su fila fuente.
+  Va primero por una razón concreta: `decision`, `proposal_type` y `taxonomy_state_fingerprint` —que las
+  compuertas siguientes consultan— son **tres de los 9 campos** que cubre el fingerprint. Un miembro
+  manipulado da `TAMPER_DETECTED` nombrando la propuesta ofensora, y **entrar por cualquiera de los dos
+  hermanos da el mismo resultado**.
+- **Defecto adicional que esto dejó al descubierto.** `payload_fingerprint_valid` se **deducía** del
+  bloqueo, así que con el tamper en un hermano habría reportado como manipulada la fila de entrada
+  **estando intacta**. Ahora la validez de la entrada se **registra como evidencia** en su propia
+  compuerta, no se infiere.
+- **B — semántica terminal de grupo.** Un bloqueo terminal ahora aborta el **grupo completo**,
+  atómicamente y con **una fila de auditoría por miembro**. Antes abortaba sólo la entrada y dejaba al
+  hermano `PENDING_APPLY` dentro de un grupo ya fallido: **varado en silencio**, aparentemente
+  aplicable, cuando aplicarlo solo crearía el concepto con un único término adjunto. Por qué todo
+  bloqueo terminal de un miembro es grupal: un grupo describe **una** convergencia indivisible, así que
+  no existe un subconjunto que siga siendo correcto aplicar. **`HUMAN_CONFIRMATION_REQUIRED` sigue NO
+  siendo terminal y no aborta nada.**
+- **D — evidencia en el informe.** Validez de payload **por miembro** (`null` = no evaluado, nunca
+  «válido»), ids manipulados, y un agregado de grupo. Y el write-set de un bloqueo terminal agrupado
+  pasa a declarar **2 filas por miembro pendiente**, no 2: decirlo mal haría parecer barato un
+  `apply()` «de prueba» que quemaría varias decisiones humanas de una vez.
+- **E — consistencia del diseño.** `supersession_state_delta` estaba exigido en la prosa pero **omitido
+  de la lista de columnas**. Reconciliado, con la razón por la que **tiene** que persistirse (el
+  fingerprint es un hash: si el delta no se guarda cuando ocurre la supersesión, se pierde para siempre
+  y la confirmación del sucesor queda sin la evidencia que la hace significativa).
+
+**Un test heredado tuvo que reescribirse, y el motivo es en sí mismo evidencia de que la corrección
+funciona:** volvía al hermano no aplicable mutando su `decision`, que **es** uno de los 9 campos del
+fingerprint, así que ahora produce (correctamente) `TAMPER_DETECTED`. Se cambió a mover su `status`, que
+**no** está cubierto.
+
+**Nada de datos reales se tocó:** #420–#422 y #629/#630 sin mutar, conteos preservados, cero
+APPLY/PUBLISH, sin migraciones.
 
 Detalle completo en
 [`audit/phase6_task0006d_preapply_preflight_2026-10-02.md`](../../audit/phase6_task0006d_preapply_preflight_2026-10-02.md);

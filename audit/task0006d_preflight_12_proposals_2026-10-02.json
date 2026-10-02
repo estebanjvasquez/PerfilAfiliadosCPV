@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-10-02 11:43:43",
+    "generated_at": "2026-10-02 13:55:32",
     "task": "TASK-0006D",
     "governance_reference": "Issue #2 comentario 5949253156",
     "mode": "READ_ONLY_PREFLIGHT",
@@ -68,7 +68,7 @@
                     "table": "taxonomy_audit_log",
                     "operation": "INSERT",
                     "rows": 1,
-                    "description": "registro del intento de apply() abortado, con authorization_reference y target_environment"
+                    "description": "registro del intento de apply() abortado, con authorization_reference y target_environment, uno por miembro abortado"
                 }
             ],
             "expected_write_count": 2,
@@ -130,7 +130,7 @@
                     "table": "taxonomy_audit_log",
                     "operation": "INSERT",
                     "rows": 1,
-                    "description": "registro del intento de apply() abortado, con authorization_reference y target_environment"
+                    "description": "registro del intento de apply() abortado, con authorization_reference y target_environment, uno por miembro abortado"
                 }
             ],
             "expected_write_count": 2,
@@ -192,7 +192,7 @@
                     "table": "taxonomy_audit_log",
                     "operation": "INSERT",
                     "rows": 1,
-                    "description": "registro del intento de apply() abortado, con authorization_reference y target_environment"
+                    "description": "registro del intento de apply() abortado, con authorization_reference y target_environment, uno por miembro abortado"
                 }
             ],
             "expected_write_count": 2,
@@ -573,7 +573,13 @@
                     630
                 ],
                 "consistent": true,
-                "reuses_concept_id": null
+                "reuses_concept_id": null,
+                "member_payload_fingerprint_valid": {
+                    "629": true,
+                    "630": true
+                },
+                "tampered_member_ids": [],
+                "all_member_payloads_valid": true
             },
             "relation_validation": null,
             "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
@@ -673,7 +679,13 @@
                     630
                 ],
                 "consistent": true,
-                "reuses_concept_id": null
+                "reuses_concept_id": null,
+                "member_payload_fingerprint_valid": {
+                    "629": true,
+                    "630": true
+                },
+                "tampered_member_ids": [],
+                "all_member_payloads_valid": true
             },
             "relation_validation": null,
             "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",

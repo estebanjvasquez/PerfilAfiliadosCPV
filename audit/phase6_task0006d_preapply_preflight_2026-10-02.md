@@ -1,6 +1,9 @@
 # TASK-0006D — Preflight de aplicabilidad (solo lectura), corrección de UX de candidatos y diseño de propuestas obsoletas
 
 **Referencia de gobernanza:** Issue #2 comentario `5949253156`
+**Re-audit (ronda 2):** Issue #2 comentario `5952211890` — `CORRECTIONS_REQUIRED / NARROW
+GROUP-INTEGRITY GATE` sobre HEAD `f9caf15`. Partes 1–5 **aceptadas**; corrección del gate de integridad
+de grupos bilingües en la **§11**.
 **Checkpoint de entrada:** `510400a2faac75c8223e5570e7581d7a3a96f416`
 **Fecha:** 2026-10-02
 **APPLY / PUBLISH:** NO EJECUTADO, NO AUTORIZADO. TASK-0007 sigue sin abrir.
@@ -17,6 +20,7 @@
 | 4 | Informe pre-APPLY de las 12 propuestas | **EJECUTADO de solo lectura** (§4) |
 | 5 | Nota de riesgo sobre edición de relaciones aprobadas | **VERIFICADO** - no bloquea TASK-0007 (§6) |
 | 6 | Tests / staging / invariantes | **EJECUTADO** (§7, §8) |
+| **Re-audit** | Gate de integridad de grupos bilingües + consistencia del diseño | **CORREGIDO** (§11) |
 
 Cero mutaciones de datos reales: ninguna propuesta, candidato, relación, concepto o mapeo cambió. Las
 únicas escrituras de esta ronda son archivos de código, tests y documentación.
@@ -103,6 +107,11 @@ Dicho explícitamente para que no se sobre-interprete: es una **foto sin lock**,
 en que se tomó. No reserva nada y no autoriza nada. Entre el preflight y un `apply()` posterior el
 estado puede cambiar, y por eso `apply()` revalida todo otra vez con locks. Un `READY_TO_APPLY`
 significa «hoy no hay nada que lo impida», **nunca** «ya está aprobado para ejecutarse».
+
+> **Corrección del re-audit `5952211890`:** la frase «`apply()` revalida todo otra vez con locks» era
+> una **sobre-afirmación** en la primera ronda, y el orquestador tenía razón en señalarlo: en el camino
+> AGRUPADO, `apply()` validaba el `payload_fingerprint` sólo de la propuesta de entrada mientras
+> escribía a todos los hermanos. La frase es **cierta ahora**, después de la corrección de la **§11**.
 
 ### 2.6 Vocabulario de bloqueo y su correspondencia con `apply()`
 
@@ -372,15 +381,19 @@ seguro. **No se reusó** el procedimiento de contenedor efímero sobre los bind 
 vivo (requisito explícito: «do not use shared live bind mounts in a way that can rewrite staging
 caches»). Ninguna propuesta/candidato/relación real participó de ningún test.
 
+> **Actualización de la ronda 2:** `ReviewedProposalPreflightTest` pasó de 18 a **24 tests** (191
+> assertions) con los 6 de integridad de grupo de la §11.5, y las suites heredadas se reejecutaron
+> **completas otra vez** contra el código corregido. Los números de abajo son los finales.
+
 | Suite | Resultado | Qué protege |
 |---|---|---|
-| `ReviewedProposalPreflightTest` (**nuevo**) | **18/18 PASS** | Ausencia de efectos, vocabulario de bloqueo, write-set, paridad con `apply()` |
+| `ReviewedProposalPreflightTest` (**nuevo**) | **24/24 PASS** (191 assertions) | Ausencia de efectos, vocabulario de bloqueo, write-set, paridad con `apply()`, **integridad de payload por miembro del grupo y semántica terminal de grupo** |
 | `ReviewedProposalServiceTest` | **41/41 PASS**, sin editar una línea | El contrato C2 de TASK-0004 tras la extracción de la cadena de validación |
 | `ReviewedProposalConfirmationTest` | **47/47 PASS**, sin editar | Confirmación humana + anulación de TASK-0006B/0006C |
 | `ReviewedProposalGroupLockingTest` | **7/7 PASS**, sin editar | Serialización por advisory lock de grupo |
 | `CanonicalConceptApplyServiceTest` | **21/21 PASS**, sin editar | Phase C1 |
 | `CandidateConceptApprovalServiceTest` | **27/27 PASS**, sin editar | Camino legacy de aprobación |
-| **Corrida de unidad combinada** | **161 tests** | — |
+| **Corrida de unidad combinada** | **167 tests** (161 + los 6 nuevos de la ronda 2) | — |
 | `TaxonomyCandidateConceptLinkReviewTest` | **19/19 PASS** (6 nuevos/reescritos) | Regresión de UX de la PARTE 2 |
 | `TaxonomyReviewedProposalResourceTest` | **11/11 PASS**, sin editar | Resource de solo lectura |
 | `TaxonomyReviewedProposalConfirmationUiTest` | **9/9 PASS**, sin editar | UX de confirmación humana |
@@ -599,3 +612,160 @@ heredadas de C2/confirmación/concurrencia se reejecutaron completas contra el c
   detalle (una entrada de solo lectura) y un comando nuevo de solo lectura. No toca búsqueda, ranking,
   embeddings, CPV ni la semántica de la taxonomía publicada.
 - **Sin cambios de esquema**, sin backfill, sin datos sembrados.
+
+---
+
+## 11. Re-audit `5952211890` — corrección del gate de integridad de grupos bilingües
+
+**Verdicto recibido:** `CORRECTIONS_REQUIRED / NARROW GROUP-INTEGRITY GATE` sobre HEAD `f9caf15`. Las
+PARTES 1, 2, 3, 4 y 5 quedaron **ACEPTADAS**; un defecto de seguridad de ejecución en el camino
+agrupado bloqueaba el cierre. **El bloqueo se acepta sin reservas: es un defecto real y alcanzable.**
+
+### 11.1 El defecto, descrito con precisión
+
+`evaluateApplicability()` validaba el `payload_fingerprint` **sólo de la propuesta de entrada**.
+`evaluateBilingualGroup()` cargaba cada hermano y le validaba status, fingerprint de estado, drift de
+fuente e identidad bilingüe — pero **nunca su propio `payload_fingerprint`**. Y
+`writeBilingualGroupCreateNew()` publica y marca `APPLIED` a **todos** los hermanos pendientes.
+
+Consecuencia: **`apply(#629)` podía escribir #630 sin revalidar el payload inmutable de #630 en el
+momento de la ejecución.** Que `preflightAll()` hubiera evaluado #630 por separado no cerraba el hueco,
+y la razón es exactamente la que el orquestador da: el preflight es explícitamente una FOTO sin lock, y
+`apply()` tiene que revalidar bajo lock todo lo que está por escribir.
+
+Dos aclaraciones de procedencia, ninguna de las cuales atenúa el defecto:
+
+- **No es corrupción de datos actual.** Los payloads reales de #629/#630 se reportaron válidos en el
+  preflight de solo lectura, y se revalidaron válidos después de la corrección (§11.5).
+- **El hueco venía del diseño original del grupo** (TASK-0006B, sección D): la versión previa de
+  `applyBilingualGroupCreateNew()` tampoco validaba el fingerprint por miembro. La extracción de
+  TASK-0006D lo **heredó sin corregirlo**, y además el audit de la primera ronda afirmó que `apply()`
+  «revalida TODO otra vez con locks», que para el camino agrupado era falso. Las dos cosas se corrigen:
+  el código acá y la afirmación en la §2.5.
+
+### 11.2 Corrección A — integridad del payload de CADA miembro pendiente
+
+`evaluateBilingualGroup()` llama ahora `payloadFingerprintIsValid($member)` como **primera compuerta de
+cada miembro pendiente**, antes de leer un solo campo de su payload o de su fila fuente.
+
+**Por qué primero y no en otro lugar del bucle**, que no es un detalle de estilo: `decision`,
+`proposal_type` y `taxonomy_state_fingerprint` —que las compuertas siguientes consultan— son **tres de
+los 9 campos cubiertos por el fingerprint**. Evaluarlas antes de comprobar que no fueron manipuladas
+sería decidir sobre datos de los que todavía no se sabe si son los que un humano revisó. Es el mismo
+orden que ya tenía la propuesta de entrada: tamper primero.
+
+Un miembro manipulado produce `TAMPER_DETECTED` (→ `ABORT_TAMPER_DETECTED`), con
+`tampered_proposal_id`, `entry_proposal_id` y `proposal_group_id` en el detalle. Como la compuerta vive
+en la cadena **compartida**, el preflight lo reporta y `apply()` lo aborta con el mismo veredicto, y
+entrar por cualquiera de los dos hermanos da el **mismo resultado de seguridad**.
+
+**Defecto adicional que esto dejó al descubierto, y se corrigió también:** el campo
+`payload_fingerprint_valid` del informe se **deducía** del bloqueo
+(`$blocker !== TAMPER_DETECTED`). Con el tamper en un hermano, eso habría reportado la fila de entrada
+como manipulada **siendo que está intacta** — acusar a una fila sana. Ahora la validez de la entrada se
+**registra como evidencia** en el momento de su compuerta (`entry_payload_valid`), no se infiere.
+
+### 11.3 Corrección B — semántica terminal de grupo
+
+Antes, un bloqueo terminal descubierto en un hermano se enrutaba por
+`applyOutcomeForBlocker($entryProposal, …)`, que abortaba **únicamente la propuesta de entrada**. El
+hermano quedaba `PENDING_APPLY` dentro de un grupo que ya había fallado como grupo: **un hermano varado
+en silencio**, aparentemente aplicable, cuando aplicarlo solo crearía el concepto con un único término
+adjunto — el duplicado que la sección D de TASK-0006B prohíbe.
+
+Se adopta la opción **preferida** por el orquestador: `abortWholeGroup()` transiciona
+**atómicamente** todos los miembros del grupo que siguen `PENDING_APPLY` al mismo desenlace terminal,
+cada uno con su **propia** fila de `taxonomy_audit_log`, dentro de la transacción de `apply()` que ya
+tiene tomado el advisory lock del grupo (re-tomado por defensa en profundidad).
+
+**Por qué TODO bloqueo terminal de un miembro es grupal, sin excepciones:** un grupo describe UNA
+convergencia indivisible — un concepto, varios términos. Si cualquier parte de esa descripción deja de
+ser válida (payload manipulado, estado obsoleto, fuente drifteada, entidad faltante, identidad
+incoherente), la convergencia **entera** dejó de ser aplicable; no existe un subconjunto del grupo que
+siga siendo correcto aplicar. Por eso no hace falta distinguir si el bloqueo se detectó en la entrada o
+en un hermano — y eso es justamente lo que hace que entrar por #629 o por #630 dé el mismo resultado.
+
+Para que un hermano **sin defecto propio** sea explicable desde la bitácora, cada fila abortada lleva
+`group_terminal_failure`, `detected_on_proposal_id`, `group_aborted_proposal_ids` y una nota que
+distingue «acá se detectó» de «abortada como parte del grupo».
+
+Los miembros ya `APPLIED` o `ABORTED` **no se tocan**: abortar algo ya ejecutado sería reescribir
+historia, y un `ABORTED` previo ya es terminal.
+
+**`HUMAN_CONFIRMATION_REQUIRED` sigue siendo NO terminal y no aborta el grupo** (requisito explícito):
+cero escrituras, todos los miembros siguen `PENDING_APPLY`, y el grupo sigue aplicable una vez
+confirmado. Probado.
+
+**Efecto en el write-set del informe:** para un grupo con bloqueo terminal, `apply()` no escribiría 2
+filas sino **2 por cada miembro pendiente**. El informe ahora lo dice con el número real. Decirlo mal
+haría parecer barato un `apply()` «de prueba» que en realidad quemaría varias decisiones humanas de una
+sola vez.
+
+### 11.4 Corrección D — evidencia de integridad de grupo en el informe
+
+El bloque `group` del informe agrega:
+
+- `member_payload_fingerprint_valid`: mapa `id => true|false|null`, con la convención de honestidad ya
+  establecida (`null` = **no evaluado** porque una compuerta anterior cortó, nunca «válido»);
+- `tampered_member_ids`: los ids hallados inválidos;
+- `all_member_payloads_valid`: agregado — `false` si **cualquiera** resultó manipulado, `true` sólo si
+  **todos** se verificaron y dieron válidos, `null` si quedó alguno sin evaluar.
+
+### 11.5 Corrección C — tests
+
+| Test | Qué prueba |
+|---|---|
+| `preflight_detects_a_tampered_sibling_when_entering_through_the_healthy_one` | El defecto central: entrar por el hermano sano detecta al manipulado, nombra la propuesta ofensora, y **reporta la fila de entrada como válida** |
+| `the_tampered_group_gives_the_same_safety_result_through_either_sibling` | Requisito explícito: entrar por #629 o por #630 da el mismo resultado de seguridad |
+| `a_healthy_group_reports_every_member_payload_as_valid` | El control positivo: sin manipulación, los dos miembros `true` y agregado `true` |
+| `apply_publishes_nothing_when_any_group_sibling_payload_is_tampered` | El camino de ESCRITURA tampoco se deja engañar: cero conceptos, cero mapeos, ningún candidato publicado |
+| `a_terminal_group_blocker_aborts_every_still_pending_member_and_strands_none` | Cero hermanos varados; `abort_reason` y lineage por fila; **una fila de auditoría por miembro** |
+| `a_pending_human_confirmation_is_not_terminal_and_never_aborts_the_group` | La compuerta de confirmación no quema el grupo |
+
+Un test heredado **tuvo que reescribirse, y el motivo es en sí mismo evidencia de que la corrección
+funciona**: `preflight_of_a_group_whose_sibling_is_no_longer_applicable_reports_group_inconsistency`
+volvía al hermano no aplicable mutando su `decision` por SQL crudo — pero `decision` **es** uno de los 9
+campos del fingerprint, así que ahora produce (correctamente) `TAMPER_DETECTED` y dejaría sin probar la
+compuerta de coherencia de grupo. Se cambió a mover su `status`, que **no** está cubierto por el
+fingerprint, y el test asserta además que los payloads siguen intactos: el problema es de ciclo de vida,
+no de manipulación.
+
+Todo con fixtures desechables dentro de `DatabaseTransactions`. **Ningún APPLY real.** Los apply de
+estos tests corren sobre fixtures creados en el mismo test y se revierten.
+
+**Resultado:** `ReviewedProposalPreflightTest` **24/24 PASS (191 assertions)**. Las suites heredadas se
+reejecutaron **completas** contra el código corregido — ver §7.1.
+
+### 11.6-bis Re-ejecución del preflight sobre las 12 reales (requisito del punto D)
+
+Corrido de nuevo después de la corrección, de solo lectura:
+
+- **Clasificación idéntica: 3 `NEEDS_REVALIDATION` (#420–#422) / 9 `READY_TO_APPLY` / 0 otros**, que es
+  lo que el orquestador anticipaba («Expected real classification remains 3 stale / 9 ready unless
+  evidence says otherwise»). La evidencia no dice otra cosa.
+- `write_statements_observed: 0`.
+- Los **12** `payload_fingerprint` de entrada siguen válidos.
+- **Evidencia nueva de grupo**, que antes no existía en el informe: #629 y #630 reportan ahora cada uno
+  `member_payload_fingerprint_valid = {"629": true, "630": true}` — validez **por miembro de todo el
+  grupo**, no sólo de la fila de entrada —, con `all_member_payloads_valid: true` y
+  `tampered_member_ids: []`. Es decir: la integridad del grupo bilingüe real está ahora **verificada y
+  registrada**, no supuesta.
+- Conteos protegidos sin cambios: 10 / 2 / 142 / 81 / 9749 / 12 / 0 aplicadas.
+
+### 11.6 Corrección E — consistencia del documento de diseño
+
+El diseño de la OPCIÓN A exigía el diff de estado en §3.5 y nombraba
+`supersession_state_delta JSONB`, pero la lista de columnas de §3.1 lo omitía: la especificación se
+contradecía a sí misma. Reconciliado: la columna está ahora en el esquema de §3.1, con la justificación
+de por qué **tiene** que ser persistida (el fingerprint es un hash, así que el delta no se puede
+reconstruir después: si no se guarda cuando la supersesión ocurre, se pierde para siempre y la
+confirmación del sucesor queda sin la evidencia que la hace significativa), la alternativa igualmente
+durable que se acepta (una fila dedicada de `taxonomy_audit_log` escrita en la misma transacción), y la
+regla de integridad que lo ata: **si hay sucesor, tiene que haber diff**. El alcance de migración de la
+tabla comparativa pasó de «8 columnas + 1 CHECK» a «9 columnas + 2 CHECK».
+
+### 11.7 Lo que esta ronda NO hizo
+
+Ninguna de las prohibiciones se tocó: **#420–#422 sin mutar**, **#629/#630 sin mutar**, cero
+APPLY/PUBLISH, ninguna supersesión ni re-freeze de filas reales, sin merge a `main`, sin despliegue a
+producción, sin migraciones. Conteos protegidos preservados.

@@ -73,7 +73,7 @@ class PreflightTaxonomyReviewedProposals extends Command
                 $row['source_label'],
                 self::confirmationCell($row),
                 self::tristate($row['stale'] ?? null, yes: 'SI', no: 'no'),
-                self::tristate($row['payload_fingerprint_valid'] ?? null, yes: 'ok', no: 'INVALIDO'),
+                self::payloadCell($row),
                 self::tristate($row['source_snapshot_drift'] ?? null, yes: 'SI', no: 'no'),
                 $row['blocker'],
                 $row['governance_category'],
@@ -136,6 +136,31 @@ class PreflightTaxonomyReviewedProposals extends Command
         return $row['confirmation']['confirmed_at'] !== null
             ? 'confirmada ('.($row['confirmation']['channel'] ?? '?').')'
             : 'PENDIENTE';
+    }
+
+    /**
+     * TASK-0006D re-audit (comentario `5952211890`, punto D): la columna de payload informa la
+     * integridad de TODO el grupo, no sólo de la fila de entrada.
+     *
+     * Sin esto la tabla podía mostrar `ok` junto a un resultado `TAMPER_DETECTED` y parecer
+     * contradictoria: en un grupo bilingüe el payload manipulado puede ser el del HERMANO, y entonces
+     * las dos cosas son ciertas a la vez. Se marca `ok (grupo: #N INVALIDO)` para que la fila diga
+     * cuál es cuál en vez de dejar al lector cruzando el JSON.
+     */
+    private static function payloadCell(array $row): string
+    {
+        $entry = self::tristate($row['payload_fingerprint_valid'] ?? null, yes: 'ok', no: 'INVALIDO');
+        $tamperedMembers = $row['group']['tampered_member_ids'] ?? null;
+
+        if (! $tamperedMembers) {
+            return $entry;
+        }
+
+        $others = array_values(array_diff($tamperedMembers, [$row['proposal_id']]));
+
+        return $others === []
+            ? $entry
+            : $entry.' (grupo: '.implode(', ', array_map(fn ($id) => '#'.$id, $others)).' INVALIDO)';
     }
 
     /** `null` = la compuerta no se evaluó porque una anterior bloqueó primero - nunca "pasó". */

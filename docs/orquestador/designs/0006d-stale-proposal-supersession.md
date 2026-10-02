@@ -85,7 +85,27 @@ taxonomy_reviewed_proposals
   + supersession_channel         VARCHAR(16) NULL    -- auto-capturado
   + supersedes_proposal_id       BIGINT NULL  -> taxonomy_reviewed_proposals(id)
   + inherited_decision_from_id   BIGINT NULL  -> taxonomy_reviewed_proposals(id)
+  + supersession_state_delta     JSONB NULL   -- el delta de estado calculado en el instante
+                                              -- de la transición; ver §3.5
 ```
+
+**`supersession_state_delta` es parte del esquema, no un extra opcional** (corrección de consistencia
+del re-audit `5952211890`, punto E: la versión anterior de este diseño exigía el diff en §3.5 y
+nombraba la columna más abajo, pero la lista de columnas la omitía, así que la especificación se
+contradecía a sí misma).
+
+Por qué tiene que ser una columna persistida y no un cálculo al momento de mostrar la pantalla: el
+`taxonomy_state_fingerprint` es un **hash**, así que el delta exacto **no se puede reconstruir** a
+partir de él más tarde. Si no se guarda cuando la supersesión ocurre, la información se pierde para
+siempre y la confirmación del sucesor queda sin la evidencia que la hace significativa — que es
+justamente la condición que §8 pone para que la OPCIÓN A sea aceptable. Alternativa igualmente durable,
+si se prefiriera no agregar la columna: una fila dedicada de `taxonomy_audit_log` con el delta
+estructurado en su payload, escrita en la MISMA transacción de la supersesión. Lo que **no** es
+aceptable es calcularlo al vuelo en la UI.
+
+Queda **fuera** del `CHECK` de completitud por la misma razón que `superseded_by_proposal_id`: una
+supersesión sin sucesor (§3.4) no necesita diff, porque no hay ninguna decisión heredada que el humano
+deba evaluar — vuelve a revisar desde la evidencia actual.
 
 Nuevo valor de `status`: **`SUPERSEDED`**. Elegido sobre `STALE_SUPERSEDED` porque el motivo
 (obsolescencia, drift, cambio de criterio) ya vive en `supersession_reason`, y meterlo en el nombre
@@ -93,8 +113,16 @@ del estado obligaría a inventar un estado nuevo por cada motivo futuro.
 
 `CHECK` de completitud, mismo criterio que los CHECK de confirmación/invalidación de TASK-0006B/C:
 `superseded_at`, `supersession_reference`, `supersession_reason`, `supersession_actor_type` y
-`supersession_channel` son todos NULL o todos NOT NULL. `superseded_by_proposal_id` queda **fuera**
-del CHECK a propósito: una supersesión puede registrarse sin sucesor (ver §3.4).
+`supersession_channel` son todos NULL o todos NOT NULL. `superseded_by_proposal_id`,
+`supersedes_proposal_id`, `inherited_decision_from_id` y `supersession_state_delta` quedan **fuera**
+del CHECK a propósito: una supersesión puede registrarse sin sucesor (ver §3.4), y en ese caso no hay
+lineage hacia adelante ni decisión heredada ni diff que mostrar.
+
+Regla de integridad que sí conviene exigir, porque es la que hace que la confirmación no sea
+ceremonial: **si hay sucesor, tiene que haber diff.** Expresable como un segundo CHECK
+(`superseded_by_proposal_id IS NULL OR supersession_state_delta IS NOT NULL`) sobre el predecesor, o
+sobre el sucesor contra `inherited_decision_from_id`. Lo decide la implementación; lo que no puede
+pasar es que exista un sucesor con decisión heredada y sin delta persistido.
 
 ### 3.2 Compatibilidad con el índice único parcial — el punto crítico
 
@@ -166,8 +194,12 @@ confirmación degenera en un botón. Mínimo exigible en la UI de confirmación 
 Limitación honesta: el fingerprint es un hash, así que el delta exacto **no** se puede reconstruir
 desde él. El diff tiene que calcularse comparando el estado actual contra lo que se pueda derivar
 del predecesor (su `reviewed_at` acota la ventana temporal) o persistiendo un snapshot estructurado
-del estado en el momento de la supersesión. Lo segundo es más fiable y es lo recomendado:
-`supersession_state_delta JSONB` con el detalle calculado en el instante de la transición.
+del estado en el momento de la supersesión. Lo segundo es más fiable y es **lo que este diseño
+adopta**: la columna `supersession_state_delta JSONB` de §3.1, escrita en la MISMA transacción de la
+transición, con el detalle calculado en ese instante. No es opcional ni un "nice to have": si el delta
+no se persiste cuando ocurre la supersesión, deja de existir, y entonces la confirmación del sucesor no
+puede mostrar qué cambió — precisamente el consentimiento ceremonial que §8 pone como condición para
+que la OPCIÓN A sea aceptable.
 
 ---
 
@@ -221,7 +253,7 @@ gratis; implementar C y después querer A obliga a agregar la lineage después.
 | **Concurrencia / idempotencia** | `lockForUpdate()` + re-chequeo; advisory lock por grupo cuando aplica. Patrón ya probado 3 veces en este servicio. | Hay que definir "revalidación vigente" bajo concurrencia — **el punto más débil**. | Igual que A, con menos partes. |
 | **Complejidad de `apply()`** | **Cero cambios.** El gate de confirmación existente ya rechaza el sucesor. | Cambio **sustantivo** en el gate más crítico. | Cero cambios. |
 | **Complejidad de UI** | Media: pantalla de diff + confirmación (reusa la acción de TASK-0006B). | Media-alta: pantalla de revalidación + estado de vigencia. | Baja: reusa `freezeReview`, ya corregido en la PARTE 2. |
-| **Alcance de migración** | 1 migración aditiva: 8 columnas + 1 valor de status + 1 CHECK + 1 índice. | 1 tabla nueva + FKs + índices + cambio de semántica en `apply()`. | 1 migración aditiva, subconjunto de la de A. |
+| **Alcance de migración** | 1 migración aditiva: **9 columnas** (8 de supersesión/lineage + `supersession_state_delta`) + 1 valor de status + 2 CHECK + 1 índice. | 1 tabla nueva + FKs + índices + cambio de semántica en `apply()`. | 1 migración aditiva, subconjunto de la de A (sin lineage ni delta). |
 | **Rollback** | Limpio: las columnas nuevas quedan NULL y `SUPERSEDED` sin usar; nada que revertir en datos. | Limpio en esquema, **sucio en semántica**: si se revierte el cambio de `apply()`, las revalidaciones emitidas pierden efecto en silencio. | Limpio. |
 | **Explicar por qué se refrescó** | **Lo mejor**: motivo + referencia + delta de estado en la propia fila. | Bueno, en la tabla nueva. | Débil: la propuesta nueva no dice a qué reemplaza salvo por la lineage de A. |
 

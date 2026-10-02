@@ -528,26 +528,229 @@ class ReviewedProposalPreflightTest extends TestCase
     #[Test]
     public function preflight_of_a_group_whose_sibling_is_no_longer_applicable_reports_group_inconsistency(): void
     {
-        $es = $this->newConceptCandidate('es');
-        $en = $this->newConceptCandidate('en');
+        [$entry, $sibling] = $this->frozenBilingualGroup();
+
+        // El hermano deja de ser aplicable sin tocar la taxonomía publicada y SIN romper su
+        // fingerprint: se mueve su `status`, que NO es uno de los 9 campos cubiertos por el
+        // `payload_fingerprint`. Esto importa desde el re-audit `5952211890`: antes este test mutaba
+        // `decision`, que SÍ está cubierto, así que ahora produciría -correctamente- TAMPER_DETECTED y
+        // dejaría sin probar la compuerta de coherencia de grupo, que es lo que quiere verificar.
+        DB::connection('pgsql')->table('taxonomy_reviewed_proposals')
+            ->where('id', $sibling->id)
+            ->update(['status' => TaxonomyReviewedProposal::STATUS_ABORTED]);
+
+        $report = (new ReviewedProposalService())->preflight($entry->id);
+
+        $this->assertSame(ReviewedProposalService::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT, $report['blocker']);
+        $this->assertFalse($report['group']['consistent']);
+        // El payload del hermano sigue intacto: el problema es su ciclo de vida, no una manipulación.
+        $this->assertTrue($report['group']['all_member_payloads_valid']);
+        $this->assertSame([], $report['group']['tampered_member_ids']);
+        $this->assertSame(ReviewedProposalService::ABORT_BILINGUAL_GROUP_NOT_APPLICABLE, $report['would_apply_abort_with']);
+        $this->assertSame(TaxonomyReviewedProposal::STATUS_PENDING_APPLY, $entry->fresh()->status);
+    }
+
+    // =========================================================================================
+    // TASK-0006D re-audit (Issue #2 comentario `5952211890`): integridad de payload POR MIEMBRO del
+    // grupo bilingüe, y semántica terminal de grupo.
+    // =========================================================================================
+
+    /**
+     * Congela un grupo bilingüe de 2 miembros y devuelve [propuestaEs, propuestaEn, groupId].
+     *
+     * @return array{0:TaxonomyReviewedProposal,1:TaxonomyReviewedProposal,2:string}
+     */
+    private function frozenBilingualGroup(): array
+    {
         $frozen = (new ReviewedProposalService())->freezeBilingualConceptGroup(
-            [$es->id, $en->id],
+            [$this->newConceptCandidate('es')->id, $this->newConceptCandidate('en')->id],
             'zzz_preflight_grupo_es_'.uniqid(),
             'zzz_preflight_group_en_'.uniqid(),
             $this->authorizedUser(),
         );
 
-        // El hermano deja de ser aplicable sin tocar la taxonomía publicada.
+        $this->assertSame(ReviewedProposalService::RESULT_FROZEN, $frozen['result']);
+
+        return [$frozen['proposals'][0], $frozen['proposals'][1], $frozen['group_id']];
+    }
+
+    /**
+     * Manipula un campo de decisión de una propuesta YA congelada, por fuera del servicio, de forma
+     * que su `payload_fingerprint` deje de coincidir. Es exactamente el ataque que la tamper-detection
+     * existe para detectar.
+     */
+    private function tamperWithPayload(TaxonomyReviewedProposal $proposal): void
+    {
+        $payload = $proposal->decision_payload;
+        $payload['canonical_name_es'] = 'nombre inyectado por fuera del servicio '.uniqid();
+
         DB::connection('pgsql')->table('taxonomy_reviewed_proposals')
-            ->where('id', $frozen['proposals'][1]->id)
-            ->update(['decision' => TaxonomyReviewedProposal::DECISION_REJECT]);
+            ->where('id', $proposal->id)
+            ->update(['decision_payload' => json_encode($payload)]);
+    }
 
-        $report = (new ReviewedProposalService())->preflight($frozen['proposals'][0]->id);
+    #[Test]
+    public function preflight_detects_a_tampered_sibling_when_entering_through_the_healthy_one(): void
+    {
+        // EL DEFECTO QUE ESTO CUBRE (re-audit `5952211890`): el grupo validaba el payload sólo de la
+        // propuesta de ENTRADA, mientras el apply publicaba y marcaba APPLIED a TODOS los hermanos
+        // pendientes. Entrar por el hermano sano tiene que detectar al hermano manipulado.
+        [$entry, $sibling] = $this->frozenBilingualGroup();
+        $this->tamperWithPayload($sibling);
 
-        $this->assertSame(ReviewedProposalService::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT, $report['blocker']);
-        $this->assertFalse($report['group']['consistent']);
-        $this->assertSame(ReviewedProposalService::ABORT_BILINGUAL_GROUP_NOT_APPLICABLE, $report['would_apply_abort_with']);
-        $this->assertSame(TaxonomyReviewedProposal::STATUS_PENDING_APPLY, $frozen['proposals'][0]->fresh()->status);
+        $writes = [];
+        $report = $this->captureWrites(fn () => (new ReviewedProposalService())->preflight($entry->id), $writes);
+
+        $this->assertSame([], $writes);
+        $this->assertSame(ReviewedProposalService::PREFLIGHT_TAMPER_DETECTED, $report['blocker']);
+        $this->assertSame($sibling->id, $report['detail']['tampered_proposal_id'], 'El diagnóstico tiene que nombrar la propuesta ofensora.');
+        $this->assertSame($entry->id, $report['detail']['entry_proposal_id']);
+
+        // El payload de la fila de ENTRADA es válido: el problema está en el hermano. Reportar `false`
+        // acá sería acusar a una fila intacta.
+        $this->assertTrue($report['payload_fingerprint_valid']);
+
+        // Y la evidencia de grupo lo dice con precisión, miembro por miembro.
+        $this->assertFalse($report['group']['all_member_payloads_valid']);
+        $this->assertSame([$sibling->id], $report['group']['tampered_member_ids']);
+        $this->assertFalse($report['group']['member_payload_fingerprint_valid'][(string) $sibling->id]);
+
+        $this->assertSame(ReviewedProposalService::ABORT_TAMPER_DETECTED, $report['would_apply_abort_with']);
+    }
+
+    #[Test]
+    public function the_tampered_group_gives_the_same_safety_result_through_either_sibling(): void
+    {
+        // Requisito explícito del re-audit: «Entry by #629 or #630 must produce the same safety result
+        // for the same damaged group.»
+        [$first, $second] = $this->frozenBilingualGroup();
+        $this->tamperWithPayload($second);
+
+        $service = new ReviewedProposalService();
+        $throughHealthy = $service->preflight($first->id);
+        $throughTampered = $service->preflight($second->id);
+
+        $this->assertSame(ReviewedProposalService::PREFLIGHT_TAMPER_DETECTED, $throughHealthy['blocker']);
+        $this->assertSame(ReviewedProposalService::PREFLIGHT_TAMPER_DETECTED, $throughTampered['blocker']);
+        $this->assertSame($second->id, $throughHealthy['detail']['tampered_proposal_id']);
+        $this->assertSame($second->id, $throughTampered['detail']['tampered_proposal_id']);
+        $this->assertSame($throughHealthy['governance_category'], $throughTampered['governance_category']);
+
+        // La diferencia legítima entre los dos informes: entrando por la manipulada, su PROPIO payload
+        // es inválido y la cadena corta en la compuerta de entrada, antes de mirar el grupo.
+        $this->assertTrue($throughHealthy['payload_fingerprint_valid']);
+        $this->assertFalse($throughTampered['payload_fingerprint_valid']);
+    }
+
+    #[Test]
+    public function a_healthy_group_reports_every_member_payload_as_valid(): void
+    {
+        [$entry, $sibling] = $this->frozenBilingualGroup();
+
+        $report = (new ReviewedProposalService())->preflight($entry->id);
+
+        $this->assertSame(ReviewedProposalService::PREFLIGHT_READY_TO_APPLY, $report['blocker']);
+        $this->assertTrue($report['group']['all_member_payloads_valid']);
+        $this->assertSame([], $report['group']['tampered_member_ids']);
+        $this->assertSame(
+            [true, true],
+            [$report['group']['member_payload_fingerprint_valid'][(string) $entry->id], $report['group']['member_payload_fingerprint_valid'][(string) $sibling->id]],
+        );
+    }
+
+    #[Test]
+    public function apply_publishes_nothing_when_any_group_sibling_payload_is_tampered(): void
+    {
+        // Fixtures desechables dentro de `DatabaseTransactions`: ninguna propuesta real participa y
+        // nada persiste. Es la contraparte de ejecución del test de preflight de arriba - lo que el
+        // re-audit pide probar es que el camino de ESCRITURA tampoco se deja engañar.
+        [$entry, $sibling, $groupId] = $this->frozenBilingualGroup();
+        $this->tamperWithPayload($sibling);
+
+        $conceptsBefore = DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count();
+        $termConceptsBefore = DB::connection('pgsql')->table('taxonomy_term_concepts')->count();
+
+        $outcome = (new ReviewedProposalService())->apply($entry->id, 'TASK-0006D re-audit test-suite 5952211890');
+
+        $this->assertSame(ReviewedProposalService::RESULT_ABORTED, $outcome['result']);
+        $this->assertSame(ReviewedProposalService::ABORT_TAMPER_DETECTED, $outcome['abort_reason']);
+        $this->assertSame($sibling->id, $outcome['application_result']['tampered_proposal_id']);
+
+        // CERO publicación de taxonomía: ni un concepto, ni un mapeo término->concepto, ni un
+        // candidato publicado.
+        $this->assertSame($conceptsBefore, DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count());
+        $this->assertSame($termConceptsBefore, DB::connection('pgsql')->table('taxonomy_term_concepts')->count());
+        foreach ([$entry, $sibling] as $member) {
+            $this->assertSame(
+                TaxonomyCandidateConceptLink::STATUS_PENDING,
+                TaxonomyCandidateConceptLink::query()->findOrFail($member->candidate_link_id)->status,
+                'Ningún candidato del grupo puede quedar publicado tras un aborto por tamper.',
+            );
+        }
+        $this->assertSame(0, DB::connection('pgsql')->table('taxonomy_reviewed_proposals')
+            ->where('proposal_group_id', $groupId)->where('status', TaxonomyReviewedProposal::STATUS_APPLIED)->count());
+    }
+
+    #[Test]
+    public function a_terminal_group_blocker_aborts_every_still_pending_member_and_strands_none(): void
+    {
+        // Punto B del re-audit: antes, un bloqueo terminal detectado en un hermano abortaba SÓLO la
+        // propuesta de entrada y dejaba al hermano PENDING_APPLY dentro de un grupo ya fallido -
+        // aparentemente aplicable, cuando aplicarlo solo crearía el concepto con un único término.
+        [$entry, $sibling, $groupId] = $this->frozenBilingualGroup();
+        $this->tamperWithPayload($sibling);
+
+        (new ReviewedProposalService())->apply($entry->id, 'TASK-0006D re-audit test-suite 5952211890');
+
+        $members = TaxonomyReviewedProposal::query()->where('proposal_group_id', $groupId)->orderBy('id')->get();
+
+        $this->assertCount(2, $members);
+        $this->assertSame(0, $members->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)->count(), 'No puede quedar ningún hermano varado en PENDING_APPLY.');
+        foreach ($members as $member) {
+            $this->assertSame(TaxonomyReviewedProposal::STATUS_ABORTED, $member->status);
+            $this->assertSame(ReviewedProposalService::ABORT_TAMPER_DETECTED, $member->application_result['abort_reason']);
+            $this->assertTrue($member->application_result['group_terminal_failure']);
+            $this->assertSame($sibling->id, $member->application_result['detected_on_proposal_id'], 'Cada fila tiene que decir DÓNDE se detectó el problema, para que un hermano sin defecto propio sea explicable.');
+            $this->assertEqualsCanonicalizing([$entry->id, $sibling->id], $member->application_result['group_aborted_proposal_ids']);
+        }
+
+        // Una fila de auditoría de ejecución POR MIEMBRO, no una sola para el grupo.
+        foreach ($members as $member) {
+            $this->assertSame(1, DB::connection('pgsql')->table('taxonomy_audit_log')
+                ->where('entity_type', TaxonomyReviewedProposal::class)
+                ->where('entity_id', $member->id)
+                ->where('new_value', TaxonomyReviewedProposal::STATUS_ABORTED)
+                ->count(), "Falta la fila de auditoría del aborto del miembro #{$member->id}.");
+        }
+    }
+
+    #[Test]
+    public function a_pending_human_confirmation_is_not_terminal_and_never_aborts_the_group(): void
+    {
+        // Requisito explícito: «HUMAN_CONFIRMATION_REQUIRED remains non-terminal and must not abort
+        // the group.» Es lo que impide que un apply() prematuro queme un grupo entero sólo porque
+        // todavía nadie lo confirmó.
+        $frozen = (new ReviewedProposalService())->freezeBilingualConceptGroup(
+            [$this->newConceptCandidate('es')->id, $this->newConceptCandidate('en')->id],
+            'zzz_preflight_grupo_es_'.uniqid(),
+            'zzz_preflight_group_en_'.uniqid(),
+            $this->authorizedUser(),
+            preparedByActorType: TaxonomyReviewedProposal::ACTOR_AGENT,
+        );
+        $this->assertSame(ReviewedProposalService::RESULT_FROZEN, $frozen['result']);
+        $groupId = $frozen['group_id'];
+
+        $outcome = (new ReviewedProposalService())->apply($frozen['proposals'][0]->id, 'TASK-0006D re-audit test-suite 5952211890');
+
+        $this->assertSame(ReviewedProposalService::RESULT_HUMAN_CONFIRMATION_REQUIRED, $outcome['result']);
+        $this->assertNull($outcome['abort_reason']);
+
+        $members = TaxonomyReviewedProposal::query()->where('proposal_group_id', $groupId)->get();
+        $this->assertCount(2, $members);
+        foreach ($members as $member) {
+            $this->assertSame(TaxonomyReviewedProposal::STATUS_PENDING_APPLY, $member->status, 'La compuerta de confirmación no puede quemar el grupo.');
+            $this->assertNull($member->application_result);
+        }
     }
 
     #[Test]
