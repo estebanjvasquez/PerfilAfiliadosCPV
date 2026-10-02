@@ -428,7 +428,47 @@ renderizado sigue siendo la del test heredado.
 
 ### 7.3 Staging
 
-*(completado tras el despliegue; ver §7.4)*
+| Ítem | Resultado |
+|---|---|
+| HEAD de runtime desplegado | **`ab1eedd6f660b401032aefe51c0ba05488195d5c`** |
+| Workflow «Deploy a Contabo» | `completed / success` para **ese sha exacto** ([run 37002784135](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/37002784135)) |
+| `GET /` | **200** |
+| `GET /admin/login` | **200** |
+| `GET /admin/taxonomy-candidate-concept-links` | 302 → `/admin/login` **200** (sin sesión, es lo esperado) |
+| `GET /admin/taxonomy-reviewed-proposals` | 302 → `/admin/login` **200** |
+| `GET /admin/taxonomy-concept-relations` | 302 → `/admin/login` **200** |
+| 500 / 503 | **ninguno** |
+| Migraciones | **ninguna** en esta tarea; el `migrate --force` del deploy es un no-op |
+| Mutación de filas reales | **ninguna** — conteos reverificados de solo lectura después del despliegue |
+
+**Identificación del HEAD, dicha con precisión:** el runtime de staging corre `ab1eedd`, que contiene
+**todo** el código, los tests y la documentación de esta tarea. El HEAD final del branch es el commit
+de documentación que va encima (este archivo con §7.3/§7.4 y el checkpoint del handoff), y
+**deliberadamente no dispara despliegue** por el `paths-ignore` (`docs/**`, `audit/**`, `**.md`) del
+workflow — un commit no puede contener su propio hash, así que la alternativa sería no registrar la
+evidencia de staging. No hay diferencia de runtime entre los dos commits.
+
+**Límite declarado, igual que en las rondas anteriores:** esta sesión no tiene clave SSH al host, así
+que el HEAD desplegado se verifica por el run del workflow para ese sha exacto y no por inspección
+directa del contenedor. El riesgo de un 500 en una pantalla autenticada queda cubierto por los tests
+que abren las páginas con `assertOk()` (`TaxonomyReviewedProposalResourceTest` 11/11 y los 9 de la UI
+de confirmación), y por el hecho de que la corrección de la PARTE 2 sólo **quita** una acción y
+**agrega** un enlace y una entrada de texto de solo lectura.
+
+### 7.4 Invariantes
+
+Reverificados de solo lectura **tres veces**: antes de empezar, después de las corridas de tests y
+después del despliegue. Idénticos las tres veces:
+
+**10 / 2 / 142 / 81 / 9749 / 12 revisadas / 0 aplicadas.**
+
+Además: los 10 candidatos siguen `pending`, las 2 relaciones siguen `candidate`, las 12 propuestas
+siguen `PENDING_APPLY` con sus mismos `confirmed_at`, el fingerprint actual sigue siendo
+`c236bc51…`, y **cero residuo de tests** (ninguna fila `zzz_*` quedó viva — `DatabaseTransactions`
+revierte todo).
+
+**Regresión de 32 consultas de búsqueda: heredada sin cambios.** Este diff no toca búsqueda, ranking,
+embeddings, CPV ni la semántica de la taxonomía publicada.
 
 ---
 

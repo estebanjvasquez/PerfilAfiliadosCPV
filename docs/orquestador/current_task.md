@@ -83,6 +83,33 @@ la decisión vieja?» sino «¿`petroleum` sigue siendo demasiado genérico ahor
 **Nada de esto se implementó ni se ejecutó.** La transición de datos sobre #420/#421/#422 requiere
 autorización explícita y separada en un comentario posterior del Issue #2.
 
+## PARTE 6 — Tests y staging
+
+**Tests: 161 de unidad + 43 de Filament.** `ReviewedProposalPreflightTest` **18/18** (nuevo) y
+`TaxonomyCandidateConceptLinkReviewTest` **19/19** (6 nuevos/reescritos). Las **143 regresiones
+heredadas pasan sin editar una sola línea** —`ReviewedProposalServiceTest` 41/41,
+`ReviewedProposalConfirmationTest` 47/47, `ReviewedProposalGroupLockingTest` 7/7,
+`CanonicalConceptApplyServiceTest` 21/21, `CandidateConceptApprovalServiceTest` 27/27,
+`TaxonomyReviewedProposalResourceTest` 11/11, `TaxonomyReviewedProposalConfirmationUiTest` 9/9,
+`TaxonomyCandidateConceptLinkResourceTest` 4/4— y **eso es la evidencia central** de que extraer la
+cadena de validación no cambió el comportamiento de `apply()`.
+
+Se declara en vez de dejarlo implícito: la corrida **base** previa al refactor **no** sirve como
+verificación de regresión (arrancó antes de terminar la extracción y PHPUnit autocarga una clase una
+sola vez, así que corrió contra el servicio viejo); se conserva como base y todo se reejecutó contra el
+código final.
+
+**El único fallo local** es el gap preexistente de `ext-intl` en la regresión de nested-signals de
+TASK-0002, verde en staging. **Verificado, no asumido:** restaurando ese archivo a su versión de HEAD
+`510400a` falla idéntico, con la misma excepción.
+
+**Staging:** HEAD de runtime `ab1eedd` (run «Deploy a Contabo» `success` para ese sha exacto); `/` 200,
+`/admin/login` 200, y las tres pantallas de taxonomía 302 → login 200. **Sin 500/503.** Sin
+migraciones. **Invariantes reverificados de solo lectura tres veces** (antes, tras los tests y tras el
+despliegue), idénticos: **10 / 2 / 142 / 81 / 9749 / 12 revisadas / 0 aplicadas**, los 10 candidatos
+`pending`, las 2 relaciones `candidate`, cero residuo de tests. Regresión de 32 consultas de búsqueda
+**heredada sin cambios**.
+
 ## PARTE 5 — Riesgo de edición de relaciones aprobadas: NO bloquea
 
 **Veredicto: no puede afectar a las 12 propuestas ni a la ejecución de TASK-0007.** El riesgo es real y

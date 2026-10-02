@@ -36,6 +36,13 @@ seguimiento abierto del comentario
 `write_statements_observed: 0`. Conteos protegidos sin cambios: 10 / 2 / 142 / 81 / 9749 / 12 / 0
 applied.
 
+**Tests:** 161 de unidad + 43 de Filament; `ReviewedProposalPreflightTest` 18/18 (nuevo) y las 143
+regresiones heredadas verdes **sin editar una línea**. El único fallo local es el gap preexistente de
+`ext-intl` (verificado restaurando el archivo a HEAD `510400a`: falla idéntico).
+
+**Staging:** HEAD de runtime `ab1eedd` desplegado (run `success` para ese sha exacto), `/` 200,
+`/admin/login` 200, las tres pantallas de taxonomía 302 → login 200, **sin 500/503**, sin migraciones.
+
 Las tres obsoletas **no se tocaron**: pasarlas por `apply()` las habría dejado en `ABORTED` de forma
 terminal, y re-congelar está bloqueado por el índice único parcial. Eso es exactamente lo que el
 preflight viene a evitar.

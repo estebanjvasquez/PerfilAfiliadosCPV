@@ -1294,6 +1294,8 @@
       "repository": "estebanjvasquez/PerfilAfiliadosCPV",
       "branch": "feature/upgrade-filament-v3",
       "review_base_sha": "510400a2faac75c8223e5570e7581d7a3a96f416",
+      "implementation_sha": "ab1eedd6f660b401032aefe51c0ba05488195d5c - all code, tests and docs; this is the sha deployed to staging",
+      "handoff_commit_sha": "SEE_HEAD_OF_PUSH - a commit cannot contain its own hash; this file's commit is the HEAD reported in the final READY_FOR_REVIEW response for TASK-0006D, and it is documentation-only (no deploy, by paths-ignore)",
       "task_definition": "docs/orquestador/tasks/0006d-preapply-preflight.md (verbatim of the opening comment)",
       "audit": "audit/phase6_task0006d_preapply_preflight_2026-10-02.md",
       "design_document": "docs/orquestador/designs/0006d-stale-proposal-supersession.md",
@@ -1325,7 +1327,35 @@
         "schema_changes": 0,
         "note": "The only writes in this round are code, tests and documentation files. The preflight run against the 12 real proposals emitted ZERO write statements, verified by the command's own listener."
       },
-      "inherited_gates_invalidated": "NONE. The highest-risk change is extracting the validation chain out of apply(); the order and outcomes were preserved gate by gate, the ABORT_* constants written are unchanged, and the inherited C2 / confirmation / group-lock suites were re-run in full against the new code.",
+      "tests": {
+        "ReviewedProposalPreflightTest": "18/18 PASS (133 assertions) - NEW. Side-effect freedom measured with DB::listen plus a column-by-column row comparison, one test per blocker in the required vocabulary, write-set shape including the two BURNING writes for a terminal blocker, the advisory-lock abstention, and the three parity checks.",
+        "ReviewedProposalServiceTest": "41/41 PASS, not a line edited - the TASK-0004 C2 contract after the validation chain was extracted",
+        "ReviewedProposalConfirmationTest": "47/47 PASS, not a line edited",
+        "ReviewedProposalGroupLockingTest": "7/7 PASS, not a line edited",
+        "CanonicalConceptApplyServiceTest": "21/21 PASS, not a line edited",
+        "CandidateConceptApprovalServiceTest": "27/27 PASS, not a line edited",
+        "unit_run_total": "161 tests, 664 assertions",
+        "TaxonomyCandidateConceptLinkReviewTest": "19/19 PASS - 6 new or rewritten for the PARTE 2 regression coverage",
+        "TaxonomyReviewedProposalResourceTest": "11/11 PASS, not a line edited",
+        "TaxonomyReviewedProposalConfirmationUiTest": "9/9 PASS, not a line edited",
+        "TaxonomyCandidateConceptLinkResourceTest": "4/4 PASS, not a line edited",
+        "filament_run_total": "43 tests",
+        "central_evidence": "143 inherited regression tests pass WITHOUT editing a single line. If the gate order, an ABORT_* constant or an outcome had changed, they would catch it - they already cover tamper, staleness, per-field drift, missing entity, already-resolved source, group coherence, relation validation, idempotency and concurrency.",
+        "baseline_is_not_a_regression_check": "Stated rather than left implicit: the pre-refactor run was launched before the extraction finished, and PHPUnit autoloads a class once, so it ran against the OLD service. It is kept as a baseline (95/95) and everything in the table above was re-run against the final code.",
+        "three_fixture_bugs_were_mine_not_the_code": "Deleting a concept cascaded away the candidate and with it the proposal (fixed by separating the DECISION target concept from the candidate's SUGGESTED one); the model guard correctly refuses to create a conflicting approved relation (state is now seeded with the query builder); and taxonomy_concept_relations has UNIQUE(source, target, relation_type), so an exact duplicate cannot be inserted by ANY path - the test now seeds the SYMMETRIC inverse, which for non-directional RELATED_TO is the same semantic relation and is rejected as DUPLICATE_VIA_SYMMETRY. That last change made the test STRONGER: a naive preflight reimplementation that only looked for exact duplicates would miss it.",
+        "only_local_failure": "TaxonomyCandidateConceptLinkReviewTest::viewing_a_propose_new_concept_candidate_with_duplicate_signals_does_not_500 - the pre-existing ext-intl gap of this environment (TextEntry::make('confidence')->numeric(4) on the detail page calls Number::format()), green on staging. VERIFIED rather than assumed: restoring that file to its HEAD 510400a version reproduces the identical failure with the same exception. That is why the new detail-page text was extracted to frozenProposalNotice() and asserted directly, so the new coverage is deterministic locally while the render coverage stays with the inherited test.",
+        "safe_isolation": "All disposable fixtures inside DatabaseTransactions on pgsql, local environment. The ephemeral-container procedure over the live staging bind mounts was NOT reused, per the explicit requirement. No real proposal/candidate/relation took part in any test, and zero test residue remains."
+      },
+      "staging": {
+        "deployed_head": "ab1eedd6f660b401032aefe51c0ba05488195d5c - workflow 'Deploy a Contabo' completed/success for that exact sha (run 37002784135)",
+        "smoke": "GET / 200; GET /admin/login 200; the three taxonomy screens 302 -> /admin/login 200 (expected without a session). NO 500/503.",
+        "migrations": "none in this task; the deploy's own migrate --force is a no-op",
+        "head_identification": "Staging runs ab1eedd, which contains ALL of this task's code, tests and documentation. The branch HEAD is the documentation commit on top (the audit's staging section plus this checkpoint), which deliberately triggers NO deploy thanks to the workflow's paths-ignore (docs/**, audit/**, **.md) - a commit cannot contain its own hash, so the alternative would be not recording the staging evidence. There is no runtime difference between the two commits.",
+        "declared_limit": "This session has no SSH key to the host, so the deployed HEAD is verified through the workflow run for that exact sha rather than by inspecting the container. The risk of a 500 on an authenticated screen is covered by the tests that open the pages with assertOk(), and by the fact that the PARTE 2 change only REMOVES an action and ADDS a link plus a read-only text entry.",
+        "invariants_reverified_after_deploy": "10 / 2 / 142 / 81 / 9749 / 12 / 0 applied, all 10 candidates still pending, both relations still candidate, all 12 proposals still PENDING_APPLY with unchanged confirmed_at, current fingerprint still c236bc51..."
+      },
+      "inherited_gates_invalidated": "NONE. The highest-risk change is extracting the validation chain out of apply(); the order and outcomes were preserved gate by gate, the ABORT_* constants written are unchanged, and the inherited C2 / confirmation / group-lock suites were re-run in full against the new code (143 inherited tests green, unedited).",
+      "search_regression": "The 32-query search regression remains INHERITED and unchanged: this diff touches ReviewedProposalService (refactor plus preflight), two Filament resources (visibility and a read-only link), one detail page (a read-only entry) and one new read-only command. It does not touch search, ranking, embeddings, CPV or published-taxonomy semantics.",
       "stop_conditions": "None reached. No APPLY, no PUBLISH, no proposal status change, no supersede/abort/delete/re-freeze, no successor proposal created, no candidate/relation status change, no published taxonomy change, no main merge, no production deploy, no migration (destructive or otherwise), no credential rotation. #420/#421/#422 were read and reported on, never modified."
     }
   ]
