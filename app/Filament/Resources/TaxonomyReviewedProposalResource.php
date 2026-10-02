@@ -108,6 +108,10 @@ class TaxonomyReviewedProposalResource extends Resource
                         'info' => TaxonomyReviewedProposal::STATUS_PENDING_APPLY,
                         'success' => TaxonomyReviewedProposal::STATUS_APPLIED,
                         'danger' => TaxonomyReviewedProposal::STATUS_ABORTED,
+                        // TASK-0006E: histórico, no un error. `gray` y no `danger` a propósito: una
+                        // supersesión no es un fallo de ejecución, es una decisión de gobernanza que
+                        // retiró la revisión de la cola conservándola íntegra.
+                        'gray' => TaxonomyReviewedProposal::STATUS_SUPERSEDED,
                     ]),
                 Tables\Columns\TextColumn::make('reviewer.name')->label('Revisor')->placeholder('—'),
                 Tables\Columns\TextColumn::make('reviewed_at')->label('Congelada el')->dateTime(),
@@ -148,6 +152,7 @@ class TaxonomyReviewedProposalResource extends Resource
                     TaxonomyReviewedProposal::STATUS_PENDING_APPLY => 'Pendiente de aplicación',
                     TaxonomyReviewedProposal::STATUS_APPLIED => 'Aplicada',
                     TaxonomyReviewedProposal::STATUS_ABORTED => 'Abortada',
+                    TaxonomyReviewedProposal::STATUS_SUPERSEDED => 'Supersedida (obsoleta, retirada de la cola)',
                 ]),
             ])
             ->defaultSort('id', 'desc')
@@ -266,6 +271,40 @@ class TaxonomyReviewedProposalResource extends Resource
         return $html;
     }
 
+    /**
+     * TASK-0006E: aplana el delta de supersesión a `string => string` para `KeyValueEntry`.
+     *
+     * Hace falta por la misma razón que el aplanado de `signals` del incidente 503 de TASK-0002:
+     * `KeyValueEntry` llama `htmlspecialchars()` sobre cada valor tal cual viene, y en PHP 8 eso es un
+     * TypeError en cuanto el valor no es escalar - y este delta tiene listas anidadas (los conceptos
+     * creados desde la revisión). Se aplana en la capa de PRESENTACIÓN; la forma real del JSONB en la
+     * base no se toca, así que un auditor que lea la columna sigue viendo la estructura completa.
+     *
+     * Los conceptos nuevos se renderizan legibles -«#2890 oleoducto / oil pipeline»- porque son la
+     * evidencia que de verdad vuelve a abrir la pregunta para el revisor, no un dato técnico.
+     */
+    private static function flattenStateDelta(?array $delta): array
+    {
+        if (! $delta) {
+            return [];
+        }
+
+        $concepts = collect($delta['concepts_created_since_review'] ?? [])
+            ->map(fn (array $c) => sprintf('#%d %s / %s', $c['id'], $c['canonical_name_es'] ?? '—', $c['canonical_name_en'] ?? '—'))
+            ->implode(' | ');
+
+        return array_filter([
+            'Fingerprint congelado' => (string) ($delta['frozen_taxonomy_state_fingerprint'] ?? ''),
+            'Fingerprint actual al supersedir' => (string) ($delta['current_taxonomy_state_fingerprint'] ?? ''),
+            'Revisada el' => (string) ($delta['review_window']['reviewed_at'] ?? ''),
+            'Supersedida el' => (string) ($delta['review_window']['superseded_at'] ?? ''),
+            'Conceptos creados desde la revisión' => (string) ($delta['concepts_created_since_review_count'] ?? '0'),
+            'Cuáles' => $concepts !== '' ? $concepts : 'ninguno',
+            'Conceptos modificados desde la revisión' => implode(', ', array_map(fn ($id) => '#'.$id, $delta['concepts_updated_since_review_ids'] ?? [])) ?: 'ninguno',
+            'Límite declarado' => (string) ($delta['limitation'] ?? ''),
+        ], fn ($v) => $v !== '');
+    }
+
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist->schema([
@@ -341,6 +380,34 @@ class TaxonomyReviewedProposalResource extends Resource
                     TextEntry::make('confirmation_invalidation_reason')->label('Motivo')->placeholder('—')->columnSpanFull(),
                     KeyValueEntry::make('invalidated_confirmation_snapshot')
                         ->label('Confirmación anulada (lo que decía antes)')
+                        ->columnSpanFull(),
+                ]),
+            // TASK-0006E (Issue #2 comentario `5955148859`, requisito 7): la propuesta supersedida
+            // tiene que seguir siendo VISIBLE y de SOLO LECTURA, con su estado y linaje claros. Se
+            // muestra sólo cuando existe, igual que la sección de corrección de TASK-0006C.
+            Section::make('Supersesión — revisión obsoleta retirada de la cola (TASK-0006E)')
+                ->description('Esta revisión quedó OBSOLETA: el estado de la taxonomía cambió después de congelarse, así que dejó de ser aplicable. Se la retiró de la cola SIN destruirla - su decisión, su payload y sus dos fingerprints están intactos y siguen siendo auditables. No se aplicó ni se publicó nada. El candidato de origen volvió a la cola de revisión humana normal: la decisión nueva vive en una propuesta NUEVA, no en esta.')
+                ->visible(fn (TaxonomyReviewedProposal $record) => $record->hasSupersessionTrail())
+                ->schema([
+                    TextEntry::make('superseded_at')->label('Supersedida el')->dateTime(),
+                    TextEntry::make('supersession_actor_type')
+                        ->label('Supersedida por')
+                        ->formatStateUsing(fn (?string $state, TaxonomyReviewedProposal $record) => match ($state) {
+                            TaxonomyReviewedProposal::ACTOR_AGENT => 'el AGENTE, por autorización explícita del dueño de la taxonomía (ninguna cuenta de persona ejecutó esta transición)',
+                            TaxonomyReviewedProposal::ACTOR_HUMAN_REVIEWER => 'la persona #'.$record->supersession_by_id,
+                            default => '—',
+                        }),
+                    TextEntry::make('supersession_channel')->label('Canal (auto-capturado)')->placeholder('—'),
+                    TextEntry::make('supersession_reference')->label('Referencia de gobernanza')->placeholder('—')->columnSpanFull(),
+                    TextEntry::make('supersession_reason')->label('Motivo')->placeholder('—')->columnSpanFull(),
+                    TextEntry::make('superseded_by_proposal_id')
+                        ->label('Propuesta sucesora')
+                        ->formatStateUsing(fn ($state) => $state === null
+                            ? 'NINGUNA, por diseño. La supersesión sin sucesor es deliberada: no arrastra la decisión vieja hacia adelante, para que la persona vuelva a decidir desde la evidencia ACTUAL en vez de confirmar algo ya redactado.'
+                            : '#'.$state),
+                    KeyValueEntry::make('supersession_state_delta')
+                        ->label('Delta de estado (por qué quedó obsoleta)')
+                        ->state(fn (TaxonomyReviewedProposal $record) => self::flattenStateDelta($record->supersession_state_delta))
                         ->columnSpanFull(),
                 ]),
             Section::make('Ejecución (apply) — fuera del alcance de esta UI')

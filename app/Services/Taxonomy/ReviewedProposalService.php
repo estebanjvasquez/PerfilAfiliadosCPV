@@ -150,6 +150,28 @@ use Illuminate\Support\Facades\DB;
  *    en silencio, aparentemente aplicable. Ahora todo bloqueo terminal de un grupo aborta el grupo
  *    COMPLETO, atómicamente y con una fila de auditoría por miembro (ver `abortWholeGroup()`).
  *    `HUMAN_CONFIRMATION_REQUIRED` sigue siendo NO terminal y no aborta nada.
+ *
+ * TASK-0006E (Issue #2 comentario `5955148859`): se agrega el CUARTO evento del ciclo de vida,
+ * `supersedeStaleProposal()`, y con él el estado terminal `SUPERSEDED`.
+ *
+ *   REVIEW/FREEZE  ->  CONFIRM  ->  APPLY
+ *                  \->  SUPERSEDE (sale de la cola sin destruirse; el origen vuelve a revisión)
+ *
+ * El problema que resuelve: una revisión cuyo `taxonomy_state_fingerprint` caducó estaba en un
+ * callejón sin salida. `apply()` la habría dejado `ABORTED` -terminal- y re-congelar está bloqueado por
+ * el índice único parcial, así que no existía forma de volver a pedir la decisión humana sin destruir
+ * la anterior. La supersesión retira la fila de `PENDING_APPLY` conservándola ÍNTEGRA (decisión,
+ * payload, los dos fingerprints, revisor y `reviewed_at` intactos) y, como los índices únicos parciales
+ * filtran por `status = 'PENDING_APPLY'`, eso **libera el slot** del origen: el candidato reaparece en
+ * la cola de revisión normal sin que ningún índice se debilite.
+ *
+ * Dos consecuencias que hubo que cerrar explícitamente, no son detalles:
+ * - `SUPERSEDED` no es `APPLIED` ni `ABORTED`, así que sin una compuerta propia habría caído por la
+ *   cadena de validación y `apply()` lo habría ABORTADO, pisando el rastro recién grabado. Hay una
+ *   compuerta terminal en `evaluateApplicability()` que devuelve `ALREADY_SUPERSEDED` con cero
+ *   escrituras, y el trigger de base de datos además prohíbe salir de ese estado.
+ * - `unconfirmedMembers()` pasó a mirar sólo miembros `PENDING_APPLY`: exigir la confirmación de un
+ *   hermano ya retirado de la cola bloquearía el grupo por una fila que nadie va a ejecutar.
  */
 class ReviewedProposalService
 {
@@ -213,6 +235,36 @@ class ReviewedProposalService
 
     /** No hay confirmación que anular: `invalidateConfirmation()` es idempotente. */
     public const RESULT_NOT_CONFIRMED = 'NOT_CONFIRMED';
+
+    /**
+     * TASK-0006E (Issue #2 comentario `5955148859`): resultados de `supersedeStaleProposal()`, la
+     * transición de ciclo de vida NO DESTRUCTIVA que retira de la cola una revisión obsoleta sin
+     * borrarla, sobrescribirla, abortarla ni aplicarla.
+     */
+    public const RESULT_SUPERSEDED = 'SUPERSEDED';
+
+    /** Replay idempotente: ya estaba supersedida, cero escrituras nuevas. */
+    public const RESULT_ALREADY_SUPERSEDED = 'ALREADY_SUPERSEDED';
+
+    /**
+     * La propuesta NO está obsoleta, así que el camino de supersesión-por-obsolescencia la rechaza.
+     * Requisito explícito del comentario: «non-stale proposal cannot be superseded through stale-only
+     * flow». Retirar de la cola una revisión que sigue siendo válida sería una decisión de gobernanza
+     * distinta, con su propia autorización - no este camino.
+     */
+    public const RESULT_NOT_STALE = 'NOT_STALE';
+
+    /**
+     * El `payload_fingerprint` de la propuesta ya no coincide con sus propios campos de decisión. No se
+     * supersede: primero hay que entender quién los modificó. Supersedir taparía el hallazgo.
+     */
+    public const RESULT_TAMPERED_PAYLOAD = 'TAMPERED_PAYLOAD';
+
+    /**
+     * La fila fuente ya no está en un estado que permita volver a revisarla (no existe, o ya la
+     * resolvió otro camino). Liberar el slot no serviría de nada: el candidato no volvería a la cola.
+     */
+    public const RESULT_SOURCE_NOT_REVIEWABLE = 'SOURCE_NOT_REVIEWABLE';
 
     /**
      * TASK-0006B, sección A: `apply()` rechazó la propuesta porque exige confirmación humana y
@@ -294,6 +346,13 @@ class ReviewedProposalService
     public const PREFLIGHT_ALREADY_APPLIED = 'ALREADY_APPLIED';
 
     public const PREFLIGHT_ALREADY_ABORTED = 'ALREADY_ABORTED';
+
+    /**
+     * TASK-0006E: la propuesta fue retirada de la cola de forma no destructiva por obsolescencia. Es
+     * un estado histórico TERMINAL - ni `READY_TO_APPLY` ni un bloqueo que se pueda corregir en esta
+     * fila: la decisión nueva vive en una propuesta NUEVA.
+     */
+    public const PREFLIGHT_ALREADY_SUPERSEDED = 'ALREADY_SUPERSEDED';
 
     public const PREFLIGHT_NOT_FOUND = 'NOT_FOUND';
 
@@ -1275,6 +1334,314 @@ class ReviewedProposalService
     }
 
     // =====================================================================================
+    // PASO 1-ter: SUPERSEDE - retira de la cola una revisión OBSOLETA sin destruirla, para que el
+    // candidato pueda volver a revisarse contra el estado ACTUAL. TASK-0006E.
+    // =====================================================================================
+
+    /**
+     * TASK-0006E (Issue #2 comentario `5955148859`, autorización explícita del dueño tras el PASS de
+     * TASK-0006D en `5954835892`): transición de ciclo de vida **no destructiva** que saca de
+     * `PENDING_APPLY` una revisión cuya validez caducó porque el estado de la taxonomía cambió.
+     *
+     * EL PROBLEMA QUE RESUELVE, dicho sin rodeos: hasta acá una propuesta obsoleta estaba en un
+     * callejón sin salida. `apply()` la habría registrado como `ABORTED` -terminal- y re-congelar está
+     * bloqueado por el índice único parcial `WHERE status = 'PENDING_APPLY'`, así que no existía
+     * ninguna forma de volver a pedirle la decisión a un humano sin destruir la anterior. Lo que hace
+     * falta no es saltear la revalidación, sino **volver a preguntar sin borrar la respuesta vieja**.
+     *
+     * LO QUE NO TOCA, verificado campo por campo por test: `decision`, `decision_payload`,
+     * `payload_version`, `payload_fingerprint`, `taxonomy_state_fingerprint`, `reviewer_id`,
+     * `reviewed_at`, `requires_human_confirmation`, `prepared_by_actor_type`, `prepared_via`,
+     * `proposal_group_id`, los campos de confirmación, los de anulación, `applied_at`,
+     * `authorization_reference`, `target_environment`, `application_result`, ni la fila fuente. La
+     * propuesta queda como registro histórico ÍNTEGRO: se puede seguir demostrando qué decidió un
+     * humano, cuándo y sobre qué estado.
+     *
+     * LO QUE SÍ ESCRIBE: `status -> SUPERSEDED` y el rastro de supersesión (momento, referencia de
+     * gobernanza, motivo, actor, canal auto-capturado y el delta de estado durable), más una fila de
+     * auditoría propia y distinguible (`field = superseded_at`).
+     *
+     * POR QUÉ EL `status` ES LA PIEZA CLAVE: los dos índices únicos parciales filtran por
+     * `status = 'PENDING_APPLY'`, así que salir de ese estado **libera el slot único del candidato**.
+     * Eso -y nada más que eso- es lo que devuelve al candidato a la cola de revisión humana normal. No
+     * se debilita ni se modifica ningún índice.
+     *
+     * SIN SUCESOR, por diseño en esta firma: este método **no crea** una propuesta nueva ni arrastra
+     * la decisión vieja hacia adelante. Es la variante de máxima agencia humana, y es exactamente la
+     * que el dueño autorizó para #420/#421/#422: la pregunta correcta no es «¿confirmás la decisión
+     * vieja?» sino «¿sigue siendo demasiado genérico ahora que existen `oleoducto` y `gasoducto`?» -
+     * eso es una revisión nueva, no una confirmación. El camino con sucesor existe en el diseño y
+     * queda deliberadamente sin implementar hasta que haga falta y se autorice, porque exige además el
+     * diff en la UI para que la confirmación no sea ceremonial.
+     *
+     * SOLO OBSOLETAS: si la propuesta NO está obsoleta, devuelve `RESULT_NOT_STALE` sin escribir nada.
+     * Retirar de la cola una revisión que sigue siendo válida es una decisión de gobernanza distinta y
+     * necesita su propia autorización - no se cuela por acá.
+     *
+     * GRUPOS BILINGÜES: un grupo describe UNA convergencia indivisible, así que se supersede COMPLETO
+     * en la misma transacción, serializado por el advisory lock del grupo. Medio grupo supersedido
+     * dejaría al hermano aplicable por su cuenta, creando el concepto con un único término adjunto -
+     * el duplicado que la sección D de TASK-0006B prohíbe.
+     *
+     * IDEMPOTENTE y CONCURRENCY-SAFE: `lockForUpdate()` + re-chequeo dentro de la transacción, igual
+     * que `apply()`/`confirm()`. Un segundo llamado ve `SUPERSEDED` bajo el lock y devuelve
+     * `RESULT_ALREADY_SUPERSEDED` sin escribir ni auditar de nuevo.
+     *
+     * ATRIBUCIÓN, con la lección de TASK-0006C aplicada: si lo ejecuta el agente bajo autorización del
+     * dueño, `supersession_by_id` queda **NULL**. Poner ahí la cuenta de una persona que no ejecutó la
+     * acción repetiría el error de procedencia que TASK-0006C vino a reparar. El actor va con la verdad
+     * en `supersession_actor_type`, el canal se auto-captura y la autorización vive en la referencia.
+     *
+     * @param  string  $supersessionReference  Referencia de gobernanza de ESTA supersesión (no vacía y
+     *                con al menos un dígito, misma convención que `apply()`/`confirm()`).
+     * @param  User|null  $authorizedBy  La PERSONA que la ejecuta, si la ejecuta una persona
+     *                autenticada. Si la ejecuta el agente/un script, se deja en `null` a propósito.
+     * @return array{result:string, proposals:array<TaxonomyReviewedProposal>, state_delta:?array}
+     */
+    public function supersedeStaleProposal(
+        int $proposalId,
+        string $supersessionReference,
+        string $reason,
+        ?User $authorizedBy = null,
+    ): array {
+        if (trim($supersessionReference) === '') {
+            throw new \InvalidArgumentException('supersedeStaleProposal() requiere $supersessionReference no vacía - la referencia de gobernanza de ESTA supersesión.');
+        }
+
+        if (! preg_match('/\d/', $supersessionReference)) {
+            throw new \InvalidArgumentException('supersedeStaleProposal() requiere que $supersessionReference sea una REFERENCIA (con al menos un dígito), no un nombre libre - misma convención que apply()/confirm().');
+        }
+
+        if (trim($reason) === '') {
+            throw new \InvalidArgumentException('supersedeStaleProposal() requiere un $reason explícito no vacío - retirar una decisión humana de la cola sin motivo registrado no es auditable.');
+        }
+
+        // Mismo criterio anti-suplantación que `confirm()`/`invalidateConfirmation()`: si quien
+        // ejecuta declara una persona, tiene que ser la autenticada.
+        if ($authorizedBy !== null && (Auth::id() === null || (int) Auth::id() !== (int) $authorizedBy->id)) {
+            return ['result' => self::RESULT_UNAUTHORIZED, 'proposals' => [], 'state_delta' => null];
+        }
+
+        // Lectura SIN lock, usada EXCLUSIVAMENTE para elegir la clave de serialización antes de tomar
+        // cualquier lock de fila - mismo patrón que `apply()`. `proposal_group_id` se escribe al
+        // insertar y nunca se actualiza, así que no puede cambiar entre esta lectura y el lock.
+        $proposalGroupId = TaxonomyReviewedProposal::query()->whereKey($proposalId)->value('proposal_group_id');
+
+        return DB::connection('pgsql')->transaction(function () use ($proposalId, $proposalGroupId, $supersessionReference, $reason, $authorizedBy) {
+            if ($proposalGroupId !== null) {
+                self::acquireGroupAdvisoryLock($proposalGroupId);
+            }
+
+            $proposal = TaxonomyReviewedProposal::query()->lockForUpdate()->find($proposalId);
+
+            if (! $proposal) {
+                return ['result' => self::RESULT_NOT_FOUND, 'proposals' => [], 'state_delta' => null];
+            }
+
+            if ($proposal->isSuperseded()) {
+                return ['result' => self::RESULT_ALREADY_SUPERSEDED, 'proposals' => [$proposal], 'state_delta' => $proposal->supersession_state_delta];
+            }
+
+            if ($proposal->status !== TaxonomyReviewedProposal::STATUS_PENDING_APPLY) {
+                return ['result' => self::RESULT_ALREADY_PROCESSED, 'proposals' => [$proposal], 'state_delta' => null];
+            }
+
+            // El grupo completo, o la propuesta sola. Orden determinístico por id.
+            $members = $proposal->isGrouped()
+                ? TaxonomyReviewedProposal::query()
+                    ->where('proposal_group_id', $proposal->proposal_group_id)
+                    ->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                    ->all()
+                : [$proposal];
+
+            // ---------------------------------------------------------------------------------
+            // REVALIDACIÓN ANTES DE TRANSICIONAR (requisito 4 del comentario). Se valida TODO el
+            // conjunto ANTES de escribir una sola fila: si un miembro falla, no se supersede ninguno.
+            // ---------------------------------------------------------------------------------
+            $currentFingerprint = CanonicalConceptBuilderService::dryRunInputFingerprint();
+
+            foreach ($members as $member) {
+                // Tamper: supersedir una propuesta manipulada taparía el hallazgo de seguridad.
+                if (! self::payloadFingerprintIsValid($member)) {
+                    return ['result' => self::RESULT_TAMPERED_PAYLOAD, 'proposals' => [$member], 'state_delta' => null];
+                }
+
+                // Obsolescencia REAL contra el fingerprint actual exacto, computado por código de
+                // aplicación - no deducido de que dos hashes guardados difieran entre sí.
+                if ($member->taxonomy_state_fingerprint === $currentFingerprint) {
+                    return ['result' => self::RESULT_NOT_STALE, 'proposals' => [$member], 'state_delta' => null];
+                }
+
+                // Ninguna ejecución ocurrió sobre esta fila.
+                if ($member->applied_at !== null || $member->authorization_reference !== null) {
+                    return ['result' => self::RESULT_ALREADY_PROCESSED, 'proposals' => [$member], 'state_delta' => null];
+                }
+
+                // La fila fuente tiene que seguir existiendo Y seguir siendo revisable: liberar el
+                // slot no sirve de nada si el candidato ya lo resolvió otro camino.
+                if (! $this->sourceRowIsStillReviewable($member)) {
+                    return ['result' => self::RESULT_SOURCE_NOT_REVIEWABLE, 'proposals' => [$member], 'state_delta' => null];
+                }
+            }
+
+            $supersededAt = now();
+            $actorType = $authorizedBy
+                ? TaxonomyReviewedProposal::ACTOR_HUMAN_REVIEWER
+                : TaxonomyReviewedProposal::ACTOR_AGENT;
+            $channel = self::currentChannel();
+
+            $superseded = [];
+            foreach ($members as $member) {
+                $stateDelta = $this->supersessionStateDelta($member, $currentFingerprint, $supersededAt);
+
+                $member->update([
+                    'status' => TaxonomyReviewedProposal::STATUS_SUPERSEDED,
+                    'superseded_at' => $supersededAt,
+                    'supersession_reference' => $supersessionReference,
+                    'supersession_reason' => $reason,
+                    'supersession_actor_type' => $actorType,
+                    'supersession_by_id' => $authorizedBy?->id,
+                    'supersession_channel' => $channel,
+                    'supersession_state_delta' => $stateDelta,
+                    // SIN SUCESOR: explícito, no un olvido. Ver el docblock.
+                    'superseded_by_proposal_id' => null,
+                ]);
+
+                // Evento de auditoría propio y distinguible: `field = superseded_at`, así que la
+                // bitácora separa sin ambigüedad FROZEN -> HUMAN_CONFIRMED -> SUPERSEDED -> (revisión
+                // nueva). SIN `authorization_reference`/`target_environment`: supersedir NO es
+                // ejecutar, y esos dos campos están reservados para el APPLY real - es la distinción
+                // sobre la que se apoya todo el contrato C2.
+                TaxonomyAuditLogger::record(
+                    entityType: TaxonomyReviewedProposal::class,
+                    entityId: $member->id,
+                    field: 'superseded_at',
+                    oldValue: TaxonomyReviewedProposal::STATUS_PENDING_APPLY,
+                    newValue: TaxonomyReviewedProposal::STATUS_SUPERSEDED,
+                    reason: 'SUPERSEDED: revisión obsoleta retirada de la cola SIN destruirla y SIN sucesor'
+                        .' (ref='.$supersessionReference.', actor='.($authorizedBy ? 'human#'.$authorizedBy->id : 'agent')
+                        .', canal='.$channel.($member->isGrouped() ? ', grupo '.$member->proposal_group_id : '').').'
+                        .' La decisión, su payload y sus DOS fingerprints quedaron intactos; no se aplicó ni se publicó nada.'
+                        .' El slot PENDING_APPLY del origen queda libre para una revisión humana nueva contra el estado actual. Motivo: '.$reason,
+                    actorType: $authorizedBy ? TaxonomyAuditLogger::ACTOR_USER : TaxonomyAuditLogger::ACTOR_SYSTEM,
+                    algorithmVersion: self::PAYLOAD_VERSION,
+                );
+
+                $superseded[] = $member->fresh();
+            }
+
+            return [
+                'result' => self::RESULT_SUPERSEDED,
+                'proposals' => $superseded,
+                'state_delta' => $superseded[0]->supersession_state_delta ?? null,
+            ];
+        });
+    }
+
+    /**
+     * ¿La fila fuente de esta propuesta sigue en un estado que permita volver a revisarla? Es la
+     * contraparte de la compuerta de `apply()`: ahí se exige para poder PUBLICAR, acá para que liberar
+     * el slot sirva de algo.
+     */
+    private function sourceRowIsStillReviewable(TaxonomyReviewedProposal $proposal): bool
+    {
+        if ($proposal->proposal_type === TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK) {
+            $candidate = TaxonomyCandidateConceptLink::query()->lockForUpdate()->find($proposal->candidate_link_id);
+
+            return $candidate !== null && $candidate->status === TaxonomyCandidateConceptLink::STATUS_PENDING;
+        }
+
+        $relation = TaxonomyConceptRelation::query()->lockForUpdate()->find($proposal->concept_relation_id);
+
+        return $relation !== null && $relation->status === TaxonomyConceptRelation::STATUS_CANDIDATE;
+    }
+
+    /**
+     * TASK-0006E (requisito 6 del comentario `5955148859`): la EVIDENCIA durable de por qué esta
+     * revisión quedó obsoleta, calculada en el instante de la transición y guardada en
+     * `supersession_state_delta`.
+     *
+     * POR QUÉ SE PERSISTE Y NO SE CALCULA DESPUÉS: el `taxonomy_state_fingerprint` es un **hash**, así
+     * que el estado viejo no se puede reconstruir desde él. Si este delta no se guarda ahora, la
+     * explicación de por qué la decisión caducó se pierde para siempre.
+     *
+     * LÍMITE DECLARADO, en vez de presentar una reconstrucción como si fuera exacta: lo que sigue NO es
+     * el estado viejo recuperado. Es (a) los dos hashes, que sí son exactos, y (b) los cambios de la
+     * taxonomía acotados por `reviewed_at` usando `created_at`/`updated_at`. Eso es evidencia real y
+     * suficiente para que un humano entienda qué apareció desde que revisó -para #420/#421/#422, los
+     * conceptos `oleoducto` y `gasoducto`-, pero una fila modificada sin tocar `updated_at` no
+     * aparecería. El propio delta lleva esa advertencia escrita.
+     */
+    private function supersessionStateDelta(TaxonomyReviewedProposal $proposal, string $currentFingerprint, \DateTimeInterface $supersededAt): array
+    {
+        $reviewedAt = $proposal->reviewed_at;
+
+        $conceptsCreatedSince = DB::connection('pgsql')->table('taxonomy_canonical_concepts')
+            ->where('created_at', '>', $reviewedAt)
+            ->orderBy('id')
+            ->get(['id', 'canonical_name_es', 'canonical_name_en', 'status', 'created_at'])
+            ->map(fn ($row) => [
+                'id' => (int) $row->id,
+                'canonical_name_es' => $row->canonical_name_es,
+                'canonical_name_en' => $row->canonical_name_en,
+                'status' => $row->status,
+                'created_at' => (string) $row->created_at,
+            ])
+            ->all();
+
+        $conceptsUpdatedSince = DB::connection('pgsql')->table('taxonomy_canonical_concepts')
+            ->where('updated_at', '>', $reviewedAt)
+            ->where(function ($q) use ($reviewedAt) {
+                $q->whereNull('created_at')->orWhere('created_at', '<=', $reviewedAt);
+            })
+            ->orderBy('id')
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $signals = [];
+        foreach ([
+            'taxonomy_terms',
+            'taxonomy_term_aliases',
+            'taxonomy_term_cpv_relations',
+            'taxonomy_term_embeddings',
+            'taxonomy_term_service_relations',
+            'taxonomy_term_source_bindings',
+            'taxonomy_settings',
+            'taxonomy_concept_relations',
+        ] as $table) {
+            $signals[$table] = CanonicalConceptBuilderService::tableVersionSignal($table);
+        }
+
+        return [
+            'computed_at' => $supersededAt->format('Y-m-d H:i:s'),
+            'stale' => true,
+            'frozen_taxonomy_state_fingerprint' => $proposal->taxonomy_state_fingerprint,
+            'current_taxonomy_state_fingerprint' => $currentFingerprint,
+            'review_window' => [
+                'reviewed_at' => $reviewedAt?->format('Y-m-d H:i:s'),
+                'superseded_at' => $supersededAt->format('Y-m-d H:i:s'),
+            ],
+            // La evidencia decision-relevante: qué conceptos existen hoy que NO existían cuando el
+            // humano decidió. Para los tres casos reales esto es lo que vuelve a abrir la pregunta.
+            'concepts_created_since_review' => $conceptsCreatedSince,
+            'concepts_created_since_review_count' => count($conceptsCreatedSince),
+            'concepts_updated_since_review_ids' => $conceptsUpdatedSince,
+            'current_concept_graph_fingerprint' => CanonicalConceptBuilderService::conceptGraphFingerprint(),
+            'current_table_version_signals' => $signals,
+            'protected_counts_at_supersession' => [
+                'taxonomy_term_concepts' => DB::connection('pgsql')->table('taxonomy_term_concepts')->count(),
+                'taxonomy_canonical_concepts' => DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(),
+                'taxonomy_term_cpv_relations' => DB::connection('pgsql')->table('taxonomy_term_cpv_relations')->count(),
+            ],
+            'limitation' => 'El fingerprint congelado es un HASH: la composición por tabla del estado VIEJO no se puede reconstruir desde él. Los dos hashes de arriba son exactos; los cambios listados se derivaron de created_at/updated_at acotados por reviewed_at, que es evidencia real pero no una reconstrucción del estado anterior. Una fila modificada sin tocar updated_at no aparecería acá (mismo límite ya documentado en dryRunInputFingerprint()).',
+        ];
+    }
+
+    // =====================================================================================
     // PASO 2: APPLY - toma un payload YA congelado, revalida contra el estado REAL, y recién ahí
     // escribe, con autorización de ejecución explícita y separada de la revisión.
     // =====================================================================================
@@ -1374,6 +1741,12 @@ class ReviewedProposalService
             return ['result' => self::RESULT_ALREADY_ABORTED, 'proposal' => $proposal, 'abort_reason' => $proposal->application_result['abort_reason'] ?? null, 'application_result' => $proposal->application_result];
         }
 
+        // TASK-0006E: CERO escrituras. `apply()` sobre una propuesta supersedida no la quema ni la
+        // revive - informa y se va, que es lo que mantiene el rastro de la supersesión intacto.
+        if ($blocker === self::PREFLIGHT_ALREADY_SUPERSEDED) {
+            return ['result' => self::RESULT_ALREADY_SUPERSEDED, 'proposal' => $proposal, 'abort_reason' => null, 'application_result' => $detail];
+        }
+
         // TASK-0006D re-audit (comentario `5952211890`, punto B): la compuerta de confirmación humana
         // sigue siendo NO TERMINAL y NO aborta el grupo. Cero escrituras: todos los miembros siguen
         // `PENDING_APPLY` y el grupo sigue aplicable una vez confirmado.
@@ -1444,7 +1817,18 @@ class ReviewedProposalService
             $memberDetail = array_merge($detail, [
                 'group_terminal_failure' => true,
                 'proposal_group_id' => $proposal->proposal_group_id,
-                'detected_on_proposal_id' => (int) ($detail['tampered_proposal_id'] ?? $proposal->id),
+                // TASK-0006E (requisito 10 del comentario `5955148859`, limpieza no bloqueante
+                // señalada en `5954835892`): atribución NORMALIZADA del hallazgo.
+                //
+                // Antes sólo el bloqueo de tamper traía un id de propuesta ofensora
+                // (`tampered_proposal_id`), así que para CUALQUIER otro bloqueo de hermano -estado,
+                // fingerprint de grupo, entidad faltante, fuente ya resuelta, drift, identidad
+                // incoherente- este campo caía al de ENTRADA y atribuía el problema a la fila
+                // equivocada. Ahora todos los bloqueos del bucle de miembros emiten
+                // `offending_proposal_id`, así que la atribución es correcta en todos los casos y el
+                // fallback a la entrada queda sólo para bloqueos de nivel de entrada, donde la entrada
+                // ES la ofensora.
+                'detected_on_proposal_id' => (int) ($detail['offending_proposal_id'] ?? $detail['tampered_proposal_id'] ?? $proposal->id),
                 'group_aborted_proposal_ids' => $abortedIds,
                 'group_abort_note' => $member->id === $proposal->id
                     ? 'Bloqueo terminal en este grupo bilingüe: el grupo se aborta COMPLETO en la misma transacción.'
@@ -1509,6 +1893,7 @@ class ReviewedProposalService
             self::PREFLIGHT_READY_TO_APPLY,
             self::PREFLIGHT_ALREADY_APPLIED,
             self::PREFLIGHT_ALREADY_ABORTED,
+            self::PREFLIGHT_ALREADY_SUPERSEDED,
             self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED,
             self::PREFLIGHT_NOT_FOUND,
         ], true)) {
@@ -1642,6 +2027,7 @@ class ReviewedProposalService
         $reachedStaleGate = ! in_array($blocker, [
             self::PREFLIGHT_ALREADY_APPLIED,
             self::PREFLIGHT_ALREADY_ABORTED,
+            self::PREFLIGHT_ALREADY_SUPERSEDED,
             self::PREFLIGHT_TAMPER_DETECTED,
         ], true);
         $currentFingerprint = $context['current_taxonomy_fingerprint'] ?? null;
@@ -1663,6 +2049,17 @@ class ReviewedProposalService
             // tamper puede estar en un hermano, y en ese caso el payload de ESTA fila sí es válido.
             // Deducirlo de `blocker === TAMPER_DETECTED` reportaría como manipulada una fila intacta.
             'payload_fingerprint_valid' => $context['entry_payload_valid'] ?? null,
+            // TASK-0006E: estado histórico, visible en el informe sin tener que cruzar tablas.
+            'superseded' => $proposal->isSuperseded(),
+            'supersession' => $proposal->hasSupersessionTrail() ? [
+                'superseded_at' => $proposal->superseded_at?->format('Y-m-d H:i:s'),
+                'reference' => $proposal->supersession_reference,
+                'reason' => $proposal->supersession_reason,
+                'actor_type' => $proposal->supersession_actor_type,
+                'channel' => $proposal->supersession_channel,
+                'superseded_by_proposal_id' => $proposal->superseded_by_proposal_id,
+                'has_state_delta' => $proposal->supersession_state_delta !== null,
+            ] : null,
             'taxonomy_state_fingerprint_frozen' => $proposal->taxonomy_state_fingerprint,
             'taxonomy_state_fingerprint_current' => $currentFingerprint,
             'stale' => $currentFingerprint === null ? null : $currentFingerprint !== $proposal->taxonomy_state_fingerprint,
@@ -1779,6 +2176,7 @@ class ReviewedProposalService
             self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT => 'El grupo bilingüe no describe una convergencia coherente - revisar los miembros antes de cualquier apply().',
             self::PREFLIGHT_ALREADY_APPLIED => 'Ninguna: ya se aplicó.',
             self::PREFLIGHT_ALREADY_ABORTED => 'Ninguna sobre esta fila: abortar es terminal. Si la decisión sigue siendo necesaria, hace falta una revisión nueva.',
+            self::PREFLIGHT_ALREADY_SUPERSEDED => 'Ninguna sobre esta fila: quedó como registro histórico íntegro. La acción pendiente es HUMANA y vive en el candidato, que volvió a la cola de revisión normal - una persona decide de nuevo desde la evidencia actual.',
             default => 'Sin acción definida para este bloqueo.',
         };
     }
@@ -1824,9 +2222,11 @@ class ReviewedProposalService
             return [
                 'expected_write_set' => [],
                 'expected_write_count' => 0,
-                'expected_write_set_note' => $blocker === self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED
-                    ? 'Cero escrituras: la compuerta de confirmación humana NO es un abort, así que un apply() prematuro deja la propuesta intacta en PENDING_APPLY (ver RESULT_HUMAN_CONFIRMATION_REQUIRED).'
-                    : 'Cero escrituras: replay idempotente de un estado ya resuelto.',
+                'expected_write_set_note' => match ($blocker) {
+                    self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED => 'Cero escrituras: la compuerta de confirmación humana NO es un abort, así que un apply() prematuro deja la propuesta intacta en PENDING_APPLY (ver RESULT_HUMAN_CONFIRMATION_REQUIRED).',
+                    self::PREFLIGHT_ALREADY_SUPERSEDED => 'Cero escrituras: un apply() sobre una propuesta supersedida no la quema ni la revive, así que el rastro de la supersesión queda intacto.',
+                    default => 'Cero escrituras: replay idempotente de un estado ya resuelto.',
+                },
             ];
         }
 
@@ -1940,6 +2340,11 @@ class ReviewedProposalService
 
         return TaxonomyReviewedProposal::query()
             ->where('proposal_group_id', $proposal->proposal_group_id)
+            // TASK-0006E: sólo los miembros que todavía están en la cola. Un hermano `SUPERSEDED`
+            // (retirado por obsolescencia) o `ABORTED` ya no se va a aplicar, así que exigir su
+            // confirmación bloquearía el grupo por una fila que nadie va a ejecutar. Para un
+            // `APPLIED` la pregunta no existe: aplicar ya exigió la confirmación.
+            ->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)
             ->where('requires_human_confirmation', true)
             ->whereNull('confirmed_at')
             ->orderBy('id')
@@ -2012,6 +2417,23 @@ class ReviewedProposalService
             return $this->blocker(self::PREFLIGHT_ALREADY_ABORTED, [
                 'note' => 'La propuesta ya fue abortada - abortar es terminal y este payload no se reintenta (se requiere una revisión nueva).',
                 'abort_reason' => $proposal->application_result['abort_reason'] ?? null,
+            ]);
+        }
+
+        // TASK-0006E (Issue #2 comentario `5955148859`, requisito «preflight understands SUPERSEDED as
+        // terminal historical state, not READY_TO_APPLY»): estado histórico TERMINAL, y esta compuerta
+        // no es decorativa - es lo que impide que `apply()` pise una supersesión.
+        //
+        // Sin ella, una propuesta `SUPERSEDED` no sería ni `APPLIED` ni `ABORTED`, así que caería por la
+        // cadena de validación y terminaría ABORTADA: `apply()` escribiría encima del estado que la
+        // supersesión acaba de registrar, destruyendo el rastro. Va acá arriba, junto a los otros dos
+        // estados ya resueltos, y produce CERO escrituras.
+        if ($proposal->status === TaxonomyReviewedProposal::STATUS_SUPERSEDED) {
+            return $this->blocker(self::PREFLIGHT_ALREADY_SUPERSEDED, [
+                'note' => 'La propuesta fue SUPERSEDIDA: se retiró de la cola de forma no destructiva por obsolescencia, su contenido sigue intacto y no es aplicable. El candidato volvió a la cola de revisión humana normal; la decisión nueva vive en una propuesta NUEVA, no en esta.',
+                'superseded_at' => $proposal->superseded_at?->format('Y-m-d H:i:s'),
+                'supersession_reference' => $proposal->supersession_reference,
+                'superseded_by_proposal_id' => $proposal->superseded_by_proposal_id,
             ]);
         }
 
@@ -2331,6 +2753,9 @@ class ReviewedProposalService
                 return $this->blocker(self::PREFLIGHT_TAMPER_DETECTED, [
                     'note' => "El payload congelado del miembro #{$member->id} del grupo bilingüe no coincide con su propio fingerprint - sus campos de decisión fueron modificados después de freeze(). No se escribió nada, y el grupo COMPLETO queda bloqueado: aplicar los hermanos sanos crearía el concepto con un solo término adjunto.",
                     'tampered_proposal_id' => (int) $member->id,
+                    // TASK-0006E requisito 10: el mismo id, además, en el campo NORMALIZADO que
+                    // `abortWholeGroup()` lee para todos los bloqueos de hermano.
+                    'offending_proposal_id' => (int) $member->id,
                     'entry_proposal_id' => (int) $proposal->id,
                     'proposal_group_id' => $proposal->proposal_group_id,
                 ], $context);

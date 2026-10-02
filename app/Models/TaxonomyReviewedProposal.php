@@ -49,6 +49,20 @@ class TaxonomyReviewedProposal extends Model
     public const STATUS_ABORTED = 'ABORTED';
 
     /**
+     * TASK-0006E (Issue #2 comentario `5955148859`): la revisión quedó OBSOLETA porque el estado de la
+     * taxonomía cambió después de congelarse, y se la retiró de la cola de forma **no destructiva**.
+     *
+     * Es un estado histórico TERMINAL, distinto de `ABORTED` en lo que importa: `ABORTED` registra un
+     * intento de EJECUCIÓN que falló (lleva `authorization_reference`/`target_environment`), mientras
+     * `SUPERSEDED` registra una decisión de GOBERNANZA de retirar la revisión antes de cualquier
+     * ejecución - nadie intentó aplicarla. La fila se conserva íntegra (decisión, payload, los dos
+     * fingerprints, revisor y `reviewed_at` intactos) y, como los índices únicos parciales filtran por
+     * `status = 'PENDING_APPLY'`, la transición **libera el slot** del candidato para que vuelva a la
+     * cola de revisión humana normal contra el estado ACTUAL.
+     */
+    public const STATUS_SUPERSEDED = 'SUPERSEDED';
+
+    /**
      * TASK-0006B (Issue #2 comentario `5936206843`), sección A: quién PREPARÓ el contenido de la
      * decisión, que no es necesariamente quién figura como `reviewer_id`. `ACTOR_AGENT` es lo que
      * el re-audit `5934324928` exigió poder decir estructuralmente en vez de dejarlo como texto
@@ -95,6 +109,16 @@ class TaxonomyReviewedProposal extends Model
         'confirmation_invalidation_reference',
         'confirmation_invalidation_reason',
         'invalidated_confirmation_snapshot',
+        'superseded_at',
+        'superseded_by_proposal_id',
+        'supersedes_proposal_id',
+        'inherited_decision_from_id',
+        'supersession_reference',
+        'supersession_reason',
+        'supersession_actor_type',
+        'supersession_by_id',
+        'supersession_channel',
+        'supersession_state_delta',
     ];
 
     protected $casts = [
@@ -111,6 +135,12 @@ class TaxonomyReviewedProposal extends Model
         'confirmation_invalidated_at' => 'datetime',
         'confirmation_invalidated_by_id' => 'integer',
         'invalidated_confirmation_snapshot' => 'array',
+        'superseded_at' => 'datetime',
+        'superseded_by_proposal_id' => 'integer',
+        'supersedes_proposal_id' => 'integer',
+        'inherited_decision_from_id' => 'integer',
+        'supersession_by_id' => 'integer',
+        'supersession_state_delta' => 'array',
     ];
 
     /**
@@ -166,6 +196,43 @@ class TaxonomyReviewedProposal extends Model
     public function confirmationInvalidatedBy()
     {
         return $this->belongsTo(UserPgsql::class, 'confirmation_invalidated_by_id');
+    }
+
+    /**
+     * TASK-0006E: esta propuesta fue retirada de la cola de forma no destructiva por obsolescencia.
+     * Su contenido sigue intacto - sólo dejó de ser aplicable.
+     */
+    public function isSuperseded(): bool
+    {
+        return $this->status === self::STATUS_SUPERSEDED;
+    }
+
+    /** ¿Tiene rastro de supersesión grabado? (equivale a `isSuperseded()` salvo estados corruptos). */
+    public function hasSupersessionTrail(): bool
+    {
+        return $this->superseded_at !== null;
+    }
+
+    /**
+     * TASK-0006E: una supersesión SIN sucesor es la variante de máxima agencia humana - el candidato
+     * vuelve a la cola de revisión normal y la persona decide de nuevo desde la evidencia actual, en
+     * vez de confirmar una decisión ya redactada. Es la que se autorizó para #420/#421/#422.
+     */
+    public function wasSupersededWithoutSuccessor(): bool
+    {
+        return $this->isSuperseded() && $this->superseded_by_proposal_id === null;
+    }
+
+    /** La propuesta que reemplazó a esta, si la supersesión creó un sucesor. */
+    public function supersededBy()
+    {
+        return $this->belongsTo(self::class, 'superseded_by_proposal_id');
+    }
+
+    /** La propuesta a la que esta reemplaza, si es un sucesor. */
+    public function supersedes()
+    {
+        return $this->belongsTo(self::class, 'supersedes_proposal_id');
     }
 
     /** Las otras filas del mismo grupo bilingüe (sin incluirse a sí misma). */

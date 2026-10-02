@@ -129,6 +129,10 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                             TaxonomyReviewedProposal::STATUS_PENDING_APPLY => 'CONGELADA_PENDIENTE',
                             TaxonomyReviewedProposal::STATUS_APPLIED => 'APLICADA',
                             TaxonomyReviewedProposal::STATUS_ABORTED => 'ABORTADA',
+                            // TASK-0006E: la revisión anterior quedó obsoleta y se retiró de la cola.
+                            // El candidato vuelve a estar revisable, y la insignia lo dice en vez de
+                            // mostrar el valor crudo del status.
+                            TaxonomyReviewedProposal::STATUS_SUPERSEDED => 'SUPERSEDIDA_REVISABLE',
                             default => $latest->status,
                         };
                     })
@@ -137,6 +141,7 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                         'info' => 'CONGELADA_PENDIENTE',
                         'success' => 'APLICADA',
                         'danger' => 'ABORTADA',
+                        'warning' => 'SUPERSEDIDA_REVISABLE',
                     ]),
                 Tables\Columns\TextColumn::make('reviewedBy.name')->label('Revisado por')->placeholder('—')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('reviewed_at')->label('Revisado el')->dateTime()->placeholder('—')->toggleable(isToggledHiddenByDefault: true),
@@ -296,6 +301,25 @@ class TaxonomyCandidateConceptLinkResource extends Resource
         $proposal = self::liveFrozenProposal($record);
 
         if (! $proposal) {
+            // TASK-0006E: si hubo una revisión anterior que quedó obsoleta y se retiró de la cola, hay
+            // que DECIRLO. Este candidato se revisa de nuevo desde cero, y quien lo revise merece saber
+            // que ya hubo una decisión y que caducó - sin eso, el candidato parece nunca revisado y el
+            // revisor pierde el contexto de por qué vuelve a estar en la cola.
+            $superseded = $record->reviewedProposals
+                ->where('status', TaxonomyReviewedProposal::STATUS_SUPERSEDED)
+                ->sortByDesc('id')
+                ->first();
+
+            if ($superseded) {
+                return sprintf(
+                    'Ninguna propuesta viva. Hubo una revisión anterior, la propuesta #%d (%s) del %s, que quedó OBSOLETA porque el grafo de conceptos cambió y fue SUPERSEDIDA el %s — se conserva íntegra y auditable en «Propuestas revisadas (C2)», pero ya no es aplicable. Este candidato está disponible para una revisión NUEVA contra el estado actual; la decisión anterior es evidencia histórica, no un punto de partida obligado.',
+                    $superseded->id,
+                    $superseded->decision,
+                    $superseded->reviewed_at?->format('Y-m-d H:i:s') ?? '—',
+                    $superseded->superseded_at?->format('Y-m-d H:i:s') ?? '—',
+                );
+            }
+
             return 'Ninguna propuesta viva (PENDING_APPLY) para este candidato.';
         }
 

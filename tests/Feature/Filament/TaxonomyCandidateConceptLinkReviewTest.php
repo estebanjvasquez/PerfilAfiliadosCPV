@@ -414,6 +414,93 @@ class TaxonomyCandidateConceptLinkReviewTest extends TestCase
             ->assertTableActionHidden('viewReviewedProposal', $candidate->fresh());
     }
 
+    // =========================================================================================
+    // TASK-0006E (Issue #2 comentario `5955148859`), requisitos 7 y 8: tras supersedir, el candidato
+    // vuelve a ser revisable por la UI normal, y la propuesta vieja queda visible y de solo lectura.
+    // =========================================================================================
+
+    #[Test]
+    public function a_candidate_becomes_reviewable_again_through_the_normal_ui_after_supersession(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $reviewer = $this->authorizedReviewer();
+
+        $frozen = app(ReviewedProposalService::class)->freeze(
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK,
+            $candidate->id,
+            TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED,
+            $reviewer,
+            ['context_reason' => 'demasiado genérico (fixture 0006E)'],
+        );
+        $this->assertSame(ReviewedProposalService::RESULT_FROZEN, $frozen['result']);
+
+        // Con la propuesta viva, el endurecimiento de TASK-0006D sigue en pie: no hay segundo freeze.
+        Livewire::actingAs($reviewer)
+            ->test(ListTaxonomyCandidateConceptLinks::class)
+            ->assertTableActionHidden('freezeReview', $candidate->fresh())
+            ->assertTableActionVisible('viewReviewedProposal', $candidate->fresh());
+
+        // Se vuelve obsoleta y se supersede.
+        TaxonomyCanonicalConcept::create(['canonical_name_es' => 'zzz_task0006e_state_'.uniqid(), 'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE]);
+        $outcome = app(ReviewedProposalService::class)->supersedeStaleProposal(
+            $frozen['proposal']->id,
+            'Issue #2 — TASK-0006E UI test-suite 5955148859',
+            'Obsoleta: el grafo de conceptos cambió desde la revisión.',
+        );
+        $this->assertSame(ReviewedProposalService::RESULT_SUPERSEDED, $outcome['result']);
+
+        // AHORA el candidato vuelve a estar revisable, y el enlace a la propuesta viva desaparece
+        // porque ya no hay ninguna viva - la vieja quedó como historia.
+        Livewire::actingAs($reviewer)
+            ->test(ListTaxonomyCandidateConceptLinks::class)
+            ->assertTableActionVisible('freezeReview', $candidate->fresh())
+            ->assertTableActionHidden('viewReviewedProposal', $candidate->fresh());
+
+        // Y la decisión nueva la congela una PERSONA por la UI, contra el estado actual.
+        Livewire::actingAs($reviewer)
+            ->test(ListTaxonomyCandidateConceptLinks::class)
+            ->callTableAction('freezeReview', $candidate->fresh(), data: [
+                'decision' => TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED,
+                'context_reason' => 'revisión nueva desde la evidencia actual',
+            ])
+            ->assertHasNoTableActionErrors();
+
+        $this->assertSame(1, TaxonomyReviewedProposal::where('candidate_link_id', $candidate->id)
+            ->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)->count());
+        $this->assertSame(TaxonomyReviewedProposal::STATUS_SUPERSEDED, $frozen['proposal']->fresh()->status,
+            'La propuesta vieja sigue supersedida: coexisten, no se reemplazan.');
+    }
+
+    #[Test]
+    public function the_detail_page_explains_that_the_previous_review_was_superseded(): void
+    {
+        $candidate = $this->newConceptCandidate();
+        $reviewer = $this->authorizedReviewer();
+
+        $frozen = app(ReviewedProposalService::class)->freeze(
+            TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK,
+            $candidate->id,
+            TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED,
+            $reviewer,
+            ['context_reason' => 'demasiado genérico (fixture 0006E)'],
+        );
+
+        TaxonomyCanonicalConcept::create(['canonical_name_es' => 'zzz_task0006e_detail_'.uniqid(), 'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE]);
+        app(ReviewedProposalService::class)->supersedeStaleProposal(
+            $frozen['proposal']->id,
+            'Issue #2 — TASK-0006E UI test-suite 5955148859',
+            'Obsoleta: el grafo de conceptos cambió desde la revisión.',
+        );
+
+        // Quien revise de nuevo merece saber que YA hubo una decisión y que caducó - sin eso el
+        // candidato parece nunca revisado y se pierde el contexto de por qué volvió a la cola.
+        $notice = \App\Filament\Resources\TaxonomyCandidateConceptLinkResource::frozenProposalNotice($candidate->fresh());
+
+        $this->assertStringContainsString('SUPERSEDIDA', $notice);
+        $this->assertStringContainsString('#'.$frozen['proposal']->id, $notice);
+        $this->assertStringContainsString('revisión NUEVA', $notice);
+    }
+
     #[Test]
     public function the_reviewed_proposal_link_is_hidden_from_a_reviewer_who_cannot_view_that_proposal(): void
     {
