@@ -83,6 +83,14 @@ class ViewTaxonomyCandidateConceptLink extends ViewRecord
                         default => 'Sin cambios desde que se generó este candidato.',
                     };
                 }),
+            // TASK-0006D (Issue #2 comentario `5949253156`), PARTE 2: la vista de detalle es donde un
+            // revisor aterriza ANTES de decidir, así que tiene que decir sin ambigüedad que ya hay
+            // una decisión congelada - si no, el candidato se ve "pending" (lo está, por diseño:
+            // `freeze()` no toca su status) y parece sin revisar. Solo lectura, sin ninguna acción.
+            TextEntry::make('frozen_reviewed_proposal')
+                ->label('Propuesta C2 congelada')
+                ->state(fn (TaxonomyCandidateConceptLink $record) => Resource::frozenProposalNotice($record))
+                ->columnSpanFull(),
             TextEntry::make('review_notes')->label('Notas de revisión')->placeholder('—'),
             TextEntry::make('reviewedBy.name')->label('Revisado por')->placeholder('—'),
             TextEntry::make('reviewed_at')->label('Revisado el')->dateTime()->placeholder('—'),

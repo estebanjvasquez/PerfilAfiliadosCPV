@@ -20,10 +20,13 @@ las decisiones humanas del dueño de la taxonomía más la elección de la **opc
 (2026-10-02T07:39:55Z). TASK-0006, TASK-0006B y TASK-0006C quedan cerradas. Detalle del cierre en la
 **§12 del audit**.
 
-**Seguimiento ABIERTO y no bloqueante:** comentario
+**Seguimiento CERRADO:** comentario
 [`5947407519`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5947407519)
-(UX de `freezeReview` en la tabla de candidatos) — ver §12.3 del audit y
-`open_followup_candidate_freeze_ux` en el handoff.
+(UX de `freezeReview` en la tabla de candidatos) quedó **CORREGIDO en la PARTE 2 de TASK-0006D** —
+ver [`0006d-preapply-preflight.md`](0006d-preapply-preflight.md), la §8 de
+`audit/phase6_task0006d_preapply_preflight_2026-10-02.md` y `resolved_in_task_0006d` dentro de
+`open_followup_candidate_freeze_ux` en el handoff. Cuando se registró estaba ABIERTO y no bloqueante;
+ver §12.3 de este audit para el reporte original.
 
 **Re-audit intermedio:** Issue #2, comentario
 [`5938949812`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5938949812)

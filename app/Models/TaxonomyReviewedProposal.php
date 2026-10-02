@@ -38,7 +38,7 @@ class TaxonomyReviewedProposal extends Model
      * la ronda 4 del re-audit, Issue #2 comentario `5909267134`). `apply()` para esta decisión NUNCA
      * escribe `taxonomy_term_concepts` ni crea un concepto, y revalida el `term_id` congelado contra
      * la fila viva antes de resolverla (ronda 4, defecto 2) - ver
-     * `ReviewedProposalService::applyCandidateLinkDecision()`.
+     * `ReviewedProposalService::evaluateCandidateLink()`/`writeCandidateLinkDecision()`.
      */
     public const DECISION_CONTEXT_REQUIRED = 'CONTEXT_REQUIRED';
 

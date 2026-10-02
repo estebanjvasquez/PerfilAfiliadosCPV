@@ -48,6 +48,16 @@ use Illuminate\Support\HtmlString;
  * `CandidateConceptApprovalService` (el único camino legacy que nunca escribió una tabla protegida)
  * se retira de la UI para no tener dos caminos distintos hacia la misma decisión - REJECT ahora
  * también pasa por `freeze()`, quedando igual de auditado/inmutable que las otras 3 decisiones.
+ *
+ * TASK-0006D (Issue #2 comentario `5949253156`), PARTE 2: `freezeReview` ya no se ofrece cuando el
+ * candidato tiene una propuesta de revisión VIVA (`PENDING_APPLY`), y en su lugar aparece un enlace
+ * de solo lectura a esa propuesta. Corrige el defecto del comentario `5947407519`: como `freeze()`
+ * no toca el `status` del candidato, un candidato ya revisado seguía siendo `pending` y la grilla le
+ * ofrecía un segundo camino de revisión en la misma fila que mostraba `CONGELADA_PENDIENTE`. Ver
+ * `liveFrozenProposal()` para el razonamiento completo, incluido por qué `ABORTED` sí debe seguir
+ * permitiendo una revisión nueva. La visibilidad de la UI NO es la salvaguarda real: el índice único
+ * parcial y `ReviewedProposalService::freeze()` siguen rechazando un segundo congelamiento por
+ * cualquier camino (probado por test).
  */
 class TaxonomyCandidateConceptLinkResource extends Resource
 {
@@ -161,12 +171,16 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                 // CRÍTICO: esto NUNCA llama a `apply()` - "Congelar revisión" congela una decisión
                 // inmutable pendiente de aplicación, nunca publica. Ver `TaxonomyReviewedProposalResource`
                 // (de solo lectura) para inspeccionar el estado de la propuesta congelada.
+                // TASK-0006D (Issue #2 comentario `5949253156`), PARTE 2: la tercera condición es la
+                // corrección del defecto reportado en el comentario `5947407519` - ver
+                // `liveFrozenProposal()`.
                 Tables\Actions\Action::make('freezeReview')
                     ->label('Revisar (congelar decisión C2)')
                     ->icon('heroicon-o-lock-closed')
                     ->color('primary')
                     ->visible(fn (TaxonomyCandidateConceptLink $record) => $record->status === TaxonomyCandidateConceptLink::STATUS_PENDING
-                        && Auth::user()?->can('update', $record))
+                        && Auth::user()?->can('update', $record)
+                        && self::liveFrozenProposal($record) === null)
                     ->form(fn (TaxonomyCandidateConceptLink $record) => self::freezeReviewForm($record))
                     ->action(function (TaxonomyCandidateConceptLink $record, array $data) {
                         $decision = $data['decision'];
@@ -223,7 +237,103 @@ class TaxonomyCandidateConceptLinkResource extends Resource
                             default => Notification::make()->title('No se pudo congelar la decisión.')->danger()->send(),
                         };
                     }),
+                self::viewReviewedProposalAction(),
             ]);
+    }
+
+    /**
+     * TASK-0006D (Issue #2 comentario `5949253156`), PARTE 2: la propuesta de revisión VIVA de este
+     * candidato, o `null` si no tiene ninguna.
+     *
+     * EL DEFECTO QUE CIERRA (reportado en el comentario `5947407519`, observado por el dueño durante
+     * su propio paso de confirmación): `freezeReview` solo chequeaba `status === pending` + permiso de
+     * update. Pero `freeze()` **deliberadamente no toca el `status` del candidato** - congelar una
+     * decisión no publica ni resuelve nada -, así que un candidato con una propuesta `PENDING_APPLY`
+     * sigue siendo `pending` POR DISEÑO. El chequeo confundía "sigue pending" con "sigue sin
+     * revisar", y la grilla terminaba ofreciendo un segundo camino de revisión en la misma fila que ya
+     * mostraba la insignia `CONGELADA_PENDIENTE`. Entrar por ahí producía un error de validación
+     * ("Identidad bilingüe inválida") que parecía un problema de la propuesta congelada cuando en
+     * realidad era un camino equivocado.
+     *
+     * La corrección se apoya en la EXISTENCIA de una propuesta viva, no en el status del candidato -
+     * que es el único predicado que distingue de verdad los dos casos.
+     *
+     * Solo `PENDING_APPLY` cuenta como "viva", y eso es una decisión explícita, no un descuido:
+     * - `ABORTED` es terminal y NO resuelve el candidato (`abort()` no toca la fila fuente), así que
+     *   el candidato queda legítimamente pendiente de una revisión nueva - que es exactamente el
+     *   camino de recuperación documentado para una propuesta obsoleta. Esconder el botón ahí dejaría
+     *   el candidato sin ninguna forma de volver a revisarse.
+     * - `APPLIED` sí resuelve el candidato (published/rejected/context_required), así que el chequeo
+     *   de `status === pending` que ya existía lo cubre solo. Un candidato `pending` con una
+     *   propuesta `APPLIED` no lo puede producir `apply()` por ningún camino; si apareciera, se trata
+     *   con la misma regla que `ABORTED` (revisable), en vez de agregar un caso especial para un
+     *   estado que la aplicación no genera.
+     *
+     * Y el índice único parcial `WHERE status = 'PENDING_APPLY'` hace que esta regla coincida
+     * exactamente con lo que la base de datos permite: donde esta función devuelve una propuesta, un
+     * `freeze()` nuevo fallaría de todos modos.
+     *
+     * Usa la relación ya cargada (`$record->reviewedProposals`), la misma que alimenta la columna
+     * `Propuesta C2` - Eloquent la cachea por fila, así que esto NO agrega consultas a la grilla.
+     */
+    public static function liveFrozenProposal(TaxonomyCandidateConceptLink $record): ?TaxonomyReviewedProposal
+    {
+        return $record->reviewedProposals
+            ->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)
+            ->sortByDesc('id')
+            ->first();
+    }
+
+    /**
+     * TASK-0006D, PARTE 2: el texto de solo lectura que la página de detalle muestra sobre la
+     * propuesta congelada. Vive acá, y no como una closure dentro del infolist, para que se pueda
+     * probar sin renderizar la página: el renderizado del detalle depende de `ext-intl`
+     * (`TextEntry::make('confidence')->numeric(4)` llama a `Number::format()`), que no está disponible
+     * en el entorno local - una limitación de entorno preexistente, ajena a esta corrección.
+     */
+    public static function frozenProposalNotice(TaxonomyCandidateConceptLink $record): string
+    {
+        $proposal = self::liveFrozenProposal($record);
+
+        if (! $proposal) {
+            return 'Ninguna propuesta viva (PENDING_APPLY) para este candidato.';
+        }
+
+        return sprintf(
+            'Propuesta #%d (%s) congelada el %s - PENDIENTE DE APLICACIÓN. La acción que corresponde a este estado vive en «Propuestas revisadas (C2)», no acá: revisar de nuevo este candidato no es el camino.',
+            $proposal->id,
+            $proposal->decision,
+            $proposal->reviewed_at?->format('Y-m-d H:i:s') ?? '—',
+        );
+    }
+
+    /**
+     * TASK-0006D, PARTE 2: la alternativa SEGURA que reemplaza al botón de revisar cuando ya hay una
+     * decisión congelada - "preferably expose a safe «Ver propuesta revisada» affordance/link".
+     *
+     * Es un enlace de solo lectura a `TaxonomyReviewedProposalResource`, que es donde vive la acción
+     * correcta para este estado (`Confirmar decisión preparada`). No aplica, no publica y no congela
+     * nada; esta pantalla sigue sin tener ningún botón de APPLY/Publish.
+     *
+     * Solo se muestra si el usuario puede ver ESA propuesta: la autorización se resuelve con la misma
+     * policy que gobierna el recurso de destino (por tipo de origen, sin fuga entre candidatos y
+     * relaciones), así que el enlace nunca lleva a un 403/404.
+     */
+    private static function viewReviewedProposalAction(): Tables\Actions\Action
+    {
+        return Tables\Actions\Action::make('viewReviewedProposal')
+            ->label('Ver propuesta revisada')
+            ->icon('heroicon-o-archive-box')
+            ->color('gray')
+            ->visible(function (TaxonomyCandidateConceptLink $record) {
+                $proposal = self::liveFrozenProposal($record);
+
+                return $proposal !== null && (Auth::user()?->can('view', $proposal) ?? false);
+            })
+            ->url(fn (TaxonomyCandidateConceptLink $record) => TaxonomyReviewedProposalResource::getUrl(
+                'view',
+                ['record' => self::liveFrozenProposal($record)?->getKey()],
+            ));
     }
 
     /**
@@ -233,8 +343,13 @@ class TaxonomyCandidateConceptLinkResource extends Resource
      * comparten `canonical_term` con este candidato, porque eso es la evidencia gobernada de que son
      * el mismo concepto en otro idioma. La marca es SUGERENCIA, no filtro: la lista no se recorta a
      * los coincidentes, así que el revisor nunca queda encerrado en lo que el dato ya sabía.
+     *
+     * TASK-0006D, PARTE 2: pública para que la regresión del filtro de propuestas vivas se pueda
+     * probar directamente, en vez de a través de la API interna de formularios de Filament (que
+     * cambia entre versiones menores y haría frágil un test de una regla de negocio estable). Es una
+     * lectura pura, sin efectos.
      */
-    private static function convergenceCandidateOptions(TaxonomyCandidateConceptLink $record): array
+    public static function convergenceCandidateOptions(TaxonomyCandidateConceptLink $record): array
     {
         $ownCanonical = $record->term?->canonical_term;
 
@@ -242,6 +357,13 @@ class TaxonomyCandidateConceptLinkResource extends Resource
             ->where('status', TaxonomyCandidateConceptLink::STATUS_PENDING)
             ->whereNull('suggested_concept_id')
             ->whereKeyNot($record->getKey())
+            // TASK-0006D, PARTE 2: misma corrección que en `freezeReview`, aplicada a la otra puerta
+            // de entrada al mismo defecto. Un candidato con una propuesta `PENDING_APPLY` viva no
+            // puede participar de un grupo nuevo: el índice único parcial lo rechazaría y
+            // `freezeBilingualConceptGroup()` revertiría el grupo COMPLETO con
+            // `ALREADY_HAS_PENDING_PROPOSAL`. Ofrecerlo acá solo servía para que el revisor perdiera
+            // también la revisión de los demás miembros.
+            ->whereDoesntHave('reviewedProposals', fn ($q) => $q->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY))
             ->with('term')
             ->orderBy('id')
             ->get()

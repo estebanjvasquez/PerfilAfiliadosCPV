@@ -114,6 +114,26 @@ use Illuminate\Support\Facades\DB;
  *    regla de inmutabilidad que ya protegía a MAP_TO_EXISTING/CREATE_NEW. El chequeo de `term_id` se
  *    movió para correr ANTES de la rama CONTEXT_REQUIRED (sigue corriendo DESPUÉS de REJECT, la única
  *    decisión que genuinamente no resuelve ningún término específico).
+ *
+ * TASK-0006D (Issue #2 comentario `5949253156`), PARTE 1: se agrega un camino de SOLO LECTURA,
+ * `preflight()`, y la validación deja de estar embutida dentro de `apply()`.
+ *
+ * El problema concreto que resuelve: hasta acá, la única forma de saber si una propuesta congelada
+ * seguía siendo aplicable era llamar a `apply()` - y `apply()` es destructivo cuando falla, porque
+ * registra obsolescencia/tamper/drift con `abort()`, que pasa la propuesta a `ABORTED` de forma
+ * TERMINAL. Como re-congelar está bloqueado por el índice único parcial, "probar con apply() para ver
+ * qué pasa" podía quemar una decisión humana sin recuperación posible. El orquestador lo resumió así:
+ * «apply() is NOT a safe preflight API».
+ *
+ * La corrección NO es una segunda implementación de la validación - eso divergiría con el tiempo y
+ * sería peor que el problema original. La cadena ENTERA se extrajo a `evaluateApplicability()`, que
+ * ahora usan los dos: `apply()` con `lockRows: true` y `preflight()` con `false`. Lo único que
+ * difiere es CÓMO se leen las filas fuente; QUÉ se valida, en qué ORDEN y con qué desenlace es un
+ * solo cuerpo de código. `applyAbortReasonForBlocker()` declara explícitamente la correspondencia
+ * entre cada bloqueo del preflight y el `ABORT_*` que `apply()` escribe de verdad, y un test de
+ * paridad la verifica bloqueo por bloqueo.
+ *
+ * `freeze()`, `confirm()` e `invalidateConfirmation()` no cambian en nada por esta tarea.
  */
 class ReviewedProposalService
 {
@@ -219,6 +239,59 @@ class ReviewedProposalService
     public const ABORT_BILINGUAL_GROUP_NOT_APPLICABLE = 'BILINGUAL_GROUP_NOT_APPLICABLE';
 
     /**
+     * TASK-0006D (Issue #2 comentario `5949253156`), PARTE 1: vocabulario de bloqueo del PREFLIGHT
+     * de solo lectura. Son nombres de DIAGNÓSTICO, no estados persistidos: `preflight()` nunca
+     * escribe `status`, así que ninguno de estos valores llega jamás a una columna.
+     *
+     * Por qué un vocabulario propio y no reusar las constantes `ABORT_*`: los `ABORT_*` describen lo
+     * que `apply()` ESCRIBIRÍA en `application_result` al quemar la propuesta, y dos de ellos
+     * (`ABORT_CANDIDATE_ALREADY_RESOLVED`/`ABORT_RELATION_ALREADY_RESOLVED`) son el MISMO hallazgo
+     * para dos tipos de origen. El preflight responde una pregunta distinta - "¿qué impide aplicar
+     * esto?" - y el orquestador pidió un vocabulario específico. La correspondencia entre los dos no
+     * se deja al lector: `applyOutcomeForBlocker()` la declara explícitamente y un test de paridad la
+     * verifica, así que un bloqueo del preflight NO puede dejar de corresponder con el desenlace real
+     * de `apply()` sin que el test falle.
+     */
+    public const PREFLIGHT_READY_TO_APPLY = 'READY_TO_APPLY';
+
+    public const PREFLIGHT_TAMPER_DETECTED = 'TAMPER_DETECTED';
+
+    public const PREFLIGHT_STALE_TAXONOMY_STATE = 'STALE_TAXONOMY_STATE';
+
+    public const PREFLIGHT_ENTITY_MISSING = 'ENTITY_MISSING';
+
+    public const PREFLIGHT_SOURCE_DRIFT = 'SOURCE_DRIFT';
+
+    public const PREFLIGHT_SOURCE_ALREADY_RESOLVED = 'SOURCE_ALREADY_RESOLVED';
+
+    public const PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED = 'HUMAN_CONFIRMATION_REQUIRED';
+
+    public const PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT = 'GROUP_INCOMPLETE_OR_INCONSISTENT';
+
+    public const PREFLIGHT_RELATION_VALIDATION_FAILED = 'RELATION_VALIDATION_FAILED';
+
+    /**
+     * No son "bloqueos" de validación sino estados ya resueltos: la propuesta salió de
+     * `PENDING_APPLY` y no hay nada que aplicar. Se distinguen de los bloqueos reales para que el
+     * informe no diga "necesita revalidación" sobre algo que ya se ejecutó.
+     */
+    public const PREFLIGHT_ALREADY_APPLIED = 'ALREADY_APPLIED';
+
+    public const PREFLIGHT_ALREADY_ABORTED = 'ALREADY_ABORTED';
+
+    public const PREFLIGHT_NOT_FOUND = 'NOT_FOUND';
+
+    /**
+     * TASK-0006D, PARTE 4: categorías de gobernanza del informe pre-APPLY. Derivadas del bloqueo, no
+     * declaradas a mano - ver `governanceCategoryForBlocker()`.
+     */
+    public const CATEGORY_READY_TO_APPLY = 'READY_TO_APPLY';
+
+    public const CATEGORY_NEEDS_REVALIDATION = 'NEEDS_REVALIDATION';
+
+    public const CATEGORY_BLOCKED_FOR_OTHER_REASON = 'BLOCKED_FOR_OTHER_REASON';
+
+    /**
      * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): bandera de contexto que SOLO
      * `apply()` enciende, alrededor de las dos únicas escrituras que constituyen "publicación" real
      * (`taxonomy_candidate_concept_links.status -> published`,
@@ -241,7 +314,7 @@ class ReviewedProposalService
     /**
      * Enciende la bandera de contexto alrededor de `$callback` y la apaga siempre al salir (incluso
      * si `$callback` lanza). Único punto donde `$applyingC2Publication` se manipula - tanto
-     * `applyCandidateLinkDecision()`/`applyConceptRelationDecision()` (uso real) como los tests que
+     * `writeCandidateLinkDecision()`/`writeConceptRelationDecision()` (uso real) como los tests que
      * necesitan aislar OTRO guard distinto del de bypass (ej. probar que el guard semántico de
      * `TaxonomyConceptRelation::booted()` sigue funcionando de forma independiente) pasan por acá -
      * nunca escriben la propiedad privada directamente. Público a propósito para que
@@ -394,7 +467,7 @@ class ReviewedProposalService
             // del payload, leídos UNA sola vez acá (bajo el lock, en el instante de la revisión) -
             // `apply()` nunca vuelve a leer `suggested_term_id`/`suggested_new_concept_name` de la
             // fila viva para decidir QUÉ escribir, solo para revalidar que no cambiaron (ver
-            // `applyCandidateLinkDecision`).
+            // `evaluateCandidateLink`).
             $snapshot = $decisionPayload;
             $snapshot['term_id'] = $candidate->suggested_term_id;
             if ($decision === TaxonomyReviewedProposal::DECISION_CREATE_NEW) {
@@ -720,7 +793,7 @@ class ReviewedProposalService
      * automáticamente al terminar la transacción de nivel superior (commit o rollback), así que no
      * hay forma de olvidarse de liberarlo ni de filtrarlo si algo lanza - a diferencia de un
      * advisory lock de sesión. Es re-entrante dentro de la misma transacción: llamarlo dos veces
-     * (ver `apply()` y `applyBilingualGroupCreateNew()`) es inofensivo.
+     * (ver `apply()` y `evaluateBilingualGroup()`) es inofensivo.
      *
      * Bloqueante a propósito, no `try`: el segundo hermano DEBE esperar y recién entonces observar
      * el estado ya aplicado. Un `pg_try_advisory_xact_lock` que devolviera false obligaría a inventar
@@ -1230,85 +1303,480 @@ class ReviewedProposalService
                 return ['result' => self::RESULT_NOT_FOUND, 'proposal' => null, 'abort_reason' => null, 'application_result' => null];
             }
 
-            if ($proposal->status === TaxonomyReviewedProposal::STATUS_APPLIED) {
-                // Replay idempotente: NINGUNA escritura nueva (ni mapeo, ni concepto, ni relación,
-                // ni fila de auditoría) - hallazgo 4 de TASK-0004.
-                return ['result' => self::RESULT_ALREADY_APPLIED, 'proposal' => $proposal, 'abort_reason' => null, 'application_result' => $proposal->application_result];
+            // TASK-0006D (Issue #2 comentario `5949253156`), PARTE 1: toda la cadena de validación
+            // (estado ya resuelto, tamper, obsolescencia, confirmación humana, existencia/estado/
+            // drift de la fila fuente, coherencia del grupo bilingüe, validación server-side de la
+            // relación) ya NO vive acá: vive en `evaluateApplicability()`, que es EXACTAMENTE la
+            // misma función que corre `preflight()`.
+            //
+            // Lo único que difiere entre los dos llamadores es CÓMO se leen las filas fuente:
+            // `apply()` pasa `lockRows: true` (con `lockForUpdate()`, igual que siempre) y
+            // `preflight()` pasa `false` (sin locks y sin transacción de escritura). QUÉ se valida,
+            // en qué ORDEN y con qué desenlace es un solo cuerpo de código - así que el preflight no
+            // puede quedar "más flojo" ni "más estricto" que el apply real por divergencia de
+            // implementación, que es justamente lo que el orquestador pidió evitar.
+            $evaluation = $this->evaluateApplicability($proposal, lockRows: true);
+
+            if ($evaluation['blocker'] !== null) {
+                return $this->applyOutcomeForBlocker($proposal, $evaluation, $authorizationReference, $targetEnvironment);
             }
 
-            if ($proposal->status === TaxonomyReviewedProposal::STATUS_ABORTED) {
-                return ['result' => self::RESULT_ALREADY_ABORTED, 'proposal' => $proposal, 'abort_reason' => $proposal->application_result['abort_reason'] ?? null, 'application_result' => $proposal->application_result];
-            }
+            // A partir de acá SOLO quedan escrituras: la validación ya pasó entera y las filas fuente
+            // vienen leídas CON lock dentro de `$evaluation['context']`, así que estos métodos no
+            // vuelven a decidir nada - escriben el payload congelado tal como se revisó.
+            return $proposal->proposal_type === TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK
+                ? $this->writeCandidateLinkDecision($proposal, $evaluation['context'], $authorizationReference, $targetEnvironment)
+                : $this->writeConceptRelationDecision($proposal, $evaluation['context'], $authorizationReference, $targetEnvironment);
+        });
+    }
 
-            // 1) Detección de manipulación: recomputa el fingerprint desde los campos de decisión
-            // TAL CUAL quedaron guardados y lo compara contra el que se computó al congelar. Un
-            // UPDATE manual de la fila (fuera de este servicio) rompe la igualdad.
-            $recomputed = self::computePayloadFingerprint([
+    /**
+     * TASK-0006D: traduce un bloqueo de `evaluateApplicability()` al desenlace REAL de `apply()`.
+     *
+     * Tres clases de desenlace, deliberadamente distintas:
+     *
+     * 1. ESTADO YA RESUELTO (`ALREADY_APPLIED`/`ALREADY_ABORTED`): replay idempotente, CERO
+     *    escrituras nuevas (ni mapeo, ni concepto, ni relación, ni fila de auditoría) - hallazgo 4
+     *    de TASK-0004.
+     * 2. FALTA CONFIRMACIÓN HUMANA: NO es un abort - ver el docblock de
+     *    `RESULT_HUMAN_CONFIRMATION_REQUIRED`. Cero escrituras, `status` intacto en `PENDING_APPLY`,
+     *    la propuesta sigue siendo aplicable una vez confirmada.
+     * 3. CUALQUIER OTRO BLOQUEO: `abort()` terminal, con la MISMA constante `ABORT_*` que escribía
+     *    la versión anterior de `apply()` y el mismo detalle en `application_result`.
+     */
+    private function applyOutcomeForBlocker(TaxonomyReviewedProposal $proposal, array $evaluation, string $authorizationReference, string $targetEnvironment): array
+    {
+        $blocker = $evaluation['blocker'];
+        $detail = $evaluation['detail'];
+
+        if ($blocker === self::PREFLIGHT_ALREADY_APPLIED) {
+            return ['result' => self::RESULT_ALREADY_APPLIED, 'proposal' => $proposal, 'abort_reason' => null, 'application_result' => $proposal->application_result];
+        }
+
+        if ($blocker === self::PREFLIGHT_ALREADY_ABORTED) {
+            return ['result' => self::RESULT_ALREADY_ABORTED, 'proposal' => $proposal, 'abort_reason' => $proposal->application_result['abort_reason'] ?? null, 'application_result' => $proposal->application_result];
+        }
+
+        if ($blocker === self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED) {
+            return ['result' => self::RESULT_HUMAN_CONFIRMATION_REQUIRED, 'proposal' => $proposal, 'abort_reason' => null, 'application_result' => $detail];
+        }
+
+        return $this->abort($proposal, self::applyAbortReasonForBlocker($blocker, $proposal->proposal_type), $authorizationReference, $targetEnvironment, $detail);
+    }
+
+    /**
+     * TASK-0006D: correspondencia EXPLÍCITA entre el vocabulario de bloqueo del preflight y la
+     * constante `ABORT_*` que `apply()` escribe de verdad. No es documentación: es el único lugar
+     * donde se decide, lo usa `apply()` en producción, y `ReviewedProposalPreflightTest` lo verifica
+     * bloqueo por bloqueo. Si alguien agrega un bloqueo nuevo al preflight y se olvida de mapearlo,
+     * este método lanza en vez de abortar con un motivo inventado.
+     *
+     * `SOURCE_ALREADY_RESOLVED` es el único que depende del tipo: el preflight lo reporta como UN
+     * hallazgo ("la fila fuente ya la resolvió otro camino"), mientras `apply()` conserva las dos
+     * constantes históricas distintas por tipo de origen - que es lo que ya está escrito en las filas
+     * `application_result` existentes y en los tests de TASK-0004.
+     */
+    private static function applyAbortReasonForBlocker(string $blocker, string $proposalType): string
+    {
+        return match ($blocker) {
+            self::PREFLIGHT_TAMPER_DETECTED => self::ABORT_TAMPER_DETECTED,
+            self::PREFLIGHT_STALE_TAXONOMY_STATE => self::ABORT_STALE_TAXONOMY_STATE,
+            self::PREFLIGHT_ENTITY_MISSING => self::ABORT_ENTITY_MISSING,
+            self::PREFLIGHT_SOURCE_DRIFT => self::ABORT_SOURCE_DRIFT,
+            self::PREFLIGHT_SOURCE_ALREADY_RESOLVED => $proposalType === TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK
+                ? self::ABORT_CANDIDATE_ALREADY_RESOLVED
+                : self::ABORT_RELATION_ALREADY_RESOLVED,
+            self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT => self::ABORT_BILINGUAL_GROUP_NOT_APPLICABLE,
+            self::PREFLIGHT_RELATION_VALIDATION_FAILED => self::ABORT_RELATION_INVALID_AT_APPLY_TIME,
+            default => throw new \LogicException("Bloqueo de preflight sin desenlace de apply() mapeado: {$blocker}. Agregalo a applyAbortReasonForBlocker() en vez de dejar que apply() aborte con un motivo inventado."),
+        };
+    }
+
+    /**
+     * TASK-0006D: misma correspondencia que usa `apply()`, expuesta para el test de paridad y para el
+     * informe pre-APPLY. Devuelve `null` para los bloqueos que NO producen un abort (los dos estados
+     * ya resueltos y la compuerta de confirmación humana) - eso también es parte de la paridad: un
+     * `apply()` prematuro sobre una propuesta sin confirmar NO la quema.
+     */
+    public static function applyAbortReasonForPreflightBlocker(string $blocker, string $proposalType): ?string
+    {
+        if (in_array($blocker, [
+            self::PREFLIGHT_READY_TO_APPLY,
+            self::PREFLIGHT_ALREADY_APPLIED,
+            self::PREFLIGHT_ALREADY_ABORTED,
+            self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED,
+            self::PREFLIGHT_NOT_FOUND,
+        ], true)) {
+            return null;
+        }
+
+        return self::applyAbortReasonForBlocker($blocker, $proposalType);
+    }
+
+    // =====================================================================================
+    // PASO 2-bis: PREFLIGHT - TASK-0006D (Issue #2 comentario `5949253156`), PARTE 1.
+    // =====================================================================================
+
+    /**
+     * Valida si una propuesta congelada se podría aplicar HOY, **sin escribir absolutamente nada**.
+     *
+     * POR QUÉ EXISTE. Hasta TASK-0006D la única forma de saber si una propuesta seguía siendo
+     * aplicable era llamar a `apply()`, y `apply()` es destructivo cuando falla: la obsolescencia, el
+     * tamper, el drift y la invalidez de una relación se registran con `abort()`, que pasa la
+     * propuesta a `ABORTED` **de forma terminal**. Y como re-congelar está bloqueado por el índice
+     * único parcial `WHERE status = 'PENDING_APPLY'`, "probar con apply() para ver qué pasa" puede
+     * quemar una decisión humana sin recuperación posible. El orquestador lo dijo así:
+     * «apply() is NOT a safe preflight API». Esto lo es.
+     *
+     * LO QUE NO HACE, y está garantizado por construcción (no por disciplina del llamador): no abre
+     * transacción de escritura, no toca `status`, `application_result`, `authorization_reference`,
+     * `target_environment` ni `applied_at`, no escribe la fila fuente, no inserta auditoría, no crea
+     * conceptos/mapeos/relaciones, y **no llama a `apply()` por ningún camino**. Solo ejecuta
+     * `evaluateApplicability(..., lockRows: false)` -que son SELECTs- y describe lo que `apply()`
+     * escribiría.
+     *
+     * LO QUE SÍ ES, dicho sin exagerar: una foto sin lock, válida en el instante en que se tomó. No
+     * reserva nada ni autoriza nada; entre este preflight y un `apply()` posterior el estado puede
+     * cambiar, y por eso `apply()` revalida todo otra vez con locks. Un `READY_TO_APPLY` acá
+     * significa «hoy no hay nada que lo impida», nunca «ya está aprobado para ejecutarse» - la
+     * autorización de ejecución sigue siendo un acto humano separado.
+     *
+     * @return array Informe de una propuesta. `blocker` es `READY_TO_APPLY` o el impedimento concreto.
+     */
+    public function preflight(int $proposalId): array
+    {
+        $proposal = TaxonomyReviewedProposal::query()->find($proposalId);
+
+        if (! $proposal) {
+            return [
+                'proposal_id' => $proposalId,
+                'blocker' => self::PREFLIGHT_NOT_FOUND,
+                'governance_category' => self::CATEGORY_BLOCKED_FOR_OTHER_REASON,
+                'detail' => ['note' => "No existe ninguna propuesta con id={$proposalId}."],
+                'action_required' => 'Verificar el id - no hay ninguna propuesta revisada con ese identificador.',
+                'expected_write_set' => [],
+                'expected_write_count' => 0,
+            ];
+        }
+
+        return $this->preflightProposal($proposal);
+    }
+
+    /**
+     * TASK-0006D: el preflight de TODAS las propuestas congeladas, en orden de id - la base del
+     * informe pre-APPLY de la PARTE 4. Igual de read-only que `preflight()`: una propuesta por
+     * iteración, cada una con su propia evaluación independiente.
+     *
+     * @param  int[]  $onlyIds  Vacío = todas.
+     * @return array<int, array>
+     */
+    public function preflightAll(array $onlyIds = []): array
+    {
+        return TaxonomyReviewedProposal::query()
+            ->when($onlyIds !== [], fn ($q) => $q->whereIn('id', $onlyIds))
+            ->orderBy('id')
+            ->get()
+            ->map(fn (TaxonomyReviewedProposal $proposal) => $this->preflightProposal($proposal))
+            ->all();
+    }
+
+    private function preflightProposal(TaxonomyReviewedProposal $proposal): array
+    {
+        $evaluation = $this->evaluateApplicability($proposal, lockRows: false);
+
+        $blocker = $evaluation['blocker'] ?? self::PREFLIGHT_READY_TO_APPLY;
+        $context = $evaluation['context'];
+
+        return array_merge(
+            [
+                'proposal_id' => (int) $proposal->id,
                 'proposal_type' => $proposal->proposal_type,
+                'decision' => $proposal->decision,
+                'proposal_status' => $proposal->status,
                 'candidate_link_id' => $proposal->candidate_link_id,
                 'concept_relation_id' => $proposal->concept_relation_id,
-                'decision' => $proposal->decision,
-                'decision_payload' => $proposal->decision_payload ?? [],
-                'payload_version' => $proposal->payload_version,
-                'taxonomy_state_fingerprint' => $proposal->taxonomy_state_fingerprint,
-                'reviewer_id' => $proposal->reviewer_id,
-                'reviewed_at' => $proposal->reviewed_at->format('Y-m-d H:i:s'),
-            ]);
+                'source_label' => self::preflightSourceLabel($proposal),
+                'review_provenance' => [
+                    'reviewer_id' => $proposal->reviewer_id,
+                    'reviewed_at' => $proposal->reviewed_at?->format('Y-m-d H:i:s'),
+                    'prepared_by_actor_type' => $proposal->prepared_by_actor_type,
+                    'prepared_via' => $proposal->prepared_via,
+                ],
+                'confirmation' => [
+                    'required' => (bool) $proposal->requires_human_confirmation,
+                    'confirmed_at' => $proposal->confirmed_at?->format('Y-m-d H:i:s'),
+                    'confirmed_by_id' => $proposal->confirmed_by_id,
+                    'channel' => $proposal->confirmation_channel,
+                    'reference' => $proposal->confirmation_reference,
+                    'previously_invalidated' => $proposal->hasInvalidatedConfirmation(),
+                ],
+                'blocker' => $blocker,
+                'governance_category' => self::governanceCategoryForBlocker($blocker),
+                'would_apply_abort_with' => self::applyAbortReasonForPreflightBlocker($blocker, $proposal->proposal_type),
+                'action_required' => self::actionRequiredForBlocker($blocker),
+                'detail' => $evaluation['detail'],
+            ],
+            $this->preflightChecks($proposal, $blocker, $context),
+            $this->expectedWriteSet($proposal, $blocker, $context),
+        );
+    }
 
-            if ($recomputed !== $proposal->payload_fingerprint) {
-                return $this->abort($proposal, self::ABORT_TAMPER_DETECTED, $authorizationReference, $targetEnvironment, [
-                    'note' => 'El payload congelado no coincide con su propio fingerprint - los campos de decisión fueron modificados después de freeze(). No se escribió nada.',
-                ]);
-            }
+    /**
+     * TASK-0006D: el estado de cada compuerta, con una regla de honestidad explícita - `null`
+     * significa **«no se evaluó»**, nunca «pasó».
+     *
+     * La cadena de `apply()` corta en el PRIMER impedimento (y debe hacerlo: seguir validando sobre
+     * una premisa ya falsa daría respuestas inventadas - no se puede buscar drift en una fila fuente
+     * que no existe). El preflight no simula las compuertas que no corrieron: informa exactamente las
+     * que `apply()` habría llegado a evaluar, y deja las demás en `null`. Lo que una compuerta SÍ
+     * evaluó se deduce de la evidencia que quedó en el contexto, no de una segunda pasada paralela
+     * que podría divergir.
+     */
+    private function preflightChecks(TaxonomyReviewedProposal $proposal, string $blocker, array $context): array
+    {
+        $reachedStaleGate = ! in_array($blocker, [
+            self::PREFLIGHT_ALREADY_APPLIED,
+            self::PREFLIGHT_ALREADY_ABORTED,
+            self::PREFLIGHT_TAMPER_DETECTED,
+        ], true);
+        $currentFingerprint = $context['current_taxonomy_fingerprint'] ?? null;
 
-            // 2) Obsolescencia: el estado de la taxonomía cambió entre freeze() y apply()?
-            $currentTaxonomyFingerprint = CanonicalConceptBuilderService::dryRunInputFingerprint();
-            if ($currentTaxonomyFingerprint !== $proposal->taxonomy_state_fingerprint) {
-                return $this->abort($proposal, self::ABORT_STALE_TAXONOMY_STATE, $authorizationReference, $targetEnvironment, [
-                    'note' => 'El estado de la taxonomía cambió entre freeze() y apply(). No se escribió nada. Se requiere una revisión nueva (un freeze() nuevo), no un reintento de este payload.',
-                    'expected_fingerprint' => $proposal->taxonomy_state_fingerprint,
-                    'current_fingerprint' => $currentTaxonomyFingerprint,
-                ]);
-            }
+        $sourceRow = $context['candidate'] ?? $context['relation'] ?? null;
+        $reachedSourceGate = $reachedStaleGate
+            && $blocker !== self::PREFLIGHT_STALE_TAXONOMY_STATE
+            && $blocker !== self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED;
 
-            // 3) TASK-0006B (Issue #2 comentario `5936206843`), sección A: compuerta de CONFIRMACIÓN
-            // HUMANA, exigible y no decorativa.
-            //
-            // REGLA DE COMPATIBILIDAD EXACTA (requisito explícito de la sección A): el único
-            // predicado consultado es `requires_human_confirmation`, que la migración creó con
-            // `DEFAULT FALSE`. Por lo tanto:
-            //   - toda propuesta congelada ANTES de TASK-0006B queda en FALSE y sigue siendo
-            //     aplicable exactamente como antes - su procedencia de revisión original YA
-            //     satisface el requisito de revisión humana (caso de #420/#421/#422/#491);
-            //   - solo exigen confirmación las filas marcadas explícitamente: las que el backfill
-            //     determinístico de la migración identificó como preparadas por el agente
-            //     (#492-#495) y las que `freeze()` marque en adelante al declararse
-            //     `ACTOR_AGENT`.
-            // Ninguna propuesta humana histórica se vuelve inválida por esta compuerta.
-            //
-            // Va DESPUÉS de tamper y obsolescencia a propósito: esos dos son hallazgos de seguridad
-            // que merecen quedar registrados como ABORTED, y deben ganarle a un simple "falta
-            // confirmar".
-            $unconfirmed = $this->unconfirmedMembers($proposal);
-            if ($unconfirmed !== []) {
-                // NO es un abort: ver el docblock de RESULT_HUMAN_CONFIRMATION_REQUIRED. Cero
-                // escrituras, `status` intacto en PENDING_APPLY, la propuesta sigue aplicable una
-                // vez confirmada.
-                return [
-                    'result' => self::RESULT_HUMAN_CONFIRMATION_REQUIRED,
-                    'proposal' => $proposal,
-                    'abort_reason' => null,
-                    'application_result' => [
-                        'note' => 'Esta propuesta exige confirmación humana explícita antes de poder aplicarse (fue preparada por un actor que no es el revisor humano). No se escribió nada y la propuesta sigue PENDING_APPLY.',
-                        'unconfirmed_proposal_ids' => $unconfirmed,
-                    ],
-                ];
-            }
+        // REJECT es la única decisión que deliberadamente NO depende de ningún campo fuente
+        // congelado, así que para ella el drift no es "ok", es "no aplica" - ver el comentario de
+        // `evaluateCandidateLink()`.
+        $driftApplicable = $proposal->decision !== TaxonomyReviewedProposal::DECISION_REJECT;
+        $driftChecked = isset($context['frozen_term_id']) || isset($context['frozen_source_concept_id']);
 
-            return $proposal->proposal_type === TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK
-                ? $this->applyCandidateLinkDecision($proposal, $authorizationReference, $targetEnvironment)
-                : $this->applyConceptRelationDecision($proposal, $authorizationReference, $targetEnvironment);
-        });
+        return [
+            'payload_fingerprint' => $proposal->payload_fingerprint,
+            'payload_fingerprint_valid' => in_array($blocker, [self::PREFLIGHT_ALREADY_APPLIED, self::PREFLIGHT_ALREADY_ABORTED], true)
+                ? null
+                : $blocker !== self::PREFLIGHT_TAMPER_DETECTED,
+            'taxonomy_state_fingerprint_frozen' => $proposal->taxonomy_state_fingerprint,
+            'taxonomy_state_fingerprint_current' => $currentFingerprint,
+            'stale' => $currentFingerprint === null ? null : $currentFingerprint !== $proposal->taxonomy_state_fingerprint,
+            'human_confirmation_satisfied' => $reachedStaleGate && $blocker !== self::PREFLIGHT_STALE_TAXONOMY_STATE
+                ? $blocker !== self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED
+                : null,
+            'source_entity_exists' => $reachedSourceGate ? $sourceRow !== null : null,
+            'source_state' => $sourceRow?->status,
+            'source_state_compatible' => $sourceRow === null
+                ? ($reachedSourceGate ? false : null)
+                : $blocker !== self::PREFLIGHT_SOURCE_ALREADY_RESOLVED,
+            'source_snapshot_drift' => match (true) {
+                ! $driftApplicable => null,
+                $blocker === self::PREFLIGHT_SOURCE_DRIFT => true,
+                $driftChecked => false,
+                default => null,
+            },
+            'source_snapshot_drift_applicable' => $driftApplicable,
+            'group' => $proposal->isGrouped() ? [
+                'proposal_group_id' => $proposal->proposal_group_id,
+                'member_ids' => $context['group_member_ids'] ?? null,
+                'members_pending_apply' => isset($context['group_pending'])
+                    ? array_map(fn (array $entry) => (int) $entry['proposal']->id, $context['group_pending'])
+                    : null,
+                'consistent' => array_key_exists('group_pending', $context)
+                    ? $blocker !== self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT
+                    : ($blocker === self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT ? false : null),
+                'reuses_concept_id' => $context['group_reuse_concept_id'] ?? null,
+            ] : null,
+            'relation_validation' => $context['relation_validation'] ?? null,
+            'checks_null_means' => 'null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa "pasó".',
+        ];
+    }
+
+    private static function preflightSourceLabel(TaxonomyReviewedProposal $proposal): string
+    {
+        if ($proposal->proposal_type === TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK) {
+            $term = $proposal->candidateLink?->term;
+
+            return $term
+                ? sprintf('candidato #%s / término #%s `%s` (%s)', $proposal->candidate_link_id, $term->id, $term->term, $term->language)
+                : sprintf('candidato #%s', $proposal->candidate_link_id);
+        }
+
+        $relation = $proposal->conceptRelation;
+
+        return $relation
+            ? sprintf('relación #%s / %s → %s (%s)', $relation->id, $relation->source_concept_id, $relation->target_concept_id, $relation->relation_type)
+            : sprintf('relación #%s', $proposal->concept_relation_id);
+    }
+
+    /**
+     * TASK-0006D, PARTE 4: las tres categorías de gobernanza del informe, derivadas del bloqueo.
+     *
+     * `NEEDS_REVALIDATION` es exactamente «el mundo cambió y la decisión congelada ya no describe la
+     * realidad, así que ningún reintento la puede arreglar - hace falta revisar contra el estado
+     * actual»: obsolescencia global, drift de la fila fuente, o una relación que dejó de ser válida.
+     *
+     * `TAMPER_DETECTED` NO entra ahí a propósito: no es un problema de frescura sino un hallazgo de
+     * seguridad (alguien modificó campos de decisión después de congelarlos), y tratarlo como «hay
+     * que revalidar» invitaría a resolverlo re-congelando en vez de investigando.
+     * `HUMAN_CONFIRMATION_REQUIRED` tampoco: no falta revalidar nada, falta que una persona confirme.
+     */
+    public static function governanceCategoryForBlocker(string $blocker): string
+    {
+        return match ($blocker) {
+            self::PREFLIGHT_READY_TO_APPLY => self::CATEGORY_READY_TO_APPLY,
+            self::PREFLIGHT_STALE_TAXONOMY_STATE,
+            self::PREFLIGHT_SOURCE_DRIFT,
+            self::PREFLIGHT_RELATION_VALIDATION_FAILED => self::CATEGORY_NEEDS_REVALIDATION,
+            default => self::CATEGORY_BLOCKED_FOR_OTHER_REASON,
+        };
+    }
+
+    private static function actionRequiredForBlocker(string $blocker): string
+    {
+        return match ($blocker) {
+            self::PREFLIGHT_READY_TO_APPLY => 'Ninguna acción correctiva. Falta SOLO la autorización de ejecución humana explícita (TASK-0007), que esta tarea no otorga.',
+            self::PREFLIGHT_STALE_TAXONOMY_STATE => 'Revalidación contra el estado actual ANTES de cualquier apply(). No pasar por apply() para "probar": abortaría la propuesta de forma terminal. Ver el diseño de supersesión de TASK-0006D.',
+            self::PREFLIGHT_SOURCE_DRIFT => 'Revisión nueva: la fila fuente cambió después de congelar, así que el payload ya no describe lo que un humano revisó.',
+            self::PREFLIGHT_RELATION_VALIDATION_FAILED => 'Revisión nueva de la relación: dejó de ser válida contra el grafo actual (duplicado/simétrica/inversa/ciclo).',
+            self::PREFLIGHT_TAMPER_DETECTED => 'INVESTIGAR: los campos de decisión se modificaron después de freeze(). No re-congelar ni aplicar hasta entender quién y cuándo (ver taxonomy_audit_log).',
+            self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED => 'Confirmación humana explícita por la UI autenticada (Propuestas Revisadas → "Confirmar decisión preparada"). Ni consola ni agente pueden confirmar.',
+            self::PREFLIGHT_ENTITY_MISSING => 'La entidad referenciada por el payload congelado ya no existe - hace falta decidir de nuevo sobre el estado actual.',
+            self::PREFLIGHT_SOURCE_ALREADY_RESOLVED => 'La fila fuente ya la resolvió otro camino - revisar por qué y si esta propuesta sigue teniendo sentido.',
+            self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT => 'El grupo bilingüe no describe una convergencia coherente - revisar los miembros antes de cualquier apply().',
+            self::PREFLIGHT_ALREADY_APPLIED => 'Ninguna: ya se aplicó.',
+            self::PREFLIGHT_ALREADY_ABORTED => 'Ninguna sobre esta fila: abortar es terminal. Si la decisión sigue siendo necesaria, hace falta una revisión nueva.',
+            default => 'Sin acción definida para este bloqueo.',
+        };
+    }
+
+    /**
+     * TASK-0006D: QUÉ escribiría `apply()`, descrito sin escribir nada.
+     *
+     * Incluye deliberadamente el caso BLOQUEADO, y eso es lo más importante de este método: el
+     * orquestador advirtió que las propuestas obsoletas «MUST NOT be passed to apply() merely to
+     * discover whether they are stale, because apply() writes ABORTED on stale-state failure». El
+     * informe lo dice fila por fila - para un bloqueo terminal el write-set de `apply()` no está
+     * vacío: son DOS escrituras que QUEMAN la propuesta (status -> ABORTED + la fila de auditoría del
+     * intento). Así nadie tiene que deducirlo.
+     */
+    private function expectedWriteSet(TaxonomyReviewedProposal $proposal, string $blocker, array $context): array
+    {
+        $abortReason = self::applyAbortReasonForPreflightBlocker($blocker, $proposal->proposal_type);
+
+        if ($abortReason !== null) {
+            return [
+                'expected_write_set' => [
+                    ['table' => 'taxonomy_reviewed_proposals', 'operation' => 'UPDATE', 'rows' => 1, 'description' => "status PENDING_APPLY -> ABORTED (terminal), con application_result.abort_reason = {$abortReason}"],
+                    ['table' => 'taxonomy_audit_log', 'operation' => 'INSERT', 'rows' => 1, 'description' => 'registro del intento de apply() abortado, con authorization_reference y target_environment'],
+                ],
+                'expected_write_count' => 2,
+                'expected_write_set_note' => 'ATENCIÓN: pasar esta propuesta por apply() NO es una prueba inocua - la quemaría de forma terminal, y re-congelar está bloqueado por el índice único parcial. Cero publicación de taxonomía, pero la decisión humana quedaría irrecuperable.',
+            ];
+        }
+
+        if ($blocker !== self::PREFLIGHT_READY_TO_APPLY) {
+            return [
+                'expected_write_set' => [],
+                'expected_write_count' => 0,
+                'expected_write_set_note' => $blocker === self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED
+                    ? 'Cero escrituras: la compuerta de confirmación humana NO es un abort, así que un apply() prematuro deja la propuesta intacta en PENDING_APPLY (ver RESULT_HUMAN_CONFIRMATION_REQUIRED).'
+                    : 'Cero escrituras: replay idempotente de un estado ya resuelto.',
+            ];
+        }
+
+        $writes = [];
+
+        if ($proposal->proposal_type === TaxonomyReviewedProposal::TYPE_CONCEPT_RELATION) {
+            $writes[] = $proposal->decision === TaxonomyReviewedProposal::DECISION_REJECT
+                ? ['table' => 'taxonomy_concept_relations', 'operation' => 'UPDATE', 'rows' => 1, 'description' => "relación #{$proposal->concept_relation_id}: status candidate -> rejected (NO publica el grafo)"]
+                : ['table' => 'taxonomy_concept_relations', 'operation' => 'UPDATE', 'rows' => 1, 'description' => "relación #{$proposal->concept_relation_id}: status candidate -> approved (PUBLICA el grafo de conceptos)"];
+
+            return self::writeSetWithProposalBookkeeping($writes, 1);
+        }
+
+        $candidateId = $proposal->candidate_link_id;
+
+        if ($proposal->decision === TaxonomyReviewedProposal::DECISION_REJECT) {
+            $writes[] = ['table' => 'taxonomy_candidate_concept_links', 'operation' => 'UPDATE', 'rows' => 1, 'description' => "candidato #{$candidateId}: status pending -> rejected (CERO escrituras de taxonomía publicada)"];
+
+            return self::writeSetWithProposalBookkeeping($writes, 1);
+        }
+
+        if ($proposal->decision === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED) {
+            $writes[] = ['table' => 'taxonomy_candidate_concept_links', 'operation' => 'UPDATE', 'rows' => 1, 'description' => "candidato #{$candidateId}: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)"];
+
+            return self::writeSetWithProposalBookkeeping($writes, 1);
+        }
+
+        if ($proposal->decision === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING) {
+            $conceptId = $context['target_concept_id'];
+            $writes[] = self::termConceptWrite((int) $context['frozen_term_id'], (int) $conceptId);
+            $writes[] = ['table' => 'taxonomy_candidate_concept_links', 'operation' => 'UPDATE', 'rows' => 1, 'description' => "candidato #{$candidateId}: status pending -> published (+ published_term_concept_id)"];
+
+            return self::writeSetWithProposalBookkeeping($writes, 1);
+        }
+
+        // CREATE_NEW - suelta o agrupada.
+        if (! $proposal->isGrouped()) {
+            $writes[] = ['table' => 'taxonomy_canonical_concepts', 'operation' => 'INSERT', 'rows' => 1, 'description' => 'un concepto canónico nuevo con la identidad del payload congelado'];
+            $writes[] = ['table' => 'taxonomy_term_concepts', 'operation' => 'INSERT', 'rows' => 1, 'description' => "término #{$context['frozen_term_id']} → el concepto nuevo"];
+            $writes[] = ['table' => 'taxonomy_candidate_concept_links', 'operation' => 'UPDATE', 'rows' => 1, 'description' => "candidato #{$candidateId}: status pending -> published (+ published_term_concept_id)"];
+
+            return self::writeSetWithProposalBookkeeping($writes, 1);
+        }
+
+        $pending = $context['group_pending'] ?? [];
+        $memberCount = count($pending);
+
+        if (($context['group_reuse_concept_id'] ?? null) === null) {
+            $writes[] = ['table' => 'taxonomy_canonical_concepts', 'operation' => 'INSERT', 'rows' => 1, 'description' => sprintf('UN solo concepto canónico bilingüe (ES/EN) para los %d miembros del grupo - nunca uno por candidato', $memberCount)];
+        }
+
+        foreach ($pending as $entry) {
+            $termId = (int) ($entry['proposal']->decision_payload['term_id'] ?? 0);
+            $writes[] = self::termConceptWrite($termId, null);
+            $writes[] = ['table' => 'taxonomy_candidate_concept_links', 'operation' => 'UPDATE', 'rows' => 1, 'description' => sprintf('candidato #%d: status pending -> published (+ published_term_concept_id)', $entry['candidate']->id)];
+        }
+
+        return self::writeSetWithProposalBookkeeping($writes, $memberCount);
+    }
+
+    /**
+     * `taxonomy_term_concepts` es idempotente (`UNIQUE(term_id, concept_id)`): si el link ya existe
+     * `apply()` lo REUSA en vez de insertar. El preflight lo consulta de verdad -es una lectura- así
+     * que el informe dice «INSERT» o «reuso» con el dato real, no una suposición.
+     */
+    private static function termConceptWrite(int $termId, ?int $conceptId): array
+    {
+        if ($conceptId === null) {
+            return ['table' => 'taxonomy_term_concepts', 'operation' => 'INSERT', 'rows' => 1, 'description' => "término #{$termId} → el concepto nuevo del grupo"];
+        }
+
+        $exists = DB::connection('pgsql')->table('taxonomy_term_concepts')
+            ->where('term_id', $termId)
+            ->where('concept_id', $conceptId)
+            ->exists();
+
+        return $exists
+            ? ['table' => 'taxonomy_term_concepts', 'operation' => 'REUSE', 'rows' => 0, 'description' => "el link término #{$termId} → concepto #{$conceptId} YA existe: apply() lo reutiliza sin insertar"]
+            : ['table' => 'taxonomy_term_concepts', 'operation' => 'INSERT', 'rows' => 1, 'description' => "término #{$termId} → concepto #{$conceptId}"];
+    }
+
+    /**
+     * Las dos escrituras de contabilidad que `apply()` hace SIEMPRE que ejecuta, una por propuesta
+     * resuelta: marcar la propuesta `APPLIED` (con `applied_at`/`authorization_reference`/
+     * `target_environment`) y su fila de auditoría de EJECUCIÓN.
+     */
+    private static function writeSetWithProposalBookkeeping(array $writes, int $proposalRows): array
+    {
+        $writes[] = ['table' => 'taxonomy_reviewed_proposals', 'operation' => 'UPDATE', 'rows' => $proposalRows, 'description' => 'status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment'];
+        $writes[] = ['table' => 'taxonomy_audit_log', 'operation' => 'INSERT', 'rows' => $proposalRows, 'description' => 'auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)'];
+
+        return [
+            'expected_write_set' => $writes,
+            'expected_write_count' => array_sum(array_column($writes, 'rows')),
+            'expected_write_set_note' => 'Descripción, no ejecución: el preflight NO escribió ninguna de estas filas.',
+        ];
     }
 
     /**
@@ -1334,23 +1802,171 @@ class ReviewedProposalService
             ->all();
     }
 
-    private function applyCandidateLinkDecision(TaxonomyReviewedProposal $proposal, string $authorizationReference, string $targetEnvironment): array
-    {
-        $candidate = TaxonomyCandidateConceptLink::query()->lockForUpdate()->find($proposal->candidate_link_id);
+    // =====================================================================================
+    // TASK-0006D (Issue #2 comentario `5949253156`), PARTE 1: primitivas de validación COMPARTIDAS
+    // entre `apply()` (que escribe después) y `preflight()` (que no escribe nunca).
+    // =====================================================================================
 
-        if (! $candidate) {
-            return $this->abort($proposal, self::ABORT_ENTITY_MISSING, $authorizationReference, $targetEnvironment, [
-                'note' => "El candidato referenciado (id={$proposal->candidate_link_id}) ya no existe.",
+    /**
+     * Resultado "hay un bloqueo": el PRIMER impedimento encontrado, en el mismo orden en que
+     * `apply()` siempre los evaluó. Se devuelve el primero y no se sigue buscando, a propósito -
+     * reportar varios obligaría a seguir validando sobre premisas que ya no se cumplen (ej. buscar
+     * drift de una fila fuente que no existe).
+     */
+    private function blocker(string $blocker, array $detail = [], array $context = []): array
+    {
+        return ['blocker' => $blocker, 'detail' => $detail, 'context' => $context];
+    }
+
+    /** Resultado "nada impide aplicar": el contexto trae las filas fuente ya resueltas. */
+    private function applicable(array $context): array
+    {
+        return ['blocker' => null, 'detail' => [], 'context' => $context];
+    }
+
+    /**
+     * TASK-0006D: la cadena de validación COMPLETA de `apply()`, sin una sola escritura.
+     *
+     * `$lockRows` es la ÚNICA diferencia entre los dos llamadores, y es deliberadamente una
+     * diferencia de LECTURA, no de validación:
+     * - `apply()` pasa `true`: las filas fuente se leen con `lockForUpdate()` dentro de su
+     *   transacción, porque inmediatamente después las va a escribir y necesita que nadie las mueva
+     *   en el medio;
+     * - `preflight()` pasa `false`: lee sin locks y fuera de cualquier transacción de escritura,
+     *   porque no va a escribir nada y no tiene por qué bloquear a un apply real que corra en
+     *   paralelo.
+     *
+     * Consecuencia honesta de esa diferencia, dicha explícitamente en vez de dejarla implícita: el
+     * resultado del preflight es una FOTO sin lock, así que es válido en el instante en que se tomó y
+     * no reserva nada. Entre el preflight y un apply posterior el estado puede cambiar, y por eso
+     * `apply()` revalida TODO otra vez con locks - el preflight no autoriza ni habilita nada, solo
+     * informa. Un preflight que tomara locks sería peor: serializaría lecturas de diagnóstico contra
+     * la ejecución real.
+     *
+     * @param  bool  $lockRows  `true` solo desde `apply()`.
+     * @return array{blocker:?string, detail:array, context:array}
+     */
+    private function evaluateApplicability(TaxonomyReviewedProposal $proposal, bool $lockRows): array
+    {
+        // 0) Estado ya resuelto: no es un hallazgo de validación, es que no hay nada que aplicar.
+        if ($proposal->status === TaxonomyReviewedProposal::STATUS_APPLIED) {
+            return $this->blocker(self::PREFLIGHT_ALREADY_APPLIED, [
+                'note' => 'La propuesta ya fue aplicada - un segundo apply() es un replay idempotente sin ninguna escritura nueva.',
             ]);
         }
+
+        if ($proposal->status === TaxonomyReviewedProposal::STATUS_ABORTED) {
+            return $this->blocker(self::PREFLIGHT_ALREADY_ABORTED, [
+                'note' => 'La propuesta ya fue abortada - abortar es terminal y este payload no se reintenta (se requiere una revisión nueva).',
+                'abort_reason' => $proposal->application_result['abort_reason'] ?? null,
+            ]);
+        }
+
+        // 1) Detección de manipulación: recomputa el fingerprint desde los campos de decisión TAL
+        // CUAL quedaron guardados y lo compara contra el que se computó al congelar. Un UPDATE manual
+        // de la fila (fuera de este servicio) rompe la igualdad.
+        if (! self::payloadFingerprintIsValid($proposal)) {
+            return $this->blocker(self::PREFLIGHT_TAMPER_DETECTED, [
+                'note' => 'El payload congelado no coincide con su propio fingerprint - los campos de decisión fueron modificados después de freeze(). No se escribió nada.',
+            ]);
+        }
+
+        // 2) Obsolescencia: el estado de la taxonomía cambió entre freeze() y apply()?
+        $currentTaxonomyFingerprint = CanonicalConceptBuilderService::dryRunInputFingerprint();
+        $context = ['current_taxonomy_fingerprint' => $currentTaxonomyFingerprint];
+
+        if ($currentTaxonomyFingerprint !== $proposal->taxonomy_state_fingerprint) {
+            return $this->blocker(self::PREFLIGHT_STALE_TAXONOMY_STATE, [
+                'note' => 'El estado de la taxonomía cambió entre freeze() y apply(). No se escribió nada. Se requiere una revisión nueva (un freeze() nuevo), no un reintento de este payload.',
+                'expected_fingerprint' => $proposal->taxonomy_state_fingerprint,
+                'current_fingerprint' => $currentTaxonomyFingerprint,
+            ], $context);
+        }
+
+        // 3) TASK-0006B (Issue #2 comentario `5936206843`), sección A: compuerta de CONFIRMACIÓN
+        // HUMANA, exigible y no decorativa.
+        //
+        // REGLA DE COMPATIBILIDAD EXACTA (requisito explícito de la sección A): el único predicado
+        // consultado es `requires_human_confirmation`, que la migración creó con `DEFAULT FALSE`. Por
+        // lo tanto:
+        //   - toda propuesta congelada ANTES de TASK-0006B queda en FALSE y sigue siendo aplicable
+        //     exactamente como antes - su procedencia de revisión original YA satisface el requisito
+        //     de revisión humana (caso de #420/#421/#422/#491);
+        //   - solo exigen confirmación las filas marcadas explícitamente: las que el backfill
+        //     determinístico de la migración identificó como preparadas por el agente (#492-#495) y
+        //     las que `freeze()` marque en adelante al declararse `ACTOR_AGENT`.
+        // Ninguna propuesta humana histórica se vuelve inválida por esta compuerta.
+        //
+        // Va DESPUÉS de tamper y obsolescencia a propósito: esos dos son hallazgos de seguridad que
+        // merecen quedar registrados como ABORTED, y deben ganarle a un simple "falta confirmar".
+        $unconfirmed = $this->unconfirmedMembers($proposal);
+        if ($unconfirmed !== []) {
+            return $this->blocker(self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED, [
+                'note' => 'Esta propuesta exige confirmación humana explícita antes de poder aplicarse (fue preparada por un actor que no es el revisor humano). No se escribió nada y la propuesta sigue PENDING_APPLY.',
+                'unconfirmed_proposal_ids' => $unconfirmed,
+            ], $context);
+        }
+
+        // 4) Fila fuente: existencia, estado y drift de los campos congelados.
+        return $proposal->proposal_type === TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK
+            ? $this->evaluateCandidateLink($proposal, $lockRows, $context)
+            : $this->evaluateConceptRelation($proposal, $lockRows, $context);
+    }
+
+    /**
+     * TASK-0006D: la tamper-detection, extraída tal cual estaba dentro de `apply()`. Pública porque
+     * es un diagnóstico útil por sí solo (el informe pre-APPLY reporta "payload válido sí/no" para
+     * las 12 propuestas) y porque no decide nada: solo recomputa un hash y lo compara.
+     *
+     * La lista de 9 campos es FIJA y no incluye ninguna columna de confirmación/ejecución, así que
+     * confirmar, anular una confirmación o aplicar no pueden invalidar el fingerprint de una
+     * propuesta - ver el docblock de `confirm()`.
+     */
+    public static function payloadFingerprintIsValid(TaxonomyReviewedProposal $proposal): bool
+    {
+        $recomputed = self::computePayloadFingerprint([
+            'proposal_type' => $proposal->proposal_type,
+            'candidate_link_id' => $proposal->candidate_link_id,
+            'concept_relation_id' => $proposal->concept_relation_id,
+            'decision' => $proposal->decision,
+            'decision_payload' => $proposal->decision_payload ?? [],
+            'payload_version' => $proposal->payload_version,
+            'taxonomy_state_fingerprint' => $proposal->taxonomy_state_fingerprint,
+            'reviewer_id' => $proposal->reviewer_id,
+            'reviewed_at' => $proposal->reviewed_at->format('Y-m-d H:i:s'),
+        ]);
+
+        return $recomputed === $proposal->payload_fingerprint;
+    }
+
+    /**
+     * TASK-0006D: validación de un candidato término→concepto. Mismo orden exacto que tenía
+     * `applyCandidateLinkDecision()` antes de la extracción - incluidas sus dos excepciones
+     * deliberadas: REJECT no exige el snapshot de `term_id`, y el chequeo de `term_id` corre ANTES de
+     * la rama CONTEXT_REQUIRED (ronda 4 de TASK-0004, defecto 2).
+     */
+    private function evaluateCandidateLink(TaxonomyReviewedProposal $proposal, bool $lockRows, array $context): array
+    {
+        $candidate = TaxonomyCandidateConceptLink::query()
+            ->when($lockRows, fn ($q) => $q->lockForUpdate())
+            ->find($proposal->candidate_link_id);
+
+        if (! $candidate) {
+            return $this->blocker(self::PREFLIGHT_ENTITY_MISSING, [
+                'note' => "El candidato referenciado (id={$proposal->candidate_link_id}) ya no existe.",
+            ], $context);
+        }
+
+        $context['candidate'] = $candidate;
 
         // Re-verificación server-side (hallazgo 3 de TASK-0004): "reviewed" no implica que nadie
         // más resolvió este candidato mientras tanto por otra vía (el camino inmediato existente,
         // otro payload, tinker, etc.).
         if ($candidate->status !== TaxonomyCandidateConceptLink::STATUS_PENDING) {
-            return $this->abort($proposal, self::ABORT_CANDIDATE_ALREADY_RESOLVED, $authorizationReference, $targetEnvironment, [
+            return $this->blocker(self::PREFLIGHT_SOURCE_ALREADY_RESOLVED, [
                 'note' => "El candidato ya no está pending (status actual: {$candidate->status}) - alguien más lo resolvió entre freeze() y apply().",
-            ]);
+                'current_source_status' => $candidate->status,
+            ], $context);
         }
 
         $decisionPayload = $proposal->decision_payload ?? [];
@@ -1359,6 +1975,320 @@ class ReviewedProposalService
             // REJECT no publica nada determinado por un campo fuente congelado - no hay nada que
             // pueda "driftear" hacia una publicación incorrecta, así que no se exige el snapshot de
             // term_id acá (freeze() igual lo guarda, pero apply() no depende de él para este caso).
+            return $this->applicable($context);
+        }
+
+        // TASK-0004, re-audit HIGH-1: re-verifica que el campo fuente congelado (term_id) siga
+        // coincidiendo con la fila VIVA antes de publicar nada - si alguien editó el candidato
+        // después de freeze() (directamente en la base, no hay UI para esto hoy, pero el guard no
+        // depende de que exista una UI), el payload ya no describe lo que un humano revisó.
+        //
+        // TASK-0004, re-audit ronda 4 (Issue #2 comentario `5909267134`, defecto 2): este chequeo
+        // corre ANTES de la rama CONTEXT_REQUIRED (antes corría después, y esa rama retornaba
+        // temprano sin pasar por acá). CONTEXT_REQUIRED es una decisión semántica SOBRE un término
+        // particular - si `suggested_term_id` cambió desde freeze(), aplicar la decisión "necesita
+        // contexto" al candidato mutado resolvería un término DISTINTO del que el humano revisó, lo
+        // cual viola la misma regla de inmutabilidad que ya protegía a MAP_TO_EXISTING/CREATE_NEW.
+        // REJECT sigue siendo la única excepción deliberada (no determina NINGÚN destino de
+        // escritura ni resuelve semánticamente un término específico).
+        $frozenTermId = $decisionPayload['term_id'] ?? null;
+        if ($frozenTermId === null || (int) $frozenTermId !== (int) $candidate->suggested_term_id) {
+            return $this->blocker(self::PREFLIGHT_SOURCE_DRIFT, [
+                'note' => 'suggested_term_id del candidato cambió desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
+                'frozen_term_id' => $frozenTermId,
+                'current_term_id' => $candidate->suggested_term_id,
+            ], $context);
+        }
+
+        $context['frozen_term_id'] = (int) $frozenTermId;
+
+        if ($proposal->decision === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED) {
+            return $this->applicable($context);
+        }
+
+        if ($proposal->decision === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING) {
+            $targetConceptId = $decisionPayload['target_concept_id'] ?? null;
+
+            if (! $targetConceptId || ! TaxonomyCanonicalConcept::query()->whereKey($targetConceptId)->exists()) {
+                return $this->blocker(self::PREFLIGHT_ENTITY_MISSING, [
+                    'note' => "El concepto destino (id={$targetConceptId}) del payload congelado ya no existe.",
+                    'frozen_target_concept_id' => $targetConceptId,
+                ], $context);
+            }
+
+            $context['target_concept_id'] = (int) $targetConceptId;
+
+            return $this->applicable($context);
+        }
+
+        // DECISION_CREATE_NEW - TASK-0004, re-audit ronda 4 (Issue #2 comentario `5909267134`,
+        // defecto 1): DOS valores distintos del payload congelado, con roles distintos - nunca se
+        // mezclan:
+        // - `new_concept_name`: el valor REVISADO/elegido explícitamente por el humano en freeze()
+        //   (hallazgo HIGH-1/corrección A) - esto, y SOLO esto, es lo que se publica.
+        // - `source_suggested_new_concept_name`: la sugerencia del Builder congelada en el instante
+        //   de freeze() - esto, y SOLO esto, es lo que se compara contra la fila VIVA para detectar
+        //   drift de la fuente. Antes de esa corrección, `apply()` comparaba el nombre REVISADO
+        //   contra la sugerencia VIVA, lo cual hacía imposible una corrección/normalización legítima
+        //   del revisor (Builder sugiere "X", humano aprueba explícitamente "Y" -> abortaba tratando
+        //   "Y != X" como si "X" hubiera cambiado, cuando en realidad nunca cambió).
+        $frozenSourceSuggestedName = $decisionPayload['source_suggested_new_concept_name'] ?? null;
+        if ($frozenSourceSuggestedName === null || $frozenSourceSuggestedName !== $candidate->suggested_new_concept_name) {
+            return $this->blocker(self::PREFLIGHT_SOURCE_DRIFT, [
+                'note' => 'suggested_new_concept_name del candidato cambió desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
+                'frozen_source_suggested_new_concept_name' => $frozenSourceSuggestedName,
+                'current_new_concept_name' => $candidate->suggested_new_concept_name,
+            ], $context);
+        }
+
+        // TASK-0006B (Issue #2 comentario `5936206843`), sección C: identidad BILINGÜE explícita
+        // (ES + EN congeladas) o identidad MONOLINGÜE histórica (`new_concept_name`). Las dos
+        // conviven; la compatibilidad hacia atrás es explícita y está cubierta por test: un payload
+        // congelado antes de TASK-0006B no trae las claves ES/EN, cae por el camino de siempre y se
+        // publica exactamente igual que antes.
+        $frozenBilingual = self::frozenBilingualNames($decisionPayload);
+
+        $frozenNewConceptName = null;
+        if ($frozenBilingual === null) {
+            $frozenNewConceptName = $decisionPayload['new_concept_name'] ?? null;
+            if ($frozenNewConceptName === null || trim((string) $frozenNewConceptName) === '') {
+                return $this->blocker(self::PREFLIGHT_SOURCE_DRIFT, [
+                    'note' => 'El payload congelado no trae un new_concept_name revisado válido - no se puede publicar.',
+                ], $context);
+            }
+        }
+
+        $context['frozen_bilingual'] = $frozenBilingual;
+        $context['frozen_new_concept_name'] = $frozenNewConceptName === null ? null : (string) $frozenNewConceptName;
+
+        // TASK-0006B, sección D: convergencia bilingüe gobernada - UN concepto para VARIOS
+        // candidatos, en una sola transacción.
+        if ($proposal->isGrouped()) {
+            return $this->evaluateBilingualGroup($proposal, $frozenBilingual, $lockRows, $context);
+        }
+
+        return $this->applicable($context);
+    }
+
+    /**
+     * TASK-0006D: validación del grupo bilingüe COMPLETO, extraída de
+     * `applyBilingualGroupCreateNew()` sin cambiarle el orden ni los desenlaces.
+     *
+     * El advisory lock del grupo se toma SOLO cuando `$lockRows` es `true`, o sea solo desde
+     * `apply()`. Que `preflight()` no lo tome es parte del contrato de no-efectos: tomar un lock de
+     * grupo para una lectura de diagnóstico haría que un preflight pudiera DEMORAR un apply real, y
+     * eso ya sería un efecto observable - justo lo que esta parte de la tarea prohíbe.
+     */
+    private function evaluateBilingualGroup(TaxonomyReviewedProposal $proposal, ?array $frozenBilingual, bool $lockRows, array $context): array
+    {
+        if ($frozenBilingual === null) {
+            return $this->blocker(self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT, [
+                'note' => 'Una propuesta agrupada exige identidad bilingüe ES/EN explícita en el payload congelado y este payload no la trae.',
+            ], $context);
+        }
+
+        if ($lockRows) {
+            // TASK-0006B re-audit (comentario `5938949812`): defensa en profundidad. `apply()` ya lo
+            // tomó antes de cualquier lock de fila; re-tomarlo acá es inofensivo (los advisory locks
+            // son re-entrantes dentro de la misma transacción y se liberan una sola vez al
+            // terminarla) y garantiza que este camino quede serializado por grupo incluso si alguna
+            // vez se lo alcanza por otra vía. No depende de que el llamador se haya acordado.
+            self::acquireGroupAdvisoryLock($proposal->proposal_group_id);
+        }
+
+        $members = TaxonomyReviewedProposal::query()
+            ->where('proposal_group_id', $proposal->proposal_group_id)
+            ->orderBy('id')
+            ->when($lockRows, fn ($q) => $q->lockForUpdate())
+            ->get();
+
+        $context['group_members'] = $members;
+        $context['group_member_ids'] = $members->pluck('id')->map(fn ($id) => (int) $id)->all();
+
+        if ($members->count() < 2) {
+            return $this->blocker(self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT, [
+                'note' => 'El grupo bilingüe quedó con menos de 2 miembros - no describe una convergencia válida.',
+                'proposal_group_id' => $proposal->proposal_group_id,
+            ], $context);
+        }
+
+        // Reutiliza el concepto si el grupo ya se aplicó (idempotencia), en vez de crear otro.
+        $alreadyAppliedConceptId = null;
+        foreach ($members as $member) {
+            if ($member->status === TaxonomyReviewedProposal::STATUS_APPLIED) {
+                $alreadyAppliedConceptId = $member->application_result['concept_id'] ?? null;
+            }
+        }
+
+        $pending = [];
+        foreach ($members as $member) {
+            if ($member->status === TaxonomyReviewedProposal::STATUS_APPLIED) {
+                continue;
+            }
+
+            if ($member->status !== TaxonomyReviewedProposal::STATUS_PENDING_APPLY
+                || $member->decision !== TaxonomyReviewedProposal::DECISION_CREATE_NEW
+                || $member->proposal_type !== TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK) {
+                return $this->blocker(self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT, [
+                    'note' => "Un miembro del grupo bilingüe no es aplicable (propuesta #{$member->id}, status={$member->status}, decision={$member->decision}).",
+                ], $context);
+            }
+
+            if ($member->taxonomy_state_fingerprint !== $proposal->taxonomy_state_fingerprint) {
+                return $this->blocker(self::PREFLIGHT_STALE_TAXONOMY_STATE, [
+                    'note' => "Los miembros del grupo bilingüe no comparten el mismo fingerprint de estado de taxonomía (propuesta #{$member->id}) - el grupo no se congeló como una sola revisión coherente.",
+                ], $context);
+            }
+
+            $memberPayload = $member->decision_payload ?? [];
+            $memberCandidate = TaxonomyCandidateConceptLink::query()
+                ->when($lockRows, fn ($q) => $q->lockForUpdate())
+                ->find($member->candidate_link_id);
+
+            if (! $memberCandidate) {
+                return $this->blocker(self::PREFLIGHT_ENTITY_MISSING, [
+                    'note' => "El candidato (id={$member->candidate_link_id}) de un miembro del grupo bilingüe ya no existe.",
+                ], $context);
+            }
+
+            if ($memberCandidate->status !== TaxonomyCandidateConceptLink::STATUS_PENDING) {
+                return $this->blocker(self::PREFLIGHT_SOURCE_ALREADY_RESOLVED, [
+                    'note' => "El candidato #{$memberCandidate->id} del grupo bilingüe ya no está pending (status actual: {$memberCandidate->status}).",
+                    'current_source_status' => $memberCandidate->status,
+                ], $context);
+            }
+
+            // Drift de fuente POR MIEMBRO - requisito explícito de la sección D ("stale/source drift
+            // is checked for BOTH source candidates").
+            if ((int) ($memberPayload['term_id'] ?? 0) !== (int) $memberCandidate->suggested_term_id) {
+                return $this->blocker(self::PREFLIGHT_SOURCE_DRIFT, [
+                    'note' => "suggested_term_id del candidato #{$memberCandidate->id} (miembro del grupo bilingüe) cambió desde freeze().",
+                    'frozen_term_id' => $memberPayload['term_id'] ?? null,
+                    'current_term_id' => $memberCandidate->suggested_term_id,
+                ], $context);
+            }
+
+            if (($memberPayload['source_suggested_new_concept_name'] ?? null) !== $memberCandidate->suggested_new_concept_name) {
+                return $this->blocker(self::PREFLIGHT_SOURCE_DRIFT, [
+                    'note' => "suggested_new_concept_name del candidato #{$memberCandidate->id} (miembro del grupo bilingüe) cambió desde freeze().",
+                ], $context);
+            }
+
+            // Las DOS identidades congeladas tienen que coincidir entre miembros: si difieren, el
+            // grupo no describe un único concepto.
+            $memberBilingual = self::frozenBilingualNames($memberPayload);
+            if ($memberBilingual !== $frozenBilingual) {
+                return $this->blocker(self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT, [
+                    'note' => "La identidad bilingüe congelada del miembro #{$member->id} no coincide con la del resto del grupo - no se puede converger en un solo concepto.",
+                ], $context);
+            }
+
+            $pending[] = ['proposal' => $member, 'candidate' => $memberCandidate];
+        }
+
+        $context['group_reuse_concept_id'] = $alreadyAppliedConceptId === null ? null : (int) $alreadyAppliedConceptId;
+        $context['group_pending'] = $pending;
+
+        if ($pending === []) {
+            return $this->blocker(self::PREFLIGHT_ALREADY_APPLIED, [
+                'note' => 'Todos los miembros del grupo bilingüe ya están aplicados - no queda nada por aplicar.',
+            ], $context);
+        }
+
+        return $this->applicable($context);
+    }
+
+    /**
+     * TASK-0006D: validación de una relación concepto→concepto, extraída de
+     * `applyConceptRelationDecision()` con el mismo orden: existencia, estado, (REJECT corta acá),
+     * drift de los tres campos congelados, y recién entonces la re-validación server-side completa.
+     */
+    private function evaluateConceptRelation(TaxonomyReviewedProposal $proposal, bool $lockRows, array $context): array
+    {
+        $relation = TaxonomyConceptRelation::query()
+            ->when($lockRows, fn ($q) => $q->lockForUpdate())
+            ->find($proposal->concept_relation_id);
+
+        if (! $relation) {
+            return $this->blocker(self::PREFLIGHT_ENTITY_MISSING, [
+                'note' => "La relación referenciada (id={$proposal->concept_relation_id}) ya no existe.",
+            ], $context);
+        }
+
+        $context['relation'] = $relation;
+
+        if ($relation->status !== TaxonomyConceptRelation::STATUS_CANDIDATE) {
+            return $this->blocker(self::PREFLIGHT_SOURCE_ALREADY_RESOLVED, [
+                'note' => "La relación ya no está candidate (status actual: {$relation->status}) - alguien más la resolvió entre freeze() y apply().",
+                'current_source_status' => $relation->status,
+            ], $context);
+        }
+
+        if ($proposal->decision === TaxonomyReviewedProposal::DECISION_REJECT) {
+            return $this->applicable($context);
+        }
+
+        // TASK-0004, re-audit HIGH-1: los campos fuente congelados (source/target/relation_type)
+        // deben seguir coincidiendo con la fila VIVA - si drifearon desde freeze(), el payload ya no
+        // describe lo que se revisó. Comparados ANTES de re-validar/publicar, no después.
+        $decisionPayload = $proposal->decision_payload ?? [];
+        $frozenSourceId = $decisionPayload['source_concept_id'] ?? null;
+        $frozenTargetId = $decisionPayload['target_concept_id'] ?? null;
+        $frozenRelationType = $decisionPayload['relation_type'] ?? null;
+
+        if ((int) $frozenSourceId !== (int) $relation->source_concept_id
+            || (int) $frozenTargetId !== (int) $relation->target_concept_id
+            || $frozenRelationType !== $relation->relation_type) {
+            return $this->blocker(self::PREFLIGHT_SOURCE_DRIFT, [
+                'note' => 'source_concept_id/target_concept_id/relation_type de la relación cambiaron desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
+                'frozen' => ['source_concept_id' => $frozenSourceId, 'target_concept_id' => $frozenTargetId, 'relation_type' => $frozenRelationType],
+                'current' => ['source_concept_id' => $relation->source_concept_id, 'target_concept_id' => $relation->target_concept_id, 'relation_type' => $relation->relation_type],
+            ], $context);
+        }
+
+        $context['frozen_source_concept_id'] = (int) $frozenSourceId;
+        $context['frozen_target_concept_id'] = (int) $frozenTargetId;
+        $context['frozen_relation_type'] = $frozenRelationType;
+
+        // DECISION_PUBLISH_RELATION: re-validación server-side completa contra el estado REAL
+        // (duplicado exacto, simétrico, vía inverso, ciclos) - hallazgo 3 de TASK-0004, mismo
+        // mecanismo que TASK-0003 hallazgo 6 (validateConceptRelationProposal con excludeId). Usa los
+        // valores CONGELADOS (que ya se verificaron arriba como idénticos a los vivos), no relee la
+        // fila viva de nuevo - "APPLY must write from the frozen payload".
+        //
+        // Es una validación de SOLO LECTURA (consultas sobre `taxonomy_concept_relations`), así que
+        // el preflight la corre de verdad en vez de estimarla - uno de los puntos del informe
+        // pre-APPLY es poder decir que la relación REALMENTE sigue siendo válida hoy.
+        $validation = app(CanonicalConceptBuilderService::class)->validateConceptRelationProposal(
+            (int) $frozenSourceId,
+            (int) $frozenTargetId,
+            $frozenRelationType,
+            excludeId: $relation->id,
+        );
+
+        $context['relation_validation'] = $validation;
+
+        if (! $validation['valid']) {
+            return $this->blocker(self::PREFLIGHT_RELATION_VALIDATION_FAILED, [
+                'note' => "La relación ya no es válida ({$validation['reason']}) - otra relación equivalente pudo haberse aprobado mientras esta esperaba aplicación.",
+                'relation_validation' => $validation,
+            ], $context);
+        }
+
+        return $this->applicable($context);
+    }
+
+    // =====================================================================================
+    // PASO 2-bis: las ESCRITURAS de apply(), ya sin ninguna decisión de validación.
+    // =====================================================================================
+
+    private function writeCandidateLinkDecision(TaxonomyReviewedProposal $proposal, array $context, string $authorizationReference, string $targetEnvironment): array
+    {
+        /** @var TaxonomyCandidateConceptLink $candidate */
+        $candidate = $context['candidate'];
+        $decisionPayload = $proposal->decision_payload ?? [];
+
+        if ($proposal->decision === TaxonomyReviewedProposal::DECISION_REJECT) {
             $candidate->update([
                 'status' => TaxonomyCandidateConceptLink::STATUS_REJECTED,
                 'reviewed_by' => $proposal->reviewer_id,
@@ -1372,27 +2302,7 @@ class ReviewedProposalService
             ]);
         }
 
-        // TASK-0004, re-audit HIGH-1: re-verifica que el campo fuente congelado (term_id) siga
-        // coincidiendo con la fila VIVA antes de publicar nada - si alguien editó el candidato
-        // después de freeze() (directamente en la base, no hay UI para esto hoy, pero el guard no
-        // depende de que exista una UI), el payload ya no describe lo que un humano revisó.
-        //
-        // TASK-0004, re-audit ronda 4 (Issue #2 comentario `5909267134`, defecto 2): este chequeo
-        // ahora corre ANTES de la rama CONTEXT_REQUIRED (antes corría después, y esa rama retornaba
-        // temprano sin pasar por acá). CONTEXT_REQUIRED es una decisión semántica SOBRE un término
-        // particular - si `suggested_term_id` cambió desde freeze(), aplicar la decisión "necesita
-        // contexto" al candidato mutado resolvería un término DISTINTO del que el humano revisó, lo
-        // cual viola la misma regla de inmutabilidad que ya protegía a MAP_TO_EXISTING/CREATE_NEW.
-        // REJECT sigue siendo la única excepción deliberada (no determina NINGÚN destino de
-        // escritura ni resuelve semánticamente un término específico).
-        $frozenTermId = $decisionPayload['term_id'] ?? null;
-        if ($frozenTermId === null || (int) $frozenTermId !== (int) $candidate->suggested_term_id) {
-            return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
-                'note' => 'suggested_term_id del candidato cambió desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
-                'frozen_term_id' => $frozenTermId,
-                'current_term_id' => $candidate->suggested_term_id,
-            ]);
-        }
+        $frozenTermId = $context['frozen_term_id'];
 
         if ($proposal->decision === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED) {
             // TASK-0004, re-audit correction C (Issue #2 comentario `5892711739`) + ronda 4 defecto 2
@@ -1420,13 +2330,8 @@ class ReviewedProposalService
         }
 
         if ($proposal->decision === TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING) {
-            $targetConceptId = $decisionPayload['target_concept_id'] ?? null;
-
-            if (! $targetConceptId || ! TaxonomyCanonicalConcept::query()->whereKey($targetConceptId)->exists()) {
-                return $this->abort($proposal, self::ABORT_ENTITY_MISSING, $authorizationReference, $targetEnvironment, [
-                    'note' => "El concepto destino (id={$targetConceptId}) del payload congelado ya no existe.",
-                ]);
-            }
+            // La existencia del concepto destino ya la verificó `evaluateCandidateLink()`.
+            $targetConceptId = $context['target_concept_id'];
 
             $termConceptId = $this->publishTermConceptLink((int) $frozenTermId, (int) $targetConceptId);
 
@@ -1445,47 +2350,16 @@ class ReviewedProposalService
             ]);
         }
 
-        // DECISION_CREATE_NEW - TASK-0004, re-audit ronda 4 (Issue #2 comentario `5909267134`,
-        // defecto 1): DOS valores distintos del payload congelado, con roles distintos - nunca se
-        // mezclan:
-        // - `new_concept_name`: el valor REVISADO/elegido explícitamente por el humano en freeze()
-        //   (hallazgo HIGH-1/corrección A) - esto, y SOLO esto, es lo que se publica abajo.
-        // - `source_suggested_new_concept_name`: la sugerencia del Builder congelada en el instante
-        //   de freeze() - esto, y SOLO esto, es lo que se compara contra la fila VIVA para detectar
-        //   drift de la fuente. Antes de esta corrección, `apply()` comparaba el nombre REVISADO
-        //   contra la sugerencia VIVA, lo cual hacía imposible una corrección/normalización legítima
-        //   del revisor (Builder sugiere "X", humano aprueba explícitamente "Y" -> abortaba tratando
-        //   "Y != X" como si "X" hubiera cambiado, cuando en realidad nunca cambió).
-        $frozenSourceSuggestedName = $decisionPayload['source_suggested_new_concept_name'] ?? null;
-        if ($frozenSourceSuggestedName === null || $frozenSourceSuggestedName !== $candidate->suggested_new_concept_name) {
-            return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
-                'note' => 'suggested_new_concept_name del candidato cambió desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
-                'frozen_source_suggested_new_concept_name' => $frozenSourceSuggestedName,
-                'current_new_concept_name' => $candidate->suggested_new_concept_name,
-            ]);
-        }
-
-        // TASK-0006B (Issue #2 comentario `5936206843`), sección C: identidad BILINGÜE explícita
-        // (ES + EN congeladas) o identidad MONOLINGÜE histórica (`new_concept_name`). Las dos
-        // conviven; la compatibilidad hacia atrás es explícita y está cubierta por test: un payload
-        // congelado antes de TASK-0006B no trae las claves ES/EN, cae por el camino de siempre y se
-        // publica exactamente igual que antes.
-        $frozenBilingual = self::frozenBilingualNames($decisionPayload);
-
-        $frozenNewConceptName = null;
-        if ($frozenBilingual === null) {
-            $frozenNewConceptName = $decisionPayload['new_concept_name'] ?? null;
-            if ($frozenNewConceptName === null || trim((string) $frozenNewConceptName) === '') {
-                return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
-                    'note' => 'El payload congelado no trae un new_concept_name revisado válido - no se puede publicar.',
-                ]);
-            }
-        }
+        // DECISION_CREATE_NEW. Los dos valores con roles distintos (el nombre REVISADO que se
+        // publica y la SUGERENCIA del Builder que solo sirve para detectar drift) ya los separó y
+        // validó `evaluateCandidateLink()` - ver su comentario y la ronda 4 de TASK-0004.
+        $frozenBilingual = $context['frozen_bilingual'];
+        $frozenNewConceptName = $context['frozen_new_concept_name'];
 
         // TASK-0006B, sección D: convergencia bilingüe gobernada - UN concepto para VARIOS
         // candidatos, en una sola transacción.
         if ($proposal->isGrouped()) {
-            return $this->applyBilingualGroupCreateNew($proposal, $frozenBilingual, $authorizationReference, $targetEnvironment);
+            return $this->writeBilingualGroupCreateNew($proposal, $context, $authorizationReference, $targetEnvironment);
         }
 
         $term = $candidate->term;
@@ -1588,113 +2462,23 @@ class ReviewedProposalService
      *    `taxonomy_state_fingerprint` que ya se validó contra el estado actual.
      * 5. CERO CPV: no se escribe ninguna relación TÉRMINO→CPV. La convergencia bilingüe no inventa
      *    mapeos de categoría (prohibición explícita de la sección D).
+     *
+     * TASK-0006D: las garantías 2/3/4 (y el advisory lock de la garantía 1) se validan en
+     * `evaluateBilingualGroup()`, que es la misma función que corre el preflight. Este método recibe
+     * el resultado ya validado -los miembros pendientes con sus candidatos leídos CON lock- y solo
+     * escribe. La garantía 1 no se debilita: `apply()` toma el advisory lock del grupo como PRIMERA
+     * acción de su transacción, antes de cualquier `lockForUpdate()`, y `evaluateBilingualGroup()` lo
+     * re-toma por defensa en profundidad cuando corre con locks.
      */
-    private function applyBilingualGroupCreateNew(
+    private function writeBilingualGroupCreateNew(
         TaxonomyReviewedProposal $proposal,
-        ?array $frozenBilingual,
+        array $context,
         string $authorizationReference,
         string $targetEnvironment,
     ): array {
-        if ($frozenBilingual === null) {
-            return $this->abort($proposal, self::ABORT_BILINGUAL_GROUP_NOT_APPLICABLE, $authorizationReference, $targetEnvironment, [
-                'note' => 'Una propuesta agrupada exige identidad bilingüe ES/EN explícita en el payload congelado y este payload no la trae.',
-            ]);
-        }
-
-        // TASK-0006B re-audit (comentario `5938949812`): defensa en profundidad. `apply()` ya lo tomó
-        // antes de cualquier lock de fila; re-tomarlo acá es inofensivo (los advisory locks son
-        // re-entrantes dentro de la misma transacción y se liberan una sola vez al terminarla) y
-        // garantiza que este camino quede serializado por grupo incluso si alguna vez se lo alcanza
-        // por otra vía. No depende de que el llamador se haya acordado.
-        self::acquireGroupAdvisoryLock($proposal->proposal_group_id);
-
-        $members = TaxonomyReviewedProposal::query()
-            ->where('proposal_group_id', $proposal->proposal_group_id)
-            ->orderBy('id')
-            ->lockForUpdate()
-            ->get();
-
-        if ($members->count() < 2) {
-            return $this->abort($proposal, self::ABORT_BILINGUAL_GROUP_NOT_APPLICABLE, $authorizationReference, $targetEnvironment, [
-                'note' => 'El grupo bilingüe quedó con menos de 2 miembros - no describe una convergencia válida.',
-                'proposal_group_id' => $proposal->proposal_group_id,
-            ]);
-        }
-
-        // Reutiliza el concepto si el grupo ya se aplicó (idempotencia), en vez de crear otro.
-        $alreadyAppliedConceptId = null;
-        foreach ($members as $member) {
-            if ($member->status === TaxonomyReviewedProposal::STATUS_APPLIED) {
-                $alreadyAppliedConceptId = $member->application_result['concept_id'] ?? null;
-            }
-        }
-
-        $pending = [];
-        foreach ($members as $member) {
-            if ($member->status === TaxonomyReviewedProposal::STATUS_APPLIED) {
-                continue;
-            }
-
-            if ($member->status !== TaxonomyReviewedProposal::STATUS_PENDING_APPLY
-                || $member->decision !== TaxonomyReviewedProposal::DECISION_CREATE_NEW
-                || $member->proposal_type !== TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK) {
-                return $this->abort($proposal, self::ABORT_BILINGUAL_GROUP_NOT_APPLICABLE, $authorizationReference, $targetEnvironment, [
-                    'note' => "Un miembro del grupo bilingüe no es aplicable (propuesta #{$member->id}, status={$member->status}, decision={$member->decision}).",
-                ]);
-            }
-
-            if ($member->taxonomy_state_fingerprint !== $proposal->taxonomy_state_fingerprint) {
-                return $this->abort($proposal, self::ABORT_STALE_TAXONOMY_STATE, $authorizationReference, $targetEnvironment, [
-                    'note' => "Los miembros del grupo bilingüe no comparten el mismo fingerprint de estado de taxonomía (propuesta #{$member->id}) - el grupo no se congeló como una sola revisión coherente.",
-                ]);
-            }
-
-            $memberPayload = $member->decision_payload ?? [];
-            $memberCandidate = TaxonomyCandidateConceptLink::query()->lockForUpdate()->find($member->candidate_link_id);
-
-            if (! $memberCandidate) {
-                return $this->abort($proposal, self::ABORT_ENTITY_MISSING, $authorizationReference, $targetEnvironment, [
-                    'note' => "El candidato (id={$member->candidate_link_id}) de un miembro del grupo bilingüe ya no existe.",
-                ]);
-            }
-
-            if ($memberCandidate->status !== TaxonomyCandidateConceptLink::STATUS_PENDING) {
-                return $this->abort($proposal, self::ABORT_CANDIDATE_ALREADY_RESOLVED, $authorizationReference, $targetEnvironment, [
-                    'note' => "El candidato #{$memberCandidate->id} del grupo bilingüe ya no está pending (status actual: {$memberCandidate->status}).",
-                ]);
-            }
-
-            // Drift de fuente POR MIEMBRO - requisito explícito de la sección D ("stale/source drift
-            // is checked for BOTH source candidates").
-            if ((int) ($memberPayload['term_id'] ?? 0) !== (int) $memberCandidate->suggested_term_id) {
-                return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
-                    'note' => "suggested_term_id del candidato #{$memberCandidate->id} (miembro del grupo bilingüe) cambió desde freeze().",
-                    'frozen_term_id' => $memberPayload['term_id'] ?? null,
-                    'current_term_id' => $memberCandidate->suggested_term_id,
-                ]);
-            }
-
-            if (($memberPayload['source_suggested_new_concept_name'] ?? null) !== $memberCandidate->suggested_new_concept_name) {
-                return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
-                    'note' => "suggested_new_concept_name del candidato #{$memberCandidate->id} (miembro del grupo bilingüe) cambió desde freeze().",
-                ]);
-            }
-
-            // Las DOS identidades congeladas tienen que coincidir entre miembros: si difieren, el
-            // grupo no describe un único concepto.
-            $memberBilingual = self::frozenBilingualNames($memberPayload);
-            if ($memberBilingual !== $frozenBilingual) {
-                return $this->abort($proposal, self::ABORT_BILINGUAL_GROUP_NOT_APPLICABLE, $authorizationReference, $targetEnvironment, [
-                    'note' => "La identidad bilingüe congelada del miembro #{$member->id} no coincide con la del resto del grupo - no se puede converger en un solo concepto.",
-                ]);
-            }
-
-            $pending[] = ['proposal' => $member, 'candidate' => $memberCandidate];
-        }
-
-        if ($pending === []) {
-            return ['result' => self::RESULT_ALREADY_APPLIED, 'proposal' => $proposal, 'abort_reason' => null, 'application_result' => $proposal->application_result];
-        }
+        $frozenBilingual = $context['frozen_bilingual'];
+        $pending = $context['group_pending'];
+        $alreadyAppliedConceptId = $context['group_reuse_concept_id'];
 
         // UN SOLO concepto para todo el grupo.
         $conceptId = $alreadyAppliedConceptId
@@ -1747,21 +2531,10 @@ class ReviewedProposalService
         return $result ?? ['result' => self::RESULT_APPLIED, 'proposal' => $proposal->fresh(), 'abort_reason' => null, 'application_result' => ['concept_id' => (int) $conceptId, 'grouped_applied_members' => $applied]];
     }
 
-    private function applyConceptRelationDecision(TaxonomyReviewedProposal $proposal, string $authorizationReference, string $targetEnvironment): array
+    private function writeConceptRelationDecision(TaxonomyReviewedProposal $proposal, array $context, string $authorizationReference, string $targetEnvironment): array
     {
-        $relation = TaxonomyConceptRelation::query()->lockForUpdate()->find($proposal->concept_relation_id);
-
-        if (! $relation) {
-            return $this->abort($proposal, self::ABORT_ENTITY_MISSING, $authorizationReference, $targetEnvironment, [
-                'note' => "La relación referenciada (id={$proposal->concept_relation_id}) ya no existe.",
-            ]);
-        }
-
-        if ($relation->status !== TaxonomyConceptRelation::STATUS_CANDIDATE) {
-            return $this->abort($proposal, self::ABORT_RELATION_ALREADY_RESOLVED, $authorizationReference, $targetEnvironment, [
-                'note' => "La relación ya no está candidate (status actual: {$relation->status}) - alguien más la resolvió entre freeze() y apply().",
-            ]);
-        }
+        /** @var TaxonomyConceptRelation $relation */
+        $relation = $context['relation'];
 
         if ($proposal->decision === TaxonomyReviewedProposal::DECISION_REJECT) {
             $relation->update([
@@ -1776,42 +2549,10 @@ class ReviewedProposalService
             ]);
         }
 
-        // TASK-0004, re-audit HIGH-1: los campos fuente congelados (source/target/relation_type)
-        // deben seguir coincidiendo con la fila VIVA - si drifearon desde freeze(), el payload ya no
-        // describe lo que se revisó. Comparados ANTES de re-validar/publicar, no después.
-        $decisionPayload = $proposal->decision_payload ?? [];
-        $frozenSourceId = $decisionPayload['source_concept_id'] ?? null;
-        $frozenTargetId = $decisionPayload['target_concept_id'] ?? null;
-        $frozenRelationType = $decisionPayload['relation_type'] ?? null;
-
-        if ((int) $frozenSourceId !== (int) $relation->source_concept_id
-            || (int) $frozenTargetId !== (int) $relation->target_concept_id
-            || $frozenRelationType !== $relation->relation_type) {
-            return $this->abort($proposal, self::ABORT_SOURCE_DRIFT, $authorizationReference, $targetEnvironment, [
-                'note' => 'source_concept_id/target_concept_id/relation_type de la relación cambiaron desde freeze() - el payload congelado ya no describe la fila real. Se requiere una revisión nueva.',
-                'frozen' => ['source_concept_id' => $frozenSourceId, 'target_concept_id' => $frozenTargetId, 'relation_type' => $frozenRelationType],
-                'current' => ['source_concept_id' => $relation->source_concept_id, 'target_concept_id' => $relation->target_concept_id, 'relation_type' => $relation->relation_type],
-            ]);
-        }
-
-        // DECISION_PUBLISH_RELATION: re-validación server-side completa contra el estado REAL
-        // (duplicado exacto, simétrico, vía inverso, ciclos) - hallazgo 3 de TASK-0004, mismo
-        // mecanismo que TASK-0003 hallazgo 6 (validateConceptRelationProposal con excludeId). Usa
-        // los valores CONGELADOS (que ya se verificaron arriba como idénticos a los vivos), no
-        // relee la fila viva de nuevo - "APPLY must write from the frozen payload".
-        $validation = app(CanonicalConceptBuilderService::class)->validateConceptRelationProposal(
-            (int) $frozenSourceId,
-            (int) $frozenTargetId,
-            $frozenRelationType,
-            excludeId: $relation->id,
-        );
-
-        if (! $validation['valid']) {
-            return $this->abort($proposal, self::ABORT_RELATION_INVALID_AT_APPLY_TIME, $authorizationReference, $targetEnvironment, [
-                'note' => "La relación ya no es válida ({$validation['reason']}) - otra relación equivalente pudo haberse aprobado mientras esta esperaba aplicación.",
-            ]);
-        }
-
+        // DECISION_PUBLISH_RELATION. El drift de los tres campos congelados y la re-validación
+        // server-side completa (duplicado exacto, simétrico, vía inverso, ciclos) ya corrieron en
+        // `evaluateConceptRelation()` - misma función que corre el preflight, mismo orden.
+        //
         // `TaxonomyConceptRelation::booted()` (guard de TASK-0003 hallazgo 6, extendido en TASK-0004
         // hallazgo HIGH-2) revalida esto MISMO otra vez dentro de `save()` Y exige que
         // `isApplyingC2Publication()` esté encendida - redundante a propósito (defensa en
