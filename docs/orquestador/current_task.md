@@ -63,8 +63,22 @@ funciona:** volvía al hermano no aplicable mutando su `decision`, que **es** un
 fingerprint, así que ahora produce (correctamente) `TAMPER_DETECTED`. Se cambió a mover su `status`, que
 **no** está cubierto.
 
-**Nada de datos reales se tocó:** #420–#422 y #629/#630 sin mutar, conteos preservados, cero
-APPLY/PUBLISH, sin migraciones.
+**Tests de la ronda 2:** `ReviewedProposalPreflightTest` **24/24** (191 assertions, 18 → 24) y las
+suites heredadas de C2 reejecutadas **completas** contra el código corregido: **95/95**. Esto último
+importa en concreto, porque la corrección B cambió el desenlace de un camino que esas suites ya
+ejercitaban (el drift de un miembro ahora aborta **los dos**), así que su verde dice que el cambio es
+compatible con todo lo aprobado y no sólo con sus propios tests.
+
+**Staging de la ronda 2:** HEAD de runtime `4eee136` (run `success` para ese sha exacto); `/` 200,
+`/admin/login` 200, las tres pantallas 302 → login 200, **sin 500/503**, sin migraciones.
+
+**Re-ejecución del preflight sobre las 12 reales:** clasificación **idéntica** (3 obsoletas / 9 listas),
+cero escrituras, y evidencia nueva de grupo — #629 y #630 reportan ahora
+`member_payload_fingerprint_valid = {629: true, 630: true}`: la integridad del grupo bilingüe real está
+**verificada y registrada**, no supuesta.
+
+**Nada de datos reales se tocó:** #420–#422 y #629/#630 sin mutar, conteos preservados
+(10 / 2 / 142 / 81 / 9749 / 12 / 0 aplicadas, 0 abortadas), cero APPLY/PUBLISH, sin migraciones.
 
 Detalle completo en
 [`audit/phase6_task0006d_preapply_preflight_2026-10-02.md`](../../audit/phase6_task0006d_preapply_preflight_2026-10-02.md);

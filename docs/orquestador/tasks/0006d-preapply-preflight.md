@@ -49,6 +49,12 @@ regresiones heredadas verdes **sin editar una línea**. El único fallo local es
 **Staging:** HEAD de runtime `ab1eedd` desplegado (run `success` para ese sha exacto), `/` 200,
 `/admin/login` 200, las tres pantallas de taxonomía 302 → login 200, **sin 500/503**, sin migraciones.
 
+**Ronda 2 (re-audit `5952211890`):** `ReviewedProposalPreflightTest` **24/24** (18 → 24) y las suites
+heredadas de C2 reejecutadas completas: **95/95**. Preflight reejecutado sobre las 12 reales con
+clasificación **idéntica** (3 obsoletas / 9 listas) y evidencia nueva de integridad por miembro del
+grupo. Staging: HEAD de runtime **`4eee136`** (run `success` para ese sha exacto), mismo smoke sin
+500/503. Conteos preservados; #420–#422 y #629/#630 sin mutar.
+
 Las tres obsoletas **no se tocaron**: pasarlas por `apply()` las habría dejado en `ABORTED` de forma
 terminal, y re-congelar está bloqueado por el índice único parcial. Eso es exactamente lo que el
 preflight viene a evitar.

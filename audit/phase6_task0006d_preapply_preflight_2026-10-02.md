@@ -441,7 +441,16 @@ renderizado sigue siendo la del test heredado.
 
 ### 7.3 Staging
 
-| Ítem | Resultado |
+> **Ronda 2:** el HEAD de runtime desplegado es ahora
+> **`4eee136e7b4117c3980cd2daa4253ee0d43b7d2a`**, con la corrección del gate de integridad de grupos —
+> workflow «Deploy a Contabo» `completed / success` para ese sha exacto
+> ([run 37019162113](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/37019162113)).
+> Smoke reejecutado: `/` **200**, `/admin/login` **200**, las tres pantallas de taxonomía 302 → login
+> **200**, **sin 500/503**. Sin migraciones. Invariantes reverificados de solo lectura después del
+> despliegue: **10 / 2 / 142 / 81 / 9749 / 12 / 0 aplicadas**, 0 abortadas, #420–#422 y #629/#630 sin
+> cambios. La tabla de abajo es la de la ronda 1, conservada para continuidad de auditoría.
+
+| Ítem | Resultado (ronda 1) |
 |---|---|
 | HEAD de runtime desplegado | **`ab1eedd6f660b401032aefe51c0ba05488195d5c`** |
 | Workflow «Deploy a Contabo» | `completed / success` para **ese sha exacto** ([run 37002784135](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/37002784135)) |
@@ -763,6 +772,23 @@ confirmación del sucesor queda sin la evidencia que la hace significativa), la 
 durable que se acepta (una fila dedicada de `taxonomy_audit_log` escrita en la misma transacción), y la
 regla de integridad que lo ata: **si hay sucesor, tiene que haber diff**. El alcance de migración de la
 tabla comparativa pasó de «8 columnas + 1 CHECK» a «9 columnas + 2 CHECK».
+
+### 11.6-ter Tests y staging de la ronda 2
+
+| Ítem | Resultado |
+|---|---|
+| `ReviewedProposalPreflightTest` | **24/24 PASS** (191 assertions), 18 → 24 con los 6 nuevos |
+| `ReviewedProposalServiceTest` + `ReviewedProposalConfirmationTest` + `ReviewedProposalGroupLockingTest` | **95/95 PASS**, reejecutadas **completas** contra el código corregido |
+| HEAD de runtime desplegado | **`4eee136e7b4117c3980cd2daa4253ee0d43b7d2a`** — workflow `success` para ese sha exacto ([run 37019162113](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/37019162113)) |
+| Smoke | `/` 200, `/admin/login` 200, las tres pantallas 302 → login 200, **sin 500/503** |
+| Migraciones | ninguna |
+| Invariantes tras el despliegue | **10 / 2 / 142 / 81 / 9749 / 12 / 0 aplicadas**, **0 abortadas** |
+
+Que las **95** regresiones heredadas pasen contra el código corregido importa específicamente acá: la
+corrección B cambió el desenlace de un camino que esas suites ya ejercitaban
+(`source_drift_on_either_member_aborts_the_whole_group_with_zero_writes` ahora aborta **los dos**
+miembros en vez de uno), así que el hecho de que sigan verdes dice que el cambio de semántica terminal
+es compatible con todo lo que ya estaba aprobado, no sólo con sus propios tests nuevos.
 
 ### 11.7 Lo que esta ronda NO hizo
 

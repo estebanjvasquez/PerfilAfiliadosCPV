@@ -1334,7 +1334,7 @@
       "repository": "estebanjvasquez/PerfilAfiliadosCPV",
       "branch": "feature/upgrade-filament-v3",
       "review_base_sha": "510400a2faac75c8223e5570e7581d7a3a96f416",
-      "implementation_sha": "ab1eedd6f660b401032aefe51c0ba05488195d5c - all code, tests and docs; this is the sha deployed to staging",
+      "implementation_sha": "4eee136e7b4117c3980cd2daa4253ee0d43b7d2a - round 2, carrying the group-integrity fix; this is the sha deployed to staging. Round 1 was ab1eedd6f660b401032aefe51c0ba05488195d5c.",
       "handoff_commit_sha": "SEE_HEAD_OF_PUSH - a commit cannot contain its own hash; this file's commit is the HEAD reported in the final READY_FOR_REVIEW response for TASK-0006D, and it is documentation-only (no deploy, by paths-ignore)",
       "task_definition": "docs/orquestador/tasks/0006d-preapply-preflight.md (verbatim of the opening comment)",
       "audit": "audit/phase6_task0006d_preapply_preflight_2026-10-02.md",
@@ -1389,7 +1389,8 @@
         "safe_isolation": "All disposable fixtures inside DatabaseTransactions on pgsql, local environment. The ephemeral-container procedure over the live staging bind mounts was NOT reused, per the explicit requirement. No real proposal/candidate/relation took part in any test, and zero test residue remains."
       },
       "staging": {
-        "deployed_head": "ab1eedd6f660b401032aefe51c0ba05488195d5c - workflow 'Deploy a Contabo' completed/success for that exact sha (run 37002784135)",
+        "deployed_head": "4eee136e7b4117c3980cd2daa4253ee0d43b7d2a - round 2, with the group-integrity fix; workflow 'Deploy a Contabo' completed/success for that exact sha (run 37019162113). Smoke re-run: GET / 200, GET /admin/login 200, the three taxonomy screens 302 -> login 200, no 500/503, no migrations. Invariants re-verified read-only after the deploy: 10 / 2 / 142 / 81 / 9749 / 12 / 0 applied, 0 aborted, #420-#422 and #629/#630 unchanged. Round 1 deployed ab1eedd6f660b401032aefe51c0ba05488195d5c (run 37002784135).",
+        "round_1_deployed_head": "ab1eedd6f660b401032aefe51c0ba05488195d5c - workflow 'Deploy a Contabo' completed/success for that exact sha (run 37002784135)",
         "smoke": "GET / 200; GET /admin/login 200; the three taxonomy screens 302 -> /admin/login 200 (expected without a session). NO 500/503.",
         "migrations": "none in this task; the deploy's own migrate --force is a no-op",
         "head_identification": "Staging runs ab1eedd, which contains ALL of this task's code, tests and documentation. The branch HEAD is the documentation commit on top (the audit's staging section plus this checkpoint), which deliberately triggers NO deploy thanks to the workflow's paths-ignore (docs/**, audit/**, **.md) - a commit cannot contain its own hash, so the alternative would be not recording the staging evidence. There is no runtime difference between the two commits.",
