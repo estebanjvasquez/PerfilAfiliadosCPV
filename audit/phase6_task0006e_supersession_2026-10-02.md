@@ -546,7 +546,7 @@ sola línea**. La única modificación de comportamiento en código heredado es 
 `unconfirmedMembers()` a miembros `PENDING_APPLY`, que es más preciso y no cambia ningún resultado de
 las 47 pruebas de confirmación.
 
-### 9.7 Gates no aplicables
+### 9.7 Gates no aplicables (continúa en §10 con la compuerta de cierre)
 
 - **APPLY / PUBLISH**: no ejecutados y no autorizados. Ninguna propuesta se aplicó.
 - **Sucesores**: no autorizados y no creados.
@@ -554,3 +554,180 @@ las 47 pruebas de confirmación.
   (§7.8).
 - **Merge a `main` / despliegue a producción / rotación de credenciales / migración destructiva**: no
   corresponden y no se hicieron.
+
+---
+
+## 10. Compuerta de cierre de TASK-0006E — preflight final de solo lectura
+
+**Referencia:** Issue #2 comentario
+[`5993828105`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5993828105)
+(2026-10-05T11:49:23Z) — *ORCHESTRATOR HUMAN RE-REVIEW VERIFICATION / FINAL READ-ONLY PREFLIGHT
+REQUIRED*.
+**Artefacto:** `audit/task0006e_final_preflight_2026-10-05.json` (`generated_at 2026-10-05 11:58:49`,
+`mode: READ_ONLY_PREFLIGHT`, **`write_statements_observed: 0`**, 15 propuestas evaluadas).
+**Autorizado en esta ronda:** sólo el preflight de solo lectura y la actualización de docs/audit/handoff.
+**Ejecutado:** exactamente eso. Cero APPLY, cero publicación, cero supersesión, cero re-freeze, cero
+cambios de esquema/runtime, cero cambios de datos.
+
+### 10.1 La re-revisión humana que cerró el ciclo
+
+El dueño completó las tres revisiones nuevas por la UI autenticada de Filament, como el §7.8 anticipaba
+que correspondía. **El agente no participó de esas decisiones.**
+
+| Propuesta nueva | Candidato / término | Decisión | Procedencia verificada |
+|---|---|---|---|
+| **#1688** | 263 / `petroleum` | `CONTEXT_REQUIRED` | `reviewer_id=3`, `prepared_by_actor_type=human_reviewer`, `prepared_via=http`, `reviewed_at 2026-10-05 11:47:48`, auditoría **#3032** `actor_type=user` `user_id=3` |
+| **#1689** | 264 / `crude oil` | `CONTEXT_REQUIRED` | ídem, `11:48:07`, auditoría **#3033** |
+| **#1690** | 265 / `oil and gas` | `CONTEXT_REQUIRED` | ídem, `11:48:24`, auditoría **#3034** |
+
+Las tres con `requires_human_confirmation = false` y `confirmed_at = NULL`, que es **lo correcto y no un
+hueco**: la compuerta de confirmación de TASK-0006B existe para decisiones *preparadas por un agente*.
+Acá la decisión la redactó la persona directamente (`prepared_by_actor_type = human_reviewer`,
+`prepared_via = http`), así que su procedencia de revisión ya satisface el requisito por sí sola —
+exactamente la misma regla de compatibilidad que aplica a #420/#422/#491.
+
+**El dueño volvió a elegir `CONTEXT_REQUIRED`.** Eso no vuelve retroactivamente innecesaria la
+supersesión: la pregunta se le devolvió abierta, con `oleoducto` y `gasoducto` ya existiendo y
+registrados en el delta, y la respondió contra el estado actual. Una decisión revalidada contra el
+estado vigente y una decisión caducada que coincide en el texto **no son lo mismo** para el contrato C2
+— la primera es aplicable, la segunda no lo era.
+
+### 10.2 Las tres propuestas históricas siguen terminales e intactas
+
+| | #420 | #421 | #422 |
+|---|---|---|---|
+| `status` | `SUPERSEDED` | `SUPERSEDED` | `SUPERSEDED` |
+| `superseded_at` | `2026-10-02 16:44:43` | `16:45:02` | `16:45:22` |
+| `superseded_by_proposal_id` | **NULL** | **NULL** | **NULL** |
+| `payload_fingerprint` | `b9e1ec92528f…` | `8f985faeef75…` | `2202c6348e65…` |
+| `taxonomy_state_fingerprint` | `1d0eb041f642…` | `1d0eb041f642…` | `1d0eb041f642…` |
+| `reviewer_id` / `reviewed_at` | 3 / `2026-10-01 09:48:41` | 3 / `09:49:42` | 3 / `09:50:20` |
+| `applied_at` | NULL | NULL | NULL |
+
+**Sin linaje retroactivo:** 0 filas en toda la tabla con `superseded_by_proposal_id` NOT NULL y 0 con
+`supersedes_proposal_id` NOT NULL. Las propuestas nuevas **no** se registraron como sucesoras, y eso es
+deliberado: la supersesión fue sin sucesor para que la decisión nueva naciera independiente, no colgada
+de la vieja. Sus fingerprints congelados siguen siendo los de 2026-10-01, o sea el registro histórico
+quedó verificable: se puede demostrar qué decidió un humano, cuándo, y contra qué estado.
+
+### 10.3 Resultado del preflight — las 12 propuestas vivas
+
+**Fingerprint actual exacto, computado por código de aplicación:**
+`c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2`
+
+| # | Origen | Decisión | Payload | Obsoleta | Fuente | Drift | Confirmación | Resultado |
+|---|---|---|---|---|---|---|---|---|
+| 491 | cand. 272 / `pipeline` | `MAP_TO_EXISTING` → #2890 | válido | no | existe, `pending` | no | no exige | **`READY_TO_APPLY`** |
+| 492 | cand. 266 / `exploration` | `CONTEXT_REQUIRED` | válido | no | existe, `pending` | no | confirmada `http` | **`READY_TO_APPLY`** |
+| 493 | cand. 267 / `upstream` | `CONTEXT_REQUIRED` | válido | no | existe, `pending` | no | confirmada `http` | **`READY_TO_APPLY`** |
+| 494 | cand. 268 / `midstream` | `CONTEXT_REQUIRED` | válido | no | existe, `pending` | no | confirmada `http` | **`READY_TO_APPLY`** |
+| 495 | cand. 269 / `downstream` | `CONTEXT_REQUIRED` | válido | no | existe, `pending` | no | confirmada `http` | **`READY_TO_APPLY`** |
+| 629 | cand. 270 / `refinery` | `CREATE_NEW` bilingüe | válido | no | existe, `pending` | no | confirmada `http` | **`READY_TO_APPLY`** |
+| 630 | cand. 271 / `refinería` | `CREATE_NEW` bilingüe | válido | no | existe, `pending` | no | confirmada `http` | **`READY_TO_APPLY`** |
+| 631 | rel. 61 / 4→25 | `REJECT` | válido | no | existe, `candidate` | n/a | confirmada `http` | **`READY_TO_APPLY`** |
+| 632 | rel. 62 / 16→61 | `REJECT` | válido | no | existe, `candidate` | n/a | confirmada `http` | **`READY_TO_APPLY`** |
+| 1688 | cand. 263 / `petroleum` | `CONTEXT_REQUIRED` | válido | no | existe, `pending` | no | no exige | **`READY_TO_APPLY`** |
+| 1689 | cand. 264 / `crude oil` | `CONTEXT_REQUIRED` | válido | no | existe, `pending` | no | no exige | **`READY_TO_APPLY`** |
+| 1690 | cand. 265 / `oil and gas` | `CONTEXT_REQUIRED` | válido | no | existe, `pending` | no | no exige | **`READY_TO_APPLY`** |
+
+**12 de 12 `READY_TO_APPLY`. Cero bloqueos.**
+
+Reportadas aparte, como el comentario autoriza («they may be reported separately … if the command
+naturally scans all rows» — el comando recorre toda la tabla):
+
+| # | Resultado | Categoría | `would_apply_abort_with` | Write-set |
+|---|---|---|---|---|
+| 420 / 421 / 422 | `ALREADY_SUPERSEDED` | `BLOCKED_FOR_OTHER_REASON` | **null** (un `apply()` no las quema) | **0 filas** |
+
+No están en la cola ejecutable: son estado histórico terminal. Que su `would_apply_abort_with` sea
+`null` es la prueba de que la compuerta de §4.5 funciona — un `apply()` sobre ellas informa y se va, sin
+pisar el rastro.
+
+### 10.4 Integridad del grupo bilingüe #629/#630
+
+| Medida | Valor |
+|---|---|
+| `proposal_group_id` | `043fce22-daf0-4fda-83ed-df666d89ace6` |
+| `member_ids` | `[629, 630]` |
+| `members_pending_apply` | `[629, 630]` |
+| `consistent` | **true** |
+| `member_payload_fingerprint_valid` | `{"629": true, "630": true}` |
+| `tampered_member_ids` | `[]` |
+| `all_member_payloads_valid` | **true** |
+| `reuses_concept_id` | `null` (ningún miembro aplicado todavía) |
+
+Los dos miembros reportan la validez **del grupo completo**, no sólo de la fila de entrada — la
+corrección de la ronda 2 de TASK-0006D, verificada otra vez contra datos reales.
+
+### 10.5 Validación de relación para #631/#632
+
+Las dos son **`REJECT`**, y por eso `relation_validation` es `null` y
+`source_snapshot_drift_applicable` es `false`. **No es un hueco de cobertura, es el contrato:** el camino
+de `REJECT` en `apply()` retorna *antes* de llamar a `validateConceptRelationProposal()`, porque rechazar
+una relación no publica nada en el grafo y por lo tanto no hay duplicado, simetría, inverso ni ciclo que
+revalidar. Lo que sí se verificó de las dos: su `payload_fingerprint` es válido, y su fila fuente existe
+y **sigue en `candidate`** (`source_state_compatible = true`), que es la precondición real para poder
+resolverlas.
+
+### 10.6 Conteos protegidos — sin cambios
+
+Coinciden exactamente con el recuento independiente que el orquestador hizo en su comentario:
+
+| Medida | Valor | Esperado |
+|---|---|---|
+| `taxonomy_candidate_concept_links` | **10** | 10 ✓ |
+| `taxonomy_concept_relations` | **2** | 2 ✓ |
+| `taxonomy_term_concepts` | **142** | 142 ✓ |
+| `taxonomy_canonical_concepts` | **81** | 81 ✓ |
+| `taxonomy_term_cpv_relations` | **9749** | 9749 ✓ |
+| `taxonomy_reviewed_proposals` | **15** | 15 ✓ |
+| `PENDING_APPLY` | **12** | 12 ✓ |
+| `SUPERSEDED` | **3** | 3 ✓ |
+| `APPLIED` | **0** | 0 ✓ |
+| `ABORTED` | **0** | 0 ✓ |
+| Candidatos `published` | **0** | 0 ✓ |
+| Relaciones `approved` | **0** | 0 ✓ |
+| Propuestas con `applied_at` NOT NULL | **0** | 0 ✓ |
+
+Y el invariante de base de datos que hizo posible todo el ciclo sigue intacto: **ningún candidato tiene
+más de un `PENDING_APPLY`** (consultado por `GROUP BY … HAVING COUNT(*) > 1`: sin filas). Los candidatos
+263/264/265 pasaron de 1 propuesta supersedida a 1 supersedida + 1 viva, y el índice único parcial lo
+permite precisamente porque sólo cuenta `PENDING_APPLY`.
+
+### 10.7 Proyección del write-set de un APPLY futuro (no es una autorización)
+
+Si las 12 se aplicaran —lo que **requiere** una autorización de TASK-0007 que no existe:
+
+| Tabla | Operación | Filas | Efecto |
+|---|---|---|---|
+| `taxonomy_canonical_concepts` | INSERT | **1** | 81 → 82 (el único concepto bilingüe del grupo) |
+| `taxonomy_term_concepts` | INSERT | **3** | 142 → 145 (término 24→#2890, y 22 y 23 → el concepto nuevo) |
+| `taxonomy_candidate_concept_links` | UPDATE | **10** | **los 10 candidatos quedan resueltos**: 3 `published`, 7 `context_required` |
+| `taxonomy_concept_relations` | UPDATE | **2** | las dos a `rejected`; **ninguna aprobada** |
+| `taxonomy_reviewed_proposals` | UPDATE | **12** | las 12 a `APPLIED` |
+| `taxonomy_audit_log` | INSERT | **12** | una fila de ejecución por propuesta |
+| `taxonomy_term_cpv_relations` | — | **0** | **9749 sin cambios** |
+
+**Total: 40 filas.** Caveat de lectura del artefacto, el mismo de siempre: #629 y #630 reportan cada uno
+el **mismo** write-set de 9 filas porque son hermanos de un grupo — entrar por cualquiera aplica el
+grupo completo. Sumar las dos filas del JSON da 49 y sería **incorrecto**; el grupo cuenta una vez.
+
+Lo significativo de la proyección: un APPLY de TASK-0007 cerraría la cola real **por completo** —
+los 10 candidatos y las 2 relaciones quedarían resueltos— y **sin tocar una sola relación TÉRMINO→CPV**.
+
+### 10.8 Qué queda pendiente, y qué no
+
+- **La cola viva no tiene ninguna propuesta obsoleta ni bloqueante.** `NEEDS_REVALIDATION = 0`,
+  `BLOCKED_FOR_OTHER_REASON` sólo las 3 históricas fuera de la cola.
+- Con esto se cumple la condición que el orquestador puso en `5954835892` para que TASK-0007 **pueda**
+  abrirse: ya no queda nada stale que lo bloquee.
+- **TASK-0007 sigue SIN ABRIR y APPLY/PUBLISH sigue NO AUTORIZADO.** Un `READY_TO_APPLY` es una foto sin
+  lock: dice «hoy nada lo impide», nunca «está aprobado para ejecutarse». Lo que falta no es una
+  verificación técnica más, es la **autorización humana de ejecución**, que es un acto separado por
+  diseño desde TASK-0004.
+
+### 10.9 Gates invalidados por esta ronda
+
+**NINGUNO.** Esta ronda no cambió código, esquema ni datos: corrió una lectura y escribió documentación.
+Las suites no se reejecutaron porque nada que puedan cubrir cambió — el último cambio de runtime fue
+`ead559f`, ya auditado en §8.

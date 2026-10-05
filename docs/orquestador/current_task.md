@@ -4,11 +4,66 @@
 (Issue #2 comentario
 [`5955148859`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5955148859),
 **autorización humana explícita** del dueño de la taxonomía). Abierta desde HEAD `af4abec`.
-**Estado: READY_FOR_REVIEW.**
+**Estado: READY_FOR_REVIEW — compuerta de cierre ejecutada.**
 
 TASK-0006D quedó **`PASS / CLOSED`** en el comentario
 [`5954835892`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5954835892).
 **TASK-0007 sigue sin abrir y APPLY/PUBLICACIÓN sigue NO AUTORIZADO.**
+
+## Compuerta de cierre (comentario `5993828105`) — preflight final de solo lectura
+
+El dueño completó las **tres re-revisiones humanas** por la UI autenticada, creando **#1688**
+`petroleum`, **#1689** `crude oil` y **#1690** `oil and gas`, las tres `CONTEXT_REQUIRED`, con
+`reviewer_id=3`, `prepared_by_actor_type=human_reviewer`, `prepared_via=http` y auditoría #3032/#3033/
+#3034 (`actor_type=user`, `user_id=3`). **El agente no participó de esas decisiones.**
+
+Esta ronda corrió **un** preflight de solo lectura y **nada más**: cero APPLY, cero publicación, cero
+supersesión, cero re-freeze, cero cambios de esquema/runtime, cero cambios de datos.
+
+**Resultado: las 12 propuestas vivas son `READY_TO_APPLY`. Cero bloqueos.**
+#491, #492, #493, #494, #495, #629, #630, #631, #632, #1688, #1689, #1690 —
+`write_statements_observed: 0`.
+
+Fingerprint actual exacto: `c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2`.
+
+Las tres históricas se reportan **aparte** como `ALREADY_SUPERSEDED`, con `would_apply_abort_with = null`
+y write-set **0** — la prueba de que un `apply()` sobre ellas informa y se va **sin pisar el rastro**.
+Siguen con sus fingerprints de 2026-10-01, su revisor y su `reviewed_at` originales, y **sin linaje
+retroactivo** (0 filas en toda la tabla con `superseded_by_proposal_id` o `supersedes_proposal_id`).
+
+Grupo bilingüe #629/#630: coherente, `member_payload_fingerprint_valid = {629: true, 630: true}`, sin
+miembros manipulados. #631/#632 son `REJECT`, así que `relation_validation` es `null` — **eso es el
+contrato, no un hueco**: el camino de REJECT retorna *antes* de la validación server-side porque rechazar
+no publica nada en el grafo; lo que sí se verificó es que su payload es válido y que las dos relaciones
+siguen en `candidate`.
+
+Conteos protegidos, idénticos al recuento independiente del orquestador: **10 / 2 / 142 / 81 / 9749 / 15
+propuestas / 12 `PENDING_APPLY` / 3 `SUPERSEDED` / 0 aplicadas / 0 abortadas**, 0 candidatos publicados,
+0 relaciones aprobadas. Y **ningún candidato tiene más de un `PENDING_APPLY`**: 263/264/265 pasaron de 1
+supersedida a 1 supersedida + 1 viva, que es justo lo que el índice único parcial permite porque sólo
+cuenta `PENDING_APPLY`.
+
+**Proyección de un APPLY futuro (no es una autorización):** 40 filas — +1 concepto (81→82), +3
+`taxonomy_term_concepts` (142→145), **los 10 candidatos resueltos** (3 `published`, 7
+`context_required`), las 2 relaciones a `rejected`, las 12 propuestas a `APPLIED`, 12 filas de auditoría,
+y **cero** relaciones TÉRMINO→CPV. Un APPLY cerraría la cola real **por completo**.
+
+**El dueño volvió a elegir `CONTEXT_REQUIRED`**, y eso no vuelve innecesaria la supersesión
+retroactivamente: la pregunta se le devolvió **abierta**, con `oleoducto` y `gasoducto` ya existiendo y
+registrados en el delta, y la respondió contra el estado actual. Una decisión revalidada contra el estado
+vigente y una decisión caducada que coincide en el texto **no son lo mismo** para el contrato C2 — la
+primera es aplicable, la segunda no lo era.
+
+**Lo que falta no es otra verificación técnica.** La cola viva ya no tiene nada obsoleto ni bloqueante
+(`NEEDS_REVALIDATION = 0`), así que se cumple la condición de `5954835892` para que TASK-0007 **pueda**
+abrirse. Falta la **autorización humana de ejecución**, que es un acto separado por diseño desde
+TASK-0004. Un `READY_TO_APPLY` es una foto sin lock: dice «hoy nada lo impide», nunca «aprobado para
+ejecutarse».
+
+Detalle completo en la **§10** de
+[`audit/phase6_task0006e_supersession_2026-10-02.md`](../../audit/phase6_task0006e_supersession_2026-10-02.md);
+artefacto en
+[`audit/task0006e_final_preflight_2026-10-05.json`](../../audit/task0006e_final_preflight_2026-10-05.json).
 
 Detalle en
 [`audit/phase6_task0006e_supersession_2026-10-02.md`](../../audit/phase6_task0006e_supersession_2026-10-02.md);
@@ -669,8 +724,9 @@ Las 10 filas fuente originales siguen existiendo (`263`–`272`), igual que las 
 (`61`, `62`). Tras TASK-0006B hay **12 propuestas congeladas**, ninguna aplicada, y **la cola real ya
 no tiene ítems sin decidir**:
 
-La columna «Preflight» es el resultado real del preflight de solo lectura, reejecutado **después** de la
-supersesión de TASK-0006E. `PENDING_APPLY` 12 → **9**; `SUPERSEDED` 0 → **3**.
+La columna «Preflight» es el resultado real del **preflight final de solo lectura** del 2026-10-05
+(comentario `5993828105`). Tras las tres re-revisiones del dueño hay **15 propuestas**:
+`PENDING_APPLY` **12** + `SUPERSEDED` **3**.
 
 | Propuesta | Origen | Decisión | Estado | Confirmación humana | `applied_at` | Preflight (tras TASK-0006E) |
 |---|---|---|---|---|---|---|
@@ -686,6 +742,9 @@ supersesión de TASK-0006E. `PENDING_APPLY` 12 → **9**; `SUPERSEDED` 0 → **3
 | #630 | cand. 271 (`refinería`) | `CREATE_NEW` ES `refinería` / EN `refinery` — grupo `043fce22…` | `PENDING_APPLY` | **CONFIRMADA** por #3 vía UI (`http`) | NULL | `READY_TO_APPLY` |
 | #631 | relación 61 | `REJECT` | `PENDING_APPLY` | **CONFIRMADA** por #3 vía UI (`http`) | NULL | `READY_TO_APPLY` |
 | #632 | relación 62 | `REJECT` | `PENDING_APPLY` | **CONFIRMADA** por #3 vía UI (`http`) | NULL | `READY_TO_APPLY` |
+| **#1688** | cand. 263 (`petroleum`) | `CONTEXT_REQUIRED` | `PENDING_APPLY` | no requiere (**revisión humana nueva**, `human_reviewer` vía `http`) | NULL | `READY_TO_APPLY` |
+| **#1689** | cand. 264 (`crude oil`) | `CONTEXT_REQUIRED` | `PENDING_APPLY` | no requiere (**revisión humana nueva**) | NULL | `READY_TO_APPLY` |
+| **#1690** | cand. 265 (`oil and gas`) | `CONTEXT_REQUIRED` | `PENDING_APPLY` | no requiere (**revisión humana nueva**) | NULL | `READY_TO_APPLY` |
 
 > Corrección de una fila desactualizada (ronda de TASK-0006D): hasta entonces esta tabla seguía
 > describiendo #492–#495 como «anulada → pendiente de confirmación humana», que era el estado **durante**
@@ -693,10 +752,16 @@ supersesión de TASK-0006E. `PENDING_APPLY` 12 → **9**; `SUPERSEDED` 0 → **3
 > `5947549221` ya lo registraba; la tabla simplemente no se había actualizado. El veredicto no cambió.
 
 **#420/#421/#422 ya NO están en la cola de aplicación:** quedaron `SUPERSEDED` en TASK-0006E, íntegras y
-auditables, y sus candidatos 263/264/265 volvieron a la cola de **revisión** humana. **Las 9 restantes
-siguen `PENDING_APPLY`, ninguna aplicada.** Por eso la cola viva ya no tiene propuestas obsoletas, y la
-única precondición que queda antes de que TASK-0007 pueda abrirse son las **tres revisiones nuevas del
-dueño** — no un cambio de código.
+auditables, y sus candidatos 263/264/265 volvieron a la cola de **revisión** humana — donde el dueño las
+re-revisó, produciendo #1688/#1689/#1690. **Las 12 vivas están `READY_TO_APPLY`, ninguna aplicada.**
+
+Los candidatos 263/264/265 tienen ahora **dos** propuestas cada uno: la supersedida (histórica) y la
+viva. El índice único parcial lo permite porque sólo cuenta `PENDING_APPLY` — y sigue impidiendo una
+tercera: ningún candidato tiene más de un `PENDING_APPLY`.
+
+La cola viva **no tiene nada obsoleto ni bloqueante**, así que ya se cumple la condición para que
+TASK-0007 pueda abrirse. Lo único que falta es la **autorización humana de ejecución**, separada por
+diseño — no un cambio de código ni otra verificación.
 
 **Las 8 confirmaciones humanas existentes llevan canal `http`; ninguna lleva `console`,** y **cero**
 propuestas quedan esperando confirmación, así que la acción «Confirmar decisión preparada» ya no se

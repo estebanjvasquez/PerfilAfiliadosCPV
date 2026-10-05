@@ -61,7 +61,42 @@ no-op.
 **STOP respetado:** el agente **no** tomó ninguna decisión semántica nueva sobre `petroleum` /
 `crude oil` / `oil and gas`, no congeló ninguna propuesta para 263/264/265 y no preseleccionó nada. La
 supersesión es sin sucesor precisamente para que no haya una decisión redactada esperando un clic. El
-dueño re-revisará los tres personalmente por Filament contra el grafo actual.
+dueño re-revisó los tres personalmente por Filament contra el grafo actual.
+
+---
+
+## Compuerta de cierre — preflight final de solo lectura (comentario `5993828105`)
+
+Issue #2, comentario
+[`5993828105`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5993828105)
+(2026-10-05T11:49:23Z). Autorizado en esa ronda: **sólo** el preflight de solo lectura y la actualización
+de docs/audit/handoff. Detalle en la **§10** del audit; artefacto en
+[`audit/task0006e_final_preflight_2026-10-05.json`](../../../audit/task0006e_final_preflight_2026-10-05.json).
+
+**Las tres re-revisiones humanas del dueño, verificadas:**
+
+| Propuesta | Candidato / término | Decisión | Procedencia |
+|---|---|---|---|
+| **#1688** | 263 / `petroleum` | `CONTEXT_REQUIRED` | `reviewer_id=3`, `human_reviewer`, `http`, `11:47:48`, auditoría #3032 (`user`) |
+| **#1689** | 264 / `crude oil` | `CONTEXT_REQUIRED` | ídem, `11:48:07`, auditoría #3033 |
+| **#1690** | 265 / `oil and gas` | `CONTEXT_REQUIRED` | ídem, `11:48:24`, auditoría #3034 |
+
+Las tres con `requires_human_confirmation = false`, que es **correcto**: la compuerta de TASK-0006B
+existe para decisiones *preparadas por un agente*, y acá la persona las redactó directamente.
+
+**Resultado: 12 de 12 `READY_TO_APPLY`, cero bloqueos, `write_statements_observed: 0`.** Las tres
+históricas se reportan aparte como `ALREADY_SUPERSEDED` con write-set 0 y `would_apply_abort_with = null`.
+
+Fingerprint actual: `c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2`. Conteos
+protegidos idénticos al recuento del orquestador: **10 / 2 / 142 / 81 / 9749 / 15 / 12 PENDING_APPLY /
+3 SUPERSEDED / 0 aplicadas**. Grupo #629/#630 coherente con validez por miembro; #631/#632 son `REJECT`
+así que no corre la validación server-side del grafo —es el contrato— y sus relaciones siguen
+`candidate`.
+
+**Proyección de un APPLY futuro (no es autorización):** 40 filas; cerraría la cola **completa** —los 10
+candidatos y las 2 relaciones— sin tocar ninguna relación TÉRMINO→CPV.
+
+**TASK-0007 sigue SIN ABRIR.** Falta la autorización humana de ejecución, no otra verificación.
 
 ---
 
@@ -283,3 +318,92 @@ dueño re-revisará los tres personalmente por Filament contra el grafo actual.
 > No schema change or real supersession of #420/#421/#422 is authorized by this PASS itself.
 >
 > Repository continuity only may record TASK-0006D CLOSED/PASS. Do not start the supersession implementation or mutate the three real proposals until a new explicit owner authorization is posted.
+
+## Texto verbatim de la compuerta de cierre (`5993828105`)
+
+> [ORCHESTRATOR HUMAN RE-REVIEW VERIFICATION — TASK-0006E / FINAL READ-ONLY PREFLIGHT REQUIRED]
+>
+> The taxonomy owner reports the three required human re-reviews are complete. I re-read the shared Supabase state directly.
+>
+> HUMAN RE-REVIEW VERIFIED
+>
+> New proposals created through the legitimate human Filament path:
+> - #1688 → candidate 263 → `petroleum` → CONTEXT_REQUIRED
+> - #1689 → candidate 264 → `crude oil` → CONTEXT_REQUIRED
+> - #1690 → candidate 265 → `oil and gas` → CONTEXT_REQUIRED
+>
+> For all three new rows:
+> - status = PENDING_APPLY
+> - reviewer_id = 3
+> - prepared_by_actor_type = human_reviewer
+> - prepared_via = http
+> - requires_human_confirmation = false
+> - confirmed_at = NULL (correct: these were authored directly by the human reviewer, not agent-prepared)
+> - applied_at = NULL
+> - authorization_reference = NULL
+> - target_environment = NULL
+> - taxonomy_state_fingerprint = `c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2`
+>
+> Audit rows:
+> - #3032 → proposal #1688, actor_type=user, user_id=3
+> - #3033 → proposal #1689, actor_type=user, user_id=3
+> - #3034 → proposal #1690, actor_type=user, user_id=3
+>
+> The original historical reviews remain intact:
+> - #420 / #421 / #422 remain SUPERSEDED
+> - no successor linkage was retroactively added to them
+> - their original payload/fingerprints/reviewer/reviewed_at remain historical
+> - no APPLY/PUBLISH occurred.
+>
+> CURRENT LIVE COUNTS
+> - candidate links = 10
+> - concept relations = 2
+> - TERM→CONCEPT = 142
+> - canonical concepts = 81
+> - TERM→CPV = 9749
+> - reviewed proposals = 15
+> - PENDING_APPLY = 12
+> - SUPERSEDED = 3
+> - APPLIED = 0
+> - ABORTED = 0
+>
+> The 12 live PENDING_APPLY proposals are now expected to be:
+> #491, #492, #493, #494, #495, #629, #630, #631, #632, #1688, #1689, #1690.
+>
+> FINAL TASK-0006E CLOSURE GATE
+> Before closing TASK-0006E and before opening TASK-0007, run ONE fresh READ-ONLY preflight against the 12 current PENDING_APPLY proposals using the already-approved side-effect-free preflight path.
+>
+> Required output:
+> - exact current fingerprint
+> - proposal-by-proposal blocker/category
+> - payload integrity
+> - source drift/state
+> - human-confirmation gate
+> - bilingual-group integrity for #629/#630
+> - relation validation for #631/#632
+> - write_statements_observed = 0
+> - protected counts unchanged
+> - explicit list of READY_TO_APPLY vs any blocker
+>
+> Do not include #420/#421/#422 in the executable queue; they are terminal historical SUPERSEDED rows. They may be reported separately as ALREADY_SUPERSEDED if the command naturally scans all rows.
+>
+> AUTHORIZED NOW
+> - read-only preflight only
+> - docs/audit/handoff update only
+>
+> NOT AUTHORIZED
+> - APPLY
+> - PUBLISH
+> - supersession
+> - re-freeze
+> - candidate/relation status changes
+> - schema/runtime changes
+> - main merge
+> - production deploy
+>
+> If all 12 current live proposals are READY_TO_APPLY and write_statements_observed=0, STOP and return:
+> READY_FOR_REVIEW
+> Issue #2
+> HEAD <exact-sha>
+>
+> TASK-0007 remains UNOPENED until the orchestrator audits that final preflight and the owner separately authorizes real APPLY.
