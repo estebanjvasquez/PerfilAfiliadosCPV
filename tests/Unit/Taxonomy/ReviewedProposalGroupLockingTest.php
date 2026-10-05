@@ -244,19 +244,32 @@ class ReviewedProposalGroupLockingTest extends TestCase
 
         $this->assertNull($frozen['proposal']->proposal_group_id);
 
-        $before = DB::connection('pgsql')->selectOne(
-            "SELECT COUNT(*) AS n FROM pg_locks WHERE locktype='advisory' AND pid=pg_backend_pid() AND granted"
+        // TASK-0007 (Issue #2 comentario `5997693379`), PARTE 5: desde que `apply()` toma el advisory
+        // lock COMÚN de ejecución C2 como primera acción de su transacción, "cuántos advisory locks
+        // tiene esta sesión" dejó de ser una medida válida de «¿tomó el lock DEL GRUPO?» - que es lo
+        // que este test afirma en su nombre y en su mensaje de error. La invariante que el test cubre
+        // NO cambió (una propuesta suelta sigue sin tomar ningún lock de grupo); lo que cambió es que
+        // el conteo total ya no la mide, porque ahora incluye un lock distinto y deliberado. Se mide
+        // entonces exactamente lo que el test siempre quiso medir -los advisory locks que NO son el de
+        // ejecución- y el de ejecución se verifica aparte, afirmando que SÍ está.
+        $groupLocks = fn () => (int) DB::connection('pgsql')->selectOne(
+            "SELECT COUNT(*) AS n FROM pg_locks
+             WHERE locktype='advisory' AND pid=pg_backend_pid() AND granted AND objsubid = 1
+               AND ((classid::bigint << 32) | objid::bigint) <> ?",
+            [ReviewedProposalService::executionAdvisoryLockKey()],
         )->n;
+
+        $before = $groupLocks();
 
         $outcome = (new ReviewedProposalService())->apply($frozen['proposal']->id, 'TASK-0006B lock test 2');
 
-        $after = DB::connection('pgsql')->selectOne(
-            "SELECT COUNT(*) AS n FROM pg_locks WHERE locktype='advisory' AND pid=pg_backend_pid() AND granted"
-        )->n;
+        $after = $groupLocks();
 
         $this->assertSame(ReviewedProposalService::RESULT_APPLIED, $outcome['result']);
-        $this->assertSame((int) $before, (int) $after,
-            'Una propuesta sin grupo no debe tomar ningún advisory lock.');
+        $this->assertSame($before, $after,
+            'Una propuesta sin grupo no debe tomar ningún advisory lock DE GRUPO.');
+        $this->assertTrue(ReviewedProposalService::holdsExecutionAdvisoryLock(),
+            'El lock común de ejecución SÍ se toma, también para una propuesta suelta - es lo que impide que un apply suelto se intercale en un lote (TASK-0007 PARTE 5).');
     }
 
     // =========================================================================================

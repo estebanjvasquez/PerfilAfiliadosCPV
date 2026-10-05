@@ -172,6 +172,26 @@ use Illuminate\Support\Facades\DB;
  *   escrituras, y el trigger de base de datos además prohíbe salir de ese estado.
  * - `unconfirmedMembers()` pasó a mirar sólo miembros `PENDING_APPLY`: exigir la confirmación de un
  *   hermano ya retirado de la cola bloquearía el grupo por una fila que nadie va a ejecutar.
+ *
+ * TASK-0007 (Issue #2 comentario `5997693379`): se agrega `applyBatch()`, la ejecución ATÓMICA de un
+ * CONJUNTO de propuestas revisadas contra un único baseline, y su preflight `previewBatch()`.
+ *
+ * EL HUECO QUE CIERRA, que no es un defecto de datos ni de `apply()`: `apply()` fue diseñado para UN
+ * payload, y su compuerta de obsolescencia exige que el estado de la taxonomía siga siendo el que el
+ * humano revisó. Varias propuestas de una misma cola revisada mutan deliberadamente las entradas de
+ * `dryRunInputFingerprint()` -una MAP_TO_EXISTING inserta `taxonomy_term_concepts`, un grupo
+ * CREATE_NEW crea un concepto más dos links, un REJECT de relación escribe
+ * `taxonomy_concept_relations`-, así que la PRIMERA escritura que cambia el grafo deja obsoletas a
+ * todas las demás propuestas del mismo conjunto. Encadenar `apply()` las habría ABORTADO una por una,
+ * de forma terminal, aunque hubieran sido revisadas contra el MISMO snapshot. Un lote no es una
+ * optimización: es la única forma correcta de ejecutar un conjunto revisado como lo que es.
+ *
+ * Lo que NO cambia: `apply()` conserva su semántica completa para el uso de una sola propuesta, y la
+ * validación del lote es la MISMA `evaluateApplicability()` -no hay un segundo motor de reglas-, con
+ * el baseline del lote como único fingerprint de obsolescencia. Lo único nuevo en el camino de una
+ * sola propuesta es el advisory lock COMÚN de ejecución (`executionAdvisoryLockKey()`), que los dos
+ * caminos toman primero: sin él, un `apply()` suelto podría cambiar el grafo entre la validación y la
+ * escritura de un lote en curso.
  */
 class ReviewedProposalService
 {
@@ -365,6 +385,77 @@ class ReviewedProposalService
     public const CATEGORY_NEEDS_REVALIDATION = 'NEEDS_REVALIDATION';
 
     public const CATEGORY_BLOCKED_FOR_OTHER_REASON = 'BLOCKED_FOR_OTHER_REASON';
+
+    /**
+     * TASK-0007 (Issue #2 comentario `5997693379`), PARTE 1/PARTE 4: vocabulario del LOTE.
+     *
+     * Por qué un tercer vocabulario y no reusar el del preflight: un bloqueo de lote es una respuesta
+     * sobre el CONJUNTO ("este lote no se ejecuta, y esta es la fila que lo impide"), no sobre una
+     * propuesta suelta. La diferencia es de gobernanza, no cosmética: el orquestador pidió errores
+     * explícitos de lote para que la autorización humana posterior pueda citarlos, y mezclarlos con
+     * los del preflight haría ambiguo si lo que falló fue una fila o la ejecución entera.
+     *
+     * La correspondencia no se deja al lector ni se duplica: `batchBlockerForProposalBlocker()` es el
+     * ÚNICO lugar donde se decide, lanza `LogicException` si aparece un bloqueo de propuesta sin
+     * mapear, y un test de paridad la recorre bloqueo por bloqueo. Mismo mecanismo anti-divergencia
+     * que `applyAbortReasonForBlocker()` en TASK-0006D.
+     */
+    public const BATCH_READY_TO_APPLY = 'BATCH_READY_TO_APPLY';
+
+    public const BATCH_QUEUE_DRIFT = 'BATCH_QUEUE_DRIFT';
+
+    public const BATCH_BASELINE_STALE = 'BATCH_BASELINE_STALE';
+
+    public const BATCH_TAMPER_DETECTED = 'BATCH_TAMPER_DETECTED';
+
+    public const BATCH_SOURCE_DRIFT = 'BATCH_SOURCE_DRIFT';
+
+    public const BATCH_CONFIRMATION_REQUIRED = 'BATCH_CONFIRMATION_REQUIRED';
+
+    public const BATCH_GROUP_INCOMPLETE = 'BATCH_GROUP_INCOMPLETE';
+
+    public const BATCH_RELATION_INVALID = 'BATCH_RELATION_INVALID';
+
+    public const BATCH_ALREADY_EXECUTED = 'BATCH_ALREADY_EXECUTED';
+
+    /**
+     * Dos bloqueos que el comentario no nombra pero que el camino de una sola propuesta SÍ distingue
+     * (`ENTITY_MISSING` y `SOURCE_ALREADY_RESOLVED`). Se conservan separados en vez de colapsarlos en
+     * `BATCH_SOURCE_DRIFT`: "la entidad ya no existe" y "otro camino ya resolvió el origen" piden
+     * acciones humanas distintas, y fundirlos haría que el informe del lote fuera MENOS preciso que
+     * el de la propuesta suelta - exactamente la divergencia que la PARTE 3 prohíbe.
+     */
+    public const BATCH_ENTITY_MISSING = 'BATCH_ENTITY_MISSING';
+
+    public const BATCH_SOURCE_ALREADY_RESOLVED = 'BATCH_SOURCE_ALREADY_RESOLVED';
+
+    /** El entorno auto-capturado no está autorizado para ejecutar un lote (PARTE 8). */
+    public const BATCH_ENVIRONMENT_NOT_AUTHORIZED = 'BATCH_ENVIRONMENT_NOT_AUTHORIZED';
+
+    /** Pedido vacío: no hay nada que ejecutar, y un lote vacío no es un lote exitoso. */
+    public const BATCH_EMPTY_REQUEST = 'BATCH_EMPTY_REQUEST';
+
+    public const BATCH_RESULT_APPLIED = 'BATCH_APPLIED';
+
+    public const BATCH_RESULT_BLOCKED = 'BATCH_BLOCKED';
+
+    public const BATCH_RESULT_ALREADY_EXECUTED = 'BATCH_ALREADY_EXECUTED';
+
+    public const BATCH_MODE_PREFLIGHT = 'READ_ONLY_BATCH_PREFLIGHT';
+
+    public const BATCH_MODE_EXECUTE = 'ATOMIC_BATCH_APPLY';
+
+    /**
+     * TASK-0007, PARTE 8: entornos donde un lote REAL puede ejecutarse. `production` no está, y no
+     * por omisión: la autorización de esta fase está explícitamente limitada al entorno
+     * compartido/staging. El valor no lo provee quien llama - se auto-captura con
+     * `app()->environment()`, igual que `$targetEnvironment` desde TASK-0004 - así que un operador no
+     * puede "declarar" que está en staging.
+     *
+     * `local` y `testing` están para desarrollo y para los tests de fixture, que corren dentro de una
+     * transacción que nunca commitea.
+     */
+    public const BATCH_ALLOWED_ENVIRONMENTS = ['local', 'testing', 'staging'];
 
     /**
      * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): bandera de contexto que SOLO
@@ -883,14 +974,90 @@ class ReviewedProposalService
     }
 
     /**
+     * TASK-0007 (Issue #2 comentario `5997693379`), PARTE 5: namespace del advisory lock COMÚN de
+     * EJECUCIÓN C2. Deliberadamente distinto del namespace de grupo, así que las dos claves no pueden
+     * colisionar y el orden `ejecución -> grupo` es siempre el mismo par de locks distintos.
+     */
+    private const EXECUTION_LOCK_NAMESPACE = 'taxonomy_c2_execution:';
+
+    /**
+     * Identificador fijo del único lock de ejecución C2. No se parametriza a propósito: un lock por
+     * "cosa que se ejecuta" no serializaría nada - el punto es que CUALQUIER ejecución C2 (un lote o
+     * un apply suelto) espere a cualquier otra.
+     */
+    private const EXECUTION_LOCK_SCOPE = 'reviewed-proposal-apply';
+
+    /**
+     * TASK-0007, PARTE 5: clave determinística del advisory lock COMÚN de ejecución C2.
+     *
+     * EL PROBLEMA QUE RESUELVE, que es el que abre TASK-0007: un `apply()` suelto concurrente puede
+     * cambiar el grafo ENTRE la validación del lote y su fase de escritura. El lote valida las 12
+     * propuestas contra UN baseline y recién después escribe; si en esa ventana otro `apply()`
+     * publica un `taxonomy_term_concepts`, el baseline con el que el lote validó ya no describe el
+     * estado real en el momento de escribir. Los locks de fila no alcanzan: el apply concurrente
+     * puede entrar por una propuesta que el lote NO pidió y aun así mover el grafo global.
+     *
+     * La corrección es un lock común tomado por los DOS caminos como PRIMERA acción de su
+     * transacción, antes de cualquier advisory lock de grupo y antes de cualquier `lockForUpdate()`.
+     * Con eso la exclusión es total: mientras un lote está entre su validación y su commit, ningún
+     * apply suelto puede siquiera empezar.
+     *
+     * POR QUÉ ESTE ORDEN Y NO OTRO (y por qué no se invierte el deadlock del grupo): el lock de
+     * ejecución es ÚNICO y global al servicio, así que es imposible que dos transacciones lo tomen
+     * "cruzado". Tomándolo primero, cualquier par de transacciones que después compita por locks de
+     * grupo o de fila ya está serializado, de modo que la corrección de TASK-0006B (clave común por
+     * grupo antes de los locks de fila) no se debilita: se le agrega un lock ESTRICTAMENTE anterior y
+     * común a todos, que es el caso favorable para evitar inversión de orden.
+     *
+     * NO es un lock de mantenimiento de aplicación: cubre exclusivamente la ejecución de propuestas
+     * revisadas C2 (`apply()` y `applyBatch()`). `freeze()`, `confirm()`, `preflight()`,
+     * `previewBatch()` y `supersedeStaleProposal()` NO lo toman - los dos primeros no publican
+     * taxonomía, los dos siguientes no escriben nada, y la supersesión sólo escribe `status` + rastro
+     * de filas `PENDING_APPLY` que ya protege con `lockForUpdate()` (un lote que las esté validando
+     * las tiene bloqueadas, así que la supersesión espera por la fila, no por el lock global).
+     * Ampliarlo más haría que una revisión humana normal pudiera quedar esperando una ejecución.
+     */
+    public static function executionAdvisoryLockKey(): int
+    {
+        return (int) hexdec(substr(hash('sha256', self::EXECUTION_LOCK_NAMESPACE.self::EXECUTION_LOCK_SCOPE), 0, 15));
+    }
+
+    /**
+     * Toma el lock común de ejecución a NIVEL DE TRANSACCIÓN: se libera solo al terminar la
+     * transacción de nivel superior, igual que el de grupo, y es re-entrante dentro de ella.
+     * Bloqueante y no `try`, por el mismo motivo que el de grupo: el segundo en entrar DEBE esperar y
+     * recién entonces observar el estado ya ejecutado, en vez de recibir un "ocupado" que no existe
+     * en el contrato de `apply()`.
+     */
+    private static function acquireExecutionAdvisoryLock(): void
+    {
+        DB::connection('pgsql')->statement(
+            'SELECT pg_advisory_xact_lock(?)',
+            [self::executionAdvisoryLockKey()],
+        );
+    }
+
+    /**
+     * Diagnóstico de solo lectura, mismo propósito que `holdsGroupAdvisoryLock()`: que un test pueda
+     * comprobar en `pg_locks` que el camino REALMENTE tomó el lock, en vez de confiar en el código.
+     */
+    public static function holdsExecutionAdvisoryLock(): bool
+    {
+        return self::holdsAdvisoryLockKey(self::executionAdvisoryLockKey());
+    }
+
+    /**
      * Diagnóstico de solo lectura: ¿esta sesión tiene tomado el advisory lock de este grupo? Existe
      * para que un test pueda comprobar que `apply()` realmente lo tomó, en vez de confiar en que el
      * código lo haga. No se usa para decidir nada en producción.
      */
     public static function holdsGroupAdvisoryLock(string $proposalGroupId): bool
     {
-        $key = self::groupAdvisoryLockKey($proposalGroupId);
+        return self::holdsAdvisoryLockKey(self::groupAdvisoryLockKey($proposalGroupId));
+    }
 
+    private static function holdsAdvisoryLockKey(int $key): bool
+    {
         // Cómo guarda Postgres un advisory lock de UN bigint: `classid` son los 32 bits altos,
         // `objid` los 32 bits bajos y `objsubid = 1` (la forma de dos enteros usa `objsubid = 2`).
         // Se reconstruye el bigint y se filtra por `objsubid = 1` para no confundir las dos formas.
@@ -1672,10 +1839,18 @@ class ReviewedProposalService
         $proposalGroupId = TaxonomyReviewedProposal::query()->whereKey($proposalId)->value('proposal_group_id');
 
         return DB::connection('pgsql')->transaction(function () use ($proposalId, $authorizationReference, $targetEnvironment, $proposalGroupId) {
-            // EL PRIMER LOCK DE LA TRANSACCIÓN, antes de cualquier `lockForUpdate()`. Es lo que
-            // elimina la espera circular: la clave se deriva del GRUPO, así que es idéntica para
-            // todos los hermanos y dos `apply()` que entren por hermanos distintos se serializan acá
-            // en vez de quedarse cada uno con el lock de la fila que el otro necesita.
+            // TASK-0007 (Issue #2 comentario `5997693379`), PARTE 5: EL PRIMER LOCK DE TODA EJECUCIÓN
+            // C2, antes incluso del advisory lock de grupo. Es el mismo lock que toma `applyBatch()`,
+            // y es lo que impide que un apply suelto se intercale entre la validación y la escritura
+            // de un lote en curso (ver `executionAdvisoryLockKey()`). El orden
+            // `ejecución -> grupo -> filas` es idéntico en los dos caminos, así que no hay inversión
+            // posible con el lock de grupo de TASK-0006B.
+            self::acquireExecutionAdvisoryLock();
+
+            // Antes de cualquier `lockForUpdate()`. Es lo que elimina la espera circular: la clave se
+            // deriva del GRUPO, así que es idéntica para todos los hermanos y dos `apply()` que
+            // entren por hermanos distintos se serializan acá en vez de quedarse cada uno con el lock
+            // de la fila que el otro necesita.
             if ($proposalGroupId !== null) {
                 self::acquireGroupAdvisoryLock($proposalGroupId);
             }
@@ -2354,6 +2529,747 @@ class ReviewedProposalService
     }
 
     // =====================================================================================
+    // PASO 2-ter: BATCH APPLY ATÓMICO - TASK-0007 (Issue #2 comentario `5997693379`).
+    // =====================================================================================
+
+    /**
+     * Aplica un CONJUNTO de propuestas revisadas como UNA sola ejecución atómica.
+     *
+     * EL HUECO SEMÁNTICO QUE CIERRA, que es la razón por la que existe TASK-0007. Encadenar
+     * `apply(491) -> apply(492) -> ...` NO es una estrategia de ejecución válida, y no por un defecto
+     * de `apply()` sino por lo que `apply()` es: el contrato de una sola propuesta exige que el estado
+     * de la taxonomía siga siendo EXACTAMENTE el que el humano revisó
+     * (`taxonomy_state_fingerprint == dryRunInputFingerprint()` en el instante de ejecutar). Varias
+     * propuestas de la cola real mutan deliberadamente las entradas de ese fingerprint - una
+     * MAP_TO_EXISTING inserta un `taxonomy_term_concepts`, un grupo CREATE_NEW crea un concepto
+     * canónico más dos links, un REJECT de relación escribe `taxonomy_concept_relations` - así que
+     * **la primera escritura que cambia el grafo deja obsoletas a todas las demás**. Con el camino de
+     * una sola propuesta eso no sería un error recuperable: `apply()` registra la obsolescencia con
+     * `abort()`, que es TERMINAL, y re-congelar está bloqueado por el índice único parcial. Un loop
+     * ingenuo quemaría decisiones humanas de una en una.
+     *
+     * Las 12 propuestas no son 12 ejecuciones independientes: son UN conjunto revisado contra UN
+     * snapshot compartido. Este método ejecuta eso como lo que es.
+     *
+     * EL CONTRATO, en el orden exacto en que se obtiene (PARTE 1 del comentario):
+     *
+     * 1. UNA transacción para todo el lote.
+     * 2. El fingerprint de baseline se computa UNA sola vez, antes de cualquier escritura.
+     * 3. El conjunto pedido se carga y bloquea completo, en orden determinístico de id.
+     * 4. TODA unidad de ejecución se valida contra ESE mismo baseline ANTES de la primera escritura.
+     * 5. Recién si el lote ENTERO pasa la validación ocurre alguna escritura.
+     * 6. Una vez empezadas las escrituras no se recomputa el fingerprint global entre miembros - y no
+     *    porque se "desactive" una compuerta, sino porque en la fase de escritura ya no queda ninguna
+     *    validación por correr: toda la validación terminó en el paso 4. Los cambios de grafo que
+     *    produce un miembro de ESTE lote autorizado son esperados, no drift externo.
+     * 7. Cualquier fallo de validación devuelve un bloqueo de lote con CERO escrituras y CERO
+     *    propuestas ABORTADAS. Este método no llama a `abort()` por ningún camino: a diferencia de
+     *    `apply()`, un lote bloqueado no quema nada - informar no cuesta una decisión humana.
+     * 8. Cualquier excepción en la fase de escritura revierte la transacción entera. No existe una
+     *    cola parcialmente APPLIED como desenlace aceptable, así que un desenlace inesperado de un
+     *    escritor se convierte en excepción a propósito.
+     * 9. El `apply()` de una sola propuesta sigue existiendo con su semántica intacta, para el uso
+     *    legítimo de una sola propuesta. Lo único que cambió ahí es que ahora toma el lock común de
+     *    ejecución (PARTE 5).
+     *
+     * NO ES UN SEGUNDO MOTOR DE REGLAS (PARTE 3). La validación de cada unidad es exactamente
+     * `evaluateApplicability()`, la misma función que corren `apply()` y `preflight()`, con
+     * `lockRows: true` y el baseline del lote. Lo único propio del lote es la validación de la FORMA
+     * del conjunto (que nada falte, que nada sobre, que ningún grupo venga partido) y la traducción
+     * del bloqueo de una propuesta al vocabulario de lote, que vive en un único `match`.
+     *
+     * @param  int[]  $proposalIds  El conjunto autorizado. El orden no importa: se normaliza y ordena.
+     * @param  string  $authorizationReference  La autorización de ESTA ejecución (no vacía, con al
+     *                menos un dígito) - mismo criterio que `apply()`. Nunca es "quién revisó".
+     * @param  array|null  $manifest  Manifiesto de lote (`ReviewedProposalBatchManifest`) a verificar
+     *                contra el estado vivo DENTRO de la transacción y con los locks ya tomados. Es el
+     *                mecanismo de la PARTE 4: sin él un lote ejecuta "los ids que le pasaron", con él
+     *                ejecuta "exactamente la cola que se autorizó o nada".
+     */
+    public function applyBatch(array $proposalIds, string $authorizationReference, ?array $manifest = null): array
+    {
+        if (trim($authorizationReference) === '') {
+            throw new \InvalidArgumentException('applyBatch() requiere $authorizationReference no vacío - la referencia de autorización de ESTA ejecución (distinta de quién revisó).');
+        }
+
+        if (! preg_match('/\d/', $authorizationReference)) {
+            throw new \InvalidArgumentException('applyBatch() requiere que $authorizationReference sea una REFERENCIA (con al menos un dígito), no un nombre libre - mismo criterio que apply().');
+        }
+
+        // Auto-capturado, nunca provisto por quien llama - mismo criterio que `apply()` desde
+        // TASK-0004. PARTE 8: un entorno no autorizado se rechaza ANTES de abrir la transacción.
+        $targetEnvironment = app()->environment();
+
+        if (! in_array($targetEnvironment, self::BATCH_ALLOWED_ENVIRONMENTS, true)) {
+            return $this->batchResult(self::BATCH_RESULT_BLOCKED, self::BATCH_ENVIRONMENT_NOT_AUTHORIZED, [
+                'note' => "El entorno auto-capturado ({$targetEnvironment}) no está autorizado para ejecutar un lote. La autorización de esta fase está limitada al entorno compartido/staging; production está prohibido.",
+                'target_environment' => $targetEnvironment,
+                'allowed_environments' => self::BATCH_ALLOWED_ENVIRONMENTS,
+            ], [
+                'mode' => self::BATCH_MODE_EXECUTE,
+                'authorization_reference' => $authorizationReference,
+                'target_environment' => $targetEnvironment,
+                'requested_proposal_ids' => self::normalisedBatchIds($proposalIds),
+            ]);
+        }
+
+        // Lectura SIN lock, usada EXCLUSIVAMENTE para elegir las claves de serialización antes de
+        // tomar cualquier lock de fila - mismo patrón y misma justificación que `apply()`:
+        // `proposal_group_id` se escribe al insertar y nunca se actualiza, así que no puede cambiar
+        // entre esta lectura y el lock, y no se decide NADA con este valor.
+        $groupIds = $this->requestedGroupIds($proposalIds);
+
+        return DB::connection('pgsql')->transaction(function () use ($proposalIds, $authorizationReference, $targetEnvironment, $groupIds, $manifest) {
+            // ORDEN DE LOCKS (PARTE 5), idéntico al de `apply()` y determinístico:
+            // 1) lock común de ejecución C2 -> 2) advisory locks de grupo ordenados -> 3) filas de
+            // propuesta ordenadas por id -> 4) filas fuente, en el orden de las unidades.
+            self::acquireExecutionAdvisoryLock();
+
+            foreach ($groupIds as $groupId) {
+                self::acquireGroupAdvisoryLock($groupId);
+            }
+
+            $evaluation = $this->evaluateBatch($proposalIds, lockRows: true, manifest: $manifest);
+
+            $base = [
+                'mode' => self::BATCH_MODE_EXECUTE,
+                'authorization_reference' => $authorizationReference,
+                'target_environment' => $targetEnvironment,
+                'baseline_taxonomy_fingerprint' => $evaluation['baseline_taxonomy_fingerprint'],
+                'requested_proposal_ids' => $evaluation['requested_proposal_ids'],
+                'accepted_proposal_ids' => $evaluation['accepted_proposal_ids'],
+                'execution_unit_count' => count($evaluation['units']),
+                'manifest_verification' => $evaluation['manifest_verification'],
+            ];
+
+            if ($evaluation['blocker'] !== null) {
+                // Requisito 7: CERO escrituras y CERO aborts. Se devuelve sin escribir una sola fila;
+                // la transacción commitea vacía (no hay nada que revertir) y ninguna propuesta cambia
+                // de estado. Un lote bloqueado NO es un lote que quema su contenido.
+                return $this->batchResult(
+                    $evaluation['already_executed'] ? self::BATCH_RESULT_ALREADY_EXECUTED : self::BATCH_RESULT_BLOCKED,
+                    $evaluation['blocker'],
+                    $evaluation['detail'],
+                    $base,
+                );
+            }
+
+            // =============================================================================
+            // FASE DE ESCRITURA. A partir de acá NO queda ninguna validación por correr: la
+            // cadena entera ya pasó para TODAS las unidades contra el mismo baseline, y las
+            // filas fuente vienen leídas CON lock dentro del contexto de cada unidad. Los
+            // escritores reciben ese contexto y no vuelven a decidir nada.
+            // =============================================================================
+            $unitOutcomes = [];
+            $appliedIds = [];
+
+            foreach ($evaluation['units'] as $unit) {
+                /** @var TaxonomyReviewedProposal $entry */
+                $entry = $unit['proposal'];
+
+                $outcome = $entry->proposal_type === TaxonomyReviewedProposal::TYPE_TERM_CONCEPT_LINK
+                    ? $this->writeCandidateLinkDecision($entry, $unit['context'], $authorizationReference, $targetEnvironment)
+                    : $this->writeConceptRelationDecision($entry, $unit['context'], $authorizationReference, $targetEnvironment);
+
+                // Requisito 8: una cola parcialmente aplicada no es un desenlace aceptable. Los
+                // escritores sólo pueden devolver `APPLIED` (no contienen ninguna llamada a
+                // `abort()` - verificado estructuralmente por test), así que cualquier otra cosa es
+                // un invariante roto: se lanza y la transacción revierte el lote COMPLETO en vez de
+                // dejar la mitad de la cola ejecutada.
+                if ($outcome['result'] !== self::RESULT_APPLIED) {
+                    throw new \LogicException("applyBatch(): la unidad de la propuesta #{$entry->id} devolvió {$outcome['result']} en la fase de escritura, cuando la validación del lote ya había pasado. Se revierte el lote completo - una cola parcialmente APPLIED no es un desenlace aceptable.");
+                }
+
+                $unitOutcomes[] = [
+                    'kind' => $unit['kind'],
+                    'entry_proposal_id' => (int) $entry->id,
+                    'proposal_ids' => $unit['proposal_ids'],
+                    'proposal_group_id' => $unit['proposal_group_id'],
+                    'decision' => $entry->decision,
+                    'result' => $outcome['result'],
+                    'application_result' => $outcome['application_result'],
+                ];
+
+                $appliedIds = array_merge($appliedIds, $unit['proposal_ids']);
+            }
+
+            sort($appliedIds);
+
+            return $this->batchResult(self::BATCH_RESULT_APPLIED, null, [], array_merge($base, [
+                'units' => $unitOutcomes,
+                'applied_proposal_ids' => $appliedIds,
+                'applied_proposal_count' => count($appliedIds),
+            ]));
+        });
+    }
+
+    /**
+     * TASK-0007, PARTE 6: el MISMO camino de validación del lote, sin entrar nunca a la fase de
+     * escritura.
+     *
+     * Es a `applyBatch()` lo que `preflight()` es a `apply()`, y por el mismo motivo: la única forma
+     * de saber si el lote se podría ejecutar hoy no puede ser intentarlo. La diferencia con
+     * `preflightAll()` -que ya existía- no es cosmética: `preflightAll()` evalúa 12 propuestas por
+     * separado, cada una contra el fingerprint del instante, y su write-set reporta el write-set
+     * COMPLETO del grupo en CADA miembro del grupo (sumar las filas del JSON da de más). Este informe
+     * evalúa el CONJUNTO: un baseline único, unidades de ejecución deduplicadas (el grupo cuenta UNA
+     * vez) y una proyección agregada de las escrituras y de los conteos protegidos finales.
+     *
+     * GARANTÍA DE NO-EFECTOS, medida y no declarada: el método instala un listener de consultas y
+     * reporta `write_statements_observed`. Si una refactorización futura introdujera un efecto, el
+     * número deja de ser 0 y tanto el comando como el test fallan. No toma locks (ni el de ejecución
+     * ni los de grupo): un informe de diagnóstico que pudiera demorar una ejecución real ya sería un
+     * efecto observable.
+     */
+    public function previewBatch(array $proposalIds, ?array $manifest = null): array
+    {
+        $writeStatements = [];
+        $recording = true;
+        DB::listen(function ($query) use (&$writeStatements, &$recording) {
+            if ($recording && preg_match('/^\s*(insert|update|delete|truncate|alter|create|drop)\b/i', $query->sql)) {
+                $writeStatements[] = $query->sql;
+            }
+        });
+
+        try {
+            $evaluation = $this->evaluateBatch($proposalIds, lockRows: false, manifest: $manifest);
+
+            $units = [];
+            $writes = [];
+            foreach ($evaluation['units'] as $unit) {
+                /** @var TaxonomyReviewedProposal $entry */
+                $entry = $unit['proposal'];
+                $unitBlocker = $unit['blocker'] ?? self::PREFLIGHT_READY_TO_APPLY;
+
+                if ($unitBlocker === self::PREFLIGHT_READY_TO_APPLY) {
+                    $writeSet = $this->expectedWriteSet($entry, $unitBlocker, $unit['context']);
+                    $writes = array_merge($writes, $writeSet['expected_write_set']);
+                } else {
+                    // IMPORTANTE, y por eso no se reusa `expectedWriteSet()` acá: para una propuesta
+                    // suelta, ese método describe correctamente que un `apply()` bloqueado ESCRIBE dos
+                    // filas (status -> ABORTED + auditoría) y quema la decisión. En un LOTE eso sería
+                    // falso: el requisito 7 es cero escrituras y cero ABORTs, así que un lote bloqueado
+                    // deja la propuesta exactamente como estaba. Copiar el write-set del camino suelto
+                    // acá haría que el informe contradijera el contrato que el lote cumple.
+                    $writeSet = [
+                        'expected_write_set' => [],
+                        'expected_write_count' => 0,
+                        'expected_write_set_note' => 'Cero escrituras: un lote bloqueado no escribe nada y NO aborta ninguna propuesta - a diferencia de un apply() de una sola propuesta, que sí la quemaría. Esta unidad queda exactamente como estaba.',
+                    ];
+                }
+
+                $units[] = array_merge([
+                    'kind' => $unit['kind'],
+                    'entry_proposal_id' => (int) $entry->id,
+                    'proposal_ids' => $unit['proposal_ids'],
+                    'proposal_group_id' => $unit['proposal_group_id'],
+                    'proposal_type' => $entry->proposal_type,
+                    'decision' => $entry->decision,
+                    'source_label' => self::preflightSourceLabel($entry),
+                    'blocker' => $unitBlocker,
+                    'batch_blocker' => $unitBlocker === self::PREFLIGHT_READY_TO_APPLY
+                        ? null
+                        : self::batchBlockerForProposalBlocker($unitBlocker),
+                ], $this->preflightChecks($entry, $unitBlocker, $unit['context']), $writeSet);
+            }
+
+            $countsNow = self::protectedQueueShape();
+
+            return [
+                'mode' => self::BATCH_MODE_PREFLIGHT,
+                'generated_at' => now()->format('Y-m-d H:i:s'),
+                'task' => 'TASK-0007',
+                'governance_reference' => 'Issue #2 comentario 5997693379',
+                'target_environment' => app()->environment(),
+                'environment_authorized_for_execution' => in_array(app()->environment(), self::BATCH_ALLOWED_ENVIRONMENTS, true),
+                'manifest_fingerprint' => $evaluation['manifest_fingerprint'],
+                'manifest_verification' => $evaluation['manifest_verification'],
+                'baseline_taxonomy_fingerprint' => $evaluation['baseline_taxonomy_fingerprint'],
+                // El mismo valor que el baseline, y se reporta por separado a propósito: el
+                // comentario pide los dos, y en un informe de lote "baseline" y "actual" son
+                // conceptos distintos aunque hoy coincidan - si alguna vez difirieran, el lote
+                // estaría bloqueado por BATCH_BASELINE_STALE y el lector tiene que poder verlo.
+                'current_taxonomy_fingerprint' => $evaluation['baseline_taxonomy_fingerprint'],
+                'requested_proposal_ids' => $evaluation['requested_proposal_ids'],
+                'accepted_proposal_ids' => $evaluation['accepted_proposal_ids'],
+                'accepted_proposal_count' => count($evaluation['accepted_proposal_ids']),
+                'execution_unit_count' => count($units),
+                'execution_units' => $units,
+                'blocker' => $evaluation['blocker'],
+                'blockers' => $evaluation['blocker'] === null ? [] : [[
+                    'blocker' => $evaluation['blocker'],
+                    'detail' => $evaluation['detail'],
+                ]],
+                'detail' => $evaluation['detail'],
+                'already_executed' => $evaluation['already_executed'],
+                'projected_write_set' => self::aggregateWriteSet($writes),
+                'projected_write_count' => array_sum(array_column($writes, 'rows')),
+                'protected_counts_now' => $countsNow,
+                'projected_protected_counts' => $evaluation['blocker'] === null
+                    ? $this->projectedProtectedCounts($evaluation['units'], $writes, $countsNow)
+                    : null,
+                'write_statements_observed' => count($writeStatements),
+                'write_statements' => array_slice($writeStatements, 0, 10),
+                'read_only_contract' => 'Este informe no escribió nada: no abre transacción de escritura, no toma locks, no llama a apply() ni a applyBatch() por ningún camino, y mide sus propios statements. Un lote sin bloqueos significa «hoy nada impide ejecutarlo», NUNCA una autorización de ejecución - esa sigue siendo un acto humano separado.',
+            ];
+        } finally {
+            $recording = false;
+        }
+    }
+
+    /**
+     * TASK-0007, PARTES 2/3/4: la validación del CONJUNTO. Una sola implementación, usada por
+     * `applyBatch()` (con locks, antes de escribir) y por `previewBatch()` (sin locks, sin escribir).
+     *
+     * Las compuertas van en este orden y el orden importa: primero la FORMA del conjunto -que lo
+     * pedido exista y esté ejecutable-, después la identidad autorizada (manifiesto), después la
+     * integridad de los grupos, y recién entonces la validación propuesta por propuesta, que es la
+     * cadena compartida de siempre. Validar aplicabilidad de un conjunto cuya forma todavía no se
+     * sabe correcta daría diagnósticos sobre premisas falsas.
+     *
+     * @return array{blocker:?string, detail:array, baseline_taxonomy_fingerprint:string, requested_proposal_ids:int[], accepted_proposal_ids:int[], units:array, already_executed:bool, manifest_verification:?array, manifest_fingerprint:?string}
+     */
+    private function evaluateBatch(array $proposalIds, bool $lockRows, ?array $manifest = null): array
+    {
+        $requested = self::normalisedBatchIds($proposalIds);
+
+        // El baseline se computa UNA sola vez por lote (requisito 2) y es el ÚNICO fingerprint contra
+        // el que se valida obsolescencia de acá en adelante.
+        $baseline = CanonicalConceptBuilderService::dryRunInputFingerprint();
+
+        $empty = [
+            'baseline_taxonomy_fingerprint' => $baseline,
+            'requested_proposal_ids' => $requested,
+            'accepted_proposal_ids' => [],
+            'units' => [],
+            'already_executed' => false,
+            'manifest_verification' => null,
+            'manifest_fingerprint' => $manifest === null ? null : ($manifest['manifest_fingerprint'] ?? null),
+        ];
+
+        if ($requested === []) {
+            return array_merge($empty, [
+                'blocker' => self::BATCH_EMPTY_REQUEST,
+                'detail' => ['note' => 'No se pidió ninguna propuesta. Un lote vacío no es un lote ejecutado con éxito: no hay nada que validar ni que escribir.'],
+            ]);
+        }
+
+        $proposals = TaxonomyReviewedProposal::query()
+            ->whereIn('id', $requested)
+            ->orderBy('id')
+            ->when($lockRows, fn ($q) => $q->lockForUpdate())
+            ->get();
+
+        $found = $proposals->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $missing = array_values(array_diff($requested, $found));
+
+        if ($missing !== []) {
+            return array_merge($empty, [
+                'blocker' => self::BATCH_QUEUE_DRIFT,
+                'detail' => [
+                    'note' => 'Alguna propuesta del conjunto pedido ya no existe. El lote no se ejecuta parcialmente: se bloquea completo y sin escribir nada.',
+                    'missing_proposal_ids' => $missing,
+                    'found_proposal_ids' => $found,
+                ],
+            ]);
+        }
+
+        $byStatus = [];
+        foreach ($proposals as $proposal) {
+            $byStatus[$proposal->status][] = (int) $proposal->id;
+        }
+
+        // Replay idempotente del MISMO lote ya ejecutado (requisito E de la PARTE 9): no es drift ni
+        // un error, es que no queda nada por hacer. Cero escrituras, y ningún concepto/link/auditoría
+        // duplicado - que es exactamente lo que garantiza que un reintento sea seguro.
+        if (($byStatus[TaxonomyReviewedProposal::STATUS_APPLIED] ?? []) === $found) {
+            return array_merge($empty, [
+                'blocker' => self::BATCH_ALREADY_EXECUTED,
+                'already_executed' => true,
+                'detail' => [
+                    'note' => 'Todas las propuestas del lote ya están APPLIED: este lote ya se ejecutó. Replay idempotente, cero escrituras nuevas, cero conceptos/links/auditoría duplicados.',
+                    'applied_proposal_ids' => $found,
+                ],
+            ]);
+        }
+
+        $notPending = [];
+        foreach ($proposals as $proposal) {
+            if ($proposal->status !== TaxonomyReviewedProposal::STATUS_PENDING_APPLY) {
+                $notPending[] = ['proposal_id' => (int) $proposal->id, 'status' => $proposal->status];
+            }
+        }
+
+        if ($notPending !== []) {
+            return array_merge($empty, [
+                'blocker' => self::BATCH_QUEUE_DRIFT,
+                'detail' => [
+                    'note' => 'Alguna propuesta del conjunto pedido ya no está PENDING_APPLY, así que el conjunto no describe la cola ejecutable. Las filas SUPERSEDED son registro histórico ÍNTEGRO y no son entradas ejecutables por diseño (TASK-0006E); las APPLIED/ABORTED ya son terminales. Cero escrituras.',
+                    'non_executable_proposals' => $notPending,
+                    'status_breakdown' => array_map('count', $byStatus),
+                ],
+            ]);
+        }
+
+        // PARTE 4: identidad autorizada. Se verifica acá -con las filas YA bloqueadas por el lote
+        // cuando corre desde `applyBatch()`- y no antes de tomar los locks: "la cola sigue siendo la
+        // que se autorizó" sólo es una afirmación útil si se hace cuando nadie más puede ejecutar.
+        $manifestVerification = null;
+        if ($manifest !== null) {
+            $manifestVerification = ReviewedProposalBatchManifest::verify($manifest, $baseline);
+
+            if (! $manifestVerification['ok']) {
+                return array_merge($empty, [
+                    'blocker' => $manifestVerification['blocker'],
+                    // Un manifiesto cuyo conjunto atado ya está ejecutado es un REPLAY, no un fallo -
+                    // el desenlace del lote tiene que decirlo igual que lo dice la compuerta de forma.
+                    'already_executed' => $manifestVerification['blocker'] === self::BATCH_ALREADY_EXECUTED,
+                    'detail' => array_merge($manifestVerification['detail'], [
+                        'manifest_fingerprint' => $manifestVerification['manifest_fingerprint'],
+                        'note' => 'El manifiesto autorizado no coincide con el estado vivo. El lote no se ejecuta: ejecutar "los ids que llegaron" en vez de "exactamente la cola autorizada" es justamente lo que esta compuerta impide. Cero escrituras.',
+                    ]),
+                    'manifest_verification' => $manifestVerification,
+                ]);
+            }
+        }
+
+        $empty['manifest_verification'] = $manifestVerification;
+
+        // PARTE 2: integridad de grupo. Un grupo bilingüe es UNA unidad indivisible, así que pedir
+        // medio grupo se rechaza en SOLO LECTURA en vez de ejecutar la mitad.
+        $groupIncomplete = $this->incompleteBatchGroups($proposals, $requested, $lockRows);
+        if ($groupIncomplete !== null) {
+            return array_merge($empty, [
+                'blocker' => self::BATCH_GROUP_INCOMPLETE,
+                'detail' => $groupIncomplete,
+            ]);
+        }
+
+        // PARTE 2: unidades de ejecución deduplicadas y determinísticas. 12 filas -> 11 unidades,
+        // porque #629/#630 son un solo grupo. La entrada de un grupo es su miembro de id más bajo, no
+        // "el que pidieron primero": así entrar por cualquiera de los dos produce exactamente la
+        // misma ejecución.
+        $units = [];
+        $seenGroups = [];
+        foreach ($proposals as $proposal) {
+            if ($proposal->isGrouped()) {
+                if (isset($seenGroups[$proposal->proposal_group_id])) {
+                    continue;
+                }
+                $seenGroups[$proposal->proposal_group_id] = true;
+
+                $memberIds = array_values(array_filter(
+                    $proposals->where('proposal_group_id', $proposal->proposal_group_id)
+                        ->pluck('id')->map(fn ($id) => (int) $id)->all()
+                ));
+                sort($memberIds);
+
+                $units[] = [
+                    'kind' => 'BILINGUAL_GROUP',
+                    'proposal' => $proposal,
+                    'proposal_ids' => $memberIds,
+                    'proposal_group_id' => $proposal->proposal_group_id,
+                ];
+
+                continue;
+            }
+
+            $units[] = [
+                'kind' => 'SINGLE_PROPOSAL',
+                'proposal' => $proposal,
+                'proposal_ids' => [(int) $proposal->id],
+                'proposal_group_id' => null,
+            ];
+        }
+
+        // PARTE 3: la validación por unidad es la cadena COMPARTIDA, con el baseline del lote. No hay
+        // acá ninguna regla propia que pueda divergir de `apply()`.
+        $blocker = null;
+        $detail = [];
+        foreach ($units as $index => $unit) {
+            /** @var TaxonomyReviewedProposal $entry */
+            $entry = $unit['proposal'];
+            $evaluation = $this->evaluateApplicability($entry, $lockRows, $baseline);
+
+            $units[$index]['context'] = $evaluation['context'];
+            $units[$index]['blocker'] = $evaluation['blocker'];
+            $units[$index]['detail'] = $evaluation['detail'];
+
+            if ($evaluation['blocker'] !== null && $blocker === null) {
+                $blocker = self::batchBlockerForProposalBlocker($evaluation['blocker']);
+                $detail = array_merge($evaluation['detail'], [
+                    // «The batch validation result must identify the exact proposal/unit that blocks
+                    // execution and why»: el id que BLOQUEA, que en un grupo puede ser un hermano y
+                    // no la entrada - por eso se lee el campo normalizado antes del fallback.
+                    'blocking_proposal_id' => (int) ($evaluation['detail']['offending_proposal_id'] ?? $evaluation['detail']['tampered_proposal_id'] ?? $entry->id),
+                    'blocking_unit_entry_proposal_id' => (int) $entry->id,
+                    'blocking_unit_kind' => $unit['kind'],
+                    'blocking_unit_proposal_ids' => $unit['proposal_ids'],
+                    'proposal_blocker' => $evaluation['blocker'],
+                    'batch_is_atomic_note' => 'Un solo bloqueo detiene el lote COMPLETO: cero escrituras, cero propuestas abortadas. Ninguna otra unidad se ejecuta "porque ella sí estaba bien".',
+                ]);
+            }
+        }
+
+        return [
+            'blocker' => $blocker,
+            'detail' => $detail,
+            'baseline_taxonomy_fingerprint' => $baseline,
+            'requested_proposal_ids' => $requested,
+            'accepted_proposal_ids' => $found,
+            'units' => $units,
+            'already_executed' => false,
+            'manifest_verification' => $manifestVerification,
+            'manifest_fingerprint' => $manifestVerification['manifest_fingerprint'] ?? ($manifest['manifest_fingerprint'] ?? null),
+        ];
+    }
+
+    /**
+     * PARTE 2: ¿algún grupo bilingüe del conjunto viene PARTIDO? Se compara contra los miembros VIVOS
+     * (`PENDING_APPLY`), no contra todos los históricos: un hermano `SUPERSEDED` o `ABORTED` no se va a
+     * ejecutar, así que exigirlo bloquearía el lote por una fila que nadie va a aplicar - mismo
+     * criterio que `unconfirmedMembers()` desde TASK-0006E.
+     */
+    private function incompleteBatchGroups(\Illuminate\Support\Collection $proposals, array $requested, bool $lockRows): ?array
+    {
+        foreach ($proposals->pluck('proposal_group_id')->filter()->unique() as $groupId) {
+            $liveMembers = TaxonomyReviewedProposal::query()
+                ->where('proposal_group_id', $groupId)
+                ->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)
+                ->orderBy('id')
+                ->when($lockRows, fn ($q) => $q->lockForUpdate())
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+
+            $absent = array_values(array_diff($liveMembers, $requested));
+
+            if ($absent !== []) {
+                return [
+                    'note' => "El grupo bilingüe {$groupId} vendría PARTIDO en este lote: faltan miembros vivos del grupo. Un grupo describe UNA convergencia indivisible (un concepto, varios términos), así que ejecutar un subconjunto crearía el concepto con un solo término adjunto. Se rechaza en solo lectura, con cero escrituras.",
+                    'proposal_group_id' => $groupId,
+                    'live_group_member_ids' => $liveMembers,
+                    'absent_from_batch_proposal_ids' => $absent,
+                    'blocking_proposal_id' => $absent[0],
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Ids de grupo distintos de las propuestas pedidas, ordenados por su CLAVE de advisory lock.
+     *
+     * El orden es por clave y no por uuid a propósito: lo que tiene que ser consistente entre dos
+     * transacciones concurrentes es el orden en que se PIDEN los locks, y el lock se identifica por su
+     * clave. Ordenar por otra cosa podría dar dos secuencias distintas para el mismo conjunto de
+     * grupos. (Con el lock común de ejecución tomado antes, dos lotes ya no pueden competir acá; esto
+     * es defensa en profundidad, no la garantía principal.)
+     *
+     * @return string[]
+     */
+    private function requestedGroupIds(array $proposalIds): array
+    {
+        $groupIds = TaxonomyReviewedProposal::query()
+            ->whereIn('id', self::normalisedBatchIds($proposalIds))
+            ->whereNotNull('proposal_group_id')
+            ->distinct()
+            ->pluck('proposal_group_id')
+            ->map(fn ($id) => (string) $id)
+            ->all();
+
+        usort($groupIds, fn (string $a, string $b) => self::groupAdvisoryLockKey($a) <=> self::groupAdvisoryLockKey($b));
+
+        return $groupIds;
+    }
+
+    /** @return int[] Ids únicos, enteros y ordenados - para que un mismo conjunto se comporte igual sin importar cómo llegó. */
+    public static function normalisedBatchIds(array $proposalIds): array
+    {
+        $ids = array_values(array_unique(array_map('intval', $proposalIds)));
+        $ids = array_values(array_filter($ids, fn (int $id) => $id > 0));
+        sort($ids);
+
+        return $ids;
+    }
+
+    /**
+     * TASK-0007, PARTE 3/PARTE 4: ÚNICO punto donde un bloqueo de propuesta se traduce al vocabulario
+     * de lote. Igual que `applyAbortReasonForBlocker()` en TASK-0006D, lanza en vez de inventar un
+     * código si alguien agrega un bloqueo nuevo y se olvida de mapearlo - así el informe de un lote no
+     * puede quedar diciendo menos de lo que la validación realmente encontró.
+     *
+     * Los tres estados ya resueltos caen en `BATCH_QUEUE_DRIFT` y no en `BATCH_ALREADY_EXECUTED`: ese
+     * último está reservado para el lote ENTERO ya ejecutado (replay idempotente). Una propuesta ya
+     * resuelta DENTRO de un lote que se pide como ejecutable significa que la cola cambió respecto de
+     * lo autorizado, que es exactamente drift.
+     */
+    public static function batchBlockerForProposalBlocker(string $blocker): string
+    {
+        return match ($blocker) {
+            self::PREFLIGHT_TAMPER_DETECTED => self::BATCH_TAMPER_DETECTED,
+            self::PREFLIGHT_STALE_TAXONOMY_STATE => self::BATCH_BASELINE_STALE,
+            self::PREFLIGHT_ENTITY_MISSING => self::BATCH_ENTITY_MISSING,
+            self::PREFLIGHT_SOURCE_DRIFT => self::BATCH_SOURCE_DRIFT,
+            self::PREFLIGHT_SOURCE_ALREADY_RESOLVED => self::BATCH_SOURCE_ALREADY_RESOLVED,
+            self::PREFLIGHT_HUMAN_CONFIRMATION_REQUIRED => self::BATCH_CONFIRMATION_REQUIRED,
+            self::PREFLIGHT_GROUP_INCOMPLETE_OR_INCONSISTENT => self::BATCH_GROUP_INCOMPLETE,
+            self::PREFLIGHT_RELATION_VALIDATION_FAILED => self::BATCH_RELATION_INVALID,
+            self::PREFLIGHT_ALREADY_APPLIED,
+            self::PREFLIGHT_ALREADY_ABORTED,
+            self::PREFLIGHT_ALREADY_SUPERSEDED,
+            self::PREFLIGHT_NOT_FOUND => self::BATCH_QUEUE_DRIFT,
+            default => throw new \LogicException("Bloqueo de propuesta sin traducción de lote mapeada: {$blocker}. Agregalo a batchBlockerForProposalBlocker() en vez de dejar que el informe del lote invente un código."),
+        };
+    }
+
+    private function batchResult(string $result, ?string $blocker, array $detail, array $base): array
+    {
+        return array_merge([
+            'result' => $result,
+            'blocker' => $blocker,
+            'detail' => $detail,
+            'units' => [],
+            'applied_proposal_ids' => [],
+            'applied_proposal_count' => 0,
+        ], $base);
+    }
+
+    /**
+     * Las escrituras de varias unidades, agrupadas por tabla+operación. Es lo que hace legible la
+     * proyección de un lote: 40 filas en 8 líneas en vez de 40 líneas sueltas.
+     */
+    private static function aggregateWriteSet(array $writes): array
+    {
+        $byKey = [];
+        foreach ($writes as $write) {
+            $key = $write['table'].'|'.$write['operation'];
+            if (! isset($byKey[$key])) {
+                $byKey[$key] = ['table' => $write['table'], 'operation' => $write['operation'], 'rows' => 0, 'descriptions' => []];
+            }
+            $byKey[$key]['rows'] += (int) $write['rows'];
+            $byKey[$key]['descriptions'][] = $write['description'];
+        }
+
+        ksort($byKey);
+
+        return array_values($byKey);
+    }
+
+    /**
+     * TASK-0007, PARTE 6: los conteos protegidos que el lote dejaría, derivados de la DECISIÓN
+     * congelada de cada unidad y del write-set real - no de una tabla de resultados escrita a mano.
+     *
+     * `taxonomy_term_cpv_relations` aparece con delta CERO explícito y no por omisión: "TERM→CPV MUST
+     * remain 9749" es un invariante del pedido, y un informe que simplemente no mencionara esa tabla
+     * no sería evidencia de nada.
+     */
+    private function projectedProtectedCounts(array $units, array $writes, array $now): array
+    {
+        $delta = array_fill_keys(array_keys($now), 0);
+
+        foreach ($writes as $write) {
+            if ($write['table'] === 'taxonomy_canonical_concepts' && $write['operation'] === 'INSERT') {
+                $delta['canonical_concepts'] += (int) $write['rows'];
+            }
+            if ($write['table'] === 'taxonomy_term_concepts' && $write['operation'] === 'INSERT') {
+                $delta['term_concepts'] += (int) $write['rows'];
+            }
+        }
+
+        foreach ($units as $unit) {
+            /** @var TaxonomyReviewedProposal $entry */
+            $entry = $unit['proposal'];
+            $memberCount = count($unit['proposal_ids']);
+
+            $delta['reviewed_proposals_pending_apply'] -= $memberCount;
+            $delta['reviewed_proposals_applied'] += $memberCount;
+
+            if ($entry->proposal_type === TaxonomyReviewedProposal::TYPE_CONCEPT_RELATION) {
+                $delta['concept_relations_candidate'] -= 1;
+
+                if ($entry->decision === TaxonomyReviewedProposal::DECISION_REJECT) {
+                    $delta['concept_relations_rejected'] += 1;
+                } else {
+                    $delta['concept_relations_approved'] += 1;
+                }
+
+                continue;
+            }
+
+            $delta['candidate_links_pending'] -= $memberCount;
+
+            if ($entry->decision === TaxonomyReviewedProposal::DECISION_REJECT) {
+                $delta['candidate_links_rejected'] += $memberCount;
+            } elseif ($entry->decision === TaxonomyReviewedProposal::DECISION_CONTEXT_REQUIRED) {
+                $delta['candidate_links_context_required'] += $memberCount;
+            } else {
+                // MAP_TO_EXISTING y CREATE_NEW (suelta o agrupada) son los dos caminos que PUBLICAN.
+                $delta['candidate_links_published'] += $memberCount;
+            }
+        }
+
+        $projected = [];
+        foreach ($now as $key => $value) {
+            $projected[$key] = $value + $delta[$key];
+        }
+
+        return [
+            'counts' => $projected,
+            'delta' => $delta,
+            'term_cpv_invariant' => [
+                'table' => 'taxonomy_term_cpv_relations',
+                'before' => $now['term_cpv_relations'],
+                'after' => $projected['term_cpv_relations'],
+                'delta' => $delta['term_cpv_relations'],
+                'note' => 'CERO escrituras TÉRMINO→CPV por construcción: ningún camino de escritura de este servicio toca esa tabla (ver writeCandidateLinkDecision/writeBilingualGroupCreateNew/writeConceptRelationDecision).',
+            ],
+        ];
+    }
+
+    /**
+     * TASK-0007, PARTE 4/PARTE 6: la FORMA de la cola protegida, en un solo lugar.
+     *
+     * Lo usan el manifiesto (que la ata para poder rechazar una ejecución si cambió) y el informe de
+     * lote (que proyecta cómo quedaría). Que sea la misma función para los dos es el punto: un
+     * manifiesto que atara conteos calculados distinto de los que el informe proyecta no probaría
+     * nada.
+     */
+    public static function protectedQueueShape(): array
+    {
+        $candidates = DB::connection('pgsql')->table('taxonomy_candidate_concept_links')
+            ->selectRaw('status, COUNT(*) AS n')->groupBy('status')->pluck('n', 'status');
+        $relations = DB::connection('pgsql')->table('taxonomy_concept_relations')
+            ->selectRaw('status, COUNT(*) AS n')->groupBy('status')->pluck('n', 'status');
+        $proposals = DB::connection('pgsql')->table('taxonomy_reviewed_proposals')
+            ->selectRaw('status, COUNT(*) AS n')->groupBy('status')->pluck('n', 'status');
+
+        $count = fn ($collection, string $key) => (int) ($collection[$key] ?? 0);
+
+        return [
+            'candidate_links' => (int) $candidates->sum(),
+            'candidate_links_pending' => $count($candidates, TaxonomyCandidateConceptLink::STATUS_PENDING),
+            'candidate_links_published' => $count($candidates, TaxonomyCandidateConceptLink::STATUS_PUBLISHED),
+            'candidate_links_context_required' => $count($candidates, TaxonomyCandidateConceptLink::STATUS_CONTEXT_REQUIRED),
+            'candidate_links_rejected' => $count($candidates, TaxonomyCandidateConceptLink::STATUS_REJECTED),
+            'candidate_links_approved' => $count($candidates, TaxonomyCandidateConceptLink::STATUS_APPROVED),
+            'concept_relations' => (int) $relations->sum(),
+            'concept_relations_candidate' => $count($relations, TaxonomyConceptRelation::STATUS_CANDIDATE),
+            'concept_relations_approved' => $count($relations, TaxonomyConceptRelation::STATUS_APPROVED),
+            'concept_relations_rejected' => $count($relations, TaxonomyConceptRelation::STATUS_REJECTED),
+            'canonical_concepts' => (int) DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(),
+            'term_concepts' => (int) DB::connection('pgsql')->table('taxonomy_term_concepts')->count(),
+            'term_cpv_relations' => (int) DB::connection('pgsql')->table('taxonomy_term_cpv_relations')->count(),
+            'reviewed_proposals' => (int) $proposals->sum(),
+            'reviewed_proposals_pending_apply' => $count($proposals, TaxonomyReviewedProposal::STATUS_PENDING_APPLY),
+            'reviewed_proposals_applied' => $count($proposals, TaxonomyReviewedProposal::STATUS_APPLIED),
+            'reviewed_proposals_aborted' => $count($proposals, TaxonomyReviewedProposal::STATUS_ABORTED),
+            'reviewed_proposals_superseded' => $count($proposals, TaxonomyReviewedProposal::STATUS_SUPERSEDED),
+        ];
+    }
+
+    // =====================================================================================
     // TASK-0006D (Issue #2 comentario `5949253156`), PARTE 1: primitivas de validación COMPARTIDAS
     // entre `apply()` (que escribe después) y `preflight()` (que no escribe nunca).
     // =====================================================================================
@@ -2401,10 +3317,32 @@ class ReviewedProposalService
      * hecho de que el preflight lo hubiera evaluado por separado no lo cubría, precisamente porque el
      * preflight es sólo una foto.
      *
-     * @param  bool  $lockRows  `true` solo desde `apply()`.
+     * TASK-0007 (Issue #2 comentario `5997693379`), PARTE 1 requisito 2 y PARTE 3: `$baselineFingerprint`
+     * permite que un LOTE valide todas sus unidades contra UN MISMO fingerprint de baseline, computado
+     * UNA sola vez antes de la primera escritura.
+     *
+     * Por qué hacía falta tocar esto y no se podía resolver en el lote: la compuerta de obsolescencia
+     * computa `dryRunInputFingerprint()` en CADA llamada. Varias propuestas de la cola real mutan
+     * justamente las entradas de ese fingerprint (#491 inserta un TERM→CONCEPT, #629/#630 crean un
+     * concepto + dos links, #631/#632 tocan `taxonomy_concept_relations`), así que un lote que
+     * revalidara entre miembros vería un fingerprint distinto después de la primera escritura y
+     * declararía obsoletas propuestas legítimamente revisadas contra el MISMO snapshot - y, con el
+     * camino de una sola propuesta, las habría ABORTADO de forma terminal. Ese es el hueco semántico
+     * que abre TASK-0007.
+     *
+     * Con `null` -que es lo que pasan `apply()` y `preflight()`- el comportamiento es EXACTAMENTE el
+     * anterior: se computa el fingerprint acá y la compuerta compara contra el estado real del
+     * instante. No hay forma de usar este parámetro para relajar la compuerta: el lote computa su
+     * baseline con la misma función, antes de escribir, y además verifica que el baseline siga siendo
+     * el actual (`BATCH_BASELINE_STALE`). No existe ningún camino que permita pasar un fingerprint
+     * arbitrario desde afuera del servicio.
+     *
+     * @param  bool  $lockRows  `true` solo desde `apply()`/`applyBatch()`.
+     * @param  string|null  $baselineFingerprint  `null` = computar el actual (comportamiento de
+     *                `apply()`/`preflight()`); un valor = el baseline único del lote.
      * @return array{blocker:?string, detail:array, context:array}
      */
-    private function evaluateApplicability(TaxonomyReviewedProposal $proposal, bool $lockRows): array
+    private function evaluateApplicability(TaxonomyReviewedProposal $proposal, bool $lockRows, ?string $baselineFingerprint = null): array
     {
         // 0) Estado ya resuelto: no es un hallazgo de validación, es que no hay nada que aplicar.
         if ($proposal->status === TaxonomyReviewedProposal::STATUS_APPLIED) {
@@ -2451,9 +3389,13 @@ class ReviewedProposalService
         // `entry_payload_valid` se registra como EVIDENCIA, no se deduce después del bloqueo: en un
         // grupo bilingüe el tamper puede estar en un HERMANO, y entonces el payload de ESTA fila es
         // perfectamente válido. Inferirlo del bloqueo diría lo contrario (ver `preflightChecks()`).
-        $currentTaxonomyFingerprint = CanonicalConceptBuilderService::dryRunInputFingerprint();
+        $currentTaxonomyFingerprint = $baselineFingerprint ?? CanonicalConceptBuilderService::dryRunInputFingerprint();
         $context = [
             'current_taxonomy_fingerprint' => $currentTaxonomyFingerprint,
+            // TASK-0007: el informe del lote necesita poder decir si el fingerprint con el que se
+            // validó fue el del instante o el baseline compartido - sin eso, un lector no puede
+            // distinguir "no estaba obsoleta" de "se validó contra un baseline".
+            'baseline_fingerprint_supplied' => $baselineFingerprint !== null,
             'entry_payload_valid' => true,
         ];
 
