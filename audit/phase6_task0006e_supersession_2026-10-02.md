@@ -435,17 +435,33 @@ TASK-0002 (`TextEntry::make('confidence')->numeric(4)` llama a `Number::format()
 
 | Ítem | Resultado |
 |---|---|
-| HEAD de runtime desplegado | **`451ba1188319f0e7200ca3a54b95f0f14fc837c8`** |
-| Workflow «Deploy a Contabo» | `completed / success` para ese sha exacto ([run 37035332746](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/37035332746)) |
+| HEAD de runtime **final** desplegado | **`ead559f9fa1a408c1f07c976c0e2770cebdc3c71`** — workflow `completed / success` para ese sha exacto ([run 37290134871](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/37290134871)), smoke `/` 200, `/admin/login` 200, las tres pantallas 302 → login 200, **sin 500/503** |
+| HEAD desplegado **al momento de la transición** | **`451ba1188319f0e7200ca3a54b95f0f14fc837c8`** |
+| Workflow «Deploy a Contabo» (ese sha) | `completed / success` ([run 37035332746](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/37035332746)) |
 | Migración | aplicada a la instancia compartida **antes** de desplegar código (aditiva, orden seguro); el `migrate --force` del deploy es un no-op |
 | Smoke **antes** de la transición | `/` 200, `/admin/login` 200, las tres pantallas 302 → login 200 |
 | Smoke **después** de la transición | idéntico: `/` 200, `/admin/login` 200, las tres pantallas 302 → login 200 |
 | 500 / 503 | **ninguno**, en ninguno de los dos smokes |
 
+La transición real corrió con **`451ba11`** desplegado; el HEAD final **`ead559f`** agrega el test de
+render de una fila supersedida más la documentación, y se desplegó después porque el workflow
+deliberadamente **no** ignora `tests/**` (decisión conservadora de TASK-0005). Su smoke también quedó
+limpio, así que hay evidencia de staging **antes** de la transición, **después** de la transición y
+**sobre el HEAD final**.
+
 Límite declarado, igual que en rondas anteriores: esta sesión no tiene clave SSH al host, así que el
 HEAD desplegado se verifica por el run del workflow para ese sha exacto y no por inspección directa. El
 riesgo de 500 en la pantalla autenticada queda cubierto por los tests que la abren con `assertOk()`,
 incluido el nuevo sobre una fila supersedida.
+
+**Limitación de verificación de esta última parte, declarada en vez de omitida:** después de ejecutar la
+transición y correr toda la validación, la política de Application Control de esta máquina pasó a
+**bloquear `php.exe`** (la misma política que ya bloqueaba `php_intl.dll`). Todo lo que este audit
+afirma se midió **antes** de ese bloqueo — la migración y su verificación, los 139 tests, la supersesión
+real, las comparaciones campo por campo, el preflight posterior y los dos primeros smokes. Lo único
+posterior al bloqueo es el commit de documentación, el despliegue del HEAD final y su smoke, que no
+necesitan PHP local. No se re-verificó el estado de la base después de ese punto, y nada en esta ronda
+lo habría cambiado: el último escrito a datos reales fue la supersesión.
 
 ---
 

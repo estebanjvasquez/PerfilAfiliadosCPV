@@ -98,9 +98,17 @@ nuevo que abre la pantalla de detalle de una propuesta **realmente supersedida**
 nueva mete listas anidadas en un `KeyValueEntry` y eso es la forma exacta del incidente 503/500 de
 TASK-0002) + 2 nuevos de UX de candidatos. Único fallo local: el gap preexistente de `ext-intl`.
 
-Staging: HEAD de runtime **`451ba11`** (run `success` para ese sha exacto), smoke **antes y después** de
-la transición sin 500/503. Migración aplicada antes de desplegar; el `migrate --force` del deploy es un
+Staging: la transición corrió con **`451ba11`** desplegado (run `success`), con smoke limpio **antes y
+después**; el HEAD final **`ead559f`** —que agrega el test de render de una fila supersedida y la
+documentación— también se desplegó (run `success`) y smokeó limpio, porque el workflow deliberadamente
+**no** ignora `tests/**`. Migración aplicada antes de desplegar; el `migrate --force` del deploy es un
 no-op.
+
+> **Limitación de verificación, declarada:** después de ejecutar la transición y correr toda la
+> validación, la política de Application Control de esta máquina pasó a **bloquear `php.exe`** (la misma
+> que ya bloqueaba `php_intl.dll`). Todo lo afirmado arriba se midió **antes** de ese bloqueo. Lo único
+> posterior es el commit de documentación, el despliegue del HEAD final y su smoke, que no necesitan PHP
+> local. El último escrito a datos reales fue la supersesión.
 
 ---
 
