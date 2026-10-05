@@ -1,14 +1,100 @@
 # Tarea activa
 
-**TASK-0006E — Ciclo de vida `SUPERSEDED` no destructivo + supersesión autorizada de #420/#421/#422**
+**TASK-0007 ronda 1 — APPLY ATÓMICO POR LOTE: implementación, manifiesto y preflight de solo lectura**
 (Issue #2 comentario
-[`5955148859`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5955148859),
-**autorización humana explícita** del dueño de la taxonomía). Abierta desde HEAD `af4abec`.
-**Estado: READY_FOR_REVIEW — compuerta de cierre ejecutada.**
+[`5997693379`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5997693379)).
+Abierta desde HEAD `4e671fa`. **Estado: READY_FOR_REVIEW.**
 
-TASK-0006D quedó **`PASS / CLOSED`** en el comentario
-[`5954835892`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5954835892).
-**TASK-0007 sigue sin abrir y APPLY/PUBLICACIÓN sigue NO AUTORIZADO.**
+TASK-0006E quedó **`PASS / CLOSED`** en el comentario
+[`5994449681`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5994449681).
+**TASK-0007 está ABIERTA y el APPLY REAL sigue NO AUTORIZADO** — esta ronda autoriza el código, los
+tests, el manifiesto de solo lectura, el preflight de lote contra datos reales y el deploy del runtime
+a staging; nada más.
+
+## El hueco semántico que abre la tarea
+
+`dryRunInputFingerprint()` hashea el grafo de conceptos (`taxonomy_canonical_concepts` +
+`taxonomy_term_concepts`) y una señal de versión de `taxonomy_concept_relations`. Tres de las unidades
+de la cola real mutan justamente esas entradas: #491 inserta un TERM→CONCEPT, #629/#630 crean un
+concepto más dos links, y #631/#632 escriben `taxonomy_concept_relations`.
+
+Por lo tanto `apply(491) -> apply(492) -> ...` **no es una estrategia válida**: la primera escritura
+que cambia el grafo deja obsoletas a todas las demás, y `apply()` registra la obsolescencia con
+`abort()`, que es **terminal**. Como re-congelar está bloqueado por el índice único parcial, un loop
+habría **quemado decisiones humanas una por una**. Las 12 propuestas no son 12 ejecuciones
+independientes: son **un conjunto revisado contra un snapshot compartido**.
+
+Esto está **demostrado ejecutando**, no argumentado: hay un test que congela dos propuestas fixture
+contra el mismo snapshot, aplica la que cambia el grafo y mide que la segunda vuelve `ABORTED` con
+`STALE_TAXONOMY_STATE`; y su gemelo que ejecuta el mismo par como lote y las deja las dos `APPLIED`.
+
+## Qué se implementó
+
+- **`applyBatch()`** — una transacción, baseline computado **una vez**, conjunto cargado y bloqueado en
+  orden de id, **toda** unidad validada contra ese baseline **antes** de la primera escritura, y cero
+  escrituras y **cero ABORTs** si algo bloquea. No es un loop alrededor de `apply()` ni un segundo
+  motor de reglas: valida con `evaluateApplicability()`, la misma función que corren `apply()` y
+  `preflight()`, con un parámetro nuevo y **opcional** (`?string $baselineFingerprint = null`) que con
+  `null` reproduce el comportamiento anterior byte por byte.
+- **11 unidades para 12 filas** — #629/#630 es UNA unidad indivisible, el escritor de grupo se llama
+  una sola vez, y pedir medio grupo devuelve `BATCH_GROUP_INCOMPLETE` en solo lectura.
+- **Manifiesto** (`ReviewedProposalBatchManifest`) — ata ids, decisiones, los dos fingerprints de cada
+  propuesta, origen, grupo, unidades, baseline, forma de la cola protegida y alcance, dentro de un
+  `manifest_fingerprint` **determinístico** (`generated_at` y el entorno quedan fuera del hash, porque
+  si el hash cambiara al regenerar no se podría citar en una autorización). Se verifica **dentro de la
+  transacción, con los locks ya tomados**.
+- **Lock común de ejecución C2** — un `pg_advisory_xact_lock` único que toman como primera acción
+  `applyBatch()` **y** `apply()`. Sin él un apply suelto podría mover el grafo entre la validación y la
+  escritura del lote, y los locks de fila no alcanzan porque ese apply puede entrar por una propuesta
+  que el lote no pidió. Orden: **ejecución → grupo → filas de propuesta → filas fuente**.
+- **`previewBatch()`** — el mismo camino sin fase de escritura, sin locks y midiendo sus propios
+  statements. A diferencia de `preflightAll()`, evalúa el CONJUNTO: baseline único, unidades
+  deduplicadas y una proyección agregada de **40 filas** con el grupo contado una sola vez (sumar las
+  filas del JSON por propuesta daba 49 y era incorrecto).
+- **Dos comandos**: `taxonomy:reviewed-proposal-batch-manifest` (solo lectura) y
+  `taxonomy:apply-reviewed-proposal-batch`, cuyo **modo predeterminado es el preflight de solo
+  lectura** — aplicar exige `--execute` más manifiesto, `--authorized-by` y `--expect-environment`
+  coincidente con el entorno real. `production` está prohibido **en el servicio**
+  (`BATCH_ALLOWED_ENVIRONMENTS = ['local','testing','staging']`).
+
+**Sin migración:** el lote no agrega columnas ni estados.
+
+## Resultado del preflight de lote REAL (solo lectura)
+
+12 propuestas aceptadas, **11 unidades**, **cero bloqueos**, `write_statements_observed = 0`, baseline
+`c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2` — el mismo del cierre de
+TASK-0006E. Write-set proyectado **40 filas** y conteos proyectados idénticos a la PARTE 7 del
+comentario: 81→82 conceptos, 142→145 TERM→CONCEPT, **9749 TERM→CPV sin cambio**, 10 candidatos
+`pending` → 3 `published` + 7 `context_required`, 2 relaciones → 2 `rejected` y **0 approved**,
+`PENDING_APPLY` 12→0, `APPLIED` 0→12, `SUPERSEDED` 3 sin cambio, `ABORTED` 0.
+
+**El lote real NO se ejecutó.** Las 12 siguen `PENDING_APPLY`, los 10 candidatos `pending`, las 2
+relaciones `candidate`, 0 filas con `applied_at`, y #420/#421/#422 intactas.
+
+Detalle en
+[`audit/phase7_task0007_batch_apply_2026-10-05.md`](../../audit/phase7_task0007_batch_apply_2026-10-05.md);
+texto verbatim en [`tasks/0007-atomic-batch-apply.md`](tasks/0007-atomic-batch-apply.md); artefactos en
+[`audit/task0007_batch_manifest_2026-10-05.json`](../../audit/task0007_batch_manifest_2026-10-05.json) y
+[`audit/task0007_batch_preflight_2026-10-05.json`](../../audit/task0007_batch_preflight_2026-10-05.json).
+
+## Qué falta para ejecutar de verdad
+
+Una autorización humana nueva y explícita en Issue #2 que cite el conjunto exacto de ids
+`[491, 492, 493, 494, 495, 629, 630, 631, 632, 1688, 1689, 1690]` y el `manifest_fingerprint`
+**`eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702`** (alcance `FULL_PENDING_QUEUE`),
+más el entorno autorizado. Un lote sin bloqueos significa «hoy nada lo impide», nunca «aprobado para
+ejecutarse».
+
+Si entre hoy y ese día cambia cualquier cosa de la cola o del grafo, el manifiesto **se rechaza solo**
+(`BATCH_QUEUE_DRIFT` / `BATCH_BASELINE_STALE`) con cero escrituras, y hay que regenerarlo y
+reautorizarlo — que es lo que hace que la autorización signifique algo.
+
+**HEAD de runtime desplegado a staging: `7d015e2`** (workflow run 37360603242, `success`; smoke
+`GET /` 200, `/admin/login` 200, las tres pantallas de taxonomía 302 → login 200, sin 500/503).
+
+---
+
+# Historial — TASK-0006E (CERRADA / PASS en `5994449681`)
 
 ## Compuerta de cierre (comentario `5993828105`) — preflight final de solo lectura
 
