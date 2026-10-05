@@ -260,16 +260,281 @@ parecería nunca revisado y quien lo revise perdería el contexto de por qué vo
 
 ## 7. La supersesión real de #420/#421/#422
 
-*(completado tras la ejecución; ver §7.1–§7.4)*
+### 7.1 Orden de ejecución respetado
+
+El comentario exige: «After code/tests/staging validation pass, execute the real supersession ONLY for
+#420/#421/#422». Se cumplió en ese orden exacto:
+
+1. migración aditiva aplicada y verificada (cero filas tocadas);
+2. tests (§8);
+3. commit `451ba11` desplegado a staging, workflow `success`, smoke sin 500/503;
+4. **recién entonces** la supersesión real;
+5. recuento de solo lectura + preflight + smoke posteriores.
+
+Antes de ejecutar se corrió además el `--dry-run` del comando sobre las tres: confirmó
+`STALE_TAXONOMY_STATE`, `obsoleta: SI`, `payload válido: SI` para #420/#421/#422, sin escribir nada.
+
+### 7.2 Salvaguardas de la ejecución
+
+- **Allowlist dura de exactamente `[420, 421, 422]`**; el script aborta si la lista no es esa.
+- **Precondición de estado**: exige encontrar 12 propuestas / 12 `PENDING_APPLY` / 0 `SUPERSEDED` /
+  0 `APPLIED`, y aborta sin escribir si el estado no es el esperado.
+- La referencia de autorización se fijó en un archivo UTF-8 y se verificó por bytes (83 bytes / 81
+  caracteres) antes de usarla, porque lleva un guion largo (U+2014) y pasarla por la consola la habría
+  expuesto a la codepage. **El camino de ejecución es el mismo comando revisable**
+  (`taxonomy:supersede-stale-reviewed-proposal` vía `Artisan::call`), no una ruta paralela.
+
+Referencia usada, textual:
+`Issue #2 — explicit owner authorization following orchestrator comment 5954835892`
+
+### 7.3 C) Estado exacto ANTES y DESPUÉS
+
+| | #420 | #421 | #422 |
+|---|---|---|---|
+| Candidato / término | 263 / `petroleum` | 264 / `crude oil` | 265 / `oil and gas` |
+| `status` | `PENDING_APPLY` → **`SUPERSEDED`** | `PENDING_APPLY` → **`SUPERSEDED`** | `PENDING_APPLY` → **`SUPERSEDED`** |
+| `superseded_at` | NULL → `2026-10-02 16:44:43` | NULL → `2026-10-02 16:45:02` | NULL → `2026-10-02 16:45:22` |
+| `superseded_by_proposal_id` | NULL → **NULL** (sin sucesor) | NULL → **NULL** | NULL → **NULL** |
+| `decision` | `CONTEXT_REQUIRED` → sin cambios | ídem | ídem |
+| `payload_fingerprint` | `b9e1ec92528f0b2e…` → **idéntico** | **idéntico** | **idéntico** |
+| `taxonomy_state_fingerprint` | `1d0eb041f6428696…` → **idéntico** | **idéntico** | **idéntico** |
+| `reviewer_id` / `reviewed_at` | 3 / `2026-10-01 09:48:41` → **idénticos** | 3 / `09:49:42` → **idénticos** | 3 / `09:50:20` → **idénticos** |
+| `applied_at` / `authorization_reference` / `target_environment` / `application_result` | NULL → **NULL** | ídem | ídem |
+| Candidato fuente | `pending`, `reviewed_at` NULL → **sin cambios** | ídem | ídem |
+
+**Campos inmutables modificados: 0 en las tres.** Verificado por comparación cruda (sin casts) de la
+fila completa antes y después, sobre 17 campos por propuesta más el estado del candidato. Lo único que
+cambió es `status` y el rastro de supersesión.
+
+`supersession_actor_type = agent` y **`supersession_by_id = NULL`**: la ejecutó el agente bajo
+autorización del dueño, y atribuirla a la cuenta de una persona que no la ejecutó repetiría exactamente
+el error de procedencia que TASK-0006C reparó.
+
+### 7.4 El delta de estado capturado
+
+Las tres registran el mismo cambio sustantivo, que es precisamente el que vuelve a abrir la pregunta:
+
+```
+fingerprint congelado 1d0eb041f642… → actual c236bc5159ae…
+conceptos creados desde la revisión: 2
+  + concepto #2890  oleoducto / oil pipeline  (2026-10-01 13:07:11)
+  + concepto #2891  gasoducto / gas pipeline  (2026-10-01 13:07:30)
+```
+
+Eso es la justificación de la recomendación que el orquestador aceptó: `petroleum`, `crude oil` y
+`oil and gas` se marcaron «demasiado genéricos para un mapeo directo» **cuando `oleoducto` y
+`gasoducto` no existían**. La pregunta correcta ahora no es «¿confirmás la decisión vieja?», es «¿sigue
+siendo demasiado genérico?» — y sólo una persona puede responderla.
+
+### 7.5 Los candidatos vuelven a la cola de revisión normal
+
+| Candidato | `status` | Propuesta viva | Slot `PENDING_APPLY` |
+|---|---|---|---|
+| 263 | `pending` | NINGUNA | **libre** |
+| 264 | `pending` | NINGUNA | **libre** |
+| 265 | `pending` | NINGUNA | **libre** |
+
+`liveFrozenProposal()` devuelve `null` para los tres, así que `freezeReview` vuelve a estar disponible
+**sin que haya hecho falta tocar la regla de visibilidad** — la señal de que el endurecimiento de
+TASK-0006D estaba bien planteado. Y la página de detalle de cada candidato explica la historia: «Hubo
+una revisión anterior, la propuesta #420 (CONTEXT_REQUIRED) del 2026-10-01 09:48:41, que quedó OBSOLETA
+… está disponible para una revisión NUEVA contra el estado actual; la decisión anterior es evidencia
+histórica, no un punto de partida obligado.»
+
+### 7.6 Auditoría
+
+Cada una tiene exactamente **2 filas** en `taxonomy_audit_log`: la del `freeze` original y la nueva de
+supersesión (ids 3007/3008/3009), con `field = superseded_at`, `PENDING_APPLY → SUPERSEDED`,
+`actor_type = system`, y **`authorization_reference` y `target_environment` en NULL** — porque
+supersedir **no es ejecutar**, y esos dos campos están reservados para el APPLY real. Es la distinción
+sobre la que se apoya todo el contrato C2. La autorización del dueño vive en `supersession_reference`
+de la propia fila y en el texto del motivo.
+
+### 7.7 Preflight posterior (solo lectura)
+
+Artefacto: `audit/task0006e_preflight_after_supersession_2026-10-02.json`.
+`write_statements_observed: 0`.
+
+| Categoría | Propuestas |
+|---|---|
+| `READY_TO_APPLY` (9) | #491, #492–#495, #629/#630, #631/#632 |
+| `BLOCKED_FOR_OTHER_REASON` (3) | #420, #421, #422 — **`ALREADY_SUPERSEDED`** |
+| `NEEDS_REVALIDATION` | **0** |
+
+Los tres ya **no** reportan `STALE_TAXONOMY_STATE` ni `READY_TO_APPLY`: reportan
+`ALREADY_SUPERSEDED`, que es el requisito 9 («preflight understands SUPERSEDED as terminal historical
+state»). Y la cola viva quedó **sin ninguna propuesta obsoleta/bloqueante** — la condición que el
+orquestador puso para que TASK-0007 pueda abrirse algún día, **detrás de una autorización de APPLY
+nueva y explícita que no existe**.
+
+### 7.8 STOP — la re-revisión humana no se hizo ni se preparó
+
+Instrucción explícita: «The development agent must NOT make the new semantic decisions for
+petroleum/crude oil/oil and gas». Se respetó al pie de la letra:
+
+- **no se congeló ninguna propuesta nueva** para 263/264/265 (§9.4: siguen con 1 propuesta cada uno, la
+  supersedida);
+- **no se preseleccionó ni se insinuó ninguna decisión**: la supersesión es sin sucesor precisamente
+  para que no haya una decisión redactada esperando un clic;
+- el motivo durable describe **por qué** caducó la revisión, nunca **qué** debería decidirse ahora.
+
+El dueño re-revisará los tres candidatos personalmente por Filament contra el grafo actual, y puede
+elegir `CONTEXT_REQUIRED` otra vez o cualquier otra decisión válida.
 
 ---
 
 ## 8. Tests
 
-*(completado tras la ejecución; ver §8.1)*
+Todo con fixtures desechables dentro de `DatabaseTransactions` sobre `pgsql`. **Ninguna propuesta real
+participó de ningún test**, y ningún test ejecuta un APPLY real.
+
+| Suite | Resultado |
+|---|---|
+| `ReviewedProposalSupersessionTest` (**nueva**) | **20/20 PASS** (140 assertions) |
+| `ReviewedProposalServiceTest` | **41/41 PASS**, sin editar |
+| `ReviewedProposalConfirmationTest` | **47/47 PASS**, sin editar |
+| `ReviewedProposalGroupLockingTest` | **7/7 PASS**, sin editar |
+| `ReviewedProposalPreflightTest` | **24/24 PASS**, sin editar |
+| **Corrida de unidad heredada combinada** | **119/119 PASS** (621 assertions) |
+| `TaxonomyReviewedProposalResourceTest` | **12/12 PASS** (11 + 1 nuevo) |
+| `TaxonomyCandidateConceptLinkReviewTest` | **21/21** salvo el fallo heredado de `ext-intl` (ver abajo) |
+| `TaxonomyReviewedProposalConfirmationUiTest` | **9/9 PASS**, sin editar |
+| **Corrida de Filament combinada** | **40/41** |
+
+Cobertura exigida por el comentario, punto por punto:
+
+| Requisito | Test |
+|---|---|
+| La supersesión preserva el contenido inmutable del predecesor | `supersession_preserves_every_immutable_field_of_the_predecessor` (comparación cruda de la fila completa) |
+| El camino sin sucesor libera el candidato para re-revisión | `the_candidate_can_be_reviewed_again_while_the_predecessor_stays_superseded` |
+| El invariante de un solo `PENDING_APPLY` sigue valiendo | `the_unique_pending_apply_invariant_still_holds_after_supersession` (un TERCER freeze sigue rechazado) |
+| Supersesión duplicada/replay es idempotente | `supersession_is_idempotent_on_replay` (cero escrituras, ninguna segunda fila de auditoría) |
+| Una propuesta no obsoleta no se puede supersedir por el camino de obsolescencia | `a_proposal_that_is_not_stale_cannot_be_superseded_through_the_stale_only_flow` |
+| Los grupos no se pueden supersedir a medias | `a_bilingual_group_is_superseded_whole_or_not_at_all` + `entering_through_either_sibling_supersedes_the_same_whole_group` |
+| La propuesta vieja sigue de solo lectura/auditable | `the_detail_page_of_a_superseded_proposal_renders_without_a_500` + `supersession_writes_its_own_distinguishable_audit_event` |
+| Tras supersedir se puede congelar una propuesta nueva mientras el predecesor sigue `SUPERSEDED` | `the_candidate_can_be_reviewed_again_…` + `a_candidate_becomes_reviewable_again_through_the_normal_ui_after_supersession` (por la UI real) |
+| No se llama a APPLY/PUBLISH | `supersession_publishes_absolutely_nothing` + `apply_on_a_superseded_proposal_writes_nothing_and_does_not_overwrite_the_trail` |
+| El preflight entiende `SUPERSEDED` como estado histórico terminal | `preflight_treats_superseded_as_terminal_history_not_ready_to_apply` |
+| Las suites C2/confirmación/preflight/grupo/UX siguen verdes | 119/119 + 40/41 arriba |
+
+Tres pruebas adicionales **a nivel de base de datos**, no de aplicación: no se puede des-supersedir, no
+se puede reescribir el rastro, y no se puede registrar un sucesor sin delta persistido.
+
+Un riesgo de render que valía cerrar explícitamente: la sección nueva del infolist mete un delta con
+**listas anidadas** en un `KeyValueEntry`, que es la forma exacta del incidente 503/500 de TASK-0002
+(`htmlspecialchars()` sobre un valor no escalar = TypeError en PHP 8). Hay un test que abre la página
+de detalle de una propuesta **realmente supersedida** y exige `assertOk()`, en vez de confiar en que el
+aplanado esté bien — y eso importa de verdad ahora, porque las tres filas reales ya tienen rastro de
+supersesión y esa pantalla se abre sobre ellas de aquí en adelante.
+
+**El único fallo local** es el gap preexistente de `ext-intl` en la regresión de nested-signals de
+TASK-0002 (`TextEntry::make('confidence')->numeric(4)` llama a `Number::format()`), verde en staging y
+**verificado preexistente** en la ronda anterior restaurando el archivo a su versión de HEAD.
+
+### 8.1 Staging
+
+| Ítem | Resultado |
+|---|---|
+| HEAD de runtime desplegado | **`451ba1188319f0e7200ca3a54b95f0f14fc837c8`** |
+| Workflow «Deploy a Contabo» | `completed / success` para ese sha exacto ([run 37035332746](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/37035332746)) |
+| Migración | aplicada a la instancia compartida **antes** de desplegar código (aditiva, orden seguro); el `migrate --force` del deploy es un no-op |
+| Smoke **antes** de la transición | `/` 200, `/admin/login` 200, las tres pantallas 302 → login 200 |
+| Smoke **después** de la transición | idéntico: `/` 200, `/admin/login` 200, las tres pantallas 302 → login 200 |
+| 500 / 503 | **ninguno**, en ninguno de los dos smokes |
+
+Límite declarado, igual que en rondas anteriores: esta sesión no tiene clave SSH al host, así que el
+HEAD desplegado se verifica por el run del workflow para ese sha exacto y no por inspección directa. El
+riesgo de 500 en la pantalla autenticada queda cubierto por los tests que la abren con `assertOk()`,
+incluido el nuevo sobre una fila supersedida.
 
 ---
 
 ## 9. Estructura de evidencia exigida por el contrato de cierre
 
-*(completado tras la ejecución; ver §9.1–§9.6)*
+### 9.1 A) Gates heredados aprobados que siguen vigentes
+
+| Gate | Origen | Estado tras este diff |
+|---|---|---|
+| Inmutabilidad del payload congelado (9 campos) | TASK-0004 | **Intacto.** Las tres propuestas supersedidas conservan `payload_fingerprint` y `taxonomy_state_fingerprint` idénticos; verificado campo por campo. |
+| Separación REVIEW / CONFIRM / APPLY | TASK-0006B | **Intacto y extendido.** `SUPERSEDE` es un cuarto evento con su propio rastro y su propia fila de auditoría; **no** usa `authorization_reference`/`target_environment`, que siguen reservados al APPLY. |
+| Gate de confirmación humana exigible | TASK-0006B | **Intacto.** Única precisión: `unconfirmedMembers()` mira sólo miembros `PENDING_APPLY` — ver §4.6. Las 47 pruebas de confirmación pasan sin editar. |
+| `confirm()` sólo por HTTP autenticado | TASK-0006C | **Intacto, no tocado.** |
+| Asimetría anulación/reasignación de confirmación | TASK-0006C | **Intacto, no tocado.** Las cuatro reglas previas del trigger siguen presentes (verificado en `pg_proc`). |
+| Guard de publicación de modelo | TASK-0004 HIGH-2 | **Intacto.** La supersesión no enciende `isApplyingC2Publication()` por ningún camino. |
+| Índices únicos parciales de un `PENDING_APPLY` | TASK-0006B | **Intactos y verificados tras migrar.** Son el mecanismo que libera el slot; no se modificaron. |
+| Advisory lock de grupo, sin deadlock | TASK-0006B re-audit | **Intacto y reusado**: la supersesión de un grupo toma la misma clave antes de cualquier lock de fila. |
+| Preflight de solo lectura + paridad con `apply()` | TASK-0006D | **Intacto.** 24/24 sin editar; el bloqueo nuevo entró por la cadena **compartida**, así que preflight y apply coinciden por construcción. |
+| Integridad de payload por miembro de grupo + aborto terminal de grupo | TASK-0006D ronda 2 | **Intacto**, y la atribución de `detected_on_proposal_id` quedó **normalizada** (§4.6). |
+| Endurecimiento de UX de candidatos | TASK-0006D | **Intacto y probado en secuencia**: oculto con propuesta viva, visible tras supersedir. |
+| Regresión de 32 consultas de búsqueda | heredada | **Heredada sin cambios**: este diff no toca búsqueda, ranking, embeddings, CPV ni la semántica de la taxonomía publicada. |
+
+### 9.2 B) Evidencia nueva de esquema y runtime
+
+1. Migración aditiva aplicada: **10 columnas**, **3 CHECK**, **3 FK** auto-referenciales, **2 índices
+   parciales**, **2 reglas nuevas de trigger** — todo verificado de solo lectura contra la base real
+   después de migrar.
+2. **Cero filas tocadas por la migración**: `superseded_at NOT NULL = 0`, `SUPERSEDED = 0`,
+   `PENDING_APPLY = 12` inmediatamente después.
+3. Los dos índices únicos parciales **siguen** filtrando por `status = 'PENDING_APPLY'` (`indexdef`
+   leído de `pg_indexes`).
+4. Las **cuatro** reglas previas del trigger siguen presentes y se sumaron las dos nuevas
+   (`pg_proc.prosrc` inspeccionado).
+5. Operación `supersedeStaleProposal()` con 5 compuertas de revalidación, transaccional, idempotente y
+   serializada por advisory lock en grupos.
+6. Comando `taxonomy:supersede-stale-reviewed-proposal` con `--dry-run`, autorización obligatoria y
+   reporte de conteos antes/después.
+7. `SUPERSEDED` como estado terminal en `apply()`/`preflight()` con cero escrituras.
+8. 20 tests nuevos de supersesión + 3 de nivel de base de datos + 3 de UI.
+
+### 9.3 C) Estado exacto antes/después de #420/#421/#422
+
+Ver **§7.3**. Resumen: `status` `PENDING_APPLY → SUPERSEDED` en las tres, rastro completo grabado,
+**0 campos inmutables modificados**, candidatos fuente sin cambios.
+
+### 9.4 D) Prueba de que NO se creó ningún sucesor
+
+| Comprobación | Resultado |
+|---|---|
+| Total de propuestas | **12** antes y después |
+| `MAX(id)` de propuestas | **632** — ningún id nuevo |
+| Filas con `supersedes_proposal_id` NOT NULL | **0** |
+| Filas con `superseded_by_proposal_id` NOT NULL | **0** |
+| Filas con `inherited_decision_from_id` NOT NULL | **0** |
+| Propuestas por candidato 263 / 264 / 265 | **1 / 1 / 1** (sólo la supersedida) |
+
+### 9.5 E) Prueba de que no hubo mutación de taxonomía publicada
+
+| Medida | Valor | Esperado |
+|---|---|---|
+| `taxonomy_term_concepts` | **142** | 142 ✓ |
+| `taxonomy_canonical_concepts` | **81** | 81 ✓ |
+| `taxonomy_term_cpv_relations` | **9749** | 9749 ✓ |
+| `taxonomy_candidate_concept_links` | **10** | 10 ✓ |
+| `taxonomy_concept_relations` | **2** | 2 ✓ |
+| Candidatos `published` | **0** | 0 ✓ |
+| Relaciones `approved` | **0** | 0 ✓ |
+| Propuestas `APPLIED` | **0** | 0 ✓ |
+| Propuestas con `applied_at` NOT NULL | **0** | 0 ✓ |
+| Propuestas `ABORTED` | **0** | 0 |
+| `PENDING_APPLY` / `SUPERSEDED` | **9 / 3** | 9 / 3 ✓ |
+| Las otras nueve propuestas | **0 con status cambiado** | 0 ✓ |
+
+### 9.6 F) Gates invalidados por este diff
+
+**NINGUNO.**
+
+El cambio de mayor riesgo era introducir un estado que `apply()` no conocía. Se cerró con una compuerta
+terminal explícita en la cadena compartida (cero escrituras) **más** una prohibición a nivel de base de
+datos, y las 119 regresiones heredadas se reejecutaron completas contra el código nuevo **sin editar una
+sola línea**. La única modificación de comportamiento en código heredado es el acotamiento de
+`unconfirmedMembers()` a miembros `PENDING_APPLY`, que es más preciso y no cambia ningún resultado de
+las 47 pruebas de confirmación.
+
+### 9.7 Gates no aplicables
+
+- **APPLY / PUBLISH**: no ejecutados y no autorizados. Ninguna propuesta se aplicó.
+- **Sucesores**: no autorizados y no creados.
+- **Re-revisión de los tres candidatos**: explícitamente **del dueño**, no del agente. No se hizo
+  (§7.8).
+- **Merge a `main` / despliegue a producción / rotación de credenciales / migración destructiva**: no
+  corresponden y no se hicieron.

@@ -188,6 +188,44 @@ class TaxonomyReviewedProposalResourceTest extends TestCase
         }
     }
 
+    /**
+     * TASK-0006E: la sección de supersesión del infolist renderiza un delta de estado con LISTAS
+     * ANIDADAS (los conceptos creados desde la revisión) dentro de un `KeyValueEntry`, que es
+     * exactamente la forma del incidente 503/500 de TASK-0002: ese componente llama
+     * `htmlspecialchars()` sobre cada valor y en PHP 8 eso es un TypeError en cuanto el valor no es
+     * escalar. El aplanado vive en `flattenStateDelta()`, y este test es el que prueba que funciona
+     * contra una fila supersedida REAL en vez de confiar en que el aplanado esté bien.
+     *
+     * Importa de verdad acá: las tres propuestas reales #420/#421/#422 ya están supersedidas, así que
+     * esta pantalla se abre sobre datos con rastro de supersesión de ahora en adelante.
+     */
+    #[Test]
+    public function the_detail_page_of_a_superseded_proposal_renders_without_a_500(): void
+    {
+        $reviewer = $this->fixtureReviewer();
+        $proposal = $this->candidateLinkProposal($reviewer);
+
+        // Se vuelve obsoleta y se supersede, igual que la historia real de #420-#422.
+        $this->concept('zzz_task0006e_state_change_');
+        $outcome = app(ReviewedProposalService::class)->supersedeStaleProposal(
+            $proposal->id,
+            'Issue #2 — TASK-0006E resource test-suite 5955148859',
+            'Obsoleta: el grafo de conceptos cambió desde la revisión.',
+        );
+        $this->assertSame(ReviewedProposalService::RESULT_SUPERSEDED, $outcome['result']);
+        $this->assertNotEmpty($proposal->fresh()->supersession_state_delta['concepts_created_since_review'],
+            'El fixture tiene que producir un delta con la lista anidada, que es justo lo que se quiere renderizar.');
+
+        $this->actingAs($this->bothTypesViewer())
+            ->get(TaxonomyReviewedProposalResource::getUrl('view', ['record' => $proposal]))
+            ->assertOk();
+
+        // Y sigue siendo de SOLO LECTURA: ninguna acción de aplicar/publicar aparece por existir el
+        // estado nuevo.
+        $this->assertSame(TaxonomyReviewedProposal::STATUS_SUPERSEDED, $proposal->fresh()->status);
+        $this->assertFalse(TaxonomyReviewedProposalResource::canCreate());
+    }
+
     #[Test]
     public function a_user_with_no_permission_cannot_open_the_list(): void
     {
