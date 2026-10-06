@@ -1,10 +1,29 @@
-# TASK-0007 — APPLY ATÓMICO POR LOTE (ronda 1)
+# TASK-0007 — APPLY ATÓMICO POR LOTE
 
-**Estado:** READY_FOR_REVIEW (ronda 1 — implementación + tests + staging + preflight de lote real)
+**Estado:** READY_FOR_REVIEW (ronda 2 — las tres compuertas de gobernanza de ejecución corregidas)
 **Abierta por:** Issue #2 comentario [`5997693379`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5997693379)
 (estebanjvasquez, 2026-10-05T15:33:13Z)
+**Re-audit de la ronda 1:** comentario [`6011317053`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6011317053)
+(2026-10-06T07:13:43Z) — `CORRECTIONS_REQUIRED / EXECUTION-GOVERNANCE GATE`. Las tres observaciones se
+aceptaron sin reservas; el detalle de cada corrección está en la **§8** de
+`audit/phase7_task0007_batch_apply_2026-10-05.md`.
 **Checkpoint base aprobado:** `4e671fa7b1b0a3635157e416be9ddbf0e9e69de7`
 **Cierre previo:** TASK-0006E = PASS/CLOSED en el comentario `5994449681`
+
+**Las tres compuertas cerradas en la ronda 2:**
+
+1. **Un manifiesto completo podía ejecutar sólo un subconjunto de sus ids.** `--id` sobrescribía los
+   ids del manifiesto y nadie exigía igualdad de conjuntos, así que
+   `--manifest=<FULL aprobado> --id=491 --execute` verificaba con éxito y ejecutaba sólo #491 — y como
+   #491 cambia el grafo, las otras once quedaban obsoletas. Ahora `--id` está prohibido con
+   `--execute` y el servicio exige igualdad exacta (`BATCH_MANIFEST_REQUEST_MISMATCH`).
+2. **Datos compartidos reales se podían ejecutar desde `APP_ENV=local`.** Los artefactos de la ronda 1
+   prueban que el `local` de la estación lee el dataset real. Ahora el único entorno operativo es
+   `staging`; `testing` es la excepción de tests automatizados y `local` conserva sólo preview y
+   generación de manifiestos.
+3. **La autorización no estaba atada al hash del manifiesto.** Ahora
+   `--expect-manifest-fingerprint` es obligatorio para ejecutar, se compara contra el manifiesto
+   cargado antes de abrir la transacción, y **no** se deduce del archivo.
 
 **APPLY REAL = NO AUTORIZADO.** Esta ronda autoriza el código de ejecución, los tests, la generación
 de solo lectura del manifiesto, el preflight de lote de solo lectura contra datos reales y el deploy
@@ -153,10 +172,15 @@ servicio**, no sólo en el comando: `BATCH_ALLOWED_ENVIRONMENTS = ['local', 'tes
 
 ## 3. Resultado del preflight de lote REAL (solo lectura)
 
-Artefacto: `audit/task0007_batch_preflight_2026-10-05.json`
-Manifiesto: `audit/task0007_batch_manifest_2026-10-05.json`
+Artefactos vigentes (ronda 2): `audit/task0007_batch_preflight_2026-10-06.json` y
+`audit/task0007_batch_manifest_2026-10-06.json`. Los de la ronda 1
+(`…_2026-10-05.json`) se conservan como registro histórico.
+
 **`manifest_fingerprint` = `eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702`**
-(alcance `FULL_PENDING_QUEUE`)
+(alcance `FULL_PENDING_QUEUE`). El re-audit pidió explícitamente no asumir que el hash anterior
+siguiera siendo autoritativo: se **regeneró** y el valor medido es el mismo, porque esta ronda no tocó
+lo que el manifiesto ata ni cómo se hashea (`generate()`/`fingerprintFor()`), sino `verify()`, que es
+la comprobación contra el estado vivo y no forma parte del contenido atado.
 
 - 12 propuestas aceptadas, **11 unidades de ejecución**, **cero bloqueos** — exactamente la
   clasificación esperada por la PARTE 6.
@@ -576,14 +600,22 @@ Una autorización humana nueva y explícita en Issue #2 que cite:
 - el `manifest_fingerprint` `eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702`;
 - el entorno autorizado (compartido/staging; production sigue prohibido).
 
-El comando que la ejecutaría, el día que esa autorización exista:
+El comando que la ejecutaría, el día que esa autorización exista — **corregido por la ronda 2**:
 
 ```bash
 php artisan taxonomy:apply-reviewed-proposal-batch \
-  --manifest=audit/task0007_batch_manifest_2026-10-05.json \
+  --manifest=audit/task0007_batch_manifest_2026-10-06.json \
   --execute --authorized-by="Issue #2 comment <id>" \
+  --expect-manifest-fingerprint=eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702 \
   --expect-environment=staging
 ```
+
+Tres cosas que cambiaron respecto de la ronda 1 y que valen la pena leer antes de ejecutar:
+
+- `--id` ya **no se puede usar** con `--execute`. Un manifiesto autoriza UN conjunto atómico.
+- `--expect-manifest-fingerprint` es **obligatorio**: el hash autorizado se cita aparte del archivo.
+- Sólo **`staging`** puede ejecutar. Correrlo desde `local` se rechaza, aunque `local` sí puede
+  generar el manifiesto y correr el preflight (las dos cosas son de solo lectura).
 
 Si entre hoy y ese día cambia cualquier cosa —una propuesta más, un candidato resuelto por otra vía,
 un concepto nuevo— el manifiesto se rechaza solo (`BATCH_QUEUE_DRIFT` / `BATCH_BASELINE_STALE`) con

@@ -1,15 +1,23 @@
-# TASK-0007 ronda 1 — APPLY ATÓMICO POR LOTE: implementación, manifiesto y preflight de solo lectura
+# TASK-0007 — APPLY ATÓMICO POR LOTE: implementación, manifiesto y preflight de solo lectura
 
 **Tarea:** Issue #2 comentario `5997693379` — *ORCHESTRATOR — OPEN TASK-0007 / ATOMIC BATCH APPLY
 PREPARATION — REAL APPLY NOT YET AUTHORIZED*
+**Re-audit de la ronda 1:** comentario `6011317053` — *CORRECTIONS_REQUIRED / EXECUTION-GOVERNANCE
+GATE*. Las tres compuertas corregidas están en la **§8**.
 **Checkpoint base:** `4e671fa7b1b0a3635157e416be9ddbf0e9e69de7` (TASK-0006E PASS/CLOSED en `5994449681`)
 **Rama:** `feature/upgrade-filament-v3`
-**Fecha:** 2026-10-05
+**Fecha:** 2026-10-05 (ronda 1) / 2026-10-06 (ronda 2, correcciones)
 **Definición de la tarea (verbatim):** `docs/orquestador/tasks/0007-atomic-batch-apply.md`
 
-**APPLY REAL = NO AUTORIZADO Y NO EJECUTADO.** Al cierre de esta ronda las 12 propuestas siguen
+**APPLY REAL = NO AUTORIZADO Y NO EJECUTADO.** Al cierre de las dos rondas las 12 propuestas siguen
 `PENDING_APPLY`, los 10 candidatos siguen `pending`, las 2 relaciones siguen `candidate`, y hay 0
 filas con `applied_at`. Nada se publicó.
+
+> **Nota de lectura.** Las §1–§7 describen la ronda 1 y siguen siendo válidas, con dos excepciones que
+> la §8 corrige explícitamente: la lista de entornos de la §2/PARTE 8 (`['local','testing','staging']`)
+> quedó reducida a `['staging']` más la excepción de tests, y el manifiesto ahora exige igualdad exacta
+> con el conjunto pedido y un hash autorizado provisto aparte. Donde las dos secciones difieran, **vale
+> la §8**.
 
 ---
 
@@ -404,7 +412,221 @@ ronda**. No se publicó taxonomía, no se cambió el status de ninguna fila real
 concepto real, no se editó ningún payload/fingerprint congelado, no se tocaron #420/#421/#422, no hubo
 merge a `main` ni deploy a producción, y no se agregó ninguna migración.
 
-## 8. Qué falta para la ejecución real
+## 8. Re-audit `6011317053` — las tres compuertas de gobernanza de ejecución
+
+Las tres observaciones se aceptan **sin reservas**: las tres son alcanzables con el código de la ronda
+1 y las tres amplían lo que el dueño autorizó. Ninguna es un desacuerdo de criterio.
+
+### 8.1 BLOQUEO 1 — un manifiesto completo podía ejecutar sólo un subconjunto de sus ids
+
+**El defecto, exacto.** `verify()` comprobaba que todas las propuestas que el manifiesto ATA siguieran
+vivas y que la cola no tuviera ninguna de más, pero **nadie comprobaba que el conjunto a EJECUTAR
+fuera ese mismo conjunto**. El CLI, además, dejaba que `--id` sobrescribiera los ids tomados del
+manifiesto y le pasaba a `applyBatch()` ese conjunto más chico junto con el manifiesto COMPLETO. Por lo
+tanto `--manifest=<FULL aprobado> --id=491 --execute` verificaba con éxito y ejecutaba sólo #491.
+
+**Por qué el daño es peor que «queda una fila sin aplicar».** #491 escribe `taxonomy_term_concepts`,
+así que tras esa ejecución parcial el fingerprint global cambia y las once revisiones restantes pueden
+quedar obsoletas. El conjunto atómico que el dueño autorizó deja de ser recuperable **como ese
+conjunto** — y re-congelar está bloqueado por el índice único parcial.
+
+**La corrección, en dos capas:**
+
+1. **Servicio** (la que no se puede evitar): `verify()` recibe ahora el conjunto PEDIDO como parámetro
+   **obligatorio y sin valor por defecto**, y exige igualdad exacta de conjuntos normalizados contra
+   los ids atados → `BATCH_MANIFEST_REQUEST_MISMATCH`, antes del baseline y antes de la liveness,
+   porque no tiene sentido verificar el estado vivo de un manifiesto que no es el que se va a
+   ejecutar. Que el parámetro no tenga default es deliberado: con uno, un llamador futuro podría
+   omitirlo y volver a habilitar el defecto en silencio.
+2. **CLI** (la opción preferida del orquestador): `--id` queda **prohibido** junto con `--execute`, y
+   se rechaza el uso simultáneo en vez de intentar reconciliar los dos insumos. Si los dos pueden
+   describir conjuntos distintos, alguien va a creer alguna vez que `--id` «acota» una ejecución
+   autorizada; no la acota, la rompe.
+
+Vale para los dos alcances. `--allow-subset-manifest` significa «el MANIFIESTO ata un subconjunto a
+propósito», nunca «tomá un subconjunto arbitrario de un manifiesto ya atado», y así quedó escrito en
+la ayuda de la opción y en el detalle del bloqueo.
+
+El ORDEN de las compuertas también se fijó: la integridad del archivo se comprueba **antes** que la
+igualdad de conjuntos, así que a un manifiesto al que le editaron la lista de propuestas se le reporta
+`BATCH_TAMPER_DETECTED` —el hallazgo correcto— y no un simple desajuste de pedido, aunque las dos
+cosas sean ciertas a la vez.
+
+### 8.2 BLOQUEO 2 — datos compartidos reales se podían ejecutar desde `APP_ENV=local`
+
+**El defecto, exacto.** `BATCH_ALLOWED_ENVIRONMENTS = ['local', 'testing', 'staging']` presentaba tres
+entornos como objetivos operativos equivalentes. Y la prueba de que eso era más amplio de lo
+autorizado está en los **propios artefactos de la ronda 1**: se generaron con
+`generated_in_environment = local` y leyeron la cola real de 12 filas y los conteos protegidos, o sea
+que el `APP_ENV=local` de esta estación **está conectado al dataset compartido REAL**. Con esa lista,
+`--execute --expect-environment=local` habría podido ejecutar datos reales desde una máquina de
+desarrollo.
+
+**La corrección**, separando lo que no es lo mismo en vez de mezclarlo en una lista:
+
+| constante | valor | qué significa |
+|---|---|---|
+| `BATCH_EXECUTABLE_ENVIRONMENTS` | `['staging']` | el ÚNICO entorno operativo que puede ejecutar |
+| `BATCH_FIXTURE_TEST_ENVIRONMENT` | `'testing'` | excepción para tests automatizados, donde cada lote vive en una transacción que **nunca commitea** |
+
+`environmentCanExecuteBatch()` es el único predicado, para que la regla no quede duplicada entre el
+servicio y el comando con posibilidad de divergir. `production` devuelve `false` por no estar en
+ninguna de las dos: la prohibición no depende de una lista negra que alguien pueda olvidar de
+actualizar, sino de que sólo pase lo explícitamente permitido.
+
+Dos matices que importan:
+
+- **`local` conserva preview y generación de manifiestos.** Las dos son de solo lectura y es donde
+  tienen sentido; dejar el preflight inutilizable no habría sido una corrección sino otro defecto. Hay
+  un test que lo comprueba: en `local` el lote se bloquea con `BATCH_ENVIRONMENT_NOT_AUTHORIZED` y el
+  mismo preview sigue devolviendo cero bloqueos y cero escrituras, reportando
+  `environment_authorized_for_execution = false`.
+- **El CLI es más estricto que el servicio, a propósito**: acepta sólo
+  `BATCH_EXECUTABLE_ENVIRONMENTS`, sin la excepción de `testing`. Una persona corriendo el comando en
+  `testing` no es un test de fixture.
+
+### 8.3 BLOQUEO 3 — la autorización del dueño no estaba atada al hash del manifiesto
+
+**El defecto, exacto.** Un manifiesto auto-hasheado prueba «este archivo no se editó sin cambiar su
+hash». **No** prueba «este es el hash que el dueño autorizó». El escenario de fallo es concreto: el
+dueño autoriza el hash A; después se genera un manifiesto B internamente válido; el operador corre B
+citando el comentario que autorizó A; y si B coincide con el estado vivo, nada detecta que la
+referencia de autorización y el manifiesto cargado describen conjuntos de ejecución distintos.
+
+**La corrección:** un SEGUNDO insumo de confianza, independiente del archivo.
+`--expect-manifest-fingerprint=<sha256>` es obligatorio con `--execute`, y `applyBatch()` lo recibe
+como parámetro propio. La compuerta corre **antes de abrir la transacción** y antes de cualquier
+confirmación —un hash que no es el autorizado no debe ni tomar locks— y distingue tres casos con
+nombres distintos, porque piden acciones distintas:
+
+| bloqueo | cuándo |
+|---|---|
+| `BATCH_AUTHORIZATION_FINGERPRINT_MISSING` | el operador no citó el hash autorizado |
+| `BATCH_AUTHORIZATION_FINGERPRINT_MALFORMED` | lo citó pero no tiene forma de sha256 (64 hex) |
+| `BATCH_AUTHORIZATION_FINGERPRINT_MISMATCH` | el manifiesto cargado **no es** el autorizado |
+
+La comparación usa `hash_equals()` sobre minúsculas y recortando espacios: un copiado/pegado desde un
+comentario del Issue no debería romper una ejecución legítima, y un hash no se compara con `===`
+cuando existe la función que lo hace en tiempo constante. Lo que **no** se acepta es un hash distinto.
+
+**No se deduce del archivo**, que es la parte que hace que la compuerta sirva de algo: deducirlo
+colapsaría los dos insumos en uno. Hay un test **estructural** que lo fija: el cuerpo de `applyBatch()`
+no puede contener `$manifest['manifest_fingerprint']` ni un fallback `$expectedManifestFingerprint ??`,
+los dos insumos llegan como parámetros separados, y la compuerta se evalúa antes del `->transaction(`.
+
+### 8.4 Tests de la ronda 2
+
+**Corrida completa, un solo proceso, requisito 1 de la ronda 2: 189/189 PASS, 1.338 aserciones, cero
+fallos.**
+
+| suite | tests |
+|---|---|
+| `ReviewedProposalBatchApplyTest` | **50** (35 heredados de la ronda 1 + 15 nuevos) |
+| `ReviewedProposalGroupLockingTest` | 7 |
+| `ReviewedProposalServiceTest` | 41 |
+| `ReviewedProposalConfirmationTest` | 47 |
+| `ReviewedProposalPreflightTest` | 24 |
+| `ReviewedProposalSupersessionTest` | 20 |
+
+Las cinco suites heredadas se corrieron **sin editar una línea**. Nota honesta sobre la trazabilidad de
+las corridas: una pasada anterior de la suite del lote tuvo **9 errores consecutivos** por una caída
+transitoria de DNS de esta máquina (`could not translate host name
+"aws-0-us-west-2.pooler.supabase.com"`), no por el código — los tests anteriores y posteriores a ese
+bloque pasaron. Esos 9 se re-corrieron limpios y después la corrida completa de 189 pasó entera en un
+solo proceso, que es la que se reporta arriba.
+
+La suite del lote pasó de **35 a 50 tests**. Los 15 nuevos cubren exactamente lo que el re-audit pidió:
+
+| requisito del re-audit | test |
+|---|---|
+| manifiesto FULL + subconjunto estricto → bloqueado, cero escrituras, cero ABORTs | `a_strict_subset_of_a_full_manifest_is_refused_with_zero_writes` |
+| manifiesto de subconjunto + subconjunto adicional → bloqueado | `a_further_subset_of_a_subset_manifest_is_refused_too` |
+| (añadido) pedir MÁS de lo atado → bloqueado | `extra_ids_beyond_the_manifest_are_refused_as_well` |
+| mismos ids en otro orden → aceptado; duplicados normalizados → aceptado | `the_same_set_in_a_different_order_or_with_duplicates_is_accepted` |
+| `--id` no puede debilitar un manifiesto (nivel comando) | `the_command_refuses_id_together_with_execute` |
+| (añadido) precedencia tamper > mismatch | `an_edited_manifest_is_reported_as_tamper_and_not_as_a_request_mismatch` |
+| `local` → `BATCH_ENVIRONMENT_NOT_AUTHORIZED`, cero escrituras | `local_can_preview_but_cannot_execute_a_batch` |
+| `production` → bloqueado, cero escrituras | `the_batch_refuses_an_environment_that_is_not_authorised_to_execute` |
+| `testing` permitido para fixtures; `staging` pasa la compuerta | `staging_passes_the_environment_gate_and_testing_is_only_the_fixture_exception` |
+| hash autorizado == hash cargado → pasa | `the_batch_executes_when_the_authorised_fingerprint_matches_the_loaded_manifest` |
+| mismatch → rechazado antes de la transacción, cero escrituras | `the_batch_refuses_a_valid_manifest_that_is_not_the_authorised_one` |
+| falta el hash con `--execute` → rechazado | `the_batch_refuses_a_manifest_without_the_authorised_fingerprint` + `the_command_refuses_execute_without_the_authorised_fingerprint` |
+| hash malformado → rechazado | `the_batch_refuses_a_malformed_authorised_fingerprint` |
+| (añadido) el hash no se deduce del archivo | `the_authorisation_fingerprint_is_never_inferred_from_the_manifest_file` |
+| (añadido) el CLI rechaza ejecutar fuera de staging | `the_command_refuses_execute_outside_staging` |
+
+Los tests de nivel comando usan un manifiesto de **fixture** escrito a un archivo temporal, no el
+artefacto real de `audit/`: ese ata las 12 propuestas reales, y si alguna compuerta del comando se
+debilitara, un test podría llegar a nombrarlas. Con un manifiesto de fixture ningún camino de esos
+tests puede siquiera mencionar una propuesta real.
+
+### 8.5 Manifiesto y preflight nuevos (requisitos 3–6 de la ronda 2)
+
+El orquestador advirtió explícitamente que **no se asuma** que el fingerprint anterior sigue siendo
+autoritativo. Se regeneró, y el valor medido es:
+
+**`manifest_fingerprint` = `eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702`**
+
+Es el **mismo** que el de la ronda 1, y la razón es verificable: esta ronda no tocó `generate()` ni
+`fingerprintFor()` —lo que el manifiesto ATA y cómo se hashea no cambió— sino `verify()`, que es la
+comprobación contra el estado vivo y no forma parte del contenido atado. Además la cola real no se
+movió. Se reporta como **medición**, no como suposición.
+
+Artefactos nuevos (los de la ronda 1 se conservan como registro histórico):
+
+- `audit/task0007_batch_manifest_2026-10-06.json` — `scope = FULL_PENDING_QUEUE`, 12 propuestas, 11
+  unidades, baseline `c236bc…`, cero statements de escritura durante la generación.
+- `audit/task0007_batch_preflight_2026-10-06.json` — `generated_at` 2026-10-06 08:53:54.
+
+Verificación del preflight nuevo, punto por punto contra el requisito 5:
+
+| requisito | medido |
+|---|---|
+| 12 filas / 11 unidades / cero bloqueos | 12 aceptadas, 11 unidades, `blocker = null` |
+| `write_statements_observed = 0` | **0** |
+| conteos vivos 10 / 2 / 142 / 81 / 9749 / 15 / 12 pending / 3 superseded / 0 applied / 0 aborted | idénticos |
+| proyección de escrituras = 40 | **40**, sin desvío que explicar |
+| sin escrituras de auditoría posteriores | `max(taxonomy_audit_log.id)` = **3034** |
+
+Y dos campos del informe que **sólo** existen por las correcciones de esta ronda, así que el artefacto
+es evidencia de que las compuertas están activas y no sólo declaradas:
+
+- `environment_authorized_for_execution: false` con `target_environment: local` — BLOQUEO 2 visible en
+  el artefacto: la máquina que generó el informe puede leer pero **no** puede ejecutar.
+- `manifest_verification.findings.requested_set_equals_bound_set: true` — BLOQUEO 1: el conjunto
+  pedido es exactamente el atado.
+
+### 8.6 Staging de la ronda 2
+
+- **HEAD desplegado: `c1d174eb6c1ac886f9c76f0965751e91538365c4`.** Workflow «Deploy a Contabo» run
+  **37439406937**, `completed/success` para ese sha exacto (job `deploy`, los cuatro pasos `success`,
+  08:55:38 → 08:57:55 UTC).
+- Smoke posterior: `GET /` **200**, `GET /admin/login` **200**, las tres pantallas de taxonomía
+  **302 → login 200**. **Ningún 500/503.**
+- Sigue sin haber migración, así que el `migrate --force` del deploy es un no-op.
+
+### 8.7 Clasificación de la ronda 2 (PARTE 10)
+
+**A) Evidencia heredada y aprobada, no invalidada.** TASK-0001/C1 a TASK-0006E; el diseño atómico de
+baseline único de TASK-0007; la validación de aplicabilidad compartida; el diseño de unidades de
+ejecución agrupadas; el diseño del advisory lock de ejecución; y la regresión congelada de búsqueda
+—esta ronda no toca búsqueda, ranking, embeddings, CPV ni semántica publicada.
+
+**B) Evidencia nueva de esta ronda.** Las tres compuertas corregidas con sus 15 tests nuevos; el deploy
+de `c1d174e` a staging con smoke limpio; el manifiesto y el preflight regenerados contra la cola real,
+los dos de solo lectura; y la re-verificación directa del estado vivo.
+
+**C) Compuertas invalidadas.** Ninguna de las compuertas técnicas heredadas. Lo que el re-audit
+invalidó —y con razón— fue la *disposición de la ronda 1 a pedir la autorización de ejecución real*, y
+eso es justamente lo que esta ronda repara. El cambio de mayor riesgo fue volver obligatorio el tercer
+parámetro de `verify()`: se hizo deliberadamente sin valor por defecto, y los llamadores existentes se
+actualizaron uno por uno.
+
+**D) No autorizado y no ejecutado.** APPLY/PUBLICACIÓN real, cambios de status de candidatos o
+relaciones, creación real de conceptos/links, deploy a producción, merge a `main`, y cualquier cambio a
+#420/#421/#422.
+
+## 9. Qué falta para la ejecución real
 
 Una autorización humana nueva y explícita en Issue #2 que cite el conjunto exacto de ids y el
 `manifest_fingerprint` del artefacto de esta ronda, más el entorno autorizado (compartido/staging;

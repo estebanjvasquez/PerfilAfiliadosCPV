@@ -1,9 +1,60 @@
 # Tarea activa
 
-**TASK-0007 ronda 1 — APPLY ATÓMICO POR LOTE: implementación, manifiesto y preflight de solo lectura**
-(Issue #2 comentario
+**TASK-0007 — APPLY ATÓMICO POR LOTE** (Issue #2 comentario
 [`5997693379`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5997693379)).
-Abierta desde HEAD `4e671fa`. **Estado: READY_FOR_REVIEW.**
+Abierta desde HEAD `4e671fa`. **Estado: READY_FOR_REVIEW — ronda 2, las tres compuertas de gobernanza
+de ejecución corregidas.**
+
+## Ronda 2 — re-audit `6011317053` (`CORRECTIONS_REQUIRED`)
+
+El orquestador encontró **dos defectos del camino de ejecución y un hueco de atadura de autorización**.
+Los tres se aceptan **sin reservas**: los tres son alcanzables con el código de la ronda 1 y los tres
+amplían lo que el dueño autorizó.
+
+1. **Un manifiesto completo podía ejecutar sólo un subconjunto de sus ids.** `--id` sobrescribía los
+   ids tomados del manifiesto y nadie exigía igualdad de conjuntos, así que
+   `--manifest=<FULL aprobado> --id=491 --execute` **verificaba con éxito** y ejecutaba sólo #491. Y el
+   daño no es «queda una fila sin aplicar»: #491 escribe `taxonomy_term_concepts`, así que tras esa
+   ejecución parcial el fingerprint global cambia y las once revisiones restantes pueden quedar
+   obsoletas — el conjunto atómico autorizado deja de ser recuperable **como ese conjunto**.
+   **Corregido en dos capas:** `--id` queda **prohibido** con `--execute`, y el servicio exige igualdad
+   exacta de conjuntos normalizados (`BATCH_MANIFEST_REQUEST_MISMATCH`), con el parámetro de ids
+   **obligatorio y sin default** para que nadie pueda omitirlo en el futuro.
+2. **Datos compartidos reales se podían ejecutar desde `APP_ENV=local`.** La prueba está en los
+   propios artefactos de la ronda 1: se generaron con `generated_in_environment = local` leyendo la
+   cola real, o sea que el `local` de esta estación **está conectado al dataset compartido**.
+   **Corregido:** `BATCH_EXECUTABLE_ENVIRONMENTS = ['staging']` —único entorno operativo— más
+   `BATCH_FIXTURE_TEST_ENVIRONMENT = 'testing'` como excepción de tests automatizados, separadas a
+   propósito en vez de mezcladas en una lista. `local` conserva **preview y generación de manifiestos**
+   (las dos de solo lectura, y es donde tienen sentido) pero no ejecución; `production` sigue
+   prohibido. El CLI es más estricto que el servicio: no acepta la excepción de `testing`.
+3. **La autorización del dueño no estaba atada al hash del manifiesto.** Un manifiesto auto-hasheado
+   prueba «este archivo no se editó», no «este es el hash que el dueño autorizó».
+   **Corregido:** `--expect-manifest-fingerprint` es obligatorio con `--execute`, se valida la forma
+   sha256, se compara con `hash_equals()` contra el manifiesto cargado **antes de abrir la
+   transacción**, y **no se deduce del archivo** — hay un test estructural que lo fija, porque
+   deducirlo colapsaría los dos insumos de confianza en uno.
+
+**Suite del lote: 35 → 50 tests.** Los 15 nuevos cubren subconjunto estricto bloqueado, subconjunto de
+un subconjunto, pedir más de lo atado, mismo conjunto en otro orden y con duplicados aceptado,
+precedencia tamper > mismatch, `local` bloqueado con su preview intacto, `production` bloqueado,
+`staging` pasando la compuerta sobre un lote de fixture, hash coincidente aceptado, y hash faltante /
+malformado / distinto rechazados antes de la transacción con cero escrituras — más tres tests de nivel
+comando que prueban que `--id` no puede debilitar un manifiesto y que no se ejecuta fuera de staging.
+
+**Artefactos vigentes:** `audit/task0007_batch_manifest_2026-10-06.json` y
+`audit/task0007_batch_preflight_2026-10-06.json`. El `manifest_fingerprint` se **regeneró** —el
+re-audit pidió no asumir que el anterior siguiera siendo autoritativo— y el valor medido es el mismo,
+`eb7d1467…`, porque esta ronda no tocó lo que el manifiesto ata ni cómo se hashea, sino `verify()`.
+
+**HEAD de runtime desplegado a staging: `c1d174e`** (workflow run 37439406937, `success`; smoke
+`GET /` 200, `/admin/login` 200, las tres pantallas 302 → login 200, sin 500/503).
+
+**APPLY REAL sigue NO AUTORIZADO y NO se ejecutó.**
+
+---
+
+## Ronda 1 — implementación, manifiesto y preflight de solo lectura
 
 TASK-0006E quedó **`PASS / CLOSED`** en el comentario
 [`5994449681`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5994449681).
