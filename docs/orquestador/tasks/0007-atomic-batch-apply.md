@@ -1,14 +1,33 @@
 # TASK-0007 — APPLY ATÓMICO POR LOTE
 
-**Estado:** READY_FOR_REVIEW (ronda 2 — las tres compuertas de gobernanza de ejecución corregidas)
+**Estado:** READY_FOR_REVIEW (ronda 3 — los dos agujeros residuales del camino de ejecución cerrados)
 **Abierta por:** Issue #2 comentario [`5997693379`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5997693379)
 (estebanjvasquez, 2026-10-05T15:33:13Z)
 **Re-audit de la ronda 1:** comentario [`6011317053`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6011317053)
 (2026-10-06T07:13:43Z) — `CORRECTIONS_REQUIRED / EXECUTION-GOVERNANCE GATE`. Las tres observaciones se
 aceptaron sin reservas; el detalle de cada corrección está en la **§8** de
 `audit/phase7_task0007_batch_apply_2026-10-05.md`.
+**Re-audit de la ronda 2:** comentario [`6015273402`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6015273402)
+(2026-10-06T11:27:52Z) — `CORRECTIONS_REQUIRED / FINAL EXECUTION-PATH HARDENING`. Dos agujeros
+residuales, aceptados sin reservas; detalle en la **§9** del mismo audit.
 **Checkpoint base aprobado:** `4e671fa7b1b0a3635157e416be9ddbf0e9e69de7`
 **Cierre previo:** TASK-0006E = PASS/CLOSED en el comentario `5994449681`
+
+**Los dos agujeros residuales cerrados en la ronda 3:**
+
+1. **El `applyBatch()` público podía saltearse el manifiesto en staging.** La compuerta de
+   autorización corría dentro de `if ($manifest !== null)`, así que `applyBatch($ids, $referencia)` —una
+   invocación directa desde Tinker, otro comando o un llamador futuro— abría la transacción en staging
+   **sin manifiesto, sin hash autorizado y sin atadura al conjunto autorizado**. Ahora el manifiesto es
+   **obligatorio en el servicio** para todo entorno operativo (`BATCH_MANIFEST_REQUIRED`, antes de la
+   transacción y antes de cualquier lock). La excepción sin manifiesto queda sólo para `testing`, y
+   documentada como SÓLO DE TESTS.
+2. **El hash se validaba después de la confirmación del CLI.** El CLI sólo miraba que la opción no
+   estuviera vacía antes del banner destructivo y del `confirm()`; forma y coincidencia se validaban
+   dentro de `applyBatch()`, o sea **después**. Se podía pedirle a una persona que confirmara un APPLY
+   con un hash equivocado para rechazarlo recién después. Ahora hay **un solo** validador
+   (`authorizationFingerprintBlocker()`, público y de solo lectura): el CLI lo llama antes del banner
+   y del prompt, y el servicio lo vuelve a llamar antes de la transacción.
 
 **Las tres compuertas cerradas en la ronda 2:**
 
@@ -172,15 +191,16 @@ servicio**, no sólo en el comando: `BATCH_ALLOWED_ENVIRONMENTS = ['local', 'tes
 
 ## 3. Resultado del preflight de lote REAL (solo lectura)
 
-Artefactos vigentes (ronda 2): `audit/task0007_batch_preflight_2026-10-06.json` y
-`audit/task0007_batch_manifest_2026-10-06.json`. Los de la ronda 1
-(`…_2026-10-05.json`) se conservan como registro histórico.
+Artefactos vigentes (ronda 3): `audit/task0007_batch_preflight_2026-10-06_r3.json` y
+`audit/task0007_batch_manifest_2026-10-06_r3.json`. Los de las rondas 1 y 2 se conservan como registro
+histórico.
 
 **`manifest_fingerprint` = `eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702`**
-(alcance `FULL_PENDING_QUEUE`). El re-audit pidió explícitamente no asumir que el hash anterior
-siguiera siendo autoritativo: se **regeneró** y el valor medido es el mismo, porque esta ronda no tocó
-lo que el manifiesto ata ni cómo se hashea (`generate()`/`fingerprintFor()`), sino `verify()`, que es
-la comprobación contra el estado vivo y no forma parte del contenido atado.
+(alcance `FULL_PENDING_QUEUE`). Los dos re-audits pidieron explícitamente no asumir que el hash
+anterior siguiera siendo autoritativo: se **regeneró** en cada ronda y el valor medido es el mismo,
+porque ninguna de las dos tocó lo que el manifiesto ata ni cómo se hashea
+(`generate()`/`fingerprintFor()`), sino las compuertas que lo verifican y el orden en que se evalúan.
+Y la cola real no se movió.
 
 - 12 propuestas aceptadas, **11 unidades de ejecución**, **cero bloqueos** — exactamente la
   clasificación esperada por la PARTE 6.
@@ -604,18 +624,21 @@ El comando que la ejecutaría, el día que esa autorización exista — **correg
 
 ```bash
 php artisan taxonomy:apply-reviewed-proposal-batch \
-  --manifest=audit/task0007_batch_manifest_2026-10-06.json \
+  --manifest=audit/task0007_batch_manifest_2026-10-06_r3.json \
   --execute --authorized-by="Issue #2 comment <id>" \
   --expect-manifest-fingerprint=eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702 \
   --expect-environment=staging
 ```
 
-Tres cosas que cambiaron respecto de la ronda 1 y que valen la pena leer antes de ejecutar:
+Lo que cambió respecto de la ronda 1 y vale la pena leer antes de ejecutar:
 
 - `--id` ya **no se puede usar** con `--execute`. Un manifiesto autoriza UN conjunto atómico.
-- `--expect-manifest-fingerprint` es **obligatorio**: el hash autorizado se cita aparte del archivo.
+- `--expect-manifest-fingerprint` es **obligatorio**: el hash autorizado se cita aparte del archivo, y
+  se valida —falta, forma y coincidencia— **antes** del banner destructivo y **antes** de preguntar.
 - Sólo **`staging`** puede ejecutar. Correrlo desde `local` se rechaza, aunque `local` sí puede
   generar el manifiesto y correr el preflight (las dos cosas son de solo lectura).
+- El manifiesto no es sólo una exigencia del comando: **el servicio** lo exige en todo entorno
+  operativo, así que una invocación directa de `applyBatch()` sin manifiesto tampoco ejecuta.
 
 Si entre hoy y ese día cambia cualquier cosa —una propuesta más, un candidato resuelto por otra vía,
 un concepto nuevo— el manifiesto se rechaza solo (`BATCH_QUEUE_DRIFT` / `BATCH_BASELINE_STALE`) con

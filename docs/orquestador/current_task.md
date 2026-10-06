@@ -2,8 +2,63 @@
 
 **TASK-0007 — APPLY ATÓMICO POR LOTE** (Issue #2 comentario
 [`5997693379`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5997693379)).
-Abierta desde HEAD `4e671fa`. **Estado: READY_FOR_REVIEW — ronda 2, las tres compuertas de gobernanza
-de ejecución corregidas.**
+Abierta desde HEAD `4e671fa`. **Estado: READY_FOR_REVIEW — ronda 3, los dos agujeros residuales del
+camino de ejecución cerrados.**
+
+## Ronda 3 — re-audit `6015273402` (`CORRECTIONS_REQUIRED / FINAL EXECUTION-PATH HARDENING`)
+
+El orquestador aceptó las tres correcciones de la ronda 2 y el manifiesto/preflight regenerados, pero
+encontró **dos agujeros residuales del camino de ejecución**. Los dos se aceptan **sin reservas**.
+
+1. **El `applyBatch()` público podía saltearse el manifiesto en staging.** La compuerta de
+   autorización corría dentro de `if ($manifest !== null)`, así que una invocación **directa** del
+   servicio —`applyBatch($ids, $referencia)` desde Tinker, otro comando o un llamador futuro— pasaba la
+   compuerta de entorno, abría la transacción y podía ejecutar **sin manifiesto, sin hash autorizado y
+   sin atadura al conjunto autorizado**. No era teórico: el propio test de la ronda 2 ponía
+   `APP_ENV=staging` y llamaba a `applyBatch()` sin manifiesto, con éxito. El CLI estaba bien, pero una
+   compuerta que protege datos compartidos reales no puede vivir sólo en un envoltorio de CLI.
+   **Corregido en el único camino de escritura:** en todo entorno **operativo** el manifiesto es
+   obligatorio (`BATCH_MANIFEST_REQUIRED`, antes de la transacción y antes de cualquier lock), y como
+   entonces está garantizado no nulo, el hash autorizado y la igualdad exacta del conjunto **siempre**
+   corren ahí. La exigencia se deriva de `BATCH_EXECUTABLE_ENVIRONMENTS`, no de
+   `environmentCanExecuteBatch()`, así que un entorno operativo nuevo la hereda sin que nadie se
+   acuerde. La excepción sin manifiesto queda sólo para `testing` —donde cada lote vive en una
+   transacción que nunca commitea— y está documentada como **SÓLO DE TESTS**.
+2. **El hash se validaba DESPUÉS de la confirmación humana del CLI.** El CLI sólo comprobaba que
+   `--expect-manifest-fingerprint` no estuviera vacía antes de imprimir el banner destructivo y
+   preguntar; `MALFORMED` y `MISMATCH` vivían en `applyBatch()`, invocado **después** de esa
+   confirmación. El servicio validaba bien, pero se le podía pedir a una persona que **confirmara un
+   APPLY destructivo** con un hash mal copiado o equivocado para rechazarlo recién después — y el audit
+   de la ronda 2 **sobreafirmó** al decir que la compuerta corría «antes de cualquier confirmación».
+   **Corregido sin duplicar validadores:** hay **uno solo**,
+   `ReviewedProposalService::authorizationFingerprintBlocker()`, ahora público y de solo lectura. El
+   CLI lo llama antes del banner y de cualquier prompt; el servicio lo vuelve a llamar antes de la
+   transacción por defensa en profundidad. El CLI rechaza **sin preguntar** hash faltante, malformado o
+   distinto.
+
+**Tests: 197/197 PASS, 1.432 aserciones, cero fallos, en un solo proceso** (lote 58 + group-locking 7 +
+service 41 + confirmation 47 + preflight 24 + supersession 20; las cinco heredadas sin editar una
+línea). **Suite del lote: 50 → 58 tests.** Los 8 nuevos cubren staging sin manifiesto → `BATCH_MANIFEST_REQUIRED`
+con cero escrituras; staging con manifiesto pero sin hash → `MISSING`; el camino sin manifiesto
+alcanzable sólo en `testing`; hash malformado / distinto / faltante → FAILED **sin llegar nunca al
+prompt** (se afirma que el banner destructivo no se imprime); hash correcto → llega a la confirmación
+normal, que el test responde «no» (fixture puro, cero escrituras); y un test estructural que fija que
+el CLI no tiene validación de forma ni `hash_equals()` propios, que llama a la primitiva del servicio
+antes del banner y del `confirm()`, y que el servicio re-valida antes de la transacción.
+
+**Artefactos vigentes:** `audit/task0007_batch_manifest_2026-10-06_r3.json` y
+`audit/task0007_batch_preflight_2026-10-06_r3.json` — 12 ids / 11 unidades / `blocker = null` /
+`write_statements_observed = 0` / proyección **40** / conteos 10 · 2 · 142 · 81 · 9749 · 15 con 12
+`PENDING_APPLY`, 3 `SUPERSEDED`, 0 `APPLIED`, 0 `ABORTED` / última auditoría de taxonomía **#3034**.
+`manifest_fingerprint` recién generado: **`eb7d1467…`** (el mismo, porque ninguna ronda tocó lo que el
+manifiesto ata ni cómo se hashea).
+
+**HEAD de runtime desplegado a staging: `004d24e`** (workflow run 37458287882, `success`; smoke
+`GET /` 200, `/admin/login` 200, las tres pantallas 302 → login 200, sin 500/503).
+
+**APPLY REAL sigue NO AUTORIZADO y NO se ejecutó.**
+
+---
 
 ## Ronda 2 — re-audit `6011317053` (`CORRECTIONS_REQUIRED`)
 

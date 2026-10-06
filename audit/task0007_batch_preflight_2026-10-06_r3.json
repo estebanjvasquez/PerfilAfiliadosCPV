@@ -1,0 +1,858 @@
+{
+    "mode": "READ_ONLY_BATCH_PREFLIGHT",
+    "generated_at": "2026-10-06 11:48:44",
+    "task": "TASK-0007",
+    "governance_reference": "Issue #2 comentario 5997693379",
+    "target_environment": "local",
+    "environment_authorized_for_execution": false,
+    "manifest_fingerprint": "eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702",
+    "manifest_verification": {
+        "ok": true,
+        "blocker": null,
+        "detail": [],
+        "manifest_fingerprint": "eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702",
+        "findings": {
+            "manifest_version": "taxonomy-reviewed-proposal-batch-manifest/v1",
+            "scope": "FULL_PENDING_QUEUE",
+            "manifest_fingerprint_recomputed_ok": true,
+            "requested_set_equals_bound_set": true,
+            "baseline_matches_current": true,
+            "bound_proposal_count": 12,
+            "bound_proposal_ids": [
+                491,
+                492,
+                493,
+                494,
+                495,
+                629,
+                630,
+                631,
+                632,
+                1688,
+                1689,
+                1690
+            ],
+            "requested_proposal_ids": [
+                491,
+                492,
+                493,
+                494,
+                495,
+                629,
+                630,
+                631,
+                632,
+                1688,
+                1689,
+                1690
+            ],
+            "all_bound_proposals_pending_apply": true,
+            "identity_matches": true,
+            "no_unauthorised_pending_proposals": true,
+            "protected_shape_matches": true
+        }
+    },
+    "baseline_taxonomy_fingerprint": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+    "current_taxonomy_fingerprint": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+    "requested_proposal_ids": [
+        491,
+        492,
+        493,
+        494,
+        495,
+        629,
+        630,
+        631,
+        632,
+        1688,
+        1689,
+        1690
+    ],
+    "accepted_proposal_ids": [
+        491,
+        492,
+        493,
+        494,
+        495,
+        629,
+        630,
+        631,
+        632,
+        1688,
+        1689,
+        1690
+    ],
+    "accepted_proposal_count": 12,
+    "execution_unit_count": 11,
+    "execution_units": [
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 491,
+            "proposal_ids": [
+                491
+            ],
+            "proposal_group_id": null,
+            "proposal_type": "TERM_CONCEPT_LINK",
+            "decision": "MAP_TO_EXISTING",
+            "source_label": "candidato #272 / término #24 `pipeline` (en)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "7e98b568d6c5fe01e73ecb89bab48501bbba1cb69265371dac0e4c215edadaf4",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "pending",
+            "source_state_compatible": true,
+            "source_snapshot_drift": false,
+            "source_snapshot_drift_applicable": true,
+            "group": null,
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_term_concepts",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "término #24 → concepto #2890"
+                },
+                {
+                    "table": "taxonomy_candidate_concept_links",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "candidato #272: status pending -> published (+ published_term_concept_id)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 4,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 492,
+            "proposal_ids": [
+                492
+            ],
+            "proposal_group_id": null,
+            "proposal_type": "TERM_CONCEPT_LINK",
+            "decision": "CONTEXT_REQUIRED",
+            "source_label": "candidato #266 / término #15 `exploration` (en)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "fc2ebd2a05fa48b106f8c8d279e3f511d4dc951c15f45a0662193c4c96cb013e",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "pending",
+            "source_state_compatible": true,
+            "source_snapshot_drift": false,
+            "source_snapshot_drift_applicable": true,
+            "group": null,
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_candidate_concept_links",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "candidato #266: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 3,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 493,
+            "proposal_ids": [
+                493
+            ],
+            "proposal_group_id": null,
+            "proposal_type": "TERM_CONCEPT_LINK",
+            "decision": "CONTEXT_REQUIRED",
+            "source_label": "candidato #267 / término #19 `upstream` (en)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "43f24bc2961b0d07859d8cfa61eaceff59c371edb931f404217327a0130e4da9",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "pending",
+            "source_state_compatible": true,
+            "source_snapshot_drift": false,
+            "source_snapshot_drift_applicable": true,
+            "group": null,
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_candidate_concept_links",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "candidato #267: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 3,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 494,
+            "proposal_ids": [
+                494
+            ],
+            "proposal_group_id": null,
+            "proposal_type": "TERM_CONCEPT_LINK",
+            "decision": "CONTEXT_REQUIRED",
+            "source_label": "candidato #268 / término #20 `midstream` (en)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "c03feb010c1c04cb2f52c7993c642066f951f7e656244ac05f4c7cbeb1a35ac4",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "pending",
+            "source_state_compatible": true,
+            "source_snapshot_drift": false,
+            "source_snapshot_drift_applicable": true,
+            "group": null,
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_candidate_concept_links",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "candidato #268: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 3,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 495,
+            "proposal_ids": [
+                495
+            ],
+            "proposal_group_id": null,
+            "proposal_type": "TERM_CONCEPT_LINK",
+            "decision": "CONTEXT_REQUIRED",
+            "source_label": "candidato #269 / término #21 `downstream` (en)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "6b23db5c20091681b11059d29c73ab6b5bb137c59b619454a2f4f816eb927234",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "pending",
+            "source_state_compatible": true,
+            "source_snapshot_drift": false,
+            "source_snapshot_drift_applicable": true,
+            "group": null,
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_candidate_concept_links",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "candidato #269: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 3,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        },
+        {
+            "kind": "BILINGUAL_GROUP",
+            "entry_proposal_id": 629,
+            "proposal_ids": [
+                629,
+                630
+            ],
+            "proposal_group_id": "043fce22-daf0-4fda-83ed-df666d89ace6",
+            "proposal_type": "TERM_CONCEPT_LINK",
+            "decision": "CREATE_NEW",
+            "source_label": "candidato #270 / término #22 `refinery` (en)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "ce9d0cdd0de3157d3d376880240fa2bfeea3552c8f0551f2bf757716f30812ac",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "pending",
+            "source_state_compatible": true,
+            "source_snapshot_drift": false,
+            "source_snapshot_drift_applicable": true,
+            "group": {
+                "proposal_group_id": "043fce22-daf0-4fda-83ed-df666d89ace6",
+                "member_ids": [
+                    629,
+                    630
+                ],
+                "members_pending_apply": [
+                    629,
+                    630
+                ],
+                "consistent": true,
+                "reuses_concept_id": null,
+                "member_payload_fingerprint_valid": {
+                    "629": true,
+                    "630": true
+                },
+                "tampered_member_ids": [],
+                "all_member_payloads_valid": true
+            },
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_canonical_concepts",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "UN solo concepto canónico bilingüe (ES/EN) para los 2 miembros del grupo - nunca uno por candidato"
+                },
+                {
+                    "table": "taxonomy_term_concepts",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "término #22 → el concepto nuevo del grupo"
+                },
+                {
+                    "table": "taxonomy_candidate_concept_links",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "candidato #270: status pending -> published (+ published_term_concept_id)"
+                },
+                {
+                    "table": "taxonomy_term_concepts",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "término #23 → el concepto nuevo del grupo"
+                },
+                {
+                    "table": "taxonomy_candidate_concept_links",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "candidato #271: status pending -> published (+ published_term_concept_id)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 2,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 2,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 9,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 631,
+            "proposal_ids": [
+                631
+            ],
+            "proposal_group_id": null,
+            "proposal_type": "CONCEPT_RELATION",
+            "decision": "REJECT",
+            "source_label": "relación #61 / 4 → 25 (RELATED_TO)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "c99475654bc9e3fb2253aab8b73baaad662e1fb121bbe9faaf8c01baf23beec9",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "candidate",
+            "source_state_compatible": true,
+            "source_snapshot_drift": null,
+            "source_snapshot_drift_applicable": false,
+            "group": null,
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_concept_relations",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "relación #61: status candidate -> rejected (NO publica el grafo)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 3,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 632,
+            "proposal_ids": [
+                632
+            ],
+            "proposal_group_id": null,
+            "proposal_type": "CONCEPT_RELATION",
+            "decision": "REJECT",
+            "source_label": "relación #62 / 16 → 61 (RELATED_TO)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "4d408b9978e8c2c431cf31904a3b8aa377f993dec5a5e70af57b10e3e13ce7f5",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "candidate",
+            "source_state_compatible": true,
+            "source_snapshot_drift": null,
+            "source_snapshot_drift_applicable": false,
+            "group": null,
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_concept_relations",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "relación #62: status candidate -> rejected (NO publica el grafo)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 3,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 1688,
+            "proposal_ids": [
+                1688
+            ],
+            "proposal_group_id": null,
+            "proposal_type": "TERM_CONCEPT_LINK",
+            "decision": "CONTEXT_REQUIRED",
+            "source_label": "candidato #263 / término #5 `petroleum` (en)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "e33530cbef2c64f6e4c048e3bbddb3f546e17b5be4d010e031b58a2d4628416a",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "pending",
+            "source_state_compatible": true,
+            "source_snapshot_drift": false,
+            "source_snapshot_drift_applicable": true,
+            "group": null,
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_candidate_concept_links",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "candidato #263: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 3,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 1689,
+            "proposal_ids": [
+                1689
+            ],
+            "proposal_group_id": null,
+            "proposal_type": "TERM_CONCEPT_LINK",
+            "decision": "CONTEXT_REQUIRED",
+            "source_label": "candidato #264 / término #8 `crude oil` (en)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "fe1f4828c8962f28f7c766aa4f894b49bcbdb9909936cddb49464088aba45f1f",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "pending",
+            "source_state_compatible": true,
+            "source_snapshot_drift": false,
+            "source_snapshot_drift_applicable": true,
+            "group": null,
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_candidate_concept_links",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "candidato #264: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 3,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 1690,
+            "proposal_ids": [
+                1690
+            ],
+            "proposal_group_id": null,
+            "proposal_type": "TERM_CONCEPT_LINK",
+            "decision": "CONTEXT_REQUIRED",
+            "source_label": "candidato #265 / término #14 `oil and gas` (en)",
+            "blocker": "READY_TO_APPLY",
+            "batch_blocker": null,
+            "payload_fingerprint": "3aad9a70b092f9673d6fa4b60b4419eeba961d40eb32292300ce5932dfffcc3d",
+            "payload_fingerprint_valid": true,
+            "superseded": false,
+            "supersession": null,
+            "taxonomy_state_fingerprint_frozen": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "taxonomy_state_fingerprint_current": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+            "stale": false,
+            "human_confirmation_satisfied": true,
+            "source_entity_exists": true,
+            "source_state": "pending",
+            "source_state_compatible": true,
+            "source_snapshot_drift": false,
+            "source_snapshot_drift_applicable": true,
+            "group": null,
+            "relation_validation": null,
+            "checks_null_means": "null = la compuerta NO se evaluó porque una anterior bloqueó primero (apply() corta igual), o no aplica a esta decisión. Nunca significa \"pasó\".",
+            "expected_write_set": [
+                {
+                    "table": "taxonomy_candidate_concept_links",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "candidato #265: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)"
+                },
+                {
+                    "table": "taxonomy_reviewed_proposals",
+                    "operation": "UPDATE",
+                    "rows": 1,
+                    "description": "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+                },
+                {
+                    "table": "taxonomy_audit_log",
+                    "operation": "INSERT",
+                    "rows": 1,
+                    "description": "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+                }
+            ],
+            "expected_write_count": 3,
+            "expected_write_set_note": "Descripción, no ejecución: el preflight NO escribió ninguna de estas filas."
+        }
+    ],
+    "blocker": null,
+    "blockers": [],
+    "detail": [],
+    "already_executed": false,
+    "projected_write_set": [
+        {
+            "table": "taxonomy_audit_log",
+            "operation": "INSERT",
+            "rows": 12,
+            "descriptions": [
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)",
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)",
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)",
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)",
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)",
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)",
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)",
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)",
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)",
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)",
+                "auditoría de EJECUCIÓN (con authorization_reference y target_environment, lo que la distingue de la auditoría de revisión)"
+            ]
+        },
+        {
+            "table": "taxonomy_candidate_concept_links",
+            "operation": "UPDATE",
+            "rows": 10,
+            "descriptions": [
+                "candidato #272: status pending -> published (+ published_term_concept_id)",
+                "candidato #266: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)",
+                "candidato #267: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)",
+                "candidato #268: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)",
+                "candidato #269: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)",
+                "candidato #270: status pending -> published (+ published_term_concept_id)",
+                "candidato #271: status pending -> published (+ published_term_concept_id)",
+                "candidato #263: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)",
+                "candidato #264: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)",
+                "candidato #265: status pending -> context_required (CERO taxonomy_term_concepts, CERO conceptos nuevos)"
+            ]
+        },
+        {
+            "table": "taxonomy_canonical_concepts",
+            "operation": "INSERT",
+            "rows": 1,
+            "descriptions": [
+                "UN solo concepto canónico bilingüe (ES/EN) para los 2 miembros del grupo - nunca uno por candidato"
+            ]
+        },
+        {
+            "table": "taxonomy_concept_relations",
+            "operation": "UPDATE",
+            "rows": 2,
+            "descriptions": [
+                "relación #61: status candidate -> rejected (NO publica el grafo)",
+                "relación #62: status candidate -> rejected (NO publica el grafo)"
+            ]
+        },
+        {
+            "table": "taxonomy_reviewed_proposals",
+            "operation": "UPDATE",
+            "rows": 12,
+            "descriptions": [
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment",
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment",
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment",
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment",
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment",
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment",
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment",
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment",
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment",
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment",
+                "status PENDING_APPLY -> APPLIED, con applied_at, authorization_reference y target_environment"
+            ]
+        },
+        {
+            "table": "taxonomy_term_concepts",
+            "operation": "INSERT",
+            "rows": 3,
+            "descriptions": [
+                "término #24 → concepto #2890",
+                "término #22 → el concepto nuevo del grupo",
+                "término #23 → el concepto nuevo del grupo"
+            ]
+        }
+    ],
+    "projected_write_count": 40,
+    "protected_counts_now": {
+        "candidate_links": 10,
+        "candidate_links_pending": 10,
+        "candidate_links_published": 0,
+        "candidate_links_context_required": 0,
+        "candidate_links_rejected": 0,
+        "candidate_links_approved": 0,
+        "concept_relations": 2,
+        "concept_relations_candidate": 2,
+        "concept_relations_approved": 0,
+        "concept_relations_rejected": 0,
+        "canonical_concepts": 81,
+        "term_concepts": 142,
+        "term_cpv_relations": 9749,
+        "reviewed_proposals": 15,
+        "reviewed_proposals_pending_apply": 12,
+        "reviewed_proposals_applied": 0,
+        "reviewed_proposals_aborted": 0,
+        "reviewed_proposals_superseded": 3
+    },
+    "projected_protected_counts": {
+        "counts": {
+            "candidate_links": 10,
+            "candidate_links_pending": 0,
+            "candidate_links_published": 3,
+            "candidate_links_context_required": 7,
+            "candidate_links_rejected": 0,
+            "candidate_links_approved": 0,
+            "concept_relations": 2,
+            "concept_relations_candidate": 0,
+            "concept_relations_approved": 0,
+            "concept_relations_rejected": 2,
+            "canonical_concepts": 82,
+            "term_concepts": 145,
+            "term_cpv_relations": 9749,
+            "reviewed_proposals": 15,
+            "reviewed_proposals_pending_apply": 0,
+            "reviewed_proposals_applied": 12,
+            "reviewed_proposals_aborted": 0,
+            "reviewed_proposals_superseded": 3
+        },
+        "delta": {
+            "candidate_links": 0,
+            "candidate_links_pending": -10,
+            "candidate_links_published": 3,
+            "candidate_links_context_required": 7,
+            "candidate_links_rejected": 0,
+            "candidate_links_approved": 0,
+            "concept_relations": 0,
+            "concept_relations_candidate": -2,
+            "concept_relations_approved": 0,
+            "concept_relations_rejected": 2,
+            "canonical_concepts": 1,
+            "term_concepts": 3,
+            "term_cpv_relations": 0,
+            "reviewed_proposals": 0,
+            "reviewed_proposals_pending_apply": -12,
+            "reviewed_proposals_applied": 12,
+            "reviewed_proposals_aborted": 0,
+            "reviewed_proposals_superseded": 0
+        },
+        "term_cpv_invariant": {
+            "table": "taxonomy_term_cpv_relations",
+            "before": 9749,
+            "after": 9749,
+            "delta": 0,
+            "note": "CERO escrituras TÉRMINO→CPV por construcción: ningún camino de escritura de este servicio toca esa tabla (ver writeCandidateLinkDecision/writeBilingualGroupCreateNew/writeConceptRelationDecision)."
+        }
+    },
+    "write_statements_observed": 0,
+    "write_statements": [],
+    "read_only_contract": "Este informe no escribió nada: no abre transacción de escritura, no toma locks, no llama a apply() ni a applyBatch() por ningún camino, y mide sus propios statements. Un lote sin bloqueos significa «hoy nada impide ejecutarlo», NUNCA una autorización de ejecución - esa sigue siendo un acto humano separado."
+}
