@@ -895,22 +895,285 @@ class ReviewedProposalBatchApplyTest extends TestCase
         $this->assertSame(['staging'], ReviewedProposalService::BATCH_EXECUTABLE_ENVIRONMENTS);
         $this->assertSame('testing', ReviewedProposalService::BATCH_FIXTURE_TEST_ENVIRONMENT);
 
-        // La compuerta pasa de verdad con el entorno en `staging`: fixture aislado dentro de
+        // RE-AUDIT 2 `6015273402`, BLOQUEO A: la versión anterior de este test ponía el entorno en
+        // `staging` y llamaba a `applyBatch()` **sin manifiesto** esperando APPLIED. El orquestador lo
+        // citó como la prueba del bypass, y tenía razón: era exactamente la invocación que podía
+        // ejecutar datos operativos sin manifiesto ni hash autorizado. Ahora el escenario correcto es
+        // con manifiesto y con el hash que lo autoriza - fixture aislado dentro de
         // DatabaseTransactions, nada real y nada commiteado.
+        $scenario = $this->representativeBatch();
+        $manifest = ReviewedProposalBatchManifest::generate($scenario['ids']);
+
+        app()->detectEnvironment(fn () => 'staging');
+
+        try {
+            $result = (new ReviewedProposalService())->applyBatch(
+                $scenario['ids'],
+                self::AUTH_REFERENCE,
+                $manifest,
+                $manifest['manifest_fingerprint'],
+            );
+
+            $this->assertSame(ReviewedProposalService::BATCH_RESULT_APPLIED, $result['result'],
+                'Con el entorno en staging, manifiesto y hash autorizado correctos, ninguna compuerta debe bloquear.');
+            $this->assertSame('staging', $result['target_environment']);
+            $this->assertTrue($result['manifest_verification']['ok']);
+            $this->assertSame($manifest['manifest_fingerprint'], $result['expected_manifest_fingerprint']);
+        } finally {
+            app()->detectEnvironment(fn () => 'testing');
+        }
+    }
+
+    // =========================================================================================
+    // RE-AUDIT 2 `6015273402` — BLOQUEO A: el servicio público ya no se puede saltear el manifiesto
+    // =========================================================================================
+
+    #[Test]
+    public function the_service_itself_refuses_a_manifestless_batch_in_an_operational_environment(): void
+    {
+        // EL BYPASS QUE CIERRA: la compuerta de autorización corría dentro de
+        // `if ($manifest !== null)`, así que `applyBatch($ids, $ref)` -sin tercer ni cuarto argumento-
+        // abría la transacción en staging y podía ejecutar sin manifiesto, sin hash autorizado y sin
+        // atadura al conjunto autorizado. El CLI estaba bien, pero el servicio es público: Tinker,
+        // otro comando o un llamador futuro entraban por ahí. Una compuerta que protege datos
+        // compartidos reales no puede vivir sólo en un envoltorio de CLI.
         $user = $this->authorizedUser();
         $proposal = $this->freezeContextRequired($this->pendingCandidate(), $user);
 
         app()->detectEnvironment(fn () => 'staging');
 
         try {
-            $result = (new ReviewedProposalService())->applyBatch([(int) $proposal->id], self::AUTH_REFERENCE);
+            $result = $this->assertBatchBlockedWithoutAnyWrite([(int) $proposal->id], ReviewedProposalService::BATCH_MANIFEST_REQUIRED);
 
-            $this->assertSame(ReviewedProposalService::BATCH_RESULT_APPLIED, $result['result'],
-                'Con el entorno en staging la compuerta de entorno no debe bloquear.');
-            $this->assertSame('staging', $result['target_environment']);
+            $this->assertSame('staging', $result['detail']['target_environment']);
+            $this->assertSame(['staging'], $result['detail']['executable_environments']);
         } finally {
             app()->detectEnvironment(fn () => 'testing');
         }
+    }
+
+    #[Test]
+    public function the_service_refuses_a_staging_batch_whose_manifest_has_no_authorised_hash(): void
+    {
+        // Con manifiesto pero sin el hash autorizado, en entorno operativo, sigue bloqueado - y por el
+        // bloqueo que corresponde, no por el de manifiesto faltante.
+        $scenario = $this->representativeBatch();
+        $manifest = ReviewedProposalBatchManifest::generate($scenario['ids']);
+
+        app()->detectEnvironment(fn () => 'staging');
+
+        try {
+            $this->assertBatchBlockedWithoutAnyWrite(
+                $scenario['ids'],
+                ReviewedProposalService::BATCH_AUTHORIZATION_FINGERPRINT_MISSING,
+                $manifest,
+            );
+        } finally {
+            app()->detectEnvironment(fn () => 'testing');
+        }
+    }
+
+    #[Test]
+    public function the_manifestless_fixture_path_remains_allowed_only_in_the_testing_environment(): void
+    {
+        // La excepción de fixtures se conserva a propósito y se documenta como SÓLO DE TESTS: en
+        // `testing` cada lote vive en una transacción que nunca commitea, así que exigir un manifiesto
+        // en cada test agregaría ceremonia sin ninguna garantía sobre datos reales. Lo que este test
+        // fija es que la excepción es EXACTAMENTE eso: `testing` sí, entorno operativo no.
+        $this->assertSame('testing', app()->environment(), 'Precondición: la suite corre en `testing`.');
+
+        $user = $this->authorizedUser();
+        $proposal = $this->freezeContextRequired($this->pendingCandidate(), $user);
+
+        $result = (new ReviewedProposalService())->applyBatch([(int) $proposal->id], self::AUTH_REFERENCE);
+
+        $this->assertSame(ReviewedProposalService::BATCH_RESULT_APPLIED, $result['result']);
+        $this->assertSame('testing', $result['target_environment']);
+
+        // Y la exigencia se deriva de la lista OPERATIVA, no de `environmentCanExecuteBatch()`: así un
+        // entorno operativo nuevo hereda la obligación sin que nadie tenga que acordarse.
+        $this->assertNotContains(
+            ReviewedProposalService::BATCH_FIXTURE_TEST_ENVIRONMENT,
+            ReviewedProposalService::BATCH_EXECUTABLE_ENVIRONMENTS,
+            'La excepción de fixtures no puede estar en la lista de entornos operativos.',
+        );
+    }
+
+    // =========================================================================================
+    // RE-AUDIT 2 `6015273402` — BLOQUEO B: el hash se valida ANTES de pedir la confirmación
+    // =========================================================================================
+
+    #[Test]
+    public function the_command_refuses_a_malformed_hash_without_ever_prompting(): void
+    {
+        // EL DEFECTO QUE CIERRA: el CLI sólo miraba que la opción no estuviera vacía antes de imprimir
+        // el banner destructivo y preguntar; forma y coincidencia se validaban en `applyBatch()`, o sea
+        // DESPUÉS de la confirmación. Se le podía pedir a una persona que confirmara un APPLY con un
+        // hash mal copiado para rechazarlo recién después.
+        $scenario = $this->representativeBatch();
+        [$path] = $this->fixtureManifestFile($scenario['ids']);
+        $before = $this->counts();
+
+        app()->detectEnvironment(fn () => 'staging');
+
+        try {
+            $this->artisan('taxonomy:apply-reviewed-proposal-batch', [
+                '--manifest' => $path,
+                '--execute' => true,
+                '--authorized-by' => 'Issue #2 test 6015273402',
+                '--expect-manifest-fingerprint' => 'no-es-un-sha256',
+                '--expect-environment' => 'staging',
+                '--allow-subset-manifest' => true,
+            ])
+                ->expectsOutputToContain(ReviewedProposalService::BATCH_AUTHORIZATION_FINGERPRINT_MALFORMED)
+                ->doesntExpectOutputToContain('APPLY ATÓMICO REAL')
+                ->assertFailed();
+        } finally {
+            app()->detectEnvironment(fn () => 'testing');
+        }
+
+        $this->assertSame($before, $this->counts());
+    }
+
+    #[Test]
+    public function the_command_refuses_a_mismatched_hash_without_ever_prompting(): void
+    {
+        $scenario = $this->representativeBatch();
+        [$path] = $this->fixtureManifestFile($scenario['ids']);
+        $before = $this->counts();
+
+        app()->detectEnvironment(fn () => 'staging');
+
+        try {
+            $this->artisan('taxonomy:apply-reviewed-proposal-batch', [
+                '--manifest' => $path,
+                '--execute' => true,
+                '--authorized-by' => 'Issue #2 test 6015273402',
+                '--expect-manifest-fingerprint' => hash('sha256', 'un manifiesto distinto que el dueño autorizó antes'),
+                '--expect-environment' => 'staging',
+                '--allow-subset-manifest' => true,
+            ])
+                ->expectsOutputToContain(ReviewedProposalService::BATCH_AUTHORIZATION_FINGERPRINT_MISMATCH)
+                ->doesntExpectOutputToContain('APPLY ATÓMICO REAL')
+                ->assertFailed();
+        } finally {
+            app()->detectEnvironment(fn () => 'testing');
+        }
+
+        $this->assertSame($before, $this->counts());
+    }
+
+    #[Test]
+    public function the_command_refuses_a_missing_hash_without_ever_prompting(): void
+    {
+        $scenario = $this->representativeBatch();
+        [$path] = $this->fixtureManifestFile($scenario['ids']);
+        $before = $this->counts();
+
+        app()->detectEnvironment(fn () => 'staging');
+
+        try {
+            $this->artisan('taxonomy:apply-reviewed-proposal-batch', [
+                '--manifest' => $path,
+                '--execute' => true,
+                '--authorized-by' => 'Issue #2 test 6015273402',
+                '--expect-environment' => 'staging',
+                '--allow-subset-manifest' => true,
+            ])
+                ->expectsOutputToContain(ReviewedProposalService::BATCH_AUTHORIZATION_FINGERPRINT_MISSING)
+                ->doesntExpectOutputToContain('APPLY ATÓMICO REAL')
+                ->assertFailed();
+        } finally {
+            app()->detectEnvironment(fn () => 'testing');
+        }
+
+        $this->assertSame($before, $this->counts());
+    }
+
+    #[Test]
+    public function a_correct_hash_reaches_the_execution_confirmation_and_cancelling_writes_nothing(): void
+    {
+        // La contraparte positiva: con el hash correcto el comando SÍ llega a la confirmación normal.
+        // Se responde «no» a propósito - el objetivo es probar que la compuerta no bloquea de más y que
+        // la confirmación se alcanza, no ejecutar nada. Fixture puro: el manifiesto ata propuestas de
+        // fixture, nunca las 12 reales.
+        $scenario = $this->representativeBatch();
+        [$path, $manifest] = $this->fixtureManifestFile($scenario['ids']);
+        $before = $this->counts();
+
+        app()->detectEnvironment(fn () => 'staging');
+
+        try {
+            $this->artisan('taxonomy:apply-reviewed-proposal-batch', [
+                '--manifest' => $path,
+                '--execute' => true,
+                '--authorized-by' => 'Issue #2 test 6015273402',
+                '--expect-manifest-fingerprint' => $manifest['manifest_fingerprint'],
+                '--expect-environment' => 'staging',
+                '--allow-subset-manifest' => true,
+            ])
+                ->expectsOutputToContain('APPLY ATÓMICO REAL')
+                ->expectsConfirmation('¿Ejecutar el lote con esta autorización?', 'no')
+                ->assertFailed();
+        } finally {
+            app()->detectEnvironment(fn () => 'testing');
+        }
+
+        $this->assertSame($before, $this->counts(), 'Cancelar en la confirmación no puede escribir nada.');
+        $this->assertSame(
+            0,
+            TaxonomyReviewedProposal::query()->whereIn('id', $scenario['ids'])->where('status', '!=', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)->count(),
+            'Cancelar deja las propuestas intactas en PENDING_APPLY.',
+        );
+    }
+
+    #[Test]
+    public function there_is_exactly_one_authorisation_hash_validator_and_the_cli_reuses_it(): void
+    {
+        // Prueba ESTRUCTURAL de «do not duplicate two divergent hash validators». El CLI no puede
+        // tener su propia validación de forma ni su propia comparación: tiene que llamar a la misma
+        // primitiva del servicio, y tiene que hacerlo ANTES del banner y de la confirmación.
+        $commandReflection = new \ReflectionClass(\App\Console\Commands\ApplyTaxonomyReviewedProposalBatch::class);
+        $source = file($commandReflection->getFileName());
+        $method = $commandReflection->getMethod('runExecute');
+        $body = implode('', array_slice($source, $method->getStartLine() - 1, $method->getEndLine() - $method->getStartLine() + 1));
+
+        $this->assertStringContainsString('ReviewedProposalService::authorizationFingerprintBlocker(', $body,
+            'El CLI tiene que reusar la primitiva del servicio, no validar por su cuenta.');
+        $this->assertStringNotContainsString('[0-9a-f]{64}', $body,
+            'El CLI no puede tener su propia validación de forma del hash: eso serían dos validadores divergentes.');
+        $this->assertStringNotContainsString('hash_equals(', $body,
+            'El CLI no puede tener su propia comparación de hash.');
+
+        $gatePosition = strpos($body, 'authorizationFingerprintBlocker(');
+        $bannerPosition = strpos($body, 'APPLY ATÓMICO REAL');
+        $confirmPosition = strpos($body, '$this->confirm(');
+        $servicePosition = strpos($body, '->applyBatch(');
+
+        $this->assertNotFalse($gatePosition);
+        $this->assertNotFalse($bannerPosition);
+        $this->assertNotFalse($confirmPosition);
+        $this->assertLessThan($bannerPosition, $gatePosition, 'La validación del hash tiene que correr antes del banner destructivo.');
+        $this->assertLessThan($confirmPosition, $gatePosition, 'La validación del hash tiene que correr antes de pedir la confirmación.');
+        $this->assertLessThan($servicePosition, $confirmPosition, 'La confirmación sigue estando antes de llamar al servicio.');
+
+        // Y el servicio sigue siendo la autoridad final: vuelve a llamar a la misma primitiva antes de
+        // abrir la transacción, así que saltearse el CLI no sirve de nada.
+        $serviceReflection = new \ReflectionClass(ReviewedProposalService::class);
+        $serviceSource = file($serviceReflection->getFileName());
+        $applyBatch = $serviceReflection->getMethod('applyBatch');
+        $applyBatchBody = implode('', array_slice($serviceSource, $applyBatch->getStartLine() - 1, $applyBatch->getEndLine() - $applyBatch->getStartLine() + 1));
+
+        $this->assertStringContainsString('self::authorizationFingerprintBlocker(', $applyBatchBody);
+        $this->assertLessThan(
+            strpos($applyBatchBody, '->transaction('),
+            strpos($applyBatchBody, 'self::authorizationFingerprintBlocker('),
+            'El servicio tiene que validar antes de abrir la transacción.',
+        );
+        $this->assertTrue(
+            (new \ReflectionMethod(ReviewedProposalService::class, 'authorizationFingerprintBlocker'))->isPublic(),
+            'La primitiva tiene que ser pública para que exista UNA sola y el CLI la reuse.',
+        );
     }
 
     // =========================================================================================
@@ -1197,7 +1460,12 @@ class ReviewedProposalBatchApplyTest extends TestCase
             '--expect-environment' => 'testing',
             '--allow-subset-manifest' => true,
             '--force' => true,
-        ])->assertFailed();
+        ])
+            // Re-audit 2 `6015273402`, BLOQUEO B: el rechazo es por el bloqueo que corresponde y, aun
+            // con `--force`, sin llegar a imprimir el banner destructivo.
+            ->expectsOutputToContain(ReviewedProposalService::BATCH_AUTHORIZATION_FINGERPRINT_MISSING)
+            ->doesntExpectOutputToContain('APPLY ATÓMICO REAL')
+            ->assertFailed();
 
         $this->assertSame($before, $this->counts());
     }

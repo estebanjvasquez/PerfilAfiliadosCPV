@@ -42,6 +42,17 @@ use Illuminate\Support\Facades\DB;
  *    autorizó». Con el hash citado aparte, un manifiesto distinto pero internamente válido se rechaza
  *    aunque coincida con el estado vivo.
  *
+ * Y DOS CORRECCIONES DEL RE-AUDIT 2 `6015273402`:
+ *
+ * 4. El hash se valida COMPLETO -falta, forma y coincidencia- **antes** del banner destructivo y
+ *    **antes** de preguntar, llamando a la misma primitiva de solo lectura del servicio en vez de
+ *    tener una versión propia. Antes el CLI sólo miraba que la opción no estuviera vacía y dejaba
+ *    forma/coincidencia al servicio, que corre después de la confirmación: se le podía pedir a una
+ *    persona que confirmara un APPLY con un hash equivocado para rechazarlo recién después.
+ * 5. La exigencia de manifiesto ya no vive sólo acá: `applyBatch()` la impone en todo entorno
+ *    OPERATIVO (`BATCH_MANIFEST_REQUIRED`), así que una invocación directa del servicio -Tinker, otro
+ *    comando, un llamador futuro- tampoco puede ejecutar sin manifiesto ni sin hash autorizado.
+ *
  * NO EJECUTA NADA EN ESTA RONDA. TASK-0007 ronda 1 autoriza el código, los tests, el manifiesto de
  * solo lectura y el preflight de lote contra datos reales - explícitamente NO el APPLY real. El modo
  * `--execute` existe para el día en que haya una autorización humana nueva que cite el
@@ -215,14 +226,30 @@ class ApplyTaxonomyReviewedProposalBatch extends Command
         // =====================================================================================
         // Re-audit `6011317053`, BLOQUEO 3: el SEGUNDO insumo de confianza. El fingerprint que el
         // dueño autorizó se cita aparte y NUNCA se deduce del archivo cargado - deducirlo colapsaría
-        // los dos insumos en uno y volvería a no probar nada. La validación de forma y la comparación
-        // viven en el servicio (`authorizationFingerprintBlocker()`), que es el único camino de
-        // escritura; acá sólo se exige que el operador lo haya provisto, para poder dar un mensaje
-        // útil antes de llegar al servicio.
+        // los dos insumos en uno y volvería a no probar nada.
+        //
+        // Re-audit 2 `6015273402`, BLOQUEO B: la validación COMPLETA -falta, forma y coincidencia- se
+        // hace ACÁ, antes de imprimir el banner destructivo y antes de preguntar. Antes el CLI sólo
+        // comprobaba que la opción no estuviera vacía y dejaba forma y coincidencia para el servicio,
+        // que corre DESPUÉS de la confirmación: se le podía pedir a una persona que confirmara un
+        // APPLY con un hash mal copiado o equivocado para rechazarlo recién después.
+        //
+        // No hay dos validadores: se llama a la MISMA primitiva de solo lectura del servicio
+        // (`authorizationFingerprintBlocker()`), que el servicio vuelve a llamar antes de la
+        // transacción por defensa en profundidad. El servicio sigue siendo la autoridad final, así
+        // que saltearse el CLI no sirve de nada.
         // =====================================================================================
         $expectedFingerprint = trim((string) $this->option('expect-manifest-fingerprint'));
-        if ($expectedFingerprint === '') {
-            $this->error('--expect-manifest-fingerprint=<sha256> es obligatorio con --execute: el manifiesto auto-hasheado sólo prueba que el archivo no se editó, no que sea el que el dueño autorizó. Hay que citar el hash autorizado aparte. No se ejecutó nada.');
+        $fingerprintBlocker = ReviewedProposalService::authorizationFingerprintBlocker($manifest, $expectedFingerprint);
+
+        if ($fingerprintBlocker !== null) {
+            $this->error($fingerprintBlocker['blocker'].': '.$fingerprintBlocker['detail']['note']);
+
+            if ($fingerprintBlocker['blocker'] === ReviewedProposalService::BATCH_AUTHORIZATION_FINGERPRINT_MISSING) {
+                $this->line('  Pasá --expect-manifest-fingerprint=<sha256> con el hash que el dueño autorizó en Issue #2.');
+            }
+
+            $this->line('  No se ejecutó nada y no se pidió ninguna confirmación.');
 
             return self::FAILURE;
         }

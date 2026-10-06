@@ -474,6 +474,24 @@ class ReviewedProposalService
 
     public const BATCH_AUTHORIZATION_FINGERPRINT_MISMATCH = 'BATCH_AUTHORIZATION_FINGERPRINT_MISMATCH';
 
+    /**
+     * TASK-0007 re-audit 2 (Issue #2 comentario `6015273402`, BLOQUEO A): en un entorno OPERATIVO, un
+     * lote sin manifiesto no se ejecuta.
+     *
+     * EL BYPASS QUE CIERRA, aceptado sin reservas y sin atenuantes: la compuerta de autorización corría
+     * dentro de `if ($manifest !== null)`, así que una invocación DIRECTA del servicio en staging
+     * -`applyBatch($ids, $referencia)`, sin tercer ni cuarto argumento- abría la transacción y podía
+     * ejecutar **sin manifiesto, sin hash autorizado y sin atadura exacta al conjunto autorizado**.
+     * El CLI estaba bien, pero el servicio es público: Tinker, otro comando o un llamador futuro
+     * entraban por ahí. Y no era teórico: el propio test de la ronda 2
+     * `staging_passes_the_environment_gate_and_testing_is_only_the_fixture_exception` ponía
+     * `APP_ENV=staging` y llamaba a `applyBatch()` sin manifiesto con éxito.
+     *
+     * Una compuerta de gobernanza que protege datos compartidos reales no puede vivir sólo en un
+     * envoltorio de CLI. Ahora vive en el único camino de escritura.
+     */
+    public const BATCH_MANIFEST_REQUIRED = 'BATCH_MANIFEST_REQUIRED';
+
     public const BATCH_RESULT_APPLIED = 'BATCH_APPLIED';
 
     public const BATCH_RESULT_BLOCKED = 'BATCH_BLOCKED';
@@ -2695,9 +2713,33 @@ class ReviewedProposalService
             ], $preTransactionBase);
         }
 
+        // =====================================================================================
+        // Re-audit 2 `6015273402`, BLOQUEO A: en un entorno OPERATIVO el manifiesto es OBLIGATORIO,
+        // y la compuerta vive acá -en el único camino de escritura- y no en el CLI.
+        //
+        // La excepción de `testing` se conserva deliberadamente: ahí cada lote de fixture vive en una
+        // transacción que nunca commitea, y exigir un manifiesto en cada test haría la suite más
+        // ceremoniosa sin agregar ninguna garantía sobre datos reales. Es una excepción SÓLO DE TESTS,
+        // y por eso se deriva de `BATCH_EXECUTABLE_ENVIRONMENTS` (la lista operativa) y no de
+        // `environmentCanExecuteBatch()` (que incluye la excepción): si mañana se agrega otro entorno
+        // operativo, hereda la exigencia sin que nadie tenga que acordarse.
+        // =====================================================================================
+        $isOperationalEnvironment = in_array($targetEnvironment, self::BATCH_EXECUTABLE_ENVIRONMENTS, true);
+
+        if ($isOperationalEnvironment && $manifest === null) {
+            return $this->batchResult(self::BATCH_RESULT_BLOCKED, self::BATCH_MANIFEST_REQUIRED, [
+                'note' => "Un lote en el entorno operativo `{$targetEnvironment}` exige un manifiesto autorizado y el fingerprint que el dueño autorizó. Sin manifiesto no hay conjunto atómico atado ni atadura a una autorización humana, así que no se abre transacción ni se toma ningún lock. Cero escrituras.",
+                'target_environment' => $targetEnvironment,
+                'executable_environments' => self::BATCH_EXECUTABLE_ENVIRONMENTS,
+                'fixture_test_environment_note' => 'La excepción sin manifiesto existe SÓLO para el entorno `'.self::BATCH_FIXTURE_TEST_ENVIRONMENT.'`, donde cada lote de fixture corre dentro de una transacción que nunca commitea.',
+            ], $preTransactionBase);
+        }
+
         // Re-audit `6011317053`, BLOQUEO 3: la compuerta de autorización corre ANTES de la transacción
         // y antes de cualquier confirmación - un hash que no es el autorizado no debe ni abrir una
-        // transacción, mucho menos tomar locks.
+        // transacción, mucho menos tomar locks. Desde el re-audit 2, en un entorno operativo el
+        // manifiesto ya está garantizado no nulo por la compuerta de arriba, así que esta compuerta
+        // SIEMPRE corre ahí; el `if` sólo deja pasar los lotes de fixture sin manifiesto de `testing`.
         if ($manifest !== null) {
             $fingerprintBlocker = self::authorizationFingerprintBlocker($manifest, $expectedManifestFingerprint);
 
@@ -3218,9 +3260,27 @@ class ReviewedProposalService
      * el copiado/pegado desde el comentario del Issue, y un hash no se compara con `===` cuando existe
      * la función que lo hace en tiempo constante.
      *
+     * TASK-0007 re-audit 2 (Issue #2 comentario `6015273402`, BLOQUEO B): esta función es **la única**
+     * validación de hash autorizado del sistema, y es PÚBLICA para que el CLI la llame ANTES de
+     * imprimir la confirmación destructiva, en vez de tener su propia versión.
+     *
+     * EL DEFECTO QUE CIERRA: el CLI sólo comprobaba que la opción no estuviera vacía antes de mostrar
+     * el banner y preguntar «¿Ejecutar el lote con esta autorización?»; las comprobaciones de FORMA y
+     * de COINCIDENCIA vivían en `applyBatch()`, invocado DESPUÉS de esa confirmación. El servicio
+     * validaba bien -antes de la transacción-, pero se le podía pedir a una persona que confirmara un
+     * APPLY destructivo con un hash mal copiado o directamente equivocado, para rechazarlo recién
+     * después. Eso no cumplía el orden de compuertas pedido, y el audit de la ronda 2 sobreafirmó al
+     * decir que corría «antes de cualquier confirmación».
+     *
+     * La corrección NO duplica validadores: hay uno solo, lo llama el CLI antes de preguntar y lo
+     * vuelve a llamar el servicio antes de la transacción, por defensa en profundidad. Es de SOLO
+     * LECTURA -no toca la base, no escribe, no abre transacción- así que llamarla dos veces es
+     * inofensivo, y que el servicio siga siendo la autoridad final es lo que hace que saltearse el CLI
+     * no sirva de nada.
+     *
      * @return array{blocker:string, detail:array}|null  `null` = la compuerta pasa.
      */
-    private static function authorizationFingerprintBlocker(array $manifest, ?string $expectedManifestFingerprint): ?array
+    public static function authorizationFingerprintBlocker(array $manifest, ?string $expectedManifestFingerprint): ?array
     {
         $manifestFingerprint = (string) ($manifest['manifest_fingerprint'] ?? '');
 
