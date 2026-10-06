@@ -187,13 +187,19 @@ final class ReviewedProposalBatchManifest
      * Las seis causas de rechazo que pide el comentario, en el orden en que se evalúan:
      *
      * 1. el manifiesto no es íntegro consigo mismo (su propio hash no coincide) -> `BATCH_TAMPER_DETECTED`;
-     * 2. el baseline de la taxonomía cambió -> `BATCH_BASELINE_STALE`;
-     * 3. alguna propuesta esperada desapareció o dejó de ser `PENDING_APPLY` -> `BATCH_QUEUE_DRIFT`
+     * 2. el conjunto PEDIDO no es exactamente el conjunto ATADO -> `BATCH_MANIFEST_REQUEST_MISMATCH`
+     *    (re-audit `6011317053`, BLOQUEO 1);
+     * 3. el baseline de la taxonomía cambió -> `BATCH_BASELINE_STALE`;
+     * 4. alguna propuesta esperada desapareció o dejó de ser `PENDING_APPLY` -> `BATCH_QUEUE_DRIFT`
      *    (o `BATCH_ALREADY_EXECUTED` si TODAS están ya `APPLIED`: replay, no drift);
-     * 4. la identidad atada difiere (payload/fingerprint de estado/decisión/origen/grupo) ->
+     * 5. la identidad atada difiere (payload/fingerprint de estado/decisión/origen/grupo) ->
      *    `BATCH_TAMPER_DETECTED`, porque un payload congelado no cambia por vías legítimas;
-     * 5. apareció una `PENDING_APPLY` FUERA del manifiesto -> `BATCH_QUEUE_DRIFT`;
-     * 6. la forma de la cola protegida difiere -> `BATCH_QUEUE_DRIFT`.
+     * 6. apareció una `PENDING_APPLY` FUERA del manifiesto -> `BATCH_QUEUE_DRIFT`;
+     * 7. la forma de la cola protegida difiere -> `BATCH_QUEUE_DRIFT`.
+     *
+     * El ORDEN de las dos primeras importa: la integridad del archivo se comprueba ANTES que la
+     * igualdad de conjuntos, así que un manifiesto al que le editaron la lista de propuestas se
+     * reporta como TAMPER -que es el hallazgo correcto- y no como un simple desajuste de pedido.
      *
      * LÍMITE DECLARADO, no escondido: la causa 5 es una foto del instante de la verificación. Un
      * `freeze()` que commitee un milisegundo después no se vería - `freeze()` no toma el lock de
@@ -203,9 +209,13 @@ final class ReviewedProposalBatchManifest
      * GOBERNANZA entre autorizar y ejecutar, que se mide en horas.
      *
      * @param  string  $currentBaselineFingerprint  Computado UNA vez por el lote, para no recomputarlo acá.
+     * @param  int[]  $requestedProposalIds  El conjunto que el lote va a ejecutar. OBLIGATORIO y sin
+     *                valor por defecto a propósito: con un default, un llamador futuro podría omitirlo
+     *                y volver a habilitar en silencio la ejecución de un SUBCONJUNTO de un manifiesto
+     *                autorizado, que es exactamente el BLOQUEO 1 del re-audit `6011317053`.
      * @return array{ok:bool, blocker:?string, detail:array, manifest_fingerprint:?string, findings:array}
      */
-    public static function verify(array $manifest, string $currentBaselineFingerprint): array
+    public static function verify(array $manifest, string $currentBaselineFingerprint, array $requestedProposalIds): array
     {
         $declaredFingerprint = $manifest['manifest_fingerprint'] ?? null;
 
@@ -224,6 +234,41 @@ final class ReviewedProposalBatchManifest
                 'note' => 'El manifiesto no coincide con su propio fingerprint: su contenido se editó después de generarlo. No se ejecuta nada.',
                 'declared_manifest_fingerprint' => $declaredFingerprint,
                 'recomputed_manifest_fingerprint' => $recomputed,
+            ], $declaredFingerprint);
+        }
+
+        // ============================================================================
+        // Re-audit `6011317053`, BLOQUEO 1: IGUALDAD EXACTA entre lo pedido y lo atado.
+        //
+        // Antes faltaba, y lo que faltaba no era una comprobación cosmética: el manifiesto verificaba
+        // que todas SUS propuestas siguieran vivas y que la cola no tuviera ninguna de más, pero nadie
+        // comprobaba que el conjunto a EJECUTAR fuera ese mismo. Con eso,
+        // `--manifest=<FULL aprobado> --id=491` verificaba con éxito y ejecutaba sólo #491.
+        //
+        // Y el daño va más allá de "queda una fila sin aplicar": #491 escribe
+        // `taxonomy_term_concepts`, así que tras esa ejecución parcial el fingerprint global cambia y
+        // las otras once revisiones quedan obsoletas - el conjunto atómico autorizado deja de ser
+        // recuperable COMO ESE CONJUNTO. Por eso la compuerta corre antes del baseline y de la
+        // liveness: no tiene sentido verificar el estado vivo de un manifiesto que no es el que se va a
+        // ejecutar.
+        //
+        // La comparación es de CONJUNTOS normalizados, así que el orden de llegada de los ids y los
+        // duplicados no importan - lo que importa es que sean los mismos.
+        // ============================================================================
+        $boundIds = ReviewedProposalService::normalisedBatchIds(
+            array_map(fn (array $row) => (int) $row['proposal_id'], $manifest['proposals'] ?? [])
+        );
+        $requestedIds = ReviewedProposalService::normalisedBatchIds($requestedProposalIds);
+
+        if ($boundIds !== $requestedIds) {
+            return self::failure(ReviewedProposalService::BATCH_MANIFEST_REQUEST_MISMATCH, [
+                'note' => 'El conjunto que se pidió ejecutar NO es exactamente el que el manifiesto ata. Un manifiesto autoriza UN conjunto atómico: ejecutar un subconjunto suyo no es "ejecutar menos", es ejecutar algo que nadie autorizó, y además puede dejar obsoletas las revisiones restantes si alguna de las ejecutadas cambia el grafo. Cero escrituras.',
+                'manifest_bound_proposal_ids' => $boundIds,
+                'requested_proposal_ids' => $requestedIds,
+                'requested_but_not_bound' => array_values(array_diff($requestedIds, $boundIds)),
+                'bound_but_not_requested' => array_values(array_diff($boundIds, $requestedIds)),
+                'scope' => $manifest['scope'] ?? null,
+                'subset_flag_note' => 'Un alcance EXPLICIT_IDS significa que el MANIFIESTO ata un subconjunto a propósito; nunca habilita tomar un subconjunto arbitrario de un manifiesto ya atado.',
             ], $declaredFingerprint);
         }
 
@@ -349,9 +394,11 @@ final class ReviewedProposalBatchManifest
                 'manifest_version' => self::MANIFEST_VERSION,
                 'scope' => $scope,
                 'manifest_fingerprint_recomputed_ok' => true,
+                'requested_set_equals_bound_set' => true,
                 'baseline_matches_current' => true,
                 'bound_proposal_count' => count($expectedIds),
                 'bound_proposal_ids' => $expectedIds,
+                'requested_proposal_ids' => $requestedIds,
                 'all_bound_proposals_pending_apply' => true,
                 'identity_matches' => true,
                 // `null` = no aplica a un manifiesto de subconjunto, nunca "pasó" - misma convención

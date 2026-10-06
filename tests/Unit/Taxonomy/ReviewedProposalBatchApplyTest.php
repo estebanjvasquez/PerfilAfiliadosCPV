@@ -54,6 +54,13 @@ class ReviewedProposalBatchApplyTest extends TestCase
             // Si nunca se abrió, no hay nada que purgar.
         }
 
+        foreach ($this->temporaryManifestFiles as $path) {
+            if (is_file($path)) {
+                @unlink($path);
+            }
+        }
+        $this->temporaryManifestFiles = [];
+
         parent::tearDown();
     }
 
@@ -266,14 +273,14 @@ class ReviewedProposalBatchApplyTest extends TestCase
      * y NADA cambió - cero escrituras SQL, cero filas de taxonomía, cero propuestas APPLIED, cero
      * propuestas ABORTED y cero filas de auditoría.
      */
-    private function assertBatchBlockedWithoutAnyWrite(array $ids, string $expectedBlocker, ?array $manifest = null): array
+    private function assertBatchBlockedWithoutAnyWrite(array $ids, string $expectedBlocker, ?array $manifest = null, ?string $expectedFingerprint = null): array
     {
         $before = $this->counts();
         $statuses = TaxonomyReviewedProposal::query()->whereIn('id', $ids)->orderBy('id')->pluck('status', 'id')->all();
 
         $writes = [];
         $result = $this->captureWrites(
-            fn () => (new ReviewedProposalService())->applyBatch($ids, self::AUTH_REFERENCE, $manifest),
+            fn () => (new ReviewedProposalService())->applyBatch($ids, self::AUTH_REFERENCE, $manifest, $expectedFingerprint),
             $writes,
         );
 
@@ -827,10 +834,403 @@ class ReviewedProposalBatchApplyTest extends TestCase
         try {
             $result = $this->assertBatchBlockedWithoutAnyWrite([(int) $proposal->id], ReviewedProposalService::BATCH_ENVIRONMENT_NOT_AUTHORIZED);
             $this->assertSame('production', $result['detail']['target_environment']);
-            $this->assertNotContains('production', ReviewedProposalService::BATCH_ALLOWED_ENVIRONMENTS);
+            $this->assertNotContains('production', ReviewedProposalService::BATCH_EXECUTABLE_ENVIRONMENTS);
         } finally {
             app()->detectEnvironment(fn () => 'testing');
         }
+    }
+
+    // =========================================================================================
+    // RE-AUDIT `6011317053` — BLOQUEO 2: `local` lee datos compartidos REALES, así que no puede
+    // ejecutar. Sólo `staging` es objetivo operativo; `testing` es la excepción de los tests.
+    // =========================================================================================
+
+    #[Test]
+    public function local_can_preview_but_cannot_execute_a_batch(): void
+    {
+        // EL DEFECTO QUE CIERRA: la lista anterior era ['local','testing','staging'], y los propios
+        // artefactos de la ronda 1 prueban que el APP_ENV=local de esta estación está conectado al
+        // dataset compartido REAL (se generaron con generated_in_environment=local leyendo la cola real
+        // de 12 filas). Con esa lista, --execute --expect-environment=local habría podido ejecutar
+        // datos reales desde una máquina de desarrollo.
+        $user = $this->authorizedUser();
+        $proposal = $this->freezeContextRequired($this->pendingCandidate(), $user);
+
+        app()->detectEnvironment(fn () => 'local');
+
+        try {
+            $this->assertFalse(ReviewedProposalService::environmentCanExecuteBatch('local'));
+
+            $result = $this->assertBatchBlockedWithoutAnyWrite([(int) $proposal->id], ReviewedProposalService::BATCH_ENVIRONMENT_NOT_AUTHORIZED);
+            $this->assertSame('local', $result['detail']['target_environment']);
+            $this->assertSame(['staging'], $result['detail']['executable_environments']);
+
+            // Pero el PREVIEW sigue siendo plenamente posible en `local`: es de solo lectura y es
+            // donde tiene sentido correrlo. Que el preflight quede inutilizable no sería una
+            // corrección, sería otro defecto.
+            $writes = [];
+            $report = $this->captureWrites(fn () => (new ReviewedProposalService())->previewBatch([(int) $proposal->id]), $writes);
+
+            $this->assertSame([], $writes);
+            $this->assertNull($report['blocker'], 'El preview tiene que seguir funcionando en local.');
+            $this->assertFalse($report['environment_authorized_for_execution'], 'Y tiene que DECIR que este entorno no puede ejecutar.');
+        } finally {
+            app()->detectEnvironment(fn () => 'testing');
+        }
+    }
+
+    #[Test]
+    public function staging_passes_the_environment_gate_and_testing_is_only_the_fixture_exception(): void
+    {
+        $this->assertTrue(ReviewedProposalService::environmentCanExecuteBatch('staging'),
+            'staging es el único entorno OPERATIVO autorizado para ejecutar.');
+        $this->assertTrue(ReviewedProposalService::environmentCanExecuteBatch('testing'),
+            'testing pasa SOLO como excepción para tests automatizados, no como objetivo operativo.');
+        $this->assertFalse(ReviewedProposalService::environmentCanExecuteBatch('local'));
+        $this->assertFalse(ReviewedProposalService::environmentCanExecuteBatch('production'));
+
+        // Y la separación es estructural, no un comentario: la lista operativa tiene UN elemento y la
+        // excepción de tests vive en otra constante. Si alguien volviera a meter `local` o `testing`
+        // en la lista operativa, este test falla.
+        $this->assertSame(['staging'], ReviewedProposalService::BATCH_EXECUTABLE_ENVIRONMENTS);
+        $this->assertSame('testing', ReviewedProposalService::BATCH_FIXTURE_TEST_ENVIRONMENT);
+
+        // La compuerta pasa de verdad con el entorno en `staging`: fixture aislado dentro de
+        // DatabaseTransactions, nada real y nada commiteado.
+        $user = $this->authorizedUser();
+        $proposal = $this->freezeContextRequired($this->pendingCandidate(), $user);
+
+        app()->detectEnvironment(fn () => 'staging');
+
+        try {
+            $result = (new ReviewedProposalService())->applyBatch([(int) $proposal->id], self::AUTH_REFERENCE);
+
+            $this->assertSame(ReviewedProposalService::BATCH_RESULT_APPLIED, $result['result'],
+                'Con el entorno en staging la compuerta de entorno no debe bloquear.');
+            $this->assertSame('staging', $result['target_environment']);
+        } finally {
+            app()->detectEnvironment(fn () => 'testing');
+        }
+    }
+
+    // =========================================================================================
+    // RE-AUDIT `6011317053` — BLOQUEO 1: un manifiesto no se puede ejecutar por partes
+    // =========================================================================================
+
+    #[Test]
+    public function a_strict_subset_of_a_full_manifest_is_refused_with_zero_writes(): void
+    {
+        // EL DEFECTO QUE CIERRA, aceptado sin reservas: el manifiesto verificaba que todas SUS
+        // propuestas siguieran vivas, pero nadie comprobaba que el conjunto a EJECUTAR fuera ese mismo.
+        // Así, `--manifest=<FULL aprobado> --id=491` verificaba con éxito y ejecutaba sólo #491.
+        $scenario = $this->representativeBatch();
+        $manifest = ReviewedProposalBatchManifest::generate($scenario['ids']);
+
+        $subset = [$scenario['ids'][0]];
+
+        $result = $this->assertBatchBlockedWithoutAnyWrite($subset, ReviewedProposalService::BATCH_MANIFEST_REQUEST_MISMATCH, $manifest, $manifest['manifest_fingerprint']);
+
+        $this->assertSame($scenario['ids'], $result['detail']['manifest_bound_proposal_ids']);
+        $this->assertSame($subset, $result['detail']['requested_proposal_ids']);
+        $this->assertSame(array_values(array_diff($scenario['ids'], $subset)), $result['detail']['bound_but_not_requested']);
+        $this->assertSame([], $result['detail']['requested_but_not_bound']);
+    }
+
+    #[Test]
+    public function a_further_subset_of_a_subset_manifest_is_refused_too(): void
+    {
+        // El alcance EXPLICIT_IDS significa que el MANIFIESTO ata un subconjunto a propósito; nunca
+        // habilita tomar un subconjunto arbitrario de un manifiesto ya atado.
+        $scenario = $this->representativeBatch();
+        $boundSubset = array_slice($scenario['ids'], 0, 3);
+        $manifest = ReviewedProposalBatchManifest::generate($boundSubset);
+
+        $this->assertSame(ReviewedProposalBatchManifest::SCOPE_EXPLICIT_IDS, $manifest['scope']);
+
+        $result = $this->assertBatchBlockedWithoutAnyWrite(array_slice($boundSubset, 0, 2), ReviewedProposalService::BATCH_MANIFEST_REQUEST_MISMATCH, $manifest, $manifest['manifest_fingerprint']);
+
+        $this->assertSame(ReviewedProposalBatchManifest::SCOPE_EXPLICIT_IDS, $result['detail']['scope']);
+    }
+
+    #[Test]
+    public function extra_ids_beyond_the_manifest_are_refused_as_well(): void
+    {
+        // La igualdad es de CONJUNTOS, así que también bloquea el caso inverso: pedir MÁS de lo que el
+        // manifiesto ata. Autorizar 6 no autoriza ejecutar 7.
+        $scenario = $this->representativeBatch();
+        $boundSubset = array_slice($scenario['ids'], 0, 5);
+        $manifest = ReviewedProposalBatchManifest::generate($boundSubset);
+
+        $result = $this->assertBatchBlockedWithoutAnyWrite($scenario['ids'], ReviewedProposalService::BATCH_MANIFEST_REQUEST_MISMATCH, $manifest, $manifest['manifest_fingerprint']);
+
+        $this->assertSame(array_values(array_diff($scenario['ids'], $boundSubset)), $result['detail']['requested_but_not_bound']);
+    }
+
+    #[Test]
+    public function the_same_set_in_a_different_order_or_with_duplicates_is_accepted(): void
+    {
+        // La compuerta compara conjuntos NORMALIZADOS: el orden de llegada y los duplicados no son
+        // una diferencia de autorización, y tratarlos como tal rompería invocaciones legítimas.
+        $scenario = $this->representativeBatch();
+        $manifest = ReviewedProposalBatchManifest::generate($scenario['ids']);
+
+        $shuffled = array_reverse($scenario['ids']);
+        $withDuplicates = array_merge($shuffled, [$scenario['ids'][0], $scenario['ids'][0]]);
+
+        $verification = ReviewedProposalBatchManifest::verify(
+            $manifest,
+            CanonicalConceptBuilderService::dryRunInputFingerprint(),
+            $withDuplicates,
+        );
+
+        $this->assertTrue($verification['ok']);
+        $this->assertTrue($verification['findings']['requested_set_equals_bound_set']);
+        $this->assertSame($scenario['ids'], $verification['findings']['requested_proposal_ids']);
+
+        // Y el lote entero se ejecuta con los ids desordenados y duplicados.
+        $result = (new ReviewedProposalService())->applyBatch(
+            $withDuplicates,
+            self::AUTH_REFERENCE,
+            $manifest,
+            $manifest['manifest_fingerprint'],
+        );
+
+        $this->assertSame(ReviewedProposalService::BATCH_RESULT_APPLIED, $result['result']);
+        $this->assertSame($scenario['ids'], $result['applied_proposal_ids']);
+    }
+
+    #[Test]
+    public function an_edited_manifest_is_reported_as_tamper_and_not_as_a_request_mismatch(): void
+    {
+        // El ORDEN de las compuertas importa: a un manifiesto al que le editaron la lista de
+        // propuestas se le tiene que reportar la integridad del archivo (hallazgo de seguridad), no un
+        // desajuste de pedido - aunque las dos cosas sean ciertas a la vez.
+        $scenario = $this->representativeBatch();
+        $manifest = ReviewedProposalBatchManifest::generate($scenario['ids']);
+        array_pop($manifest['proposals']);
+
+        $verification = ReviewedProposalBatchManifest::verify(
+            $manifest,
+            CanonicalConceptBuilderService::dryRunInputFingerprint(),
+            array_map(fn (array $row) => (int) $row['proposal_id'], $manifest['proposals']),
+        );
+
+        $this->assertSame(ReviewedProposalService::BATCH_TAMPER_DETECTED, $verification['blocker']);
+    }
+
+    // =========================================================================================
+    // RE-AUDIT `6011317053` — BLOQUEO 3: la autorización atada al hash del manifiesto
+    // =========================================================================================
+
+    #[Test]
+    public function the_batch_refuses_a_manifest_without_the_authorised_fingerprint(): void
+    {
+        // Un manifiesto auto-hasheado sólo prueba «este archivo no se editó». Para probar «este es el
+        // hash que el dueño autorizó» hace falta un SEGUNDO insumo, citado aparte.
+        $scenario = $this->representativeBatch();
+        $manifest = ReviewedProposalBatchManifest::generate($scenario['ids']);
+
+        $result = $this->assertBatchBlockedWithoutAnyWrite(
+            $scenario['ids'],
+            ReviewedProposalService::BATCH_AUTHORIZATION_FINGERPRINT_MISSING,
+            $manifest,
+        );
+
+        $this->assertSame($manifest['manifest_fingerprint'], $result['detail']['manifest_fingerprint_in_file']);
+    }
+
+    #[Test]
+    public function the_batch_refuses_a_malformed_authorised_fingerprint(): void
+    {
+        $scenario = $this->representativeBatch();
+        $manifest = ReviewedProposalBatchManifest::generate($scenario['ids']);
+
+        foreach (['no-es-un-hash', 'eb7d1467', str_repeat('z', 64)] as $malformed) {
+            $before = $this->counts();
+            $writes = [];
+
+            $result = $this->captureWrites(
+                fn () => (new ReviewedProposalService())->applyBatch($scenario['ids'], self::AUTH_REFERENCE, $manifest, $malformed),
+                $writes,
+            );
+
+            $this->assertSame([], $writes);
+            $this->assertSame(ReviewedProposalService::BATCH_AUTHORIZATION_FINGERPRINT_MALFORMED, $result['blocker'], "No rechazó el hash malformado `{$malformed}`.");
+            $this->assertSame($before, $this->counts());
+        }
+    }
+
+    #[Test]
+    public function the_batch_refuses_a_valid_manifest_that_is_not_the_authorised_one(): void
+    {
+        // EL ESCENARIO DE FALLO EXACTO que el re-audit describe: el dueño autoriza el hash A; después
+        // se genera un manifiesto B internamente válido; el operador corre B citando la autorización
+        // de A. Sin esta compuerta, si B coincide con el estado vivo nada lo detecta.
+        $scenario = $this->representativeBatch();
+        $manifestB = ReviewedProposalBatchManifest::generate($scenario['ids']);
+        $authorizedHashA = hash('sha256', 'un manifiesto distinto que el dueño autorizó antes');
+
+        $result = $this->assertBatchBlockedWithoutAnyWrite(
+            $scenario['ids'],
+            ReviewedProposalService::BATCH_AUTHORIZATION_FINGERPRINT_MISMATCH,
+            $manifestB,
+            $authorizedHashA,
+        );
+
+        $this->assertSame($authorizedHashA, $result['detail']['authorized_manifest_fingerprint']);
+        $this->assertSame($manifestB['manifest_fingerprint'], $result['detail']['loaded_manifest_fingerprint']);
+    }
+
+    #[Test]
+    public function the_batch_executes_when_the_authorised_fingerprint_matches_the_loaded_manifest(): void
+    {
+        $scenario = $this->representativeBatch();
+        $manifest = ReviewedProposalBatchManifest::generate($scenario['ids']);
+
+        // El hash se pasa como lo citaría una autorización humana: en mayúsculas y con espacios
+        // alrededor, porque un copiado/pegado desde un comentario no debería romper una ejecución
+        // legítima. Lo que NO se acepta es un hash distinto.
+        $result = (new ReviewedProposalService())->applyBatch(
+            $scenario['ids'],
+            self::AUTH_REFERENCE,
+            $manifest,
+            '  '.strtoupper($manifest['manifest_fingerprint']).'  ',
+        );
+
+        $this->assertSame(ReviewedProposalService::BATCH_RESULT_APPLIED, $result['result']);
+        $this->assertSame($scenario['ids'], $result['applied_proposal_ids']);
+        $this->assertTrue($result['manifest_verification']['ok']);
+    }
+
+    #[Test]
+    public function the_authorisation_fingerprint_is_never_inferred_from_the_manifest_file(): void
+    {
+        // Prueba ESTRUCTURAL de la regla «do NOT infer the expected hash from the same manifest file:
+        // that would collapse the two trust inputs back into one». Si alguien "arreglara" la compuerta
+        // rellenando el hash esperado desde el manifiesto, los dos insumos volverían a ser uno y este
+        // test falla.
+        $reflection = new \ReflectionClass(ReviewedProposalService::class);
+        $source = file($reflection->getFileName());
+        $method = $reflection->getMethod('applyBatch');
+        $body = implode('', array_slice($source, $method->getStartLine() - 1, $method->getEndLine() - $method->getStartLine() + 1));
+
+        $this->assertStringNotContainsString("\$expectedManifestFingerprint ??", $body,
+            'El hash autorizado no puede tener un fallback que lo deduzca del manifiesto.');
+        $this->assertStringNotContainsString("\$manifest['manifest_fingerprint']", $body,
+            'applyBatch() no debe leer el hash del archivo para construir la expectativa: ahí es donde los dos insumos de confianza se colapsarían en uno.');
+
+        // Y los dos insumos llegan como PARÁMETROS separados, no como un campo del mismo arreglo.
+        $parameters = array_map(fn (\ReflectionParameter $p) => $p->getName(), $method->getParameters());
+        $this->assertSame(['proposalIds', 'authorizationReference', 'manifest', 'expectedManifestFingerprint'], $parameters);
+
+        // Y la compuerta se evalúa ANTES de la transacción: un hash que no es el autorizado no debe
+        // ni abrir una transacción, mucho menos tomar locks.
+        $gatePosition = strpos($body, 'authorizationFingerprintBlocker(');
+        $transactionPosition = strpos($body, '->transaction(');
+
+        $this->assertNotFalse($gatePosition);
+        $this->assertNotFalse($transactionPosition);
+        $this->assertLessThan($transactionPosition, $gatePosition,
+            'La compuerta de autorización tiene que correr antes de abrir la transacción.');
+    }
+
+    // =========================================================================================
+    // RE-AUDIT `6011317053` — nivel COMANDO: `--id` no puede debilitar un manifiesto
+    // =========================================================================================
+
+    /**
+     * Escribe un manifiesto de FIXTURE a un archivo temporal y devuelve su ruta.
+     *
+     * Los tests de comando NO usan el manifiesto real de `audit/` a propósito: ese ata las 12
+     * propuestas reales, y si alguna compuerta del comando se debilitara, un test podría llegar a
+     * ejecutar la cola real (aunque `DatabaseTransactions` la revirtiera). Con un manifiesto de
+     * fixture, ningún camino de estos tests puede siquiera nombrar una propuesta real.
+     */
+    private function fixtureManifestFile(array $ids): array
+    {
+        $manifest = ReviewedProposalBatchManifest::generate($ids);
+        $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'zzz_task0007_fixture_manifest_'.uniqid('', true).'.json';
+        file_put_contents($path, json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $this->temporaryManifestFiles[] = $path;
+
+        return [$path, $manifest];
+    }
+
+    /** @var string[] */
+    private array $temporaryManifestFiles = [];
+
+    #[Test]
+    public function the_command_refuses_id_together_with_execute(): void
+    {
+        // La opción PREFERIDA del orquestador: con `--execute`, `--id` no puede redefinir el
+        // manifiesto en absoluto. Se comprueba al nivel del COMANDO porque es ahí donde el operador
+        // tipea las dos opciones.
+        $scenario = $this->representativeBatch();
+        [$path, $manifest] = $this->fixtureManifestFile($scenario['ids']);
+        $before = $this->counts();
+
+        $this->artisan('taxonomy:apply-reviewed-proposal-batch', [
+            '--manifest' => $path,
+            '--id' => [(string) $scenario['ids'][0]],
+            '--execute' => true,
+            '--authorized-by' => 'Issue #2 test 6011317053',
+            '--expect-manifest-fingerprint' => $manifest['manifest_fingerprint'],
+            '--expect-environment' => 'testing',
+            '--allow-subset-manifest' => true,
+            '--force' => true,
+        ])->assertFailed();
+
+        $this->assertSame($before, $this->counts(), 'El rechazo de --id con --execute no puede escribir nada.');
+    }
+
+    #[Test]
+    public function the_command_refuses_execute_without_the_authorised_fingerprint(): void
+    {
+        $scenario = $this->representativeBatch();
+        [$path] = $this->fixtureManifestFile($scenario['ids']);
+        $before = $this->counts();
+
+        $this->artisan('taxonomy:apply-reviewed-proposal-batch', [
+            '--manifest' => $path,
+            '--execute' => true,
+            '--authorized-by' => 'Issue #2 test 6011317053',
+            '--expect-environment' => 'testing',
+            '--allow-subset-manifest' => true,
+            '--force' => true,
+        ])->assertFailed();
+
+        $this->assertSame($before, $this->counts());
+    }
+
+    #[Test]
+    public function the_command_refuses_execute_outside_staging(): void
+    {
+        // El CLI acepta SÓLO entornos operativos, sin la excepción de `testing`: una persona corriendo
+        // este comando en `testing` no es un test de fixture. Y `local` queda fuera porque lee datos
+        // compartidos reales.
+        $scenario = $this->representativeBatch();
+        [$path, $manifest] = $this->fixtureManifestFile($scenario['ids']);
+        $before = $this->counts();
+
+        foreach (['testing', 'local'] as $environment) {
+            app()->detectEnvironment(fn () => $environment);
+
+            try {
+                $this->artisan('taxonomy:apply-reviewed-proposal-batch', [
+                    '--manifest' => $path,
+                    '--execute' => true,
+                    '--authorized-by' => 'Issue #2 test 6011317053',
+                    '--expect-manifest-fingerprint' => $manifest['manifest_fingerprint'],
+                    '--expect-environment' => $environment,
+                    '--allow-subset-manifest' => true,
+                    '--force' => true,
+                ])->assertFailed();
+            } finally {
+                app()->detectEnvironment(fn () => 'testing');
+            }
+        }
+
+        $this->assertSame($before, $this->counts(), 'Ningún rechazo de entorno puede escribir nada.');
     }
 
     // =========================================================================================
@@ -923,7 +1323,7 @@ class ReviewedProposalBatchApplyTest extends TestCase
         $reversed = ReviewedProposalBatchManifest::generate(array_reverse($scenario['ids']));
         $this->assertSame($first['manifest_fingerprint'], $reversed['manifest_fingerprint']);
 
-        $verification = ReviewedProposalBatchManifest::verify($first, CanonicalConceptBuilderService::dryRunInputFingerprint());
+        $verification = ReviewedProposalBatchManifest::verify($first, CanonicalConceptBuilderService::dryRunInputFingerprint(), $scenario['ids']);
         $this->assertTrue($verification['ok']);
     }
 
@@ -937,11 +1337,14 @@ class ReviewedProposalBatchApplyTest extends TestCase
         // ejecuto 11".
         array_pop($manifest['proposals']);
 
-        $verification = ReviewedProposalBatchManifest::verify($manifest, CanonicalConceptBuilderService::dryRunInputFingerprint());
+        $verification = ReviewedProposalBatchManifest::verify($manifest, CanonicalConceptBuilderService::dryRunInputFingerprint(), $scenario['ids']);
         $this->assertFalse($verification['ok']);
         $this->assertSame(ReviewedProposalService::BATCH_TAMPER_DETECTED, $verification['blocker']);
 
-        $this->assertBatchBlockedWithoutAnyWrite($scenario['ids'], ReviewedProposalService::BATCH_TAMPER_DETECTED, $manifest);
+        // El `manifest_fingerprint` declarado sigue siendo el original (se editó el contenido, no el
+        // hash), así que la compuerta de autorización pasa y el hallazgo que queda es el correcto: la
+        // integridad del archivo.
+        $this->assertBatchBlockedWithoutAnyWrite($scenario['ids'], ReviewedProposalService::BATCH_TAMPER_DETECTED, $manifest, $manifest['manifest_fingerprint']);
     }
 
     #[Test]
@@ -963,7 +1366,13 @@ class ReviewedProposalBatchApplyTest extends TestCase
 
         $intruder = $this->freezeContextRequired($intruderCandidate, $scenario['user']);
 
-        $verification = ReviewedProposalBatchManifest::verify($manifest, CanonicalConceptBuilderService::dryRunInputFingerprint());
+        // Se verifica contra el conjunto que el propio manifiesto ata, así que la compuerta de
+        // igualdad pasa y lo que este test mide es la que le interesa: la PENDING_APPLY de más.
+        $verification = ReviewedProposalBatchManifest::verify(
+            $manifest,
+            CanonicalConceptBuilderService::dryRunInputFingerprint(),
+            array_map(fn (array $row) => (int) $row['proposal_id'], $manifest['proposals']),
+        );
 
         $this->assertFalse($verification['ok']);
         $this->assertSame(ReviewedProposalService::BATCH_QUEUE_DRIFT, $verification['blocker']);
@@ -982,7 +1391,7 @@ class ReviewedProposalBatchApplyTest extends TestCase
 
         $this->assertSame(ReviewedProposalBatchManifest::SCOPE_EXPLICIT_IDS, $manifest['scope']);
 
-        $verification = ReviewedProposalBatchManifest::verify($manifest, CanonicalConceptBuilderService::dryRunInputFingerprint());
+        $verification = ReviewedProposalBatchManifest::verify($manifest, CanonicalConceptBuilderService::dryRunInputFingerprint(), $scenario['ids']);
 
         $this->assertTrue($verification['ok'], 'Un manifiesto de subconjunto no debe fallar por las PENDING_APPLY que deliberadamente no ata.');
         $this->assertNull($verification['findings']['no_unauthorised_pending_proposals'],
@@ -991,7 +1400,7 @@ class ReviewedProposalBatchApplyTest extends TestCase
         $relabelled = array_merge($manifest, ['scope' => ReviewedProposalBatchManifest::SCOPE_FULL_PENDING_QUEUE]);
         $this->assertSame(
             ReviewedProposalService::BATCH_TAMPER_DETECTED,
-            ReviewedProposalBatchManifest::verify($relabelled, CanonicalConceptBuilderService::dryRunInputFingerprint())['blocker'],
+            ReviewedProposalBatchManifest::verify($relabelled, CanonicalConceptBuilderService::dryRunInputFingerprint(), $scenario['ids'])['blocker'],
         );
     }
 
@@ -1003,7 +1412,7 @@ class ReviewedProposalBatchApplyTest extends TestCase
 
         $this->concept('zzz_batch_manifest_stale_'.uniqid());
 
-        $verification = ReviewedProposalBatchManifest::verify($manifest, CanonicalConceptBuilderService::dryRunInputFingerprint());
+        $verification = ReviewedProposalBatchManifest::verify($manifest, CanonicalConceptBuilderService::dryRunInputFingerprint(), $scenario['ids']);
         $this->assertFalse($verification['ok']);
         $this->assertSame(ReviewedProposalService::BATCH_BASELINE_STALE, $verification['blocker']);
     }
@@ -1014,11 +1423,18 @@ class ReviewedProposalBatchApplyTest extends TestCase
         $scenario = $this->representativeBatch();
         $manifest = ReviewedProposalBatchManifest::generate($scenario['ids']);
 
-        $result = (new ReviewedProposalService())->applyBatch($scenario['ids'], self::AUTH_REFERENCE, $manifest);
+        $result = (new ReviewedProposalService())->applyBatch(
+            $scenario['ids'],
+            self::AUTH_REFERENCE,
+            $manifest,
+            $manifest['manifest_fingerprint'],
+        );
 
         $this->assertSame(ReviewedProposalService::BATCH_RESULT_APPLIED, $result['result']);
         $this->assertSame($manifest['manifest_fingerprint'], $result['manifest_verification']['manifest_fingerprint']);
+        $this->assertSame($manifest['manifest_fingerprint'], $result['expected_manifest_fingerprint']);
         $this->assertTrue($result['manifest_verification']['ok']);
+        $this->assertTrue($result['manifest_verification']['findings']['requested_set_equals_bound_set']);
         $this->assertSame($scenario['ids'], $result['applied_proposal_ids']);
     }
 

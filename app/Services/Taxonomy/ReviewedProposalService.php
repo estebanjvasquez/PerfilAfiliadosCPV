@@ -435,6 +435,45 @@ class ReviewedProposalService
     /** Pedido vacío: no hay nada que ejecutar, y un lote vacío no es un lote exitoso. */
     public const BATCH_EMPTY_REQUEST = 'BATCH_EMPTY_REQUEST';
 
+    /**
+     * TASK-0007 re-audit (Issue #2 comentario `6011317053`, BLOQUEO 1): el conjunto PEDIDO no es
+     * exactamente el conjunto que el manifiesto ATA.
+     *
+     * EL DEFECTO QUE CIERRA, aceptado sin reservas: el manifiesto verificaba que todas las propuestas
+     * que ÉL ata siguieran vivas y que la cola no tuviera ninguna de más, pero NADIE comprobaba que el
+     * conjunto a ejecutar fuera ese mismo conjunto. Con eso,
+     * `--manifest=<manifiesto FULL aprobado> --id=491 --execute` verificaba el manifiesto **con éxito**
+     * y ejecutaba únicamente #491 - justo lo que el manifiesto existe para impedir.
+     *
+     * Y el daño no es "queda una fila sin aplicar": #491 escribe `taxonomy_term_concepts`, así que
+     * después de esa ejecución parcial el fingerprint global cambia y las otras once revisiones quedan
+     * obsoletas. El conjunto atómico que el dueño autorizó deja de ser recuperable COMO ESE CONJUNTO.
+     *
+     * Vale para los dos alcances. `--allow-subset-manifest` significa «el MANIFIESTO ata un
+     * subconjunto a propósito», nunca «tomá un subconjunto arbitrario de un manifiesto ya atado».
+     */
+    public const BATCH_MANIFEST_REQUEST_MISMATCH = 'BATCH_MANIFEST_REQUEST_MISMATCH';
+
+    /**
+     * TASK-0007 re-audit (Issue #2 comentario `6011317053`, BLOQUEO 3): la autorización del dueño no
+     * estaba atada al hash del manifiesto.
+     *
+     * Un manifiesto auto-hasheado prueba «este archivo no se editó sin cambiar su hash». NO prueba
+     * «este es el hash que el dueño autorizó». El escenario de fallo es concreto: el dueño autoriza el
+     * hash A; después se genera un manifiesto B internamente válido; el operador corre B citando el
+     * comentario que autorizó A; y si B coincide con el estado vivo, nada detecta que la referencia de
+     * autorización y el manifiesto cargado describen conjuntos de ejecución distintos.
+     *
+     * La corrección exige un SEGUNDO insumo de confianza, independiente del archivo: el fingerprint que
+     * el dueño autorizó, provisto aparte. Deliberadamente NO se deduce del propio manifiesto - eso
+     * colapsaría los dos insumos en uno y volvería a no probar nada.
+     */
+    public const BATCH_AUTHORIZATION_FINGERPRINT_MISSING = 'BATCH_AUTHORIZATION_FINGERPRINT_MISSING';
+
+    public const BATCH_AUTHORIZATION_FINGERPRINT_MALFORMED = 'BATCH_AUTHORIZATION_FINGERPRINT_MALFORMED';
+
+    public const BATCH_AUTHORIZATION_FINGERPRINT_MISMATCH = 'BATCH_AUTHORIZATION_FINGERPRINT_MISMATCH';
+
     public const BATCH_RESULT_APPLIED = 'BATCH_APPLIED';
 
     public const BATCH_RESULT_BLOCKED = 'BATCH_BLOCKED';
@@ -446,16 +485,51 @@ class ReviewedProposalService
     public const BATCH_MODE_EXECUTE = 'ATOMIC_BATCH_APPLY';
 
     /**
-     * TASK-0007, PARTE 8: entornos donde un lote REAL puede ejecutarse. `production` no está, y no
-     * por omisión: la autorización de esta fase está explícitamente limitada al entorno
-     * compartido/staging. El valor no lo provee quien llama - se auto-captura con
-     * `app()->environment()`, igual que `$targetEnvironment` desde TASK-0004 - así que un operador no
-     * puede "declarar" que está en staging.
+     * TASK-0007, PARTE 8, corregido por el re-audit `6011317053` (BLOQUEO 2): el ÚNICO entorno
+     * operativo donde un lote REAL puede ejecutarse.
      *
-     * `local` y `testing` están para desarrollo y para los tests de fixture, que corren dentro de una
-     * transacción que nunca commitea.
+     * EL DEFECTO QUE CIERRA, aceptado sin reservas: la lista anterior era
+     * `['local', 'testing', 'staging']`, y presentar esos tres como objetivos operativos equivalentes
+     * era más amplio de lo que el dueño autorizó. La prueba está en los propios artefactos de la ronda
+     * 1: se generaron con `generated_in_environment = local` y leyeron la cola real de 12 filas, así
+     * que **el `APP_ENV=local` de esta estación está conectado al dataset compartido REAL**. Con la
+     * lista vieja, `--execute --expect-environment=local` habría podido ejecutar datos reales desde una
+     * máquina de desarrollo.
+     *
+     * `local` sigue siendo plenamente capaz de PREVIEW y de generar manifiestos - las dos cosas son de
+     * solo lectura y es donde tienen sentido -, pero ya no es capaz de EJECUTAR.
+     *
+     * El valor no lo provee quien llama: se auto-captura con `app()->environment()`, igual que
+     * `$targetEnvironment` desde TASK-0004, así que un operador no puede "declarar" que está en
+     * staging.
      */
-    public const BATCH_ALLOWED_ENVIRONMENTS = ['local', 'testing', 'staging'];
+    public const BATCH_EXECUTABLE_ENVIRONMENTS = ['staging'];
+
+    /**
+     * Excepción para TESTS AUTOMATIZADOS, deliberadamente separada de la lista operativa en vez de
+     * mezclada con ella.
+     *
+     * No es un cuarto objetivo de ejecución: es el entorno en el que corre PHPUnit, donde cada lote de
+     * fixture vive dentro de una transacción que **nunca commitea** (`DatabaseTransactions`). Tenerla
+     * como constante aparte es lo que hace que leer el código no sugiera que `testing` y `staging` son
+     * lo mismo. El CLI NO acepta esta excepción -ver `ApplyTaxonomyReviewedProposalBatch`-: una persona
+     * corriendo el comando en `testing` no es un test de fixture.
+     */
+    public const BATCH_FIXTURE_TEST_ENVIRONMENT = 'testing';
+
+    /**
+     * ¿Este entorno puede ejecutar un lote? Un solo predicado, para que la regla no quede repetida en
+     * el servicio y en el comando con la posibilidad de divergir.
+     *
+     * `production` devuelve `false` por no estar en ninguna de las dos, que es lo correcto: la
+     * prohibición no depende de una lista negra que alguien pueda olvidar de actualizar, sino de que
+     * sólo lo explícitamente permitido pasa.
+     */
+    public static function environmentCanExecuteBatch(string $environment): bool
+    {
+        return in_array($environment, self::BATCH_EXECUTABLE_ENVIRONMENTS, true)
+            || $environment === self::BATCH_FIXTURE_TEST_ENVIRONMENT;
+    }
 
     /**
      * TASK-0004, re-audit HIGH-2 (Issue #2 comentario `5890113782`): bandera de contexto que SOLO
@@ -2585,8 +2659,13 @@ class ReviewedProposalService
      *                contra el estado vivo DENTRO de la transacción y con los locks ya tomados. Es el
      *                mecanismo de la PARTE 4: sin él un lote ejecuta "los ids que le pasaron", con él
      *                ejecuta "exactamente la cola que se autorizó o nada".
+     * @param  string|null  $expectedManifestFingerprint  Re-audit `6011317053`, BLOQUEO 3: el
+     *                fingerprint que el DUEÑO autorizó, provisto como un insumo de confianza SEPARADO
+     *                del archivo. OBLIGATORIO cuando viene `$manifest`: sin él el manifiesto sólo
+     *                prueba que no se editó, no que sea el que se autorizó. Nunca se deduce del propio
+     *                manifiesto - eso colapsaría los dos insumos en uno.
      */
-    public function applyBatch(array $proposalIds, string $authorizationReference, ?array $manifest = null): array
+    public function applyBatch(array $proposalIds, string $authorizationReference, ?array $manifest = null, ?string $expectedManifestFingerprint = null): array
     {
         if (trim($authorizationReference) === '') {
             throw new \InvalidArgumentException('applyBatch() requiere $authorizationReference no vacío - la referencia de autorización de ESTA ejecución (distinta de quién revisó).');
@@ -2600,17 +2679,31 @@ class ReviewedProposalService
         // TASK-0004. PARTE 8: un entorno no autorizado se rechaza ANTES de abrir la transacción.
         $targetEnvironment = app()->environment();
 
-        if (! in_array($targetEnvironment, self::BATCH_ALLOWED_ENVIRONMENTS, true)) {
+        $preTransactionBase = [
+            'mode' => self::BATCH_MODE_EXECUTE,
+            'authorization_reference' => $authorizationReference,
+            'target_environment' => $targetEnvironment,
+            'requested_proposal_ids' => self::normalisedBatchIds($proposalIds),
+        ];
+
+        if (! self::environmentCanExecuteBatch($targetEnvironment)) {
             return $this->batchResult(self::BATCH_RESULT_BLOCKED, self::BATCH_ENVIRONMENT_NOT_AUTHORIZED, [
-                'note' => "El entorno auto-capturado ({$targetEnvironment}) no está autorizado para ejecutar un lote. La autorización de esta fase está limitada al entorno compartido/staging; production está prohibido.",
+                'note' => "El entorno auto-capturado ({$targetEnvironment}) no puede ejecutar un lote. El único entorno OPERATIVO autorizado para esta fase es staging; `local` conserva preview y generación de manifiestos (las dos son de solo lectura) pero no ejecución, `testing` es la excepción de tests automatizados, y production está prohibido.",
                 'target_environment' => $targetEnvironment,
-                'allowed_environments' => self::BATCH_ALLOWED_ENVIRONMENTS,
-            ], [
-                'mode' => self::BATCH_MODE_EXECUTE,
-                'authorization_reference' => $authorizationReference,
-                'target_environment' => $targetEnvironment,
-                'requested_proposal_ids' => self::normalisedBatchIds($proposalIds),
-            ]);
+                'executable_environments' => self::BATCH_EXECUTABLE_ENVIRONMENTS,
+                'fixture_test_environment' => self::BATCH_FIXTURE_TEST_ENVIRONMENT,
+            ], $preTransactionBase);
+        }
+
+        // Re-audit `6011317053`, BLOQUEO 3: la compuerta de autorización corre ANTES de la transacción
+        // y antes de cualquier confirmación - un hash que no es el autorizado no debe ni abrir una
+        // transacción, mucho menos tomar locks.
+        if ($manifest !== null) {
+            $fingerprintBlocker = self::authorizationFingerprintBlocker($manifest, $expectedManifestFingerprint);
+
+            if ($fingerprintBlocker !== null) {
+                return $this->batchResult(self::BATCH_RESULT_BLOCKED, $fingerprintBlocker['blocker'], $fingerprintBlocker['detail'], $preTransactionBase);
+            }
         }
 
         // Lectura SIN lock, usada EXCLUSIVAMENTE para elegir las claves de serialización antes de
@@ -2619,7 +2712,7 @@ class ReviewedProposalService
         // entre esta lectura y el lock, y no se decide NADA con este valor.
         $groupIds = $this->requestedGroupIds($proposalIds);
 
-        return DB::connection('pgsql')->transaction(function () use ($proposalIds, $authorizationReference, $targetEnvironment, $groupIds, $manifest) {
+        return DB::connection('pgsql')->transaction(function () use ($proposalIds, $authorizationReference, $targetEnvironment, $groupIds, $manifest, $expectedManifestFingerprint) {
             // ORDEN DE LOCKS (PARTE 5), idéntico al de `apply()` y determinístico:
             // 1) lock común de ejecución C2 -> 2) advisory locks de grupo ordenados -> 3) filas de
             // propuesta ordenadas por id -> 4) filas fuente, en el orden de las unidades.
@@ -2640,6 +2733,9 @@ class ReviewedProposalService
                 'accepted_proposal_ids' => $evaluation['accepted_proposal_ids'],
                 'execution_unit_count' => count($evaluation['units']),
                 'manifest_verification' => $evaluation['manifest_verification'],
+                // Re-audit `6011317053`, BLOQUEO 3: queda en el resultado -y por lo tanto en el
+                // artefacto de auditoría- CUÁL fingerprint se exigió, no sólo cuál traía el archivo.
+                'expected_manifest_fingerprint' => $expectedManifestFingerprint,
             ];
 
             if ($evaluation['blocker'] !== null) {
@@ -2781,7 +2877,7 @@ class ReviewedProposalService
                 'task' => 'TASK-0007',
                 'governance_reference' => 'Issue #2 comentario 5997693379',
                 'target_environment' => app()->environment(),
-                'environment_authorized_for_execution' => in_array(app()->environment(), self::BATCH_ALLOWED_ENVIRONMENTS, true),
+                'environment_authorized_for_execution' => self::environmentCanExecuteBatch(app()->environment()),
                 'manifest_fingerprint' => $evaluation['manifest_fingerprint'],
                 'manifest_verification' => $evaluation['manifest_verification'],
                 'baseline_taxonomy_fingerprint' => $evaluation['baseline_taxonomy_fingerprint'],
@@ -2916,7 +3012,11 @@ class ReviewedProposalService
         // que se autorizó" sólo es una afirmación útil si se hace cuando nadie más puede ejecutar.
         $manifestVerification = null;
         if ($manifest !== null) {
-            $manifestVerification = ReviewedProposalBatchManifest::verify($manifest, $baseline);
+            // Re-audit `6011317053`, BLOQUEO 1: el conjunto PEDIDO se le pasa a la verificación, que
+            // exige igualdad exacta con el conjunto ATADO. Es parámetro obligatorio y no opcional a
+            // propósito: con un valor por defecto, un llamador futuro podría omitirlo y volver a
+            // habilitar en silencio la ejecución de un subconjunto de un manifiesto autorizado.
+            $manifestVerification = ReviewedProposalBatchManifest::verify($manifest, $baseline, $requested);
 
             if (! $manifestVerification['ok']) {
                 return array_merge($empty, [
@@ -3105,6 +3205,52 @@ class ReviewedProposalService
      * resuelta DENTRO de un lote que se pide como ejecutable significa que la cola cambió respecto de
      * lo autorizado, que es exactamente drift.
      */
+    /**
+     * TASK-0007 re-audit (Issue #2 comentario `6011317053`, BLOQUEO 3): compuerta de AUTORIZACIÓN.
+     *
+     * Son tres comprobaciones distintas y con nombres distintos a propósito, porque piden acciones
+     * distintas: falta el dato (el operador no citó el hash autorizado), el dato no tiene forma de
+     * sha256 (typo o copia truncada), o el dato no coincide con el manifiesto cargado (el archivo no es
+     * el que se autorizó). Colapsarlas en un solo código haría que el operador no supiera qué
+     * corregir, y la tercera es la única que es un hallazgo de gobernanza real.
+     *
+     * Se compara con `hash_equals()` y en minúsculas: la comparación no debería depender de cómo quedó
+     * el copiado/pegado desde el comentario del Issue, y un hash no se compara con `===` cuando existe
+     * la función que lo hace en tiempo constante.
+     *
+     * @return array{blocker:string, detail:array}|null  `null` = la compuerta pasa.
+     */
+    private static function authorizationFingerprintBlocker(array $manifest, ?string $expectedManifestFingerprint): ?array
+    {
+        $manifestFingerprint = (string) ($manifest['manifest_fingerprint'] ?? '');
+
+        if ($expectedManifestFingerprint === null || trim($expectedManifestFingerprint) === '') {
+            return ['blocker' => self::BATCH_AUTHORIZATION_FINGERPRINT_MISSING, 'detail' => [
+                'note' => 'Falta el fingerprint de manifiesto AUTORIZADO. Un manifiesto auto-hasheado sólo prueba que el archivo no se editó; para probar que es el que el dueño autorizó hace falta ese hash citado aparte, como segundo insumo de confianza. Cero escrituras.',
+                'manifest_fingerprint_in_file' => $manifestFingerprint,
+            ]];
+        }
+
+        $expected = strtolower(trim($expectedManifestFingerprint));
+
+        if (preg_match('/^[0-9a-f]{64}$/', $expected) !== 1) {
+            return ['blocker' => self::BATCH_AUTHORIZATION_FINGERPRINT_MALFORMED, 'detail' => [
+                'note' => 'El fingerprint autorizado que se pasó no tiene forma de sha256 (64 dígitos hexadecimales). No se ejecutó nada.',
+                'expected_manifest_fingerprint' => $expectedManifestFingerprint,
+            ]];
+        }
+
+        if (! hash_equals(strtolower($manifestFingerprint), $expected)) {
+            return ['blocker' => self::BATCH_AUTHORIZATION_FINGERPRINT_MISMATCH, 'detail' => [
+                'note' => 'El manifiesto cargado NO es el que se autorizó: su fingerprint no coincide con el autorizado. Es exactamente el escenario que esta compuerta existe para detectar - un manifiesto internamente válido pero distinto del que cita la referencia de autorización. Cero escrituras.',
+                'authorized_manifest_fingerprint' => $expected,
+                'loaded_manifest_fingerprint' => $manifestFingerprint,
+            ]];
+        }
+
+        return null;
+    }
+
     public static function batchBlockerForProposalBlocker(string $blocker): string
     {
         return match ($blocker) {
