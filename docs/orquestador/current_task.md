@@ -3,10 +3,55 @@
 **TASK-0008 — UAT DEL BUSCADOR PARA EL CLIENTE + REVISIÓN TAXONÓMICA DELEGADA** (Issue #2 comentarios
 [`6035726459`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6035726459)
 y [`6035827197`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6035827197)).
-Abierta desde HEAD `fd2c018`. **Estado: READY_FOR_REVIEW — paquete completo en `docs/uat/`. Sólo
-documentación y plantillas: cero cambios de aplicación, Worker, base de datos, taxonomía o secretos.**
+Abierta desde HEAD `fd2c018`. **Estado: READY_FOR_REVIEW — ronda 2, las tres correcciones del re-audit
+`6036293989` aplicadas. Sólo documentación y plantillas: cero cambios de aplicación, Worker, base de
+datos, taxonomía o secretos.**
 
-## TASK-0008 — paquete de UAT y revisión taxonómica
+## Ronda 2 — re-audit `6036293989` (`CORRECTIONS_REQUIRED`) + `6038426912`
+
+El orquestador aceptó el paquete como «sustancialmente completo y bien estructurado», aceptó
+explícitamente `docs/uat/README.md`, y confirmó de forma independiente los conteos de taxonomía y que
+no hubo deploy. Pero señaló **un bloqueante de gobernanza y dos correcciones de consistencia**. Los
+tres se aceptan **sin reservas**. El comentario `6038426912` además advirtió, con razón, que se había
+reenviado el mismo HEAD `fc0b1cc` sin aplicar nada; esta ronda devuelve un HEAD nuevo.
+
+1. **BLOQUEANTE — la guía de calibración autorizaba mutación real de taxonomía.** El contrato
+   `6035827197` dice que TASK-0008 es sólo documentación, que no se cambian datos de taxonomía, y que
+   los permisos operativos del pasante exigen una autorización **separada** y posterior. Pero la guía
+   mandaba al pasante a usar los botones reales: la sección 3 mapeaba `APPROVE` al botón *Aprobar*
+   —que `transitionStatus()` convierte en `STATUS_APPROVED` y **publica al buscador en vivo**—, el paso
+   G del flujo le pedía usar el botón y escribir el *Motivo*, y la sección 13 lo repetía. El formato
+   Markdown replicaba el mapeo operativo y el resumen de lote **verificaba** que los `APPROVE`/`REJECT`
+   se hubieran registrado en pantalla. Con el permiso `taxonomy_publish`, un ejercicio de calibración
+   habría mutado taxonomía gobernada. **Corregido:** la calibración es ahora **estrictamente de
+   revisión registrada**. Las **cinco** decisiones se anotan sólo en la planilla, la fila queda en *"En
+   revisión"*, y están prohibidos *Aprobar*, *Rechazar*, *Editar*, *Eliminar* y toda acción masiva —
+   incluso si los botones aparecen, porque la restricción es de la tarea y no de la configuración de la
+   pantalla. El mapeo con la UI real **se conserva**, como pide el contrato, pero reformulado como
+   informativo y condicional: *«si una tarea posterior autorizada habilita decisiones operativas,
+   `APPROVE` correspondería a Aprobar y `REJECT` a Rechazar; durante TASK-0008 no se usan esos
+   botones»*. Aplicado en los seis archivos que el re-audit enumera. El resumen de lote ahora
+   **verifica lo contrario** de lo que verificaba: que hubo cero modificaciones, con una comprobación
+   objetiva del supervisor (`reviewed_at` o cambios de estado del lote = 0).
+2. **La guía del cliente cruzaba el límite de columnas.** En *«Si algo no funciona»* le pedía marcar
+   `Tipo_de_problema = OTRO`, que es una columna de triage técnico posterior a `Comentario_cliente`,
+   contradiciendo a la sección 6 de la misma guía. **Corregido:** el cliente describe el síntoma en
+   `Comentario_cliente` y avisa a SISTEG; la clasificación la hace el revisor técnico después. Se
+   agregó además la instrucción explícita de no completar ninguna columna posterior.
+3. **El ciclo de vida del ejemplo era inconsistente.** `EJ-001` tenía `Decision = APPROVE` con campos
+   de supervisor vacíos y `Estado = REVISADA`, mientras el Markdown decía que todo ítem nace
+   `PENDIENTE_SUPERVISOR`. **Corregido:** los tres ejemplos nacen `PENDIENTE_SUPERVISOR`, y el ejemplo
+   de `APPROVE` explica por qué su estado es ése aunque la decisión sea aprobar. Verificado por script:
+   ningún `Estado` distinto de `PENDIENTE_SUPERVISOR` con campos de supervisor vacíos.
+
+**Todo lo aceptado se conservó sin retoques gratuitos**, incluido `docs/uat/README.md`, la estructura
+del UAT del cliente, las 35+10 consultas, el modelo de puntuación, la ausencia de empresas esperadas
+pre-cargadas, el árbol de triage, el estándar de evidencia, las cinco decisiones, el lote 30–50 con el
+≥90% como indicador y no como umbral de publicación, los ejemplos regionales y el aviso de n8n.
+
+---
+
+## TASK-0008 ronda 1 — paquete de UAT y revisión taxonómica
 
 Dos entregas independientes, ambas en `docs/uat/` (10 archivos), que pueden avanzar en paralelo con
 personas distintas. Índice de orientación: `docs/uat/README.md`.

@@ -8,6 +8,29 @@ entregar tal cual.
 
 ---
 
+> # ⚠️ ESTA ETAPA ES DE REVISIÓN REGISTRADA, NO DE PUBLICACIÓN
+>
+> Durante esta etapa —la **calibración**— usted **anota sus decisiones en una planilla y nada más**.
+>
+> **No hace clic en ningún botón que cambie el estado de una relación.** Ni *Aprobar*, ni *Rechazar*,
+> ni *Editar*, ni *Eliminar*, ni ninguna acción masiva. **Ninguno.**
+>
+> La pantalla se usa **sólo para leer**: para ver el término, la categoría, la jerarquía y la
+> evidencia. Sus cinco decisiones —`APPROVE`, `REJECT`, `NEEDS_CONTEXT`, `ESCALATE`,
+> `POSSIBLE_NEW_CATEGORY`— se registran **únicamente** en
+> `FORMATO_REVISION_TAXONOMICA_PASANTE.csv`.
+>
+> **Por qué.** El botón *Aprobar* no guarda una opinión: **publica la relación al buscador en vivo**,
+> en el acto. Mientras no haya una autorización formal y separada de la Cámara, su revisión tiene que
+> poder equivocarse sin consecuencias — y eso sólo es cierto si no se toca nada. Primero su
+> supervisor compara las primeras 30–50 decisiones con las suyas; recién después, y como **tarea
+> aparte explícitamente autorizada**, se evaluará habilitar decisiones operativas.
+>
+> Anotar `APPROVE` en la planilla **no aprueba nada**. Es exactamente lo que queremos de usted en
+> esta etapa: su criterio, por escrito, sin riesgo.
+
+---
+
 ## 1. Para qué sirve esta tarea
 
 El sistema de búsqueda de la Cámara conecta **términos** del sector petrolero (*cabria*, *mechurrio*,
@@ -40,9 +63,11 @@ directamente** lo que el buscador puede encontrar.
 - **No** se le pide rediseñar la taxonomía ni proponer una clasificación nueva.
 - **No** se le pide tocar el código del buscador, ni los pesos, ni la base de datos.
 - **No** se le pide decidir casos difíciles solo. Para eso existe el escalamiento (sección 10).
+- **No** se le pide aprobar ni rechazar nada **en el sistema**. En esta etapa no se modifica ninguna
+  relación: usted registra su criterio en la planilla y el sistema queda igual que antes.
 
-Se le pide una cosa concreta y acotada: **mirar una relación propuesta a la vez y decir si es
-correcta.**
+Se le pide una cosa concreta y acotada: **mirar una relación propuesta a la vez, decir si es correcta,
+y anotarlo.**
 
 ---
 
@@ -50,30 +75,39 @@ correcta.**
 
 ### Puede
 
+- **Leer** la pantalla de relaciones: navegar, filtrar, ordenar y abrir filas para verlas.
 - Revisar **una** relación término↔CPV a la vez.
 - Mirar el término, el código y la categoría CPV, la jerarquía, el tipo de relación, el peso, la
   confianza y la evidencia disponible.
-- Clasificar la relación con una de las cinco decisiones de la sección 3.
+- Clasificar la relación con una de las cinco decisiones de la sección 3, **anotándola en la
+  planilla**.
 - Escribir un comentario técnico breve.
 - Marcar términos ambiguos o demasiado generales para que los revise alguien más.
 - Señalar categorías que faltan o huecos evidentes de la taxonomía.
 
 ### No puede
 
+- **No** usar el botón **"Aprobar"**. Ni una vez, ni como prueba.
+- **No** usar el botón **"Rechazar"**.
+- **No** usar **"Editar"** ni **"Eliminar"**.
+- **No** usar **ninguna acción masiva** (*"Aprobar seleccionadas"*, *"Rechazar seleccionadas"*).
+  Existen en la pantalla y usted puede llegar a verlas: **no se usan.** Ver el aviso de la sección 5.
 - **No** inventar códigos CPV nuevos.
 - **No** aprobar porque las palabras *se parecen*. Esto es la regla más importante de todas; la
   sección 4 la desarrolla.
 - **No** inferir capacidades que la evidencia no respalda.
 - **No** modificar código, ranking, pesos de búsqueda ni la base de datos.
-- **No** usar las acciones masivas (*"Aprobar seleccionadas"*). Existen en la pantalla y usted puede
-  llegar a verlas: **no se usan.** Ver el aviso de la sección 5.
 - **No** resolver solo los casos ambiguos o de alto impacto.
 - **No** cambiar definiciones de conceptos canónicos fuera de este flujo.
 
-> **Sobre los permisos.** Según los permisos que le asigne la Cámara, puede que algunos botones ni
-> siquiera le aparezcan. Eso es correcto y deliberado: *Aprobar* publica la relación al buscador en
-> vivo, y requiere un permiso distinto de *Rechazar*. Si un botón no está, **no es un error** y no hay
-> que pedir que se lo habiliten por cuenta propia.
+Dicho de la forma más corta posible: **en esta pantalla usted lee; escribir es en la planilla.**
+
+> **Sobre los permisos.** Según los permisos que le asigne la Cámara, puede que algunos de esos
+> botones ni siquiera le aparezcan. Eso es correcto y deliberado: *Aprobar* publica la relación al
+> buscador en vivo y requiere un permiso específico, distinto del de *Rechazar*. **Si un botón no
+> está, no es un error**, no hay nada que reportar y no hay que pedir que se lo habiliten por cuenta
+> propia. Y si los botones **sí** aparecen —porque su cuenta ya tenía esos permisos por otro motivo—
+> **igual no se usan**: la restricción es de esta tarea, no de la configuración de la pantalla.
 
 ---
 
@@ -89,31 +123,44 @@ correcta.**
 | **`ESCALATE`** | Hace falta que lo valide un experto en CPV |
 | **`POSSIBLE_NEW_CATEGORY`** | El concepto es legítimo pero no se ve ninguna categoría existente adecuada |
 
-### ⚠️ Importante: la pantalla sólo tiene DOS botones de decisión
+### ⚠️ En esta etapa, las CINCO decisiones se registran igual: en la planilla
 
-La pantalla real de revisión **no** tiene cinco botones. Tiene exactamente dos acciones de decisión,
-en español. Ésta es la correspondencia exacta, y hay que respetarla:
-
-| Su decisión | Qué hacer **en la pantalla** | Qué pasa con la fila |
+| Su decisión | Qué hacer **en la pantalla**, durante la calibración | Qué pasa con la fila |
 |---|---|---|
-| `APPROVE` | Botón **"Aprobar"** (✓ verde). Pide confirmación y un **"Motivo"** obligatorio | Pasa a **"Aprobada"** y **se publica al buscador en vivo** |
-| `REJECT` | Botón **"Rechazar"** (✗ rojo). Pide confirmación y un **"Motivo"** obligatorio | Pasa a **"Rechazada"** |
-| `NEEDS_CONTEXT` | **Ninguna acción en la pantalla.** No toque la fila | Queda en **"En revisión"** |
-| `ESCALATE` | **Ninguna acción en la pantalla.** No toque la fila | Queda en **"En revisión"** |
-| `POSSIBLE_NEW_CATEGORY` | **Ninguna acción en la pantalla.** No toque la fila | Queda en **"En revisión"** |
+| `APPROVE` | **Nada.** Anótelo en la planilla | Queda en **"En revisión"** |
+| `REJECT` | **Nada.** Anótelo en la planilla | Queda en **"En revisión"** |
+| `NEEDS_CONTEXT` | **Nada.** Anótelo en la planilla | Queda en **"En revisión"** |
+| `ESCALATE` | **Nada.** Anótelo en la planilla | Queda en **"En revisión"** |
+| `POSSIBLE_NEW_CATEGORY` | **Nada.** Anótelo en la planilla | Queda en **"En revisión"** |
 
-**Las tres últimas decisiones no tienen botón.** No existe un botón "Necesita contexto", ni "Escalar",
-ni "Categoría nueva". Si busca uno, no lo va a encontrar, y **no hay que improvisar con otro botón**
-para simular el efecto.
+**Las cinco se tratan igual, y eso simplifica su trabajo:** no tiene que recordar cuál lleva botón y
+cuál no. Ninguna lo lleva. Todas van a `FORMATO_REVISION_TAXONOMICA_PASANTE.csv` y la fila de la
+pantalla queda intacta, en **"En revisión"**, que es la verdad: *todavía no decidido por la Cámara*.
 
-Esas tres decisiones se registran **únicamente en la planilla** (`FORMATO_REVISION_TAXONOMICA_PASANTE.csv`),
-dejando la fila intacta en la pantalla. Dejarla en "En revisión" es exactamente el resultado correcto:
-significa "todavía no decidido", que es la verdad.
+### Correspondencia con la pantalla real, para cuando se habilite
 
-> **Lo que NO hay que hacer con `NEEDS_CONTEXT`:** la pantalla tiene un botón *"Editar"* que permite
-> cambiar el Estado a mano (por ejemplo a *"Candidata (no urgente)"*). **No lo use.** Cambiar el estado
-> por esa vía se salta la confirmación y el motivo obligatorio, y deja la auditoría incompleta. Para
-> usted, *Editar* y *Eliminar* no existen.
+La Cámara nos pidió documentar cómo se corresponde su vocabulario con la pantalla real, para el día en
+que una **tarea aparte, formalmente autorizada**, habilite decisiones operativas. Esa correspondencia
+es:
+
+| Su decisión | A qué acción real correspondería, si se autoriza más adelante |
+|---|---|
+| `APPROVE` | Botón **"Aprobar"** (✓ verde): confirmación + **"Motivo"** obligatorio → la fila pasa a **"Aprobada"** y **se publica al buscador en vivo** |
+| `REJECT` | Botón **"Rechazar"** (✗ rojo): confirmación + **"Motivo"** obligatorio → la fila pasa a **"Rechazada"** |
+| `NEEDS_CONTEXT` | No existe acción equivalente. La fila se deja en **"En revisión"** |
+| `ESCALATE` | No existe acción equivalente. La fila se deja en **"En revisión"** |
+| `POSSIBLE_NEW_CATEGORY` | No existe acción equivalente. La fila se deja en **"En revisión"** |
+
+**Esta tabla es informativa. Durante TASK-0008 / la calibración, NO use esos botones.**
+
+Y note, además, que no existe ningún botón "Necesita contexto", "Escalar" ni "Categoría nueva": tres
+de las cinco decisiones no tienen equivalente en la pantalla ni lo tendrán. Si alguna vez busca uno,
+no lo va a encontrar, y **no hay que improvisar con otro botón** para simular el efecto.
+
+> **En particular, no use *"Editar"*.** La pantalla permite cambiar el Estado a mano desde ahí (por
+> ejemplo a *"Candidata (no urgente)"*), y podría parecer una forma inofensiva de registrar un
+> `NEEDS_CONTEXT`. No lo es: se salta la confirmación y el motivo obligatorio, modifica una relación
+> gobernada y deja la auditoría incompleta. Para usted, *Editar* y *Eliminar* no existen.
 
 ---
 
@@ -225,10 +272,9 @@ Si la respuesta es "sí, claramente" → `APPROVE`. Si es "no" → `REJECT`. Si 
   cable de pozo."*
 - ❌ *"Es correcto."* / *"Tiene sentido."*
 
-**G.** **Registre y guarde:**
-- Si es `APPROVE` o `REJECT`: use el botón correspondiente en la pantalla y pegue su motivo en el campo
-  **"Motivo"** (es obligatorio y queda en la auditoría). Después anote la fila en la planilla.
-- Si es `NEEDS_CONTEXT`, `ESCALATE` o `POSSIBLE_NEW_CATEGORY`: **sólo** la planilla. No toque la fila.
+**G.** **Registre en la planilla y guárdela.** Una fila por relación revisada, con su decisión, su
+confianza, la evidencia que consultó y su motivo. **No toque la pantalla**: cualquiera de las cinco
+decisiones se registra igual, sólo en la planilla, y la fila queda en *"En revisión"*.
 
 **H.** Pase a la siguiente.
 
@@ -237,14 +283,18 @@ Si la respuesta es "sí, claramente" → `APPROVE`. Si es "no" → `REJECT`. Si 
 La pantalla **tiene** acciones masivas: si marca varias filas con las casillas, aparece un menú con
 **"Aprobar seleccionadas"** y **"Rechazar seleccionadas"**.
 
-**No las use. Nunca, en ninguna circunstancia.**
+**No las use. Nunca, en ninguna circunstancia, en ninguna etapa.**
 
 Se lo advertimos explícitamente porque el botón existe, es fácil de encontrar, y con 9.282 filas
 pendientes la tentación es real. Aprobar en masa publica al buscador relaciones que nadie miró, y
 deshacerlo después no es tan simple como volver a marcarlas: ya afectaron resultados reales, y cada
 cambio queda en la auditoría con su nombre.
 
-Una fila, una mirada, una decisión.
+Durante la calibración esto ni se plantea, porque **no se usa ninguna** acción que modifique filas. El
+aviso queda igual, por dos razones: para que no haya ambigüedad si en el futuro se habilitan
+decisiones operativas, y porque es el error más fácil de cometer sin querer al explorar la pantalla.
+
+Una fila, una mirada, una decisión **anotada**.
 
 ---
 
@@ -254,7 +304,10 @@ Una fila, una mirada, una decisión.
 
 ### Primer lote: 30 a 50 relaciones
 
-1. Usted revisa esas 30–50 aplicando esta guía.
+Este primer lote es una **revisión semántica registrada**: produce una planilla con su criterio y
+**cero cambios en el sistema**. Al terminarlo, la pantalla queda exactamente como estaba.
+
+1. Usted revisa esas 30–50 aplicando esta guía, anotando en la planilla y sin tocar ninguna fila.
 2. **Antes de seguir**, CPV/SISTEG revisan las mismas y comparan.
 3. Se calcula la **tasa de coincidencia** sobre los casos **no ambiguos**.
 4. Se identifican las ambigüedades que se repiten.
@@ -277,13 +330,17 @@ Una fila, una mirada, una decisión.
 
 ## 7. Ritmo de trabajo y lotes
 
-Después de la calibración:
+Después de la calibración, y **siempre que siga siendo revisión registrada**:
 
 - Trabaje en **lotes de 50 a 100** relaciones.
-- **Nunca** apruebe filas que no miró una por una.
+- **Nunca** anote `APPROVE` en filas que no miró una por una.
 - Si la **misma ambigüedad aparece varias veces**, pare y escale. No decida veinte veces una duda que
   no se resolvió una.
 - Al cerrar cada lote, llene `RESUMEN_LOTE_REVISION_TAXONOMICA_TEMPLATE.md`.
+
+> Ampliar el tamaño del lote **no** habilita decisiones operativas. Son dos cosas independientes:
+> cuántas relaciones revisa por lote lo decide su supervisor según la calibración; poder modificar
+> relaciones en el sistema requiere una autorización formal y separada de la Cámara (sección 14).
 
 **La calidad vale más que la cantidad.** Un lote de 50 bien revisado aporta más que 300 aprobados a
 medias, porque los 300 hay que auditarlos de nuevo.
@@ -429,21 +486,29 @@ de rediseñar nada ni de programar.
 revisar nosotros en paralelo para comparar criterios y ajustar las instrucciones antes de ampliar. Es
 normal y esperado que en esta etapa aparezcan dudas: anotalas, nos sirven.
 
+**Esta etapa es de revisión registrada, no de publicación.** Es la parte más importante de la
+consigna: **no vas a hacer clic en ningún botón que cambie una relación.** Ni *Aprobar*, ni
+*Rechazar*, ni *Editar*, ni *Eliminar*, ni acciones masivas. La pantalla se usa **sólo para leer**, y
+tus decisiones van a la planilla. El botón *Aprobar* no guarda una opinión: publica la relación al
+buscador en vivo, y mientras no haya una autorización formal para eso, tu revisión tiene que poder
+equivocarse sin consecuencias. Si los botones te aparecen en pantalla, igual no se usan.
+
 **Cómo registrar las decisiones.** Para cada relación elegís una de cinco opciones —`APPROVE`,
 `REJECT`, `NEEDS_CONTEXT`, `ESCALATE`, `POSSIBLE_NEW_CATEGORY`— y escribís un motivo de una a tres
-frases. Todo queda en la planilla `FORMATO_REVISION_TAXONOMICA_PASANTE.csv`. Importante: **en la
-pantalla sólo hay botones para *Aprobar* y *Rechazar***; las otras tres decisiones se registran
-únicamente en la planilla y la fila se deja como está. La guía explica exactamente cómo.
+frases. **Las cinco se registran igual: en la planilla
+`FORMATO_REVISION_TAXONOMICA_PASANTE.csv`, y la fila de la pantalla queda intacta.** Anotar
+`APPROVE` no aprueba nada todavía: es tu criterio por escrito, que es exactamente lo que necesitamos.
+La guía explica el detalle.
 
 **Cuándo escalar.** Si el término puede ir a más de una categoría, si es muy genérico (*upstream*,
 *oil and gas*), si no encontrás categoría adecuada, o si simplemente no estás seguro: marcá
 `ESCALATE` y seguí. **No decidas solo los casos dudosos.** Escalar es la respuesta correcta, no una
 falla.
 
-**Dos reglas que no se negocian.** Primera: no se aprueba nada sólo porque las palabras se parezcan o
-porque un algoritmo diga que son similares; hace falta evidencia real. Segunda: **no uses las acciones
-masivas de la pantalla** ("Aprobar seleccionadas"), aunque existan y aunque haya muchas filas
-pendientes.
+**Dos reglas que no se negocian.** Primera: no se anota `APPROVE` sólo porque las palabras se
+parezcan o porque un algoritmo diga que son similares; hace falta evidencia real. Segunda: **no se
+toca ningún botón que modifique relaciones**, en particular las acciones masivas ("Aprobar
+seleccionadas"), aunque existan y aunque haya muchas filas pendientes.
 
 **La calidad importa más que la velocidad.** Preferimos 40 relaciones bien revisadas que 300 aprobadas
 a medias: las segundas hay que auditarlas de nuevo y pueden degradar el buscador mientras tanto. No hay
@@ -472,14 +537,15 @@ Las decisiones permitidas en la columna `Decision` son exactamente cinco: `APPRO
 
 ## 13. Resumen de una página
 
+0. **La pantalla es de sólo lectura para usted.** Ningún botón que cambie una relación: ni *Aprobar*,
+   ni *Rechazar*, ni *Editar*, ni *Eliminar*, ni acciones masivas.
 1. Panel → **"Taxonomía CPV"** → **"Relaciones Término↔CPV"**. Ya viene filtrado por *"En revisión"*.
 2. Una fila a la vez. Active las columnas *"Coincidió con"* y *"Fuente"*.
 3. Pregunta clave: **¿un afiliado esperaría que este término devuelva empresas de esta categoría?**
 4. `APPROVE` sólo con **evidencia real**. Nunca por parecido de palabras ni por similitud semántica.
 5. Términos genéricos (*upstream*, *oil and gas*) → `NEEDS_CONTEXT`.
 6. Duda → `ESCALATE`. Siempre.
-7. `APPROVE`/`REJECT` → botón en pantalla + *Motivo* obligatorio + planilla.
-   `NEEDS_CONTEXT`/`ESCALATE`/`POSSIBLE_NEW_CATEGORY` → **sólo** planilla, fila intacta.
+7. **Las cinco decisiones se anotan igual: sólo en la planilla.** La fila queda en *"En revisión"*.
 8. **Jamás** las acciones masivas.
 9. Primer lote: 30–50 y pare para calibrar.
 10. Al cerrar el lote, llene el resumen.
@@ -491,7 +557,25 @@ Las decisiones permitidas en la columna `Decision` son exactamente cinco: `APPRO
 Esta guía es **documentación y capacitación**. Por sí sola no otorga ningún permiso operativo sobre el
 sistema.
 
-Habilitar al pasante para revisar o aprobar relaciones de verdad requiere una **autorización explícita
-y separada** por parte de la Cámara, posterior a la revisión de esta guía de calibración. El pasante
-**no** recibe acceso directo a la base de datos en ningún caso, y esta tarea no modifica ningún dato de
-la taxonomía.
+**La etapa que esta guía describe es estrictamente de revisión registrada.** El pasante lee la
+pantalla y anota su criterio en una planilla; **no se modifica ninguna relación Término↔CPV, no se
+aprueba ni se rechaza nada en el sistema, y no se publica nada al buscador.** Al terminar un lote, el
+estado de la taxonomía es idéntico al de antes de empezar. Lo que el lote produce es la planilla.
+
+Habilitar al pasante para tomar decisiones **operativas** —usar *Aprobar* o *Rechazar* de verdad—
+requiere una **tarea aparte, con autorización explícita y separada** de la Cámara, posterior a la
+revisión de esta guía de calibración y de sus resultados. Esa autorización es un acto distinto de
+cualquier métrica de calidad: alcanzar la tasa de coincidencia sugerida **no** la otorga ni la
+anticipa.
+
+En ningún caso el pasante recibe acceso directo a la base de datos.
+
+### Por qué está planteado así
+
+El botón *Aprobar* no registra una opinión: ejecuta una transición de estado que **publica la relación
+al buscador en vivo** y queda asentada en la auditoría con el nombre de quien la hizo. Una etapa de
+calibración existe precisamente para que las decisiones puedan compararse y discutirse **antes** de
+tener consecuencias. Si la calibración ya publicara, no sería calibración.
+
+Separar «revisar» de «publicar» también protege al pasante: en esta etapa, equivocarse no cuesta nada
+más que una línea corregida en una planilla.

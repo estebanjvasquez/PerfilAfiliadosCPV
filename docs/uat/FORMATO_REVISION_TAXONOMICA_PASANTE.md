@@ -9,6 +9,14 @@ Instrucciones completas: `GUIA_ASIGNACION_PASANTE_REVISION_TAXONOMICA.md`.
 > El CSV incluye tres filas de ejemplo con `Review_ID` que empieza en `EJ-` y `Revisor = EJEMPLO (borrar
 > esta fila)`. **Bórrelas antes de empezar** para que no entren en las cuentas del lote.
 
+> ### ⚠️ Esta planilla ES el registro de la decisión
+>
+> Durante la calibración, **las cinco decisiones se anotan únicamente acá** y la pantalla se usa sólo
+> para leer. No se usa *Aprobar*, ni *Rechazar*, ni *Editar*, ni *Eliminar*, ni ninguna acción masiva.
+>
+> Escribir `APPROVE` en esta planilla **no aprueba nada en el sistema**: la relación queda en *"En
+> revisión"* y el `Estado` del ítem queda en `PENDIENTE_SUPERVISOR` hasta que el supervisor lo compare.
+
 ---
 
 ## 1. Diccionario de campos
@@ -49,16 +57,22 @@ Instrucciones completas: `GUIA_ASIGNACION_PASANTE_REVISION_TAXONOMICA.md`.
 
 ### Valores permitidos de `Decision`
 
-| Valor | Significado | Acción en la pantalla |
+| Valor | Significado | Acción en la pantalla, durante la calibración |
 |---|---|---|
-| `APPROVE` | El término pertenece claramente a esa categoría | Botón **"Aprobar"** + *Motivo* obligatorio |
-| `REJECT` | La relación es incorrecta o engañosa | Botón **"Rechazar"** + *Motivo* obligatorio |
+| `APPROVE` | El término pertenece claramente a esa categoría | **Ninguna.** La fila queda en *"En revisión"* |
+| `REJECT` | La relación es incorrecta o engañosa | **Ninguna.** La fila queda en *"En revisión"* |
 | `NEEDS_CONTEXT` | Demasiado amplio o ambiguo para mapearse así | **Ninguna.** La fila queda en *"En revisión"* |
 | `ESCALATE` | Necesita un experto en CPV | **Ninguna.** La fila queda en *"En revisión"* |
 | `POSSIBLE_NEW_CATEGORY` | Concepto legítimo sin categoría adecuada visible | **Ninguna.** La fila queda en *"En revisión"* |
 
-**No hay más valores.** Y recuerde: sólo las dos primeras tienen botón. Las otras tres se registran
-aquí y nada más.
+**No hay más valores**, y **las cinco se registran igual: sólo acá.** En esta etapa la pantalla se usa
+sólo para leer; no se usa *Aprobar*, ni *Rechazar*, ni *Editar*, ni *Eliminar*, ni ninguna acción
+masiva. Anotar `APPROVE` en esta planilla **no aprueba nada en el sistema**.
+
+> Si una tarea posterior, formalmente autorizada, habilita decisiones operativas, `APPROVE`
+> correspondería al botón *"Aprobar"* y `REJECT` al botón *"Rechazar"*, ambos con *Motivo* obligatorio.
+> Las otras tres no tienen equivalente en la pantalla. **Durante la calibración, no se usan esos
+> botones.** Ver la sección 3 de `GUIA_ASIGNACION_PASANTE_REVISION_TAXONOMICA.md`.
 
 ### Valores sugeridos de `Evidencia_Consultada`
 
@@ -148,6 +162,10 @@ Estado:                    PENDIENTE_SUPERVISOR
 Por qué está bien: hay significado industrial inequívoco **y** respaldo en el perfil. El comentario dice
 qué es el término, no "es correcto".
 
+Y note el `Estado`: **`PENDIENTE_SUPERVISOR`, aunque la decisión sea `APPROVE`.** En la pantalla no se
+tocó nada, la relación sigue en *"En revisión"*, y el ítem espera la comparación del supervisor. Durante
+la calibración **todos** los ítems nacen así.
+
 ### Ejemplo 2 — `NEEDS_CONTEXT` por término genérico
 
 ```
@@ -165,7 +183,7 @@ Estado:                    PENDIENTE_SUPERVISOR
 ```
 
 Note que la **confianza es 4**: está bastante seguro de que *no* hay que mapearlo así. La confianza es
-en su decisión, no en la relación. **En la pantalla no se tocó nada.**
+en su decisión, no en la relación.
 
 ### Ejemplo 3 — `ESCALATE` por evidencia insuficiente
 
@@ -197,8 +215,9 @@ sigue sin aprobar a propósito. Es el ejemplo exacto de por qué un peso alto no
 - [ ] Ningún `APPROVE` tiene `Evidencia_Consultada = NINGUNA`.
 - [ ] Ningún `APPROVE` se apoya **sólo** en `COINCIDIO_CON` o `EVIDENCIA_AUTO_MAPPER`.
 - [ ] Todo `ESCALATE` tiene `Escalar_A` y `Motivo_Escalamiento`.
-- [ ] Los `NEEDS_CONTEXT`, `ESCALATE` y `POSSIBLE_NEW_CATEGORY` **no** tocaron la fila en la pantalla.
-- [ ] Los `APPROVE` y `REJECT` llevan su *Motivo* escrito también en la pantalla.
-- [ ] **No usé ninguna acción masiva.**
+- [ ] **No modifiqué ninguna fila en la pantalla**, con ninguna de las cinco decisiones.
+- [ ] **No usé *Aprobar*, *Rechazar*, *Editar*, *Eliminar* ni ninguna acción masiva.**
+- [ ] Todos los ítems quedaron en `Estado = PENDIENTE_SUPERVISOR` (salvo que el supervisor ya los haya
+      revisado y completado sus campos).
 - [ ] `Review_ID` sin repetidos.
 - [ ] Llené `RESUMEN_LOTE_REVISION_TAXONOMICA_TEMPLATE.md`.

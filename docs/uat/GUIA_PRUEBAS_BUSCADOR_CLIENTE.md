@@ -97,9 +97,12 @@ No hacen falta frases largas. Una línea concreta sirve más que un párrafo gen
 ### Si algo no funciona
 
 Si al enviar una consulta aparece un error, un mensaje vacío, o la pantalla se queda esperando mucho
-tiempo: **no es su culpa y no es parte de lo que evaluamos acá.** Anótelo en
-**Comentario_cliente**, marque `Tipo_de_problema = OTRO` y avise a SISTEG. Es un problema de
-plataforma, distinto de un problema de relevancia.
+tiempo: **no es su culpa y no es parte de lo que evaluamos acá.** Descríbalo en
+**`Comentario_cliente`** —qué hizo y qué pasó— y avise a SISTEG. Es un problema de plataforma,
+distinto de un problema de relevancia, y lo clasifica el equipo técnico después.
+
+**No complete ninguna columna posterior a `Comentario_cliente`**, tampoco en este caso. Describir el
+síntoma es todo lo que necesitamos de su parte.
 
 ---
 

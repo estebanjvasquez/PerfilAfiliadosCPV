@@ -34,6 +34,12 @@ siguientes son del triage técnico.
 **Qué revisa:** las relaciones propuestas entre términos del sector y categorías CPV. Hay **9.282** en
 estado *"En revisión"* de un total de 9.749.
 
+> **⚠️ Esta etapa es de REVISIÓN REGISTRADA, no de publicación.** El pasante **lee** la pantalla y anota
+> su criterio en una planilla. **No usa *Aprobar*, ni *Rechazar*, ni *Editar*, ni *Eliminar*, ni
+> acciones masivas**, y por lo tanto el lote produce una planilla y **cero cambios en la taxonomía**: al
+> terminar, el sistema queda igual que antes. Habilitar decisiones operativas requiere una **tarea
+> aparte con autorización explícita y separada** de la Cámara.
+
 | Orden | Archivo | Para quién |
 |---|---|---|
 | 1 | [`GUIA_ASIGNACION_PASANTE_REVISION_TAXONOMICA.md`](GUIA_ASIGNACION_PASANTE_REVISION_TAXONOMICA.md) | **Empiece acá.** Pasante. La sección 11 trae el texto listo para asignarle la tarea |
@@ -53,18 +59,22 @@ recuerda lo anterior y eso contamina la prueba.
 conversa a través de un webhook de n8n; si ese flujo está detenido, **todas** las consultas fallan igual
 y el UAT entero se ve como una falla catastrófica del buscador cuando no lo es.
 
-**3. La pantalla de revisión taxonómica tiene sólo dos botones de decisión** —*Aprobar* y *Rechazar*— y
-**sí tiene acciones masivas**. El vocabulario de la guía del pasante tiene cinco decisiones; las otras
-tres se registran únicamente en la planilla, dejando la fila intacta. La correspondencia exacta está en
-la sección 3 de esa guía, y las acciones masivas no se usan nunca.
+**3. En la etapa de calibración, la pantalla de revisión taxonómica es de sólo lectura para el
+pasante.** Las cinco decisiones se registran únicamente en la planilla y la fila queda intacta en *"En
+revisión"*. La pantalla **sí tiene** botones *Aprobar* y *Rechazar* y **sí tiene acciones masivas**, y
+puede que le aparezcan según sus permisos: igual no se usan. La sección 3 de la guía del pasante
+documenta a qué acción real correspondería cada decisión **si** una tarea posterior lo autoriza.
 
 ---
 
 ## Alcance y gobernanza
 
 - Esta tarea es **documentación y plantillas**. No otorga ningún permiso operativo.
+- **La calibración del pasante es estrictamente de revisión registrada:** no modifica ninguna relación
+  Término↔CPV, no aprueba ni rechaza nada en el sistema y no publica nada al buscador.
 - Habilitar al pasante para aprobar relaciones de verdad requiere una **autorización explícita y
-  separada**, posterior a la revisión de la guía de calibración.
+  separada**, posterior a la revisión de la guía de calibración y de sus resultados. Alcanzar la tasa de
+  coincidencia sugerida **no** la otorga ni la anticipa.
 - El pasante **no** recibe acceso directo a la base de datos.
 - Ninguna corrección que surja del UAT se ejecuta en el mismo ciclo que el diagnóstico.
 - Toda corrección de ranking o pesos exige volver a correr la regresión congelada de 32 consultas antes

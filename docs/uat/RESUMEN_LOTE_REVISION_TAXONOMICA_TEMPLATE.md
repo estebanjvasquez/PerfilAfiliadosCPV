@@ -3,6 +3,11 @@
 Se llena **al cerrar cada lote**, después de que el supervisor revisó. Reemplace cada `___`. Lo que no
 se pudo medir se escribe `no medido` — **no se estima**.
 
+> **Etapa de revisión registrada.** En esta etapa el lote produce una planilla de decisiones y **cero
+> cambios en el sistema**: ninguna relación Término↔CPV se aprueba, se rechaza ni se publica. Las
+> cuentas de `APPROVE` de abajo son **criterio registrado**, no relaciones publicadas. La sección 7
+> verifica explícitamente que así fue.
+
 | | |
 |---|---|
 | **ID del lote** | `___` (p. ej. L1) |
@@ -125,18 +130,37 @@ categoría (huérfano)"*.
 
 ## 7. Verificación de reglas
 
-Confirmación explícita de que las restricciones se respetaron.
+Confirmación explícita de que las restricciones se respetaron. **La primera es la que define esta
+etapa.**
 
+- [ ] **CERO modificaciones en la pantalla.** Ninguna de las relaciones revisadas en este lote cambió
+      de estado: todas siguen en *"En revisión"*, con las cinco decisiones registradas sólo en la
+      planilla.
+- [ ] No se usó **"Aprobar"** en ninguna fila.
+- [ ] No se usó **"Rechazar"** en ninguna fila.
+- [ ] No se usó **"Editar"** ni **"Eliminar"** en ninguna fila.
 - [ ] **No se usó ninguna acción masiva** (*"Aprobar seleccionadas"* / *"Rechazar seleccionadas"*).
-- [ ] Todo `APPROVE` y `REJECT` registrado en pantalla lleva su *Motivo*.
-- [ ] Los `NEEDS_CONTEXT`, `ESCALATE` y `POSSIBLE_NEW_CATEGORY` dejaron la fila en *"En revisión"*, sin
-      tocarla.
-- [ ] No se usó *Editar* ni *Eliminar* en ninguna fila.
+- [ ] Todos los ítems quedaron en `Estado = PENDIENTE_SUPERVISOR`, salvo los que el supervisor ya
+      revisó y completó.
 - [ ] Ningún `APPROVE` se apoya sólo en similitud semántica o parecido de palabras.
 - [ ] No se crearon códigos CPV nuevos.
 - [ ] No se modificó código, pesos, ranking ni la base de datos.
 
 **Si alguna casilla quedó sin marcar, explique:** `___`
+
+> **Si la primera casilla no se puede marcar**, pare y avise a SISTEG antes de continuar con otro lote.
+> Una relación modificada durante la calibración no es un error de forma: publicó o descartó algo que
+> todavía no estaba autorizado, y hay que registrarlo y revisarlo explícitamente.
+
+### Verificación independiente del supervisor
+
+| Verificación | Resultado |
+|---|---|
+| Relaciones del lote que siguen en *"En revisión"* | `___` de `___` |
+| Relaciones del lote con `reviewed_at` o cambio de estado | `___` (lo esperado es **0**) |
+
+> La segunda fila es la comprobación objetiva: si es distinta de 0, hubo modificación en pantalla, por
+> más que las casillas de arriba estén marcadas.
 
 ---
 
@@ -154,6 +178,10 @@ Confirmación explícita de que las restricciones se respetaron.
 - [ ] **Pausar** y revisar la guía antes de continuar.
 
 **Fundamento:** `___`
+
+> Esta decisión es **sólo sobre el tamaño del lote**. Habilitar decisiones operativas —que el revisor
+> pueda usar *Aprobar* o *Rechazar* de verdad— es una **tarea aparte con autorización explícita y
+> separada** de la Cámara, y no se decide en esta plantilla por más alta que sea la coincidencia.
 
 ### Ajustes a la guía
 
