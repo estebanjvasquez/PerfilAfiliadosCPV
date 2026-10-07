@@ -11,6 +11,15 @@ HARDENING*. Los dos agujeros residuales corregidos están en la **§9**.
 **Fecha:** 2026-10-05 (ronda 1) / 2026-10-06 (rondas 2 y 3, correcciones)
 **Definición de la tarea (verbatim):** `docs/orquestador/tasks/0007-atomic-batch-apply.md`
 
+> **CORRECCIÓN POSTERIOR — ESTE DOCUMENTO DESCRIBE SÓLO LAS TRES RONDAS DE IMPLEMENTACIÓN.** El
+> 2026-10-07 el dueño autorizó el APPLY real (comentario `6032819854`, con la procedencia registrada
+> según el protocolo del comentario `6032759610`) y **el APPLY/PUBLISH real se ejecutó en staging**. El
+> párrafo de abajo era cierto al cierre de la ronda 3 y es **falso desde el 2026-10-07 07:09 UTC**. Se
+> conserva tal cual, en vez de reescribirlo, porque fue el estado real en el que el orquestador emitió
+> su PASS técnico — pero no debe leerse como estado actual. El estado posterior a la publicación, la
+> validación post-APPLY y el único punto que quedó bloqueado están en
+> **`audit/phase7_task0007_post_apply_closure_2026-10-07.md`**.
+
 **APPLY REAL = NO AUTORIZADO Y NO EJECUTADO.** Al cierre de las tres rondas las 12 propuestas siguen
 `PENDING_APPLY`, los 10 candidatos siguen `pending`, las 2 relaciones siguen `candidate`, y hay 0
 filas con `applied_at`. Nada se publicó.

@@ -2,10 +2,49 @@
 
 **TASK-0007 — APPLY ATÓMICO POR LOTE** (Issue #2 comentario
 [`5997693379`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5997693379)).
-Abierta desde HEAD `4e671fa`. **Estado: READY_FOR_REVIEW — ronda 3, los dos agujeros residuales del
-camino de ejecución cerrados.**
+Abierta desde HEAD `4e671fa`. **Estado: READY_FOR_REVIEW — APPLY/PUBLISH real EJECUTADO en staging el
+2026-10-07, validación post-APPLY completa con un punto bloqueado por credencial.**
+
+## Cierre — APPLY real ejecutado y validado (`6032819854` + `6032959069`)
+
+**El APPLY/PUBLISH atómico real se ejecutó.** El dueño autorizó en la conversación del orquestador y
+éste registró la autorización en Issue #2 comentario
+[`6032819854`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6032819854),
+citando entorno `staging`, el conjunto exacto `[491,492,493,494,495,629,630,631,632,1688,1689,1690]` y
+el fingerprint `eb7d1467…f3702`. La procedencia se registró con honestidad según el protocolo del
+comentario `6032759610`: el registro **no** finge que el dueño lo escribió en GitHub. Esa referencia es
+la que quedó grabada en `authorization_reference` de las 12 filas y de las 12 filas de auditoría.
+
+`BATCH_APPLIED` — 12 propuestas en 11 unidades, una sola transacción, `blocker = null`. Estado publicado:
+10 candidatos = 3 `published` + 7 `context_required`; 2 relaciones `rejected`; conceptos 81 → **82**;
+TERM→CONCEPT 142 → **145**; TERM→CPV **9749 sin cambios**; `PENDING_APPLY` 12 → **0**, `APPLIED` 0 →
+**12**; `SUPERSEDED` 3 y `ABORTED` 0 sin moverse. Concepto nuevo **#4819** (`refinería` / `refinery`),
+TERM→CONCEPT nuevos **#1191/#1192/#1193**, auditoría **#5249…#5260**. **#420/#421/#422 intactas.**
+
+Fingerprint de taxonomía **post**-APPLY: **`e1087a481ab15a45936519d2b0f6190e2e48d7f1c05e04cf87c0d1c703db9b5b`**
+(el pre-APPLY era `c236bc51…`; difieren porque el grafo publicado cambió, como exige el contrato).
+
+Validación post-APPLY del comentario `6032959069`: pasos 1, 2, 4 y 5 **PASS** (18/18 invariantes sin
+discrepancias), smoke **PASS** (11 rutas, cero 500/503, cero errores de aplicación en el log). **Paso 3
+(regresión congelada de 32 queries): `BLOCKED_AUTH_TOKEN_UNAVAILABLE`** — `DEBUG_TOKEN` del Worker no
+disponible y la rotación de secretos no está autorizada. Se acotó el riesgo midiendo que **0 de las 32
+queries congeladas alcanza** los conceptos #2890/#4819, pero eso **no sustituye** la corrida.
+**PHPUnit no fue ejecutable** en esta ronda (`php.exe` bloqueado localmente por Application Control y
+`composer install --no-dev` en staging): límite declarado, no omisión.
+
+Detalle completo: **`audit/phase7_task0007_post_apply_closure_2026-10-07.md`**, más
+`audit/task0007_batch_apply_result_2026-10-07.json` (artefacto de ejecución, sin editar) y
+`audit/task0007_post_apply_closure_2026-10-07.json` (evidencia estructurada de solo lectura).
+
+Sin autorización: producción, merge a `main`, más mutaciones de taxonomía, rotación de secretos, otro
+APPLY/replay, y fixes a búsqueda/ranking/datos.
+
+---
 
 ## Ronda 3 — re-audit `6015273402` (`CORRECTIONS_REQUIRED / FINAL EXECUTION-PATH HARDENING`)
+
+> Histórico: lo de abajo describe el estado al cierre de la ronda 3, **antes** de la autorización del
+> dueño y del APPLY real. Ver la sección de cierre, arriba, para el estado actual.
 
 El orquestador aceptó las tres correcciones de la ronda 2 y el manifiesto/preflight regenerados, pero
 encontró **dos agujeros residuales del camino de ejecución**. Los dos se aceptan **sin reservas**.

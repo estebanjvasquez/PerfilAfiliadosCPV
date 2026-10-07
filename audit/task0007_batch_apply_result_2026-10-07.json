@@ -1,0 +1,296 @@
+{
+    "result": "BATCH_APPLIED",
+    "blocker": null,
+    "detail": [],
+    "units": [
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 491,
+            "proposal_ids": [
+                491
+            ],
+            "proposal_group_id": null,
+            "decision": "MAP_TO_EXISTING",
+            "result": "APPLIED",
+            "application_result": {
+                "candidate_link_id": 272,
+                "concept_id": 2890,
+                "term_concept_id": 1191,
+                "outcome": "MAPPED_TO_EXISTING"
+            }
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 492,
+            "proposal_ids": [
+                492
+            ],
+            "proposal_group_id": null,
+            "decision": "CONTEXT_REQUIRED",
+            "result": "APPLIED",
+            "application_result": {
+                "candidate_link_id": 266,
+                "outcome": "CONTEXT_REQUIRED"
+            }
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 493,
+            "proposal_ids": [
+                493
+            ],
+            "proposal_group_id": null,
+            "decision": "CONTEXT_REQUIRED",
+            "result": "APPLIED",
+            "application_result": {
+                "candidate_link_id": 267,
+                "outcome": "CONTEXT_REQUIRED"
+            }
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 494,
+            "proposal_ids": [
+                494
+            ],
+            "proposal_group_id": null,
+            "decision": "CONTEXT_REQUIRED",
+            "result": "APPLIED",
+            "application_result": {
+                "candidate_link_id": 268,
+                "outcome": "CONTEXT_REQUIRED"
+            }
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 495,
+            "proposal_ids": [
+                495
+            ],
+            "proposal_group_id": null,
+            "decision": "CONTEXT_REQUIRED",
+            "result": "APPLIED",
+            "application_result": {
+                "candidate_link_id": 269,
+                "outcome": "CONTEXT_REQUIRED"
+            }
+        },
+        {
+            "kind": "BILINGUAL_GROUP",
+            "entry_proposal_id": 629,
+            "proposal_ids": [
+                629,
+                630
+            ],
+            "proposal_group_id": "043fce22-daf0-4fda-83ed-df666d89ace6",
+            "decision": "CREATE_NEW",
+            "result": "APPLIED",
+            "application_result": {
+                "candidate_link_id": 270,
+                "concept_id": 4819,
+                "proposal_group_id": "043fce22-daf0-4fda-83ed-df666d89ace6",
+                "grouped_applied_members": [
+                    {
+                        "proposal_id": 629,
+                        "candidate_link_id": 270,
+                        "term_id": 22,
+                        "term_concept_id": 1192
+                    },
+                    {
+                        "proposal_id": 630,
+                        "candidate_link_id": 271,
+                        "term_id": 23,
+                        "term_concept_id": 1193
+                    }
+                ],
+                "outcome": "CREATED_NEW_BILINGUAL_CONCEPT_FOR_GROUP"
+            }
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 631,
+            "proposal_ids": [
+                631
+            ],
+            "proposal_group_id": null,
+            "decision": "REJECT",
+            "result": "APPLIED",
+            "application_result": {
+                "concept_relation_id": 61,
+                "outcome": "REJECTED"
+            }
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 632,
+            "proposal_ids": [
+                632
+            ],
+            "proposal_group_id": null,
+            "decision": "REJECT",
+            "result": "APPLIED",
+            "application_result": {
+                "concept_relation_id": 62,
+                "outcome": "REJECTED"
+            }
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 1688,
+            "proposal_ids": [
+                1688
+            ],
+            "proposal_group_id": null,
+            "decision": "CONTEXT_REQUIRED",
+            "result": "APPLIED",
+            "application_result": {
+                "candidate_link_id": 263,
+                "outcome": "CONTEXT_REQUIRED"
+            }
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 1689,
+            "proposal_ids": [
+                1689
+            ],
+            "proposal_group_id": null,
+            "decision": "CONTEXT_REQUIRED",
+            "result": "APPLIED",
+            "application_result": {
+                "candidate_link_id": 264,
+                "outcome": "CONTEXT_REQUIRED"
+            }
+        },
+        {
+            "kind": "SINGLE_PROPOSAL",
+            "entry_proposal_id": 1690,
+            "proposal_ids": [
+                1690
+            ],
+            "proposal_group_id": null,
+            "decision": "CONTEXT_REQUIRED",
+            "result": "APPLIED",
+            "application_result": {
+                "candidate_link_id": 265,
+                "outcome": "CONTEXT_REQUIRED"
+            }
+        }
+    ],
+    "applied_proposal_ids": [
+        491,
+        492,
+        493,
+        494,
+        495,
+        629,
+        630,
+        631,
+        632,
+        1688,
+        1689,
+        1690
+    ],
+    "applied_proposal_count": 12,
+    "mode": "ATOMIC_BATCH_APPLY",
+    "authorization_reference": "Issue #2 comment 6032819854",
+    "target_environment": "staging",
+    "baseline_taxonomy_fingerprint": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+    "requested_proposal_ids": [
+        491,
+        492,
+        493,
+        494,
+        495,
+        629,
+        630,
+        631,
+        632,
+        1688,
+        1689,
+        1690
+    ],
+    "accepted_proposal_ids": [
+        491,
+        492,
+        493,
+        494,
+        495,
+        629,
+        630,
+        631,
+        632,
+        1688,
+        1689,
+        1690
+    ],
+    "execution_unit_count": 11,
+    "manifest_verification": {
+        "ok": true,
+        "blocker": null,
+        "detail": [],
+        "manifest_fingerprint": "eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702",
+        "findings": {
+            "manifest_version": "taxonomy-reviewed-proposal-batch-manifest/v1",
+            "scope": "FULL_PENDING_QUEUE",
+            "manifest_fingerprint_recomputed_ok": true,
+            "requested_set_equals_bound_set": true,
+            "baseline_matches_current": true,
+            "bound_proposal_count": 12,
+            "bound_proposal_ids": [
+                491,
+                492,
+                493,
+                494,
+                495,
+                629,
+                630,
+                631,
+                632,
+                1688,
+                1689,
+                1690
+            ],
+            "requested_proposal_ids": [
+                491,
+                492,
+                493,
+                494,
+                495,
+                629,
+                630,
+                631,
+                632,
+                1688,
+                1689,
+                1690
+            ],
+            "all_bound_proposals_pending_apply": true,
+            "identity_matches": true,
+            "no_unauthorised_pending_proposals": true,
+            "protected_shape_matches": true
+        }
+    },
+    "expected_manifest_fingerprint": "eb7d14672a1051cdb4fcb98e3e8c5bd68ef01e0910193c004843f565686f3702",
+    "generated_at": "2026-10-07 07:09:26",
+    "protected_counts_after": {
+        "candidate_links": 10,
+        "candidate_links_pending": 0,
+        "candidate_links_published": 3,
+        "candidate_links_context_required": 7,
+        "candidate_links_rejected": 0,
+        "candidate_links_approved": 0,
+        "concept_relations": 2,
+        "concept_relations_candidate": 0,
+        "concept_relations_approved": 0,
+        "concept_relations_rejected": 2,
+        "canonical_concepts": 82,
+        "term_concepts": 145,
+        "term_cpv_relations": 9749,
+        "reviewed_proposals": 15,
+        "reviewed_proposals_pending_apply": 0,
+        "reviewed_proposals_applied": 12,
+        "reviewed_proposals_aborted": 0,
+        "reviewed_proposals_superseded": 3
+    }
+}

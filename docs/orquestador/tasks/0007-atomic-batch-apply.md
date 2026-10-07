@@ -49,6 +49,14 @@ de solo lectura del manifiesto, el preflight de lote de solo lectura contra dato
 del runtime a staging. La ejecución real exige una autorización humana NUEVA y explícita, posterior a
 la auditoría de esta ronda, que cite el conjunto exacto de propuestas y el `manifest_fingerprint`.
 
+> **ACTUALIZACIÓN 2026-10-07 — esa autorización llegó y el APPLY se ejecutó.** El párrafo de arriba
+> describe el alcance de las rondas de implementación y se conserva como tal. La autorización quedó
+> registrada en Issue #2 comentario `6032819854` (procedencia según el protocolo del comentario
+> `6032759610`), citando `staging`, el conjunto exacto y el fingerprint `eb7d1467…f3702`; el lote
+> ejecutó `BATCH_APPLIED` con 12 propuestas en 11 unidades y una sola transacción. Validación
+> post-APPLY y el único punto que quedó bloqueado:
+> **`audit/phase7_task0007_post_apply_closure_2026-10-07.md`**.
+
 ---
 
 ## 1. El hueco semántico que abre la tarea

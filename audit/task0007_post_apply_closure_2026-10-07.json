@@ -1,0 +1,410 @@
+{
+    "artifact": "TASK-0007 post-APPLY closure validation (read only)",
+    "authorizing_comment": "6032819854",
+    "closure_contract_comment": "6032959069",
+    "generated_at": "2026-10-07 07:32:29",
+    "target_environment": "staging",
+    "write_statements_performed": 0,
+    "step_2_fingerprint": {
+        "pre_apply_baseline": "c236bc5159ae4421a72dc64b1daa5b850b77a40b1c19425a3c6ac6762d305da2",
+        "post_apply_fingerprint": "e1087a481ab15a45936519d2b0f6190e2e48d7f1c05e04cf87c0d1c703db9b5b",
+        "differs_as_required": true,
+        "note": "Expected to differ: the published graph changed (+1 canonical concept, +3 TERM->CONCEPT)."
+    },
+    "step_5_invariants": {
+        "protected_counts_now": {
+            "candidate_links": 10,
+            "candidate_links_pending": 0,
+            "candidate_links_published": 3,
+            "candidate_links_context_required": 7,
+            "candidate_links_rejected": 0,
+            "candidate_links_approved": 0,
+            "concept_relations": 2,
+            "concept_relations_candidate": 0,
+            "concept_relations_approved": 0,
+            "concept_relations_rejected": 2,
+            "canonical_concepts": 82,
+            "term_concepts": 145,
+            "term_cpv_relations": 9749,
+            "reviewed_proposals": 15,
+            "reviewed_proposals_pending_apply": 0,
+            "reviewed_proposals_applied": 12,
+            "reviewed_proposals_aborted": 0,
+            "reviewed_proposals_superseded": 3
+        },
+        "expected_by_orchestrator": {
+            "candidate_links": 10,
+            "candidate_links_pending": 0,
+            "candidate_links_published": 3,
+            "candidate_links_context_required": 7,
+            "candidate_links_rejected": 0,
+            "candidate_links_approved": 0,
+            "concept_relations": 2,
+            "concept_relations_candidate": 0,
+            "concept_relations_approved": 0,
+            "concept_relations_rejected": 2,
+            "canonical_concepts": 82,
+            "term_concepts": 145,
+            "term_cpv_relations": 9749,
+            "reviewed_proposals": 15,
+            "reviewed_proposals_pending_apply": 0,
+            "reviewed_proposals_applied": 12,
+            "reviewed_proposals_aborted": 0,
+            "reviewed_proposals_superseded": 3
+        },
+        "mismatches": [],
+        "all_match": true,
+        "authorized_rows": [
+            {
+                "id": 491,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:25",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 492,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:25",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 493,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:25",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 494,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:25",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 495,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:25",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 629,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:26",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 630,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:26",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 631,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:26",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 632,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:26",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 1688,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:26",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 1689,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:26",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            },
+            {
+                "id": 1690,
+                "status": "APPLIED",
+                "applied_at": "2026-10-07 07:09:26",
+                "authorization_reference": "Issue #2 comment 6032819854",
+                "target_environment": "staging"
+            }
+        ],
+        "historical_rows_420_422": [
+            {
+                "id": 420,
+                "status": "SUPERSEDED",
+                "applied_at": null,
+                "authorization_reference": null,
+                "target_environment": null
+            },
+            {
+                "id": 421,
+                "status": "SUPERSEDED",
+                "applied_at": null,
+                "authorization_reference": null,
+                "target_environment": null
+            },
+            {
+                "id": 422,
+                "status": "SUPERSEDED",
+                "applied_at": null,
+                "authorization_reference": null,
+                "target_environment": null
+            }
+        ],
+        "execution_audit": {
+            "row_count": 12,
+            "ids": [
+                5249,
+                5250,
+                5251,
+                5252,
+                5253,
+                5254,
+                5255,
+                5256,
+                5257,
+                5258,
+                5259,
+                5260
+            ],
+            "actor_types": [
+                "system"
+            ],
+            "target_environments": [
+                "staging"
+            ],
+            "max_audit_id_global": 5260
+        },
+        "published_concept_4819": {
+            "id": 4819,
+            "canonical_name_en": "refinery",
+            "canonical_name_es": "refinería",
+            "status": "active",
+            "created_at": "2026-10-07 07:09:25",
+            "updated_at": "2026-10-07 07:09:25",
+            "concept_type": null,
+            "domain": null
+        },
+        "new_term_concepts": [
+            {
+                "id": 1191,
+                "term_id": 24,
+                "concept_id": 2890,
+                "created_at": "2026-10-07 07:09:25"
+            },
+            {
+                "id": 1192,
+                "term_id": 22,
+                "concept_id": 4819,
+                "created_at": "2026-10-07 07:09:25"
+            },
+            {
+                "id": 1193,
+                "term_id": 23,
+                "concept_id": 4819,
+                "created_at": "2026-10-07 07:09:25"
+            }
+        ],
+        "concept_relations": [
+            {
+                "id": 61,
+                "source_concept_id": 4,
+                "target_concept_id": 25,
+                "relation_type": "RELATED_TO",
+                "status": "rejected"
+            },
+            {
+                "id": 62,
+                "source_concept_id": 16,
+                "target_concept_id": 61,
+                "relation_type": "RELATED_TO",
+                "status": "rejected"
+            }
+        ],
+        "term_cpv_untouched": {
+            "total": 9749,
+            "rows_created_on_apply_date": 0,
+            "rows_updated_on_apply_date": 0,
+            "rows_of_new_concept_terms_22_23": [
+                {
+                    "id": 9728,
+                    "term_id": 22,
+                    "cpv_code": "CPV-37.06.16S",
+                    "status": "candidate",
+                    "source": "auto_mapper_v1",
+                    "created_at": "2026-09-18 15:59:14"
+                },
+                {
+                    "id": 9736,
+                    "term_id": 23,
+                    "cpv_code": "CPV-37.06.16S",
+                    "status": "candidate",
+                    "source": "auto_mapper_v1",
+                    "created_at": "2026-09-18 16:05:13"
+                }
+            ],
+            "classification": "The 2 rows of terms 22/23 predate the APPLY (created 2026-09-18 by auto_mapper_v1, status=candidate). Zero TERM->CPV rows were created or updated on 2026-10-07 and the total is unchanged at 9749, so the APPLY wrote none. No CPV mapping was invented for the new refinery concept."
+        }
+    },
+    "step_4_search_probe": {
+        "method": "READ-ONLY data-side reproduction of the L0-L3 branches of perfilafiliados-mcp/src/canonical-expansion.ts against the same Supabase rows the Worker reads. NOT an end-to-end /debug-search call: that endpoint needs DEBUG_TOKEN, which is unavailable this round (see step 3).",
+        "decisive_predicate": "canonical-expansion.ts inherits a CPV code through a canonical concept only via `taxonomy_term_cpv_relations r ... and r.status = 'approved'` on a SIBLING term (sib_link.term_id != t.id).",
+        "queries": [
+            {
+                "query": "pipeline",
+                "l0_terms": [
+                    {
+                        "term_id": 25,
+                        "term": "ducto",
+                        "term_type": "translation_alias",
+                        "own_cpv_total": 8,
+                        "own_cpv_approved": 0,
+                        "own_cpv_statuses": [
+                            "needs_review"
+                        ],
+                        "linked_concepts": []
+                    },
+                    {
+                        "term_id": 24,
+                        "term": "pipeline",
+                        "term_type": "technical_term",
+                        "own_cpv_total": 8,
+                        "own_cpv_approved": 0,
+                        "own_cpv_statuses": [
+                            "needs_review"
+                        ],
+                        "linked_concepts": [
+                            {
+                                "concept_id": 2890,
+                                "canonical_name_es": "oleoducto",
+                                "canonical_name_en": "oil pipeline",
+                                "siblings": [],
+                                "inherited_cpv_visible_to_live_path": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "query": "refinery",
+                "l0_terms": [
+                    {
+                        "term_id": 22,
+                        "term": "refinery",
+                        "term_type": "technical_term",
+                        "own_cpv_total": 1,
+                        "own_cpv_approved": 0,
+                        "own_cpv_statuses": [
+                            "candidate"
+                        ],
+                        "linked_concepts": [
+                            {
+                                "concept_id": 4819,
+                                "canonical_name_es": "refinería",
+                                "canonical_name_en": "refinery",
+                                "siblings": [
+                                    {
+                                        "term_id": 23,
+                                        "term": "refinería",
+                                        "cpv_approved": 0
+                                    }
+                                ],
+                                "inherited_cpv_visible_to_live_path": []
+                            }
+                        ]
+                    },
+                    {
+                        "term_id": 23,
+                        "term": "refinería",
+                        "term_type": "translation_alias",
+                        "own_cpv_total": 1,
+                        "own_cpv_approved": 0,
+                        "own_cpv_statuses": [
+                            "candidate"
+                        ],
+                        "linked_concepts": [
+                            {
+                                "concept_id": 4819,
+                                "canonical_name_es": "refinería",
+                                "canonical_name_en": "refinery",
+                                "siblings": [
+                                    {
+                                        "term_id": 22,
+                                        "term": "refinery",
+                                        "cpv_approved": 0
+                                    }
+                                ],
+                                "inherited_cpv_visible_to_live_path": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "query": "refineria",
+                "l0_terms": [
+                    {
+                        "term_id": 23,
+                        "term": "refinería",
+                        "term_type": "translation_alias",
+                        "own_cpv_total": 1,
+                        "own_cpv_approved": 0,
+                        "own_cpv_statuses": [
+                            "candidate"
+                        ],
+                        "linked_concepts": [
+                            {
+                                "concept_id": 4819,
+                                "canonical_name_es": "refinería",
+                                "canonical_name_en": "refinery",
+                                "siblings": [
+                                    {
+                                        "term_id": 22,
+                                        "term": "refinery",
+                                        "cpv_approved": 0
+                                    }
+                                ],
+                                "inherited_cpv_visible_to_live_path": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "cpv_status_distribution": {
+            "approved": 212,
+            "candidate": 17,
+            "deprecated": 238,
+            "needs_review": 9282
+        },
+        "conclusion": "The newly published TERM->CONCEPT mappings are present in the data but contribute ZERO new CPV expansion to the live search path. Concept #2890 holds only term #24, so the sibling-inheritance branch has nothing to inherit; concept #4819 holds terms #22+#23 whose only CPV rows are status=candidate, and the branch requires approved. All own CPV rows of these terms are needs_review/candidate, so L0/L1 contributes nothing either."
+    },
+    "step_3_fixture_exposure": {
+        "frozen_queries_evaluated": 32,
+        "queries_reaching_changed_taxonomy": [],
+        "exposure_count": 0,
+        "changed_concepts": [
+            2890,
+            4819
+        ],
+        "changed_terms": [
+            22,
+            23,
+            24
+        ],
+        "worker_reads_taxonomy_concept_relations": false,
+        "worker_reads_note": "grep of perfilafiliados-mcp/src/*.ts for taxonomy_concept_relations returns 0 occurrences, so the REJECT of relations #61/#62 cannot affect search by construction."
+    }
+}
