@@ -6,6 +6,13 @@ TASK-0007 REAL ATOMIC BATCH APPLY/PUBLISH IN STAGING*
 CLOSURE VALIDATION REQUIRED*
 **Protocolo de procedencia de la autorización:** comentario `6032759610`
 **Re-audit previo (PASS técnico):** comentario `6031966511`
+**Re-audit del paquete de cierre:** comentario `6033475804` — *BLOCKED_AUTH_TOKEN_UNAVAILABLE / NO CODE
+CORRECTION REQUIRED*
+**Intento con el token existente:** comentario `6033535873` → respondido
+`BLOCKED_EXISTING_DEBUG_TOKEN_NOT_ACCESSIBLE`
+**Autorización de rotación de `DEBUG_TOKEN`:** comentario `6033692919` — rotación **ejecutada del lado
+del dueño**, no por este agente
+**Compuerta de regresión en PASS:** comentario `6034438914`
 **Runtime desplegado:** `004d24e98159bf152c741bd9f0ee698b43139d87`
 **HEAD revisado al momento de ejecutar:** `f8a98df5ff5e90a05849c709f3a5847f6945d198`
 **Rama:** `feature/upgrade-filament-v3`
@@ -19,6 +26,17 @@ relaciones están `rejected`, y hay 12 filas con `applied_at`. La taxonomía se 
 
 **En esta ronda de cierre no se ejecutó ningún APPLY y no se hizo ningún fix.** Todo lo medido abajo es
 de solo lectura, salvo la captura de artefactos de auditoría y este documento.
+
+**Artefactos de esta validación** (ninguno contiene secretos; los cuatro fueron escaneados):
+
+| Artefacto | Qué prueba |
+|---|---|
+| `audit/task0007_batch_apply_result_2026-10-07.json` | La ejecución real, tal cual la escribió el comando |
+| `audit/task0007_post_apply_closure_2026-10-07.json` | Invariantes, fingerprint y sonda de búsqueda del lado-datos |
+| `audit/regression_post_apply_2026-10-07.json` | Snapshot post-APPLY de las 32 queries congeladas |
+| `audit/task0007_targeted_search_post_apply_2026-10-07.json` | Los tres checks end-to-end contra el Worker |
+
+`audit/regression_baseline_2026-09-23.json` **no se tocó** y no es ninguno de los cuatro.
 
 ---
 
@@ -89,29 +107,78 @@ Corroboración independiente y gratuita: el preflight de lote sin manifiesto aho
 
 ---
 
-## 3. Regresión congelada de 32 queries (paso 3): `BLOCKED_AUTH_TOKEN_UNAVAILABLE`
+## 3. Regresión congelada de 32 queries (paso 3): **PASS**
 
-**No se pudo correr.** `scripts/regression-suite.mjs` exige `--token` y pega contra
-`POST {url}/debug-search`, que está protegido por el `DEBUG_TOKEN` del Worker.
+**32/32 queries, cero diffs estructurales contra la baseline congelada.** La corrida la hizo el dueño
+contra el Worker desplegado (`scripts/regression-suite.mjs`, baseline
+`audit/regression_baseline_2026-09-23.json`, autenticación con un `$env:DEBUG_TOKEN` efímero), y su
+salida fue la de la propia suite: *«Sin cambios en ninguna de las 32 queries del fixture.»* Reportado en
+el comentario `6034438914`.
 
-Lo verificado antes de declarar el bloqueo, en vez de suponerlo:
+### 3.1 Verificación independiente, no aceptación del reporte
 
-- `GET https://perfilafiliados-mcp.sisteg.workers.dev/` → `200 {"ok":true,"service":"perfilafiliados-mcp"}`.
-  El Worker está sano.
-- `POST /debug-search` sin token → `401`. La capa de auth está viva.
-- No existe `.dev.vars`, `.dev.vars.local`, `.env` ni `.env.local` en `perfilafiliados-mcp`, y
-  `wrangler.toml` no contiene `DEBUG_TOKEN` ni `MCP_TOKEN` (0 ocurrencias). El token es un secreto de
-  Worker, nunca persistido a un archivo trackeado — la convención establecida desde TASK-0003.
-- No hay token de API de Cloudflare disponible en esta sesión para rotarlo.
+El resultado no se dio por bueno de palabra. Se diffeó el artefacto contra la baseline con los **mismos
+nueve campos** que compara `diffSnapshot()` de la suite (`candidates_after_dedup`,
+`direct_company_count`, `detected_intent`, `regional_terms`, `canonical_concepts`, `cpv_relations`,
+`diagnostic_flags`, `top_empresa_ids`, `top_evidence_strengths`):
 
-**No se rotó ningún secreto.** La sección D del contrato lo prohíbe explícitamente y el paso 3 ordena
-reportar `BLOCKED_AUTH_TOKEN_UNAVAILABLE` en vez de rotar. Tampoco se modificó código de búsqueda,
-ranking, taxonomía, fixtures ni salida esperada para fabricar un verde: la suite simplemente no corrió.
+| Medición | Resultado |
+|---|---|
+| Queries en la baseline / en el snapshot | 32 / 32 |
+| Queries faltantes / sobrantes | 0 / 0 |
+| Campos comparados (32 × 9) | **288** |
+| Diffs estrictos (`JSON.stringify`) | **0** |
+| Diffs reales ignorando serialización | **0** |
+| `sha256` baseline | `f416f839427c1f3b0cfc11b0eb22686278b29b8d29a5f2042766502db6b45303` |
+| `sha256` snapshot post-APPLY | `f416f839427c1f3b0cfc11b0eb22686278b29b8d29a5f2042766502db6b45303` |
 
-`audit/regression_baseline_2026-09-23.json` **no se tocó.** No se creó ningún artefacto de resultado,
-porque no hay resultado que guardar.
+Los dos archivos son **byte-idénticos**, que es exactamente lo que produce un `--save` sin cambios: la
+suite serializa con `JSON.stringify(results, null, 2)`, así que resultados idénticos dan un archivo
+idéntico. No es una coincidencia sospechosa, es la salida esperada de un verde limpio.
 
-### 3.1 Qué sí se pudo medir sobre el riesgo que la suite cubriría
+**Límite de procedencia, dicho de frente:** la identidad byte a byte confirma el *contenido*, no prueba
+por sí sola que el archivo se generó en vez de copiarse. Lo que sostiene la procedencia es otra cosa, y
+es verificable: el artefacto end-to-end de la §4 contiene resultados vivos de tres queries que **no
+están en el fixture**, con ids de empresa y señales de evidencia reales, y **corrobora exactamente** la
+predicción que esta misma auditoría había hecho del lado-datos antes de tener token. Un archivo copiado
+no podría haber producido eso.
+
+`audit/regression_baseline_2026-09-23.json` **no se tocó** — verificado con `git diff`, sin cambios. El
+resultado nuevo se guardó como artefacto **aparte**: `audit/regression_post_apply_2026-10-07.json`.
+
+### 3.2 Cómo se desbloqueó, y qué hizo este agente y qué no
+
+La historia importa porque la compuerta estuvo bloqueada dos veces por razones distintas, y ninguna de
+las dos se resolvió fabricando un verde.
+
+1. **Primer bloqueo (`BLOCKED_AUTH_TOKEN_UNAVAILABLE`, re-audit `6033475804`).** La suite exige
+   `--token` contra `POST /debug-search`, protegido por el `DEBUG_TOKEN` del Worker. Verificado antes de
+   declararlo: Worker sano (`GET /` → `200 {"ok":true,...}`), capa de auth viva (`POST /debug-search`
+   sin token → `401`), sin `.dev.vars`/`.dev.vars.local`/`.env`/`.env.local` en `perfilafiliados-mcp`, y
+   `wrangler.toml` con 0 ocurrencias de `DEBUG_TOKEN`/`MCP_TOKEN`.
+2. **Segundo intento (`6033535873`): usar el token EXISTENTE, sin rotar.** Respondido
+   `BLOCKED_EXISTING_DEBUG_TOKEN_NOT_ACCESSIBLE`, tras enumerar y medir todas las fuentes plausibles:
+   variables de entorno de la sesión (5 nombres candidatos más un barrido por patrón `DEBUG.*TOKEN`, 0),
+   scratchpad de la sesión (0 coincidencias de `--token <v>` / `Bearer <v>` / `DEBUG_TOKEN=<v>`),
+   `.wrangler/` local (un único archivo, la caché de account-id), CI del repo MCP (no existe ningún
+   workflow), repo Laravel fuera de `audit/`+`docs/` (0), y la página consumidora
+   `public/cira-test/index.html` (0 tokens embebidos). Lo decisivo está en el propio Worker
+   (`src/index.ts`): el token **deliberadamente no se embebe** en la página servida — el admin escribe
+   `/debug-on <clave>` y queda en el `sessionStorage` de **su** navegador. Por diseño el único plaintext
+   vive en el secret store de Cloudflare, irrecuperable, y en la sesión del humano. **No** se intentó
+   leerlo de vuelta por la API de Cloudflare ni con `wrangler secret list`, porque la regla crítica de
+   `6033535873` lo prohíbe explícitamente.
+3. **Desbloqueo (`6033692919`): el dueño autorizó rotar ÚNICAMENTE `DEBUG_TOKEN`** y ejecutó la
+   rotación él mismo, dejando el valor disponible de forma efímera en su shell local. **Este agente no
+   roto ningún secreto en ningún momento de TASK-0007.** Verificado que la rotación no tocó código:
+   el repo `perfilafiliados-mcp` tiene working tree limpio y su último commit es del **2026-09-28**,
+   nueve días anterior al APPLY — `wrangler secret put` despliega una versión nueva del Worker con el
+   binding actualizado y el **mismo** código fuente, que es justo lo que esa autorización permitía.
+
+En ninguno de los tres momentos se modificó código de búsqueda, ranking, taxonomía, fixtures ni salida
+esperada, ni se inventó un resultado, ni se sobrescribió la baseline.
+
+### 3.3 La acotación de riesgo previa, ahora confirmada
 
 El bloqueo es de credencial, no de información. Las 32 queries del fixture son datos legibles, y la
 taxonomía que el APPLY cambió es exactamente conocida: los conceptos **#2890** y **#4819**, y los
@@ -126,9 +193,11 @@ términos #22/#23/#24 ni comparte concepto con ellos.
 Y `taxonomy_concept_relations` **no aparece en ningún archivo** de `perfilafiliados-mcp/src/*.ts` (0
 ocurrencias), así que el REJECT de las relaciones #61/#62 no puede afectar la búsqueda por construcción.
 
-Esto es una acotación del riesgo, **no un sustituto de la corrida**. La suite compara nueve campos
-estructurales por query, incluidos `top_empresa_ids` y `top_evidence_strengths`, que dependen de más
-cosas que la expansión canónica. La compuerta sigue abierta y requiere el token.
+Cuando se escribió esto, era una acotación del riesgo y **no un sustituto de la corrida** — la suite
+compara nueve campos estructurales por query, incluidos `top_empresa_ids` y `top_evidence_strengths`,
+que dependen de más cosas que la expansión canónica. **La corrida ya se hizo (§3) y confirmó la
+acotación: 0 diffs en los 288 campos.** La predicción y la medición coinciden, que es la razón por la
+que se conserva esta subsección en vez de borrarla.
 
 ---
 
@@ -172,6 +241,30 @@ TERM→CPV. Distribución global de estados CPV, sin cambios: 212 `approved`, 17
 Evidencia estructurada completa: `audit/task0007_post_apply_closure_2026-10-07.json`, sección
 `step_4_search_probe`. Está etiquetada ahí mismo como reproducción del lado-datos, **no** como llamada
 end-to-end.
+
+### 4.1 Confirmación END-TO-END contra el Worker real
+
+Con el `DEBUG_TOKEN` rotado y efímero, el dueño ejecutó los tres checks contra `POST /debug-search` del
+Worker desplegado. Artefacto: `audit/task0007_targeted_search_post_apply_2026-10-07.json` (escaneado:
+**0** coincidencias de `Bearer`, `token` o cualquier material de secreto; el valor no quedó persistido).
+
+| Query | `canonical_concepts` | `cpv_relations` | `candidates_after_dedup` | `direct_company_count` | `detected_intent` |
+|---|---|---|---|---|---|
+| `pipeline` | **`[]`** | **`[]`** | 20 | 13 | `generic` |
+| `refinery` | **`[]`** | **`[]`** | 27 | 0 | `generic` |
+| `refinería` | **`[]`** | **`[]`** | 17 | 4 | `generic` |
+
+**La predicción del lado-datos se cumple exactamente.** La §4 había concluido, leyendo el predicado
+`r.status = 'approved'` en `canonical-expansion.ts` y midiendo la base viva, que los TERM→CONCEPT
+recién publicados aportarían **cero** expansión CPV al camino vivo. El Worker real devuelve
+`canonical_concepts: []` y `cpv_relations: []` en las tres, incluido `refinería`, que es el término
+nuevo. No es una coincidencia: es la misma causa medida por dos vías independientes, una por SQL contra
+Supabase y otra por HTTP contra el Worker.
+
+Las tres queries **sí** devuelven candidatos (20 / 27 / 17) por `LITERAL_MATCH` y
+`SEMANTIC_INFERENCE`, así que la búsqueda funciona con normalidad; lo que todavía no aporta nada es la
+capa de taxonomía para estos términos, porque sus relaciones CPV siguen en `candidate`/`needs_review` y
+nadie autorizó aprobarlas. **No se inventó ningún mapeo CPV** y no se tocó ningún dato.
 
 ---
 
@@ -279,18 +372,41 @@ versión de Laravel). **Cero errores de aplicación**, y el APPLY corrió a las 
 |---|---|
 | 1. Artefacto de ejecución capturado | **PASS** |
 | 2. Fingerprint post-APPLY registrado y distinto | **PASS** |
-| 3. Regresión congelada de 32 queries | **`BLOCKED_AUTH_TOKEN_UNAVAILABLE`** |
-| 4. Checks dirigidos `pipeline`/`refinery`/`refinería` | **PASS (lado-datos)**; end-to-end bloqueado por el mismo token |
+| 3. Regresión congelada de 32 queries | **PASS** — 32/32, 288 campos, 0 diffs, verificado de forma independiente (§3.1) |
+| 4. Checks dirigidos `pipeline`/`refinery`/`refinería` | **PASS lado-datos (§4) y PASS end-to-end (§4.1)**, coincidentes |
 | 5. Invariantes post-APPLY | **PASS**, 0 discrepancias |
 | 6. Tests y smoke | **Smoke PASS**; PHPUnit **no ejecutable** (límite declarado en §6.1) |
-| 7. Auditoría y commit | este documento + 2 artefactos |
+| 7. Auditoría y commit | este documento + 4 artefactos |
 
-**No se encontró ninguna regresión.** Tampoco se encontró evidencia positiva de ausencia de regresión
-en el camino de búsqueda, porque la compuerta que la daría está bloqueada por credencial. Las dos cosas
-se reportan por separado a propósito.
+**No se encontró ninguna regresión, y esta vez sí hay evidencia positiva de ausencia de regresión.** En
+la versión anterior de este documento las dos cosas se reportaban por separado justamente porque la
+segunda faltaba; ya no falta. Los 288 campos estructurales de las 32 queries congeladas no se movieron,
+y los tres checks end-to-end confirman por HTTP la misma conclusión que el análisis por SQL.
 
-Nada se arregló en esta ronda, no había nada que arreglar, y si lo hubiera habido el contrato ordena
-parar y documentar en vez de corregir.
+Nada se arregló en esta ronda ni en la anterior, no había nada que arreglar, y si lo hubiera habido el
+contrato ordena parar y documentar en vez de corregir.
+
+### 7.1 Clasificación de TASK-0007 para cierre
+
+| Compuerta | Estado |
+|---|---|
+| Implementación del lote atómico + 3 rondas de endurecimiento de gobernanza | **PASS** (heredado) |
+| Autorización explícita del dueño con procedencia registrada | **PASS** — `6032819854`, protocolo `6032759610` |
+| APPLY/PUBLISH atómico real | **PASS** — `BATCH_APPLIED`, 12 propuestas, 11 unidades, 1 transacción |
+| Artefacto de ejecución | **PASS** — sin editar |
+| Invariantes de base post-APPLY | **PASS** — 18/18, más filas históricas intactas |
+| Fingerprint post-APPLY | **PASS** — cambió, como debía |
+| Ausencia de mutación TERM→CPV | **PASS** — 9749 sin cambios, 0 filas escritas el día del APPLY |
+| Integridad del grupo bilingüe #629/#630 | **PASS** — un solo concepto #4819, dos términos |
+| **Regresión congelada de 32 queries (la única que quedaba abierta)** | **PASS** — 0 diffs |
+| Checks dirigidos end-to-end | **PASS** |
+| Smoke de staging | **PASS** — 11 rutas, 0 errores de aplicación |
+| PHPUnit en esta ronda | **Límite declarado**, no bloqueante: cero cambios de runtime desde el 197/197 de la ronda 3 |
+| Manejo de secretos | **PASS** — este agente no roto ningún secreto; el token nunca se imprimió, commiteó ni persistió |
+
+**No queda ninguna compuerta abierta de TASK-0007.** La única que el APPLY había invalidado —la
+regresión congelada— volvió a correr y pasó. Desde el punto de vista de este agente la tarea está
+**lista para que el orquestador la cierre**; el cierre formal es su acto, no el mío.
 
 ## 8. Lo que sigue sin autorización
 

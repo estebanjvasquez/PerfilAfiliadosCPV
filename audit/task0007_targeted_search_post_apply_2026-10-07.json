@@ -1,0 +1,98 @@
+﻿{
+    "pipeline":  {
+                     "query":  "pipeline",
+                     "candidates_after_dedup":  20,
+                     "direct_company_count":  13,
+                     "detected_intent":  "generic",
+                     "regional_terms":  [
+
+                                        ],
+                     "canonical_concepts":  [
+
+                                            ],
+                     "cpv_relations":  [
+
+                                       ],
+                     "diagnostic_flags":  [
+                                              "NO_CRAWLER_EVIDENCE"
+                                          ],
+                     "top_empresa_ids":  [
+                                             "157",
+                                             "141",
+                                             "151",
+                                             "86",
+                                             "80"
+                                         ],
+                     "top_evidence_strengths":  [
+                                                    "LITERAL_MATCH",
+                                                    "LITERAL_MATCH",
+                                                    "LITERAL_MATCH",
+                                                    "LITERAL_MATCH",
+                                                    "LITERAL_MATCH"
+                                                ]
+                 },
+    "refinery":  {
+                     "query":  "refinery",
+                     "candidates_after_dedup":  27,
+                     "direct_company_count":  0,
+                     "detected_intent":  "generic",
+                     "regional_terms":  [
+
+                                        ],
+                     "canonical_concepts":  [
+
+                                            ],
+                     "cpv_relations":  [
+
+                                       ],
+                     "diagnostic_flags":  [
+                                              "NO_CRAWLER_EVIDENCE"
+                                          ],
+                     "top_empresa_ids":  [
+                                             "157",
+                                             "187",
+                                             "85",
+                                             "149",
+                                             "125"
+                                         ],
+                     "top_evidence_strengths":  [
+                                                    "SEMANTIC_INFERENCE",
+                                                    "SEMANTIC_INFERENCE",
+                                                    "SEMANTIC_INFERENCE",
+                                                    "SEMANTIC_INFERENCE",
+                                                    "SEMANTIC_INFERENCE"
+                                                ]
+                 },
+    "refinería":  {
+                      "query":  "refinería",
+                      "candidates_after_dedup":  17,
+                      "direct_company_count":  4,
+                      "detected_intent":  "generic",
+                      "regional_terms":  [
+
+                                         ],
+                      "canonical_concepts":  [
+
+                                             ],
+                      "cpv_relations":  [
+
+                                        ],
+                      "diagnostic_flags":  [
+                                               "NO_CRAWLER_EVIDENCE"
+                                           ],
+                      "top_empresa_ids":  [
+                                              "85",
+                                              "91",
+                                              "395",
+                                              "480",
+                                              "149"
+                                          ],
+                      "top_evidence_strengths":  [
+                                                     "LITERAL_MATCH",
+                                                     "LITERAL_MATCH",
+                                                     "LITERAL_MATCH",
+                                                     "LITERAL_MATCH",
+                                                     "SEMANTIC_INFERENCE"
+                                                 ]
+                  }
+}

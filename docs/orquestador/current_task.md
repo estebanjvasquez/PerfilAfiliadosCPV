@@ -3,7 +3,8 @@
 **TASK-0007 — APPLY ATÓMICO POR LOTE** (Issue #2 comentario
 [`5997693379`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5997693379)).
 Abierta desde HEAD `4e671fa`. **Estado: READY_FOR_REVIEW — APPLY/PUBLISH real EJECUTADO en staging el
-2026-10-07, validación post-APPLY completa con un punto bloqueado por credencial.**
+2026-10-07 y validación post-APPLY COMPLETA. Ninguna compuerta de TASK-0007 queda abierta; lista para
+cierre por el orquestador.**
 
 ## Cierre — APPLY real ejecutado y validado (`6032819854` + `6032959069`)
 
@@ -24,17 +25,37 @@ TERM→CONCEPT nuevos **#1191/#1192/#1193**, auditoría **#5249…#5260**. **#42
 Fingerprint de taxonomía **post**-APPLY: **`e1087a481ab15a45936519d2b0f6190e2e48d7f1c05e04cf87c0d1c703db9b5b`**
 (el pre-APPLY era `c236bc51…`; difieren porque el grafo publicado cambió, como exige el contrato).
 
-Validación post-APPLY del comentario `6032959069`: pasos 1, 2, 4 y 5 **PASS** (18/18 invariantes sin
-discrepancias), smoke **PASS** (11 rutas, cero 500/503, cero errores de aplicación en el log). **Paso 3
-(regresión congelada de 32 queries): `BLOCKED_AUTH_TOKEN_UNAVAILABLE`** — `DEBUG_TOKEN` del Worker no
-disponible y la rotación de secretos no está autorizada. Se acotó el riesgo midiendo que **0 de las 32
-queries congeladas alcanza** los conceptos #2890/#4819, pero eso **no sustituye** la corrida.
-**PHPUnit no fue ejecutable** en esta ronda (`php.exe` bloqueado localmente por Application Control y
-`composer install --no-dev` en staging): límite declarado, no omisión.
+Validación post-APPLY del comentario `6032959069`: **todos los pasos PASS.** 18/18 invariantes sin
+discrepancias; smoke 11 rutas, cero 500/503, cero errores de aplicación en el log.
 
-Detalle completo: **`audit/phase7_task0007_post_apply_closure_2026-10-07.md`**, más
-`audit/task0007_batch_apply_result_2026-10-07.json` (artefacto de ejecución, sin editar) y
-`audit/task0007_post_apply_closure_2026-10-07.json` (evidencia estructurada de solo lectura).
+**Regresión congelada de 32 queries: PASS** (comentario `6034438914`). Estuvo bloqueada dos veces y
+ninguna se resolvió fabricando un verde: primero `BLOCKED_AUTH_TOKEN_UNAVAILABLE` (`6033475804`), luego
+`BLOCKED_EXISTING_DEBUG_TOKEN_NOT_ACCESSIBLE` al intentar usar el token existente (`6033535873`) — por
+diseño el plaintext sólo vive en el secret store de Cloudflare y en el `sessionStorage` del navegador
+del admin. Se desbloqueó cuando el dueño autorizó rotar **únicamente** `DEBUG_TOKEN` (`6033692919`) y
+ejecutó la rotación y la corrida él mismo. **Este agente no rotó ningún secreto en ningún momento de
+TASK-0007.** El resultado se verificó de forma independiente: 32/32 queries, **288 campos comparados, 0
+diffs**, y el snapshot resulta byte-idéntico a la baseline (`f416f839…`), que es la salida esperada de un
+`--save` sin cambios. La baseline congelada **no se tocó**.
+
+**Checks dirigidos end-to-end: PASS y coincidentes con la predicción.** `pipeline`, `refinery` y
+`refinería` devuelven `canonical_concepts: []` y `cpv_relations: []` contra el Worker real — exactamente
+lo que la sonda del lado-datos había predicho leyendo el predicado `r.status = 'approved'` de
+`canonical-expansion.ts`. Las tres sí devuelven candidatos (20/27/17) por otras señales, así que la
+búsqueda funciona; la capa de taxonomía todavía no aporta nada para esos términos porque sus relaciones
+CPV siguen en `candidate`/`needs_review` y nadie autorizó aprobarlas.
+
+**PHPUnit no fue ejecutable** en esta ronda (`php.exe` bloqueado localmente por Application Control y
+`composer install --no-dev` en staging): límite declarado y no bloqueante, porque no hubo un solo cambio
+de runtime desde el 197/197 de la ronda 3.
+
+**No queda ninguna compuerta abierta de TASK-0007.** El cierre formal es acto del orquestador.
+
+Detalle completo: **`audit/phase7_task0007_post_apply_closure_2026-10-07.md`**, más cuatro artefactos
+sin secretos: `task0007_batch_apply_result_2026-10-07.json` (ejecución, sin editar),
+`task0007_post_apply_closure_2026-10-07.json` (invariantes y sonda lado-datos),
+`regression_post_apply_2026-10-07.json` (snapshot de las 32 queries) y
+`task0007_targeted_search_post_apply_2026-10-07.json` (los tres checks end-to-end).
 
 Sin autorización: producción, merge a `main`, más mutaciones de taxonomía, rotación de secretos, otro
 APPLY/replay, y fixes a búsqueda/ranking/datos.
