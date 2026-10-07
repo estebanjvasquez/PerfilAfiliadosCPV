@@ -1,10 +1,65 @@
 # Tarea activa
 
-**TASK-0007 — APPLY ATÓMICO POR LOTE** (Issue #2 comentario
-[`5997693379`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5997693379)).
-Abierta desde HEAD `4e671fa`. **Estado: READY_FOR_REVIEW — APPLY/PUBLISH real EJECUTADO en staging el
-2026-10-07 y validación post-APPLY COMPLETA. Ninguna compuerta de TASK-0007 queda abierta; lista para
-cierre por el orquestador.**
+**TASK-0008 — UAT DEL BUSCADOR PARA EL CLIENTE + REVISIÓN TAXONÓMICA DELEGADA** (Issue #2 comentarios
+[`6035726459`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6035726459)
+y [`6035827197`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6035827197)).
+Abierta desde HEAD `fd2c018`. **Estado: READY_FOR_REVIEW — paquete completo en `docs/uat/`. Sólo
+documentación y plantillas: cero cambios de aplicación, Worker, base de datos, taxonomía o secretos.**
+
+## TASK-0008 — paquete de UAT y revisión taxonómica
+
+Dos entregas independientes, ambas en `docs/uat/` (10 archivos), que pueden avanzar en paralelo con
+personas distintas. Índice de orientación: `docs/uat/README.md`.
+
+**Entrega A — UAT del buscador** (contrato `6035726459`):
+`GUIA_PRUEBAS_BUSCADOR_CLIENTE.md` (guía para revisor no técnico, 8 grupos de consultas, escala 5→1
+más `N/A`), `FORMATO_RESULTADOS_BUSCADOR_CLIENTE.csv` y su gemelo `.md` (23 campos exigidos, 45 filas:
+35 consultas propuestas + 10 en blanco para el cliente, validado con `Import-Csv`),
+`GUIA_CLASIFICACION_RESULTADOS_UAT.md` (triage técnico con árbol de decisión) y
+`RESUMEN_UAT_CLIENTE_TEMPLATE.md` (decisión final `ACCEPTED` / `ACCEPTED_WITH_OBSERVATIONS` /
+`REQUIRES_CORRECTIONS`).
+
+**Entrega B — revisión taxonómica del pasante** (contrato `6035827197`):
+`GUIA_ASIGNACION_PASANTE_REVISION_TAXONOMICA.md` con las 13 secciones pedidas y el texto listo para
+asignar la tarea, `FORMATO_REVISION_TAXONOMICA_PASANTE.csv` y su gemelo `.md` (20 campos exigidos,
+validado) y `RESUMEN_LOTE_REVISION_TAXONOMICA_TEMPLATE.md`.
+
+### Lo que se verificó contra el sistema real, en vez de redactarse
+
+El contrato prohíbe explícitamente inventar acciones de UI, así que las guías se escribieron **después**
+de leer el código:
+
+- **La pantalla de pruebas no es un buscador con caja de resultados**, es un chat (*"CIRA — Asistente
+  CPV"*, `public/cira-test/index.html`) que llama a un webhook de **n8n**, con botones de atajo y
+  *"Nueva conversación"*. La guía indica reiniciar la conversación antes de cada consulta, porque el
+  chat arrastra contexto y eso contaminaría la prueba. URL verificada: `200`.
+- **La cola real de TERM→CPV tiene sólo DOS acciones de decisión**: *Aprobar* y *Rechazar*
+  (`ManagesTaxonomyRelationReview`), ambas con *Motivo* obligatorio y auditado. Las otras tres decisiones
+  del vocabulario del cliente —`NEEDS_CONTEXT`, `ESCALATE`, `POSSIBLE_NEW_CATEGORY`— **no tienen botón**,
+  y la guía lo dice así: se registran sólo en la planilla y la fila queda en *"En revisión"*.
+- **Existen acciones masivas** (*"Aprobar seleccionadas"*). La guía advierte explícitamente que no se
+  usan, porque el botón es real y con 9.282 filas pendientes la tentación también.
+- Permisos reales: *Aprobar* exige `taxonomy_publish` (publica al buscador en vivo), *Rechazar* exige
+  `taxonomy_edit_relations`. Documentado, incluido que algunos botones pueden no aparecer.
+- Conteos de taxonomía del contrato (9.749 / 212 / 17 / 9.282 / 238) **corroborados** contra la base
+  viva: coinciden exactamente.
+- **No existe ninguna expectativa de negocio aprobada** en `docs/` (verificado), así que
+  `Empresa_esperada` queda en blanco para que lo complete el cliente, como el contrato exige.
+- Riesgo operativo señalado: si el flujo de n8n está inactivo, **todas** las consultas fallan igual y el
+  UAT se ve como una falla catastrófica del buscador. Queda como chequeo previo de CPV/SISTEG. **No se
+  invocó el webhook** desde esta tarea.
+
+**TASK-0007 permanece CLOSED** (comentario `6035642794`, HEAD `fd2c018`). Esta tarea no toca nada de su
+estado.
+
+---
+
+## TASK-0007 — APPLY ATÓMICO POR LOTE (CERRADA)
+
+**CLOSED/PASS** en el comentario
+[`6035642794`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6035642794).
+Abierta desde HEAD `4e671fa`. **APPLY/PUBLISH real EJECUTADO en staging el 2026-10-07, validación
+post-APPLY COMPLETA, ninguna compuerta abierta.**
 
 ## Cierre — APPLY real ejecutado y validado (`6032819854` + `6032959069`)
 
