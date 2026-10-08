@@ -1,3 +1,26 @@
+# CHECKPOINT ACTIVO — ESPERANDO FEEDBACK EXTERNO
+
+**Fecha:** 2026-10-08  
+**Estado:** TASK-0007 y TASK-0008 están **CLOSED / PASS**. No hay una tarea de desarrollo activa.  
+**Esperando:** (1) UAT del buscador por el cliente; (2) lote de calibración de 30–50 relaciones por el pasante, REVIEW-ONLY.
+
+**Punto de reanudación maestro:** `docs/orquestador/SESSION_RESUME.md`.
+
+Para retomar, NO releer todo este archivo ni todo Issue #2. Leer primero:
+1. `docs/orquestador/SESSION_RESUME.md`
+2. este encabezado
+3. `audit/orchestrator_handoff.json` (campos current_*)
+4. último comentario del orquestador en Issue #2
+
+Últimos cierres formales:
+- TASK-0007: Issue #2 comentario `6035642794`
+- TASK-0008: Issue #2 comentario `6041102746`
+
+Próximo trabajo al recibir UAT: abrir TASK-0009 de triage, sin aplicar fixes en la misma ronda.
+Próximo trabajo al recibir calibración del pasante: medir acuerdo y revisar patrones; cualquier permiso operativo requiere tarea/autorización separada.
+
+---
+
 # Tarea activa
 
 **TASK-0008 — UAT DEL BUSCADOR PARA EL CLIENTE + REVISIÓN TAXONÓMICA DELEGADA** (Issue #2 comentarios
