@@ -193,7 +193,22 @@ Toda corrección de ranking/search debe cerrar con nueva regresión contra la l�
 
 ---
 
-## 6. Cómo debe reanudar ChatGPT
+## 6. Loop autónomo Orquestador ↔ Agente
+
+El protocolo vigente está en `docs/orquestador/AUTONOMOUS_DEV_LOOP.md`.
+
+Regla resumida:
+- el propietario autoriza una tarea/fase una vez;
+- dentro de ese alcance, implementación, pruebas, correcciones, commits, pushes y re-revisiones fluyen
+  entre orquestador y agente sin usar al propietario como mensajero;
+- sólo se vuelve al propietario ante gates críticos (nueva tarea/fase, producción/main, datos
+  destructivos/publicación masiva, secretos/permisos, decisión de negocio/dominio, coste/seguridad/acción
+  externa irreversible);
+- al terminar, el orquestador informa `PASS / CLOSED` y propone la siguiente tarea si corresponde.
+
+---
+
+## 7. Cómo debe reanudar ChatGPT
 
 Cuando se abra este proyecto desde otro dispositivo o desde la app de escritorio:
 
@@ -213,7 +228,7 @@ No releer todo el Issue #2 por defecto.
 
 ---
 
-## 7. Cómo debe reanudar el agente desarrollador
+## 8. Cómo debe reanudar el agente desarrollador
 
 Al iniciar una nueva sesión del agente:
 
@@ -222,22 +237,25 @@ Al iniciar una nueva sesión del agente:
 3. verificar que el working tree esté limpio
 4. leer, en este orden:
    - `docs/orquestador/SESSION_RESUME.md`
+   - `docs/orquestador/AUTONOMOUS_DEV_LOOP.md`
    - `docs/orquestador/current_task.md`
    - `audit/orchestrator_handoff.json`
    - último comentario del orquestador en Issue #2
 5. confirmar el HEAD remoto antes de modificar archivos
 6. no reconstruir decisiones históricas si estos cuatro puntos son consistentes
 7. si existe discrepancia entre documentación y repo/base viva, detenerse y reportarla
-8. al terminar cualquier tarea:
-   - dejar working tree limpio;
-   - commit + push a la rama activa;
+8. si hay una tarea/fase ya autorizada, entrar directamente al loop de `AUTONOMOUS_DEV_LOOP.md`:
+   - implementar/probar/corregir sin pedir autorización por fallos ordinarios;
+   - commit + push;
    - actualizar `current_task.md` y `orchestrator_handoff.json`;
-   - nunca persistir tokens, contraseñas ni claves;
-   - devolver únicamente `READY_FOR_REVIEW / Issue #2 / HEAD <sha>`.
+   - leer directamente la última auditoría del orquestador en Issue #2;
+   - aplicar `CORRECTIONS_REQUIRED` sin que el propietario retransmita mensajes;
+   - detenerse sólo ante un `OWNER_GATE_REQUIRED`, bloqueo externo real o `PASS / CLOSED`;
+   - nunca persistir tokens, contraseñas ni claves.
 
 ---
 
-## 8. Comentarios de gobierno clave
+## 9. Comentarios de gobierno clave
 
 No hace falta leerlos todos al reanudar, pero son las referencias autoritativas:
 
@@ -250,7 +268,7 @@ No hace falta leerlos todos al reanudar, pero son las referencias autoritativas:
 
 ---
 
-## 9. Regla maestra
+## 10. Regla maestra
 
 **No confiar sólo en la memoria de una conversación o de un agente.**
 
