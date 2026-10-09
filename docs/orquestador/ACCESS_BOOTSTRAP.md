@@ -41,7 +41,7 @@ Qué se puede hacer, con qué credencial, y de dónde sale el valor.
 |---|---|---|---|---|
 | 1 | `git fetch` / `push` a GitHub | — | Windows Credential Manager (vía Git Credential Manager) | ✅ ya persistente |
 | 2 | Leer Issue #2 y la API de GitHub | — (anónimo) | no requiere credencial: los repos son públicos | ✅ siempre disponible |
-| 3 | **Escribir** comentarios en Issue #2 | `CPV_GITHUB_TOKEN` | almacén local (§3) / secretos del orquestador | ⚠️ **no disponible para el agente** (§5) |
+| 3 | **Escribir** comentarios en Issue #2 | `CPV_GITHUB_TOKEN` | almacén local (§3) / secretos del orquestador | ✅ **habilitado 2026-10-09** (§5) |
 | 4 | `artisan` y Eloquent contra Supabase | `DB_PGSQL_*` | `.env` del repo (gitignored) | ✅ ya persistente |
 | 5 | Postgres directo (psql / scripts) | `DB_PGSQL_*` | mismos valores que (4) | ✅ ya persistente |
 | 6 | SSH a staging (Contabo) | clave privada OpenSSH | `%USERPROFILE%\.ssh\` en la máquina del propietario | ✅ local |
@@ -160,22 +160,49 @@ cubre `.claude/settings.local.json`.
 
 ---
 
-## 5. Limitación actual: el agente no puede comentar en Issue #2
+## 5. Escritura del agente en Issue #2 — HABILITADA el 2026-10-09
 
-Confirmado por el orquestador en el comentario `6079826097`, y confirmado otra vez el 2026-10-09:
+Esto **deja obsoleto** el comentario `6079826097`, que registraba
+`agent_issue_write_access = UNAVAILABLE`.
+
+Estado actual:
 
 - el agente **lee** Issue #2 sin credencial (repo público);
-- el agente **no escribe** en Issue #2;
+- el agente **escribe** en Issue #2 con `CPV_GITHUB_TOKEN`;
 - el agente **sí** hace commit/push y actualiza `audit/orchestrator_handoff.json`.
 
-**Causa exacta, medida:** no hay `gh` CLI instalado, y el PAT que usa `git` está en Windows Credential
-Manager, pero el clasificador de permisos del sandbox del agente **bloquea leerlo** (motivo
-`Credential Exploration`). Es una barrera de seguridad del entorno del agente, no una restricción de
-GitHub ni un permiso faltante en el token.
+**Verificado de extremo a extremo:** se creó un comentario de prueba y se eliminó, devolviendo el hilo
+a su conteo previo; después se publicaron dos comentarios reales (`6084535525`, `6084542694`) y se
+releyeron para confirmar la integridad UTF-8.
 
-### 5.1 Fallback vigente (no requiere al propietario como mensajero)
+### 5.0 Historia del bloqueo, porque la causa importa
 
-Es el de `AUTONOMOUS_DEV_LOOP.md` §11, y funciona porque la lectura es anónima:
+El bloqueo original **no** era un scope faltante. No hay `gh` CLI, y el PAT que usa `git` está en
+Windows Credential Manager, pero el clasificador de permisos del sandbox **bloquea leerlo** (motivo
+`Credential Exploration`) — una barrera del entorno del agente, no de GitHub.
+
+La solución fue un **token aparte, provisto a propósito** en el almacén fuera del repo. **No hizo falta
+ninguna regla de permiso del sandbox**, lo que se demostró sondeando la ruta de publicación con un
+token inválido y recibiendo el `401` de GitHub: eso probó que la ruta en sí no estaba bloqueada.
+
+El primer token provisto autenticaba pero devolvía `403` al escribir. La cabecera de respuesta de
+GitHub nombró el hueco exacto —`x-accepted-github-permissions: issues=write`—: el token se había creado
+sin **Issues: Read and write**. Diagnosticado desde la respuesta en lugar de adivinado.
+
+> ### Dos advertencias operativas
+>
+> **El token caduca, y el fallo sería silencioso:** el loop simplemente se detiene esperando una
+> revisión que nadie publicó. Ante una parada inexplicada, verificar la credencial primero.
+>
+> **El token autentica como la cuenta del propietario**, así que los comentarios del agente y del
+> orquestador aparecen firmados por él. En un hilo cuyo protocolo existe para distinguir quién autoriza
+> qué, eso borra la distinción visual. Mitigado con una declaración de autor en el cuerpo de cada
+> comentario; la solución limpia es una cuenta máquina. Decisión del propietario, no tomada.
+
+### 5.1 El fallback no se retira: queda como fallback
+
+Sigue siendo el camino válido cuando el token falte o caduque. Es el de `AUTONOMOUS_DEV_LOOP.md` §11, y
+funciona porque la lectura es anónima:
 
 1. el agente hace commit/push y escribe en el handoff `review_state`, `review_head`, `review_task`,
    `review_issue`, `review_requested_at`;

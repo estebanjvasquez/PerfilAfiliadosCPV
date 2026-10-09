@@ -47,8 +47,10 @@
       "credentials": ["CPV_GITHUB_TOKEN"],
       "required_scopes": ["repo or public_repo"],
       "value_location": "local_store_or_orchestrator_secrets",
-      "status": "unavailable_to_agent",
-      "notes": "No gh CLI, and the agent sandbox's permission classifier blocks reading the stored git credential (reason: Credential Exploration). Fallback in AUTONOMOUS_DEV_LOOP.md section 11 is in force."
+      "status": "available",
+      "enabled_at": "2026-10-09",
+      "supersedes_comment": 6079826097,
+      "notes": "Enabled with a separate purpose-built fine-grained PAT in the out-of-repo store; verified end to end. No sandbox permission rule was required. The original blocker was never a missing scope: gh CLI is absent and the sandbox classifier blocks reading the stored git credential (Credential Exploration). The fallback in AUTONOMOUS_DEV_LOOP.md section 11 remains valid for when the token is missing or expired. CAVEATS: the token expires and the failure is silent (the loop stalls waiting for a review nobody posted), and it authenticates as the owner's account so comments appear signed by the owner."
     },
     {
       "id": "database_laravel",

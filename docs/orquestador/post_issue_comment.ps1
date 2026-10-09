@@ -48,7 +48,11 @@ if ((-not $token) -and (-not $WhatIfPreference)) {
     throw 'BLOCKED_NO_GITHUB_WRITE_CREDENTIAL'
 }
 
-$body = Get-Content -Raw -LiteralPath $BodyFile -Encoding UTF8
+# Lectura deterministica: .NET devuelve un String limpio y decodifica UTF-8 explicitamente.
+# NO usar Get-Content -Raw aqui: decora su salida con propiedades PS* (PSPath, PSProvider...), y
+# ConvertTo-Json las expande, enviando {"body":{"value":...,"Length":...}} en lugar de una cadena.
+# GitHub lo rechaza con 422 "Invalid request. For 'properties/body'". Encontrado en vivo 2026-10-09.
+$body = [System.IO.File]::ReadAllText($BodyFile, [System.Text.Encoding]::UTF8)
 
 # Barrido defensivo: este repositorio es PUBLICO, un comentario tambien lo es.
 $secretPatterns = @(
@@ -76,8 +80,15 @@ if (-not $PSCmdlet.ShouldProcess($uri, "Publicar comentario de $($body.Length) c
     return
 }
 
-$payload = @{ body = $body } | ConvertTo-Json -Compress -Depth 3
-$bytes   = [System.Text.Encoding]::UTF8.GetBytes($payload)
+$payload = @{ body = [string]$body } | ConvertTo-Json -Compress -Depth 3
+
+# Guarda contra la regresion descrita arriba: si el cuerpo no se serializo como cadena plana,
+# abortar antes de enviar en lugar de dejar que GitHub devuelva un 422 opaco.
+if ($payload -notmatch '^\{"body":"') {
+    throw "ABORTADO: el cuerpo no se serializo como cadena JSON plana. Payload: $($payload.Substring(0, [Math]::Min(120, $payload.Length)))"
+}
+
+$bytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
 
 $result = Invoke-RestMethod -Method Post -Uri $uri `
     -Headers @{

@@ -2911,8 +2911,15 @@
   "review_requested_at": null,
   "last_orchestrator_comment_id": 6079977242,
   "last_orchestrator_verdict": "TASKS_OPENED",
-  "agent_issue_write_access": "UNAVAILABLE",
-  "agent_issue_write_blocked_reason": "No gh CLI is installed, and the agent sandbox's permission classifier blocks reading the stored git credential (reason: Credential Exploration). This is an agent-environment security barrier, NOT a missing GitHub scope. Enabling it needs both a CPV_GITHUB_TOKEN in the local store and a PowerShell permission rule in Claude Code settings - owner decision, GATE D. See docs/orquestador/ACCESS_BOOTSTRAP.md section 5.",
+  "agent_issue_write_access": "AVAILABLE",
+  "agent_issue_write_enabled_at": "2026-10-09",
+  "agent_issue_write_supersedes_comment": 6079826097,
+  "agent_issue_write_verified_how": "End-to-end probe: a comment was created and then deleted, and the thread returned to its prior count of 68. Then two real comments were posted, 6084535525 and 6084542694, bringing the thread to 70, and both were read back to confirm UTF-8 integrity (no mojibake, section marks and emoji intact).",
+  "agent_issue_write_history": "Originally UNAVAILABLE. The blocker was NOT a missing GitHub scope: gh CLI is absent and the sandbox permission classifier blocks reading the stored git credential (reason: Credential Exploration). Resolved by the owner provisioning a separate purpose-built fine-grained PAT in the out-of-repo store. No sandbox permission rule was needed - proven by probing the posting path with an invalid token and receiving GitHub's own 401, which showed the path itself was unblocked. The first provisioned token authenticated but returned 403; GitHub's response header named the exact gap (x-accepted-github-permissions: issues=write), the token had been created without Issues: Read and write, and the owner corrected it.",
+  "agent_issue_write_caveats": [
+    "The token expires. The failure mode is SILENT: the loop stalls waiting for a review nobody published. Treat an unexplained stall as a credential check first.",
+    "The token authenticates as the owner's own GitHub account, so agent and orchestrator comments appear signed by the owner. Mitigated by an in-body author declaration on every comment; the clean fix is a machine account. Owner decision, not taken."
+  ],
   "agent_issue_read_access": "AVAILABLE_ANONYMOUS",
   "agent_issue_read_note": "Both repositories are PUBLIC, so the agent reads Issue #2 with no credential at all. This is what makes the AUTONOMOUS_DEV_LOOP.md section 11 polling fallback work. If the repo is made private, CPV_GITHUB_TOKEN becomes mandatory for READING too and the fallback breaks until it is provisioned.",
   "continuity_infrastructure": {
@@ -2931,6 +2938,24 @@
       "docs/orquestador/post_issue_comment.ps1"
     ],
     "credential_model": "The repo holds the MAP; each executor holds its own KEYS. Agent values live in %USERPROFILE%\\.cpv\\credentials.env, outside the git tree. Zero secrets in repo, docs, logs or Issue #2.",
+    "shared_knowledge_base": {
+      "branch": "knowledge/project-context",
+      "head": "2d53b0c54e3b80c63533d873bdfb31b8fb7ec4ac",
+      "branched_from": "f5471ac43976122304e26162b6bcddbe2051b33d",
+      "purpose": "A place where the developer agent and the orchestrator each write down what they know, so the loop does not depend on one conversation's memory. Documentation only; not to be merged into a feature branch without owner authorization.",
+      "agent_files": [
+        "docs/knowledge/README.md",
+        "docs/knowledge/AGENT_DOMAIN_KNOWLEDGE.md",
+        "docs/knowledge/AGENT_TASK_HISTORY.md",
+        "docs/knowledge/AGENT_LESSONS_LEARNED.md",
+        "docs/knowledge/AGENT_OPEN_QUESTIONS.md"
+      ],
+      "orchestrator_file_pending": "docs/knowledge/ORCHESTRATOR_KNOWLEDGE.md",
+      "contribution_rules": "Each author owns its own files and never edits the other's. Discrepancies go in ORCHESTRATOR_CORRECTIONS.md rather than overwriting. No force-push or rebase. Fast-forward before writing. Zero secrets. Every non-trivial claim carries a confidence mark.",
+      "requested_from_orchestrator": "Issue #2 comment 6084542694"
+    },
+    "issue_comments_posted_this_round": [6084535525, 6084542694],
+    "post_issue_comment_bug_fixed": "post_issue_comment.ps1 sent {\"body\":{\"value\":...,\"Length\":...}} instead of a plain JSON string and GitHub rejected it with 422, because Get-Content -Raw decorates its output with PS* properties and ConvertTo-Json -Depth 3 expanded them. Fixed by reading with [System.IO.File]::ReadAllText with explicit UTF-8, which also removes an encoding ambiguity, plus a guard that aborts if the payload is not a plain string.",
     "loader_verified": "bootstrap_access.ps1 executed successfully: anonymous GitHub API PASS, staging HTTP 200, Worker HTTP 200, PATH and .env detection working, no value printed.",
     "findings": {
       "repositories_are_public": {
