@@ -63,7 +63,9 @@ Leyenda: ✅ funciona · ⚠️ limitación conocida · ⬜ no configurado, se c
   `curl.exe -s "https://api.github.com/repos/estebanjvasquez/PerfilAfiliadosCPV/issues/2/comments?per_page=10&page=<n>"`.
   Esto es lo que hace funcionar el *polling* de revisiones de `AUTONOMOUS_DEV_LOOP.md` §11 **sin
   ninguna credencial**.
-- **(3) Escritura en Issue #2.** Requiere un PAT con scope `repo` (o `public_repo`). Ver §5.
+- **(3) Escritura en Issue #2.** El token en uso es **fine-grained**, así que lo que la gobierna es el
+  permiso **Issues: Read and write** sobre `PerfilAfiliadosCPV`, no un scope. Un PAT clásico usaría en
+  su lugar el scope `public_repo`. Tabla comparativa y diagnóstico en §5.2.
 - **(4)/(5) Base de datos.** `.env` ya existe y está en `.gitignore`. **No hay base local separada:
   estos valores apuntan a la misma Supabase que usa staging** (ver `PROJECT_KNOWLEDGE.md` §3).
 - **(8) `DEBUG_TOKEN`.** Por diseño el único plaintext está en el almacén de Cloudflare y en el
@@ -211,16 +213,34 @@ funciona porque la lectura es anónima:
 
 El canal de ida es el repositorio; el de vuelta es Issue #2. El loop cierra.
 
-### 5.2 Si se quiere habilitar la escritura directa del agente
+### 5.2 Cómo se habilita (y qué NO hace falta)
 
-Dos piezas, ambas decisión del propietario:
+**Hace falta una sola pieza: la credencial.** Añadir `CPV_GITHUB_TOKEN` al almacén local (§3). Que sea
+un **token distinto** del de `git push`, con el permiso mínimo y caducidad corta.
 
-1. **La credencial:** añadir `CPV_GITHUB_TOKEN` al almacén local (§3), con un PAT de scope `repo`
-   (o `public_repo`, suficiente para comentar en un repo público). Conviene que sea un **token
-   distinto** del de `git push`, con el mínimo scope y caducidad corta.
-2. **El permiso del sandbox:** una regla de permiso para `PowerShell` en los *settings* de Claude Code,
-   porque sin ella el agente no puede leer ni su propia variable de entorno de token mediante los
-   comandos que el clasificador marca como exploración de credenciales.
+> **No hace falta ninguna regla de permiso del sandbox.** Una versión anterior de esta sección exigía
+> una regla para `PowerShell` en los *settings* de Claude Code. **Era incorrecto**, y contradecía el
+> resultado medido de §5.0: la ruta de publicación se sondeó con un token inválido y devolvió el `401`
+> de GitHub, lo que prueba que el sandbox no la bloquea. Lo que el clasificador bloquea es **leer
+> credenciales almacenadas en otro sitio** (`git credential fill`, `~/.ssh`), no usar una variable de
+> entorno provista a propósito.
+
+#### Qué permiso pedir, según el tipo de token
+
+Los dos tipos de PAT de GitHub usan modelos distintos, y confundirlos es exactamente lo que produjo el
+`403` de §5.0:
+
+| Tipo | Qué se configura | Valor para comentar en Issue #2 |
+|---|---|---|
+| **Fine-grained** (`github_pat_…`) — **el provisto** | *permisos por recurso*, acotados a repos concretos | *Repository access* → sólo `PerfilAfiliadosCPV`; *Permissions* → **Issues: Read and write** |
+| **Classic** (`ghp_…`) | *scopes* globales sobre todos los repos del usuario | scope `public_repo` (basta en repo público); `repo` es más amplio de lo necesario |
+
+Un token fine-grained **no tiene scopes**: pedirle `repo` o `public_repo` no significa nada. Y un
+scope de PAT clásico no se traduce a *Issues*. El token en uso es **fine-grained**, así que lo que
+gobierna la escritura es el permiso **Issues: Read and write** y nada más.
+
+**Cómo diagnosticar un rechazo** en lugar de adivinar: GitHub nombra el hueco exacto en la cabecera de
+respuesta. Un `403` al comentar devuelve `x-accepted-github-permissions: issues=write`. Leerla.
 
 Con ambas, publicar un comentario es un solo comando, usando el script ya versionado
 [`post_issue_comment.ps1`](post_issue_comment.ps1):
@@ -264,9 +284,39 @@ tenga que parsear este Markdown.
    campos `current_*` y `review_*` de `audit/orchestrator_handoff.json` →
    `PROJECT_KNOWLEDGE.md` (sólo si necesita conocimiento técnico).
 3. `GET /repos/{CPV_REPO}/issues/2/comments` (última página) → último veredicto publicado.
-4. Comparar `review_head` del handoff contra el HEAD remoto:
-   - distintos y `review_state = READY_FOR_REVIEW` → **hay trabajo que auditar**;
-   - iguales y ya existe veredicto para ese HEAD → nada que hacer.
+4. **Decidir si hay revisión pendiente.** No basta con comparar `review_head` contra el HEAD remoto:
+   **lo que determina que haya trabajo es la ausencia de un veredicto válido**, no que los SHA
+   difieran. La condición correcta es la conjunción de tres cosas:
+
+   - `review_task` corresponde a la TASK activa y la rama está dentro del alcance autorizado;
+   - existe un `review_head` con `review_state = READY_FOR_REVIEW`;
+   - **no** existe en Issue #2 un veredicto válido para ese `review_head`, posterior a
+     `review_requested_at`.
+
+   Un veredicto es válido sólo si es posterior a `review_requested_at`, menciona la TASK activa,
+   corresponde inequívocamente a ese `review_head`, y es uno de los cuatro del paso 6.
+
+   | `review_head` vs HEAD remoto | ¿Veredicto válido? | Acción |
+   |---|---|---|
+   | iguales | sí | nada que hacer |
+   | **iguales** | **no** | **auditar ese HEAD** ← el caso que esta sección omitía |
+   | distintos | — | hay un HEAD posterior: ir al paso 4.1 |
+
+   > **Por qué importa el caso resaltado:** el agente empuja y marca `READY_FOR_REVIEW` sin cambiar
+   > nada más. Entonces `review_head` **es** el HEAD remoto y, con la regla anterior, la ronda quedaba
+   > clasificada como "nada que hacer" y el loop se detenía en silencio esperando indefinidamente.
+
+4.1 **Si el HEAD remoto es posterior a `review_head`, clasificar el delta antes de invalidar nada.**
+   Esto es la regla de continuidad de gates de `AUTONOMOUS_DEV_LOOP.md` §5, y se aplica aquí:
+
+   - delta **sólo documental** (`docs/**`, `audit/**`, `**.md`) → **no invalida** evidencia de runtime;
+     la evidencia previa se hereda como `INHERITED / VALID`;
+   - delta que **toca runtime** → puede invalidar tests relevantes: `INVALIDATED / MUST RERUN`;
+   - **mutación de datos** → puede invalidar regresiones **aunque el código no cambie**.
+
+   Auditar el HEAD remoto más reciente, nunca uno ya superado, y **declarar** cómo se clasificó la
+   evidencia anterior en lugar de reiniciar gates en silencio.
+
 5. Auditar leyendo **código real** en ese HEAD, no el resumen del agente.
 6. Publicar en Issue #2 con uno de los veredictos: `PASS / CLOSED`, `CORRECTIONS_REQUIRED`,
    `BLOCKED_EXTERNAL`, `OWNER_GATE_REQUIRED`.

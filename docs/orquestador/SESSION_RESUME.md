@@ -131,12 +131,18 @@ Conector confirmado con lectura y escritura:
 - Worker: `estebanjvasquez/perfilafiliados-mcp`
 - hilo de gobierno: **Issue #2** del repo principal
 
-Loop del desarrollador:
+Loop del desarrollador (protocolo completo en `AUTONOMOUS_DEV_LOOP.md`):
 1. agente trabaja;
-2. devuelve `READY_FOR_REVIEW / Issue #2 / HEAD <sha>`;
+2. agente hace commit/push y publica `READY_FOR_REVIEW / Issue #2 / HEAD <sha>`;
 3. orquestador lee código/docs reales en ese HEAD;
 4. orquestador publica auditoría completa directamente en Issue #2;
-5. usuario pasa al agente sólo el comentario de revisión y pide nuevo HEAD.
+5. **el agente lee esa auditoría directamente de Issue #2** y, si es `CORRECTIONS_REQUIRED`, aplica las
+   correcciones y devuelve un HEAD nuevo.
+
+**El propietario no retransmite comentarios.** Interviene sólo ante un gate A–F, un bloqueo externo que
+requiera su acción, o un `PASS / CLOSED`. Desde el 2026-10-09 el agente también **escribe** en Issue #2
+(`CPV_GITHUB_TOKEN`), así que el loop cierra en ambas direcciones; si ese token falta o caduca, el
+fallback es `AUTONOMOUS_DEV_LOOP.md` §11, donde la señal de ida es el handoff más el HEAD remoto.
 
 ### Supabase
 
