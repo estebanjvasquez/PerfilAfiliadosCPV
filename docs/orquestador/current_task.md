@@ -6,6 +6,8 @@
 
 **Punto de reanudación maestro:** `docs/orquestador/SESSION_RESUME.md`.
 
+**Protocolo de desarrollo vigente:** `docs/orquestador/AUTONOMOUS_DEV_LOOP.md`. Una vez autorizada una tarea/fase, desarrollo, pruebas y correcciones iteran directamente entre orquestador y agente; el propietario interviene sólo ante gates críticos o para abrir una nueva tarea/fase.
+
 Para retomar, NO releer todo este archivo ni todo Issue #2. Leer primero:
 1. `docs/orquestador/SESSION_RESUME.md`
 2. este encabezado
