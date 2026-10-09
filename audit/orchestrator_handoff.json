@@ -2904,13 +2904,14 @@
       "COST_SECURITY_OR_IRREVERSIBLE_EXTERNAL_ACTION"
     ]
   },
-  "review_state": "READY_FOR_REVIEW",
+  "review_state": "WAITING_ORCHESTRATOR_REVIEW",
+  "review_state_note": "Set per AUTONOMOUS_DEV_LOOP.md section 11 after 60 minutes of polling Issue #2 (last checked 2026-10-09T12:56Z) with no review for review_head. Waiting is not an owner gate; the reviewable code is still review_head.",
   "review_task": "TASK-0010A",
   "review_head": "badce535d60a88e94a63896827dcd5d54b1e738b",
   "review_head_note": "review_head is the TASK-0010A implementation commit; a separate small handoff/docs commit (this file + docs/orquestador/current_task.md) sits on top of it as the branch tip of feature/task-0010a-category-request.",
   "review_issue": 2,
   "review_requested_at": "2026-10-09T11:59:40Z",
-  "last_orchestrator_comment_id": 6079977242,
+  "last_orchestrator_comment_id": 6080004466,
   "last_orchestrator_verdict": "TASKS_OPENED",
   "agent_issue_write_access": "UNAVAILABLE",
   "agent_review_polling_policy": {
