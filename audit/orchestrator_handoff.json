@@ -2886,8 +2886,22 @@
   },
   "resume_read_order": [
     "docs/orquestador/SESSION_RESUME.md",
+    "docs/orquestador/AUTONOMOUS_DEV_LOOP.md",
     "docs/orquestador/current_task.md",
     "audit/orchestrator_handoff.json current_* fields",
     "latest orchestrator comment in Issue #2"
-  ]
+  ],
+  "development_loop_protocol": "docs/orquestador/AUTONOMOUS_DEV_LOOP.md",
+  "development_loop_mode": "AUTONOMOUS_WITH_OWNER_GATES",
+  "owner_intervention_policy": {
+    "ordinary_dev_test_fix_review_cycles": "NO_OWNER_INTERVENTION",
+    "owner_required_for": [
+      "NEW_TASK_OR_PHASE_OR_MATERIAL_SCOPE_EXPANSION",
+      "PRODUCTION_OR_MAIN_OR_PUBLIC_TRAFFIC",
+      "DESTRUCTIVE_OR_BROAD_DATA_MUTATION_OR_BULK_PUBLICATION",
+      "SECRETS_CREDENTIALS_OR_PRIVILEGE_CHANGES",
+      "BUSINESS_OR_DOMAIN_DECISION",
+      "COST_SECURITY_OR_IRREVERSIBLE_EXTERNAL_ACTION"
+    ]
+  }
 }
