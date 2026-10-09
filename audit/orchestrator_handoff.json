@@ -2903,5 +2903,19 @@
       "BUSINESS_OR_DOMAIN_DECISION",
       "COST_SECURITY_OR_IRREVERSIBLE_EXTERNAL_ACTION"
     ]
+  },
+  "review_state": "PAUSED_NO_ACTIVE_TASK",
+  "review_task": null,
+  "review_head": null,
+  "review_issue": 2,
+  "review_requested_at": null,
+  "last_orchestrator_comment_id": 6079730982,
+  "last_orchestrator_verdict": "PROCESS_UPDATE",
+  "agent_issue_write_access": "UNAVAILABLE",
+  "agent_review_polling_policy": {
+    "first_20_minutes": "EVERY_2_MINUTES",
+    "until_60_minutes": "EVERY_5_MINUTES",
+    "after_60_minutes": "SET_WAITING_ORCHESTRATOR_REVIEW_AND_STOP_ACTIVE_POLLING",
+    "owner_gate_on_wait": false
   }
 }
