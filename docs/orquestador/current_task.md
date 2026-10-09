@@ -1,3 +1,33 @@
+# TASK-0010 — DOS SUBTAREAS PARALELAS AUTORIZADAS
+
+**Autorización del propietario:** Issue #2 comentario `6079956985`.  
+**Protocolo:** `docs/orquestador/AUTONOMOUS_DEV_LOOP.md`.  
+**Estado:** ACTIVE / PARALLEL DEVELOPMENT. No se espera feedback del cliente para estas dos mejoras.
+
+## TASK-0010A — Solicitud de revisión/creación de categoría
+- Contrato: Issue #2 comentario `6079967780`
+- Rama: `feature/task-0010a-category-request`
+- Objetivo: si el afiliado no encuentra una Categoría CPV adecuada, registrar una solicitud gobernada para revisión de la Cámara, con justificación, contexto de empresa/usuario, persistencia y email al responsable configurable.
+- No crea ni publica categorías automáticamente.
+
+## TASK-0010B — Manual de usuario en línea
+- Contrato: Issue #2 comentario `6079977242`
+- Rama: `feature/task-0010b-online-manual`
+- Objetivo: manual autenticado dentro de Filament, actualizado al sistema actual, con énfasis en la nueva taxonomía, selección de categorías, beneficios y flujo de solicitud de revisión.
+
+## Paralelización e integración
+- ambas ramas parten del mismo checkpoint coordinado;
+- se desarrollan y revisan independientemente;
+- ninguna rama de subtarea despliega por sí sola;
+- cuando ambas estén PASS, se integran en `feature/upgrade-filament-v3`;
+- se ejecutan tests de integración/regresión pertinentes;
+- el build integrado puede desplegarse a **staging** para verificación del propietario;
+- producción/main siguen fuera de alcance.
+
+El propietario no interviene en rondas ordinarias de desarrollo/pruebas/correcciones. Sólo ante `OWNER_GATE_REQUIRED`, bloqueo externo que requiera su acción, o cuando el integrado esté listo para su verificación.
+
+---
+
 # CHECKPOINT ACTIVO — ESPERANDO FEEDBACK EXTERNO
 
 **Fecha:** 2026-10-08  
