@@ -245,3 +245,76 @@ autorización sólo porque cambió la sesión o el dispositivo.
 
 **Autorización al inicio de la tarea/fase + gates críticos explícitos. Todo lo demás fluye entre
 orquestador y agente hasta PASS.**
+
+
+---
+
+## 11. Polling de revisión cuando el agente no puede comentar
+
+Si el agente de desarrollo no tiene credencial para escribir en Issue #2, el loop sigue siendo autónomo
+usando dos superficies:
+
+1. **Señal de salida del agente:** `audit/orchestrator_handoff.json` + nuevo HEAD remoto.
+2. **Señal de vuelta del orquestador:** comentario en Issue #2 que cite la TASK y el HEAD revisado.
+
+### Después de cada push
+
+El agente debe:
+1. actualizar el handoff con:
+   - `review_state = "READY_FOR_REVIEW"`
+   - `review_head = "<exact-sha>"`
+   - `review_task = "TASK-XXXX"`
+   - `review_issue = 2`
+   - `review_requested_at = "<UTC ISO-8601>"`
+2. hacer commit + push;
+3. confirmar que `origin/feature/upgrade-filament-v3` apunta al HEAD esperado;
+4. consultar Issue #2 periódicamente hasta encontrar una revisión del orquestador para ese HEAD.
+
+### Cadencia recomendada de polling
+
+Para no depender del propietario ni saturar GitHub:
+- cada **2 minutos** durante los primeros **20 minutos**;
+- luego cada **5 minutos** hasta completar **60 minutos**;
+- después, si todavía no existe revisión, dejar:
+  `review_state = "WAITING_ORCHESTRATOR_REVIEW"`
+  y detener el proceso activo sin pedir intervención al propietario.
+
+La espera de una revisión NO es un `OWNER_GATE_REQUIRED`.
+
+El monitor automático del orquestador actúa como respaldo y revisa GitHub periódicamente. Cuando el
+agente se reactive, su primer paso es consultar Issue #2 antes de pedir instrucciones.
+
+### Cómo reconocer la revisión correcta
+
+No basta con "el último comentario". El agente debe aceptar una revisión sólo si:
+- el comentario es posterior a `review_requested_at`;
+- menciona la TASK activa;
+- menciona o corresponde inequívocamente a `review_head`;
+- el veredicto es uno de:
+  - `PASS / CLOSED`
+  - `CORRECTIONS_REQUIRED`
+  - `BLOCKED_EXTERNAL`
+  - `OWNER_GATE_REQUIRED`.
+
+Si aparece `CORRECTIONS_REQUIRED`, el agente entra directamente en la siguiente ronda.
+
+---
+
+## 12. Campos de handoff para el loop autónomo
+
+Durante una TASK activa, `audit/orchestrator_handoff.json` debe mantener como mínimo:
+
+```json
+{
+  "review_state": "IN_PROGRESS | READY_FOR_REVIEW | WAITING_ORCHESTRATOR_REVIEW | CORRECTIONS_REQUIRED | PASS_CLOSED | OWNER_GATE_REQUIRED | BLOCKED_EXTERNAL",
+  "review_task": "TASK-XXXX",
+  "review_head": "<sha>",
+  "review_issue": 2,
+  "review_requested_at": "<UTC ISO-8601>",
+  "last_orchestrator_comment_id": "<id-or-null>",
+  "last_orchestrator_verdict": "<verdict-or-null>"
+}
+```
+
+Estos campos son de coordinación, no sustituyen el estado funcional de la tarea.
+
