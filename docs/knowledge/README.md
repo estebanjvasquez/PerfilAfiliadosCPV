@@ -15,6 +15,12 @@ versionado se puede leer en un commit exacto, comparar entre versiones y corregi
 Esta rama es **documentación pura**. No contiene código, no se despliega, y no está pensada para
 mezclarse con una rama de feature.
 
+**Estado:** ambos autores han contribuido. La rama completó su primera vuelta del loop el 2026-10-09:
+el agente escribió sus cuatro archivos, el orquestador aportó el suyo y publicó la revisión
+`6084707259` con `CORRECTIONS_REQUIRED`, y el agente aplicó las correcciones **sin que el propietario
+retransmitiera nada**. Las reglas de §2 se respetaron en ambos sentidos: ninguno editó archivos del
+otro, y las discrepancias quedaron registradas en lugar de sobrescritas.
+
 ---
 
 ## 2. Reglas de contribución — importantes
@@ -55,8 +61,8 @@ Esta rama la escriben **dos autores distintos y asíncronos**. Sin reglas, se pi
 
 | Archivo | Contenido |
 |---|---|
-| [`ORCHESTRATOR_KNOWLEDGE.md`](ORCHESTRATOR_KNOWLEDGE.md) | **plantilla pendiente de rellenar** — estructura requerida dentro del archivo |
-| `ORCHESTRATOR_CORRECTIONS.md` | (crear si hace falta) discrepancias encontradas en los `AGENT_*.md` |
+| [`ORCHESTRATOR_KNOWLEDGE.md`](ORCHESTRATOR_KNOWLEDGE.md) | **completado** en `9744b7a`: contexto de negocio y origen del problema, decisiones del propietario, criterio de auditoría y clasificación de evidencia, roadmap y su fundamento, responsabilidades, y respuestas a las incógnitas abiertas **como recomendaciones, no como decisiones** |
+| [`ORCHESTRATOR_CORRECTIONS.md`](ORCHESTRATOR_CORRECTIONS.md) | discrepancias encontradas en documentación del agente. Registra C1–C4 de la revisión `6084707259` |
 
 ### Referencia técnica, en la rama principal
 
