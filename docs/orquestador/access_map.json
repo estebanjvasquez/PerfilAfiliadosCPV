@@ -1,0 +1,164 @@
+{
+  "schema": "cpv.access_map/1.0",
+  "generated_at": "2026-10-09",
+  "contains_secrets": false,
+  "warning": "Both project repositories are PUBLIC. This file carries credential NAMES and locations only. Never add a value.",
+  "project": {
+    "name": "PerfilAfiliadosCPV / CIRA / Taxonomia CPV",
+    "main_repo": "estebanjvasquez/PerfilAfiliadosCPV",
+    "main_repo_visibility": "public",
+    "main_repo_default_branch": "main",
+    "active_branch": "feature/upgrade-filament-v3",
+    "worker_repo": "estebanjvasquez/perfilafiliados-mcp",
+    "worker_repo_visibility": "public",
+    "worker_repo_default_branch": "master",
+    "governance_issue": 2,
+    "governance_issue_title": "CPV - Development Orchestration & Review"
+  },
+  "read_order_on_resume": [
+    "docs/orquestador/SESSION_RESUME.md",
+    "docs/orquestador/AUTONOMOUS_DEV_LOOP.md",
+    "docs/orquestador/current_task.md",
+    "audit/orchestrator_handoff.json (current_* and review_* fields)",
+    "latest orchestrator comment in Issue #2",
+    "docs/orquestador/PROJECT_KNOWLEDGE.md",
+    "docs/orquestador/ACCESS_BOOTSTRAP.md"
+  ],
+  "capabilities": [
+    {
+      "id": "github_git_push",
+      "description": "git fetch/push to the authorized branch",
+      "credentials": [],
+      "value_location": "windows_credential_manager",
+      "status": "available",
+      "notes": "Stored PAT lacks the 'workflow' scope: any push touching .github/workflows/** is rejected. Widening it is GATE D."
+    },
+    {
+      "id": "github_api_read",
+      "description": "Read Issue #2 comments, branches, commits",
+      "credentials": [],
+      "value_location": "none_required",
+      "status": "available",
+      "notes": "Anonymous REST works because both repos are public. This is what makes the agent's review polling work with zero credentials. It STOPS working if the repo is made private."
+    },
+    {
+      "id": "github_api_write",
+      "description": "Post comments to Issue #2",
+      "credentials": ["CPV_GITHUB_TOKEN"],
+      "required_scopes": ["repo or public_repo"],
+      "value_location": "local_store_or_orchestrator_secrets",
+      "status": "unavailable_to_agent",
+      "notes": "No gh CLI, and the agent sandbox's permission classifier blocks reading the stored git credential (reason: Credential Exploration). Fallback in AUTONOMOUS_DEV_LOOP.md section 11 is in force."
+    },
+    {
+      "id": "database_laravel",
+      "description": "artisan / Eloquent against Supabase PostgreSQL",
+      "credentials": [
+        "DB_CONNECTION",
+        "DB_PGSQL_HOST",
+        "DB_PGSQL_PORT",
+        "DB_PGSQL_DATABASE",
+        "DB_PGSQL_USERNAME",
+        "DB_PGSQL_PASSWORD",
+        "DB_PGSQL_SSLMODE"
+      ],
+      "value_location": "repo_dotenv_gitignored",
+      "status": "available",
+      "notes": "Connection name is 'pgsql' in config/database.php. .env.example is STALE (describes MySQL). CRITICAL: local dev and staging share ONE Supabase database, so any local write mutates shared real data."
+    },
+    {
+      "id": "staging_ssh",
+      "description": "SSH into the Contabo staging VPS",
+      "credentials": ["openssh_private_key"],
+      "value_location": "user_profile_ssh_directory",
+      "status": "owner_local_only"
+    },
+    {
+      "id": "staging_deploy",
+      "description": "GitHub Actions deploy to staging",
+      "credentials": ["CONTABO_HOST", "CONTABO_USER", "CONTABO_SSH_KEY"],
+      "value_location": "github_repository_secrets",
+      "status": "available",
+      "notes": "Workflow .github/workflows/deploy-contabo.yml. Triggers on push to feature/upgrade-filament-v3 with paths-ignore docs/**, audit/**, **.md (all-or-nothing over the whole push), plus workflow_dispatch."
+    },
+    {
+      "id": "worker_debug_search",
+      "description": "POST /debug-search and the frozen 32-query regression suite",
+      "credentials": ["DEBUG_TOKEN"],
+      "value_location": "cloudflare_worker_secret",
+      "status": "not_recoverable",
+      "notes": "By design the plaintext exists only in Cloudflare's secret store and in the sessionStorage of the admin browser that typed /debug-on <key>. Reading it back through a metadata-only API is explicitly forbidden. Rotation is GATE D."
+    },
+    {
+      "id": "worker_deploy",
+      "description": "wrangler deploy / wrangler secret put",
+      "credentials": ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"],
+      "value_location": "local_store",
+      "status": "not_configured"
+    },
+    {
+      "id": "supabase_management",
+      "description": "Supabase management API / MCP connector, read-only auditing",
+      "credentials": ["SUPABASE_ACCESS_TOKEN"],
+      "value_location": "local_store",
+      "status": "optional"
+    },
+    {
+      "id": "n8n_cira",
+      "description": "n8n workflow backing the CIRA UAT chat page",
+      "credentials": [],
+      "value_location": "owner_managed",
+      "status": "out_of_agent_scope",
+      "notes": "Pre-flight check before any UAT session: if the workflow is stopped, every query fails identically and a whole UAT looks like a catastrophic search failure."
+    }
+  ],
+  "local_store": {
+    "path": "%USERPROFILE%\\.cpv\\credentials.env",
+    "format": "NAME=value, one per line, # comments",
+    "template": "docs/orquestador/credentials.env.example",
+    "loader": "docs/orquestador/bootstrap_access.ps1",
+    "comment_poster": "docs/orquestador/post_issue_comment.ps1",
+    "rationale": "Outside the git tree so it cannot be committed, stashed or diffed by accident. The repos are public.",
+    "per_command_usage": ". C:\\Proyectos\\GitHub\\PerfilAfiliadosCPV\\docs\\orquestador\\bootstrap_access.ps1 -Quiet; <command>",
+    "why_per_command": "PowerShell 5.1 does not persist state between agent tool calls, so exporting once per session does not work."
+  },
+  "orchestrator_env": {
+    "CPV_GITHUB_TOKEN": "required - post audits and verdicts to Issue #2",
+    "CPV_REPO": "estebanjvasquez/PerfilAfiliadosCPV",
+    "CPV_WORKER_REPO": "estebanjvasquez/perfilafiliados-mcp",
+    "CPV_BRANCH": "feature/upgrade-filament-v3",
+    "CPV_ISSUE": "2",
+    "SUPABASE_ACCESS_TOKEN": "optional - read-only live data verification",
+    "DB_PGSQL_*": "optional - read-only direct count verification"
+  },
+  "verdicts": ["PASS_CLOSED", "CORRECTIONS_REQUIRED", "BLOCKED_EXTERNAL", "OWNER_GATE_REQUIRED"],
+  "review_states": [
+    "IN_PROGRESS",
+    "READY_FOR_REVIEW",
+    "WAITING_ORCHESTRATOR_REVIEW",
+    "CORRECTIONS_REQUIRED",
+    "PASS_CLOSED",
+    "OWNER_GATE_REQUIRED",
+    "BLOCKED_EXTERNAL"
+  ],
+  "owner_gates": {
+    "A": "New task, phase, or material scope expansion",
+    "B": "Production, main branch, or real public traffic",
+    "C": "Destructive data or mass publication",
+    "D": "Credentials, secrets, privileges",
+    "E": "Human business or domain decision",
+    "F": "Cost, contract, security, irreversible external action"
+  },
+  "hard_rules": [
+    "Never write a secret value into the repo, docs, logs or Issue #2 - all are public",
+    "Never print, echo, commit or expose a token value; never ask for one to be pasted into chat",
+    "Never read back a Cloudflare Worker secret through a metadata-only API",
+    "Never touch audit/regression_baseline_2026-09-23.json",
+    "Never touch the unrelated Hyperdrive config talento-cpv-db",
+    "No merge to main, no production deploy, no further taxonomy APPLY/replay without explicit owner authorization",
+    "No mass approval of TERM->CPV relations",
+    "No ranking or weight changes to improve an isolated query",
+    "Every ranking or search correction must close with a fresh regression run against the frozen baseline",
+    "Do not guess ambiguous decisions - report them"
+  ]
+}

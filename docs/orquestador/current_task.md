@@ -28,6 +28,38 @@ El propietario no interviene en rondas ordinarias de desarrollo/pruebas/correcci
 
 ---
 
+# INFRAESTRUCTURA DE CONTINUIDAD — CONOCIMIENTO Y ACCESOS
+
+**Fecha:** 2026-10-09. **Origen:** pedido directo del propietario (no una TASK del orquestador).
+**Alcance ejecutado:** sólo documentación. Cero cambios de runtime, BD, taxonomía, secretos o deploy.
+
+Objetivo: que el orquestador autónomo y cada sesión nueva del agente adquieran conocimiento y accesos
+sin depender de una conversación de chat viva.
+
+Artefactos nuevos:
+
+| Archivo | Contenido |
+|---|---|
+| `docs/orquestador/PROJECT_KNOWLEDGE.md` | conocimiento técnico: arquitectura, repos, BD, contrato C2, Worker, staging, limitaciones del entorno |
+| `docs/orquestador/ACCESS_BOOTSTRAP.md` | inventario de accesos por **nombre**, dónde vive cada valor, cómo se verifica, qué gate lo gobierna |
+| `docs/orquestador/access_map.json` | el mismo mapa, legible por máquina, para el orquestador autónomo |
+| `docs/orquestador/credentials.env.example` | plantilla del almacén local, **sólo nombres, cero valores** |
+| `docs/orquestador/bootstrap_access.ps1` | cargador por comando: arregla `PATH`, carga el almacén, nunca imprime valores |
+| `docs/orquestador/post_issue_comment.ps1` | publica un comentario en Issue #2 desde un archivo, con barrido de secretos previo; utilizable en cuanto exista `CPV_GITHUB_TOKEN` |
+
+Dos hechos que cambian supuestos previos y deben leerse antes de operar:
+
+1. **Los dos repositorios son PÚBLICOS** (verificado vía API de GitHub). Issue #2, `docs/` y `audit/`
+   son legibles por cualquiera. Recomendación de reducir esa exposición en `ACCESS_BOOTSTRAP.md` §7,
+   pendiente de decisión del propietario (GATE F). Ningún secreto está expuesto.
+2. **El agente sigue sin poder escribir en Issue #2, y ahora se sabe la causa exacta:** no hay `gh`
+   CLI y el clasificador de permisos del sandbox bloquea leer la credencial almacenada
+   (`Credential Exploration`). No es un scope faltante del token. El fallback de
+   `AUTONOMOUS_DEV_LOOP.md` §11 sigue siendo el canal válido, y funciona sin credencial porque la
+   lectura de un repo público es anónima.
+
+---
+
 # CHECKPOINT ACTIVO — ESPERANDO FEEDBACK EXTERNO
 
 **Fecha:** 2026-10-08  

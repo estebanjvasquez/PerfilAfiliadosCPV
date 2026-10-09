@@ -2912,6 +2912,42 @@
   "last_orchestrator_comment_id": 6079977242,
   "last_orchestrator_verdict": "TASKS_OPENED",
   "agent_issue_write_access": "UNAVAILABLE",
+  "agent_issue_write_blocked_reason": "No gh CLI is installed, and the agent sandbox's permission classifier blocks reading the stored git credential (reason: Credential Exploration). This is an agent-environment security barrier, NOT a missing GitHub scope. Enabling it needs both a CPV_GITHUB_TOKEN in the local store and a PowerShell permission rule in Claude Code settings - owner decision, GATE D. See docs/orquestador/ACCESS_BOOTSTRAP.md section 5.",
+  "agent_issue_read_access": "AVAILABLE_ANONYMOUS",
+  "agent_issue_read_note": "Both repositories are PUBLIC, so the agent reads Issue #2 with no credential at all. This is what makes the AUTONOMOUS_DEV_LOOP.md section 11 polling fallback work. If the repo is made private, CPV_GITHUB_TOKEN becomes mandatory for READING too and the fallback breaks until it is provisioned.",
+  "continuity_infrastructure": {
+    "recorded_at": "2026-10-09",
+    "origin": "Direct owner request in the developer-agent session, not an orchestrator TASK",
+    "goal": "Let the autonomous orchestrator and every new agent session acquire project knowledge and accesses without a live chat conversation",
+    "scope_executed": "DOCUMENTATION_ONLY",
+    "runtime_database_taxonomy_secret_changes": "NONE",
+    "deploy_triggered": false,
+    "artifacts": [
+      "docs/orquestador/PROJECT_KNOWLEDGE.md",
+      "docs/orquestador/ACCESS_BOOTSTRAP.md",
+      "docs/orquestador/access_map.json",
+      "docs/orquestador/credentials.env.example",
+      "docs/orquestador/bootstrap_access.ps1",
+      "docs/orquestador/post_issue_comment.ps1"
+    ],
+    "credential_model": "The repo holds the MAP; each executor holds its own KEYS. Agent values live in %USERPROFILE%\\.cpv\\credentials.env, outside the git tree. Zero secrets in repo, docs, logs or Issue #2.",
+    "loader_verified": "bootstrap_access.ps1 executed successfully: anonymous GitHub API PASS, staging HTTP 200, Worker HTTP 200, PATH and .env detection working, no value printed.",
+    "findings": {
+      "repositories_are_public": {
+        "verified_how": "GitHub REST API, 2026-10-09: \"visibility\": \"public\" on both estebanjvasquez/PerfilAfiliadosCPV and estebanjvasquez/perfilafiliados-mcp",
+        "impact": "Issue #2, docs/** and audit/** are world-readable, including VPS IP, staging URLs, deploy path, Supabase project id, Hyperdrive id and Actions secret NAMES",
+        "secrets_exposed": "NONE - verified by pattern sweeps that returned only false positives (prose lines enumerating the search patterns themselves)",
+        "recommendation": "Make the main repository private, or move infrastructure identifiers out of docs/. Owner decision, GATE F. See ACCESS_BOOTSTRAP.md section 7.",
+        "status": "REPORTED_NOT_ACTED"
+      },
+      "root_gitignore_change_deferred": {
+        "what": "Six credential-ignore lines belong in the root .gitignore so they travel to future clones",
+        "why_deferred": ".gitignore does not match the workflow paths-ignore (docs/**, audit/**, **.md), and paths-ignore is all-or-nothing over the whole push, so committing it alone would trigger a full staging rebuild and redeploy with zero runtime change",
+        "mitigation_applied": "Rules written to .git/info/exclude, which also covers the wt-task-0010a and wt-task-0010b worktrees because they share the same .git directory",
+        "action": "Fold the six lines into the next commit that already touches runtime, e.g. the TASK-0010 integration"
+      }
+    }
+  },
   "agent_review_polling_policy": {
     "first_20_minutes": "EVERY_2_MINUTES",
     "until_60_minutes": "EVERY_5_MINUTES",
