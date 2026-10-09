@@ -9,6 +9,16 @@
 - Rama: `feature/task-0010a-category-request`
 - Objetivo: si el afiliado no encuentra una Categoría CPV adecuada, registrar una solicitud gobernada para revisión de la Cámara, con justificación, contexto de empresa/usuario, persistencia y email al responsable configurable.
 - No crea ni publica categorías automáticamente.
+- **Estado: READY_FOR_REVIEW** (ronda 1). `review_head` = commit de implementación; el commit de handoff queda encima (ver `audit/orchestrator_handoff.json` → `parallel_tasks.TASK-0010A`).
+- Implementado:
+  - Acción secundaria **"No encuentro la categoría / Solicitar revisión"** en `TaxonomyCategoriesRelationManager` (junto a "Buscar y agregar categoría", sin cambiar esta última). Modal "Solicitar revisión de categoría a la Cámara" con texto explícito: NO crea categoría; la Cámara revisa si una existente cubre la necesidad y puede contactar al usuario.
+  - Campos: `necesidad` (requerido, 3–500), `justificacion` (lista cerrada de 6 códigos, `in` validado en formulario + servicio + CHECK en DB), `detalle` (requerido, 20–3000; 40 mínimo y etiqueta/ayuda específica si `OTRO`), `terminos_probados` (opcional, ≤500).
+  - `App\Services\TaxonomyCategoryRequestService`: valida server-side, verifica acceso del usuario a la empresa (mismo alcance que `EmpresaResource` + bypass Super Admin existente; sin privilegio nuevo), deriva empresa/usuario/contexto en el servidor (snapshot JSONB con nombre, RIF, teléfono, web, usuario, categorías vinculadas con breadcrumb y principal/secundaria), **persiste primero** y luego envía el correo; sin destinatario o con excepción de correo la fila queda `delivery_status=failed` con código (`recipient_not_configured` / `mail_send_failed`) y el detalle técnico solo va al log.
+  - Migración aditiva/reversible `2026_10_09_120000_create_taxonomy_category_requests_table.php` (tabla nueva + columna nullable `taxonomy_selection_settings.category_request_recipient_email`; `IF NOT EXISTS`; `down()` revierte ambas).
+  - Mailable `App\Mail\TaxonomyCategoryRequestMail` (vista `resources/views/mail/taxonomy-category-request.blade.php`, todo escapado), asunto "Solicitud de revisión de categoría CPV — <empresa> — #<id>", nota obligatoria de no-creación y enlace a la ficha de la empresa en el panel.
+  - Campo "Correo responsable de solicitudes de categorías" (validado `email`) en `TaxonomySelectionSettingsPage` (solo Super Admin).
+- Tests: `tests/Feature/Filament/TaxonomyCategoryRequestTest.php` (12 tests / 177 aserciones OK: los 11 del contrato + página de configuración) y regresión `TaxonomyCategoriesRelationManagerTest.php` (4 tests / 27 aserciones OK, sin cambios). La migración se aplica DENTRO de la transacción del test (DDL transaccional de Postgres) y se revierte al final - **no se corrió `migrate` contra la base compartida**; verificado después que `taxonomy_category_requests` no existe en ella.
+- Pendiente para integración: correr la migración en el deploy integrado a staging y configurar el correo responsable en la página de Super Admin.
 
 ## TASK-0010B — Manual de usuario en línea
 - Contrato: Issue #2 comentario `6079977242`

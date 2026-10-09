@@ -2904,11 +2904,12 @@
       "COST_SECURITY_OR_IRREVERSIBLE_EXTERNAL_ACTION"
     ]
   },
-  "review_state": "IN_PROGRESS",
-  "review_task": "TASK-0010",
-  "review_head": null,
+  "review_state": "READY_FOR_REVIEW",
+  "review_task": "TASK-0010A",
+  "review_head": "badce535d60a88e94a63896827dcd5d54b1e738b",
+  "review_head_note": "review_head is the TASK-0010A implementation commit; a separate small handoff/docs commit (this file + docs/orquestador/current_task.md) sits on top of it as the branch tip of feature/task-0010a-category-request.",
   "review_issue": 2,
-  "review_requested_at": null,
+  "review_requested_at": "2026-10-09T11:59:40Z",
   "last_orchestrator_comment_id": 6079977242,
   "last_orchestrator_verdict": "TASKS_OPENED",
   "agent_issue_write_access": "UNAVAILABLE",
@@ -2921,11 +2922,103 @@
   "owner_authorization_reference": "Issue #2 comment 6079956985",
   "parallel_tasks": {
     "TASK-0010A": {
-      "status": "AUTHORIZED_PENDING_DEV",
+      "status": "READY_FOR_REVIEW",
       "branch": "feature/task-0010a-category-request",
       "contract": "Issue #2 comment 6079967780",
       "deploy_from_task_branch": false,
-      "owner_gate_required": false
+      "owner_gate_required": false,
+      "base": "3d104e6bebb3f23bdae04ec291ee7ca8f99c3f46",
+      "head": "badce535d60a88e94a63896827dcd5d54b1e738b",
+      "head_note": "Implementation commit. The handoff/docs commit sits on top as branch tip (a commit cannot contain its own sha).",
+      "round": 1,
+      "summary": "Secondary action 'No encuentro la categoría / Solicitar revisión' in TaxonomyCategoriesRelationManager opens a modal that records a governed Chamber-REVIEW request (never creates/mutates a CPV category). Logic lives in App\\Services\\TaxonomyCategoryRequestService: Laravel Validator with the same rules as the form (closed justification list via Rule::in + DB CHECK), access check equal to EmpresaResource scope (user linked through empresa_user, plus the existing filament-shield Super Admin bypass; no new privilege), empresa/user/context derived server-side (only the 4 declared form keys are read; injected empresa_id/user_id ignored), JSONB context_snapshot (company name/RIF/phone/website, user name/email/phone, linked CPV categories with breadcrumb + principal/secundaria), persist FIRST with delivery_status=pending, then synchronous Mail::to(recipient)->send(TaxonomyCategoryRequestMail). Missing/invalid recipient -> delivery_status=failed, delivery_error=recipient_not_configured, Log::warning. Mail exception -> delivery_status=failed, delivery_error=mail_send_failed, Log::error with exception class/message server-side only. Success -> sent + mail_sent_at. User sees success vs warning notification, never technical detail. Mailable subject 'Solicitud de revisión de categoría CPV — <empresa> — #<id>', HTML view fully escaped ({{ }} only), includes request id/date, company name+RIF+phone+website, user name/email/phone, human-readable justification, necesidad, detalle, terminos_probados, linked CPV categories, the mandatory no-creation note and an admin link to EmpresaResource edit page (null if it cannot be generated). Super Admin-only TaxonomySelectionSettingsPage gains the validated (email, max 255, nullable) field.",
+      "files_changed": [
+        "app/Filament/Resources/EmpresaResource/RelationManagers/TaxonomyCategoriesRelationManager.php",
+        "app/Filament/Pages/TaxonomySelectionSettingsPage.php",
+        "app/Models/TaxonomySelectionSettings.php",
+        "app/Models/TaxonomyCategoryRequest.php",
+        "app/Services/TaxonomyCategoryRequestService.php",
+        "app/Mail/TaxonomyCategoryRequestMail.php",
+        "resources/views/mail/taxonomy-category-request.blade.php",
+        "database/migrations/2026_10_09_120000_create_taxonomy_category_requests_table.php",
+        "tests/Feature/Filament/TaxonomyCategoryRequestTest.php"
+      ],
+      "migration": {
+        "file": "database/migrations/2026_10_09_120000_create_taxonomy_category_requests_table.php",
+        "additive": true,
+        "reversible": true,
+        "up": "CREATE TABLE IF NOT EXISTS taxonomy_category_requests (id, empresa_id FK empresas ON DELETE CASCADE, user_id FK users ON DELETE SET NULL nullable, necesidad, justificacion + CHECK closed list, detalle, terminos_probados nullable, context_snapshot JSONB, request_status default pending_review, delivery_status pending|sent|failed + CHECK, delivery_error nullable code, recipient_email nullable, submitted_at, mail_sent_at nullable, timestamps) + 2 indexes; ALTER TABLE taxonomy_selection_settings ADD COLUMN IF NOT EXISTS category_request_recipient_email VARCHAR(255) NULL",
+        "down": "DROP COLUMN IF EXISTS category_request_recipient_email; DROP TABLE IF EXISTS taxonomy_category_requests",
+        "empresa_fk_cascade_rationale": "Same criterion as empresa_module_status: without it Empresa::deleteWithDependencies() would fail with an FK violation for companies that have requests.",
+        "applied_to_shared_db": false,
+        "to_apply_at": "integrated staging deploy only"
+      },
+      "tests": {
+        "new_file": "tests/Feature/Filament/TaxonomyCategoryRequestTest.php",
+        "new_result": "12 tests, 177 assertions, 0 failures (OK; 1 PHPUnit deprecation that is config-level and also present on the untouched TaxonomyCategoriesRelationManagerTest)",
+        "contract_test_mapping": {
+          "1_form_exists": "the_request_action_and_its_form_exist_in_the_categories_cpv_relation_manager",
+          "2_user_can_submit": "an_authenticated_company_user_can_submit_for_its_accessible_company",
+          "3_ids_not_spoofable": "persisted_empresa_and_user_ids_cannot_be_spoofed (form injection, direct service injection, and AuthorizationException for a company the user cannot access)",
+          "4_closed_justification": "the_justification_list_is_closed_and_validated (form + service)",
+          "5_required_fields": "required_fields_reject_an_empty_submission (also OTRO short-detalle and max length)",
+          "6_persist_before_mail": "the_request_is_persisted_before_and_independently_of_the_mail_attempt",
+          "7_mail_fake_content": "the_mail_goes_to_the_configured_recipient_with_subject_and_key_content (recipient, exact subject, all key fields, admin link, HTML escaping)",
+          "8_missing_recipient": "a_missing_recipient_configuration_does_not_lose_the_request",
+          "9_mail_exception": "a_mail_exception_does_not_lose_the_request_and_shows_a_user_safe_status",
+          "10_no_taxonomy_writes": "a_request_never_writes_taxonomy_categories_or_term_mappings (query listener: every INSERT/UPDATE targets only taxonomy_category_requests; row counts of taxonomy_categories/translations/synonyms/term_cpv_relations/canonical_concepts/candidate_concept_links/empresa_taxonomy_category unchanged)",
+          "11_existing_add_unchanged": "the_existing_search_and_add_action_and_its_limits_remain_unchanged + existing TaxonomyCategoriesRelationManagerTest",
+          "extra": "super_admin_can_configure_a_validated_recipient_email_on_the_settings_page"
+        },
+        "regression": "tests/Feature/Filament/TaxonomyCategoriesRelationManagerTest.php: 4 tests, 27 assertions, 0 failures (unchanged file)",
+        "intl_limited_tests": "none - no test in this set reached Number::format()",
+        "mail": "Mail::fake() / Mail::shouldReceive mocks only; no real mail sent"
+      },
+      "transactional_ddl_test_approach": "The branch must not migrate the shared remote Supabase DB. TaxonomyCategoryRequestTest::setUp() (after parent::setUp(), i.e. inside the DatabaseTransactions transaction on pgsql) requires the migration file and calls up() when the table or settings column is missing. Postgres DDL is transactional, so the rollback at the end of each test removes both the table and the column. up() uses IF NOT EXISTS, so the same tests keep working once the migration is really applied at the integrated deploy. Side effect while a test runs: the ALTER/FK DDL holds locks on taxonomy_selection_settings/empresas/users for that test's transaction (seconds).",
+      "shared_db_untouched_verification": "After all runs, read-only `php artisan tinker --execute` with Schema::connection('pgsql'): hasTable('taxonomy_category_requests') = false, hasColumn('taxonomy_selection_settings','category_request_recipient_email') = false (same as before the runs). php artisan migrate was never run.",
+      "final_ui_labels": {
+        "action_label": "No encuentro la categoría / Solicitar revisión",
+        "existing_action_label_unchanged": "Buscar y agregar categoría",
+        "modal_heading": "Solicitar revisión de categoría a la Cámara",
+        "modal_description": "Esta solicitud NO crea una categoría automáticamente. La Cámara revisará si alguna categoría existente cubre lo que su empresa hace o si corresponde evaluar una nueva, y podrá contactarle para aclarar detalles.",
+        "submit_button": "Enviar solicitud",
+        "field_necesidad": "¿Qué producto, servicio o capacidad necesita representar?",
+        "field_justificacion": "¿Por qué solicita la revisión?",
+        "field_detalle": "Detalle",
+        "field_detalle_when_otro": "Explique el motivo y describa lo que necesita",
+        "field_detalle_helper": "En 1 a 5 párrafos cortos, incluya términos útiles: nombres técnicos, marcas, normas, para qué y dónde se usa. (prefixed with 'Eligió \"Otro motivo\": explique cuál es el motivo de la solicitud. ' when OTRO)",
+        "field_terminos_probados": "¿Qué palabras probó al buscar? (opcional)",
+        "field_terminos_probados_helper": "Nos ayuda a distinguir si falta una categoría o si es un tema de términos de búsqueda.",
+        "justificaciones": {
+          "NO_ENCUENTRO_CATEGORIA": "No encuentro una categoría que describa lo que hacemos.",
+          "DEMASIADO_GENERAL": "Las categorías que encuentro son demasiado generales.",
+          "OTRO_NOMBRE": "Creo que existe, pero la conozco con otro nombre o término.",
+          "NO_ESTOY_SEGURO": "No estoy seguro de cuál categoría corresponde.",
+          "CAPACIDAD_ESPECIALIZADA": "Es una capacidad/producto/servicio especializado que no veo reflejado.",
+          "OTRO": "Otro motivo."
+        },
+        "notification_success_title": "Solicitud enviada a la Cámara",
+        "notification_success_body": "Su solicitud #<id> fue registrada y enviada para revisión. No se creó ninguna categoría: la Cámara verificará si una categoría existente cubre su necesidad y podrá contactarle para aclarar detalles.",
+        "notification_warning_title": "Solicitud registrada, aviso por correo pendiente",
+        "notification_warning_body": "Su solicitud #<id> quedó registrada, pero no se pudo completar el aviso por correo a la Cámara. La solicitud no se perdió y queda guardada para su revisión. No se creó ninguna categoría.",
+        "notification_error_title": "No se pudo registrar la solicitud",
+        "notification_error_body": "Ocurrió un problema al guardar su solicitud. Intente nuevamente en unos minutos.",
+        "notification_unauthorized": "No autorizado / No tiene acceso para enviar solicitudes en nombre de esta empresa.",
+        "settings_field_label": "Correo responsable de solicitudes de categorías",
+        "settings_field_helper": "Recibe las solicitudes de revisión de categoría CPV enviadas por las empresas. Vacío = las solicitudes se registran igual, pero no se envía correo.",
+        "mail_subject": "Solicitud de revisión de categoría CPV — <empresa> — #<id>",
+        "mail_mandatory_note": "Esta solicitud no implica creación automática. Debe verificarse primero si una categoría existente cubre la necesidad."
+      },
+      "limitations": [
+        "No admin UI to list/triage taxonomy_category_requests was added (not in contract); requests with delivery_status=failed are only visible in the DB/logs until a follow-up adds one.",
+        "No automatic retry of failed deliveries (not in contract).",
+        "Mail is sent synchronously (not queued) so the delivery result can be recorded on the request and reported honestly to the user.",
+        "The settings page save notification still reads 'Límites actualizados' (unchanged existing copy)."
+      ],
+      "integration_notes": [
+        "Run the new migration at the integrated staging deploy, then set 'Correo responsable de solicitudes de categorías' on the Super Admin page; until then requests persist with delivery_status=failed and the user sees the warning notification.",
+        "Top-level review_* fields in this file are shared with TASK-0010B and will conflict textually at integration; resolve by keeping both parallel_tasks entries."
+      ]
     },
     "TASK-0010B": {
       "status": "AUTHORIZED_PENDING_DEV",
