@@ -47,6 +47,23 @@ Artefactos nuevos:
 | `docs/orquestador/bootstrap_access.ps1` | cargador por comando: arregla `PATH`, carga el almacén, nunca imprime valores |
 | `docs/orquestador/post_issue_comment.ps1` | publica un comentario en Issue #2 desde un archivo, con barrido de secretos previo; utilizable en cuanto exista `CPV_GITHUB_TOKEN` |
 
+## Base de conocimiento compartida
+
+**Rama `knowledge/project-context`**, HEAD `2d53b0c54e3b80c63533d873bdfb31b8fb7ec4ac`.
+
+Agente y orquestador depositan ahí por escrito lo que cada uno sabe. El agente ya escribió
+`docs/knowledge/` con dominio/taxonomía, historial TASK-0004→0010, lecciones medidas y preguntas
+abiertas; el orquestador tiene pendiente `ORCHESTRATOR_KNOWLEDGE.md`, solicitado en el comentario
+`6084542694`. Reglas en `docs/knowledge/README.md` §2: **cada autor sólo edita sus archivos**, nunca
+`--force` ni `rebase`, y no se mezcla a esta rama sin autorización del propietario.
+
+## Escritura del agente en Issue #2: HABILITADA
+
+Desde el 2026-10-09 el agente publica directamente en Issue #2 (`CPV_GITHUB_TOKEN`). Esto deja obsoleto
+el comentario `6079826097`. El fallback de `AUTONOMOUS_DEV_LOOP.md` §11 sigue válido para cuando el
+token falte o caduque. **El token caduca y el fallo es silencioso:** ante una parada inexplicada del
+loop, verificar la credencial antes que cualquier otra cosa.
+
 Dos hechos que cambian supuestos previos y deben leerse antes de operar:
 
 1. **Los dos repositorios son PÚBLICOS** (verificado vía API de GitHub). Issue #2, `docs/` y `audit/`
