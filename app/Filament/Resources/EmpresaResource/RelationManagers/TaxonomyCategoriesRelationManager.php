@@ -4,8 +4,14 @@ namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
 use App\Models\EmpresaTaxonomyCategory;
 use App\Models\TaxonomyCategory;
+use App\Models\TaxonomyCategoryRequest;
 use App\Models\TaxonomySelectionSettings;
+use App\Services\TaxonomyCategoryRequestService;
 use App\Services\TaxonomyCategorySearch;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -81,6 +87,7 @@ class TaxonomyCategoriesRelationManager extends RelationManager
             ])
             ->headerActions([
                 $this->buscarYAgregarAction(),
+                $this->solicitarRevisionAction(),
             ])
             ->actions([
                 Tables\Actions\Action::make('confirmar')
@@ -268,6 +275,128 @@ class TaxonomyCategoriesRelationManager extends RelationManager
 
                 Notification::make()->success()->title('Categorías agregadas')->send();
             });
+    }
+
+    /**
+     * TASK-0010A (Issue #2 comentario `6079967780`): acción secundaria para cuando la empresa no
+     * encuentra la categoría adecuada. Registra una solicitud de REVISIÓN para la Cámara - nunca
+     * crea ni modifica categorías. La lógica (validación server-side, contexto derivado del
+     * servidor, persistencia antes del correo, manejo de fallas) vive en
+     * TaxonomyCategoryRequestService; acá solo el formulario y la notificación al usuario.
+     *
+     * Visibilidad: misma que "Buscar y agregar categoría" - la gobierna el acceso ya existente a
+     * esta pestaña (EmpresaResource). No se agrega ningún permiso nuevo.
+     */
+    private function solicitarRevisionAction(): Tables\Actions\Action
+    {
+        return Tables\Actions\Action::make('solicitarRevisionCategoria')
+            ->label(self::SOLICITUD_ACTION_LABEL)
+            ->icon('heroicon-o-question-mark-circle')
+            ->color('gray')
+            ->modalHeading(self::SOLICITUD_MODAL_HEADING)
+            ->modalDescription(self::SOLICITUD_MODAL_DESCRIPTION)
+            ->modalSubmitActionLabel(self::SOLICITUD_SUBMIT_LABEL)
+            ->form([
+                Forms\Components\Textarea::make('necesidad')
+                    ->label('¿Qué producto, servicio o capacidad necesita representar?')
+                    ->placeholder('ej. reparación de bombas electrosumergibles en sitio')
+                    ->required()
+                    ->minLength(3)
+                    ->maxLength(TaxonomyCategoryRequestService::NECESIDAD_MAX)
+                    ->rows(2),
+                Forms\Components\Radio::make('justificacion')
+                    ->label('¿Por qué solicita la revisión?')
+                    ->options(TaxonomyCategoryRequest::JUSTIFICACIONES)
+                    // Radio no agrega la regla `in` sola (a diferencia de Select) - lista cerrada explícita.
+                    ->in(array_keys(TaxonomyCategoryRequest::JUSTIFICACIONES))
+                    ->required()
+                    ->live(),
+                Forms\Components\Textarea::make('detalle')
+                    ->label(fn (Get $get) => $get('justificacion') === TaxonomyCategoryRequest::JUSTIFICACION_OTRO
+                        ? 'Explique el motivo y describa lo que necesita'
+                        : 'Detalle')
+                    ->helperText(fn (Get $get) => ($get('justificacion') === TaxonomyCategoryRequest::JUSTIFICACION_OTRO
+                        ? 'Eligió "Otro motivo": explique cuál es el motivo de la solicitud. '
+                        : '')
+                        .'En 1 a 5 párrafos cortos, incluya términos útiles: nombres técnicos, marcas, normas, para qué y dónde se usa.')
+                    ->required()
+                    ->minLength(fn (Get $get) => $get('justificacion') === TaxonomyCategoryRequest::JUSTIFICACION_OTRO
+                        ? TaxonomyCategoryRequestService::DETALLE_MIN_OTRO
+                        : TaxonomyCategoryRequestService::DETALLE_MIN)
+                    ->maxLength(TaxonomyCategoryRequestService::DETALLE_MAX)
+                    ->rows(5),
+                Forms\Components\Textarea::make('terminos_probados')
+                    ->label('¿Qué palabras probó al buscar? (opcional)')
+                    ->helperText('Nos ayuda a distinguir si falta una categoría o si es un tema de términos de búsqueda.')
+                    ->maxLength(TaxonomyCategoryRequestService::TERMINOS_MAX)
+                    ->rows(2),
+            ])
+            ->action(function (array $data) {
+                try {
+                    $solicitud = app(TaxonomyCategoryRequestService::class)->submit(
+                        $this->getOwnerRecord(),
+                        Auth::user(),
+                        $data,
+                    );
+                } catch (AuthorizationException) {
+                    Notification::make()->danger()
+                        ->title('No autorizado')
+                        ->body('No tiene acceso para enviar solicitudes en nombre de esta empresa.')
+                        ->send();
+
+                    return;
+                } catch (ValidationException $e) {
+                    throw $e;
+                } catch (\Throwable $e) {
+                    Log::error('TASK-0010A: no se pudo registrar la solicitud de revisión de categoría.', [
+                        'empresa_id' => $this->getOwnerRecord()->getKey(),
+                        'exception' => get_class($e),
+                        'message' => $e->getMessage(),
+                    ]);
+
+                    Notification::make()->danger()
+                        ->title(self::SOLICITUD_ERROR_TITLE)
+                        ->body(self::SOLICITUD_ERROR_BODY)
+                        ->persistent()
+                        ->send();
+
+                    return;
+                }
+
+                self::notificacionSolicitud($solicitud)->send();
+            });
+    }
+
+    public const SOLICITUD_ACTION_LABEL = 'No encuentro la categoría / Solicitar revisión';
+
+    public const SOLICITUD_MODAL_HEADING = 'Solicitar revisión de categoría a la Cámara';
+
+    public const SOLICITUD_MODAL_DESCRIPTION = 'Esta solicitud NO crea una categoría automáticamente. La Cámara revisará si alguna categoría existente cubre lo que su empresa hace o si corresponde evaluar una nueva, y podrá contactarle para aclarar detalles.';
+
+    public const SOLICITUD_SUBMIT_LABEL = 'Enviar solicitud';
+
+    public const SOLICITUD_OK_TITLE = 'Solicitud enviada a la Cámara';
+
+    public const SOLICITUD_WARNING_TITLE = 'Solicitud registrada, aviso por correo pendiente';
+
+    public const SOLICITUD_ERROR_TITLE = 'No se pudo registrar la solicitud';
+
+    public const SOLICITUD_ERROR_BODY = 'Ocurrió un problema al guardar su solicitud. Intente nuevamente en unos minutos.';
+
+    /** Notificación al usuario según el resultado de la entrega - nunca expone detalle técnico. */
+    public static function notificacionSolicitud(TaxonomyCategoryRequest $solicitud): Notification
+    {
+        if ($solicitud->delivery_status === TaxonomyCategoryRequest::DELIVERY_SENT) {
+            return Notification::make()->success()
+                ->title(self::SOLICITUD_OK_TITLE)
+                ->body("Su solicitud #{$solicitud->id} fue registrada y enviada para revisión. No se creó ninguna categoría: la Cámara verificará si una categoría existente cubre su necesidad y podrá contactarle para aclarar detalles.")
+                ->persistent();
+        }
+
+        return Notification::make()->warning()
+            ->title(self::SOLICITUD_WARNING_TITLE)
+            ->body("Su solicitud #{$solicitud->id} quedó registrada, pero no se pudo completar el aviso por correo a la Cámara. La solicitud no se perdió y queda guardada para su revisión. No se creó ninguna categoría.")
+            ->persistent();
     }
 
     /** @return array<int, string> category_id => breadcrumb (+ aviso si es una Familia con hijos). */

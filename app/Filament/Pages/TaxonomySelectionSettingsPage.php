@@ -45,6 +45,7 @@ class TaxonomySelectionSettingsPage extends Page implements HasForms
         $this->form->fill(TaxonomySelectionSettings::current()->only([
             'max_categorias_principales',
             'max_categorias_secundarias',
+            'category_request_recipient_email',
         ]));
     }
 
@@ -64,6 +65,14 @@ class TaxonomySelectionSettingsPage extends Page implements HasForms
                     ->minValue(1)
                     ->nullable()
                     ->helperText('Vacío = sin tope.'),
+                // TASK-0010A: destinatario de las solicitudes "No encuentro la categoría / Solicitar
+                // revisión" (TaxonomyCategoriesRelationManager). Configuración operativa, no un secreto.
+                TextInput::make('category_request_recipient_email')
+                    ->label('Correo responsable de solicitudes de categorías')
+                    ->email()
+                    ->maxLength(255)
+                    ->nullable()
+                    ->helperText('Recibe las solicitudes de revisión de categoría CPV enviadas por las empresas. Vacío = las solicitudes se registran igual, pero no se envía correo.'),
             ])
             ->statePath('data');
     }
