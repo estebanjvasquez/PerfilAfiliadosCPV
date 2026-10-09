@@ -2904,11 +2904,12 @@
       "COST_SECURITY_OR_IRREVERSIBLE_EXTERNAL_ACTION"
     ]
   },
-  "review_state": "IN_PROGRESS",
-  "review_task": "TASK-0010",
-  "review_head": null,
+  "review_state": "READY_FOR_REVIEW",
+  "review_task": "TASK-0010B",
+  "review_head": "08e879b5d56595cbd5b51735d200974c9a283cc7",
+  "review_head_note": "review_head is the TASK-0010B implementation commit. A separate small handoff-only commit (this file + docs/orquestador/current_task.md) sits on top of it as the branch tip.",
   "review_issue": 2,
-  "review_requested_at": null,
+  "review_requested_at": "2026-10-09T11:53:49Z",
   "last_orchestrator_comment_id": 6079977242,
   "last_orchestrator_verdict": "TASKS_OPENED",
   "agent_issue_write_access": "UNAVAILABLE",
@@ -2928,11 +2929,87 @@
       "owner_gate_required": false
     },
     "TASK-0010B": {
-      "status": "AUTHORIZED_PENDING_DEV",
+      "status": "READY_FOR_REVIEW",
       "branch": "feature/task-0010b-online-manual",
       "contract": "Issue #2 comment 6079977242",
+      "base": "3d104e6",
+      "head": "08e879b5d56595cbd5b51735d200974c9a283cc7",
+      "head_note": "Implementation commit. The branch tip is a separate handoff-only commit on top of 08e879b.",
       "deploy_from_task_branch": false,
-      "owner_gate_required": false
+      "deployed": false,
+      "owner_gate_required": false,
+      "summary": "Authenticated Filament page 'Manual de usuario' (slug /admin/manual-de-usuario, nav icon book-open, sort 90, ungrouped) visible to every authenticated panel user (no HasPageShield, canAccess = Auth::check(); guests stopped by the panel Authenticate middleware). Content rendered from a single Markdown source with a hardened league/commonmark pipeline: html_input=strip, allow_unsafe_links=false, images removed, no Attributes extension (only renderer-generated id/class/role attributes), external links get target=_blank + rel=noopener noreferrer, stable explicit heading anchors ({#id}), auto slugs for the rest, TOC built from h2, 'Volver al indice' links, IMPORTANTE/CONSEJO/NOTA blockquote callouts. Responsive layout (TOC stacked on mobile, sticky sidebar from 1024px), scoped CSS using Filament color variables for light/dark, no external dependency. 11 required sections; content reconciled against the real UI code. Historical docs/manual_usuario/manual_usuario.md kept as distributable history with a status header and OBSOLETO markers on stale legacy behaviour (Sectores y Servicios 'Vincular', related FAQ row, Aug-2026 known-problem note). Orphan placeholder resources/views/filament/widgets/user-manual-widget.blade.php (no class, never referenced) removed; replaced by the page.",
+      "content_source": "resources/manual/manual_usuario.md (rendered by app/Support/UserManual/UserManualRenderer.php; page app/Filament/Pages/UserManual.php; view resources/views/filament/pages/user-manual.blade.php). No runtime dependency on docs/.",
+      "files_changed": [
+        "app/Filament/Pages/UserManual.php (new)",
+        "app/Support/UserManual/UserManualRenderer.php (new)",
+        "resources/manual/manual_usuario.md (new)",
+        "resources/views/filament/pages/user-manual.blade.php (new)",
+        "resources/views/filament/widgets/user-manual-widget.blade.php (deleted, orphan placeholder)",
+        "docs/manual_usuario/manual_usuario.md (status header + OBSOLETO markers)",
+        "tests/Feature/Filament/UserManualContentTest.php (new, 10 tests, no DB)",
+        "tests/Feature/Filament/UserManualPageTest.php (new, 4 tests, DatabaseTransactions on pgsql)"
+      ],
+      "tests": {
+        "UserManualContentTest": "10/10 PASS, 113 assertions (no DB)",
+        "UserManualPageTest": "4/4 PASS, 13 assertions (remote pgsql, DatabaseTransactions; ~30s)",
+        "total": "14/14 PASS, 126 assertions",
+        "contract_test_mapping": {
+          "1_affiliate_access": "UserManualPageTest::an_authenticated_affiliate_user_can_open_the_manual (+ an_admin_can_open_the_manual_too)",
+          "2_guest_blocked": "UserManualPageTest::a_guest_is_redirected_to_login",
+          "3_navigation": "UserManualPageTest::the_manual_is_visible_in_the_panel_navigation_for_an_affiliate (asserts the rendered sidebar link, not only the class flags)",
+          "4_taxonomy_section": "UserManualContentTest::the_manual_contains_the_cpv_taxonomy_section",
+          "5_group_family_category": "UserManualContentTest::the_manual_explains_group_family_and_category",
+          "6_add_workflow": "UserManualContentTest::the_manual_documents_the_real_category_add_workflow (each quoted label is also asserted to exist in TaxonomyCategoriesRelationManager source - drift guard)",
+          "7_principal_secundaria": "UserManualContentTest::the_manual_explains_principal_vs_secundaria_with_the_real_ui_wording (same drift guard)",
+          "8_no_encuentro": "UserManualContentTest::the_manual_documents_the_category_not_found_review_request_behaviour",
+          "9_no_internal_language": "UserManualContentTest::the_manual_does_not_expose_internal_repo_debug_or_secret_language",
+          "10_no_docs_dependency": "UserManualContentTest::the_manual_has_no_runtime_dependency_on_docs_paths_or_assets (+ internal-anchor integrity)",
+          "extra": "the_manual_has_all_required_sections_with_stable_anchors_in_the_table_of_contents, the_benefits_section_does_not_promise_ranking_or_leads, the_renderer_strips_raw_html_unsafe_links_and_images"
+        },
+        "not_run_locally": "Full suite not run (out of scope, slow remote DB). No intl-limited case was hit: the manual page does not use Number::format()."
+      },
+      "assumed_0010a_labels": {
+        "action_label": "No encuentro la categoría / Solicitar revisión (in the 'Categorías CPV (taxonomía nueva)' tab)",
+        "field_necesidad": "¿Qué producto, servicio o capacidad necesita representar?",
+        "field_justificacion_options": [
+          "No encuentro una categoría que describa lo que hacemos.",
+          "Las categorías que encuentro son demasiado generales.",
+          "Creo que existe, pero la conozco con otro nombre o término.",
+          "No estoy seguro de cuál categoría corresponde.",
+          "Es una capacidad/producto/servicio especializado que no veo reflejado.",
+          "Otro motivo."
+        ],
+        "field_detalle": "described generically as 'un detalle breve (de uno a cinco párrafos cortos)' - exact label not assumed",
+        "field_terminos_probados": "¿Qué palabras probó al buscar?",
+        "partial_delivery_message": "described generically ('la solicitud quedó registrada pero no se pudo enviar la notificación') - exact text not assumed",
+        "behaviour": "request for Chamber REVIEW; Chamber first checks whether an existing category fits; may contact the user; no automatic creation/publication; no category added to the company; company/user data captured automatically",
+        "fallback_copy": "Manual tells the user to contact the Chamber if the option is not visible",
+        "integration_action": "If TASK-0010A final labels differ, update resources/manual/manual_usuario.md section #no-encuentro-categoria and the strings asserted in UserManualContentTest::the_manual_documents_the_category_not_found_review_request_behaviour."
+      },
+      "verification_note_internal": {
+        "purpose": "Internal, not user-facing: maps manual claims to the code that supports them (paths relative to repo root at 3d104e6).",
+        "access": "Page canAccess = Auth::check(); no Shield trait -> visible to role-less affiliates; panel authMiddleware Authenticate + EnsureEmailIsVerified (app/Providers/Filament/AdminPanelProvider.php).",
+        "login": "Entrar/Correo electrónico/Contraseña/Recordarme (vendor filament es lang); eye-icon reveal + Turnstile + 5/min rate limit (app/Filament/Pages/Login.php). No password-reset route registered (route:list) -> manual says contact the Chamber.",
+        "register": "'Abrir una cuenta' link, Nombre/Correo/Contraseña/Confirmar contraseña/Registrarse + Turnstile (app/Filament/Pages/Register.php, filament es lang).",
+        "my_profile": "Breezy myProfile in user menu, password min 8 + current password required (AdminPanelProvider; breezy es lang 'Mi perfil', 'Actualizar', 'Modificar').",
+        "company_scope": "EmpresaResource::getEloquentQuery whereRelation users = Auth user -> users only see associated companies; list columns PDF/Nombre de la empresa/Activo/Año de fundación/Ciudad/País/Sector principal.",
+        "wizard": "EditEmpresa::getSteps steps '1- Datos generales','2 - Datos de contacto','3 - Operaciones','4 - Clientes', field labels as quoted; RIF disabled for non-super-admin (rifField); Sector principal disabled for non-super-admin with helper text; 'Guardar cambios'/'Guardado' from filament es lang; beforeSave 'Su empresa tiene servicios en más de 2 sectores'.",
+        "taxonomy_tab": "TaxonomyCategoriesRelationManager: title 'Categorías CPV (taxonomía nueva)', header action 'Buscar y agregar categoría', fields and helper text as quoted, Family auto-removal + warning, server-side leaf-only guard, 'Guardar como' Principal/Secundaria (default secundaria) applied to all selected, limits via TaxonomySelectionSettings (null = no cap) with 'Límite alcanzado' message, already-linked rows skipped but counted in the limit check, row actions Confirmar (suggested only)/Marcar como principal|secundaria (limit re-checked)/Quitar (requires confirmation), Origen labels. Search excludes Groups and inactive categories, accent-insensitive, es+en names (app/Services/TaxonomyCategorySearch.php).",
+        "other_tabs": "Relation managers under app/Filament/Resources/EmpresaResource/RelationManagers: Chambers (Vincular/Desvincular, helper text), Contacts (create, no edit, Marcar como principal, Desvincular), Users, Services (read-only legacy), Assets/Management (subtype buttons + per-subtype No Aplica), Experiences (Agregar experiencia/Editar/Eliminar), Presence (create only if none, Editar/Borrar), Sustainabilities (Area/Status No|Sí: Inactivo|Sí: Activo, Borrar). NoAplicaAction + CompletionBadge on the 5 modules (app/Filament/Support). Completion = Empresa::moduleBreakdown (does not include CPV categories; 'Sectores y Servicios' uses legacy services).",
+        "tab_titles": "Chambers/Contacts/Users relation managers define no $title, so Filament v3 RelationManager::getTitle() falls back to the headline of the relationship name ('Chambers', 'Contacts', 'Users'); the manual says the tab 'puede aparecer con el título' accordingly."
+      },
+      "findings_outside_scope_not_fixed": [
+        "Panel has no ->emailVerification() and no password-reset routes, while User implements MustVerifyEmail and the panel uses EnsureEmailIsVerified; registration sends a verify-email notification whose URL relies on panel email-verification routes. Could not verify the live flow from code; the manual words verification conservatively. Worth a separate check.",
+        "Chambers/Contacts/Users relation-manager tabs likely render with English titles (no $title in v3).",
+        "EditEmpresa 'Su empresa tiene servicios en más de 2 sectores' tells the user to unlink services in 'Sectores y servicios', which is now read-only.",
+        "Empresas list 'Activo' tooltip says only the Chamber can (de)activate, but the edit form exposes 'Estatus actual' (same status_id) to affiliates; the manual avoids asserting either rule."
+      ],
+      "limitations": [
+        "No visual/browser verification was performed (no screenshots by design); responsiveness and light/dark contrast rely on scoped CSS with Filament color variables and were not checked in a real browser.",
+        "Shield permissions of the real panel_user role are DB data, not code; the manual therefore says some tabs/options appear depending on account permissions.",
+        "'CIRA' is mentioned only as an example of the Chamber's search/consultation tools, per the contract wording."
+      ]
     }
   },
   "integration_plan": {

@@ -14,6 +14,11 @@
 - Contrato: Issue #2 comentario `6079977242`
 - Rama: `feature/task-0010b-online-manual`
 - Objetivo: manual autenticado dentro de Filament, actualizado al sistema actual, con énfasis en la nueva taxonomía, selección de categorías, beneficios y flujo de solicitud de revisión.
+- **Estado: READY_FOR_REVIEW** — commit de implementación `08e879b5d56595cbd5b51735d200974c9a283cc7` (base `3d104e6`); encima va un commit separado sólo de handoff (este archivo + `audit/orchestrator_handoff.json`). Sin deploy.
+- Implementado: página Filament **"Manual de usuario"** (`/admin/manual-de-usuario`, `app/Filament/Pages/UserManual.php`), visible en la navegación para todo usuario autenticado (sin `HasPageShield`; invitados → login). Fuente única de contenido: `resources/manual/manual_usuario.md`, renderizada por `app/Support/UserManual/UserManualRenderer.php` (HTML crudo eliminado, enlaces inseguros deshabilitados, imágenes eliminadas, anclas estables `{#id}`, índice desde los h2, recuadros IMPORTANTE/CONSEJO/NOTA, enlaces externos con `noopener noreferrer`). Vista responsiva con CSS acotado y variables de color de Filament (claro/oscuro), sin dependencias externas.
+- Contenido: las 11 secciones del contrato, reconciliadas contra el código real de la UI (pestaña `Categorías CPV (taxonomía nueva)`, `Buscar y agregar categoría`, exploración por Familia, `Guardar como` Principal/Secundaria, límites, Confirmar/Marcar/Quitar, módulos del perfil, No Aplica, completitud). La sección «No encuentro una categoría» sigue el contrato de TASK-0010A; etiquetas supuestas en `parallel_tasks.TASK-0010B.assumed_0010a_labels` del handoff.
+- `docs/manual_usuario/manual_usuario.md` se conserva como histórico distribuible, con encabezado de estado y marcas OBSOLETO en el comportamiento heredado; el placeholder huérfano `resources/views/filament/widgets/user-manual-widget.blade.php` se eliminó.
+- Tests: `UserManualContentTest` 10/10 (113 aserciones, sin BD) + `UserManualPageTest` 4/4 (13 aserciones, pgsql con `DatabaseTransactions`) = **14/14 PASS**. Mapeo a los 10 tests del contrato, nota de verificación interna, hallazgos fuera de alcance y limitaciones: en el handoff.
 
 ## Paralelización e integración
 - ambas ramas parten del mismo checkpoint coordinado;
