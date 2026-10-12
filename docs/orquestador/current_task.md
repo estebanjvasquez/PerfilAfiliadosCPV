@@ -1,8 +1,24 @@
-# TASK-0010 — DOS SUBTAREAS PARALELAS AUTORIZADAS
+# TASK-0010 — DOS SUBTAREAS AUTORIZADAS, **EN ESPERA / NO INICIADAS**
 
-**Autorización del propietario:** Issue #2 comentario `6079956985`.  
-**Protocolo:** `docs/orquestador/AUTONOMOUS_DEV_LOOP.md`.  
-**Estado:** ACTIVE / PARALLEL DEVELOPMENT. No se espera feedback del cliente para estas dos mejoras.
+**Autorización del propietario:** Issue #2 comentario `6079956985`.
+**Protocolo:** `docs/orquestador/AUTONOMOUS_DEV_LOOP.md`.
+
+> ## ⛔ ESTADO: AUTHORIZED BUT HELD — NOT STARTED
+>
+> **Decisión del propietario:** no se arranca TASK-0010A/B hasta que el loop autónomo esté
+> funcionando y su infraestructura pase revisión. Registrado en la revisión `6084707259` y
+> reafirmado en el record de autorización `6085642297`.
+>
+> **Esto NO es una tarea activa.** `SESSION_RESUME.md` §8 indica entrar directamente al loop cuando
+> hay una tarea autorizada; esa instrucción **no aplica aquí**. Una sesión nueva que lea este
+> encabezado y empiece a implementar TASK-0010A/B estaría rompiendo una pausa deliberada.
+>
+> Para levantar la espera hace falta: (1) revisión PASS de la infraestructura de orquestación, y
+> (2) un record explícito del propietario que la levante. Ninguna de las dos existe todavía.
+>
+> **Trabajo activo en su lugar:** la infraestructura de orquestación (ejecutor persistente + PHPUnit
+> aislado en Contabo), autorizada en `6085642297` y detallada en el contrato
+> `SISTEG-Agent-Orchestrator` / `docs/CPV_EXECUTOR_CONTABO_CONTRACT.md`.
 
 ## TASK-0010A — Solicitud de revisión/creación de categoría
 - Contrato: Issue #2 comentario `6079967780`
@@ -64,20 +80,25 @@ el comentario `6079826097`. El fallback de `AUTONOMOUS_DEV_LOOP.md` §11 sigue v
 token falte o caduque. **El token caduca y el fallo es silencioso:** ante una parada inexplicada del
 loop, verificar la credencial antes que cualquier otra cosa.
 
-Dos hechos que cambian supuestos previos y deben leerse antes de operar:
+Un hecho que cambia supuestos previos y debe leerse antes de operar:
 
 1. **Los dos repositorios son PÚBLICOS** (verificado vía API de GitHub). Issue #2, `docs/` y `audit/`
    son legibles por cualquiera. Recomendación de reducir esa exposición en `ACCESS_BOOTSTRAP.md` §7,
    pendiente de decisión del propietario (GATE F). Ningún secreto está expuesto.
-2. **El agente sigue sin poder escribir en Issue #2, y ahora se sabe la causa exacta:** no hay `gh`
-   CLI y el clasificador de permisos del sandbox bloquea leer la credencial almacenada
-   (`Credential Exploration`). No es un scope faltante del token. El fallback de
-   `AUTONOMOUS_DEV_LOOP.md` §11 sigue siendo el canal válido, y funciona sin credencial porque la
-   lectura de un repo público es anónima.
+
+> **Nota histórica, ya superada.** Una versión anterior de esta sección afirmaba aquí que el agente
+> *seguía sin poder escribir* en Issue #2, contradiciendo el encabezado de la propia sección. Eso era
+> cierto hasta el 2026-10-09 y dejó de serlo ese mismo día; la contradicción la detectó la revisión
+> `6126109865`. La causa original del bloqueo queda registrada porque explica por qué la solución fue
+> un token aparte y no una regla de permisos: no hay `gh` CLI y el clasificador del sandbox impide
+> leer la credencial *almacenada* (`Credential Exploration`) — nunca fue un scope faltante.
 
 ---
 
-# CHECKPOINT ACTIVO — ESPERANDO FEEDBACK EXTERNO
+# Histórico — checkpoint 2026-10-08 (esperando feedback externo)
+
+> Sección **histórica**, conservada por trazabilidad. **No describe el estado actual.** El trabajo
+> activo es la infraestructura de orquestación; ver el encabezado de este archivo.
 
 **Fecha:** 2026-10-08  
 **Estado:** TASK-0007 y TASK-0008 están **CLOSED / PASS**. No hay una tarea de desarrollo activa.  
@@ -102,7 +123,10 @@ Próximo trabajo al recibir calibración del pasante: medir acuerdo y revisar pa
 
 ---
 
-# Tarea activa
+# Histórico — TASK-0008 (CLOSED / PASS en `6041102746`)
+
+> Sección **histórica**. TASK-0008 se cerró formalmente. El texto de abajo se redactó cuando todavía
+> estaba en `READY_FOR_REVIEW` y se conserva sin reescribir para no falsear el registro de la ronda.
 
 **TASK-0008 — UAT DEL BUSCADOR PARA EL CLIENTE + REVISIÓN TAXONÓMICA DELEGADA** (Issue #2 comentarios
 [`6035726459`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6035726459)

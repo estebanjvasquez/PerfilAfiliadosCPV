@@ -59,6 +59,23 @@ Paquete aceptado en `docs/uat/`:
 El pasante NO está autorizado a usar `Aprobar`, `Rechazar`, `Editar`, `Eliminar` ni acciones
 masivas durante la calibración. Sus cinco decisiones se registran sólo en la planilla.
 
+### TASK-0010 — solicitud de categoría + manual en línea
+
+**AUTORIZADA PERO EN ESPERA — NO INICIADA.** Autorización: `6079956985`. Espera registrada en la
+revisión `6084707259` y reafirmada en `6085642297`.
+
+**No entrar al loop por estas dos subtareas.** La instrucción de §8 de entrar directamente al loop
+cuando hay una tarea autorizada **no aplica** acá: el propietario frenó TASK-0010A/B hasta que la
+infraestructura de orquestación funcione y pase revisión. Hace falta revisión PASS **más** un record
+explícito del propietario que levante la espera; ninguno de los dos existe todavía.
+
+### Trabajo activo: infraestructura de orquestación
+
+Autorizada en `6085642297`, contrato en el repo privado `estebanjvasquez/SISTEG-Agent-Orchestrator`,
+`docs/CPV_EXECUTOR_CONTABO_CONTRACT.md`. Dos workstreams: ejecutor persistente en el VPS de Contabo
+(systemd, estado durable, revisión por SHA exacto, write-back autenticado, recuperación tras caída) y
+PHPUnit aislado en el mismo servidor con PostgreSQL desechable.
+
 ---
 
 ## 2. Próximo trabajo cuando llegue feedback
