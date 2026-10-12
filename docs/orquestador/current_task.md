@@ -893,7 +893,7 @@ aplicadas.
 
 ## Seguimiento CERRADO en TASK-0006D — UX de la tabla de candidatos
 
-> **Estado: CORREGIDO** en la PARTE 2 de TASK-0006D (ver «Tarea activa» arriba y la §8 del audit de
+> **Estado: CORREGIDO** en la PARTE 2 de TASK-0006D (ver la sección «Histórico — TASK-0008» más arriba y la §8 del audit de
 > TASK-0006D). Lo que sigue es el reporte original tal como se registró.
 
 Issue #2 comentario
@@ -1198,11 +1198,22 @@ Lo entregado:
 **Lo que esta tarea NO hizo, por instrucción explícita:** no modificó las 3 revisiones ya congeladas,
 no procesó los 7 candidatos restantes ni las 2 relaciones, y no ejecutó ningún APPLY.
 
-## Estado de la cola real (estado vivo)
+## Estado de la cola — HISTÓRICO pre-TASK-0007, SUPERADO
 
-Las 10 filas fuente originales siguen existiendo (`263`–`272`), igual que las 2 relaciones candidatas
-(`61`, `62`). Tras TASK-0006B hay **12 propuestas congeladas**, ninguna aplicada, y **la cola real ya
-no tiene ítems sin decidir**:
+> ### ⚠️ ESTOS NÚMEROS YA NO SON EL ESTADO ACTUAL
+>
+> Esta sección y la tabla de invariantes más abajo describen la cola **antes** del APPLY, cuando se
+> redactaron. El APPLY real **sí se ejecutó** el 2026-10-07 y las cifras de aquí quedaron superadas.
+>
+> **Estado actual: `docs/orquestador/SESSION_RESUME.md` §3** — 12 propuestas `APPLIED`,
+> 82 conceptos canónicos, 145 TERM→CONCEPT, TERM→CPV 9.749, último `taxonomy_audit_log.id` 5260.
+>
+> Se conserva sin reescribir porque es el registro de la ronda; la etiqueta anterior decía «estado
+> vivo» y habría hecho creer a una sesión nueva que el APPLY nunca ocurrió.
+
+Las 10 filas fuente originales seguían existiendo (`263`–`272`), igual que las 2 relaciones candidatas
+(`61`, `62`). Tras TASK-0006B había **12 propuestas congeladas**, ninguna aplicada, y **la cola real ya
+no tenía ítems sin decidir**:
 
 La columna «Preflight» es el resultado real del **preflight final de solo lectura** del 2026-10-05
 (comentario `5993828105`). Tras las tres re-revisiones del dueño hay **15 propuestas**:
@@ -1262,17 +1273,17 @@ originó la tarea. El revisor creó dos conceptos específicos (`oleoducto / oil
 término a uno de ellos, en lugar de forzarlo contra una opción inadecuada. Esta sesión no tocó nada
 de eso. Detalle en la sección 10 del audit.
 
-**Invariantes del estado vivo:**
+**Invariantes medidas ENTONCES (pre-APPLY, superadas — ver `SESSION_RESUME.md` §3):**
 
-| Tabla | Valor | Nota |
+| Tabla | Valor entonces | Nota |
 |---|---|---|
-| `taxonomy_candidate_concept_links` | 10 | sin cambios |
-| `taxonomy_concept_relations` | 2 | sin cambios |
-| `taxonomy_term_concepts` | 142 | sin cambios — **nada publicado** |
-| `taxonomy_canonical_concepts` | **81** | era 79; +2 conceptos creados por el humano, ninguno publicado en `taxonomy_term_concepts` (0 filas cada uno) |
-| `taxonomy_term_cpv_relations` | 9749 | sin cambios |
-| `taxonomy_reviewed_proposals` | **12** | 4 sin requisito + 4 confirmadas + 4 nuevas pendientes de confirmar |
-| Propuestas aplicadas | **0** | ningún APPLY ocurrió nunca |
+| `taxonomy_candidate_concept_links` | 10 | sin cambios en esa ronda |
+| `taxonomy_concept_relations` | 2 | sin cambios en esa ronda |
+| `taxonomy_term_concepts` | 142 | nada publicado **todavía**; hoy 145 |
+| `taxonomy_canonical_concepts` | 81 | era 79; hoy 82 |
+| `taxonomy_term_cpv_relations` | 9749 | sin cambios; sigue 9.749 hoy |
+| `taxonomy_reviewed_proposals` | 12 | 4 sin requisito + 4 confirmadas + 4 nuevas pendientes de confirmar |
+| Propuestas aplicadas | 0 **en ese momento** | el APPLY se ejecutó después, el 2026-10-07: hoy son 12 `APPLIED` |
 
 **Siguen NO autorizados:** APPLY/publicación, producción, merge a `main`. TASK-0007 (APPLY) sigue sin
 abrir. Las tres decisiones humanas de gobernanza que bloqueaban TASK-0006 llegaron en el comentario
@@ -1447,4 +1458,4 @@ análisis de los 3 fallos): `audit/phase5_staging_deployment_2026-09-30.md`.
 | TASK-0006B (confirmación humana + bilingüe) | **CLOSED / PASS** (comentario `5947549221`); ronda 1 `CORRECTIONS_REQUIRED` por `5938949812`, ronda 2 `CODE PASS` por `5939882569` | [`tasks/0006b-human-confirmation.md`](tasks/0006b-human-confirmation.md); detalle en `audit/phase6_task0006b_human_confirmation_2026-10-01.md` |
 | TASK-0006C (reparación de procedencia de confirmación) | **CLOSED / PASS** (comentario `5947549221`); diseño `PASS FOR IMPLEMENTATION` en `5939882569`, autorización del dueño en `5939903005` | mismo archivo de tarea; diseño en [`designs/0006c-confirmation-provenance-correction.md`](designs/0006c-confirmation-provenance-correction.md); detalle en la §11 del audit |
 | TASK-0006D (preflight + UX de candidatos + diseño de obsoletas) | **CLOSED / PASS** (comentario `5954835892`); ronda 1 `CORRECTIONS_REQUIRED` por `5952211890`, resuelto en la ronda 2 — resuelve además el seguimiento abierto `5947407519` | [`tasks/0006d-preapply-preflight.md`](tasks/0006d-preapply-preflight.md); diseño en [`designs/0006d-stale-proposal-supersession.md`](designs/0006d-stale-proposal-supersession.md); detalle en `audit/phase6_task0006d_preapply_preflight_2026-10-02.md` |
-| TASK-0006E (ciclo `SUPERSEDED` + supersesión autorizada de #420–#422) | **READY_FOR_REVIEW** (comentario `5955148859`, autorización explícita del dueño) | [`tasks/0006e-stale-supersession.md`](tasks/0006e-stale-supersession.md); detalle en `audit/phase6_task0006e_supersession_2026-10-02.md` |
+| TASK-0006E (ciclo `SUPERSEDED` + supersesión autorizada de #420–#422) | **CLOSED / PASS** (cierre `5994449681`; la autorización del dueño fue `5955148859`) | [`tasks/0006e-stale-supersession.md`](tasks/0006e-stale-supersession.md); detalle en `audit/phase6_task0006e_supersession_2026-10-02.md` |
