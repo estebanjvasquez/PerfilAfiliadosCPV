@@ -2946,7 +2946,9 @@
     "credential_model": "The repo holds the MAP; each executor holds its own KEYS. Agent values live in %USERPROFILE%\\.cpv\\credentials.env, outside the git tree. Zero secrets in repo, docs, logs or Issue #2.",
     "shared_knowledge_base": {
       "branch": "knowledge/project-context",
-      "head": "2d53b0c54e3b80c63533d873bdfb31b8fb7ec4ac",
+      "head": "44db2fa2b5a87c9f1dffcb5ddf1ac9c74e6368a1",
+      "head_verified_how": "git ls-remote origin knowledge/project-context, 2026-10-12",
+      "created_at_head": "2d53b0c54e3b80c63533d873bdfb31b8fb7ec4ac",
       "branched_from": "f5471ac43976122304e26162b6bcddbe2051b33d",
       "purpose": "A place where the developer agent and the orchestrator each write down what they know, so the loop does not depend on one conversation's memory. Documentation only; not to be merged into a feature branch without owner authorization.",
       "agent_files": [

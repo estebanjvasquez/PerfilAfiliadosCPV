@@ -65,7 +65,9 @@ Artefactos nuevos:
 
 ## Base de conocimiento compartida
 
-**Rama `knowledge/project-context`**, HEAD `2d53b0c54e3b80c63533d873bdfb31b8fb7ec4ac`.
+**Rama `knowledge/project-context`**, HEAD actual `44db2fa2b5a87c9f1dffcb5ddf1ac9c74e6368a1`
+(verificado con `git ls-remote`). Creada en `2d53b0c54e3b80c63533d873bdfb31b8fb7ec4ac`; el valor vigente
+es el de arriba y también está en `orchestrator_handoff.json` como `review_knowledge_branch_head`.
 
 Agente y orquestador depositan ahí por escrito lo que cada uno sabe. El agente ya escribió
 `docs/knowledge/` con dominio/taxonomía, historial TASK-0004→0010, lecciones medidas y preguntas
@@ -893,8 +895,10 @@ aplicadas.
 
 ## Seguimiento CERRADO en TASK-0006D — UX de la tabla de candidatos
 
-> **Estado: CORREGIDO** en la PARTE 2 de TASK-0006D (ver la sección «Histórico — TASK-0008» más arriba y la §8 del audit de
-> TASK-0006D). Lo que sigue es el reporte original tal como se registró.
+> **Estado: CORREGIDO** en la PARTE 2 de TASK-0006D (ver la sección «TASK-0006D (cerrada, histórico)
+> — Preflight + UX de candidatos» más arriba, y la §8 del audit
+> `audit/phase6_task0006d_preapply_preflight_2026-10-02.md`). Lo que sigue es el reporte original tal
+> como se registró.
 
 Issue #2 comentario
 [`5947407519`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-5947407519)
