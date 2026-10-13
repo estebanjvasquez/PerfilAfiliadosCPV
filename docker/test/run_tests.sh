@@ -467,6 +467,22 @@ printf("%d permissions, %d roles",
   DB::table("permissions")->count(), DB::table("roles")->count());' 2>/dev/null | tr -d '\r')
     say "permission catalogue: $COUNTS"
   fi
+
+  # 7.8 WHAT DATA THE FIXTURE ACTUALLY HOLDS, measured rather than assumed.
+  #     Several tests state their own data preconditions in their failure
+  #     messages ("Se necesita al menos una empresa real en la BD de pruebas",
+  #     "Precondición: hacen falta 18 categorías reales de referencia"), so the
+  #     row counts are part of the evidence: they say what those tests had.
+  compose run --rm -T testapp php -r '
+require "vendor/autoload.php"; $a=require "bootstrap/app.php";
+$a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+foreach (["empresas","taxonomy_categories","taxonomy_terms","taxonomy_canonical_concepts",
+          "taxonomy_term_cpv_relations","users","permissions","roles"] as $t) {
+    try { printf("%-30s %d\n", $t, DB::table($t)->count()); }
+    catch (Throwable $e) { printf("%-30s (unreadable)\n", $t); }
+}' 2>/dev/null | tr -d '\r' > "$ARTIFACTS/fixture_rows.txt"
+  say "fixture data inventory (rows):"
+  sed 's/^/           /' "$ARTIFACTS/fixture_rows.txt"
 fi
 
 TABLES=$(compose run --rm -T testapp php -r '
