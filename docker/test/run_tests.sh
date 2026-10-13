@@ -240,8 +240,23 @@ fi
 # --- 7. migrate --------------------------------------------------------------
 
 step "7. Migrate the fixture database"
+# `migrate:install` FIRST, and this is a finding rather than a detail.
+# db:skip-mysql-only-view-migrations reads `select max(batch) from migrations`,
+# so it cannot run on a database that has never been migrated - yet its own
+# docblock says to run it once per NEW pgsql database (test, production). On the
+# shared Supabase database the table already existed, which is why nobody hit
+# this; on a genuinely empty fixture it fails with
+# `relation "migrations" does not exist`. migrate:install creates only the
+# migrations repository table, so the skip command has somewhere to record.
+compose run --rm -T testapp php artisan migrate:install \
+  >"$ARTIFACTS/migrate.log" 2>&1 || die "migrate:install failed"
+ok "migrations table created (empty fixture: it did not exist)"
 compose run --rm -T testapp php artisan db:skip-mysql-only-view-migrations \
-  >"$ARTIFACTS/migrate.log" 2>&1 || die "db:skip-mysql-only-view-migrations failed"
+  >>"$ARTIFACTS/migrate.log" 2>&1 || die "db:skip-mysql-only-view-migrations failed"
+note "STATED LIMIT of this fixture: the 15 MySQL-only view migrations are marked"
+note "as run, so those views do NOT exist here. In Supabase they were created by"
+note "another mechanism. No test references them (grep over tests/ and app/), but"
+note "the fixture is therefore not view-for-view identical to the shared database."
 compose run --rm -T testapp php artisan migrate --force --no-interaction \
   >>"$ARTIFACTS/migrate.log" 2>&1 || { tail -30 "$ARTIFACTS/migrate.log"; die "migrate failed"; }
 TABLES=$(compose run --rm -T testapp php -r '
