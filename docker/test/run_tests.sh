@@ -541,8 +541,15 @@ assert_mounts "$ARTIFACTS/mounts_phpunit.txt" "the container that ran PHPUnit"
 docker rm -f "$PHPUNIT_CONTAINER" >/dev/null 2>&1 || true
 say "phpunit exit status: $PHPUNIT_EXIT"
 tail -5 "$ARTIFACTS/phpunit.txt" | sed 's/^/           /'
-[ "$PHPUNIT_EXIT" = "0" ] && ok "suite exited 0" \
-                          || bad "suite exited $PHPUNIT_EXIT (recorded, not hidden)"
+# The suite's outcome belongs to the TEST group, so it must not touch the
+# isolation counters. It did, and the run then printed "isolation: FAIL (1 of
+# 19)" for a run in which every isolation assertion passed and only the suite
+# was red - exactly the conflation the three-group split exists to prevent.
+if [ "$PHPUNIT_EXIT" = "0" ]; then
+  say "[SUITE GREEN] phpunit exited 0"
+else
+  say "[SUITE RED] phpunit exited $PHPUNIT_EXIT (recorded, not hidden)"
+fi
 
 # --- 9. staging smoke, after -------------------------------------------------
 
