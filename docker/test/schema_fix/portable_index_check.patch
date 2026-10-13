@@ -1,0 +1,22 @@
+diff --git a/database/migrations/2026_07_24_000001_add_sub_type_to_empresa_module_status_table.php b/database/migrations/2026_07_24_000001_add_sub_type_to_empresa_module_status_table.php
+index be6a1c4..b4d7726 100644
+--- a/database/migrations/2026_07_24_000001_add_sub_type_to_empresa_module_status_table.php
++++ b/database/migrations/2026_07_24_000001_add_sub_type_to_empresa_module_status_table.php
+@@ -77,10 +77,12 @@ public function down()
+ 
+     private function indexExists(string $indexName): bool
+     {
+-        return DB::table('information_schema.statistics')
+-            ->where('table_schema', Schema::getConnection()->getDatabaseName())
+-            ->where('table_name', 'empresa_module_status')
+-            ->where('index_name', $indexName)
+-            ->exists();
++        // information_schema.statistics is a MySQL-only view: PostgreSQL has no
++        // such relation, so the previous implementation of this method made the
++        // migration unrunnable there. Schema::hasIndex() is driver-aware and
++        // asks each engine its own catalogue, so it behaves identically on
++        // MySQL and works on PostgreSQL. Available since Laravel 11; this
++        // project runs v12.69.0.
++        return Schema::hasIndex('empresa_module_status', $indexName);
+     }
+ };

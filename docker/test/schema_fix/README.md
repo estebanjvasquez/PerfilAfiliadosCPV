@@ -62,6 +62,26 @@ into the three closures that need them, and replaces the static references.
 `permission_id` and `role_id` — the column names the existing databases already
 have, so the resulting schema is unchanged.
 
+## The third defect, found the same way
+
+With both of those fixed the replay reaches migration 36 of 98,
+`2026_07_24_000001_add_sub_type_to_empresa_module_status_table`, and fails:
+
+```
+SQLSTATE[42P01] relation "information_schema.statistics" does not exist
+```
+
+Its private `indexExists()` queries `information_schema.statistics`, which is a
+**MySQL-only** view — PostgreSQL has no such relation. The migration is recent
+(dated 2026-07-24) and its docblock is explicitly MySQL-centric: it reasons
+about InnoDB reusing an index as foreign-key support and about MySQL error 1553.
+
+`portable_index_check.patch` replaces that one method body with
+`Schema::hasIndex('empresa_module_status', $indexName)`, which is driver-aware,
+asks each engine its own catalogue, behaves identically on MySQL, and works on
+PostgreSQL. It is available from Laravel 11; this project runs v12.69.0. It is
+the only migration in the set that uses `information_schema.statistics`.
+
 ## The correction
 
 Two parts, both minimal and both reversible:

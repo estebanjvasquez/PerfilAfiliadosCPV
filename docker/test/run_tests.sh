@@ -298,7 +298,7 @@ fi
 #     two different rationales, and the owner may want to promote one and not
 #     the other. Each is --check'ed first: a patch that does not fit this SHA is
 #     a loud failure, never a forced apply against a mangled tree.
-SCHEMA_PATCHES="defer_four_fks.patch align_permission_migration_to_v6.patch"
+SCHEMA_PATCHES="defer_four_fks.patch align_permission_migration_to_v6.patch portable_index_check.patch"
 APPLIED_PATCHES=""
 for name in $SCHEMA_PATCHES; do
   PATCH="$COMPOSE_DIR/schema_fix/$name"
