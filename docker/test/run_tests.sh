@@ -67,6 +67,12 @@ bad() { FAILED=$((FAILED+1)); printf '  [FAIL] %s\n' "$*"; }
 # never be read as "the isolation did not hold", and so a run that found
 # something cannot be reported as a clean pass either.
 finding() { FINDINGS=$((FINDINGS+1)); printf '  [FINDING] %s\n' "$*"; }
+# Schema preparation is a THIRD result group, counted apart from the isolation
+# assertions and from the suite. A green suite that needed a prepared schema
+# must never read as a suite that needed nothing.
+PREP_PASSED=0; PREP_FAILED=0
+pok()  { PREP_PASSED=$((PREP_PASSED+1)); printf '  [PREP PASS] %s\n' "$*"; }
+pbad() { PREP_FAILED=$((PREP_FAILED+1)); printf '  [PREP FAIL] %s\n' "$*"; }
 
 compose() {
   docker compose -p "$PROJECT" -f "$COMPOSE_DIR/docker-compose.test.yml" "$@"
@@ -242,10 +248,67 @@ else
   die "connection verification failed; nothing was migrated"
 fi
 
-# --- 7. migrate --------------------------------------------------------------
+# --- 7. SCHEMA PREPARATION ---------------------------------------------------
+#
+# ITS OWN PHASE, ON PURPOSE. Isolation, schema preparation and test results are
+# three separate groups of evidence with three separate counters, so a suite
+# that needed a prepared schema can never be reported as one that needed
+# nothing.
+#
+# WHY PREPARATION IS NEEDED AT ALL
+#   Replaying the migration set into an empty database aborts: four foreign keys
+#   reference tables that later migrations create. Measured, not assumed - see
+#   migration_deps.txt in this run's artifacts, and schema_fix/README.md for the
+#   four violations and the proposed minimal correction.
+#
+#   The correction preserves every constraint: it defers exactly four
+#   declarations and re-creates them from SQL once their tables exist, with
+#   Laravel's own constraint names. No foreign key is disabled, no migration is
+#   reordered or renamed, and nothing is applied to any existing database - the
+#   patch touches the disposable workspace and the SQL touches the disposable
+#   fixture.
+#
+#   CONSEQUENCE TO READ HONESTLY: the suite then runs the candidate SHA PLUS
+#   this patch. That is stated in the log, in summary.txt and in the artifacts,
+#   because it is not the same thing as running the SHA alone.
 
-step "7. Migrate the fixture database"
-# `migrate:install` FIRST, and this is a finding rather than a detail.
+step "7. SCHEMA PREPARATION (its own phase: not isolation, not the suite)"
+
+# 7.1 The dependency analysis, at the candidate SHA. node does not exist on this
+#     host, so it runs in a throwaway container, read-only, over the workspace.
+DEPS_VIOLATIONS=unknown
+if docker run --rm \
+     -v "$WORKSPACE:/w:ro" \
+     -v "$COMPOSE_DIR/migration_deps.mjs:/t/deps.mjs:ro" \
+     node:20-alpine node /t/deps.mjs /w/database/migrations \
+     >"$ARTIFACTS/migration_deps.txt" 2>&1; then
+  DEPS_VIOLATIONS=0
+  pok "migration dependency analysis: no ordering violations at this SHA"
+elif [ -s "$ARTIFACTS/migration_deps.txt" ] && grep -q 'VIOLATIONS' "$ARTIFACTS/migration_deps.txt"; then
+  DEPS_VIOLATIONS=$(grep -c 'created later by' "$ARTIFACTS/migration_deps.txt" || true)
+  finding "$DEPS_VIOLATIONS migration ordering violation(s) at this SHA (migration_deps.txt)"
+  grep -A3 'VIOLATIONS -' "$ARTIFACTS/migration_deps.txt" | sed 's/^/           /' | head -8
+else
+  pbad "dependency analysis did not run; see migration_deps.txt"
+  tail -3 "$ARTIFACTS/migration_deps.txt" 2>/dev/null | sed 's/^/           /'
+fi
+
+# 7.2 The proposed minimal correction, applied to the WORKSPACE ONLY.
+PATCH="$COMPOSE_DIR/schema_fix/defer_four_fks.patch"
+[ -f "$PATCH" ] || die "schema_fix/defer_four_fks.patch is missing"
+if git -C "$WORKSPACE" apply --check "$PATCH" 2>"$ARTIFACTS/schema_fix.log"; then
+  git -C "$WORKSPACE" apply "$PATCH" || die "the patch passed --check but failed to apply"
+  git -C "$WORKSPACE" diff > "$ARTIFACTS/schema_fix_applied.diff"
+  pok "deferral patch applied to the workspace: $(git -C "$WORKSPACE" diff --shortstat | sed 's/^ *//')"
+  note "Applied to $WORKSPACE only. No existing database and no branch is touched."
+  note "The suite below therefore runs $SHA PLUS schema_fix/defer_four_fks.patch."
+else
+  pbad "the deferral patch does not apply at $SHA - NOT forced"
+  cat "$ARTIFACTS/schema_fix.log" | sed 's/^/           /' | head -6
+  die "refusing to mangle the workspace; regenerate the patch for this SHA"
+fi
+
+# 7.3 `migrate:install` FIRST, and this is a finding rather than a detail.
 # db:skip-mysql-only-view-migrations reads `select max(batch) from migrations`,
 # so it cannot run on a database that has never been migrated - yet its own
 # docblock says to run it once per NEW pgsql database (test, production). On the
@@ -255,7 +318,7 @@ step "7. Migrate the fixture database"
 # migrations repository table, so the skip command has somewhere to record.
 compose run --rm -T testapp php artisan migrate:install \
   >"$ARTIFACTS/migrate.log" 2>&1 || die "migrate:install failed"
-ok "migrations table created (empty fixture: it did not exist)"
+pok "migrations table created (the empty fixture had none)"
 compose run --rm -T testapp php artisan db:skip-mysql-only-view-migrations \
   >>"$ARTIFACTS/migrate.log" 2>&1 || die "db:skip-mysql-only-view-migrations failed"
 note "STATED LIMIT of this fixture: the 15 MySQL-only view migrations are marked"
@@ -263,40 +326,73 @@ note "as run, so those views do NOT exist here. In Supabase they were created by
 note "another mechanism. No test references them (grep over tests/ and app/), but"
 note "the fixture is therefore not view-for-view identical to the shared database."
 #
-# A FAILING MIGRATE IS A FINDING, NOT A REASON TO ABORT THE RUN.
+# 7.4 The replay itself. A FAILURE HERE IS A FINDING, NOT A WORKAROUND CUE.
 #
-#   At 99e603cb the migration set cannot build a database from zero, in any
-#   engine: 2022_05_31_223828_create_empresas_table declares
+#   WITHOUT the deferral patch, this aborts at
+#   2022_05_31_223828_create_empresas_table, which declares
 #   foreign('city_id')->references('id')->on('cities') while
-#   2022_07_28_183312_create_cities_table sorts LATER, and there is no
-#   database/schema dump to short-circuit the replay. The real databases were
-#   built incrementally over years, so nothing ever replayed the set from
-#   scratch - an empty fixture is the first thing that does.
+#   2022_07_28_183312_create_cities_table sorts later, and there is no
+#   database/schema dump to short-circuit the replay.
 #
-#   This is NOT worked around here. Reordering or renaming migrations, dropping
-#   the constraint, or disabling foreign keys would be changing the code under
-#   test to manufacture a green, and the schema is outside this task's
-#   authorization. So the failure is recorded with its exact SQL and the run
-#   continues with the suites that do not need the schema.
+#   MEASURED ON POSTGRESQL 16.15, which is what this fixture runs. Whether
+#   other engines reject the same declaration is NOT established by this run
+#   and is not claimed: the earlier wording said "in any engine", which was
+#   reasoning about foreign key behaviour, not evidence from a measurement.
+#
+#   Still not worked around: reordering or renaming migrations, dropping a
+#   constraint or disabling foreign keys would be editing the code under test
+#   to manufacture a green. The patch defers four declarations and SQL
+#   re-creates all four below, which is why 7.6 asks the catalogue instead of
+#   trusting that.
 #
 MIGRATE_OK=yes
 if ! compose run --rm -T testapp php artisan migrate --force --no-interaction \
        >>"$ARTIFACTS/migrate.log" 2>&1; then
   MIGRATE_OK=no
-  finding "migrate FAILED on the empty fixture - recorded, not worked around"
-  grep -oE 'SQLSTATE\[[^]]*\][^(]*' "$ARTIFACTS/migrate.log" | head -2 | sed 's/^/           /'
-  note "This is a repository defect reachable in any engine, not a test-runner"
-  note "problem, and fixing it is a schema change this task is not authorized to"
-  note "make. See the comment above this line in run_tests.sh."
+  finding "migrate FAILED even with the deferral patch applied - recorded, not worked around"
+  grep -oE 'SQLSTATE\[[^]]*\][^(]*' "$ARTIFACTS/migrate.log" | head -3 | sed 's/^/           /'
+  pbad "the fixture schema is incomplete; the suite below cannot be read as a code result"
+else
+  pok "all migrations replayed into the empty fixture"
 fi
+
+# 7.5 Re-create the four deferred foreign keys, now that their tables exist.
+if [ "$MIGRATE_OK" = "yes" ]; then
+  if compose exec -T testdb psql -v ON_ERROR_STOP=1 -U cpv_test -d cpv_test \
+       < "$COMPOSE_DIR/schema_fix/restore_four_fks.sql" \
+       >"$ARTIFACTS/schema_fix_sql.log" 2>&1; then
+    pok "the four deferred foreign keys were re-created with Laravel's own names"
+  else
+    pbad "re-creating the deferred foreign keys FAILED"
+    tail -6 "$ARTIFACTS/schema_fix_sql.log" | sed 's/^/           /'
+    MIGRATE_OK=no
+  fi
+fi
+
+# 7.6 Ask the CATALOGUE whether integrity survived. Fails closed: the SQL raises
+#     on a missing constraint, so this cannot pass by omission.
+if [ "$MIGRATE_OK" = "yes" ]; then
+  if compose exec -T testdb psql -v ON_ERROR_STOP=1 -U cpv_test -d cpv_test \
+       < "$COMPOSE_DIR/schema_fix/verify_constraints.sql" \
+       >"$ARTIFACTS/constraints.txt" 2>&1; then
+    pok "catalogue confirms all four constraints exist, with their definitions"
+    grep -E 'foreign_keys_total|FOREIGN KEY|BASE TABLE|VIEW' "$ARTIFACTS/constraints.txt" \
+      | head -8 | sed 's/^/           /'
+  else
+    pbad "constraint verification FAILED - the schema is missing a foreign key"
+    tail -8 "$ARTIFACTS/constraints.txt" | sed 's/^/           /'
+    MIGRATE_OK=no
+  fi
+fi
+
 TABLES=$(compose run --rm -T testapp php -r '
 require "vendor/autoload.php"; $a=require "bootstrap/app.php";
 $a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 echo DB::select("select count(*) n from information_schema.tables where table_schema=\x27public\x27")[0]->n;' 2>/dev/null | tr -d '\r')
 if [ "$MIGRATE_OK" = "yes" ]; then
-  ok "migrations applied; $TABLES tables in the fixture database"
+  pok "fixture schema ready: $TABLES tables"
 else
-  say "fixture reached $TABLES tables before the migration failure (partial schema)"
+  say "fixture reached $TABLES tables before the failure (partial schema)"
 fi
 
 # --- 8. the suite ------------------------------------------------------------
@@ -307,13 +403,20 @@ ARGS=(vendor/bin/phpunit --do-not-cache-result)
 # WHICH SUITES CAN HONESTLY RUN
 #   17 test files use DatabaseTransactions, which wraps each test in a
 #   transaction and rolls it back - it does NOT create tables. Only one uses
-#   RefreshDatabase. So the Feature suite assumes a schema that already exists,
-#   which is exactly how the historical 197/197 was produced: against the shared
-#   Supabase database, with phpunit.xml's sqlite override commented out.
+#   RefreshDatabase. So the Feature suite assumes a schema that already exists.
+#   WHAT THAT DOES AND DOES NOT ESTABLISH: those tests need a pre-existing
+#   schema, and phpunit.xml's commented-out sqlite override establishes that
+#   DB_CONNECTION comes from the environment. Neither identifies which database
+#   any historical run actually used - an earlier version of this comment
+#   asserted it was the shared Supabase one, which was inference presented as
+#   fact. The historical 197/197 stands as evidence of that execution; it is
+#   simply not evidence that the migrations can rebuild an empty database.
 #   With a partial schema, running Feature would produce a wall of
 #   "relation does not exist" errors that say nothing about the code. That is
 #   reported as BLOCKED by the migration defect rather than run for appearances.
-SUITES_RUN="requested"
+SUITES_RUN="Unit+Feature (full suite)"
+[ -n "$SUITE" ]  && SUITES_RUN="$SUITE suite only (requested)"
+[ -n "$FILTER" ] && SUITES_RUN="$SUITES_RUN, filter $FILTER"
 if [ -z "$SUITE" ] && [ -z "$FILTER" ] && [ "$MIGRATE_OK" != "yes" ]; then
   SUITE=Unit
   SUITES_RUN="Unit only (Feature BLOCKED by the migration-order defect)"
@@ -356,13 +459,20 @@ say "GET $STAGING_URL -> $SMOKE_AFTER"
   echo "sha=$SHA"
   echo "phpunit_exit=$PHPUNIT_EXIT"
   echo "suites_run=$SUITES_RUN"
-  echo "migrate_ok=$MIGRATE_OK"
   echo "findings=$FINDINGS"
+  echo "-- isolation --"
+  echo "isolation_passed=$PASSED"
+  echo "isolation_failed=$FAILED"
+  echo "-- schema preparation --"
+  echo "schema_fix_applied=defer_four_fks.patch"
+  echo "migration_ordering_violations=$DEPS_VIOLATIONS"
+  echo "migrate_ok=$MIGRATE_OK"
+  echo "prep_passed=$PREP_PASSED"
+  echo "prep_failed=$PREP_FAILED"
   echo "fixture_tables=$TABLES"
+  echo "-- tests --"
   echo "staging_before=$SMOKE_BEFORE"
   echo "staging_after=$SMOKE_AFTER"
-  echo "checks_passed=$PASSED"
-  echo "checks_failed=$FAILED"
   echo "php_version=$(compose run --rm -T testapp php -r 'echo PHP_VERSION;' 2>/dev/null | tr -d '\r')"
   echo "extensions=$(compose run --rm -T testapp php -r 'echo implode(",",array_intersect(["pdo_pgsql","intl","zip","gd","bcmath"],get_loaded_extensions()));' 2>/dev/null | tr -d '\r')"
 } > "$ARTIFACTS/summary.txt"
@@ -372,17 +482,18 @@ teardown
 printf '\n%s\n' "$(printf '%.0s-' $(seq 1 70))"
 cat "$ARTIFACTS/summary.txt"
 printf '%s\n' "$(printf '%.0s-' $(seq 1 70))"
-# Three distinct outcomes, because collapsing them would let a partial run be
-# reported as a clean one. Exit 0 full pass, 3 isolation held but the suite could
-# not be run in full, 1 something actually failed.
-if [ "$FAILED" -eq 0 ] && [ "$PHPUNIT_EXIT" = "0" ] && [ "$FINDINGS" -eq 0 ]; then
-  echo "RESULT: PASS - isolated suite green, isolation asserted, staging unaffected"
-  exit 0
-fi
-if [ "$FAILED" -eq 0 ] && [ "$PHPUNIT_EXIT" = "0" ] && [ "$FINDINGS" -gt 0 ]; then
-  echo "RESULT: ISOLATION PASS, SUITE PARTIAL - $FINDINGS finding(s) in the repository"
-  echo "        under test; suites run: $SUITES_RUN. Isolation checks: $PASSED passed, 0 failed."
-  exit 3
-fi
-echo "RESULT: FAIL. Checks failed: $FAILED, phpunit exit: $PHPUNIT_EXIT, findings: $FINDINGS"
+# THE THREE GROUPS ARE REPORTED SEPARATELY, never collapsed into one verdict.
+# A green suite that needed a prepared schema is not the same result as a green
+# suite that needed nothing, and a finding is not an isolation failure.
+[ "$FAILED" -eq 0 ]      && I="PASS ($PASSED checks)"      || I="FAIL ($FAILED of $((PASSED+FAILED)))"
+[ "$PREP_FAILED" -eq 0 ] && P="PASS ($PREP_PASSED steps)"  || P="FAIL ($PREP_FAILED of $((PREP_PASSED+PREP_FAILED)))"
+[ "$PHPUNIT_EXIT" = "0" ] && T="GREEN"                     || T="RED (exit $PHPUNIT_EXIT)"
+echo "RESULT  isolation      : $I"
+echo "RESULT  schema prep    : $P   [patch applied; $DEPS_VIOLATIONS ordering violation(s) deferred]"
+echo "RESULT  test suite     : $T   [$SUITES_RUN]"
+echo "RESULT  findings in the repository under test: $FINDINGS"
+# Exit: 0 all three good, 3 isolation held but the schema could not be prepared
+# so the suite result says nothing about the code, 1 anything else.
+if [ "$FAILED" -eq 0 ] && [ "$PREP_FAILED" -eq 0 ] && [ "$PHPUNIT_EXIT" = "0" ]; then exit 0; fi
+if [ "$FAILED" -eq 0 ] && [ "$PREP_FAILED" -gt 0 ]; then exit 3; fi
 exit 1

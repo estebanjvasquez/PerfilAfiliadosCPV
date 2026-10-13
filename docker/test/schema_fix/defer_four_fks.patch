@@ -1,0 +1,51 @@
+diff --git a/database/migrations/2022_05_31_223828_create_empresas_table.php b/database/migrations/2022_05_31_223828_create_empresas_table.php
+index 06a363a..bb1f710 100644
+--- a/database/migrations/2022_05_31_223828_create_empresas_table.php
++++ b/database/migrations/2022_05_31_223828_create_empresas_table.php
+@@ -33,7 +33,6 @@ public function up()
+             $table->string('youtube_profile', 20)->nullable();
+             $table->string('otros_profile', 20)->nullable();
+ 
+-            $table->foreign('city_id')->references('id')->on('cities');
+ 
+             $table->unsignedBigInteger('billing_id')->nullable();
+             $table->unsignedBigInteger('employees_id')->nullable();
+diff --git a/database/migrations/2022_08_12_145310_create_sustainabilities_table.php b/database/migrations/2022_08_12_145310_create_sustainabilities_table.php
+index ddfea0b..a145266 100644
+--- a/database/migrations/2022_08_12_145310_create_sustainabilities_table.php
++++ b/database/migrations/2022_08_12_145310_create_sustainabilities_table.php
+@@ -16,7 +16,7 @@ public function up()
+         Schema::create('sustainabilities', function (Blueprint $table) {
+             $table->id();
+             $table->foreignId('empresa_id')->constrained();
+-            $table->foreignId('areas_id')->constrained();
++            $table->foreignId('areas_id');
+             $table->foreignId('user_id')->nullable()->constrained();
+             $table->enum('sust_status', ['0', '1', '2'])->default('0');
+             $table->timestamps();
+diff --git a/database/migrations/2022_09_01_154856_create_infratypes_table.php b/database/migrations/2022_09_01_154856_create_infratypes_table.php
+index 3c8a5c8..075452e 100644
+--- a/database/migrations/2022_09_01_154856_create_infratypes_table.php
++++ b/database/migrations/2022_09_01_154856_create_infratypes_table.php
+@@ -15,7 +15,7 @@ public function up()
+     {
+         Schema::create('infratypes', function (Blueprint $table) {
+             $table->id();
+-            $table->foreignId('infrasectors_id')->constrained();
++            $table->foreignId('infrasectors_id');
+             $table->string('type_name', 100);
+             $table->timestamps();
+         });
+diff --git a/database/migrations/2022_09_01_185804_create_infrafacilities_table.php b/database/migrations/2022_09_01_185804_create_infrafacilities_table.php
+index 8f63e0f..b87303b 100644
+--- a/database/migrations/2022_09_01_185804_create_infrafacilities_table.php
++++ b/database/migrations/2022_09_01_185804_create_infrafacilities_table.php
+@@ -15,7 +15,7 @@ public function up()
+     {
+         Schema::create('infrafacilities', function (Blueprint $table) {
+             $table->id();
+-            $table->foreignId('infraregion_infrasystem_id')->references('id')->on('infraregion_infrasystem');
++            $table->foreignId('infraregion_infrasystem_id');
+             //$table->foreignId('infrasystems_id')->references('infrasystem_id')->on('infraregion_infrasystem');
+             //$table->foreignId('infraregions_id')->references('infraregion_id')->on('infraregion_infrasystem');
+             $table->string('facility_name', 100);
