@@ -95,6 +95,12 @@ services:
         limits:
           cpus: "2.0"
           memory: 1536M
-    # The runner drives this with `docker compose run`, so no long-running
-    # command is needed.
-    entrypoint: ["sleep", "infinity"]
+    # `command`, NOT `entrypoint`. The runner drives this service with
+    # `docker compose run testapp <cmd>`, and that replaces the COMMAND while
+    # keeping the entrypoint. An `entrypoint: ["sleep","infinity"]` here turned
+    # every step into `sleep infinity composer install --prefer-dist ...`, which
+    # failed as `sleep: unrecognized option '--prefer-dist'`.
+    # As a command it is only the idle default for `compose up -d testapp` (used
+    # to obtain a stable container for the mount evidence); every `run` replaces
+    # it, and the image's own docker-php-entrypoint then execs the real command.
+    command: ["sleep", "infinity"]

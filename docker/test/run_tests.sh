@@ -162,25 +162,45 @@ esac
 # --- 4. prove the isolation, from docker's own view -------------------------
 
 step "4. Mount and port isolation, from docker inspect"
-compose run --rm --no-deps -T testapp true >/dev/null 2>&1 || true
-CID=$(docker ps -aq --filter "label=com.docker.compose.project=$PROJECT" | head -1)
-if [ -z "$CID" ]; then
-  bad "no container found to inspect"
-else
-  docker inspect "$CID" --format '{{range .Mounts}}{{.Type}} {{.Source}} -> {{.Destination}} rw={{.RW}}
-{{end}}' > "$ARTIFACTS/mounts.txt"
-  say "mounts:"; sed 's/^/           /' "$ARTIFACTS/mounts.txt"
-  if grep -q "$LIVE_APP_DIR" "$ARTIFACTS/mounts.txt"; then
-    bad "a mount references $LIVE_APP_DIR"
-  else
-    ok "no mount references $LIVE_APP_DIR"
-  fi
-  for forbidden in "$LIVE_APP_DIR/bootstrap/cache" "$LIVE_APP_DIR/storage" \
-                   "$LIVE_APP_DIR/public" "$LIVE_APP_DIR/.env"; do
-    grep -q "$forbidden" "$ARTIFACTS/mounts.txt" && bad "mounts include $forbidden"
-  done
-  ok "none of the live app's storage, bootstrap/cache, public or .env is mounted"
-fi
+
+# WHY THIS IS WRITTEN DEFENSIVELY
+#   The first version of this step inspected whichever container `docker ps -aq`
+#   returned after a one-off `compose run --rm ... true`. That command failed for
+#   an unrelated reason, the container was gone by the time it was inspected, and
+#   the mount listing came back EMPTY - at which point "no mount references the
+#   live app" and "none of the live app's directories are mounted" both passed on
+#   an empty string. An absence of evidence printed as proof of isolation.
+#   So: the listing must be non-empty, and the expected mount must be present by
+#   exact source and destination. Nothing here passes by default.
+assert_mounts() {
+  # $1 = artifact file, $2 = what produced it (for the message)
+  local file="$1" what="$2" binds
+  [ -s "$file" ] || { bad "$what: mount listing is EMPTY - cannot conclude isolation"
+                      die "refusing to treat an empty docker inspect as proof"; }
+  say "mounts ($what):"; sed 's/^/           /' "$file"
+
+  grep -q "bind $WORKSPACE -> /app " "$file" \
+    || { bad "$what: the disposable workspace is not mounted at /app"
+         die "the container under test is not running this run's workspace"; }
+
+  binds=$(grep -c '^bind ' "$file" || true)
+  [ "$binds" = "1" ] || { bad "$what: $binds bind mounts, expected exactly 1"
+                          die "an unexpected host path is mounted into the test container"; }
+  ok "$what: exactly one bind mount, and it is this run's workspace at /app"
+
+  grep -q "$LIVE_APP_DIR" "$file" && { bad "$what: a mount references $LIVE_APP_DIR"
+                                       die "the live application directory is mounted"; }
+  ok "$what: no mount references $LIVE_APP_DIR (storage, bootstrap/cache, public, .env included)"
+}
+
+# A container that STAYS inspectable: `command: sleep infinity` keeps it up, and
+# its mounts come from the same service definition every `compose run` uses.
+compose up -d testapp >/dev/null 2>&1 || die "cannot start the test application container"
+CID=$(compose ps -q testapp 2>/dev/null | head -1)
+[ -n "$CID" ] || die "no test application container to inspect"
+docker inspect "$CID" --format '{{range .Mounts}}{{.Type}} {{.Source}} -> {{.Destination}} rw={{.RW}}
+{{end}}' | grep -v '^[[:space:]]*$' > "$ARTIFACTS/mounts.txt"
+assert_mounts "$ARTIFACTS/mounts.txt" "testapp service container"
 docker inspect "$(docker ps -q --filter "label=com.docker.compose.project=$PROJECT" \
   --filter "label=com.docker.compose.service=testdb")" \
   --format '{{json .NetworkSettings.Ports}}' > "$ARTIFACTS/db_ports.json" 2>/dev/null || true
@@ -237,10 +257,19 @@ ARGS=(vendor/bin/phpunit --do-not-cache-result)
 [ -n "$SUITE" ]  && ARGS+=(--testsuite "$SUITE")
 [ -n "$FILTER" ] && ARGS+=(--filter "$FILTER")
 say "command: ${ARGS[*]}"
+# Named and NOT --rm, so the container that actually ran the suite survives long
+# enough to be inspected. The step-4 evidence is from the service container; this
+# is from the one that ran the tests, which is what the isolation claim is about.
+PHPUNIT_CONTAINER="${PROJECT}-phpunit-${RUN_ID}"
+docker rm -f "$PHPUNIT_CONTAINER" >/dev/null 2>&1 || true
 set +o pipefail
-compose run --rm -T testapp "${ARGS[@]}" 2>&1 | tee "$ARTIFACTS/phpunit.txt"
+compose run --name "$PHPUNIT_CONTAINER" -T testapp "${ARGS[@]}" 2>&1 | tee "$ARTIFACTS/phpunit.txt"
 PHPUNIT_EXIT=${PIPESTATUS[0]}
 set -o pipefail
+docker inspect "$PHPUNIT_CONTAINER" --format '{{range .Mounts}}{{.Type}} {{.Source}} -> {{.Destination}} rw={{.RW}}
+{{end}}' 2>/dev/null | grep -v '^[[:space:]]*$' > "$ARTIFACTS/mounts_phpunit.txt" || true
+assert_mounts "$ARTIFACTS/mounts_phpunit.txt" "the container that ran PHPUnit"
+docker rm -f "$PHPUNIT_CONTAINER" >/dev/null 2>&1 || true
 say "phpunit exit status: $PHPUNIT_EXIT"
 tail -5 "$ARTIFACTS/phpunit.txt" | sed 's/^/           /'
 [ "$PHPUNIT_EXIT" = "0" ] && ok "suite exited 0" \
