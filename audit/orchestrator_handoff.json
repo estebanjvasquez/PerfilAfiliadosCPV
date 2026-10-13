@@ -2906,6 +2906,8 @@
     ]
   },
   "review_state": "READY_FOR_REVIEW",
+  "review_branch": "feature/upgrade-filament-v3",
+  "review_branch_note": "The branch the EXECUTOR watches, and an authoritative field rather than a convenience. The executor's publication marker is sha256(repo|task|BRANCH|sha) truncated to 32 hex: the branch is PART OF THE MARKER. validate_handoff.mjs used to take it from `git rev-parse --abbrev-ref HEAD`, so running the gate from any other local checkout - the infra/contabo-test-runner branch, for instance - computed a marker that is never published and reported 'review_head has NO verdict'. That is a false FAIL, the mirror image of the false PASS the gate exists to prevent, and in the other direction it would invite publishing a duplicate request for a pointer that already has one. The gate now resolves the branch as --branch, then this field, then the checkout, and WARNS on the last one because it is a guess about what the executor watches. Proof the fix works rather than a claim: with the branch correct the marker e28fb1167b6b5866edff851e2eea2115 resolves to comment 6143456158, which is the verdict that actually exists for review_head d1e1ee14.",
   "review_task": "KNOWLEDGE-HANDOFF",
   "review_task_note": "Owner-directed round, not a numbered TASK. review_task must stay a SHORT IDENTIFIER: the executor correlates a published verdict by looking for this value in comment bodies, so a sentence here makes the test unsatisfiable. That defect caused review 6126109865 to re-review work that already had verdict 6084824840.",
   "review_head": "d1e1ee1485b29dcd37f0511871fc020f000558eb",

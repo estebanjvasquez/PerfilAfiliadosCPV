@@ -27,6 +27,7 @@
  *   node docs/orquestador/validate_handoff.mjs --github      # exact verdict check over the API
  *   node docs/orquestador/validate_handoff.mjs --parked      # pointer intentionally not advanced
  *   node docs/orquestador/validate_handoff.mjs --head <sha>  # also require this review_head
+ *   node docs/orquestador/validate_handoff.mjs --branch <b> # the branch the EXECUTOR watches
  *   node docs/orquestador/validate_handoff.mjs --docs        # limited resume-path document checks
  *   node docs/orquestador/validate_handoff.mjs --strict      # warnings become failures
  *
@@ -69,6 +70,8 @@ const parked = flag('--parked');
 const checkDocs = flag('--docs');
 const expectedHead = args[args.indexOf('--head') + 1] && args.includes('--head')
   ? args[args.indexOf('--head') + 1] : null;
+const branchArg = args.includes('--branch') && args[args.indexOf('--branch') + 1]
+  ? args[args.indexOf('--branch') + 1] : null;
 
 let failures = 0, warnings = 0, unchecked = 0;
 const pass = (m) => console.log('  [PASS] ' + m);
@@ -118,7 +121,32 @@ if (!matched) {
 
 // --- 3. review pointer ------------------------------------------------------
 
+// --- the branch the EXECUTOR watches, which is not necessarily the checkout --
+//
+// The publication marker is sha256(repo|task|BRANCH|sha): the branch is PART OF
+// IT. An earlier version read the branch from `git rev-parse --abbrev-ref HEAD`,
+// so running this from any other local branch - a test-runner branch, say -
+// computed a marker that is never published and reported "review_head has NO
+// verdict". That is a false FAIL, the mirror image of the false PASS this
+// script exists to prevent, and in the other direction it would invite
+// publishing a duplicate request for a pointer that already has a verdict.
+//
+// Authority order: explicit flag, then the handoff's own field, then the
+// checkout - and the last one warns, because it is a guess about what the
+// executor watches.
+const checkoutBranch = gitQ('rev-parse', '--abbrev-ref', 'HEAD');
+const reviewBranch = branchArg || handoff.review_branch || checkoutBranch;
+const branchSource = branchArg ? '--branch'
+  : handoff.review_branch ? 'handoff.review_branch'
+  : 'the current checkout';
+
 section('3. Review pointer');
+note('review branch: ' + (reviewBranch || '(unknown)') + '  [from ' + branchSource + ']');
+if (branchSource === 'the current checkout') {
+  warn('the review branch was taken from the current checkout (' + checkoutBranch + '). ' +
+       'The marker in section 4 is branch-dependent, so pass --branch or set ' +
+       'handoff.review_branch to make this exact rather than inferred.');
+}
 const head = handoff.review_head;
 let headOk = false;
 if (typeof head !== 'string' || !SHA_RE.test(head)) {
@@ -131,13 +159,25 @@ if (typeof head !== 'string' || !SHA_RE.test(head)) {
     headOk = false;
   } else {
     pass('review_head resolves to a real commit');
-    const branch = gitQ('rev-parse', '--abbrev-ref', 'HEAD') || '(unknown)';
-    const isAncestor = (() => {
-      try { git('merge-base', '--is-ancestor', head, 'HEAD'); return true; } catch { return false; }
-    })();
-    if (isAncestor || gitQ('rev-parse', 'HEAD') === head) pass('review_head is reachable from ' + branch);
-    else fail('review_head is not an ancestor of ' + branch +
-              '; the reviewer would audit a commit outside this branch');
+    // Reachability must be judged on the branch the reviewer will audit, not on
+    // whatever is checked out. origin/<branch> is preferred: it is what the
+    // executor fetches.
+    const branchRef = ['refs/remotes/origin/' + reviewBranch, 'refs/heads/' + reviewBranch]
+      .find((r) => reviewBranch && gitQ('rev-parse', '--verify', '--quiet', r));
+    if (!branchRef) {
+      skip('cannot verify reachability: neither origin/' + reviewBranch + ' nor ' +
+           reviewBranch + ' exists locally. Run `git fetch origin ' + reviewBranch + '`.');
+    } else {
+      const isAncestor = (() => {
+        try { git('merge-base', '--is-ancestor', head, branchRef); return true; } catch { return false; }
+      })();
+      if (isAncestor || gitQ('rev-parse', branchRef) === head) {
+        pass('review_head is reachable from ' + branchRef.replace('refs/remotes/', '').replace('refs/heads/', ''));
+      } else {
+        fail('review_head is not an ancestor of ' + branchRef +
+             '; the reviewer would audit a commit outside the branch it watches');
+      }
+    }
   }
   if (expectedHead) {
     if (head === expectedHead) pass('review_head matches the expected ' + expectedHead.slice(0, 12));
@@ -162,14 +202,15 @@ const repoSlug = (() => {
   const m = url.match(/[:/]([^/]+\/[^/]+?)(?:\.git)?$/);
   return m ? m[1] : null;
 })();
-const branchNow = gitQ('rev-parse', '--abbrev-ref', 'HEAD');
 const task = handoff.review_task;
 let marker = null;
-if (headOk && repoSlug && branchNow && typeof task === 'string' && task) {
+if (headOk && repoSlug && reviewBranch && typeof task === 'string' && task) {
   marker = MARKER_PREFIX + ':' + createHash('sha256')
-    .update([repoSlug, task, branchNow, head].join('|'), 'utf8')
+    .update([repoSlug, task, reviewBranch, head].join('|'), 'utf8')
     .digest('hex').slice(0, 32);
   note('expected marker: ' + marker);
+  note('computed over repo|task|branch|sha with branch=' + reviewBranch +
+       ' [from ' + branchSource + ']');
 }
 
 if (!marker) {
