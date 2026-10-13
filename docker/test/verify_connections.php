@@ -71,6 +71,42 @@ $forbiddenHostPatterns = [
     '/amazonaws/i',
 ];
 
+/*
+ * WHY NON-DEFAULT CONNECTIONS ARE JUDGED DIFFERENTLY, AND WHY THIS IS NOT A
+ * LOOSENING OF THE GUARD
+ *
+ *   The first version required EVERY pgsql/mysql connection to resolve to the
+ *   fixture host. On the first otherwise-clean run it aborted on Laravel's
+ *   stock `mysql` connection (127.0.0.1/forge), which nothing uses - while
+ *   silently allowing `mariadb` (127.0.0.1/laravel) and `sqlsrv`
+ *   (localhost/forge), because their drivers were not in the list it gated on.
+ *   A rule that rejects one unused loopback placeholder and waves two others
+ *   through is the wrong shape, not merely strict.
+ *
+ *   The rule now covers every connection and every driver. Each one must be
+ *   either the fixture database, or provably unable to reach anything: a
+ *   loopback placeholder with NOTHING LISTENING on its port - attempted here,
+ *   not assumed - or a sqlite file inside the disposable workspace. The
+ *   forbidden-host patterns and the url check now apply to all drivers instead
+ *   of only two, and the sqlite path is checked where it was not checked at
+ *   all before. A host that is neither the fixture nor container loopback is
+ *   still an abort, and the default connection is still held to the strictest
+ *   form: exact fixture host AND exact fixture database.
+ */
+$loopbackHosts = ['127.0.0.1', 'localhost', '::1', '[::1]', ''];
+$defaultPorts = ['mysql' => 3306, 'mariadb' => 3306, 'pgsql' => 5432, 'sqlsrv' => 1433];
+
+/** True when something actually answers on that host and port. */
+$somethingListensOn = static function (string $host, int $port): bool {
+    $socket = @fsockopen($host, $port, $errno, $errstr, 0.5);
+    if ($socket === false) {
+        return false;
+    }
+    fclose($socket);
+
+    return true;
+};
+
 echo "== Resolved database connections, before any migration\n";
 echo str_repeat('-', 72) . "\n";
 
@@ -124,6 +160,7 @@ foreach ((array) config('database.connections') as $name => $settings) {
         );
     }
 
+    // Every driver, not only two: a shared host is forbidden wherever it appears.
     foreach ($forbiddenHostPatterns as $pattern) {
         if ($host !== '' && preg_match($pattern, (string) $host)) {
             $problems[] = sprintf(
@@ -135,28 +172,81 @@ foreach ((array) config('database.connections') as $name => $settings) {
         }
     }
 
-    /*
-     * sqlite and sqlsrv are defined in config but unused here. They are only a
-     * problem if the default points at them, which is checked above. A
-     * file-backed sqlite path inside the workspace is harmless.
-     */
-    if (in_array($driver, ['pgsql', 'mysql'], true)) {
+    // The default connection is what the suite actually uses: strictest form.
+    if ($name === $default) {
         if ($host !== $expectedHost) {
             $problems[] = sprintf(
-                'connection "%s" (driver %s) resolves to host "%s", expected "%s".',
+                'default connection "%s" (driver %s) resolves to host "%s", expected "%s".',
                 $name,
                 $driver,
                 $host === '' ? '(none)' : $host,
                 $expectedHost
             );
         }
-        if ($name === $default && $database !== $expectedDatabase) {
+        if ($database !== $expectedDatabase) {
             $problems[] = sprintf(
                 'default connection "%s" resolves to database "%s", expected "%s".',
                 $name,
                 $database === '' ? '(none)' : $database,
                 $expectedDatabase
             );
+        }
+        continue;
+    }
+
+    // A sqlite file is only harmless while it is inside the disposable workspace.
+    if ($driver === 'sqlite') {
+        $path = (string) $database;
+        if ($path !== ':memory:' && strpos($path, $root . '/') !== 0) {
+            $problems[] = sprintf(
+                'connection "%s" is a sqlite file at "%s", outside the disposable workspace %s. '
+                . 'A test run must not be able to write a database file elsewhere on the host.',
+                $name,
+                $path === '' ? '(none)' : $path,
+                $root
+            );
+        } else {
+            echo sprintf("  %-22s sqlite path inside the workspace\n", '');
+        }
+        continue;
+    }
+
+    // Everything else: the fixture, or unable to reach anything at all.
+    if ($host === $expectedHost) {
+        continue;
+    }
+
+    $hostKey = strtolower((string) $host);
+    if (!in_array($hostKey, $loopbackHosts, true)) {
+        $problems[] = sprintf(
+            'connection "%s" (driver %s) resolves to host "%s", which is neither the fixture '
+            . 'host "%s" nor container loopback. An unused connection must still be incapable '
+            . 'of reaching anything.',
+            $name,
+            $driver,
+            $host === '' ? '(none)' : $host,
+            $expectedHost
+        );
+        continue;
+    }
+
+    /*
+     * Loopback is only safe while nothing answers there. Attempt it, so this is
+     * a verified fact about this container rather than an assumption about it.
+     */
+    $port = (int) ($settings['port'] ?? $defaultPorts[$driver] ?? 0);
+    if ($port > 0 && $hostKey !== '') {
+        $probeHost = $hostKey === '[::1]' ? '::1' : $hostKey;
+        if ($somethingListensOn($probeHost, $port)) {
+            $problems[] = sprintf(
+                'connection "%s" points at %s:%d and something IS listening there. An unused '
+                . 'placeholder connection must not be able to connect to anything.',
+                $name,
+                $host,
+                $port
+            );
+        } else {
+            echo sprintf("  %-22s unused placeholder: nothing listening on %s:%d\n", '', $host, $port);
         }
     }
 }
