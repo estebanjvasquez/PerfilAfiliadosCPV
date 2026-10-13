@@ -1,0 +1,46 @@
+# Test-only image. SEPARATE from the serving image on purpose.
+#
+# The serving image (../../Dockerfile) builds with `composer install --no-dev`,
+# which is correct for serving traffic and is why PHPUnit does not exist in
+# staging. That image is NOT modified and NOT rebuilt by the test path: adding
+# development packages to a container that serves requests is exactly what the
+# contract forbids.
+#
+# Same PHP version and extension set as the serving image, so a test result is
+# about the code and not about an environment difference.
+#
+# DELIBERATELY NO vendor/ IN THE IMAGE. The runner mounts the disposable
+# workspace at /app, which would mask anything installed there at build time -
+# a quiet way to end up running against a different dependency set than the one
+# you think. Instead the runner installs dependencies INSIDE the mounted
+# workspace, so vendor/ is created per run, belongs to that run, and is thrown
+# away with it. That also satisfies the requirement that tests have their own
+# vendor rather than sharing the live app's.
+
+FROM php:8.2-fpm AS test
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpq-dev \
+        libicu-dev \
+        libzip-dev \
+        libpng-dev \
+        libonig-dev \
+        libxml2-dev \
+        git \
+        unzip \
+        postgresql-client \
+    && docker-php-ext-install -j"$(nproc)" \
+        pdo_pgsql \
+        intl \
+        zip \
+        gd \
+        bcmath \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Composer needs a writable home; the workspace mount owns everything else.
+ENV COMPOSER_HOME=/tmp/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+WORKDIR /app

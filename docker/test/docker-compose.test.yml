@@ -1,0 +1,100 @@
+# Isolated test stack. Runs under its own compose project (`cpvtest`), so
+# `docker compose up/down` here can never recreate or stop the live
+# perfilafiliados app or nginx.
+#
+# ISOLATION PROPERTIES, each one deliberate:
+#   * No path under /opt/perfilafiliados appears anywhere below. The test
+#     application code is a mount of a disposable workspace created per run.
+#   * The live app's .env, storage, bootstrap/cache, vendor and public are
+#     never mounted. bootstrap/cache in particular: a test container writing
+#     package-discovery cache through the live shared mount has already caused
+#     HTTP 500s on staging. Here it is a directory inside the workspace.
+#   * Postgres publishes NO ports. It is reachable only on the private network
+#     by service name, so the fixture database is not exposed to the host or
+#     the internet.
+#   * Orchestration and GitHub credentials are absent from these containers.
+#     They have the fixture database and nothing else.
+
+name: cpvtest
+
+networks:
+  cpvtest_internal:
+    driver: bridge
+    internal: false   # the app image is built from a registry; no host ports open
+
+services:
+  testdb:
+    # pgvector image: migrations run CREATE EXTENSION vector and declare
+    # vector(1024) columns, so a plain postgres image fails on migrate.
+    # pg_trgm ships with contrib in the official images.
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: cpv_test
+      POSTGRES_USER: cpv_test
+      POSTGRES_PASSWORD: ${CPV_TEST_DB_PASSWORD:?set by the runner, ephemeral}
+      # Fixture data only. Faster and acceptable because the database is
+      # discarded at the end of the run.
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    command: >
+      postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off
+               -c shared_buffers=256MB -c max_connections=50
+    networks: [cpvtest_internal]
+    # No `ports:` on purpose.
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cpv_test -d cpv_test"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768M
+
+  testapp:
+    build:
+      # Context is the dockerfile directory, not the workspace: the image carries
+      # only PHP and extensions, never application code or vendor.
+      context: .
+      dockerfile: Dockerfile.test
+    image: cpvtest-php:8.2
+    depends_on:
+      testdb:
+        condition: service_healthy
+    working_dir: /app
+    volumes:
+      # The ONLY mount: the disposable workspace for this run.
+      - ${CPV_TEST_WORKSPACE:?set by the runner}:/app
+    environment:
+      APP_ENV: testing
+      APP_DEBUG: "true"
+      APP_KEY: ${CPV_TEST_APP_KEY:?set by the runner, ephemeral}
+      # Explicit: config/database.php defaults to mysql when DB_CONNECTION is
+      # unset, so leaving it out would point the suite at a MySQL that does not
+      # exist instead of failing clearly.
+      DB_CONNECTION: pgsql
+      DB_PGSQL_HOST: testdb
+      DB_PGSQL_PORT: "5432"
+      DB_PGSQL_DATABASE: cpv_test
+      DB_PGSQL_USERNAME: cpv_test
+      DB_PGSQL_PASSWORD: ${CPV_TEST_DB_PASSWORD:?set by the runner, ephemeral}
+      DB_PGSQL_SSLMODE: prefer
+      # Nothing leaves the container.
+      MAIL_MAILER: array
+      QUEUE_CONNECTION: sync
+      CACHE_DRIVER: array
+      SESSION_DRIVER: array
+      BROADCAST_DRIVER: log
+      TELESCOPE_ENABLED: "false"
+      BCRYPT_ROUNDS: "4"
+    networks: [cpvtest_internal]
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1536M
+    # The runner drives this with `docker compose run`, so no long-running
+    # command is needed.
+    entrypoint: ["sleep", "infinity"]
