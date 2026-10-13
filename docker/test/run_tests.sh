@@ -320,7 +320,44 @@ say "net effect on migrations: $(git -C "$WORKSPACE" diff --shortstat -- databas
 note "Applied to $WORKSPACE only. No existing database and no branch is touched."
 note "The suite below therefore runs $SHA PLUS: $APPLIED_PATCHES"
 
-# 7.3 `migrate:install` FIRST, and this is a finding rather than a detail.
+# 7.3 THE INTEGRATION BRANCH'S MIGRATION SET IS NOT SELF-CONTAINED.
+#
+#   Six migrations reference taxonomy_categories, and NOTHING at this SHA
+#   creates it. The migrations that do - 7 Phase-4 table migrations and the 13
+#   PostgreSQL view migrations - live in database/migrations/pgsql/ on
+#   origin/feature/supplhi-postgres-buscador, a branch that is NOT merged into
+#   this one. At this SHA that directory holds only the 2026_09_07 rework,
+#   whose own docblock says it assumes those tables already exist.
+#
+#   So this is not schema that has to be invented: it is a branch that is not
+#   merged. The fixture is therefore built from the UNION of both sets, which is
+#   what was actually done against Supabase - Laravel sorts migrations by
+#   filename across every --path, so dating puts them in the historical order:
+#   base tables (2022-) -> pgsql views (2026_08_31) -> Phase 4 (2026_09_01) ->
+#   rework (2026_09_07) -> the migrations that reference them (2026_09_11+).
+#
+#   DECLARED, not hidden: the fixture schema comes from two branches. The
+#   sibling SHA is recorded below and in summary.txt. Deciding whether that
+#   branch should be merged is the owner's call, not this script's.
+SIBLING_BRANCH=feature/supplhi-postgres-buscador
+if git -C "$WORKSPACE" fetch -q --depth 1 origin "$SIBLING_BRANCH" 2>>"$ARTIFACTS/schema_fix.log"; then
+  SIBLING_SHA=$(git -C "$WORKSPACE" rev-parse FETCH_HEAD)
+  if git -C "$WORKSPACE" checkout -q FETCH_HEAD -- database/migrations/pgsql 2>>"$ARTIFACTS/schema_fix.log"; then
+    BOOTSTRAP_COUNT=$(ls "$WORKSPACE"/database/migrations/pgsql/*.php 2>/dev/null | wc -l | tr -d ' ')
+    pok "pgsql bootstrap migrations taken from $SIBLING_BRANCH @ ${SIBLING_SHA:0:12}: $BOOTSTRAP_COUNT files"
+    ls "$WORKSPACE"/database/migrations/pgsql/*.php | xargs -n1 basename > "$ARTIFACTS/pgsql_bootstrap_migrations.txt"
+    head -3 "$ARTIFACTS/pgsql_bootstrap_migrations.txt" | sed 's/^/           /'
+    [ "$BOOTSTRAP_COUNT" -gt 3 ] && note "...and $((BOOTSTRAP_COUNT - 3)) more, listed in pgsql_bootstrap_migrations.txt"
+  else
+    pbad "could not take database/migrations/pgsql from $SIBLING_BRANCH"
+    SIBLING_SHA=unavailable
+  fi
+else
+  pbad "could not fetch $SIBLING_BRANCH; the fixture will be missing taxonomy_categories"
+  SIBLING_SHA=unavailable
+fi
+
+# 7.4 `migrate:install` FIRST, and this is a finding rather than a detail.
 # db:skip-mysql-only-view-migrations reads `select max(batch) from migrations`,
 # so it cannot run on a database that has never been migrated - yet its own
 # docblock says to run it once per NEW pgsql database (test, production). On the
@@ -359,6 +396,7 @@ note "the fixture is therefore not view-for-view identical to the shared databas
 #
 MIGRATE_OK=yes
 if ! compose run --rm -T testapp php artisan migrate --force --no-interaction \
+       --path=database/migrations --path=database/migrations/pgsql \
        >>"$ARTIFACTS/migrate.log" 2>&1; then
   MIGRATE_OK=no
   finding "migrate FAILED even with the deferral patch applied - recorded, not worked around"
@@ -477,6 +515,8 @@ say "GET $STAGING_URL -> $SMOKE_AFTER"
   echo "isolation_failed=$FAILED"
   echo "-- schema preparation --"
   echo "schema_fix_applied=$APPLIED_PATCHES"
+  echo "pgsql_bootstrap_from=$SIBLING_BRANCH@$SIBLING_SHA"
+  echo "pgsql_bootstrap_migrations=${BOOTSTRAP_COUNT:-0}"
   echo "migration_ordering_violations=$DEPS_VIOLATIONS"
   echo "migrate_ok=$MIGRATE_OK"
   echo "prep_passed=$PREP_PASSED"
