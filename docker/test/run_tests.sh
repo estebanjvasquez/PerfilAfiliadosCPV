@@ -126,6 +126,12 @@ mkdir -p "$WORKSPACE/storage/framework/"{cache/data,sessions,views} \
 chmod -R 777 "$WORKSPACE/storage" "$WORKSPACE/bootstrap/cache"
 ok "workspace has its own storage and bootstrap/cache"
 
+# The verifier is TOOLING and is injected, not taken from the candidate SHA:
+# a candidate that predates this test runner would not contain it, and the
+# guard must not depend on the code it is guarding.
+cp "$COMPOSE_DIR/verify_connections.php" "$WORKSPACE/cpv_verify_connections.php"
+ok "connection verifier injected into the workspace (not taken from the SHA)"
+
 # No live .env is copied. Ephemeral credentials for this run only.
 export CPV_TEST_WORKSPACE="$WORKSPACE"
 export CPV_TEST_DB_PASSWORD="$(head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n')"
@@ -202,7 +208,7 @@ ls -la "$WORKSPACE/bootstrap/cache" | sed 's/^/           /' | head -6
 # --- 6. the pre-flight guard -------------------------------------------------
 
 step "6. Verify EVERY resolved connection BEFORE migrating"
-compose run --rm -T testapp php docker/test/verify_connections.php testdb cpv_test \
+compose run --rm -T testapp php cpv_verify_connections.php testdb cpv_test \
   2>&1 | tee "$ARTIFACTS/connections.txt"
 if grep -q '^SAFE:' "$ARTIFACTS/connections.txt"; then
   ok "pre-flight passed: all connections point at the disposable fixture"

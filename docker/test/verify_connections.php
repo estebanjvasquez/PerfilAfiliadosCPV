@@ -40,9 +40,25 @@ if ($expectedHost === '' || $expectedDatabase === '') {
     exit(1);
 }
 
-require __DIR__ . '/../../vendor/autoload.php';
+/*
+ * This file is TOOLING, not part of the code under test: the runner injects it
+ * into the disposable workspace so any candidate SHA can be verified, including
+ * ones that predate the test runner. So the application root is discovered by
+ * searching upward rather than assumed at a fixed relative depth.
+ */
+$root = __DIR__;
+while ($root !== dirname($root) && !is_file($root . '/vendor/autoload.php')) {
+    $root = dirname($root);
+}
+if (!is_file($root . '/vendor/autoload.php')) {
+    fwrite(STDERR, "cannot locate vendor/autoload.php above " . __DIR__ . "
+");
+    exit(1);
+}
 
-$app = require_once __DIR__ . '/../../bootstrap/app.php';
+require $root . '/vendor/autoload.php';
+
+$app = require_once $root . '/bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 $problems = [];
