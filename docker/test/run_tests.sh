@@ -59,9 +59,14 @@ step() { printf '\n== %s\n' "$*"; }
 note() { printf '         %s\n' "$*"; }
 die()  { printf '\nFAILED: %s\n' "$*" >&2; teardown; exit 1; }
 
-PASSED=0; FAILED=0
+PASSED=0; FAILED=0; FINDINGS=0
 ok()  { PASSED=$((PASSED+1)); printf '  [PASS] %s\n' "$*"; }
 bad() { FAILED=$((FAILED+1)); printf '  [FAIL] %s\n' "$*"; }
+# A FINDING is a defect in the repository under test, not a failure of the
+# isolation this script asserts. Kept in its own counter so a real finding can
+# never be read as "the isolation did not hold", and so a run that found
+# something cannot be reported as a clean pass either.
+finding() { FINDINGS=$((FINDINGS+1)); printf '  [FINDING] %s\n' "$*"; }
 
 compose() {
   docker compose -p "$PROJECT" -f "$COMPOSE_DIR/docker-compose.test.yml" "$@"
@@ -257,18 +262,64 @@ note "STATED LIMIT of this fixture: the 15 MySQL-only view migrations are marked
 note "as run, so those views do NOT exist here. In Supabase they were created by"
 note "another mechanism. No test references them (grep over tests/ and app/), but"
 note "the fixture is therefore not view-for-view identical to the shared database."
-compose run --rm -T testapp php artisan migrate --force --no-interaction \
-  >>"$ARTIFACTS/migrate.log" 2>&1 || { tail -30 "$ARTIFACTS/migrate.log"; die "migrate failed"; }
+#
+# A FAILING MIGRATE IS A FINDING, NOT A REASON TO ABORT THE RUN.
+#
+#   At 99e603cb the migration set cannot build a database from zero, in any
+#   engine: 2022_05_31_223828_create_empresas_table declares
+#   foreign('city_id')->references('id')->on('cities') while
+#   2022_07_28_183312_create_cities_table sorts LATER, and there is no
+#   database/schema dump to short-circuit the replay. The real databases were
+#   built incrementally over years, so nothing ever replayed the set from
+#   scratch - an empty fixture is the first thing that does.
+#
+#   This is NOT worked around here. Reordering or renaming migrations, dropping
+#   the constraint, or disabling foreign keys would be changing the code under
+#   test to manufacture a green, and the schema is outside this task's
+#   authorization. So the failure is recorded with its exact SQL and the run
+#   continues with the suites that do not need the schema.
+#
+MIGRATE_OK=yes
+if ! compose run --rm -T testapp php artisan migrate --force --no-interaction \
+       >>"$ARTIFACTS/migrate.log" 2>&1; then
+  MIGRATE_OK=no
+  finding "migrate FAILED on the empty fixture - recorded, not worked around"
+  grep -oE 'SQLSTATE\[[^]]*\][^(]*' "$ARTIFACTS/migrate.log" | head -2 | sed 's/^/           /'
+  note "This is a repository defect reachable in any engine, not a test-runner"
+  note "problem, and fixing it is a schema change this task is not authorized to"
+  note "make. See the comment above this line in run_tests.sh."
+fi
 TABLES=$(compose run --rm -T testapp php -r '
 require "vendor/autoload.php"; $a=require "bootstrap/app.php";
 $a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 echo DB::select("select count(*) n from information_schema.tables where table_schema=\x27public\x27")[0]->n;' 2>/dev/null | tr -d '\r')
-ok "migrations applied; $TABLES tables in the fixture database"
+if [ "$MIGRATE_OK" = "yes" ]; then
+  ok "migrations applied; $TABLES tables in the fixture database"
+else
+  say "fixture reached $TABLES tables before the migration failure (partial schema)"
+fi
 
 # --- 8. the suite ------------------------------------------------------------
 
 step "8. Run PHPUnit"
 ARGS=(vendor/bin/phpunit --do-not-cache-result)
+#
+# WHICH SUITES CAN HONESTLY RUN
+#   17 test files use DatabaseTransactions, which wraps each test in a
+#   transaction and rolls it back - it does NOT create tables. Only one uses
+#   RefreshDatabase. So the Feature suite assumes a schema that already exists,
+#   which is exactly how the historical 197/197 was produced: against the shared
+#   Supabase database, with phpunit.xml's sqlite override commented out.
+#   With a partial schema, running Feature would produce a wall of
+#   "relation does not exist" errors that say nothing about the code. That is
+#   reported as BLOCKED by the migration defect rather than run for appearances.
+SUITES_RUN="requested"
+if [ -z "$SUITE" ] && [ -z "$FILTER" ] && [ "$MIGRATE_OK" != "yes" ]; then
+  SUITE=Unit
+  SUITES_RUN="Unit only (Feature BLOCKED by the migration-order defect)"
+  note "Feature suite BLOCKED: it needs the pre-existing schema that the"
+  note "migration set cannot build. Running the Unit suite, which does not."
+fi
 [ -n "$SUITE" ]  && ARGS+=(--testsuite "$SUITE")
 [ -n "$FILTER" ] && ARGS+=(--filter "$FILTER")
 say "command: ${ARGS[*]}"
@@ -304,6 +355,9 @@ say "GET $STAGING_URL -> $SMOKE_AFTER"
   echo "run_id=$RUN_ID"
   echo "sha=$SHA"
   echo "phpunit_exit=$PHPUNIT_EXIT"
+  echo "suites_run=$SUITES_RUN"
+  echo "migrate_ok=$MIGRATE_OK"
+  echo "findings=$FINDINGS"
   echo "fixture_tables=$TABLES"
   echo "staging_before=$SMOKE_BEFORE"
   echo "staging_after=$SMOKE_AFTER"
@@ -318,9 +372,17 @@ teardown
 printf '\n%s\n' "$(printf '%.0s-' $(seq 1 70))"
 cat "$ARTIFACTS/summary.txt"
 printf '%s\n' "$(printf '%.0s-' $(seq 1 70))"
-if [ "$FAILED" -eq 0 ] && [ "$PHPUNIT_EXIT" = "0" ]; then
-  echo "RESULT: PASS - isolated suite green and staging unaffected"
+# Three distinct outcomes, because collapsing them would let a partial run be
+# reported as a clean one. Exit 0 full pass, 3 isolation held but the suite could
+# not be run in full, 1 something actually failed.
+if [ "$FAILED" -eq 0 ] && [ "$PHPUNIT_EXIT" = "0" ] && [ "$FINDINGS" -eq 0 ]; then
+  echo "RESULT: PASS - isolated suite green, isolation asserted, staging unaffected"
   exit 0
 fi
-echo "RESULT: see above. Isolation checks failed: $FAILED, phpunit exit: $PHPUNIT_EXIT"
+if [ "$FAILED" -eq 0 ] && [ "$PHPUNIT_EXIT" = "0" ] && [ "$FINDINGS" -gt 0 ]; then
+  echo "RESULT: ISOLATION PASS, SUITE PARTIAL - $FINDINGS finding(s) in the repository"
+  echo "        under test; suites run: $SUITES_RUN. Isolation checks: $PASSED passed, 0 failed."
+  exit 3
+fi
+echo "RESULT: FAIL. Checks failed: $FAILED, phpunit exit: $PHPUNIT_EXIT, findings: $FINDINGS"
 exit 1
