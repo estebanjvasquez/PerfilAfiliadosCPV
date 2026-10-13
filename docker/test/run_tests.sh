@@ -435,6 +435,40 @@ if [ "$MIGRATE_OK" = "yes" ]; then
   fi
 fi
 
+# 7.7 DATA THE SUITE ASSUMES EXISTS, which is a finding in its own right.
+#
+#   With the schema complete the dominant failure became
+#   `PermissionDoesNotExist: There is no permission named
+#   update_taxonomy::candidate::concept::link for guard web` - 265 errors of it.
+#   The tests assume the Shield-style permission catalogue is already in the
+#   database. No test creates it, and DatabaseSeeder does not call the seeders
+#   that do, so a freshly migrated database cannot satisfy the suite.
+#
+#   These are the PROJECT'S OWN seeders, both idempotent (firstOrCreate), run
+#   explicitly here. No permission, role or fixture row is invented by this
+#   script.
+if [ "$MIGRATE_OK" = "yes" ]; then
+  SEED_OK=yes
+  for seeder in Phase3PermissionsSeeder TaxonomyV2PermissionsSeeder; do
+    if compose run --rm -T testapp php artisan db:seed --class="$seeder" --force \
+         >>"$ARTIFACTS/seed.log" 2>&1; then
+      pok "seeded $seeder"
+    else
+      SEED_OK=no
+      pbad "$seeder failed"
+      tail -5 "$ARTIFACTS/seed.log" | sed 's/^/           /'
+    fi
+  done
+  if [ "$SEED_OK" = "yes" ]; then
+    COUNTS=$(compose run --rm -T testapp php -r '
+require "vendor/autoload.php"; $a=require "bootstrap/app.php";
+$a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+printf("%d permissions, %d roles",
+  DB::table("permissions")->count(), DB::table("roles")->count());' 2>/dev/null | tr -d '\r')
+    say "permission catalogue: $COUNTS"
+  fi
+fi
+
 TABLES=$(compose run --rm -T testapp php -r '
 require "vendor/autoload.php"; $a=require "bootstrap/app.php";
 $a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
