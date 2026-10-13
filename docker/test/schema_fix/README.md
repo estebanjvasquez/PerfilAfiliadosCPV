@@ -32,6 +32,36 @@ claimed here.
 The existing databases do not have this problem because they were never built
 by replaying the set from zero.
 
+## The second defect, found by replaying with the first one fixed
+
+With the four foreign keys deferred, the replay reaches
+`2022_06_13_231159_create_permission_tables` and fails:
+
+```
+Access to undeclared static property Spatie\Permission\PermissionRegistrar::$pivotPermission
+```
+
+The committed migration is spatie/laravel-permission's **v5** published stub,
+while `composer.lock` installs **6.25.0**, where those static properties no
+longer exist. The installed package's own stub reads the names from config
+instead:
+
+```php
+$pivotRole = $columnNames['role_pivot_key'] ?? 'role_id';
+$pivotPermission = $columnNames['permission_pivot_key'] ?? 'permission_id';
+```
+
+This is independent of the ordering problem: a published vendor migration that
+drifted from the dependency it was published by. It is invisible on existing
+databases because that migration ran years ago, under the version that was
+installed then.
+
+`align_permission_migration_to_v6.patch` declares those two locals, passes them
+into the three closures that need them, and replaces the static references.
+`config/permission.php` has both keys set to `null`, so they resolve to
+`permission_id` and `role_id` — the column names the existing databases already
+have, so the resulting schema is unchanged.
+
 ## The correction
 
 Two parts, both minimal and both reversible:

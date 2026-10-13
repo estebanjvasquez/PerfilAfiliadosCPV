@@ -293,20 +293,32 @@ else
   tail -3 "$ARTIFACTS/migration_deps.txt" 2>/dev/null | sed 's/^/           /'
 fi
 
-# 7.2 The proposed minimal correction, applied to the WORKSPACE ONLY.
-PATCH="$COMPOSE_DIR/schema_fix/defer_four_fks.patch"
-[ -f "$PATCH" ] || die "schema_fix/defer_four_fks.patch is missing"
-if git -C "$WORKSPACE" apply --check "$PATCH" 2>"$ARTIFACTS/schema_fix.log"; then
-  git -C "$WORKSPACE" apply "$PATCH" || die "the patch passed --check but failed to apply"
-  git -C "$WORKSPACE" diff > "$ARTIFACTS/schema_fix_applied.diff"
-  pok "deferral patch applied to the workspace: $(git -C "$WORKSPACE" diff --shortstat | sed 's/^ *//')"
-  note "Applied to $WORKSPACE only. No existing database and no branch is touched."
-  note "The suite below therefore runs $SHA PLUS schema_fix/defer_four_fks.patch."
-else
-  pbad "the deferral patch does not apply at $SHA - NOT forced"
-  cat "$ARTIFACTS/schema_fix.log" | sed 's/^/           /' | head -6
-  die "refusing to mangle the workspace; regenerate the patch for this SHA"
-fi
+# 7.2 The proposed minimal corrections, applied to the WORKSPACE ONLY.
+#     Two patches, kept separate because they are two independent defects with
+#     two different rationales, and the owner may want to promote one and not
+#     the other. Each is --check'ed first: a patch that does not fit this SHA is
+#     a loud failure, never a forced apply against a mangled tree.
+SCHEMA_PATCHES="defer_four_fks.patch align_permission_migration_to_v6.patch"
+APPLIED_PATCHES=""
+for name in $SCHEMA_PATCHES; do
+  PATCH="$COMPOSE_DIR/schema_fix/$name"
+  [ -f "$PATCH" ] || die "schema_fix/$name is missing"
+  if git -C "$WORKSPACE" apply --check "$PATCH" 2>>"$ARTIFACTS/schema_fix.log"; then
+    git -C "$WORKSPACE" apply "$PATCH" || die "$name passed --check but failed to apply"
+    APPLIED_PATCHES="${APPLIED_PATCHES}${APPLIED_PATCHES:+,}$name"
+    pok "applied $name"
+  else
+    pbad "$name does not apply at $SHA - NOT forced"
+    tail -6 "$ARTIFACTS/schema_fix.log" | sed 's/^/           /'
+    die "refusing to mangle the workspace; regenerate the patch for this SHA"
+  fi
+done
+# Only the migrations, so the record is the patches' effect and not the mode
+# changes that preparing a writable workspace makes.
+git -C "$WORKSPACE" diff -- database/migrations > "$ARTIFACTS/schema_fix_applied.diff"
+say "net effect on migrations: $(git -C "$WORKSPACE" diff --shortstat -- database/migrations | sed 's/^ *//')"
+note "Applied to $WORKSPACE only. No existing database and no branch is touched."
+note "The suite below therefore runs $SHA PLUS: $APPLIED_PATCHES"
 
 # 7.3 `migrate:install` FIRST, and this is a finding rather than a detail.
 # db:skip-mysql-only-view-migrations reads `select max(batch) from migrations`,
@@ -464,7 +476,7 @@ say "GET $STAGING_URL -> $SMOKE_AFTER"
   echo "isolation_passed=$PASSED"
   echo "isolation_failed=$FAILED"
   echo "-- schema preparation --"
-  echo "schema_fix_applied=defer_four_fks.patch"
+  echo "schema_fix_applied=$APPLIED_PATCHES"
   echo "migration_ordering_violations=$DEPS_VIOLATIONS"
   echo "migrate_ok=$MIGRATE_OK"
   echo "prep_passed=$PREP_PASSED"
