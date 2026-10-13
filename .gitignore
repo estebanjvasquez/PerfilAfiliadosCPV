@@ -20,3 +20,9 @@ email_cliente_despliegue.md
 Propuesta_SupplHi_Buscador_Semantico_*.docx
 ~$*.docx
 /docs/taxonomia/
+
+# The schema bootstrap SQL that docker/test/run_tests.sh needs ON THE SERVER.
+# The blanket *.sql rule above excluded it and `git add` said nothing, so the
+# runner failed at "restore_four_fks.sql: No such file or directory" after a
+# successful replay. These two files are tooling, not a database dump.
+!docker/test/schema_fix/*.sql
