@@ -863,6 +863,26 @@ echo "ux user id=", $u->id, " empresa id=", $e->id,
     tail -6 "$ARTIFACTS/ux/seed_user.log" | sed 's/^/           /'
   fi
 
+  # Publish Filament's own CSS/JS into the workspace's public/ before serving.
+  #
+  # Without this the browser gets the page with only PARTIALLY styled panel
+  # chrome, which is honest about geometry but misleading as a picture: the
+  # first screenshots showed an unstyled sidebar. `filament:assets` is what a
+  # deployment runs, so running it here makes the evidence representative
+  # instead of an artefact of a workspace that never had an asset step.
+  #
+  # STATED LIMIT, since it is not the whole story: this publishes the package's
+  # prebuilt assets. It does NOT run a frontend build (`npm run build`), so a
+  # custom compiled theme is still absent, and the screenshots are therefore
+  # close to but not byte-identical with a built deployment.
+  if compose run --rm -T testapp php artisan filament:assets \
+       >"$ARTIFACTS/ux/filament_assets.log" 2>&1; then
+    uxok "Filament assets published into the workspace public/ (no frontend build)"
+  else
+    uxbad "filament:assets failed; the screenshots will show unstyled chrome"
+    tail -5 "$ARTIFACTS/ux/filament_assets.log" | sed 's/^/           /'
+  fi
+
   # Serve the app inside the workspace container, detached, no host port.
   UX_SERVER="${PROJECT}-uxserve-${RUN_ID}"
   docker rm -f "$UX_SERVER" >/dev/null 2>&1 || true
