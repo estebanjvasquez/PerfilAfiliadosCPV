@@ -846,9 +846,15 @@ $u = App\Models\User::firstOrCreate(
    "email_verified_at" => now()]
 );
 $u->forceFill(["password" => Illuminate\Support\Facades\Hash::make(getenv("CPV_UX_PASSWORD")), "email_verified_at" => now()])->save();
+// Empresa::created() reads Auth::User()->id to write the empresa_user link, so
+// creating a company with nobody logged in dies with "Attempt to read property
+// id on null". Logging the synthetic user in first is what that hook expects,
+// and it also makes the link for us. (That the hook is hostile to any
+// non-HTTP context is a pre-existing property of the model, not this round.)
+Illuminate\Support\Facades\Auth::login($u);
 $e = App\Models\Empresa::firstOrCreate(["rif" => "J-00000000-9"], ["name" => "ZZZ UX Empresa Ficticia"]);
-if (method_exists($e, "users")) { $e->users()->syncWithoutDetaching([$u->id]); }
-echo "ux user id=", $u->id, " empresa id=", $e->id, "\n";
+echo "ux user id=", $u->id, " empresa id=", $e->id,
+     " linked=", (int) $e->users()->where("users.id", $u->id)->exists(), "\n";
 ' >"$ARTIFACTS/ux/seed_user.log" 2>&1; then
     uxok "synthetic affiliate and company created for the browser check"
     sed 's/^/           /' "$ARTIFACTS/ux/seed_user.log" | tail -2
@@ -878,16 +884,46 @@ echo "ux user id=", $u->id, " empresa id=", $e->id, "\n";
     docker logs "$UX_SERVER" 2>&1 | tail -15 | sed 's/^/           /'
   fi
 
+  # The playwright image ships the BROWSERS (/ms-playwright) but not the npm
+  # package, so `import { chromium } from 'playwright'` fails with
+  # ERR_MODULE_NOT_FOUND. Install it once into a cache in TEST_ROOT, pinned to
+  # the image's own version so the client and the browsers cannot drift, and
+  # mount it read-only afterwards. Same reasoning as the composer cache: outside
+  # the workspace, so teardown does not throw it away.
+  PW_VERSION=1.49.1
+  PW_CACHE="${TEST_ROOT}/playwright-node"
+  if [ ! -d "$PW_CACHE/node_modules/playwright" ]; then
+    mkdir -p "$PW_CACHE"
+    if docker run --rm -v "$PW_CACHE:/pw" -w /pw \
+         mcr.microsoft.com/playwright:v${PW_VERSION}-jammy \
+         npm install --silent --no-audit --no-fund "playwright@${PW_VERSION}" \
+         >"$ARTIFACTS/ux/playwright_install.log" 2>&1; then
+      uxok "playwright client ${PW_VERSION} installed into the cache"
+    else
+      uxbad "could not install the playwright client"
+      tail -8 "$ARTIFACTS/ux/playwright_install.log" | sed 's/^/           /'
+      UX_UP=no
+    fi
+  else
+    uxok "playwright client ${PW_VERSION} already cached"
+  fi
+
   if [ "$UX_UP" = "yes" ]; then
     set +e
+    # The script is mounted NEXT TO the cached node_modules, not into /t.
+    # NODE_PATH does not apply to ESM `import`: resolution walks up from the
+    # importing module's own directory looking for node_modules, so a script in
+    # /t could never see a package in /pwnm no matter what NODE_PATH said.
     docker run --rm \
       --network "${PROJECT}_cpvtest_internal" \
-      -v "$COMPOSE_DIR/ux_check.mjs:/t/ux_check.mjs:ro" \
+      -v "$PW_CACHE/node_modules:/pw/node_modules:ro" \
+      -v "$COMPOSE_DIR/ux_check.mjs:/pw/ux_check.mjs:ro" \
       -v "$ARTIFACTS/ux:/out" \
+      -w /pw \
       -e BASE_URL="http://${UX_SERVER}:8000" \
       -e UX_EMAIL="$UX_EMAIL" -e UX_PASSWORD="$UX_PASSWORD" \
-      mcr.microsoft.com/playwright:v1.49.1-jammy \
-      node /t/ux_check.mjs >"$ARTIFACTS/ux/ux_check.log" 2>&1
+      mcr.microsoft.com/playwright:v${PW_VERSION}-jammy \
+      node /pw/ux_check.mjs >"$ARTIFACTS/ux/ux_check.log" 2>&1
     UX_EXIT=$?
     set -e
     sed 's/^/           /' "$ARTIFACTS/ux/ux_check.log"
@@ -1000,7 +1036,15 @@ printf '%s\n' "$(printf '%.0s-' $(seq 1 70))"
 [ "$FAILED" -eq 0 ]      && I="PASS ($PASSED checks)"      || I="FAIL ($FAILED of $((PASSED+FAILED)))"
 [ "$PREP_FAILED" -eq 0 ] && P="PASS ($PREP_PASSED steps)"  || P="FAIL ($PREP_FAILED of $((PREP_PASSED+PREP_FAILED)))"
 [ "$FIX_FAILED" -eq 0 ]  && F="PASS ($FIX_PASSED checks)"  || F="FAIL ($FIX_FAILED of $((FIX_PASSED+FIX_FAILED)))"
-[ "$PHPUNIT_EXIT" = "0" ] && T="GREEN"                     || T="RED (exit $PHPUNIT_EXIT)"
+# NOT RUN is its own verdict. With --skip-suite this printed
+# "RESULT test suite : RED (exit skipped)", which is worse than useless: it
+# reads as a failing suite to anyone skimming, when in fact no suite ran at all.
+# A run that did not execute the suite must not look like one that did, in
+# either direction.
+if [ "$PHPUNIT_EXIT" = "skipped" ]; then T="NOT RUN"
+elif [ "$PHPUNIT_EXIT" = "0" ];      then T="GREEN"
+else                                      T="RED (exit $PHPUNIT_EXIT)"
+fi
 if [ -n "$APPLIED_PATCHES" ]; then
   PREP_NOTE="patch applied; $DEPS_VIOLATIONS ordering violation(s) deferred"
 else
@@ -1024,7 +1068,16 @@ echo "RESULT  findings in the repository under test: $FINDINGS"
 #      a declared precondition is unmet - the suite ran against data it says it
 #      needs and does not have, so its data-dependent failures are expected
 #   1  anything else, the ordinary red suite included
-if [ "$FAILED" -eq 0 ] && [ "$PREP_FAILED" -eq 0 ] && [ "$FIX_FAILED" -eq 0 ] && [ "$PHPUNIT_EXIT" = "0" ]; then exit 0; fi
+#   5  every other group held but a UX/browser check failed
+#
+# A skipped suite does not count as green: with --skip-suite the only way to
+# exit 0 is for every group that DID run to pass.
+SUITE_OK=no
+[ "$PHPUNIT_EXIT" = "0" ] && SUITE_OK=yes
+[ "$PHPUNIT_EXIT" = "skipped" ] && SUITE_OK=skipped
+if [ "$FAILED" -eq 0 ] && [ "$PREP_FAILED" -eq 0 ] && [ "$FIX_FAILED" -eq 0 ] \
+   && [ "$UX_FAILED" -eq 0 ] && [ "$SUITE_OK" != "no" ]; then exit 0; fi
 if [ "$FAILED" -eq 0 ] && [ "$PREP_FAILED" -gt 0 ]; then exit 3; fi
 if [ "$FAILED" -eq 0 ] && [ "$FIX_FAILED" -gt 0 ]; then exit 4; fi
+if [ "$FAILED" -eq 0 ] && [ "$UX_FAILED" -gt 0 ] && [ "$SUITE_OK" != "no" ]; then exit 5; fi
 exit 1
