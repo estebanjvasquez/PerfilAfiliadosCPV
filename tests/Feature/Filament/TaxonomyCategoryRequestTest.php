@@ -252,6 +252,96 @@ class TaxonomyCategoryRequestTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    /**
+     * Corrección de la revisión `6171023100`: el servicio validaba el texto CRUDO y recortaba al
+     * persistir, así que un `detalle` de un carácter más espacios pasaba `min:20` y se guardaba con
+     * 1 carácter - por debajo del mínimo declarado en el contrato.
+     *
+     * Se prueba por el camino DIRECTO al servicio además del formulario, porque es ahí donde vive
+     * la garantía: la UI puede evadirse llamando al servicio por otra vía.
+     */
+    #[Test]
+    public function padded_text_cannot_slip_under_the_declared_minimum(): void
+    {
+        Mail::fake();
+        [$empresa, $user] = $this->empresaConUsuario();
+        $servicio = app(TaxonomyCategoryRequestService::class);
+
+        // `detalle` de 1 carácter relleno hasta superar el mínimo. Largo crudo >= 20, largo real 1.
+        $rellenado = 'a'.str_repeat(' ', TaxonomyCategoryRequestService::DETALLE_MIN + 5);
+        $this->assertGreaterThanOrEqual(TaxonomyCategoryRequestService::DETALLE_MIN, strlen($rellenado));
+
+        try {
+            $servicio->submit($empresa, $user, ['detalle' => $rellenado] + self::DATOS_VALIDOS);
+            $this->fail('Un detalle relleno de espacios no debe pasar la validación.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('detalle', $e->errors());
+        }
+
+        // Lo mismo para `necesidad`, cuyo mínimo es 3.
+        try {
+            $servicio->submit($empresa, $user, ['necesidad' => 'a  '] + self::DATOS_VALIDOS);
+            $this->fail('Una necesidad rellena de espacios no debe pasar la validación.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('necesidad', $e->errors());
+        }
+
+        $this->assertSame(0, TaxonomyCategoryRequest::query()->where('empresa_id', $empresa->id)->count(),
+            'Ninguna fila debe quedar guardada por debajo del mínimo declarado.');
+
+        // Y el camino feliz guarda el texto YA normalizado, sin espacios de borde.
+        $solicitud = $servicio->submit($empresa, $user, [
+            'necesidad' => '  Reparación de bombas  ',
+            'detalle' => '  '.self::DATOS_VALIDOS['detalle'].'  ',
+            'terminos_probados' => '  BES, ESP  ',
+        ] + self::DATOS_VALIDOS);
+
+        $this->assertSame('Reparación de bombas', $solicitud->necesidad);
+        $this->assertSame(self::DATOS_VALIDOS['detalle'], $solicitud->detalle);
+        $this->assertSame('BES, ESP', $solicitud->terminos_probados);
+        Mail::assertNothingSent();
+    }
+
+    /**
+     * Corrección de la revisión `6171023100`: `rules()` recibía la justificación CRUDA en un
+     * parámetro `?string`, así que un array producía un `TypeError` - un 500 - en vez del
+     * `ValidationException` que corresponde a una entrada malformada.
+     */
+    #[Test]
+    public function malformed_input_produces_a_validation_error_and_never_a_type_error(): void
+    {
+        Mail::fake();
+        [$empresa, $user] = $this->empresaConUsuario();
+        $servicio = app(TaxonomyCategoryRequestService::class);
+
+        foreach ([
+            'array' => ['x' => 'y'],
+            'numero' => 12345,
+            'booleano' => true,
+        ] as $caso => $valor) {
+            try {
+                $servicio->submit($empresa, $user, ['justificacion' => $valor] + self::DATOS_VALIDOS);
+                $this->fail("Una justificación malformada ({$caso}) no debe aceptarse.");
+            } catch (ValidationException $e) {
+                $this->assertArrayHasKey('justificacion', $e->errors(), "Caso {$caso}");
+            }
+        }
+
+        // Y un array donde se espera texto libre tampoco debe reventar.
+        try {
+            $servicio->submit($empresa, $user, ['detalle' => ['no', 'soy', 'texto']] + self::DATOS_VALIDOS);
+            $this->fail('Un detalle malformado no debe aceptarse.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('detalle', $e->errors());
+        }
+
+        // `rules()` tiene que tolerar el valor crudo sin lanzar, que es la causa raíz.
+        $this->assertIsArray(TaxonomyCategoryRequestService::rules(['soy' => 'array']));
+        $this->assertIsArray(TaxonomyCategoryRequestService::rules(null));
+        $this->assertSame(0, TaxonomyCategoryRequest::query()->where('empresa_id', $empresa->id)->count());
+        Mail::assertNothingSent();
+    }
+
     // 6
     #[Test]
     public function the_request_is_persisted_before_and_independently_of_the_mail_attempt(): void

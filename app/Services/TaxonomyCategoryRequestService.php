@@ -53,15 +53,23 @@ class TaxonomyCategoryRequestService
             throw new AuthorizationException('El usuario no tiene acceso a esta empresa.');
         }
 
+        // NORMALIZAR ANTES DE VALIDAR, no después.
+        //
+        // Antes se validaba el texto crudo y se recortaba al persistir, así que un `detalle` de un
+        // carácter más 19 espacios pasaba `min:20` y se guardaba con 1 carácter: por debajo del
+        // mínimo que el propio contrato declara. Validar exactamente lo que se va a guardar cierra
+        // esa diferencia, en vez de confiar en que nadie rellene con espacios.
+        $data = self::normalize($data);
+
         $validated = Validator::make($data, self::rules($data['justificacion'] ?? null))->validate();
 
         $request = TaxonomyCategoryRequest::create([
             'empresa_id' => $empresa->getKey(),
             'user_id' => $user->getKey(),
-            'necesidad' => trim($validated['necesidad']),
+            'necesidad' => $validated['necesidad'],
             'justificacion' => $validated['justificacion'],
-            'detalle' => trim($validated['detalle']),
-            'terminos_probados' => filled($validated['terminos_probados'] ?? null) ? trim($validated['terminos_probados']) : null,
+            'detalle' => $validated['detalle'],
+            'terminos_probados' => filled($validated['terminos_probados'] ?? null) ? $validated['terminos_probados'] : null,
             'context_snapshot' => $this->contextSnapshot($empresa, $user),
             'request_status' => TaxonomyCategoryRequest::STATUS_PENDING_REVIEW,
             'delivery_status' => TaxonomyCategoryRequest::DELIVERY_PENDING,
@@ -74,11 +82,40 @@ class TaxonomyCategoryRequestService
     }
 
     /**
+     * Recorta SOLO los cuatro campos declarados, y sólo cuando ya son cadenas.
+     *
+     * Deliberadamente NO convierte tipos. Si llega un array donde se espera texto, se deja como
+     * está para que el validador lo rechace con un `ValidationException` legible; castearlo a
+     * cadena lo convertiría en un dato inventado, y dejar que explote más adelante lo convertiría
+     * en un `TypeError` (un 500, no un error de validación). Cualquier clave fuera de las cuatro
+     * se ignora aquí igual que se ignora al persistir.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public static function normalize(array $data): array
+    {
+        foreach (['necesidad', 'justificacion', 'detalle', 'terminos_probados'] as $campo) {
+            if (array_key_exists($campo, $data) && is_string($data[$campo])) {
+                $data[$campo] = trim($data[$campo]);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Reglas de validación (compartidas con el formulario de Filament).
+     *
+     * `mixed` y no `?string`: este método recibe la justificación CRUDA, antes de validar, así que
+     * un array o un número llegaban a un parámetro tipado y producían un `TypeError` - un 500 en
+     * vez del `ValidationException` que corresponde. Lo único que se decide aquí es si aplica el
+     * mínimo más exigente de `OTRO`, y eso sólo puede ser cierto para esa cadena exacta; cualquier
+     * otro valor cae en el mínimo normal y lo rechaza la regla `string`/`Rule::in` de abajo.
      *
      * @return array<string, array<int, mixed>>
      */
-    public static function rules(?string $justificacion = null): array
+    public static function rules(mixed $justificacion = null): array
     {
         $detalleMin = $justificacion === TaxonomyCategoryRequest::JUSTIFICACION_OTRO ? self::DETALLE_MIN_OTRO : self::DETALLE_MIN;
 
