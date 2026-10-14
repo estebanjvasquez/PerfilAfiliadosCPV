@@ -1,0 +1,16 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-phpunit-20261014T152859Z-20dd365c8e36 Creating 
+ Container cpvtest-phpunit-20261014T152859Z-20dd365c8e36 Created 
+PHPUnit 11.5.56 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.34
+Configuration: /app/phpunit.xml
+
+...............                                                   15 / 15 (100%)
+
+Time: 00:01.345, Memory: 72.50 MB
+
+OK, but there were issues!
+Tests: 15, Assertions: 133, PHPUnit Deprecations: 1.
