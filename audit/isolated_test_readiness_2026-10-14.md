@@ -1,8 +1,174 @@
 # CPV — Esquema desde cero y fixtures sintéticos en PostgreSQL desechable
 
-Ronda única para revisión manual. Entorno aislado de Contabo. El orquestador
+Entrega para revisión manual. Entorno aislado de Contabo. El orquestador
 autónomo sigue **suspendido**: esta ronda no hizo polling, no llamó a Anthropic
 y no disparó ninguna revisión automática.
+**Ronda 2: correcciones de la revisión manual `6167931953`.**
+
+---
+
+## 0. Correcciones de la revisión `6167931953`
+
+**Resultado: la suite completa pasa en verde, sin fallos, sin tests vacíos y sin
+deprecaciones.**
+
+```
+OK (433 tests, 2334 assertions)
+
+RESULT  isolation    : PASS (19 checks)
+RESULT  schema prep  : PASS (12 steps)   [no patch needed; the corrections are committed at this SHA]
+RESULT  fixture load : PASS (2 checks)   [8 precondiciones]
+RESULT  test suite   : GREEN            [Unit+Feature, suite completa]
+```
+
+Es un `OK` pelado, no un «OK, but there were issues!»: cero fallos, cero errores,
+**cero risky** y **cero deprecaciones**. Los cuatro fallos y los dos tests vacíos
+de la ronda anterior están resueltos, no silenciados.
+
+### 0.1 Rollback de la migración de claves foráneas (punto 1)
+
+La objeción era correcta y el defecto era mío: `up()` **omite** una restricción
+que ya exista, así que sobre una base ya migrada no crea nada, pero `down()`
+borraba igualmente cualquiera que coincidiera. En Supabase las cuatro existen
+desde que corrieron sus migraciones de origen, de modo que un rollback habría
+**eliminado integridad histórica que esta migración nunca creó** — y con un
+nombre distinto al esperado, `dropForeign()` además falla.
+
+Una migración no puede distinguir lo que creó sin una marca de propiedad
+durable, e inventarla es más maquinaria de la que justifica una reparación
+puramente aditiva. Así que `down()` es ahora un **no-op explícito y documentado**,
+que es lo que la revisión acepta para este caso, con sus consecuencias escritas:
+sobre una base ya migrada no toca nada; sobre una construida desde cero las
+cuatro se van con sus tablas cuando el rollback llega a las migraciones que las
+crearon; y `rollback` + `migrate` es seguro porque `up()` las encuentra presentes.
+
+Dos cosas más que pedía el punto 1:
+
+* **una precondición ausente ahora levanta excepción.** Era un `continue`, lo que
+  significaba que una base sin `cities` terminaba la migración como exitosa, sin
+  la clave y sin que nada lo dijera — exactamente el fallo silencioso que esta
+  migración existe para evitar;
+* **la equivalencia es estricta**: ya no basta con que coincida la columna, se
+  comprueban también la columna referenciada exacta y las acciones referenciales.
+  Una clave con `ON DELETE CASCADE` donde el objetivo es `NO ACTION` **no** es la
+  misma garantía; aceptarla dejaría la base comportándose distinto de lo
+  declarado y lo reportaría como correcto. Si existe algo no equivalente, levanta
+  excepción en vez de apilar una segunda restricción.
+
+### 0.2 Escenarios de regresión en base desechable (punto 2)
+
+`tests/Feature/Database/DeferredForeignKeysMigrationTest.php`, **9 tests**, cubre
+los seis escenarios pedidos y dos fallos declarados:
+
+| escenario | test |
+|---|---|
+| réplica limpia | `a_fresh_replay_ends_with_all_four_deferred_foreign_keys` |
+| preexistente con nombre original **y** alternativo | `up_leaves_a_preexisting_foreign_key_intact_whatever_its_name` (data provider) |
+| el rollback no borra lo preexistente | `down_is_a_no_op_and_never_removes_a_preexisting_foreign_key` |
+| `down` + `up` sin duplicados | `down_then_up_is_safe_and_creates_no_duplicates` |
+| `up()` repetido sin duplicados | `up_is_idempotent_across_repeated_runs` |
+| **filas sintéticas pobladas** que sobreviven | `synthetic_rows_survive_up_down_and_up_again` |
+| tabla referenciada ausente → excepción | `a_missing_referenced_table_raises_instead_of_silently_succeeding` |
+| clave preexistente no equivalente → excepción | `a_preexisting_but_non_equivalent_foreign_key_raises` |
+
+Las filas se **inventan en el test** (país → estado → ciudad → empresa): no se
+copió ni un dato de cliente, ni se leyó la base compartida. El test se niega a
+correr si la base no se llama `cpv_test`, así que no puede aplicar DDL en otro
+sitio, y **no hay `migrate:rollback` contra datos vivos**.
+
+### 0.3 Timestamps: la cadena completa, no sólo un cast (punto 3)
+
+La revisión tenía razón en que `datetime:Y-m-d H:i:s.u` por sí solo no prueba
+nada. Lo que se comprobó de punta a punta:
+
+| eslabón | medido |
+|---|---|
+| formato de binding del grammar | `Y-m-d H:i:s` — **sin microsegundos** (`Grammar::getDateFormat()`) |
+| lo que liga el query builder | dos instantes separados 2 ms → **la misma cadena** |
+| comparación en PostgreSQL | `bound t2 > bound t1` → **NO** |
+| tipo de columna | `TIMESTAMP`, es decir microsegundos: **la base sí puede, PHP no se los manda** |
+
+Es decir: la causa no está en el esquema sino en el **binding**, y por eso subir
+la precisión de una sola columna no habría arreglado nada. La evidencia está en
+`isolated_phpunit_2026-10-14c/timestamp_probe.txt`.
+
+**Límite declarado, como pidió la revisión:** las filas ya guardadas con
+resolución de segundo **no pueden recuperar precisión retroactivamente**. Para
+ellas el grado `boundary_same_second` es el techo de lo que se puede afirmar, y
+el delta lo dice en su propio campo `limitation`.
+
+### 0.4 Auditoría de invalidación (punto 4)
+
+No se «formatea un lado distinto para esquivar la igualdad». `record()` conserva
+**intacto** su guard de no-op —correcto para un cambio de valor, y hay un test
+que lo comprueba— y se añade `recordEvent()`, un método **aparte y estrecho**
+para registrar un HECHO. Quien quiera saltarse el guard tiene que nombrarlo.
+
+El payload además es más veraz: identifica **qué** confirmación se anuló
+(referencia, canal, quién), no sólo su instante.
+
+### 0.5 Delta de supersesión (punto 5)
+
+El `>` **no** se relajó a `>=`, que metería en la lista los conceptos que el
+revisor sí vio. Se reportan dos grados:
+
+* `exact` — estrictamente posterior: apareció después, sin duda;
+* `boundary_same_second` — indistinguible del instante de la revisión: **candidato
+  conservador**, contado aparte, con sus ids.
+
+Y llega al humano, no sólo al JSON: el infolist muestra los dos recuentos y marca
+cada concepto limítrofe con «[mismo segundo: candidato]». Las salvaguardas de
+`stale` y de fingerprint quedan intactas y la regresión **afirma que siguen
+disparando**.
+
+### 0.6 Regresiones deterministas, sin `sleep` (puntos 4 y 5)
+
+`tests/Unit/Taxonomy/SameSecondTimestampRegressionTest.php`, **5 tests**: el reloj
+se fija con `Carbon::setTestNow()`, así que confirmar y anular caen en el mismo
+segundo **por construcción, en cualquier máquina**. Nada de `sleep()` ni de
+depender de la latencia de red — que es justo lo que hacía que los tests
+originales pasaran contra una base remota y fallaran contra una local.
+
+### 0.7 El test de UI obsoleto (punto 6)
+
+`an_already_frozen_candidate_is_still_protected_from_a_second_freeze` ahora
+afirma que `freezeReview` está **escondida** en el segundo intento y que sigue
+habiendo exactamente una propuesta `PENDING_APPLY`. Eso es **más exigente** que
+afirmar que se puede invocar sin error: afirma la defensa nueva además de la
+intención original. La salvaguarda real sigue cubierta por el test de invocación
+directa al servicio y por el del índice único parcial, nombrados en el comentario.
+
+### 0.8 Los dos tests vacíos, y la deprecación (punto 7)
+
+Los dos **no afirmaban nada**: iteraban una colección vacía, el bucle no daba ni
+una vuelta y PHPUnit los marcaba «risky» mientras figuraban en verde. Ahora cada
+uno monta sus propios datos sintéticos, afirma que **la entrada se procesó** y que
+**la salida no está vacía**, y recién después la propiedad que su nombre promete.
+No se borró ninguno, no se permiten bucles vacíos y no se siembra nada compartido.
+
+**La deprecación está identificada y corregida, y estaba en código del proyecto.**
+Con la opción `display-phpunit-deprecations` resultó ser: «Your XML configuration
+validates against a deprecated schema». Dos causas, las dos en `phpunit.xml`:
+`processUncoveredFiles`, que PHPUnit eliminó, y `include` dentro de `coverage`,
+que desde PHPUnit 10 vive en `source`. Migrado a mano para no perder los
+comentarios que explican por qué la conexión de base no se fija ahí. **No se
+actualizó ninguna dependencia.**
+
+**Un error mío por el camino, que conviene registrar:** escribí los nombres de las
+opciones con sus guiones dentro de un comentario XML, y un comentario no puede
+contener dos guiones seguidos. PHPUnit rechazó la configuración entera —exit 2,
+cero tests— que es peor que la deprecación que documentaba. Corregido, y el
+comentario ahora explica por qué.
+
+### 0.9 Correcciones de documentación (lote)
+
+Las cuatro, aplicadas en el cuerpo de este informe: el SHA probado **sí** cambia
+el juego de migraciones (§1); «ningún efecto sobre bases existentes» pasa a ser la
+condición exacta con su tabla de estados y los escenarios realmente probados,
+incluyendo que **insertar la fila en `migrations` ya es un cambio** (§3.1); la
+latencia de red queda como **inferencia plausible y no causa establecida** (§7); y
+«esquema completo» se precisa como el juego de tablas y migraciones **probado**,
+que no es paridad vista por vista con la base desplegada (encabezado).
 
 **Lo que esta ronda logró:** una base PostgreSQL vacía se construye desde las
 migraciones, y la suite pasó de **25 fallos/errores a 4 fallos y 0 errores** sin
@@ -25,10 +191,12 @@ esa salvedad sería inexacto.
 | Repositorio | `estebanjvasquez/PerfilAfiliadosCPV` (público) |
 | Rama de trabajo **aislada** | `feature/isolated-test-readiness` |
 | SHA base (de partida) | `a6e9db4711718ca053b9e8be0678be92cfe02ecb` (`feature/upgrade-filament-v3`) |
-| **SHA exacto probado** | `d4ea4055ab96c43ce7c72232339ca6809d853ae3` |
-| Arnés de pruebas | `infra/contabo-test-runner` @ `2e896639b374a1a1ad970a060604afe46a681131` |
+| **SHA probado, ronda 2** (`TESTED_HEAD`) | `8b8bcff1e0a874e594a98e4056ad0d750a9aa259` |
+| SHA probado, ronda 1 (histórico) | `d4ea4055ab96c43ce7c72232339ca6809d853ae3` |
+| Arnés de pruebas | `infra/contabo-test-runner` @ `278a50236a8a0c58b5a6663f1b62111ca09ac12a` |
 | Rama hermana consultada | `feature/supplhi-postgres-buscador` @ `5df23fa9c5d0b93d5ccd0e155095a0e98726d6d0` |
-| `run_id` | `20261014T092024Z-d4ea4055ab96` |
+| `run_id` ronda 2 (suite GREEN) | `20261014T165650Z-8b8bcff1e0a8` |
+| `run_id` ronda 1 | `20261014T092024Z-d4ea4055ab96` |
 
 **Qué comparte y qué no con el SHA de la ronda anterior**, corregido tras la
 revisión `6167931953`: la versión previa de este párrafo decía que *la base y el
@@ -482,7 +650,13 @@ tiene esquema y datos.
 
 ---
 
-## 7. Los cuatro fallos restantes
+## 7. Los cuatro fallos de la ronda 1 — TODOS RESUELTOS en la ronda 2
+
+> **Estado:** lo que sigue es el diagnóstico tal como se hizo en la ronda 1, que
+> es la evidencia de **por qué** cada corrección es la que es. Los cuatro están
+> corregidos y la suite completa pasa en verde (§0). Se conserva en vez de
+> borrarse porque un diagnóstico medido vale más que la nota «arreglado»: lo que
+> aquí se razona es lo que §0.3–§0.7 implementan.
 
 **Tres de los cuatro son la misma causa raíz**, por dos caminos de código
 distintos: los timestamps se escriben con **resolución de un segundo**, así que

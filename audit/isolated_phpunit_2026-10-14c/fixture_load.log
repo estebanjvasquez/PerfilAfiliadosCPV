@@ -1,0 +1,19 @@
+DO
+INSERT 0 2
+INSERT 0 4
+INSERT 0 20
+INSERT 0 3
+DO
+NOTICE:  fixture ok: 26 categories (2/4/20), 3 empresas, leaf=7 family=3 group=1 sibling=8 other_family_child=12
+    fixture_table    | level | row_count 
+---------------------+-------+-----------
+ taxonomy_categories |     0 |         2
+ taxonomy_categories |     1 |         4
+ taxonomy_categories |     2 |        20
+(3 rows)
+
+ fixture_table | level | row_count 
+---------------+-------+-----------
+ empresas      |       |         3
+(1 row)
+
