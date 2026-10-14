@@ -259,8 +259,48 @@ fi
 # --- 5. dependencies, inside the workspace ----------------------------------
 
 step "5. Install dependencies INSIDE the workspace (dev included)"
-compose run --rm -T testapp composer install --prefer-dist --no-interaction --no-scripts \
-  >"$ARTIFACTS/composer.log" 2>&1 || { tail -20 "$ARTIFACTS/composer.log"; die "composer install failed"; }
+#
+# TWO ATTEMPTS, and the second one is not a retry of the same thing.
+#
+# `--prefer-dist` downloads zipballs from api.github.com, and when GitHub returns
+# a 500 for one package composer aborts the whole install with "Source fallback
+# is disabled. Not trying alternative sources." That happened for real, twice in
+# a row for phpunit/php-text-template, on a tree that had installed fine an hour
+# earlier - so it is not a flake to shrug at and not a defect in the code under
+# test. It is a dependency of the HARNESS on a third-party registry being up.
+#
+# The fallback clones from source instead. Same packages, same composer.lock,
+# same resolved versions - only the transport differs, so it cannot change what
+# is installed. It is slower, which is why it is the fallback and not the
+# default.
+#
+# The composer cache lives in TEST_ROOT, OUTSIDE the workspace, so it survives
+# the per-run teardown and a package fetched once is never fetched again. That
+# is also what makes the harness mostly immune to this class of outage. It is a
+# cache of public packages, nothing run-specific, so sharing it across runs
+# leaks nothing between them: the workspace, the database and the credentials
+# are still created fresh every time.
+COMPOSER_CACHE="${TEST_ROOT}/composer-cache"
+mkdir -p "$COMPOSER_CACHE"
+composer_install() {
+  compose run --rm -T \
+    -v "$COMPOSER_CACHE:/composer-cache" \
+    -e COMPOSER_CACHE_DIR=/composer-cache \
+    testapp composer install --no-interaction --no-scripts "$@"
+}
+if composer_install --prefer-dist >"$ARTIFACTS/composer.log" 2>&1; then
+  ok "dependencies installed from dist"
+else
+  finding "composer --prefer-dist failed; retrying with source fallback (registry problem, not the code under test)"
+  grep -oE 'could not be downloaded \([^)]*\)|HTTP/[0-9.]+ [0-9]{3}' "$ARTIFACTS/composer.log" \
+    | sort -u | head -3 | sed 's/^/           /'
+  if composer_install >>"$ARTIFACTS/composer.log" 2>&1; then
+    ok "dependencies installed with source fallback (same composer.lock, same versions)"
+  else
+    tail -20 "$ARTIFACTS/composer.log"
+    die "composer install failed from dist AND from source"
+  fi
+fi
 [ -x "$WORKSPACE/vendor/bin/phpunit" ] && ok "phpunit present in the workspace vendor" \
                                        || die "phpunit missing after composer install"
 compose run --rm -T testapp php artisan package:discover --ansi \
