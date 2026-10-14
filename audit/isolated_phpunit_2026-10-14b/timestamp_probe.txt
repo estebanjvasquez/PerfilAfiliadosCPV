@@ -1,0 +1,15 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-96f02a1e21af Creating 
+ Container cpvtest-testapp-run-96f02a1e21af Created 
+binding date format for this connection : Y-m-d H:i:s
+php captured t1                         : 2026-10-14 09:22:15.386575
+php captured t2 (2ms later)             : 2026-10-14 09:22:15.388771
+t2 is after t1 in PHP                   : yes
+what the query builder actually binds   : 2026-10-14 09:22:15  |  2026-10-14 09:22:15
+postgres says bound t2 > bound t1       : NO
+
+CONSEQUENCE: a row written in the same WHOLE SECOND as the review is
+invisible to where("created_at", ">", reviewed_at). The column holds
+microseconds; the binding format drops them before they are stored.
