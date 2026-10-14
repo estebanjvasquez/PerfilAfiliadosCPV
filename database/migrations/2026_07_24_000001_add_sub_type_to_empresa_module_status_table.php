@@ -77,10 +77,12 @@ return new class extends Migration
 
     private function indexExists(string $indexName): bool
     {
-        return DB::table('information_schema.statistics')
-            ->where('table_schema', Schema::getConnection()->getDatabaseName())
-            ->where('table_name', 'empresa_module_status')
-            ->where('index_name', $indexName)
-            ->exists();
+        // information_schema.statistics is a MySQL-only view: PostgreSQL has no
+        // such relation, so the previous implementation of this method made the
+        // migration unrunnable there. Schema::hasIndex() is driver-aware and
+        // asks each engine its own catalogue, so it behaves identically on
+        // MySQL and works on PostgreSQL. Available since Laravel 11; this
+        // project runs v12.69.0.
+        return Schema::hasIndex('empresa_module_status', $indexName);
     }
 };

@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('infrafacilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('infraregion_infrasystem_id')->references('id')->on('infraregion_infrasystem');
+            $table->foreignId('infraregion_infrasystem_id');
             //$table->foreignId('infrasystems_id')->references('infrasystem_id')->on('infraregion_infrasystem');
             //$table->foreignId('infraregions_id')->references('infraregion_id')->on('infraregion_infrasystem');
             $table->string('facility_name', 100);
