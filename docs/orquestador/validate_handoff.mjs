@@ -371,18 +371,42 @@ if (shallow === 'true') {
 // --- 9. hold consistency, in the handoff only -------------------------------
 
 section('9. Hold consistency (handoff fields only)');
+//
+// THE HOLD IS A FACT ABOUT GOVERNANCE, NOT A CONSTANT.
+//   These checks used to fail on any parallel task reading as ACTIVE, full
+//   stop, because TASK-0010A/B were held. The owner lifted that condition on
+//   2026-10-14, which would have left the gate failing a handoff that was
+//   telling the truth - and the way to answer that is not to word the status so
+//   it slips past a regex. So the hold is read from the handoff, and the strict
+//   check applies only while it is in force. A lift must say who lifted it:
+//   flipping the flag without provenance is itself a failure.
+const holdInForce = handoff.current_hold_in_force !== false;
+const liftedBy = handoff.current_hold_lifted_by;
 const parallel = handoff.parallel_tasks || {};
 const statuses = Object.entries(parallel).map(([n, v]) => [n, (v && v.status) || '']);
-if (statuses.some(([, s]) => /ACTIVE|PENDING_DEV/.test(s)))
-  fail('a parallel task still reads as active: ' + statuses.map(([n, s]) => n + '=' + s).join(', '));
-else if (statuses.length) pass('parallel tasks: ' + statuses.map(([n, s]) => n + '=' + s).join(', '));
+const asText = statuses.map(([n, s]) => n + '=' + s).join(', ');
+
+if (holdInForce) {
+  if (statuses.some(([, s]) => /ACTIVE|PENDING_DEV/.test(s)))
+    fail('a parallel task reads as active while the hold is in force: ' + asText);
+  else if (statuses.length) pass('hold IN FORCE; parallel tasks: ' + asText);
+  if (/ACTIVE_PARALLEL_DEVELOPMENT/.test(String(handoff.current_status || '')))
+    fail('current_status claims active parallel development while the hold is in force');
+  else pass('current_status is ' + handoff.current_status);
+} else if (typeof liftedBy === 'string' && liftedBy.trim().length > 20) {
+  pass('hold LIFTED; parallel tasks: ' + asText);
+  pass('the lift records its provenance (' + liftedBy.trim().length + ' chars)');
+  note('This section does not judge whether the lift was authorised. It checks');
+  note('that the handoff says who lifted it and when, so a resuming session is');
+  note('not left guessing why a held task now reads as resumed.');
+  pass('current_status is ' + handoff.current_status);
+} else {
+  fail('current_hold_in_force is false but current_hold_lifted_by does not record ' +
+       'who lifted it and when; a hold must not be liftable by flipping a flag');
+}
 
 if (handoff.current_hold) pass('current_hold is recorded');
 else warn('no current_hold field; if a task is held, say so where a resuming session reads it');
-
-if (/ACTIVE_PARALLEL_DEVELOPMENT/.test(String(handoff.current_status || '')))
-  fail('current_status claims active parallel development while TASK-0010 is held');
-else pass('current_status is ' + handoff.current_status);
 note('SCOPE: this section reads the HANDOFF only. It does not certify the');
 note('documentation set. Pass --docs for the limited document checks.');
 
