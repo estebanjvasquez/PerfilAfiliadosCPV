@@ -30,12 +30,22 @@ use Tests\TestCase;
 /**
  * TASK-0010A (Issue #2 comentario `6079967780`): solicitud de revisión de categoría CPV.
  *
- * DDL transaccional: la base de tests es la Postgres remota compartida (la misma de staging) y esta
- * rama NO puede correr `migrate` sola contra ella. Por eso setUp() aplica la migración nueva DENTRO
- * de la transacción de `DatabaseTransactions` (DDL en Postgres es transaccional) - el rollback al
- * final de cada test la deshace por completo, sin dejar ni la tabla ni la columna nueva en la base
- * compartida. El `up()` de la migración es idempotente (`IF NOT EXISTS`), así que el mismo test
- * sigue funcionando cuando la migración ya esté aplicada de verdad (deploy integrado).
+ * DÓNDE CORRE ESTO. En el PostgreSQL DESECHABLE del entorno aislado de Contabo, nunca contra la
+ * base compartida de Supabase: el propietario lo descartó explícitamente el 2026-10-14, y esa base
+ * la comparten el desarrollo local y staging al mismo tiempo. En el entorno aislado `migrate`
+ * construye el esquema desde vacío, así que la migración de esta tarea ya está aplicada de verdad
+ * antes del primer test y el condicional de setUp() no hace nada.
+ *
+ * POR QUÉ setUp() IGUAL PUEDE APLICARLA. El condicional se queda porque hace al test ejecutable
+ * contra una base que ya existe y a la que esta rama no puede migrarle sola - un `migrate` de esta
+ * rama sobre una base compartida es justamente lo que no debe pasar. En esa ruta aplica la
+ * migración DENTRO de la transacción de `DatabaseTransactions` (en PostgreSQL el DDL es
+ * transaccional) y el rollback de cada test la deshace por completo: no deja ni la tabla ni la
+ * columna. El `up()` es idempotente (`IF NOT EXISTS`), así que las dos rutas convergen.
+ *
+ * LÍMITE DECLARADO: en la ruta transaccional esto ejercita el `up()` de la migración, no su
+ * aplicación real por `migrate` ni su `down()`. Que el juego de migraciones se reproduzca desde
+ * vacío lo prueba la corrida aislada, que es un resultado aparte.
  */
 class TaxonomyCategoryRequestTest extends TestCase
 {
