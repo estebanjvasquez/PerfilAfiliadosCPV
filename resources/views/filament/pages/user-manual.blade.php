@@ -50,8 +50,27 @@
         .cpv-manual__content code { font-size: 0.9em; padding: 0.1rem 0.3rem; border-radius: 0.25rem; background: rgb(var(--gray-100)); }
         .dark .cpv-manual__content code { background: rgb(var(--gray-800)); }
 
-        .cpv-manual__content .manual-table { display: block; overflow-x: auto; border-collapse: collapse; margin: 0.75rem 0; max-width: 100%; }
-        .cpv-manual__content .manual-table th, .cpv-manual__content .manual-table td { border: 1px solid rgb(var(--gray-300)); padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; min-width: 10rem; }
+        /*
+            TABLAS EN PANTALLA ANGOSTA. La versión anterior era
+            `display: block; overflow-x: auto` con `min-width: 10rem` en cada celda, y medido en
+            Chromium a 390px eso desbordaba la página 111px en horizontal: tres columnas por 160px
+            dan ~501px de ancho intrínseco, y `display: block` sobre un `<table>` no lo contiene de
+            forma fiable - crea una caja de tabla anónima que se dimensiona por su contenido.
+            Desbordar la página entera en un móvil es justo lo que el contrato no quiere.
+
+            Debajo de 640px la tabla es `fixed` al 100% del contenedor y el texto se parte: en un
+            manual se lee la tabla, no se arrastra. Desde 640px vuelve el ancho mínimo por columna,
+            que a esos anchos ya entra sin empujar nada.
+        */
+        .cpv-manual__content .manual-table {
+            display: table; width: 100%; max-width: 100%; table-layout: fixed;
+            border-collapse: collapse; margin: 0.75rem 0;
+        }
+        .cpv-manual__content .manual-table th, .cpv-manual__content .manual-table td { border: 1px solid rgb(var(--gray-300)); padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; overflow-wrap: break-word; word-break: break-word; }
+        @media (min-width: 640px) {
+            .cpv-manual__content .manual-table { table-layout: auto; }
+            .cpv-manual__content .manual-table th, .cpv-manual__content .manual-table td { min-width: 10rem; }
+        }
         .cpv-manual__content .manual-table th { background: rgb(var(--gray-100)); font-weight: 600; }
         .dark .cpv-manual__content .manual-table th, .dark .cpv-manual__content .manual-table td { border-color: rgb(var(--gray-700)); }
         .dark .cpv-manual__content .manual-table th { background: rgb(var(--gray-800)); }
