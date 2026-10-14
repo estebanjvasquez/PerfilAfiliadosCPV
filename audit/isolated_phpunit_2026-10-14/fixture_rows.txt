@@ -1,0 +1,8 @@
+empresas                       0
+taxonomy_categories            0
+taxonomy_terms                 0
+taxonomy_canonical_concepts    0
+taxonomy_term_cpv_relations    0
+users                          0
+permissions                    16
+roles                          0

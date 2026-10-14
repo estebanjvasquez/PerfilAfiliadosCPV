@@ -1,0 +1,16 @@
+Failing-test names, run 20261013T183459Z vs run 20261014T063709Z, same SHA
+99e603cb4713fe0a349f7958af44327e5ae34845, same preparation.
+
+Command used:
+  names() { grep -E '^[0-9]+\) ' "$1" | sed 's/^[0-9]*) //' | sort; }
+  comm -23 <(names run1/phpunit.txt) <(names run2/phpunit.txt)   # only in run 1
+  comm -13 <(names run1/phpunit.txt) <(names run2/phpunit.txt)   # only in run 2
+
+run 1 failing entries: 28
+run 2 failing entries: 27
+
+ONLY IN RUN 1:
+  Tests\Unit\Taxonomy\ReviewedProposalConfirmationTest::invalidating_is_recorded_as_its_own_distinguishable_audit_event
+
+ONLY IN RUN 2:
+  (none)

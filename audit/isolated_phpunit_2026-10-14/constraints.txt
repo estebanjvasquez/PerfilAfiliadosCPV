@@ -1,0 +1,28 @@
+== The four deferred constraints must exist
+DO
+
+== Their definitions, from the catalogue
+NOTICE:  all four deferred foreign keys are present
+                  constraint_name                   |                                   definition                                    
+----------------------------------------------------+---------------------------------------------------------------------------------
+ empresas_city_id_foreign                           | FOREIGN KEY (city_id) REFERENCES cities(id)
+ infrafacilities_infraregion_infrasystem_id_foreign | FOREIGN KEY (infraregion_infrasystem_id) REFERENCES infraregion_infrasystem(id)
+ infratypes_infrasectors_id_foreign                 | FOREIGN KEY (infrasectors_id) REFERENCES infrasectors(id)
+ sustainabilities_areas_id_foreign                  | FOREIGN KEY (areas_id) REFERENCES areas(id)
+(4 rows)
+
+
+== Every foreign key in the fixture, counted
+ foreign_keys_total 
+--------------------
+                 82
+(1 row)
+
+
+== Tables and views present
+ table_type | n  
+------------+----
+ BASE TABLE | 77
+ VIEW       | 13
+(2 rows)
+

@@ -12,8 +12,8 @@ artifacts are** below for findings 1 and 3 of that verdict.
 | | |
 |---|---|
 | SHA under test | `99e603cb4713fe0a349f7958af44327e5ae34845` (`feature/upgrade-filament-v3`) |
-| Test runner | `infra/contabo-test-runner` @ `d17854bd875a68ce23ed7ec9a87f87046f00512f` |
-| Run id | `20261013T183459Z-99e603cb4713` |
+| Test runner | `infra/contabo-test-runner` @ `d17854bd875a68ce23ed7ec9a87f87046f00512f` (first run, and the commit the three patches live at) · `04c1fbf` (repeat run, after the host path was externalised) |
+| Run id | `20261013T183459Z-99e603cb4713` (first) · `20261014T063709Z-99e603cb4713` (repeat) |
 | Host | the project staging VPS, `66.94.121.98` (already recorded in `PROJECT_KNOWLEDGE.md`) |
 | Runtime | PHP 8.2.34 · `pdo_pgsql,intl,zip,gd,bcmath` · PostgreSQL 16.15 (`pgvector/pgvector:pg16`) |
 | Artifacts | 18 files on the host; the 10 checkable ones are committed, redacted, under [`audit/isolated_phpunit_2026-10-13/`](isolated_phpunit_2026-10-13/) |
@@ -38,16 +38,32 @@ this document broke that rule, which verdict `6152642797` reported as a major
 finding. It was right.
 
 Measured at `99e603cb`, so that redaction follows the rule rather than a
-feeling about it:
+feeling about it. **One command, quoted so the numbers can be reproduced** —
+note the pattern carries no leading `/`, for the reason given below:
 
-| detail | prior occurrences | verdict |
+```bash
+git grep -c "<pattern>" 99e603c | awk -F: '{s+=$NF} END {print s+0}'
+```
+
+| detail (pattern) | prior occurrences | verdict |
 |---|---|---|
-| executor install, state and config directories | 0 | **new**, redacted |
-| runner workspace and checkout paths under the host account | 0 | **new**, redacted |
-| exact OS release | 0 | **new**, removed |
-| private container network address | 2, both byte matches inside a binary `.pdf` | not published in any readable form; redacted |
-| live application directory | 13, including `.github/workflows/deploy-contabo.yml` | already published; may stay, placeholdered here anyway |
-| `66.94.121.98`, `vmi3554091...`, staging hostname | 12 / 4 / 33 | already published; kept |
+| executor install dir (`opt/cpv-orchestrator`) | 0 | **new**, redacted |
+| executor state dir (`var/lib/cpv-orchestrator`) | 0 | **new**, redacted |
+| executor config dir (`etc/cpv-orchestrator`) | 0 | **new**, redacted |
+| runner workspace (`root/cpv-test`) and checkout (`root/cpv-runner`) | 0 and 0 | **new**, redacted |
+| exact OS release (`AlmaLinux`) | 0 | **new**, removed |
+| private container network address (`172.21.`) | **2, and both are byte matches inside the binary `app/images/user.pdf`; 0 in any text file** | never published in readable form; redacted |
+| live application directory (`opt/perfilafiliados`) | 13, including `.github/workflows/deploy-contabo.yml` | already published; may stay, placeholdered here anyway |
+| host IP (`66.94.121.98`) | 12 | already published; kept |
+| host name (`vmi3554091`) | 4 | already published; kept |
+| staging hostname (`pruebas.camarapetrolera.app`) | 33 | already published; kept |
+
+The private address is the one row that is not simply "0", and verdict
+`6162548587` was right that the handoff narrative and this table disagreed
+about it: the narrative said every redacted item measured 0. The measured value
+is 2, both of them bytes inside a binary image, which is why it is treated as
+never published in readable form rather than as published. Both files now state
+that same value and the same command.
 
 The first attempt at this measurement reported 0 for everything, including
 identifiers that are plainly in the deploy workflow. The cause was the command,
@@ -89,6 +105,48 @@ from the live application directory. The runner asserts exactly that, by exact
 string, and records the assertion in `summary.txt` as part of the 18 isolation
 checks.
 
+## The pointer was advanced, and here is the proof
+
+Verdict `6162548587` raised, conditionally, that the pointer might not have been
+advanced for that round, because the handoff excerpt it was given showed
+`review_head=650db29c` and `review_requested_at=2026-10-13T18:40:33Z` — the
+previous round's values. It was right to raise it: nothing in the bundle said
+which commit that excerpt came from.
+
+The pointer had been advanced. `review_head` read straight from git at each
+commit of that round:
+
+```
+at 650db29  review_head=d1e1ee1485b2  requested_at=2026-10-13T10:21:48Z
+at 25e25c3  review_head=650db29c6daf  requested_at=2026-10-13T18:40:33Z
+at 20d3c12  review_head=650db29c6daf  requested_at=2026-10-13T18:40:33Z   <- reviewed commit
+at 179efa3  review_head=20d3c12d9bc7  requested_at=2026-10-14T06:40:59Z   <- pointer commit
+```
+
+That is the two-commit pattern working: a commit cannot contain its own hash, so
+the pointer naming the content commit must sit above it.
+
+The decisive check is the marker, because the executor derives it from
+`review_head` and nothing else. The marker published on `6162548587` is
+`211231898585851937714c720a90d920`, and:
+
+```
+sha256("<repo>|KNOWLEDGE-HANDOFF|feature/upgrade-filament-v3|20d3c12…")[:32]
+  = 211231898585851937714c720a90d920   <- matches the published marker
+sha256(… same, but 650db29…)[:32]
+  = ac6200348544573b58dbee9673f68072   <- that is the PREVIOUS verdict's marker
+```
+
+Had the pointer still named `650db29`, the executor would have found the
+existing marker and skipped the round as already reviewed. It did not: it logged
+`branch_advanced_past_review_head  declared=20d3c12d9bc7  tip=179efa3e617f`,
+which is it reading the advanced pointer from the tip.
+
+**Fixed where the ambiguity actually was**, since a conditional finding that
+recurs every round costs a review each time: the executor's evidence bundle now
+labels the handoff section with the commit it was read at and states what the
+pointer fields mean there. `SISTEG-Agent-Orchestrator@64ecc4bf`.
+
 ## Reproducing it
 
 ```bash
@@ -107,7 +165,18 @@ not be prepared so the suite says nothing about the code, `1` anything else.
 ## Where the artifacts are
 
 Verdict `6152642797`, finding 3, asked for the evidence to be checkable from
-the repository rather than cited by hash. Committed under
+the repository rather than cited by hash. **Which commit produced which set**,
+since verdict `6162548587` finding 4 asked for exactly that:
+
+| artifact set | run | runner commit |
+|---|---|---|
+| [`audit/isolated_phpunit_2026-10-13/`](isolated_phpunit_2026-10-13/) | `20261013T183459Z-99e603cb4713` | `d17854bd` |
+| [`audit/isolated_phpunit_2026-10-14/`](isolated_phpunit_2026-10-14/) | `20261014T063709Z-99e603cb4713` | `04c1fbf` |
+
+The patch files themselves are at `d17854bd` and unchanged by `04c1fbf`, which
+touched only the runner's path handling.
+
+The first set, under
 [`audit/isolated_phpunit_2026-10-13/`](isolated_phpunit_2026-10-13/):
 
 | file | what it holds |
@@ -123,9 +192,17 @@ the repository rather than cited by hash. Committed under
 | `phpunit_failures.txt` | the full failing-test section of the suite output |
 | `schema_fix_applied.diff` | the three patches' net effect on `database/migrations` |
 
+The repeat run's set, under
+[`audit/isolated_phpunit_2026-10-14/`](isolated_phpunit_2026-10-14/), is
+`summary.txt`, `fixture_rows.txt`, `constraints.txt`, `phpunit_failures.txt`
+and `failing_test_name_diff.txt`, the last of which carries the exact commands
+used to compare the two runs' failing-test names.
+
 The three patches themselves, and the proposal that explains them, are in this
 same repository on the runner branch, at
-`infra/contabo-test-runner` @ `d17854bd875a68ce23ed7ec9a87f87046f00512f`:
+`infra/contabo-test-runner` @ `d17854bd875a68ce23ed7ec9a87f87046f00512f`
+(path handling later externalised at `04c1fbf`; the patches are identical in
+both):
 
 ```
 docker/test/schema_fix/README.md                          the proposal, with both promotion routes
@@ -355,9 +432,15 @@ only in the first run:
     ::invalidating_is_recorded_as_its_own_distinguishable_audit_event
 ```
 
-Everything else is identical. Two runs are not enough to characterise the cause
-and none is claimed here; they are enough to establish that the suite is not
-deterministic at this SHA. This is the first thing the isolated harness bought
+Everything else is identical. **Checkable from the repository**, which verdict
+`6162548587` finding 1 correctly required rather than prose: the repeat run's
+`summary.txt`, `phpunit_failures.txt` and `failing_test_name_diff.txt` are
+committed under
+[`audit/isolated_phpunit_2026-10-14/`](isolated_phpunit_2026-10-14/), and the
+name diff states the exact commands used to produce it.
+
+Two runs are not enough to characterise the cause and none is claimed here;
+they are enough to establish that the suite is not deterministic at this SHA. This is the first thing the isolated harness bought
 that the shared database could not: against a database other work also writes
 to, a test that changes verdict between runs is indistinguishable from data
 drift.
@@ -424,8 +507,11 @@ for it.
 * **Deployed version, proven byte-identical** rather than asserted: all ten
   modules in the executor's install directory have `git hash-object` blob ids
   equal to those committed at
-  `SISTEG-Agent-Orchestrator@b126bc11e9f2d927c616b7230c98b316ab7786e2`
-  (`feature/cpv-executor-contabo`, pushed).
+  `SISTEG-Agent-Orchestrator@64ecc4bfb1bd22715f79371ea3e2d6c99272a40d`
+  (`feature/cpv-executor-contabo`, pushed), including the two modules changed
+  this round. The runs reported above were served by
+  `b126bc11e9f2d927c616b7230c98b316ab7786e2`; `64ecc4bf` changes only how
+  evidence is assembled for reviews and nothing about how tests run.
 * **Cadence**: `cycle_complete` every 120 s to the second
   (…17:29:51, 17:31:51, 17:33:51, 17:35:51, 17:37:52, 17:39:51Z), 1.3–2.1 s per
   cycle, `health: ok`, service `active` and `enabled`.
@@ -437,10 +523,16 @@ for it.
   relies on them.
 * **Fault injector disabled**: `CPV_FAULT_INJECT` appears in no unit file, no
   file in the executor's config directory, and not in the unit's `Environment`.
-* **Evidence truncation, disclosed:** the review of `650db29c` reported
-  `evidence_chars 234361` against a 220000 cap, so 14361 characters were
-  dropped. Truncation takes the tail and inserts an explicit marker telling the
-  reviewer that evidence was omitted, so what was lost is the end of the recent
-  issue thread and the closing instruction line; the request, governance,
-  handoff excerpt and full diff come first and survived. The reviewer recorded
-  the same limitation itself.
+* **Evidence truncation, disclosed and then fixed.** It grew across rounds:
+  14361 characters dropped reviewing `650db29c`, then 30780 reviewing
+  `20d3c12d` against a 220000 budget. Because truncation took the tail, by the
+  second round it had swallowed the diff of the very file a finding was about,
+  and verdict `6162548587` recorded that it could not verify the correction it
+  had asked for — including the gate's new exit-2 behaviour.
+
+  Trimming is now by priority rather than position, in
+  `SISTEG-Agent-Orchestrator@64ecc4bf`: the recent-thread section is the only
+  one that excerpts material a reviewer can fetch for itself, so it is dropped
+  first, with a note saying so and a log line recording it, while the request,
+  governance, handoff and the full diff stay. The tail truncation remains as a
+  last resort, which makes it rare instead of normal.
