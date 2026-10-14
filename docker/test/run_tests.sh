@@ -1001,6 +1001,48 @@ printf("microseconds; the binding format drops them before they are stored.\n");
 ' >"$ARTIFACTS/timestamp_probe.txt" 2>&1 || true
 sed 's/^/           /' "$ARTIFACTS/timestamp_probe.txt"
 
+# --- 8-quater. NO TAXONOMY MUTATION -------------------------------------------
+#
+# Instruction 6173818866 step 5 asks the integrated checks to show no taxonomy
+# mutations. "No test wrote to the governed tables" is a claim worth measuring
+# rather than asserting: the suite exercises the category-request flow and the
+# whole point of TASK-0010A is that a request NEVER creates or publishes a
+# category.
+#
+# The counts are taken from the fixture AFTER everything has run and compared
+# with what the fixture phase loaded. Tests use DatabaseTransactions and roll
+# back, so the expectation is equality - a difference means something escaped a
+# transaction, which is exactly what this is here to catch.
+if [ "$MIGRATE_OK" = "yes" ] && [ "$FIXTURE_LOADED" = "yes" ]; then
+  step "8-quater. Governed taxonomy tables unchanged by the run"
+  compose run --rm -T testapp php -r '
+require "vendor/autoload.php"; $a=require "bootstrap/app.php";
+$a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+foreach (["taxonomy_categories","taxonomy_category_translations","taxonomy_term_cpv_relations",
+          "taxonomy_canonical_concepts","taxonomy_term_concepts","taxonomy_concept_relations",
+          "empresa_taxonomy_category"] as $t) {
+    try { printf("%-34s %d\n", $t, DB::table($t)->count()); }
+    catch (Throwable $e) { printf("%-34s (unreadable)\n", $t); }
+}' 2>/dev/null | tr -d '\r' > "$ARTIFACTS/taxonomy_after_suite.txt"
+  sed 's/^/           /' "$ARTIFACTS/taxonomy_after_suite.txt"
+
+  # taxonomy_categories is the one the fixture populated; the rest started empty
+  # and must still be empty. Compared against fixture_rows.txt, not retyped.
+  CAT_BEFORE=$(awk '$1=="taxonomy_categories"{print $2}' "$ARTIFACTS/fixture_rows.txt")
+  CAT_AFTER=$(awk '$1=="taxonomy_categories"{print $2}' "$ARTIFACTS/taxonomy_after_suite.txt")
+  if [ "$CAT_BEFORE" = "$CAT_AFTER" ]; then
+    pok "taxonomy_categories unchanged by the suite ($CAT_AFTER rows, as the fixture loaded)"
+  else
+    pbad "taxonomy_categories CHANGED: $CAT_BEFORE -> $CAT_AFTER (something escaped a test transaction)"
+  fi
+  LEAKED=$(awk '$1!="taxonomy_categories" && $2!=0 && $2!="(unreadable)"{print $1"="$2}' "$ARTIFACTS/taxonomy_after_suite.txt" | tr '\n' ' ')
+  if [ -z "$LEAKED" ]; then
+    pok "every other governed taxonomy table is still empty: nothing was published"
+  else
+    pbad "governed taxonomy rows left behind: $LEAKED"
+  fi
+fi
+
 # --- 9. staging smoke, after -------------------------------------------------
 
 step "9. Staging smoke AFTER"

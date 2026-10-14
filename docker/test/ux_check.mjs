@@ -140,6 +140,32 @@ try {
   }
 
   // ---------------------------------------------------------------------------
+  // 4-bis. THE FINAL TASK-0010A LABELS ARE VISIBLE TO THE READER.
+  //
+  //    Integration check for instruction 6173818866: the manual must cite the
+  //    labels the affiliate actually sees in the request flow. PHPUnit asserts
+  //    this against the implementation constants; here it is confirmed in the
+  //    RENDERED page, which is the thing a person reads.
+  // ---------------------------------------------------------------------------
+  {
+    const finalLabels = [
+      'No encuentro la categoría / Solicitar revisión',
+      'Solicitar revisión de categoría a la Cámara',
+      '¿Qué producto, servicio o capacidad necesita representar?',
+      '¿Por qué solicita la revisión?',
+      '¿Qué palabras probó al buscar? (opcional)',
+    ];
+    const text = await page.evaluate(() => document.body.innerText);
+    const missing = finalLabels.filter((l) => !text.includes(l));
+    record('the manual shows the final TASK-0010A labels', missing.length === 0,
+      missing.length ? 'MISSING: ' + missing.join(' | ') : `all ${finalLabels.length} labels rendered`);
+
+    // And it still states the governing promise, in the rendered text.
+    record('the manual states the request does not create a category', /no\s+crea\b[^.]{0,40}categor/i.test(text),
+      'checked the rendered text, not the markdown source');
+  }
+
+  // ---------------------------------------------------------------------------
   // 5. EVERY TABLE-OF-CONTENTS LINK REACHES A VISIBLE HEADING.
   //    This is the one the contract cares about ("stable anchors"), and the one
   //    a wall of text would quietly fail.
