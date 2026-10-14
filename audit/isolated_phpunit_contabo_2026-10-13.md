@@ -64,7 +64,26 @@ by role-based placeholders: `<runner checkout>`, `<workspace>`,
 `<executor state dir>`, `<executor config dir>`, `<private network address>`.
 The unredacted originals stay on the host, outside this repository.
 
-The one place this costs evidence is `mounts.txt`, where the workspace path is
+### The same rule applied where the review did not look
+
+Verdict `6152642797` reviewed the integration-branch commit. The identical
+violation was in the runner's own source on `infra/contabo-test-runner` — the
+same public repository, a different branch — because `run_tests.sh` hard-coded
+the scratch root under the host account, which the measurement above puts at 0
+prior occurrences. Leaving it because nobody flagged it would have been
+knowingly keeping a reported class of defect.
+
+It now comes from `CPV_TEST_ROOT` with **no default**: a missing value is a
+loud failure rather than a silent fallback to somebody's home directory, and a
+relative value is rejected. The live application directory keeps its default,
+since it is already published 13 times including in the deploy workflow, and
+`CPV_LIVE_APP_DIR` can override it. Fixed in
+`infra/contabo-test-runner` @ `04c1fbf`, and the run was repeated afterwards
+(`20261014T063709Z-99e603cb4713`) to confirm the runner still works end to end
+with the path supplied from outside: isolation PASS (18 checks, 0 failed),
+schema preparation PASS (11 steps, 0 failed), 90 objects, suite RED again.
+
+The one place redaction costs evidence is `mounts.txt`, where the workspace path is
 now a placeholder, so a reader cannot see for themselves that it is disjoint
 from the live application directory. The runner asserts exactly that, by exact
 string, and records the assertion in `summary.txt` as part of the 18 isolation
@@ -323,6 +342,26 @@ failure was `PermissionDoesNotExist: There is no permission named
 update_taxonomy::candidate::concept::link for guard web`, 265 times. No
 permission, role or fixture row was invented by the runner.
 
+### One test is not deterministic, which only a repeatable harness could show
+
+The repeat run at the same SHA, with the same preparation, produced **20
+failures instead of 21** and 2160 assertions instead of 2157. Diffing the
+failing-test names between the two runs isolates the whole difference to one
+test:
+
+```
+only in the first run:
+  Tests\Unit\Taxonomy\ReviewedProposalConfirmationTest
+    ::invalidating_is_recorded_as_its_own_distinguishable_audit_event
+```
+
+Everything else is identical. Two runs are not enough to characterise the cause
+and none is claimed here; they are enough to establish that the suite is not
+deterministic at this SHA. This is the first thing the isolated harness bought
+that the shared database could not: against a database other work also writes
+to, a test that changes verdict between runs is indistinguishable from data
+drift.
+
 **The claim boundary, stated precisely:** 7 of the 26 declare a data
 precondition explicitly. The other 19 are assertion mismatches whose shape
 (`expected size 2, actual 0`; `an array contains 274`; `0 is identical to 1`) is
@@ -350,7 +389,13 @@ remaining 19 are not real code defects.
    reads `select max(batch) from migrations` before anything creates that table.
    The runner calls `migrate:install` first. On an existing database this is
    invisible.
-4. **`.gitignore`'s blanket `*.sql` silently excluded the bootstrap SQL.**
+4. **One test is not deterministic.** Two runs at the same SHA with the same
+   preparation differ by exactly one:
+   `ReviewedProposalConfirmationTest::invalidating_is_recorded_as_its_own_distinguishable_audit_event`
+   failed in the first and passed in the second. Not characterised — two runs
+   cannot do that — but established, and only visible because the harness is
+   repeatable.
+5. **`.gitignore`'s blanket `*.sql` silently excluded the bootstrap SQL.**
    `git add` reported nothing and the run failed on the host with
    `restore_four_fks.sql: No such file or directory` after a successful replay.
    A negation rule now keeps those two files.
