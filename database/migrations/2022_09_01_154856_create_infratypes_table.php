@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('infratypes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('infrasectors_id')->constrained();
+            $table->foreignId('infrasectors_id');
             $table->string('type_name', 100);
             $table->timestamps();
         });

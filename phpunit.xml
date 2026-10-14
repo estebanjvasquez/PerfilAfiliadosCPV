@@ -12,11 +12,29 @@
             <directory suffix="Test.php">./tests/Feature</directory>
         </testsuite>
     </testsuites>
-    <coverage processUncoveredFiles="true">
+    <!--
+        Migrado al esquema de PHPUnit 10/11 (corrección de la revisión 6167931953, punto 7).
+
+        Cada corrida reportaba «PHPUnit Deprecations: 1» sin decir cuál. Identificado con la opción
+        "display-phpunit-deprecations" de PHPUnit, era: «Your XML configuration validates against a
+        deprecated schema». Dos cosas lo causaban, las dos en este archivo y no en una dependencia:
+
+          * el atributo processUncoveredFiles, que PHPUnit eliminó;
+          * el elemento "include" dentro de "coverage", que desde PHPUnit 10 vive en "source".
+
+        Se corrige a mano y no con la opción "migrate-configuration" para no perder los comentarios
+        de abajo, que documentan por qué la conexión de base NO se fija aquí. No se actualizó
+        ninguna dependencia: el cambio es de configuración y nada más.
+
+        (Y un comentario XML no puede contener dos guiones seguidos, así que las opciones se
+        nombran sin sus guiones iniciales: escribirlas tal cual rompió la configuración entera y la
+        suite salió con exit 2 y «Comment must not contain double-hyphen».)
+    -->
+    <source>
         <include>
             <directory suffix=".php">./app</directory>
         </include>
-    </coverage>
+    </source>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="BCRYPT_ROUNDS" value="4"/>

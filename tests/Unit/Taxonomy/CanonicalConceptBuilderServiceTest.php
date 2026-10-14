@@ -207,14 +207,59 @@ class CanonicalConceptBuilderServiceTest extends TestCase
         $this->assertContains('CPV_WITHOUT_COMPANIES', $impact['data_gap_flags']);
     }
 
+    /**
+     * Corrección de la revisión `6167931953`, punto 7: este test NO AFIRMABA NADA.
+     *
+     * Iteraba `sample_results` y, sobre un fixture sin términos candidatos, el bucle no daba ni una
+     * vuelta: PHPUnit lo marcaba «risky - did not perform any assertions» y el test pasaba sin
+     * comprobar el comportamiento que su nombre promete. Un test que pasa vacío es peor que no
+     * tenerlo: ocupa el lugar de una comprobación real.
+     *
+     * Ahora monta sus PROPIOS datos sintéticos - un concepto con miembro y un término candidato sin
+     * vincular con el mismo término canónico, que es lo que `dryRun()` busca - y afirma primero que
+     * la entrada y la salida NO están vacías, y recién después la propiedad que le interesa. Los
+     * datos se crean por test y se revierten con la transacción; no se siembra nada compartido.
+     */
     #[Test]
     public function dry_run_attaches_predicted_impact_to_every_scored_candidate(): void
     {
-        $result = $this->builder()->dryRun(5);
+        $needle = 'zzz_dryrun_impact_'.substr(uniqid('', true), -10);
 
+        // Un concepto con su término miembro...
+        $member = TaxonomyTerm::create($this->syntheticTermAttributes($needle, 'es'));
+        $concept = TaxonomyCanonicalConcept::create([
+            'canonical_name_es' => $needle,
+            'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE,
+        ]);
+        DB::connection('pgsql')->table('taxonomy_term_concepts')->insert([
+            'term_id' => $member->id, 'concept_id' => $concept->id, 'created_at' => now(),
+        ]);
+
+        // ...y un término candidato SIN vincular ni CPV aprobado, que es lo que dryRun() recoge.
+        $candidate = TaxonomyTerm::create($this->syntheticTermAttributes($needle, 'en'));
+
+        $result = $this->builder()->dryRun(50);
+
+        // LA ENTRADA no está vacía: si esto falla, el fixture no da candidatos y cualquier
+        // conclusión sobre la salida sería vacía.
+        $this->assertGreaterThan(0, $result['terms_processed'],
+            'El dry run no procesó ningún término: sin entrada, afirmar algo sobre la salida no significa nada.');
+        $this->assertGreaterThan(0, $result['pairs_scored'],
+            'No se puntuó ningún par término-concepto.');
+
+        // LA SALIDA tampoco: el candidato sintético tiene que haber sido puntuado.
+        $this->assertNotEmpty($result['sample_results'],
+            'El dry run no devolvió ningún candidato puntuado pese a existir uno con término canónico idéntico a un concepto.');
+
+        $ids = array_column($result['sample_results'], 'term_id');
+        $this->assertContains($candidate->id, $ids,
+            'El término candidato sintético de este test tiene que aparecer entre los puntuados.');
+
+        // Y RECIÉN AHORA la propiedad que el nombre del test promete.
         foreach ($result['sample_results'] as $scored) {
             $this->assertArrayHasKey('predicted_impact', $scored);
             $this->assertArrayHasKey('total_unique_company_count', $scored['predicted_impact']);
+            $this->assertIsInt($scored['predicted_impact']['total_unique_company_count']);
         }
     }
 
@@ -238,13 +283,37 @@ class CanonicalConceptBuilderServiceTest extends TestCase
         $this->assertGreaterThan(0, $proposal['evidence']['shared_cpv']);
     }
 
+    /**
+     * Corrección de la revisión `6167931953`, punto 7: igual que el anterior, este test NO AFIRMABA
+     * NADA. `proposeConceptRelations()` sin argumentos sobre un fixture sin conceptos devolvía cero
+     * propuestas, el bucle no daba ni una vuelta, y «el Builder nunca propone tipos direccionales»
+     * quedaba sin comprobar mientras el test figuraba en verde (marcado «risky»).
+     *
+     * Ahora crea dos conceptos que COMPARTEN una categoría CPV aprobada, que es justo la evidencia
+     * con la que el Builder propone, afirma que hay propuestas y después la propiedad: ninguna
+     * puede ser direccional/jerárquica. Datos por test, revertidos con la transacción.
+     */
     #[Test]
     public function propose_concept_relations_never_returns_directional_types(): void
     {
-        $result = $this->builder()->proposeConceptRelations();
+        $category = $this->syntheticCategory();
+        [$conceptA] = $this->conceptWithApprovedCpv('zzz_nodirectional_a_'.substr(uniqid('', true), -10), $category);
+        [$conceptB] = $this->conceptWithApprovedCpv('zzz_nodirectional_b_'.substr(uniqid('', true), -10), $category);
 
+        $result = $this->builder()->proposeConceptRelations([$conceptA->id, $conceptB->id]);
+
+        // La ENTRADA se evaluó de verdad.
+        $this->assertSame(1, $result['pairs_evaluated'],
+            'El par sintético de este test tiene que haberse evaluado.');
+        // Y hay SALIDA que inspeccionar: sin esto el bucle de abajo no probaría nada.
+        $this->assertNotEmpty($result['proposals'],
+            'Dos conceptos con la misma categoría CPV aprobada deben producir al menos una propuesta; sin propuestas, afirmar que ninguna es direccional es vacío.');
+
+        $directional = ['PART_OF', 'HAS_PART', 'SUPERSEDES', 'SUPERSEDED_BY'];
         foreach ($result['proposals'] as $proposal) {
             $this->assertSame('RELATED_TO', $proposal['relation_type'], 'El Builder nunca debe auto-proponer tipos direccionales/jerarquicos (PART_OF/HAS_PART/SUPERSEDES/SUPERSEDED_BY) - solo un humano puede proponerlos, ver audit/phase3_phase_b.md.');
+            $this->assertNotContains($proposal['relation_type'], $directional);
+            $this->assertSame('symmetric', $proposal['direction']);
         }
     }
 

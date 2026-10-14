@@ -1,0 +1,12 @@
+empresas                       3
+taxonomy_categories            26
+taxonomy_terms                 0
+taxonomy_canonical_concepts    0
+taxonomy_term_cpv_relations    0
+users                          0
+permissions                    16
+roles                          0
+taxonomy_concept_types         9
+taxonomy_concept_relation_types 5
+taxonomy_intent_markers        9
+empresa_taxonomy_category      0

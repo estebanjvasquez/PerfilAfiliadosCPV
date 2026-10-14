@@ -1,0 +1,26 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-5765325de644 Creating 
+ Container cpvtest-testapp-run-5765325de644 Created 
+
+   INFO  Seeding database.  
+
+No existe el rol 'super_admin' todavía - los permisos quedaron creados pero sin asignar a nadie.
+9 permiso(s) de Phase 3 verificados/creados.
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-903a7842468e Creating 
+ Container cpvtest-testapp-run-903a7842468e Created 
+
+   INFO  Seeding database.  
+
+No existe el rol 'super_admin' todavía - los permisos quedaron creados pero sin asignar a nadie.
+7 permiso(s) del diccionario V2 verificados/creados.
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-d366957dbfc8 Creating 
+ Container cpvtest-testapp-run-d366957dbfc8 Created 
+Concept types: 9 nueva(s). Relation types: 5 nueva(s). Intent markers: 9 nueva(s).

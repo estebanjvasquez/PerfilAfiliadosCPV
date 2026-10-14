@@ -48,6 +48,55 @@ class TaxonomyAuditLogger
             return;
         }
 
+        self::write($entityType, $entityId, $field, $oldValue, $newValue, $reason, $actorType, $algorithmVersion, $authorizationReference, $targetEnvironment);
+    }
+
+    /**
+     * Registra un EVENTO que ocurrió, sin el guard de no-op de `record()`.
+     *
+     * POR QUÉ EXISTE (corrección de la revisión `6167931953`, punto 4). `record()` descarta la fila
+     * cuando el valor viejo y el nuevo son iguales, lo cual es correcto para un CAMBIO DE VALOR: un
+     * "guardar" que no cambió nada no debe ensuciar la bitácora. Pero hay escrituras que no son un
+     * cambio de valor sino un HECHO - "esta confirmación fue anulada" - y ahí la igualdad de dos
+     * timestamps no significa que no pasó nada, significa que pasó dentro del mismo segundo.
+     *
+     * Medido: Laravel liga las fechas con el formato `Y-m-d H:i:s` del grammar, sin microsegundos,
+     * así que una confirmación y su anulación en el mismo segundo producían dos cadenas idénticas y
+     * el guard DESCARTABA EN SILENCIO el rastro de auditoría. Un evento de gobernanza que
+     * desaparece porque ocurrió rápido es un defecto, no ruido.
+     *
+     * Deliberadamente es un método APARTE y no un parámetro de `record()`: el comportamiento
+     * genérico de no-op se conserva intacto para los 20+ call sites que sí registran cambios de
+     * valor, y quien quiera saltárselo tiene que decirlo explícitamente en el nombre que invoca.
+     * No se "formatea un lado distinto" para esquivar la igualdad: el hecho se declara como hecho.
+     */
+    public static function recordEvent(
+        string $entityType,
+        int|string $entityId,
+        string $field,
+        mixed $oldValue,
+        mixed $newValue,
+        ?string $reason = null,
+        string $actorType = self::ACTOR_USER,
+        ?string $algorithmVersion = null,
+        ?string $authorizationReference = null,
+        ?string $targetEnvironment = null,
+    ): void {
+        self::write($entityType, $entityId, $field, $oldValue, $newValue, $reason, $actorType, $algorithmVersion, $authorizationReference, $targetEnvironment);
+    }
+
+    private static function write(
+        string $entityType,
+        int|string $entityId,
+        string $field,
+        mixed $oldValue,
+        mixed $newValue,
+        ?string $reason,
+        string $actorType,
+        ?string $algorithmVersion,
+        ?string $authorizationReference,
+        ?string $targetEnvironment,
+    ): void {
         TaxonomyAuditLog::query()->create([
             'user_id' => Auth::id(),
             'entity_type' => $entityType,

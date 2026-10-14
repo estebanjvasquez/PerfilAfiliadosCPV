@@ -33,7 +33,6 @@ return new class extends Migration
             $table->string('youtube_profile', 20)->nullable();
             $table->string('otros_profile', 20)->nullable();
 
-            $table->foreign('city_id')->references('id')->on('cities');
 
             $table->unsignedBigInteger('billing_id')->nullable();
             $table->unsignedBigInteger('employees_id')->nullable();

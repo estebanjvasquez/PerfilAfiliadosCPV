@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('sustainabilities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained();
-            $table->foreignId('areas_id')->constrained();
+            $table->foreignId('areas_id');
             $table->foreignId('user_id')->nullable()->constrained();
             $table->enum('sust_status', ['0', '1', '2'])->default('0');
             $table->timestamps();
