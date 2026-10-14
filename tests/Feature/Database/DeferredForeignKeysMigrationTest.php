@@ -222,12 +222,16 @@ class DeferredForeignKeysMigrationTest extends TestCase
             'created_at' => now(), 'updated_at' => now(),
         ]);
         $empresaId = DB::connection('pgsql')->table('empresas')->insertGetId([
-            // `rif` es UNIQUE y de 12 caracteres. La version anterior lo armaba con dos digitos
+            // `rif` es UNIQUE y de 12 caracteres. La primera version lo armaba con dos digitos
             // aleatorios y colisionaba con las empresas del fixture (J-00000000-1..3): falló de
-            // verdad en una corrida, que es exactamente la clase de test inestable que este
-            // trabajo viene corrigiendo. Prefijo 'Z' - que el fixture nunca usa - más uniqid, que
-            // es único por proceso y por microsegundo.
-            'rif' => substr('Z'.str_replace('.', '', uniqid('', true)), 0, 12),
+            // verdad en una corrida.
+            //
+            // La segunda tampoco servia, y lo dijo la comprobacion: truncar `uniqid()` a 12
+            // caracteres conserva el PREFIJO, que es la parte lenta del timestamp - 2000 valores
+            // generados daban 10 distintos. Aqui hacen falta bits aleatorios de verdad, no una
+            // marca de tiempo recortada. Prefijo 'Z', que el fixture nunca usa, mas 11 caracteres
+            // hexadecimales de `random_bytes`.
+            'rif' => 'Z'.substr(bin2hex(random_bytes(8)), 0, 11),
             'name' => 'ZZZ Empresa Ficticia FK '.uniqid('', true),
             'city_id' => $cityId,
             'created_at' => now(), 'updated_at' => now(),
