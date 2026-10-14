@@ -206,6 +206,20 @@ Elegir bien sus categorías tiene ventajas prácticas:
 
 > **NOTA:** Una clasificación correcta mejora la calidad de las coincidencias, pero no garantiza una posición determinada en los resultados ni la llegada de clientes u oportunidades comerciales.
 
+<!--
+PROVISIONAL-TASK-0010A: las etiquetas en negrita de esta seccion se copiaron
+literalmente de las constantes de TaxonomyCategoriesRelationManager en la rama
+feature/task-0010a-category-request (SOLICITUD_ACTION_LABEL,
+SOLICITUD_MODAL_HEADING y los labels de los campos del formulario), que a la
+fecha de esta entrega NO esta aceptada todavia. Si la revision manual cambia
+alguna etiqueta, la integracion tiene que reconciliar esta seccion Y la fila
+correspondiente de la tabla de "Errores y dudas frecuentes".
+
+Este bloque es un comentario HTML y el renderizador corre con
+html_input = strip, asi que NO llega al manual que ve el afiliado. Hay un test
+que lo comprueba (the_provisional_label_marker_never_reaches_the_reader), para
+que esta nota no pueda convertirse en una fuga de detalle interno.
+-->
 ## No encuentro una categoría {#no-encuentro-categoria}
 
 No encontrar una categoría al primer intento **no significa necesariamente** que no exista en la taxonomía. Muchas veces la categoría sí está, pero con otro nombre, en otro idioma o dentro de una Familia que no esperaba.

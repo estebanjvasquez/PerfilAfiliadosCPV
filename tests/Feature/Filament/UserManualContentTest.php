@@ -252,4 +252,48 @@ class UserManualContentTest extends TestCase
         $this->assertStringNotContainsString('<p></p>', $html, 'Un párrafo que solo tenía una imagen no debe quedar vacío.');
         $this->assertStringContainsString('class="manual-callout manual-callout--importante"', $html);
     }
+
+    /**
+     * La sección «No encuentro una categoría» copia etiquetas literales de TASK-0010A, que todavía
+     * no está aceptada, así que el fuente lleva un comentario PROVISIONAL-TASK-0010A para que la
+     * integración sepa qué reconciliar si una etiqueta cambia.
+     *
+     * Ese comentario es detalle interno: nombra una rama, un archivo de implementación y
+     * constantes de código. El contrato prohíbe exponer rutas del repositorio o notas internas al
+     * afiliado, así que el marcador NO debe llegar al HTML renderizado. Vive en un comentario HTML
+     * y el renderizador corre con `html_input = strip`, pero eso es configuración que alguien
+     * podría cambiar - este test lo vuelve una garantía comprobada en vez de una suposición.
+     */
+    #[Test]
+    public function the_provisional_label_marker_never_reaches_the_reader(): void
+    {
+        $markdown = file_get_contents(resource_path('manual/manual_usuario.md'));
+
+        // Primero: el marcador SIGUE en el fuente. Si alguien lo borra sin reconciliar las
+        // etiquetas, este test avisa en vez de dejar que la nota desaparezca en silencio.
+        $this->assertStringContainsString(
+            'PROVISIONAL-TASK-0010A',
+            $markdown,
+            'El marcador provisional desapareció del fuente: si ya se reconciliaron las etiquetas con la TASK-0010A aceptada, quítese también este test.'
+        );
+
+        $html = app(UserManualRenderer::class)->render()['html'];
+
+        foreach ([
+            'PROVISIONAL-TASK-0010A',
+            'feature/task-0010a-category-request',
+            'TaxonomyCategoriesRelationManager',
+            'SOLICITUD_ACTION_LABEL',
+            'html_input',
+        ] as $interno) {
+            $this->assertStringNotContainsString(
+                $interno,
+                $html,
+                "El manual renderizado expone detalle interno al afiliado: {$interno}"
+            );
+        }
+
+        // Y la sección que el marcador anota sí tiene que estar renderizada.
+        $this->assertStringContainsString('No encuentro la categoría / Solicitar revisión', $html);
+    }
 }
