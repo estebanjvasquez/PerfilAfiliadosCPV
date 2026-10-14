@@ -26,3 +26,8 @@ Propuesta_SupplHi_Buscador_Semantico_*.docx
 # runner failed at "restore_four_fks.sql: No such file or directory" after a
 # successful replay. These two files are tooling, not a database dump.
 !docker/test/schema_fix/*.sql
+
+# Same reason, same trap: the synthetic fixture the runner loads into the
+# disposable PostgreSQL. It is a versioned DEFINITION written by hand - every
+# value is literal in the file - not a dump of anybody's data.
+!docker/test/fixtures/*.sql

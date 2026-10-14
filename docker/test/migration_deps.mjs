@@ -70,6 +70,13 @@ const source = new Map();
 for (const f of files) source.set(f.name, stripComments(readFileSync(f.path, 'utf8')));
 
 const createdBy = new Map();
+// Renames are collected as they are found and printed in the report, because a
+// table whose creator is a rename is a fact a reader needs: it is the reason
+// the set is not self-contained without the branch that creates the old name.
+// `source` is iterated in filename order - the order Laravel replays in - so a
+// rename is only followed when the migration that created the old name sorts
+// earlier, which is the only case where the replay would succeed.
+const renames = [];
 for (const [file, src] of source) {
   // Schema::create AND Schema::connection('pgsql')->create: the taxonomy and
   // experiencia migrations use the connection-qualified form, and matching only
@@ -83,6 +90,31 @@ for (const [file, src] of source) {
   for (const m of src.matchAll(
     /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:"?[a-z_][a-z0-9_]*"?\.)?"?([a-z_][a-z0-9_]*)"?/gi)) {
     if (!createdBy.has(m[1])) createdBy.set(m[1], file);
+  }
+  // A RENAMED TABLE IS STILL CREATED, and not following renames made this
+  // analyser report a table as MISSING that the replay builds without trouble:
+  // `taxonomy_categories` is created as `supplier_categories` by
+  // 2026_09_01_120000 and renamed by 2026_09_07_090000, so by the time
+  // 2026_09_11_090000 references it, it exists. Reported as MISSING, that reads
+  // as "the creating migration is not in this set", which is the opposite of
+  // the truth and would send a reader looking for a migration to merge.
+  //
+  // The rename migration's own file becomes the creator of the NEW name, which
+  // is what the ordering check needs: referencing the new name before the
+  // rename really is a violation. The old name keeps its original creator,
+  // because a migration between the two legitimately refers to it.
+  //
+  // Both forms, since this project uses the connection-qualified one.
+  for (const m of src.matchAll(
+    /Schema::(?:connection\(\s*['"][^'"]*['"]\s*\)\s*->)?rename\(\s*['"]([^'"]+)['"]\s*,\s*['"]([^'"]+)['"]/g)) {
+    const [, from, to] = m;
+    // Only if something in this set created the old name - otherwise the rename
+    // is of a table from outside the set and claiming to have created the new
+    // name would be an invention.
+    if (createdBy.has(from) && !createdBy.has(to)) {
+      createdBy.set(to, file);
+      renames.push({ from, to, file });
+    }
   }
 }
 
@@ -140,6 +172,12 @@ console.log('  ORDERING VIOLATIONS       : ' + violations.length);
 console.log('  MISSING tables            : ' + missing.length +
             ' (' + new Set(missing.map((m) => m.table)).size + ' distinct)');
 console.log('  unresolved                : ' + unresolved.length);
+if (renames.length) {
+  console.log('  tables reached by RENAME   : ' + renames.length);
+  for (const r of renames) {
+    console.log('      ' + r.from + ' -> ' + r.to + '   (renamed by ' + r.file + ')');
+  }
+}
 
 if (violations.length) {
   console.log('\nVIOLATIONS - replaying into an empty database aborts at each of these:');

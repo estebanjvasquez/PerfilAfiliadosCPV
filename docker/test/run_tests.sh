@@ -92,6 +92,14 @@ finding() { FINDINGS=$((FINDINGS+1)); printf '  [FINDING] %s\n' "$*"; }
 PREP_PASSED=0; PREP_FAILED=0
 pok()  { PREP_PASSED=$((PREP_PASSED+1)); printf '  [PREP PASS] %s\n' "$*"; }
 pbad() { PREP_FAILED=$((PREP_FAILED+1)); printf '  [PREP FAIL] %s\n' "$*"; }
+# Loading fixture DATA is a FOURTH group, counted apart from building the
+# SCHEMA. They fail for unrelated reasons and the distinction is the whole
+# question of this round: a schema that rebuilds but has no rows, and a schema
+# that rebuilds and is then populated, produce the same `migrate_ok=yes` and
+# very different suites. Collapsing them would hide which one happened.
+FIX_PASSED=0; FIX_FAILED=0
+fok()  { FIX_PASSED=$((FIX_PASSED+1)); printf '  [FIXTURE PASS] %s\n' "$*"; }
+fbad() { FIX_FAILED=$((FIX_FAILED+1)); printf '  [FIXTURE FAIL] %s\n' "$*"; }
 
 compose() {
   docker compose -p "$PROJECT" -f "$COMPOSE_DIR/docker-compose.test.yml" "$@"
@@ -317,8 +325,18 @@ fi
 #     two different rationales, and the owner may want to promote one and not
 #     the other. Each is --check'ed first: a patch that does not fit this SHA is
 #     a loud failure, never a forced apply against a mangled tree.
+#
+#     A SHA THAT ALREADY CONTAINS A PATCH IS NOT AN ERROR, and telling the two
+#     cases apart matters: `apply --reverse --check` succeeding means the change
+#     is already in the tree. Without this the harness could only ever test the
+#     integration branch, and the whole point of preparing the corrections on an
+#     isolated branch is to run this same harness against it and see the
+#     preparation phase shrink to nothing. Three outcomes, each reported as
+#     itself: applied here, already present at this SHA, or does not fit - and
+#     only the third is fatal.
 SCHEMA_PATCHES="defer_four_fks.patch align_permission_migration_to_v6.patch portable_index_check.patch"
 APPLIED_PATCHES=""
+PRESENT_PATCHES=""
 for name in $SCHEMA_PATCHES; do
   PATCH="$COMPOSE_DIR/schema_fix/$name"
   [ -f "$PATCH" ] || die "schema_fix/$name is missing"
@@ -326,18 +344,26 @@ for name in $SCHEMA_PATCHES; do
     git -C "$WORKSPACE" apply "$PATCH" || die "$name passed --check but failed to apply"
     APPLIED_PATCHES="${APPLIED_PATCHES}${APPLIED_PATCHES:+,}$name"
     pok "applied $name"
+  elif git -C "$WORKSPACE" apply --reverse --check "$PATCH" 2>>"$ARTIFACTS/schema_fix.log"; then
+    PRESENT_PATCHES="${PRESENT_PATCHES}${PRESENT_PATCHES:+,}$name"
+    pok "$name is ALREADY PRESENT at $SHA - nothing to apply"
   else
-    pbad "$name does not apply at $SHA - NOT forced"
+    pbad "$name neither applies nor is already present at $SHA - NOT forced"
     tail -6 "$ARTIFACTS/schema_fix.log" | sed 's/^/           /'
     die "refusing to mangle the workspace; regenerate the patch for this SHA"
   fi
 done
+[ -n "$PRESENT_PATCHES" ] && note "already in the code under test: $PRESENT_PATCHES"
 # Only the migrations, so the record is the patches' effect and not the mode
 # changes that preparing a writable workspace makes.
 git -C "$WORKSPACE" diff -- database/migrations > "$ARTIFACTS/schema_fix_applied.diff"
 say "net effect on migrations: $(git -C "$WORKSPACE" diff --shortstat -- database/migrations | sed 's/^ *//')"
 note "Applied to $WORKSPACE only. No existing database and no branch is touched."
-note "The suite below therefore runs $SHA PLUS: $APPLIED_PATCHES"
+if [ -n "$APPLIED_PATCHES" ]; then
+  note "The suite below therefore runs $SHA PLUS: $APPLIED_PATCHES"
+else
+  note "NOTHING was patched: the suite below runs $SHA exactly as committed."
+fi
 
 # 7.3 THE INTEGRATION BRANCH'S MIGRATION SET IS NOT SELF-CONTAINED.
 #
@@ -358,8 +384,25 @@ note "The suite below therefore runs $SHA PLUS: $APPLIED_PATCHES"
 #   DECLARED, not hidden: the fixture schema comes from two branches. The
 #   sibling SHA is recorded below and in summary.txt. Deciding whether that
 #   branch should be merged is the owner's call, not this script's.
+#
+#   MEASURED, NOT ASSUMED, at each SHA. The indispensable file is the one that
+#   CREATES the table the six migrations reference: supplier_categories, which
+#   2026_09_07_090000 then renames to taxonomy_categories. If this SHA already
+#   carries it, the branch is self-contained for this purpose and nothing is
+#   borrowed - which is exactly what an isolated branch carrying the dependency
+#   should demonstrate. The check is for the creating migration, not for a
+#   non-empty directory, because the integration branch HAS that directory: it
+#   holds the 2026_09_07 rework alone, whose own docblock says it assumes those
+#   tables already exist.
 SIBLING_BRANCH=feature/supplhi-postgres-buscador
-if git -C "$WORKSPACE" fetch -q --depth 1 origin "$SIBLING_BRANCH" 2>>"$ARTIFACTS/schema_fix.log"; then
+CATEGORY_CREATOR=$(grep -rl "create('supplier_categories'" "$WORKSPACE/database/migrations/" 2>/dev/null | head -1)
+if [ -n "$CATEGORY_CREATOR" ]; then
+  SIBLING_SHA="not needed at this SHA"
+  BOOTSTRAP_COUNT=$(ls "$WORKSPACE"/database/migrations/pgsql/*.php 2>/dev/null | wc -l | tr -d ' ')
+  pok "the category-creating migration is ALREADY at this SHA ($(basename "$CATEGORY_CREATOR"))"
+  note "nothing borrowed from $SIBLING_BRANCH; database/migrations/pgsql holds $BOOTSTRAP_COUNT file(s)"
+  ls "$WORKSPACE"/database/migrations/pgsql/*.php | xargs -n1 basename > "$ARTIFACTS/pgsql_bootstrap_migrations.txt"
+elif git -C "$WORKSPACE" fetch -q --depth 1 origin "$SIBLING_BRANCH" 2>>"$ARTIFACTS/schema_fix.log"; then
   SIBLING_SHA=$(git -C "$WORKSPACE" rev-parse FETCH_HEAD)
   if git -C "$WORKSPACE" checkout -q FETCH_HEAD -- database/migrations/pgsql 2>>"$ARTIFACTS/schema_fix.log"; then
     BOOTSTRAP_COUNT=$(ls "$WORKSPACE"/database/migrations/pgsql/*.php 2>/dev/null | wc -l | tr -d ' ')
@@ -426,14 +469,40 @@ else
 fi
 
 # 7.5 Re-create the four deferred foreign keys, now that their tables exist.
+#
+#     ASK FIRST, because there are now two ways they can get there. On the
+#     integration branch the deferral is a PATCH, so nothing re-creates them and
+#     this SQL must run. On a branch that carries the correction as a committed
+#     migration, that migration already created them during the replay - and
+#     restore_four_fks.sql deliberately has no IF NOT EXISTS (an
+#     already-present constraint on a fixture that started empty means
+#     something else created it), so running it anyway would abort the
+#     preparation phase on the branch that needs it least.
+#
+#     The question goes to the catalogue, not to a variable this script set.
+FK_RESTORE=skipped
 if [ "$MIGRATE_OK" = "yes" ]; then
-  if compose exec -T testdb psql -v ON_ERROR_STOP=1 -U cpv_test -d cpv_test \
-       < "$COMPOSE_DIR/schema_fix/restore_four_fks.sql" \
-       >"$ARTIFACTS/schema_fix_sql.log" 2>&1; then
-    pok "the four deferred foreign keys were re-created with Laravel's own names"
+  FKS_PRESENT=$(compose exec -T testdb psql -tAq -U cpv_test -d cpv_test -c \
+    "select count(*) from pg_constraint where contype='f' and conname in (
+       'empresas_city_id_foreign','sustainabilities_areas_id_foreign',
+       'infratypes_infrasectors_id_foreign',
+       'infrafacilities_infraregion_infrasystem_id_foreign')" 2>/dev/null | tr -d '\r[:space:]')
+  if [ "$FKS_PRESENT" = "4" ]; then
+    FK_RESTORE="not needed (the replay itself created all four)"
+    pok "the four deferred foreign keys exist already after the replay - no out-of-band SQL run"
+  elif [ "$FKS_PRESENT" = "0" ]; then
+    if compose exec -T testdb psql -v ON_ERROR_STOP=1 -U cpv_test -d cpv_test \
+         < "$COMPOSE_DIR/schema_fix/restore_four_fks.sql" \
+         >"$ARTIFACTS/schema_fix_sql.log" 2>&1; then
+      FK_RESTORE="restore_four_fks.sql"
+      pok "the four deferred foreign keys were re-created with Laravel's own names"
+    else
+      pbad "re-creating the deferred foreign keys FAILED"
+      tail -6 "$ARTIFACTS/schema_fix_sql.log" | sed 's/^/           /'
+      MIGRATE_OK=no
+    fi
   else
-    pbad "re-creating the deferred foreign keys FAILED"
-    tail -6 "$ARTIFACTS/schema_fix_sql.log" | sed 's/^/           /'
+    pbad "found $FKS_PRESENT of the 4 deferred foreign keys - a partial state neither path produces"
     MIGRATE_OK=no
   fi
 fi
@@ -478,6 +547,31 @@ if [ "$MIGRATE_OK" = "yes" ]; then
       tail -5 "$ARTIFACTS/seed.log" | sed 's/^/           /'
     fi
   done
+  # The GOVERNED VOCABULARY, from the project's own versioned command.
+  #
+  # Six tests were failing with reason UNKNOWN_OR_INACTIVE_RELATION_TYPE, and a
+  # seventh (corpus case K) on a zero intent-contamination penalty. Neither is a
+  # code defect: CanonicalConceptBuilderService::validateConceptRelationProposal
+  # looks the relation type up in taxonomy_concept_relation_types and refuses
+  # what the catalogue does not list, and the penalty is computed from
+  # taxonomy_intent_markers. On an empty database both tables are empty, so
+  # every proposal is correctly refused and no term can be contaminated.
+  #
+  # taxonomy:seed-concept-vocabulary is the PROJECT'S definition of those three
+  # catalogues - 9 concept types, 5 relation types, 9 intent markers, all
+  # literal in app/Console/Commands/SeedTaxonomyConceptVocabulary.php - and it
+  # is insertOrIgnore by natural key, so it never overwrites an edited row.
+  # Nothing here is invented by this script.
+  for cmd in taxonomy:seed-concept-vocabulary; do
+    if compose run --rm -T testapp php artisan "$cmd" \
+         >>"$ARTIFACTS/seed.log" 2>&1; then
+      pok "ran $cmd (the project's own versioned catalogue)"
+    else
+      SEED_OK=no
+      pbad "$cmd failed"
+      tail -5 "$ARTIFACTS/seed.log" | sed 's/^/           /'
+    fi
+  done
   if [ "$SEED_OK" = "yes" ]; then
     COUNTS=$(compose run --rm -T testapp php -r '
 require "vendor/autoload.php"; $a=require "bootstrap/app.php";
@@ -486,7 +580,92 @@ printf("%d permissions, %d roles",
   DB::table("permissions")->count(), DB::table("roles")->count());' 2>/dev/null | tr -d '\r')
     say "permission catalogue: $COUNTS"
   fi
+fi
 
+# --- 7-bis. FIXTURE LOAD -----------------------------------------------------
+#
+# ITS OWN PHASE AND ITS OWN COUNTERS, for the same reason schema preparation is
+# separate from isolation: a suite that needed rows loaded for it must never be
+# reportable as a suite that needed nothing. "fixtures" is the third preparation
+# group - schema, catalogues, fixture data - and the report keeps the three
+# apart.
+#
+# WHAT IS LOADED AND WHERE IT COMES FROM
+#   Nine tests state a data precondition in their own failure message: two want
+#   at least one and at least two companies, five want 18 reference categories,
+#   and two corpus cases want a category TREE deep enough to have a leaf, a
+#   sibling and a second family under the same group. None of them creates that
+#   data; all of them use DatabaseTransactions, so they expect it to be there
+#   already and roll back only what they add themselves.
+#
+#   docker/test/fixtures/synthetic_fixture.sql is a hand-written versioned
+#   definition: every value is literal in the file, the codes are ZZTEST-
+#   prefixed so no row can be mistaken for the real reference catalogue, and the
+#   companies carry invalid-by-construction RIFs. NOTHING IS COPIED FROM ANY
+#   EXISTING DATABASE - not from the shared Supabase database, not from staging.
+#   The file refuses to run unless it is connected to the disposable `cpv_test`
+#   database AND both tables are empty, and it asserts the loaded shape itself,
+#   so a partial load is a failure here and not a puzzling test failure later.
+#
+#   Authorised by the owner decision of 2026-10-14, for the disposable test
+#   PostgreSQL only.
+FIXTURE_LOADED=no
+if [ "$MIGRATE_OK" = "yes" ]; then
+  step "7-bis. FIXTURE LOAD (its own phase: not schema, not the suite)"
+  FIXTURE_SQL="$COMPOSE_DIR/fixtures/synthetic_fixture.sql"
+  [ -f "$FIXTURE_SQL" ] || die "fixtures/synthetic_fixture.sql is missing"
+  if compose exec -T testdb psql -v ON_ERROR_STOP=1 -U cpv_test -d cpv_test \
+       < "$FIXTURE_SQL" >"$ARTIFACTS/fixture_load.log" 2>&1; then
+    FIXTURE_LOADED=yes
+    fok "synthetic fixture loaded and its own shape assertions passed"
+    grep -E 'NOTICE|fixture ok' "$ARTIFACTS/fixture_load.log" | head -3 | sed 's/^/           /'
+  else
+    fbad "the synthetic fixture FAILED to load - the data preconditions are NOT met"
+    tail -8 "$ARTIFACTS/fixture_load.log" | sed 's/^/           /'
+  fi
+
+  # The preconditions, asked the way the TESTS ask them rather than the way the
+  # fixture states them. A fixture that asserts its own counts proves it loaded;
+  # this proves the thing the tests actually read.
+  compose exec -T testdb psql -tAq -U cpv_test -d cpv_test \
+    >"$ARTIFACTS/fixture_preconditions.txt" 2>&1 <<'PRECHECK'
+\echo '-- precondition: >= 1 empresa (predict_affected_companies_counts_direct_companies_deduplicated_by_empresa_id)'
+select case when count(*) >= 1 then 'PASS' else 'FAIL' end || '  empresas >= 1  (have ' || count(*) || ')' from empresas;
+\echo '-- precondition: >= 2 empresas (predict_affected_companies_breaks_down_direct_evidence_by_origen)'
+select case when count(*) >= 2 then 'PASS' else 'FAIL' end || '  empresas >= 2  (have ' || count(*) || ')' from empresas;
+\echo '-- precondition: >= 18 categories with a code (TaxonomyConceptExplorerTest::existingCategoryIds)'
+select case when count(*) >= 18 then 'PASS' else 'FAIL' end || '  categories with code >= 18  (have ' || count(*) || ')' from taxonomy_categories where code is not null;
+\echo '-- precondition: >= 1 level-2 category (ValidationCorpusTest::anyLeafCategoryId)'
+select case when count(*) >= 1 then 'PASS' else 'FAIL' end || '  level-2 categories >= 1  (have ' || count(*) || ')' from taxonomy_categories where level = 2;
+\echo '-- precondition: the first level-2 category has a sibling (siblingCategoryUnderSameFamily)'
+select case when count(*) >= 1 then 'PASS' else 'FAIL' end || '  siblings of the first leaf  (have ' || count(*) || ')'
+from taxonomy_categories
+where parent_id = (select parent_id from taxonomy_categories where level = 2 order by id limit 1)
+  and id <> (select id from taxonomy_categories where level = 2 order by id limit 1);
+\echo '-- precondition: a second family under the same group has a child (categoryInDifferentFamilySameGroup)'
+select case when count(*) >= 1 then 'PASS' else 'FAIL' end || '  children of the other family  (have ' || count(*) || ')'
+from taxonomy_categories
+where parent_id in (
+  select f.id from taxonomy_categories f
+  where f.parent_id = (select parent_id from taxonomy_categories
+                        where id = (select parent_id from taxonomy_categories where level = 2 order by id limit 1))
+    and f.id <> (select parent_id from taxonomy_categories where level = 2 order by id limit 1));
+\echo '-- precondition: the relation-type catalogue is populated and active (validateConceptRelationProposal)'
+select case when count(*) >= 5 then 'PASS' else 'FAIL' end || '  active relation types >= 5  (have ' || count(*) || ')' from taxonomy_concept_relation_types where active;
+\echo '-- precondition: intent markers exist (corpus case K intent_contamination_penalty)'
+select case when count(*) >= 1 then 'PASS' else 'FAIL' end || '  intent markers >= 1  (have ' || count(*) || ')' from taxonomy_intent_markers;
+PRECHECK
+  PRE_FAIL=$(grep -c '^FAIL' "$ARTIFACTS/fixture_preconditions.txt" 2>/dev/null || true)
+  PRE_PASS=$(grep -c '^PASS' "$ARTIFACTS/fixture_preconditions.txt" 2>/dev/null || true)
+  sed 's/^/           /' "$ARTIFACTS/fixture_preconditions.txt"
+  if [ "${PRE_FAIL:-1}" = "0" ] && [ "${PRE_PASS:-0}" -ge 8 ]; then
+    fok "all $PRE_PASS declared test preconditions are satisfied by the fixture"
+  else
+    fbad "$PRE_FAIL declared precondition(s) NOT satisfied (fixture_preconditions.txt)"
+  fi
+fi
+
+if [ "$MIGRATE_OK" = "yes" ]; then
   # 7.8 WHAT DATA THE FIXTURE ACTUALLY HOLDS, measured rather than assumed.
   #     Several tests state their own data preconditions in their failure
   #     messages ("Se necesita al menos una empresa real en la BD de pruebas",
@@ -496,7 +675,9 @@ printf("%d permissions, %d roles",
 require "vendor/autoload.php"; $a=require "bootstrap/app.php";
 $a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 foreach (["empresas","taxonomy_categories","taxonomy_terms","taxonomy_canonical_concepts",
-          "taxonomy_term_cpv_relations","users","permissions","roles"] as $t) {
+          "taxonomy_term_cpv_relations","users","permissions","roles",
+          "taxonomy_concept_types","taxonomy_concept_relation_types","taxonomy_intent_markers",
+          "empresa_taxonomy_category"] as $t) {
     try { printf("%-30s %d\n", $t, DB::table($t)->count()); }
     catch (Throwable $e) { printf("%-30s (unreadable)\n", $t); }
 }' 2>/dev/null | tr -d '\r' > "$ARTIFACTS/fixture_rows.txt"
@@ -590,7 +771,9 @@ say "GET $STAGING_URL -> $SMOKE_AFTER"
   echo "isolation_passed=$PASSED"
   echo "isolation_failed=$FAILED"
   echo "-- schema preparation --"
-  echo "schema_fix_applied=$APPLIED_PATCHES"
+  echo "schema_fix_applied=${APPLIED_PATCHES:-(none: already in the code under test)}"
+  echo "schema_fix_already_present=${PRESENT_PATCHES:-(none)}"
+  echo "deferred_fks_restored_by=$FK_RESTORE"
   echo "pgsql_bootstrap_from=$SIBLING_BRANCH@$SIBLING_SHA"
   echo "pgsql_bootstrap_migrations=${BOOTSTRAP_COUNT:-0}"
   echo "migration_ordering_violations=$DEPS_VIOLATIONS"
@@ -598,6 +781,11 @@ say "GET $STAGING_URL -> $SMOKE_AFTER"
   echo "prep_passed=$PREP_PASSED"
   echo "prep_failed=$PREP_FAILED"
   echo "fixture_tables=$TABLES"
+  echo "-- fixture load --"
+  echo "fixture_loaded=$FIXTURE_LOADED"
+  echo "fixture_source=docker/test/fixtures/synthetic_fixture.sql (synthetic, no copied data)"
+  echo "preconditions_passed=${PRE_PASS:-0}"
+  echo "preconditions_failed=${PRE_FAIL:-unknown}"
   echo "-- tests --"
   echo "staging_before=$SMOKE_BEFORE"
   echo "staging_after=$SMOKE_AFTER"
@@ -615,13 +803,28 @@ printf '%s\n' "$(printf '%.0s-' $(seq 1 70))"
 # suite that needed nothing, and a finding is not an isolation failure.
 [ "$FAILED" -eq 0 ]      && I="PASS ($PASSED checks)"      || I="FAIL ($FAILED of $((PASSED+FAILED)))"
 [ "$PREP_FAILED" -eq 0 ] && P="PASS ($PREP_PASSED steps)"  || P="FAIL ($PREP_FAILED of $((PREP_PASSED+PREP_FAILED)))"
+[ "$FIX_FAILED" -eq 0 ]  && F="PASS ($FIX_PASSED checks)"  || F="FAIL ($FIX_FAILED of $((FIX_PASSED+FIX_FAILED)))"
 [ "$PHPUNIT_EXIT" = "0" ] && T="GREEN"                     || T="RED (exit $PHPUNIT_EXIT)"
+if [ -n "$APPLIED_PATCHES" ]; then
+  PREP_NOTE="patch applied; $DEPS_VIOLATIONS ordering violation(s) deferred"
+else
+  PREP_NOTE="no patch needed; the corrections are committed at this SHA"
+fi
 echo "RESULT  isolation      : $I"
-echo "RESULT  schema prep    : $P   [patch applied; $DEPS_VIOLATIONS ordering violation(s) deferred]"
+echo "RESULT  schema prep    : $P   [$PREP_NOTE]"
+echo "RESULT  fixture load   : $F   [$FIXTURE_LOADED; ${PRE_PASS:-0} precondition(s) satisfied]"
 echo "RESULT  test suite     : $T   [$SUITES_RUN]"
 echo "RESULT  findings in the repository under test: $FINDINGS"
-# Exit: 0 all three good, 3 isolation held but the schema could not be prepared
-# so the suite result says nothing about the code, 1 anything else.
-if [ "$FAILED" -eq 0 ] && [ "$PREP_FAILED" -eq 0 ] && [ "$PHPUNIT_EXIT" = "0" ]; then exit 0; fi
+# Exit codes say WHICH group failed, because "the suite is red" and "the suite
+# never had a schema" need different work and must not share an exit code:
+#   0  all four groups good
+#   3  isolation held, the SCHEMA could not be prepared - the suite result says
+#      nothing about the code
+#   4  isolation held and the schema was built, but the FIXTURE did not load or
+#      a declared precondition is unmet - the suite ran against data it says it
+#      needs and does not have, so its data-dependent failures are expected
+#   1  anything else, the ordinary red suite included
+if [ "$FAILED" -eq 0 ] && [ "$PREP_FAILED" -eq 0 ] && [ "$FIX_FAILED" -eq 0 ] && [ "$PHPUNIT_EXIT" = "0" ]; then exit 0; fi
 if [ "$FAILED" -eq 0 ] && [ "$PREP_FAILED" -gt 0 ]; then exit 3; fi
+if [ "$FAILED" -eq 0 ] && [ "$FIX_FAILED" -gt 0 ]; then exit 4; fi
 exit 1
