@@ -1,0 +1,6 @@
+
+In Standard input code line 102:
+                               
+  Undefined constant "STDOUT"  
+                               
+

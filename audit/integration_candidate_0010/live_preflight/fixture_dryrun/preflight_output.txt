@@ -1,0 +1,116 @@
+   base   | esquema |   search_path   |        version_servidor         | transaccion_solo_lectura | en_recuperacion | tiene_migrations | tiene_taxonomy_categories |                  veredicto                  
+----------+---------+-----------------+---------------------------------+--------------------------+-----------------+------------------+---------------------------+---------------------------------------------
+ cpv_test | public  | "$user", public | 16.15 (Debian 16.15-1.pgdg12+2) | off                      | f               | t                | t                         | PARAR: la transaccion NO es de solo lectura
+(1 row)
+
+                            nombre                             |          carpeta          |                    clase                    | registrada | batch |                           veredicto                            
+---------------------------------------------------------------+---------------------------+---------------------------------------------+------------+-------+----------------------------------------------------------------
+ 2022_12_02_000000_restore_deferred_foreign_keys               | database/migrations       | nueva: reparacion de integridad             | t          |     2 | ATENCION: nueva del candidato y ya registrada; revisar por que
+ 2026_10_09_120000_create_taxonomy_category_requests_table     | database/migrations       | nueva: TASK-0010A                           | t          |     2 | ATENCION: nueva del candidato y ya registrada; revisar por que
+ 2026_09_01_120000_create_supplier_categories_table            | database/migrations/pgsql | IMPORTADA de supplhi: debe estar REGISTRADA | t          |     2 | OK
+ 2026_09_01_120001_create_supplier_category_translations_table | database/migrations/pgsql | IMPORTADA de supplhi: debe estar REGISTRADA | t          |     2 | OK
+ 2026_09_01_120002_create_supplier_category_synonyms_table     | database/migrations/pgsql | IMPORTADA de supplhi: debe estar REGISTRADA | t          |     2 | OK
+ 2026_09_01_120003_create_empresa_supplier_categories_table    | database/migrations/pgsql | IMPORTADA de supplhi: debe estar REGISTRADA | t          |     2 | OK
+ 2026_09_01_120004_create_empresa_catalog_items_table          | database/migrations/pgsql | IMPORTADA de supplhi: debe estar REGISTRADA | t          |     2 | OK
+ 2026_09_01_120005_create_empresa_catalog_item_category_table  | database/migrations/pgsql | IMPORTADA de supplhi: debe estar REGISTRADA | t          |     2 | OK
+ 2026_09_01_120006_create_category_mapping_audit_table         | database/migrations/pgsql | IMPORTADA de supplhi: debe estar REGISTRADA | t          |     2 | OK
+(9 rows)
+
+ nombre | veredicto 
+--------+-----------
+(0 rows)
+
+ nombre | batch | veredicto 
+--------+-------+-----------
+(0 rows)
+
+                            nombre                             | registrada | batch | veredicto 
+---------------------------------------------------------------+------------+-------+-----------
+ 2022_05_31_223828_create_empresas_table                       | t          |     2 | OK
+ 2022_06_13_231159_create_permission_tables                    | t          |     2 | OK
+ 2022_08_12_145310_create_sustainabilities_table               | t          |     2 | OK
+ 2022_09_01_154856_create_infratypes_table                     | t          |     2 | OK
+ 2022_09_01_185804_create_infrafacilities_table                | t          |     2 | OK
+ 2026_07_24_000001_add_sub_type_to_empresa_module_status_table | t          |     2 | OK
+(6 rows)
+
+                                objeto                                | existe |                            veredicto                            
+----------------------------------------------------------------------+--------+-----------------------------------------------------------------
+ columna taxonomy_selection_settings.category_request_recipient_email | t      | ATENCION: ya existe; comparar con la migracion antes de aplicar
+ indice taxonomy_category_requests_empresa_idx                        | t      | ATENCION: ya existe; comparar con la migracion antes de aplicar
+ indice taxonomy_category_requests_pkey                               | t      | ATENCION: ya existe; comparar con la migracion antes de aplicar
+ indice taxonomy_category_requests_status_idx                         | t      | ATENCION: ya existe; comparar con la migracion antes de aplicar
+ secuencia taxonomy_category_requests_id_seq                          | t      | ATENCION: ya existe; comparar con la migracion antes de aplicar
+ tabla taxonomy_category_requests                                     | t      | ATENCION: ya existe; comparar con la migracion antes de aplicar
+ tabla taxonomy_selection_settings (singleton que se extiende)        | t      | OK
+(7 rows)
+
+ filas | veredicto 
+-------+-----------
+     1 | OK
+(1 row)
+
+             columna              |        tipo_esperado        |          tipo_real          | nulable_esperado | nulable_real |                   veredicto                   
+----------------------------------+-----------------------------+-----------------------------+------------------+--------------+-----------------------------------------------
+ category_request_recipient_email |                             | character varying           |                  | YES          | ATENCION: columna no prevista en el singleton
+ created_at                       | timestamp without time zone | timestamp without time zone | YES              | YES          | OK
+ id                               | bigint                      | bigint                      | NO               | NO           | OK
+ max_categorias_principales       | smallint                    | smallint                    | YES              | YES          | OK
+ max_categorias_secundarias       | smallint                    | smallint                    | YES              | YES          | OK
+ updated_at                       | timestamp without time zone | timestamp without time zone | YES              | YES          | OK
+(6 rows)
+
+  tabla   | columna |  tipo  | pk_o_unique | veredicto 
+----------+---------+--------+-------------+-----------
+ empresas | id      | bigint | t           | OK
+ users    | id      | bigint | t           | OK
+(2 rows)
+
+      tabla       |          columna           |                   nombre_actual                    | nombre_es_el_de_laravel | esquema_local |      columnas_locales      | esquema_ref |        tabla_ref        | columnas_ref |   destino_de_la_migracion   | on_delete | on_update | validada | diferible | claves_en_columna |          veredicto          
+------------------+----------------------------+----------------------------------------------------+-------------------------+---------------+----------------------------+-------------+-------------------------+--------------+-----------------------------+-----------+-----------+----------+-----------+-------------------+-----------------------------
+ empresas         | city_id                    | empresas_city_id_foreign                           | t                       | public        | city_id                    | public      | cities                  | id           | cities(id)                  | a         | a         | t        | f         |                 1 | OK: la migracion la omitira
+ infrafacilities  | infraregion_infrasystem_id | infrafacilities_infraregion_infrasystem_id_foreign | t                       | public        | infraregion_infrasystem_id | public      | infraregion_infrasystem | id           | infraregion_infrasystem(id) | a         | a         | t        | f         |                 1 | OK: la migracion la omitira
+ infratypes       | infrasectors_id            | infratypes_infrasectors_id_foreign                 | t                       | public        | infrasectors_id            | public      | infrasectors            | id           | infrasectors(id)            | a         | a         | t        | f         |                 1 | OK: la migracion la omitira
+ sustainabilities | areas_id                   | sustainabilities_areas_id_foreign                  | t                       | public        | areas_id                   | public      | areas                   | id           | areas(id)                   | a         | a         | t        | f         |                 1 | OK: la migracion la omitira
+(4 rows)
+
+                                 relacion                                 | no_nulos | huerfanos | veredicto 
+--------------------------------------------------------------------------+----------+-----------+-----------
+ empresas.city_id -> cities.id                                            |        0 |         0 | OK
+ infrafacilities.infraregion_infrasystem_id -> infraregion_infrasystem.id |        0 |         0 | OK
+ infratypes.infrasectors_id -> infrasectors.id                            |        0 |         0 | OK
+ sustainabilities.areas_id -> areas.id                                    |        0 |         0 | OK
+(4 rows)
+
+           nombre            | existe | veredicto 
+-----------------------------+--------+-----------
+ areas                       | t      | OK
+ cities                      | t      | OK
+ empresas                    | t      | OK
+ infrafacilities             | t      | OK
+ infraregion_infrasystem     | t      | OK
+ infrasectors                | t      | OK
+ infratypes                  | t      | OK
+ sustainabilities            | t      | OK
+ taxonomy_selection_settings | t      | OK
+ users                       | t      | OK
+(10 rows)
+
+              tabla               | filas | veredicto 
+----------------------------------+-------+-----------
+ empresas                         |     3 | BASELINE
+ empresa_taxonomy_category        |     0 | BASELINE
+ migrations                       |   108 | BASELINE
+ migrations.max_batch             |     2 | BASELINE
+ taxonomy_audit_log               |     0 | BASELINE
+ taxonomy_candidate_concept_links |     0 | BASELINE
+ taxonomy_canonical_concepts      |     0 | BASELINE
+ taxonomy_categories              |    26 | BASELINE
+ taxonomy_reviewed_proposals      |     0 | BASELINE
+ taxonomy_selection_settings      |     1 | BASELINE
+ taxonomy_term_concepts           |     0 | BASELINE
+ taxonomy_term_cpv_relations      |     0 | BASELINE
+ taxonomy_terms                   |     0 | BASELINE
+ users                            |     0 | BASELINE
+(14 rows)
+

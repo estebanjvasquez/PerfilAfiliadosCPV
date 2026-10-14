@@ -1,0 +1,4 @@
+staging_head=f8a98df5ff5e90a05849c709f3a5847f6945d198
+app_container_id_before=e26ae9260fc1
+app_image_before=sha256:ce97a62f4d51
+http_before=200

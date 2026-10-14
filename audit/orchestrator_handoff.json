@@ -3013,7 +3013,24 @@
       "task_0010b": "964550dc11174e0f02def0b02b1264a89d3a8a83"
     },
     "authorized_by_comment": 6173818866,
-    "note": "Preparation and testing only. NOT authorization to push runtime to feature/upgrade-filament-v3 or to deploy; staging follows the existing authorized contract only after integrated manual acceptance."
+    "note": "Preparation and testing only. NOT authorization to push runtime to feature/upgrade-filament-v3 or to deploy; staging follows the existing authorized contract only after integrated manual acceptance.",
+    "accepted_by_comment": 6174401867,
+    "accepted_review_head": "b384e1ad1f6ee360b36bc79bd638a5950aecb3a5",
+    "live_preflight": {
+      "status": "PREFLIGHT_READY_FOR_REVIEW_MANUAL",
+      "instruction_comment": 6174401867,
+      "outcome": "COMPATIBLE: 13 blocks, 51 OK, 21 INFO, 14 BASELINE, 0 stops, runner exit 0",
+      "executed_at_utc": "2026-10-14T17:47:08Z",
+      "executed_from_sha": "cec3b48d1bce62dc09ce1816f2ad5953523e01ba",
+      "sql_sha256": "d70bb7a1ce284b66a6cf6303be7d6a4a9ba43832e307128c496cd5e831f69e3a",
+      "runner_sha256": "562d852c67702e5f9b51b1c4338de6daca555efc060751865678b1d8d4be09f7",
+      "target": "database resolved by staging's pgsql connection, inside the running app container; one READ ONLY transaction, ROLLBACK",
+      "staging_deployed_sha": "f8a98df5ff5e90a05849c709f3a5847f6945d198 (runtime code identical to a6e9db4; the difference is docs/audit only)",
+      "pending_for_migrate_force": ["2022_12_02_000000_restore_deferred_foreign_keys", "2026_10_09_120000_create_taxonomy_category_requests_table"],
+      "report": "audit/integration_candidate_0010_live_preflight_2026-10-14.md",
+      "artifacts": "audit/integration_candidate_0010/live_preflight/",
+      "note": "Read-only evidence only. No push to feature/upgrade-filament-v3, no deploy, no ledger or data change. The staging execution instruction is the orchestrator's to record."
+    }
   },
   "agent_issue_write_access": "AVAILABLE since 2026-10-09 via docs/orquestador/post_issue_comment.ps1 and the purpose-built token in the out-of-repo store; verified again on 2026-10-14 (comments 6167868489, 6168251563, 6168437907, 6172040668, 6172055856, 6173789525).",
   "agent_review_polling_policy": {
