@@ -298,14 +298,14 @@ class TaxonomyCategoriesRelationManager extends RelationManager
             ->modalSubmitActionLabel(self::SOLICITUD_SUBMIT_LABEL)
             ->form([
                 Forms\Components\Textarea::make('necesidad')
-                    ->label('¿Qué producto, servicio o capacidad necesita representar?')
+                    ->label(self::SOLICITUD_NECESIDAD_LABEL)
                     ->placeholder('ej. reparación de bombas electrosumergibles en sitio')
                     ->required()
                     ->minLength(3)
                     ->maxLength(TaxonomyCategoryRequestService::NECESIDAD_MAX)
                     ->rows(2),
                 Forms\Components\Radio::make('justificacion')
-                    ->label('¿Por qué solicita la revisión?')
+                    ->label(self::SOLICITUD_JUSTIFICACION_LABEL)
                     ->options(TaxonomyCategoryRequest::JUSTIFICACIONES)
                     // Radio no agrega la regla `in` sola (a diferencia de Select) - lista cerrada explícita.
                     ->in(array_keys(TaxonomyCategoryRequest::JUSTIFICACIONES))
@@ -326,7 +326,7 @@ class TaxonomyCategoriesRelationManager extends RelationManager
                     ->maxLength(TaxonomyCategoryRequestService::DETALLE_MAX)
                     ->rows(5),
                 Forms\Components\Textarea::make('terminos_probados')
-                    ->label('¿Qué palabras probó al buscar? (opcional)')
+                    ->label(self::SOLICITUD_TERMINOS_LABEL)
                     ->helperText('Nos ayuda a distinguir si falta una categoría o si es un tema de términos de búsqueda.')
                     ->maxLength(TaxonomyCategoryRequestService::TERMINOS_MAX)
                     ->rows(2),
@@ -367,7 +367,24 @@ class TaxonomyCategoriesRelationManager extends RelationManager
             });
     }
 
+    /*
+     * INTEGRACIÓN TASK-0010A + TASK-0010B: estas etiquetas son la ÚNICA fuente de verdad.
+     *
+     * Las tres de los campos estaban en línea en el formulario y el manual de usuario las citaba
+     * como cadenas copiadas a mano, de modo que cambiar una aquí dejaba el manual mintiendo sin
+     * que nada fallara. Ahora son constantes y
+     * `UserManualContentTest::the_manual_cites_the_final_task_0010a_labels_read_from_the_implementation`
+     * las LEE de aquí para comprobar que el manual las cita: si alguien cambia una etiqueta sin
+     * reconciliar el manual - o al revés - el test falla y dice cuál. Eso reemplaza al marcador
+     * provisional que TASK-0010B llevaba mientras esta tarea estaba pendiente de aceptación.
+     */
     public const SOLICITUD_ACTION_LABEL = 'No encuentro la categoría / Solicitar revisión';
+
+    public const SOLICITUD_NECESIDAD_LABEL = '¿Qué producto, servicio o capacidad necesita representar?';
+
+    public const SOLICITUD_JUSTIFICACION_LABEL = '¿Por qué solicita la revisión?';
+
+    public const SOLICITUD_TERMINOS_LABEL = '¿Qué palabras probó al buscar? (opcional)';
 
     public const SOLICITUD_MODAL_HEADING = 'Solicitar revisión de categoría a la Cámara';
 

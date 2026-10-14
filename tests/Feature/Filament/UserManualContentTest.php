@@ -254,33 +254,66 @@ class UserManualContentTest extends TestCase
     }
 
     /**
-     * La sección «No encuentro una categoría» copia etiquetas literales de TASK-0010A, que todavía
-     * no está aceptada, así que el fuente lleva un comentario PROVISIONAL-TASK-0010A para que la
-     * integración sepa qué reconciliar si una etiqueta cambia.
+     * INTEGRACIÓN: las etiquetas de TASK-0010A son FINALES, y este test las ata a su origen.
      *
-     * Ese comentario es detalle interno: nombra una rama, un archivo de implementación y
-     * constantes de código. El contrato prohíbe exponer rutas del repositorio o notas internas al
-     * afiliado, así que el marcador NO debe llegar al HTML renderizado. Vive en un comentario HTML
-     * y el renderizador corre con `html_input = strip`, pero eso es configuración que alguien
-     * podría cambiar - este test lo vuelve una garantía comprobada en vez de una suposición.
+     * Antes había aquí `the_provisional_label_marker_never_reaches_the_reader`, que comprobaba que
+     * un comentario `PROVISIONAL-TASK-0010A` siguiera en el fuente y no llegara al HTML. Tenía
+     * sentido mientras A estaba pendiente de aceptación, pero dejar para siempre un test que EXIGE
+     * un comentario interno es exactamente lo que la revisión `6171023438` pidió no hacer. A quedó
+     * aceptada (comentario `6172299365`), el marcador se retiró y esto lo reemplaza.
+     *
+     * Lo que afirma ahora es más fuerte: el manual cita las etiquetas **leídas de las propias
+     * constantes de la implementación**, no cadenas copiadas a mano. Si alguien cambia una etiqueta
+     * en `TaxonomyCategoriesRelationManager` sin actualizar el manual - o al revés - este test
+     * falla y dice cuál. Es la reconciliación convertida en garantía comprobable en vez de en una
+     * nota que alguien tiene que acordarse de leer.
      */
     #[Test]
-    public function the_provisional_label_marker_never_reaches_the_reader(): void
+    public function the_manual_cites_the_final_task_0010a_labels_read_from_the_implementation(): void
     {
+        $html = app(UserManualRenderer::class)->render()['html'];
         $markdown = file_get_contents(resource_path('manual/manual_usuario.md'));
 
-        // Primero: el marcador SIGUE en el fuente. Si alguien lo borra sin reconciliar las
-        // etiquetas, este test avisa en vez de dejar que la nota desaparezca en silencio.
-        $this->assertStringContainsString(
-            'PROVISIONAL-TASK-0010A',
-            $markdown,
-            'El marcador provisional desapareció del fuente: si ya se reconciliaron las etiquetas con la TASK-0010A aceptada, quítese también este test.'
+        // Las etiquetas que el afiliado verá en pantalla, tomadas de donde la UI las define.
+        $labels = [
+            'acción de la grilla' => TaxonomyCategoriesRelationManager::SOLICITUD_ACTION_LABEL,
+            'título del modal' => TaxonomyCategoriesRelationManager::SOLICITUD_MODAL_HEADING,
+            'campo necesidad' => TaxonomyCategoriesRelationManager::SOLICITUD_NECESIDAD_LABEL,
+            'campo justificación' => TaxonomyCategoriesRelationManager::SOLICITUD_JUSTIFICACION_LABEL,
+            'campo términos probados' => TaxonomyCategoriesRelationManager::SOLICITUD_TERMINOS_LABEL,
+        ];
+
+        foreach ($labels as $cual => $label) {
+            $this->assertNotSame('', trim((string) $label), "La constante de la UI para {$cual} está vacía.");
+            $this->assertStringContainsString(
+                $label,
+                $html,
+                "El manual no cita la etiqueta FINAL de {$cual} («{$label}»). Si la UI cambió, hay que reconciliar la sección «No encuentro una categoría» y la fila correspondiente de «Errores y dudas frecuentes»."
+            );
+        }
+
+        // El comportamiento prometido, no sólo las palabras: el manual tiene que decir que la
+        // solicitud NO crea la categoría y que la Cámara revisa primero si ya existe una.
+        $this->assertMatchesRegularExpression(
+            '/no\s+crea\s+una\s+categor/iu',
+            $html,
+            'El manual tiene que decir explícitamente que la solicitud no crea una categoría.'
+        );
+        $this->assertMatchesRegularExpression(
+            '/(revisar|revisará|revisa)[^.]{0,120}categor/iu',
+            $html,
+            'El manual tiene que decir que la Cámara revisa si una categoría existente cubre la necesidad.'
         );
 
-        $html = app(UserManualRenderer::class)->render()['html'];
-
-        foreach ([
+        // Y el marcador provisional ya NO debe estar: su trabajo lo hace este test.
+        $this->assertStringNotContainsString(
             'PROVISIONAL-TASK-0010A',
+            $markdown,
+            'TASK-0010A está aceptada: el marcador provisional sobra y debe retirarse del fuente.'
+        );
+
+        // Sigue sin filtrarse detalle interno al afiliado.
+        foreach ([
             'feature/task-0010a-category-request',
             'TaxonomyCategoriesRelationManager',
             'SOLICITUD_ACTION_LABEL',
@@ -292,8 +325,5 @@ class UserManualContentTest extends TestCase
                 "El manual renderizado expone detalle interno al afiliado: {$interno}"
             );
         }
-
-        // Y la sección que el marcador anota sí tiene que estar renderizada.
-        $this->assertStringContainsString('No encuentro la categoría / Solicitar revisión', $html);
     }
 }

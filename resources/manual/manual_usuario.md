@@ -206,20 +206,6 @@ Elegir bien sus categorías tiene ventajas prácticas:
 
 > **NOTA:** Una clasificación correcta mejora la calidad de las coincidencias, pero no garantiza una posición determinada en los resultados ni la llegada de clientes u oportunidades comerciales.
 
-<!--
-PROVISIONAL-TASK-0010A: las etiquetas en negrita de esta seccion se copiaron
-literalmente de las constantes de TaxonomyCategoriesRelationManager en la rama
-feature/task-0010a-category-request (SOLICITUD_ACTION_LABEL,
-SOLICITUD_MODAL_HEADING y los labels de los campos del formulario), que a la
-fecha de esta entrega NO esta aceptada todavia. Si la revision manual cambia
-alguna etiqueta, la integracion tiene que reconciliar esta seccion Y la fila
-correspondiente de la tabla de "Errores y dudas frecuentes".
-
-Este bloque es un comentario HTML y el renderizador corre con
-html_input = strip, asi que NO llega al manual que ve el afiliado. Hay un test
-que lo comprueba (the_provisional_label_marker_never_reaches_the_reader), para
-que esta nota no pueda convertirse en una fuga de detalle interno.
--->
 ## No encuentro una categoría {#no-encuentro-categoria}
 
 No encontrar una categoría al primer intento **no significa necesariamente** que no exista en la taxonomía. Muchas veces la categoría sí está, pero con otro nombre, en otro idioma o dentro de una Familia que no esperaba.
@@ -233,12 +219,12 @@ No encontrar una categoría al primer intento **no significa necesariamente** qu
 
 ### Solicitar revisión a la Cámara {#solicitar-revision}
 
-Si aun así no encuentra una categoría que describa lo que su empresa ofrece, use la opción **No encuentro la categoría / Solicitar revisión** de la pestaña **Categorías CPV (taxonomía nueva)**.
+Si aun así no encuentra una categoría que describa lo que su empresa ofrece, use la opción **No encuentro la categoría / Solicitar revisión** de la pestaña **Categorías CPV (taxonomía nueva)**. Se abre una ventana titulada **Solicitar revisión de categoría a la Cámara**.
 
 En el formulario de la solicitud:
 
 1. Describa en **¿Qué producto, servicio o capacidad necesita representar?** exactamente lo que no pudo clasificar.
-2. Elija el motivo que mejor describe su caso:
+2. En **¿Por qué solicita la revisión?**, elija el motivo que mejor describe su caso:
     - No encuentro una categoría que describa lo que hacemos.
     - Las categorías que encuentro son demasiado generales.
     - Creo que existe, pero la conozco con otro nombre o término.
@@ -246,7 +232,7 @@ En el formulario de la solicitud:
     - Es una capacidad/producto/servicio especializado que no veo reflejado.
     - Otro motivo (en este caso, explique el motivo en el detalle).
 3. Escriba un detalle breve (de uno a cinco párrafos cortos): términos técnicos, marcas, normas, en qué contexto lo usa su empresa y cualquier dato que ayude a entender la necesidad.
-4. Si quiere, indique en **¿Qué palabras probó al buscar?** los términos que ya intentó. Esto ayuda a la Cámara a saber si se trata de un vacío real de la taxonomía o de un problema de búsqueda.
+4. Si quiere, indique en **¿Qué palabras probó al buscar? (opcional)** los términos que ya intentó. Esto ayuda a la Cámara a saber si se trata de un vacío real de la taxonomía o de un problema de búsqueda.
 
 No necesita escribir los datos de su empresa ni sus datos de usuario: el sistema los toma automáticamente, junto con las categorías que su empresa ya tiene.
 
