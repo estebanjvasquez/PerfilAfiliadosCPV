@@ -33,15 +33,22 @@ SHA="${1:-}"
 shift || true
 SUITE=""
 FILTER=""
+# --ux runs the browser check of the rendered authenticated page; --skip-suite
+# leaves PHPUnit out. Together they give the UX evidence without rerunning the
+# whole suite, which review 6171023438 explicitly did not want for screenshots.
+UX=no
+SKIP_SUITE=no
 while [ $# -gt 0 ]; do
   case "$1" in
     --suite)  SUITE="${2:-}"; shift 2 ;;
     --filter) FILTER="${2:-}"; shift 2 ;;
+    --ux)         UX=yes; shift ;;
+    --skip-suite) SKIP_SUITE=yes; shift ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
 
-[ -n "$SHA" ] || { echo "usage: $0 <sha> [--suite Unit|Feature] [--filter <pattern>]" >&2; exit 2; }
+[ -n "$SHA" ] || { echo "usage: $0 <sha> [--suite Unit|Feature] [--filter <pattern>] [--ux] [--skip-suite]" >&2; exit 2; }
 case "$SHA" in *[!0-9a-f]*|"") echo "sha must be lowercase hex" >&2; exit 2 ;; esac
 [ "${#SHA}" -eq 40 ] || { echo "sha must be 40 characters" >&2; exit 2; }
 
@@ -697,6 +704,13 @@ fi
 
 # --- 8. the suite ------------------------------------------------------------
 
+PHPUNIT_EXIT=skipped
+SUITES_RUN="not run (--skip-suite)"
+if [ "$SKIP_SUITE" = "yes" ]; then
+step "8. PHPUnit SKIPPED (--skip-suite)"
+note "Requested explicitly. The suite result below is 'not run', never 'green':"
+note "a run that did not execute the suite must not read like a run that did."
+else
 step "8. Run PHPUnit"
 ARGS=(vendor/bin/phpunit --do-not-cache-result)
 #
@@ -749,6 +763,103 @@ if [ "$PHPUNIT_EXIT" = "0" ]; then
   say "[SUITE GREEN] phpunit exited 0"
 else
   say "[SUITE RED] phpunit exited $PHPUNIT_EXIT (recorded, not hidden)"
+fi
+fi
+
+# --- 8-ter. UX / BROWSER CHECK (its own group) -------------------------------
+#
+# Requested by review 6171023438: the contract's responsive and accessibility
+# requirements were implemented and never exercised, so they were not acceptance
+# evidence. This drives a REAL browser against the REAL authenticated Filament
+# page, in this run's disposable stack - not a standalone HTML file, which the
+# review rightly says must not be called authenticated verification.
+#
+# No separate staging deployment: `php artisan serve` runs inside the same
+# throwaway container, on the private compose network, and publishes no host
+# port. The browser is a sibling container on that network. Both die with the
+# run.
+#
+# SESSION_DRIVER is overridden to `file` for this phase only. The compose file
+# sets `array`, which is right for PHPUnit and useless for a browser: an
+# in-memory session does not survive the redirect after login, so the affiliate
+# could never actually reach the manual.
+UX_PASSED=0; UX_FAILED=0
+uxok()  { UX_PASSED=$((UX_PASSED+1)); printf '  [UX PASS] %s\n' "$*"; }
+uxbad() { UX_FAILED=$((UX_FAILED+1)); printf '  [UX FAIL] %s\n' "$*"; }
+
+if [ "$UX" = "yes" ] && [ "$MIGRATE_OK" = "yes" ]; then
+  step "8-ter. UX check in a real browser (its own group)"
+  mkdir -p "$ARTIFACTS/ux"
+
+  # Synthetic affiliate and company, created here and nowhere else. No customer
+  # data: the password is generated for this run and dies with it.
+  UX_PASSWORD="$(head -c 18 /dev/urandom | od -An -tx1 | tr -d ' \n')"
+  UX_EMAIL="zzz-ux-affiliate@example.test"
+  if compose run --rm -T \
+       -e CPV_UX_EMAIL="$UX_EMAIL" -e CPV_UX_PASSWORD="$UX_PASSWORD" \
+       testapp php -r '
+require "vendor/autoload.php"; $a=require "bootstrap/app.php";
+$a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$u = App\Models\User::firstOrCreate(
+  ["email" => getenv("CPV_UX_EMAIL")],
+  ["name" => "ZZZ UX Afiliado", "password" => Illuminate\Support\Facades\Hash::make(getenv("CPV_UX_PASSWORD")),
+   "email_verified_at" => now()]
+);
+$u->forceFill(["password" => Illuminate\Support\Facades\Hash::make(getenv("CPV_UX_PASSWORD")), "email_verified_at" => now()])->save();
+$e = App\Models\Empresa::firstOrCreate(["rif" => "J-00000000-9"], ["name" => "ZZZ UX Empresa Ficticia"]);
+if (method_exists($e, "users")) { $e->users()->syncWithoutDetaching([$u->id]); }
+echo "ux user id=", $u->id, " empresa id=", $e->id, "\n";
+' >"$ARTIFACTS/ux/seed_user.log" 2>&1; then
+    uxok "synthetic affiliate and company created for the browser check"
+    sed 's/^/           /' "$ARTIFACTS/ux/seed_user.log" | tail -2
+  else
+    uxbad "could not create the synthetic affiliate"
+    tail -6 "$ARTIFACTS/ux/seed_user.log" | sed 's/^/           /'
+  fi
+
+  # Serve the app inside the workspace container, detached, no host port.
+  UX_SERVER="${PROJECT}-uxserve-${RUN_ID}"
+  docker rm -f "$UX_SERVER" >/dev/null 2>&1 || true
+  compose run -d --name "$UX_SERVER" -e SESSION_DRIVER=file -T testapp \
+    php artisan serve --host=0.0.0.0 --port=8000 >/dev/null 2>&1 || true
+  # Wait for it, from inside the network rather than guessing with a sleep.
+  UX_UP=no
+  for _ in $(seq 1 30); do
+    if docker run --rm --network "${PROJECT}_cpvtest_internal" curlimages/curl:8.11.1 \
+         -s -o /dev/null --max-time 3 "http://${UX_SERVER}:8000/admin/login" 2>/dev/null; then
+      UX_UP=yes; break
+    fi
+    sleep 2
+  done
+  if [ "$UX_UP" = "yes" ]; then
+    uxok "the application is serving inside the disposable stack (no host port published)"
+  else
+    uxbad "the application never came up; the browser check cannot run"
+    docker logs "$UX_SERVER" 2>&1 | tail -15 | sed 's/^/           /'
+  fi
+
+  if [ "$UX_UP" = "yes" ]; then
+    set +e
+    docker run --rm \
+      --network "${PROJECT}_cpvtest_internal" \
+      -v "$COMPOSE_DIR/ux_check.mjs:/t/ux_check.mjs:ro" \
+      -v "$ARTIFACTS/ux:/out" \
+      -e BASE_URL="http://${UX_SERVER}:8000" \
+      -e UX_EMAIL="$UX_EMAIL" -e UX_PASSWORD="$UX_PASSWORD" \
+      mcr.microsoft.com/playwright:v1.49.1-jammy \
+      node /t/ux_check.mjs >"$ARTIFACTS/ux/ux_check.log" 2>&1
+    UX_EXIT=$?
+    set -e
+    sed 's/^/           /' "$ARTIFACTS/ux/ux_check.log"
+    if [ "$UX_EXIT" = "0" ]; then
+      uxok "browser checks passed (see ux/ux_results.json and the screenshots)"
+    else
+      uxbad "browser checks reported failures (exit $UX_EXIT) - see ux/ux_results.json"
+    fi
+    ls -1 "$ARTIFACTS/ux" | sed 's/^/           /'
+  fi
+
+  docker rm -f "$UX_SERVER" >/dev/null 2>&1 || true
 fi
 
 # --- 8-bis. TIMESTAMP RESOLUTION PROBE ---------------------------------------
@@ -822,6 +933,15 @@ say "GET $STAGING_URL -> $SMOKE_AFTER"
   echo "fixture_source=docker/test/fixtures/synthetic_fixture.sql (synthetic, no copied data)"
   echo "preconditions_passed=${PRE_PASS:-0}"
   echo "preconditions_failed=${PRE_FAIL:-unknown}"
+  if [ "$UX" = "yes" ]; then
+    echo "-- ux / browser --"
+    echo "ux_checked=yes"
+    echo "ux_passed=$UX_PASSED"
+    echo "ux_failed=$UX_FAILED"
+    echo "ux_viewports=1440x900,820x1180,390x844"
+    echo "ux_schemes=light,dark"
+    echo "ux_served=php artisan serve inside the disposable container, private network, no host port"
+  fi
   echo "-- tests --"
   echo "staging_before=$SMOKE_BEFORE"
   echo "staging_after=$SMOKE_AFTER"
@@ -850,6 +970,10 @@ echo "RESULT  isolation      : $I"
 echo "RESULT  schema prep    : $P   [$PREP_NOTE]"
 echo "RESULT  fixture load   : $F   [$FIXTURE_LOADED; ${PRE_PASS:-0} precondition(s) satisfied]"
 echo "RESULT  test suite     : $T   [$SUITES_RUN]"
+if [ "$UX" = "yes" ]; then
+  [ "$UX_FAILED" -eq 0 ] && U="PASS ($UX_PASSED checks)" || U="FAIL ($UX_FAILED of $((UX_PASSED+UX_FAILED)))"
+  echo "RESULT  ux / browser   : $U   [real authenticated page, 3 widths x 2 schemes]"
+fi
 echo "RESULT  findings in the repository under test: $FINDINGS"
 # Exit codes say WHICH group failed, because "the suite is red" and "the suite
 # never had a schema" need different work and must not share an exit code:
