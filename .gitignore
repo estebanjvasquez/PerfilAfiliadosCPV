@@ -13,6 +13,11 @@ yarn-error.log
 /.idea
 /.vscode
 *.sql
+# Excepcion: los scripts de despliegue NO son volcados de datos. La regla *.sql de
+# arriba los descartaba y `git add` no decia nada - ya paso tres veces en este
+# repositorio con archivos que el runner necesitaba. Si se agrega otro script .sql
+# que deba versionarse, hace falta su negacion explicita aqui.
+!docs/deploy/*.sql
 Propuesta_Categorizacion_Buscador_CPV.docx
 Manual_Usuario_Perfil_Afiliados.docx
 Manual_Usuario_Perfil_Afiliados_v2.docx
