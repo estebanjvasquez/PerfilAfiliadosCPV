@@ -18,6 +18,8 @@ class TaxonomySelectionSettings extends Model
     protected $fillable = [
         'max_categorias_principales',
         'max_categorias_secundarias',
+        // TASK-0010A: destinatario de las solicitudes de revisión de categoría (nullable).
+        'category_request_recipient_email',
     ];
 
     protected $casts = [

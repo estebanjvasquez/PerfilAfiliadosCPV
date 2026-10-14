@@ -1,0 +1,32 @@
+paths scanned               : /w/database/migrations
+migrations scanned          : 99
+tables created by migrations: 65
+foreign key references      : 70 (28 with an inferred table name)
+  satisfied at replay time  : 62
+  ORDERING VIOLATIONS       : 4
+  MISSING tables            : 4 (1 distinct)
+  unresolved                : 0
+
+VIOLATIONS - replaying into an empty database aborts at each of these:
+  2022_05_31_223828_create_empresas_table.php:36
+      needs "cities" via references()->on('cities') [explicit]
+      created later by 2022_07_28_183312_create_cities_table.php
+  2022_08_12_145310_create_sustainabilities_table.php:19
+      needs "areas" via constrained() inferred from column areas_id [inferred]
+      created later by 2022_08_15_005221_create_areas_table.php
+  2022_09_01_154856_create_infratypes_table.php:18
+      needs "infrasectors" via constrained() inferred from column infrasectors_id [inferred]
+      created later by 2022_09_06_153218_create_infrasectors_table.php
+  2022_09_01_185804_create_infrafacilities_table.php:18
+      needs "infraregion_infrasystem" via references()->on('infraregion_infrasystem') [explicit]
+      created later by 2022_12_01_222538_create_infraregion_infrasystem_table.php
+
+MISSING - referenced, but NO scanned migration creates them.
+No reordering can fix this: the creating migration is not in this set.
+  "taxonomy_categories" referenced by 4 place(s):
+      2026_09_11_090000_create_taxonomy_category_embeddings_table.php:52
+      2026_09_12_120000_create_service_taxonomy_homologacion_table.php:30
+      2026_09_18_090300_create_taxonomy_term_cpv_relations_table.php:37
+      2026_09_18_090500_create_legacy_service_cpv_relations_table.php:29
+
+RESULT: 4 ordering violation(s) in 4 file(s), 1 missing table(s).
