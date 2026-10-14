@@ -289,9 +289,20 @@ class TaxonomyReviewedProposalResource extends Resource
             return [];
         }
 
+        // El grado de evidencia se muestra por concepto, no sólo en el JSON: un candidato del
+        // mismo segundo que la revisión NO es lo mismo que un concepto que apareció después, y
+        // quien decide tiene que poder distinguirlos sin abrir el delta crudo.
         $concepts = collect($delta['concepts_created_since_review'] ?? [])
-            ->map(fn (array $c) => sprintf('#%d %s / %s', $c['id'], $c['canonical_name_es'] ?? '—', $c['canonical_name_en'] ?? '—'))
+            ->map(fn (array $c) => sprintf(
+                '#%d %s / %s%s',
+                $c['id'],
+                $c['canonical_name_es'] ?? '—',
+                $c['canonical_name_en'] ?? '—',
+                ($c['evidence'] ?? 'exact') === 'boundary_same_second' ? ' [mismo segundo: candidato]' : ''
+            ))
             ->implode(' | ');
+
+        $boundaryCount = (int) ($delta['concepts_created_since_review_boundary_count'] ?? 0);
 
         return array_filter([
             'Fingerprint congelado' => (string) ($delta['frozen_taxonomy_state_fingerprint'] ?? ''),
@@ -299,6 +310,10 @@ class TaxonomyReviewedProposalResource extends Resource
             'Revisada el' => (string) ($delta['review_window']['reviewed_at'] ?? ''),
             'Supersedida el' => (string) ($delta['review_window']['superseded_at'] ?? ''),
             'Conceptos creados desde la revisión' => (string) ($delta['concepts_created_since_review_count'] ?? '0'),
+            'De ellos, evidencia exacta' => (string) ($delta['concepts_created_since_review_exact_count'] ?? '0'),
+            'De ellos, candidatos del mismo segundo' => $boundaryCount > 0
+                ? $boundaryCount.' (no se puede ordenar respecto de la revisión: ver el límite declarado)'
+                : '0',
             'Cuáles' => $concepts !== '' ? $concepts : 'ninguno',
             'Conceptos modificados desde la revisión' => implode(', ', array_map(fn ($id) => '#'.$id, $delta['concepts_updated_since_review_ids'] ?? [])) ?: 'ninguno',
             'Límite declarado' => (string) ($delta['limitation'] ?? ''),

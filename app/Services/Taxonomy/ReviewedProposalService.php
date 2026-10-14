@@ -1574,12 +1574,26 @@ class ReviewedProposalService
             // Evento de auditoría propio y distinguible: `field = confirmation_invalidated_at`, con
             // el `confirmed_at` anulado como valor viejo. Sin `authorization_reference`/
             // `target_environment`: corregir no es ejecutar.
-            TaxonomyAuditLogger::record(
+            // `recordEvent`, no `record`: esto es un HECHO, no un cambio de valor.
+            //
+            // Con `record()` el guard de no-op comparaba `confirmed_at` contra `invalidated_at`
+            // como cadenas `Y-m-d H:i:s` y, cuando confirmar y anular caían en el mismo segundo,
+            // las dos eran idénticas y la fila de auditoría se DESCARTABA EN SILENCIO. Una
+            // anulación de confirmación sin rastro es un defecto de gobernanza: el rastro durable
+            // de qué se anuló es justamente lo que esta fila sostiene.
+            //
+            // El payload además identifica la confirmación anulada, no sólo su instante: la
+            // referencia y el canal dicen QUÉ se anuló incluso si los dos timestamps coinciden.
+            TaxonomyAuditLogger::recordEvent(
                 entityType: TaxonomyReviewedProposal::class,
                 entityId: $proposal->id,
                 field: 'confirmation_invalidated_at',
-                oldValue: $snapshot['confirmed_at'],
-                newValue: $invalidatedAt->format('Y-m-d H:i:s'),
+                oldValue: 'confirmed_at='.($snapshot['confirmed_at'] ?? 'null')
+                    .'; reference='.($snapshot['confirmation_reference'] ?? 'null')
+                    .'; channel='.($snapshot['confirmation_channel'] ?? 'null')
+                    .'; by_id='.($snapshot['confirmed_by_id'] ?? 'null'),
+                newValue: 'invalidated_at='.$invalidatedAt->format('Y-m-d H:i:s')
+                    .'; correction_reference='.$correctionReference,
                 reason: 'CONFIRMATION_INVALIDATED: procedencia de confirmación anulada por corrección de gobernanza'
                     .' (ref='.$correctionReference.', actor='.($authorizedBy ? 'human#'.$authorizedBy->id : 'agent')
                     .', canal='.self::currentChannel().'). La decisión, su payload y sus fingerprints NO se modificaron;'
@@ -1838,18 +1852,58 @@ class ReviewedProposalService
     {
         $reviewedAt = $proposal->reviewed_at;
 
-        $conceptsCreatedSince = DB::connection('pgsql')->table('taxonomy_canonical_concepts')
-            ->where('created_at', '>', $reviewedAt)
+        // EVIDENCIA EXACTA vs CANDIDATOS DEL MISMO SEGUNDO (corrección de la revisión
+        // `6167931953`, punto 5).
+        //
+        // Antes esto era `where('created_at', '>', $reviewedAt)` a secas, y eso perdía en silencio
+        // los conceptos creados DENTRO DEL MISMO SEGUNDO que la revisión. Medido: Laravel liga las
+        // fechas con el formato `Y-m-d H:i:s` del grammar, sin microsegundos, así que dos
+        // escrituras separadas por milisegundos quedan con el mismo valor y el `>` estricto las
+        // excluye. Un cambio de taxonomía invisible en el delta es exactamente lo que el revisor
+        // humano necesitaba ver.
+        //
+        // No se relaja el `>` a `>=`, que metería en la lista los conceptos que el revisor SÍ vio.
+        // Se separan dos grados de evidencia y se dicen los dos:
+        //   * `exact`    - `created_at` estrictamente posterior: apareció después, sin duda;
+        //   * `boundary` - `created_at` IGUAL al instante de la revisión: con resolución de
+        //                  segundo no se puede saber si fue antes o después, así que se reporta
+        //                  como CANDIDATO conservador en vez de afirmarlo o esconderlo.
+        //
+        // Las filas viejas, ya guardadas con resolución de segundo, no pueden recuperar precisión
+        // retroactivamente: para ellas el grado `boundary` es el techo de lo que se puede afirmar.
+        $conceptRows = DB::connection('pgsql')->table('taxonomy_canonical_concepts')
+            ->where('created_at', '>=', $reviewedAt)
             ->orderBy('id')
-            ->get(['id', 'canonical_name_es', 'canonical_name_en', 'status', 'created_at'])
-            ->map(fn ($row) => [
-                'id' => (int) $row->id,
-                'canonical_name_es' => $row->canonical_name_es,
-                'canonical_name_en' => $row->canonical_name_en,
-                'status' => $row->status,
-                'created_at' => (string) $row->created_at,
-            ])
+            ->get(['id', 'canonical_name_es', 'canonical_name_en', 'status', 'created_at']);
+
+        $reviewedAtKey = $reviewedAt?->format('Y-m-d H:i:s');
+        $conceptsCreatedSince = $conceptRows
+            ->map(function ($row) use ($reviewedAtKey) {
+                $createdAt = (string) $row->created_at;
+                $sameSecond = $reviewedAtKey !== null
+                    && substr($createdAt, 0, 19) === substr($reviewedAtKey, 0, 19);
+
+                return [
+                    'id' => (int) $row->id,
+                    'canonical_name_es' => $row->canonical_name_es,
+                    'canonical_name_en' => $row->canonical_name_en,
+                    'status' => $row->status,
+                    'created_at' => $createdAt,
+                    // Declarado por fila, para que nadie tenga que deducir el grado de evidencia.
+                    'evidence' => $sameSecond ? 'boundary_same_second' : 'exact',
+                ];
+            })
+            ->values()
             ->all();
+
+        $conceptsCreatedExact = array_values(array_filter(
+            $conceptsCreatedSince,
+            fn (array $c) => $c['evidence'] === 'exact'
+        ));
+        $conceptsCreatedBoundary = array_values(array_filter(
+            $conceptsCreatedSince,
+            fn (array $c) => $c['evidence'] === 'boundary_same_second'
+        ));
 
         $conceptsUpdatedSince = DB::connection('pgsql')->table('taxonomy_canonical_concepts')
             ->where('updated_at', '>', $reviewedAt)
@@ -1888,6 +1942,11 @@ class ReviewedProposalService
             // humano decidió. Para los tres casos reales esto es lo que vuelve a abrir la pregunta.
             'concepts_created_since_review' => $conceptsCreatedSince,
             'concepts_created_since_review_count' => count($conceptsCreatedSince),
+            // Los dos grados, por separado y contados, para que un lector pueda quedarse sólo con
+            // la evidencia exacta si eso es lo que necesita para decidir.
+            'concepts_created_since_review_exact_count' => count($conceptsCreatedExact),
+            'concepts_created_since_review_boundary_count' => count($conceptsCreatedBoundary),
+            'concepts_created_since_review_boundary_ids' => array_map(fn (array $c) => $c['id'], $conceptsCreatedBoundary),
             'concepts_updated_since_review_ids' => $conceptsUpdatedSince,
             'current_concept_graph_fingerprint' => CanonicalConceptBuilderService::conceptGraphFingerprint(),
             'current_table_version_signals' => $signals,
@@ -1896,7 +1955,7 @@ class ReviewedProposalService
                 'taxonomy_canonical_concepts' => DB::connection('pgsql')->table('taxonomy_canonical_concepts')->count(),
                 'taxonomy_term_cpv_relations' => DB::connection('pgsql')->table('taxonomy_term_cpv_relations')->count(),
             ],
-            'limitation' => 'El fingerprint congelado es un HASH: la composición por tabla del estado VIEJO no se puede reconstruir desde él. Los dos hashes de arriba son exactos; los cambios listados se derivaron de created_at/updated_at acotados por reviewed_at, que es evidencia real pero no una reconstrucción del estado anterior. Una fila modificada sin tocar updated_at no aparecería acá (mismo límite ya documentado en dryRunInputFingerprint()).',
+            'limitation' => 'El fingerprint congelado es un HASH: la composición por tabla del estado VIEJO no se puede reconstruir desde él. Los dos hashes de arriba son exactos; los cambios listados se derivaron de created_at/updated_at acotados por reviewed_at, que es evidencia real pero no una reconstrucción del estado anterior. Una fila modificada sin tocar updated_at no aparecería acá (mismo límite ya documentado en dryRunInputFingerprint()). RESOLUCIÓN TEMPORAL: Laravel liga las fechas con formato de SEGUNDO (Y-m-d H:i:s), así que un concepto creado dentro del mismo segundo que la revisión no se puede ordenar respecto de ella; esas filas se listan con evidence=boundary_same_second y se cuentan aparte, como candidatos conservadores y no como hechos. Las filas ya guardadas con resolución de segundo NO pueden recuperar precisión retroactivamente.',
         ];
     }
 

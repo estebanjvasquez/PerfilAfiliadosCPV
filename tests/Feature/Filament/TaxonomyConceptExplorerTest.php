@@ -500,15 +500,34 @@ class TaxonomyConceptExplorerTest extends TestCase
         $candidate = $this->pendingCandidate($concept);
         $reviewer = $this->reviewer();
 
-        foreach ([1, 2] as $attempt) {
-            Livewire::actingAs($reviewer)
-                ->test(ListTaxonomyCandidateConceptLinks::class)
-                ->callTableAction('freezeReview', $candidate->fresh(), data: [
-                    'decision' => TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
-                    'target_concept_id' => $concept->id,
-                ])
-                ->assertHasNoTableActionErrors();
-        }
+        // Primer congelamiento: la acción está disponible y funciona.
+        Livewire::actingAs($reviewer)
+            ->test(ListTaxonomyCandidateConceptLinks::class)
+            ->callTableAction('freezeReview', $candidate->fresh(), data: [
+                'decision' => TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
+                'target_concept_id' => $concept->id,
+            ])
+            ->assertHasNoTableActionErrors();
+
+        // SEGUNDO INTENTO: desde TASK-0006D PARTE 2 ya no se OFRECE.
+        //
+        // Este test conducía la acción dos veces y esperaba que la segunda también se pudiera
+        // invocar. Esa expectativa quedó obsoleta cuando `TaxonomyCandidateConceptLinkResource`
+        // pasó a esconder `freezeReview` en cuanto el candidato tiene una propuesta viva
+        // (`liveFrozenProposal($record) === null` en su `visible()`), que es una defensa MÁS
+        // fuerte: el segundo camino de revisión ya no existe en la grilla.
+        //
+        // Afirmar que está escondida es más exigente que afirmar que se puede invocar sin error,
+        // y la intención original -que no se duplique la propuesta- se conserva intacta en la
+        // aserción final de abajo. No se debilita nada: se afirma la defensa nueva ADEMÁS de la
+        // vieja. La salvaguarda real, que no depende de la visibilidad, la cubren
+        // `TaxonomyCandidateConceptLinkReviewTest::freeze_review_double_submit_does_not_create_a_second_pending_proposal`
+        // (invocación directa al servicio) y
+        // `ReviewedProposalBatchApplyTest::the_partial_unique_pending_index_still_blocks_a_second_freeze_of_the_same_candidate`
+        // (el índice único parcial).
+        Livewire::actingAs($reviewer)
+            ->test(ListTaxonomyCandidateConceptLinks::class)
+            ->assertTableActionHidden('freezeReview', $candidate->fresh());
 
         $this->assertSame(1, TaxonomyReviewedProposal::where('candidate_link_id', $candidate->id)
             ->where('status', TaxonomyReviewedProposal::STATUS_PENDING_APPLY)->count());
