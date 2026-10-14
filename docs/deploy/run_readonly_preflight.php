@@ -25,23 +25,31 @@
  *      este script), verificada con SHOW antes del primer bloque;
  *   4. la transaccion termina SIEMPRE con ROLLBACK, tambien si todo salio bien;
  *   5. un error SQL detiene todo (codigo 5); un veredicto que no sea OK / INFO / BASELINE es una
- *      PARADA (codigo 6). Nada se omite ni se reintenta.
+ *      PARADA (codigo 6). Nada se omite ni se reintenta. Cualquier otra excepcion sale con 1:
+ *      nunca con 0.
+ *
+ * STDOUT/STDERR NO se usan: cuando el script llega por stdin, PHP CLI no define esas constantes.
+ * La primera ejecucion de este archivo murio por eso en la primera linea de salida, antes de
+ * abrir la transaccion, y el manejador de Laravel la dejo salir con 0.
  */
+
+$stdout = fopen('php://stdout', 'w');
+$stderr = fopen('php://stderr', 'w');
 
 $sql = base64_decode((string) getenv('PREFLIGHT_SQL_B64'), true);
 if ($sql === false || $sql === '') {
-    fwrite(STDERR, "PREFLIGHT_SQL_B64 ausente o invalido\n");
+    fwrite($stderr, "PREFLIGHT_SQL_B64 ausente o invalido\n");
     exit(2);
 }
 if (hash('sha256', $sql) !== (string) getenv('PREFLIGHT_SQL_SHA256')) {
-    fwrite(STDERR, "El sha256 del SQL recibido no coincide con PREFLIGHT_SQL_SHA256: no se ejecuta nada\n");
+    fwrite($stderr, "El sha256 del SQL recibido no coincide con PREFLIGHT_SQL_SHA256: no se ejecuta nada\n");
     exit(2);
 }
 
 // --- Partir por marcadores y validar ANTES de abrir ninguna conexion ---------------------------
 preg_match_all('/^-- @block\s+(\S+)\s*\|\s*(.+)$/m', $sql, $markers, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
 if ($markers === []) {
-    fwrite(STDERR, "El SQL no tiene marcadores -- @block\n");
+    fwrite($stderr, "El SQL no tiene marcadores -- @block\n");
     exit(2);
 }
 
@@ -68,15 +76,15 @@ foreach ($markers as $i => $marker) {
     $probe = preg_replace('/--[^\n]*/', '', $probe);
 
     if (! preg_match('/^\s*(SELECT|WITH)\b/i', $probe)) {
-        fwrite(STDERR, "Bloque {$marker[1][0]}: no empieza por SELECT/WITH; no se ejecuta nada\n");
+        fwrite($stderr, "Bloque {$marker[1][0]}: no empieza por SELECT/WITH; no se ejecuta nada\n");
         exit(2);
     }
     if (str_contains($probe, ';')) {
-        fwrite(STDERR, "Bloque {$marker[1][0]}: mas de una sentencia; no se ejecuta nada\n");
+        fwrite($stderr, "Bloque {$marker[1][0]}: mas de una sentencia; no se ejecuta nada\n");
         exit(2);
     }
     if (preg_match($forbidden, $probe, $hit)) {
-        fwrite(STDERR, "Bloque {$marker[1][0]}: palabra no permitida «{$hit[1]}»; no se ejecuta nada\n");
+        fwrite($stderr, "Bloque {$marker[1][0]}: palabra no permitida «{$hit[1]}»; no se ejecuta nada\n");
         exit(2);
     }
 
@@ -86,7 +94,7 @@ foreach ($markers as $i => $marker) {
 // Ensayo: solo particion y guarda, sin arrancar Laravel ni abrir conexion.
 if (getenv('PREFLIGHT_DRY_RUN') === '1') {
     foreach ($blocks as $block) {
-        fwrite(STDOUT, "bloque {$block['id']} aceptado (".strlen($block['sql'])." bytes)\n");
+        fwrite($stdout, "bloque {$block['id']} aceptado (".strlen($block['sql'])." bytes)\n");
     }
     exit(0);
 }
@@ -98,8 +106,8 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 $conn = Illuminate\Support\Facades\DB::connection('pgsql');
 
-$out = static function (string $line = ''): void {
-    fwrite(STDOUT, $line."\n");
+$out = static function (string $line = '') use ($stdout): void {
+    fwrite($stdout, $line."\n");
 };
 $scalar = static function ($value): string {
     if ($value === null) {
@@ -124,9 +132,12 @@ $out('app_env='.config('app.env'));
 $stops = [];
 $counts = [];
 $exit = 0;
+$opened = false;
 
-$conn->beginTransaction();
 try {
+    $conn->beginTransaction();
+    $opened = true;
+
     // PostgreSQL hace cumplir esto: cualquier escritura dentro de la transaccion falla con 25006.
     $conn->unprepared('SET TRANSACTION READ ONLY');
     $conn->unprepared("SET LOCAL statement_timeout = '60s'");
@@ -181,9 +192,11 @@ try {
     $out('ABORTADO: '.$e->getMessage());
 } finally {
     // SIEMPRE rollback: no hay nada que confirmar.
-    $conn->rollBack();
-    $out();
-    $out('transaccion_cerrada=ROLLBACK');
+    if ($opened) {
+        $conn->rollBack();
+        $out();
+        $out('transaccion_cerrada=ROLLBACK');
+    }
 }
 
 ksort($counts);
