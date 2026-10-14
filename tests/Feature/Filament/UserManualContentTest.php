@@ -150,7 +150,12 @@ class UserManualContentTest extends TestCase
         $this->assertStringContainsString('no significa necesariamente', $text);
         $this->assertStringContainsString('Solicitar revisión', $text);
         $this->assertStringContainsString('¿Qué producto, servicio o capacidad necesita representar?', $text);
-        $this->assertStringContainsString('Elija el motivo', $text);
+        // La etiqueta FINAL del campo, no una paráfrasis: al reconciliar con la TASK-0010A
+        // aceptada, el paso 2 pasó a citar el label que el afiliado ve en pantalla
+        // («¿Por qué solicita la revisión?, elija el motivo...»), así que buscar «Elija el motivo»
+        // con mayúscula dejó de encontrar nada.
+        $this->assertStringContainsString(TaxonomyCategoriesRelationManager::SOLICITUD_JUSTIFICACION_LABEL, $text);
+        $this->assertStringContainsString('elija el motivo', $text);
         $this->assertStringContainsString('La Cámara puede contactarle', $text);
         $this->assertStringContainsString('revisa primero si alguna categoría existente ya cubre su necesidad', $text);
         $this->assertStringContainsString('no crea ni publica una categoría automáticamente', $text);
@@ -294,8 +299,10 @@ class UserManualContentTest extends TestCase
 
         // El comportamiento prometido, no sólo las palabras: el manual tiene que decir que la
         // solicitud NO crea la categoría y que la Cámara revisa primero si ya existe una.
+        // «no crea NI PUBLICA una categoría automáticamente» es lo que dice el manual, así que el
+        // patrón no puede exigir que «crea» y «categoría» sean contiguas.
         $this->assertMatchesRegularExpression(
-            '/no\s+crea\s+una\s+categor/iu',
+            '/no\s+crea\b[^.]{0,40}categor/iu',
             $html,
             'El manual tiene que decir explícitamente que la solicitud no crea una categoría.'
         );
