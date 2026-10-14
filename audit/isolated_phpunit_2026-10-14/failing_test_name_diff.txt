@@ -13,9 +13,14 @@ and run2/phpunit.txt, which are host paths that do not exist here:
 
 Verified against the committed files: 1 entry only in run 1, 0 only in run 2.
 
-ON THE COUNTS BELOW: these files hold the errors AND failures sections, so 28
-and 27 are errors + failures + risky entries, not the failure counts alone,
-which were 21 and 20. The suite lines are in each run's summary.txt.
+ON THE COUNTS BELOW, spelled out per run because verdict 6162770894 noted the
+previous wording did not state the risky count:
+
+  run 1 (20261013T183459Z):  5 errors + 21 failures + 2 risky = 28 entries
+  run 2 (20261014T063709Z):  5 errors + 20 failures + 2 risky = 27 entries
+
+So 28 and 27 are NOT the failure counts, which were 21 and 20. Each run's
+PHPUnit summary line is in its own summary.txt.
 
 run 1 entries: 28
 run 2 entries: 27

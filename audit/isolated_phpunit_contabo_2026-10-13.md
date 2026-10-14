@@ -219,10 +219,10 @@ since verdict `6162548587` finding 4 asked for exactly that:
 
 | artifact set | run | runner commit |
 |---|---|---|
-| [`audit/isolated_phpunit_2026-10-13/`](isolated_phpunit_2026-10-13/) | `20261013T183459Z-99e603cb4713` | `d17854bd` |
+| [`audit/isolated_phpunit_2026-10-13/`](isolated_phpunit_2026-10-13/) | `20261013T183459Z-99e603cb4713` | `d17854bd875a68ce23ed7ec9a87f87046f00512f` |
 | [`audit/isolated_phpunit_2026-10-14/`](isolated_phpunit_2026-10-14/) | `20261014T063709Z-99e603cb4713` | `04c1fbf9abcfa6847575368e5761482a8345ff2b` |
 
-The patch files themselves are at `d17854bd` and unchanged by `04c1fbf9abcfa6847575368e5761482a8345ff2b`, which
+The patch files themselves are at `d17854bd875a68ce23ed7ec9a87f87046f00512f` and unchanged by `04c1fbf9abcfa6847575368e5761482a8345ff2b`, which
 touched only the runner's path handling.
 
 The first set, under
