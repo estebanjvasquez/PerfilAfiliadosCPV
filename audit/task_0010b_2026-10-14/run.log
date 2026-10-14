@@ -1,0 +1,290 @@
+CPV isolated test run
+  run id   : 20261014T122734Z-247240e44fe0
+  sha      : 247240e44fe0dcc703c6317a36a8ee69c0d0dea0
+  workspace: <CPV_TEST_ROOT>/20261014T122734Z-247240e44fe0
+  artifacts: <CPV_TEST_ROOT>/artifacts/20261014T122734Z-247240e44fe0
+
+== 1. Staging smoke BEFORE
+  GET https://pruebas.camarapetrolera.app/ -> 200
+  [PASS] staging healthy before the run
+
+== 2. Disposable workspace at the exact candidate SHA
+  [PASS] workspace is at 247240e44fe0dcc703c6317a36a8ee69c0d0dea0
+  [PASS] workspace path is disjoint from <LIVE_APP_DIR>
+  [PASS] workspace has its own storage and bootstrap/cache
+  [PASS] connection verifier injected into the workspace (not taken from the SHA)
+  [PASS] ephemeral APP_KEY and fixture DB password generated for this run only
+         Not a secret change to any real system: both exist only in this process
+         and the disposable containers, and die with them. Never written to disk.
+  [PASS] no .env in the workspace: configuration comes from the environment only
+
+== 3. Build the test image and start the fixture database
+  [PASS] test image built (log: <CPV_TEST_ROOT>/artifacts/20261014T122734Z-247240e44fe0/build.log)
+  [PASS] fixture database is healthy
+
+== 4. Mount and port isolation, from docker inspect
+  mounts (testapp service container):
+           bind <CPV_TEST_ROOT>/20261014T122734Z-247240e44fe0 -> /app rw=true
+  [PASS] testapp service container: exactly one bind mount, and it is this run's workspace at /app
+  [PASS] testapp service container: no mount references <LIVE_APP_DIR> (storage, bootstrap/cache, public, .env included)
+  fixture db published ports: {"5432/tcp":null}
+  [PASS] the fixture database publishes no host port
+
+== 5. Install dependencies INSIDE the workspace (dev included)
+  [PASS] phpunit present in the workspace vendor
+  [PASS] package discovery written inside the workspace
+         This is the step that once wrote through a SHARED bootstrap/cache mount
+         and produced live HTTP 500s. Here the target is <CPV_TEST_ROOT>/20261014T122734Z-247240e44fe0/bootstrap/cache.
+           total 40
+           drwxrwxrwx. 2 root root    64 Oct 14 14:27 .
+           drwxr-xr-x. 3 root root    51 Oct 14 14:27 ..
+           -rwxrwxrwx. 1 root root    14 Oct 14 14:27 .gitignore
+           -rwxr-xr-x. 1 root root  5742 Oct 14 14:27 packages.php
+           -rwxr-xr-x. 1 root root 25551 Oct 14 14:27 services.php
+
+== 6. Verify EVERY resolved connection BEFORE migrating
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-6e58d14829a1 Creating 
+ Container cpvtest-testapp-run-6e58d14829a1 Created 
+== Resolved database connections, before any migration
+------------------------------------------------------------------------
+  APP_ENV                testing
+  default connection     'pgsql'
+  sqlite                 driver=sqlite   host=(none)                       database=/app/database/database.sqlite
+                         sqlite path inside the workspace
+  mysql                  driver=mysql    host=127.0.0.1                    database=forge
+                         unused placeholder: nothing listening on 127.0.0.1:3306
+  mariadb                driver=mariadb  host=127.0.0.1                    database=laravel
+                         unused placeholder: nothing listening on 127.0.0.1:3306
+  pgsql                  driver=pgsql    host=testdb                       database=cpv_test
+  sqlsrv                 driver=sqlsrv   host=localhost                    database=forge
+                         unused placeholder: nothing listening on localhost:1433
+------------------------------------------------------------------------
+  live current_database  cpv_test
+  live server address    <docker-bridge-ip>/32
+  live version           PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x8
+  tables in public       0
+------------------------------------------------------------------------
+connections inspected: 5
+
+SAFE: every resolved connection points at the disposable fixture database.
+  [PASS] pre-flight passed: all connections point at the disposable fixture
+
+== 7. SCHEMA PREPARATION (its own phase: not isolation, not the suite)
+  [FINDING] 4 migration ordering violation(s) at this SHA (migration_deps.txt)
+           VIOLATIONS - replaying into an empty database aborts at each of these:
+             2022_05_31_223828_create_empresas_table.php:36
+                 needs "cities" via references()->on('cities') [explicit]
+                 created later by 2022_07_28_183312_create_cities_table.php
+  [PREP PASS] applied defer_four_fks.patch
+  [PREP PASS] applied align_permission_migration_to_v6.patch
+  [PREP PASS] applied portable_index_check.patch
+  net effect on migrations: 6 files changed, 28 insertions(+), 25 deletions(-)
+         Applied to <CPV_TEST_ROOT>/20261014T122734Z-247240e44fe0 only. No existing database and no branch is touched.
+         The suite below therefore runs 247240e44fe0dcc703c6317a36a8ee69c0d0dea0 PLUS: defer_four_fks.patch,align_permission_migration_to_v6.patch,portable_index_check.patch
+  [PREP PASS] pgsql bootstrap migrations taken from feature/supplhi-postgres-buscador @ 5df23fa9c5d0: 21 files
+           2026_08_31_161504_create_sustainability_view_pgsql.php
+           2026_08_31_161706_create_management_view_pgsql.php
+           2026_08_31_161834_create_catalogo_view_pgsql.php
+         ...and 18 more, listed in pgsql_bootstrap_migrations.txt
+  [PREP PASS] migrations table created (the empty fixture had none)
+         STATED LIMIT of this fixture: the 15 MySQL-only view migrations are marked
+         as run, so those views do NOT exist here. In Supabase they were created by
+         another mechanism. No test references them (grep over tests/ and app/), but
+         the fixture is therefore not view-for-view identical to the shared database.
+  [PREP PASS] all migrations replayed into the empty fixture
+  [PREP PASS] the four deferred foreign keys were re-created with Laravel's own names
+  [PREP PASS] catalogue confirms all four constraints exist, with their definitions
+            empresas_city_id_foreign                           | FOREIGN KEY (city_id) REFERENCES cities(id)
+            infrafacilities_infraregion_infrasystem_id_foreign | FOREIGN KEY (infraregion_infrasystem_id) REFERENCES infraregion_infrasystem(id)
+            infratypes_infrasectors_id_foreign                 | FOREIGN KEY (infrasectors_id) REFERENCES infrasectors(id)
+            sustainabilities_areas_id_foreign                  | FOREIGN KEY (areas_id) REFERENCES areas(id)
+            foreign_keys_total 
+            BASE TABLE | 77
+            VIEW       | 13
+  [PREP PASS] seeded Phase3PermissionsSeeder
+  [PREP PASS] seeded TaxonomyV2PermissionsSeeder
+  [PREP PASS] ran taxonomy:seed-concept-vocabulary (the project's own versioned catalogue)
+  permission catalogue: 16 permissions, 0 roles
+
+== 7-bis. FIXTURE LOAD (its own phase: not schema, not the suite)
+  [FIXTURE PASS] synthetic fixture loaded and its own shape assertions passed
+           NOTICE:  fixture ok: 26 categories (2/4/20), 3 empresas, leaf=7 family=3 group=1 sibling=8 other_family_child=12
+           -- precondition: >= 1 empresa (predict_affected_companies_counts_direct_companies_deduplicated_by_empresa_id)
+           PASS  empresas >= 1  (have 3)
+           -- precondition: >= 2 empresas (predict_affected_companies_breaks_down_direct_evidence_by_origen)
+           PASS  empresas >= 2  (have 3)
+           -- precondition: >= 18 categories with a code (TaxonomyConceptExplorerTest::existingCategoryIds)
+           PASS  categories with code >= 18  (have 26)
+           -- precondition: >= 1 level-2 category (ValidationCorpusTest::anyLeafCategoryId)
+           PASS  level-2 categories >= 1  (have 20)
+           -- precondition: the first level-2 category has a sibling (siblingCategoryUnderSameFamily)
+           PASS  siblings of the first leaf  (have 4)
+           -- precondition: a second family under the same group has a child (categoryInDifferentFamilySameGroup)
+           PASS  children of the other family  (have 5)
+           -- precondition: the relation-type catalogue is populated and active (validateConceptRelationProposal)
+           PASS  active relation types >= 5  (have 5)
+           -- precondition: intent markers exist (corpus case K intent_contamination_penalty)
+           PASS  intent markers >= 1  (have 9)
+  [FIXTURE PASS] all 8 declared test preconditions are satisfied by the fixture
+  fixture data inventory (rows):
+           empresas                       3
+           taxonomy_categories            26
+           taxonomy_terms                 0
+           taxonomy_canonical_concepts    0
+           taxonomy_term_cpv_relations    0
+           users                          0
+           permissions                    16
+           roles                          0
+           taxonomy_concept_types         9
+           taxonomy_concept_relation_types 5
+           taxonomy_intent_markers        9
+           empresa_taxonomy_category      0
+  [PREP PASS] fixture schema ready: 90 tables
+
+== 8. Run PHPUnit
+  command: vendor/bin/phpunit --do-not-cache-result
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-phpunit-20261014T122734Z-247240e44fe0 Creating 
+ Container cpvtest-phpunit-20261014T122734Z-247240e44fe0 Created 
+PHPUnit 11.5.56 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.34
+Configuration: /app/phpunit.xml
+
+...............................................................  63 / 434 ( 14%)
+..R.R.......................................................... 126 / 434 ( 29%)
+...........................................................F... 189 / 434 ( 43%)
+............................................................... 252 / 434 ( 58%)
+........................................F...................... 315 / 434 ( 72%)
+....................................................F.......... 378 / 434 ( 87%)
+...............................F........................        434 / 434 (100%)
+
+Time: 00:54.261, Memory: 115.00 MB
+
+There were 4 failures:
+
+1) Tests\Unit\Taxonomy\ReviewedProposalConfirmationTest::invalidating_is_recorded_as_its_own_distinguishable_audit_event
+Failed asserting that actual size 0 matches expected size 1.
+
+/app/tests/Unit/Taxonomy/ReviewedProposalConfirmationTest.php:669
+
+2) Tests\Unit\Taxonomy\ReviewedProposalSupersessionTest::the_state_delta_records_why_the_review_became_stale
+Failed asserting that an array contains 274.
+
+/app/tests/Unit/Taxonomy/ReviewedProposalSupersessionTest.php:430
+
+3) Tests\Feature\Filament\TaxonomyConceptExplorerTest::an_already_frozen_candidate_is_still_protected_from_a_second_freeze
+Failed asserting that a table action with name [freezeReview] is visible on the [App\Filament\Resources\TaxonomyCandidateConceptLinkResource\Pages\ListTaxonomyCandidateConceptLinks] component for record [{"id":415,"suggested_term_id":462,"suggested_concept_id":386,"suggested_new_concept_name":null,"signals":[],"confidence":0.5,"tier":"REVIEW","status":"pending","review_notes":null,"reviewed_by":null,"reviewed_at":null,"published_term_concept_id":null,"created_at":"2026-10-14T12:28:51.000000Z","updated_at":"2026-10-14T12:28:51.000000Z","taxonomy_state_fingerprint":null,"reviewed_proposals":[{"id":410,"proposal_type":"TERM_CONCEPT_LINK","candidate_link_id":415,"concept_relation_id":null,"decision":"MAP_TO_EXISTING","decision_payload":{"term_id":462,"target_concept_id":386},"payload_version":"taxonomy-reviewed-proposal\/c2-v1","taxonomy_state_fingerprint":"2173e26373cc1039389e671ec319978f9cfec83361067305b4b94bfe3d8394b6","payload_fingerprint":"758994cfc50e485f18319fb4d3e0e51d08c751e0613722e7b746797b3df66063","reviewer_id":235,"reviewed_at":"2026-10-14T12:28:52.000000Z","status":"PENDING_APPLY","applied_at":null,"authorization_reference":null,"target_environment":null,"application_result":null,"created_at":"2026-10-14T12:28:52.000000Z","updated_at":"2026-10-14T12:28:52.000000Z","requires_human_confirmation":false,"prepared_by_actor_type":"human_reviewer","prepared_via":"http","confirmed_by_id":null,"confirmed_at":null,"confirmation_reference":null,"confirmation_channel":null,"confirmation_note":null,"proposal_group_id":null,"confirmation_invalidated_at":null,"confirmation_invalidated_by_id":null,"confirmation_invalidation_actor_type":null,"confirmation_invalidation_channel":null,"confirmation_invalidation_reference":null,"confirmation_invalidation_reason":null,"invalidated_confirmation_snapshot":null,"superseded_at":null,"superseded_by_proposal_id":null,"supersedes_proposal_id":null,"inherited_decision_from_id":null,"supersession_reference":null,"supersession_reason":null,"supersession_actor_type":null,"supersession_by_id":null,"supersession_channel":null,"supersession_state_delta":null}]}].
+Failed asserting that true is false.
+
+/app/vendor/filament/tables/src/Testing/TestsActions.php:294
+/app/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:407
+/app/vendor/filament/tables/src/Testing/TestsActions.php:108
+/app/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:407
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:506
+
+4) Tests\Feature\Filament\TaxonomyReviewedProposalResourceTest::the_detail_page_of_a_superseded_proposal_renders_without_a_500
+El fixture tiene que producir un delta con la lista anidada, que es justo lo que se quiere renderizar.
+Failed asserting that an array is not empty.
+
+/app/tests/Feature/Filament/TaxonomyReviewedProposalResourceTest.php:216
+
+--
+
+There were 2 risky tests:
+
+1) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::dry_run_attaches_predicted_impact_to_every_scored_candidate
+This test did not perform any assertions
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:211
+
+2) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::propose_concept_relations_never_returns_directional_types
+This test did not perform any assertions
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:242
+
+FAILURES!
+Tests: 434, Assertions: 2361, Failures: 4, PHPUnit Deprecations: 1, Risky: 2.
+
+  mounts (the container that ran PHPUnit):
+           bind <CPV_TEST_ROOT>/20261014T122734Z-247240e44fe0 -> /app rw=true
+  [PASS] the container that ran PHPUnit: exactly one bind mount, and it is this run's workspace at /app
+  [PASS] the container that ran PHPUnit: no mount references <LIVE_APP_DIR> (storage, bootstrap/cache, public, .env included)
+  phpunit exit status: 1
+           /app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:242
+           
+           FAILURES!
+           Tests: 434, Assertions: 2361, Failures: 4, PHPUnit Deprecations: 1, Risky: 2.
+           
+  [SUITE RED] phpunit exited 1 (recorded, not hidden)
+
+== 8-bis. Timestamp resolution probe (a measurement, not a test)
+            Container cpvtest-testdb-1 Running 
+            Container cpvtest-testdb-1 Waiting 
+            Container cpvtest-testdb-1 Healthy 
+            Container cpvtest-testapp-run-5e3b0f4fc94e Creating 
+            Container cpvtest-testapp-run-5e3b0f4fc94e Created 
+           binding date format for this connection : Y-m-d H:i:s
+           php captured t1                         : 2026-10-14 12:29:09.465684
+           php captured t2 (2ms later)             : 2026-10-14 12:29:09.467848
+           t2 is after t1 in PHP                   : yes
+           what the query builder actually binds   : 2026-10-14 12:29:09  |  2026-10-14 12:29:09
+           postgres says bound t2 > bound t1       : NO
+           
+           CONSEQUENCE: a row written in the same WHOLE SECOND as the review is
+           invisible to where("created_at", ">", reviewed_at). The column holds
+           microseconds; the binding format drops them before they are stored.
+
+== 9. Staging smoke AFTER
+  GET https://pruebas.camarapetrolera.app/ -> 200
+  [PASS] staging still healthy after the run
+
+== Teardown (only resources belonging to this run)
+  compose project cpvtest removed, including its volumes
+  live stack: app:Up 8 days nginx:Up 3 weeks 
+  workspace <CPV_TEST_ROOT>/20261014T122734Z-247240e44fe0 removed
+  artifacts kept at <CPV_TEST_ROOT>/artifacts/20261014T122734Z-247240e44fe0
+
+----------------------------------------------------------------------
+run_id=20261014T122734Z-247240e44fe0
+sha=247240e44fe0dcc703c6317a36a8ee69c0d0dea0
+phpunit_exit=1
+suites_run=Unit+Feature (full suite)
+findings=1
+-- isolation --
+isolation_passed=18
+isolation_failed=0
+-- schema preparation --
+schema_fix_applied=defer_four_fks.patch,align_permission_migration_to_v6.patch,portable_index_check.patch
+schema_fix_already_present=(none)
+deferred_fks_restored_by=restore_four_fks.sql
+pgsql_bootstrap_from=feature/supplhi-postgres-buscador@5df23fa9c5d0b93d5ccd0e155095a0e98726d6d0
+pgsql_bootstrap_migrations=21
+migration_ordering_violations=4
+migrate_ok=yes
+prep_passed=12
+prep_failed=0
+fixture_tables=90
+-- fixture load --
+fixture_loaded=yes
+fixture_source=docker/test/fixtures/synthetic_fixture.sql (synthetic, no copied data)
+preconditions_passed=8
+preconditions_failed=0
+-- tests --
+staging_before=200
+staging_after=200
+php_version=8.2.34
+extensions=pdo_pgsql,intl,zip,gd,bcmath
+----------------------------------------------------------------------
+RESULT  isolation      : PASS (18 checks)
+RESULT  schema prep    : PASS (12 steps)   [patch applied; 4 ordering violation(s) deferred]
+RESULT  fixture load   : PASS (2 checks)   [yes; 8 precondition(s) satisfied]
+RESULT  test suite     : RED (exit 1)   [Unit+Feature (full suite)]
+RESULT  findings in the repository under test: 1

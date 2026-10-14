@@ -23,6 +23,21 @@ Versión 3.2 — 24 de agosto de 2026
 > "Contactos" pueden no coincidir exactamente hasta el próximo deploy; quedó anotado junto a cada
 > una.
 
+> **ESTADO DE ESTE DOCUMENTO (octubre 2026) — HISTÓRICO:** la versión vigente del manual de usuario
+> es el **Manual de usuario en línea**, disponible dentro del sistema (menú lateral "Manual de
+> usuario", página `/admin/manual-de-usuario`). Su contenido se mantiene en
+> `resources/manual/manual_usuario.md` y es la única fuente que debe actualizarse cuando cambie la
+> UI. Este archivo y su `.docx` se conservan como documentación distribuible histórica (v3.2) y **no
+> describen la Taxonomía CPV**. En particular, quedaron desactualizados:
+> - **Sectores y Servicios → "Vincular"** (sección 3): esa pestaña ahora es **solo de consulta**; lo que
+>   la empresa ofrece se declara en la pestaña **Categorías CPV (taxonomía nueva)**.
+> - La fila de "Errores comunes" sobre servicios que no aparecen al buscarlos (ya no se vinculan
+>   servicios).
+> - El "Problema conocido" del paso 3 → 4 del formulario (sección 2) es un registro de agosto de 2026,
+>   no una descripción del comportamiento actual.
+>
+> Ante cualquier diferencia, prevalece el manual en línea.
+
 ---
 
 ## Qué cambió recientemente
@@ -101,6 +116,10 @@ Vaya a "Empresas" y presione "Editar" sobre su empresa.
 Debajo de los Datos Generales encontrará estas pestañas adicionales.
 
 ### Sectores y Servicios
+
+> **[OBSOLETO — octubre 2026]** Esta pestaña ya no permite vincular servicios: queda solo de
+> consulta. Lo que ofrece la empresa se declara en **Categorías CPV (taxonomía nueva)** — ver el
+> manual en línea. Los pasos de abajo se conservan solo como registro histórico.
 
 1. Presione "Vincular".
 2. Seleccione un Sector y luego los Servicios asociados a ese sector.
@@ -237,7 +256,7 @@ de Empresas y en cada pestaña.
 | El Sector Principal aparece bloqueado | Es intencional — solo lo edita la Cámara. Contáctelos para solicitar un cambio. |
 | Una sección quedó vacía | Si no corresponde a su empresa, actívela como "No Aplica" en vez de dejarla en blanco. |
 | No está seguro si guardó los cambios | Cada pestaña tiene su propio "Guardar" o "Siguiente"; el mensaje "Guardado" en la parte superior confirma el registro. |
-| No encuentra un sector, servicio o cámara al buscarlo para vincular | Es porque su empresa ya está vinculada a ese elemento — no vuelve a aparecer en la lista para evitar duplicados. |
+| No encuentra un sector, servicio o cámara al buscarlo para vincular *(sectores/servicios: OBSOLETO, ya no se vinculan — ver manual en línea)* | Es porque su empresa ya está vinculada a ese elemento — no vuelve a aparecer en la lista para evitar duplicados. |
 
 ---
 
