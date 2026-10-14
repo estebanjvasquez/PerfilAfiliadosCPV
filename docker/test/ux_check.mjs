@@ -231,7 +231,27 @@ try {
       });
       const p = await c.newPage();
       await p.goto(BASE + MANUAL_PATH, { waitUntil: 'domcontentloaded' });
-      await p.waitForTimeout(900);
+      // Wait for Alpine/Filament to settle. Without this the mobile screenshots
+      // caught the panel sidebar still rendered open as a full-screen overlay,
+      // covering the manual: the geometry was fine and the PICTURE was useless.
+      await p.waitForLoadState('networkidle').catch(() => {});
+      await p.waitForTimeout(1200);
+
+      // If the mobile nav is still open over the content, close it the way a
+      // reader would. Recorded, not hidden: a sidebar that cannot be dismissed
+      // would be a real defect, so the attempt and its outcome are reported.
+      const overlayClosed = await p.evaluate(() => {
+        const open = Array.from(document.querySelectorAll('.fi-sidebar'))
+          .some((s) => {
+            const r = s.getBoundingClientRect();
+            return r.width > 0 && r.right > 0 && getComputedStyle(s).position === 'fixed';
+          });
+        if (!open) return 'not open';
+        const closer = document.querySelector('.fi-sidebar-close-btn, [x-on\\:click*="close"], .fi-topbar button');
+        if (closer) { closer.click(); return 'closed via control'; }
+        return 'still open, no control found';
+      });
+      if (overlayClosed !== 'not open') await p.waitForTimeout(700);
 
       const m = await p.evaluate(() => {
         const de = document.documentElement;
@@ -335,6 +355,28 @@ try {
         record(`[${scheme}/${vp.label}] body text contrast measurable`, false,
           `could not parse colours fg=${m.color} bg=${m.background}`);
       }
+
+      // The manual's own content must be VISIBLE in what we screenshot, not
+      // covered by panel chrome. Otherwise the picture proves nothing.
+      const contentVisible = await p.evaluate(() => {
+        const el = document.querySelector('.cpv-manual__content');
+        if (!el) return { found: false };
+        const r = el.getBoundingClientRect();
+        const cx = Math.round(r.left + Math.min(r.width, window.innerWidth) / 2);
+        const cy = Math.round(Math.max(r.top, 0) + 40);
+        const top = document.elementFromPoint(cx, cy);
+        return {
+          found: true,
+          width: Math.round(r.width),
+          covered: !(top && (el === top || el.contains(top))),
+          topTag: top ? top.tagName.toLowerCase() + (top.className ? '.' + String(top.className).split(/\s+/)[0] : '') : null,
+        };
+      });
+      record(`[${scheme}/${vp.label}] manual content is visible, not covered by panel chrome`,
+        contentVisible.found && !contentVisible.covered,
+        contentVisible.found
+          ? `content width=${contentVisible.width}px, topmost at its centre=${contentVisible.topTag}, sidebar=${overlayClosed}`
+          : '.cpv-manual__content not found');
 
       const file = `${OUT}/${scheme}-${vp.label}-${vp.width}x${vp.height}.png`;
       await p.screenshot({ path: file, fullPage: false });
