@@ -276,9 +276,10 @@ try {
             });
           }
         }
-        // Deepest offenders first: an ancestor is usually only wide because a
-        // descendant forced it.
-        culprits.sort((a, b) => b.width - a.width);
+        // Widest first, but keep whatever reaches furthest right too: an
+        // element offset to the right can set scrollWidth without being wide,
+        // and sorting by width alone hid exactly that in the previous run.
+        culprits.sort((a, b) => Math.max(b.width, b.right) - Math.max(a.width, a.right));
 
         // EFFECTIVE background: walk up until something is not transparent.
         // body is transparent in this theme, so comparing against it produced a
@@ -339,6 +340,49 @@ try {
       await p.screenshot({ path: file, fullPage: false });
       await c.close();
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 8. CONTROL: is an overflow OURS, or the panel's at this width?
+  //
+  //    The manual page overflowed by 111px at 390px and every element sticking
+  //    out was Filament's own chrome (fi-main, fi-page, fi-header). That is a
+  //    claim, not a conclusion, until another page of the same panel is
+  //    measured the same way. If the control overflows identically, the manual
+  //    did not cause it; if the control is clean, it did.
+  // ---------------------------------------------------------------------------
+  {
+    const measure = async (path) => {
+      const c = await browser.newContext({
+        viewport: { width: 390, height: 844 },
+        storageState: await ctx.storageState(),
+      });
+      const p = await c.newPage();
+      await p.goto(BASE + path, { waitUntil: 'domcontentloaded' });
+      await p.waitForTimeout(900);
+      const r = await p.evaluate(() => ({
+        scrollWidth: Math.round(document.documentElement.scrollWidth),
+        clientWidth: Math.round(document.documentElement.clientWidth),
+      }));
+      await p.screenshot({ path: `${OUT}/control-${path.replace(/\W+/g, '_')}-390.png` });
+      await c.close();
+      return r.scrollWidth - r.clientWidth;
+    };
+
+    const manualOverflow = await measure(MANUAL_PATH);
+    const panelRootOverflow = await measure('/admin');
+    const samePanelWide = panelRootOverflow > 2 && Math.abs(manualOverflow - panelRootOverflow) <= 4;
+
+    record('mobile overflow is attributable, not guessed', true,
+      `manual=${manualOverflow}px panel_root=${panelRootOverflow}px -> ` +
+      (samePanelWide
+        ? 'the panel shell overflows identically on a page with none of this content: NOT caused by the manual'
+        : manualOverflow > 2
+          ? 'the manual overflows MORE than the panel root: at least part of it is the manual content'
+          : 'no overflow on either'));
+    record('the manual adds no horizontal overflow of its own at 390px',
+      manualOverflow <= Math.max(panelRootOverflow, 2) + 4,
+      `manual=${manualOverflow}px vs panel_root=${panelRootOverflow}px`);
   }
 
   await ctx.close();
