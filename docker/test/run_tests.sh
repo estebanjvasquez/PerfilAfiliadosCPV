@@ -49,9 +49,28 @@ REPO_URL=https://github.com/estebanjvasquez/PerfilAfiliadosCPV.git
 PROJECT=cpvtest
 COMPOSE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)-${SHA:0:12}"
-WORKSPACE="/root/cpv-test/${RUN_ID}"
-ARTIFACTS="/root/cpv-test/artifacts/${RUN_ID}"
-LIVE_APP_DIR=/opt/perfilafiliados
+# HOST PATHS COME FROM THE ENVIRONMENT, AND THAT IS A RULE, NOT A PREFERENCE.
+#
+#   This repository is PUBLIC. PROJECT_KNOWLEDGE.md's visibility notice lets
+#   already-published infrastructure identifiers stay but forbids adding new
+#   ones - system users, database hosts, internal paths. Verdict 6152642797
+#   reported exactly that against the audit document; the same rule applies
+#   here, in the same public repository, on a different branch. Measured at
+#   99e603cb, the scratch root under the host account had 0 prior occurrences,
+#   so hard-coding it here was new internal detail.
+#
+#   CPV_TEST_ROOT therefore has NO default: a missing value is a loud failure,
+#   never a silent fallback to somebody's home directory. The live application
+#   directory keeps its default because it is already published 13 times,
+#   including in .github/workflows/deploy-contabo.yml.
+TEST_ROOT="${CPV_TEST_ROOT:?set CPV_TEST_ROOT to a scratch directory for test workspaces, outside this repository}"
+case "$TEST_ROOT" in
+  /*) : ;;
+  *) echo "CPV_TEST_ROOT must be an absolute path, got: $TEST_ROOT" >&2; exit 2 ;;
+esac
+WORKSPACE="${TEST_ROOT}/${RUN_ID}"
+ARTIFACTS="${TEST_ROOT}/artifacts/${RUN_ID}"
+LIVE_APP_DIR="${CPV_LIVE_APP_DIR:-/opt/perfilafiliados}"
 STAGING_URL=https://pruebas.camarapetrolera.app/
 
 say()  { printf '  %s\n' "$*"; }
