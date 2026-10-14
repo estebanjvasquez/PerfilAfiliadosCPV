@@ -12,11 +12,11 @@ artifacts are** below for findings 1 and 3 of that verdict.
 | | |
 |---|---|
 | SHA under test | `99e603cb4713fe0a349f7958af44327e5ae34845` (`feature/upgrade-filament-v3`) |
-| Test runner | `infra/contabo-test-runner` @ `d17854bd875a68ce23ed7ec9a87f87046f00512f` (first run, and the commit the three patches live at) · `04c1fbf` (repeat run, after the host path was externalised) |
+| Test runner | `infra/contabo-test-runner` @ `d17854bd875a68ce23ed7ec9a87f87046f00512f` (first run, and the commit the three patches live at) · `04c1fbf9abcfa6847575368e5761482a8345ff2b` (repeat run, after the host path was externalised) |
 | Run id | `20261013T183459Z-99e603cb4713` (first) · `20261014T063709Z-99e603cb4713` (repeat) |
 | Host | the project staging VPS, `66.94.121.98` (already recorded in `PROJECT_KNOWLEDGE.md`) |
 | Runtime | PHP 8.2.34 · `pdo_pgsql,intl,zip,gd,bcmath` · PostgreSQL 16.15 (`pgvector/pgvector:pg16`) |
-| Artifacts | 18 files on the host; the 10 checkable ones are committed, redacted, under [`audit/isolated_phpunit_2026-10-13/`](isolated_phpunit_2026-10-13/) |
+| Artifacts | 18 files per run on the host; the checkable ones are committed, redacted, under [`audit/isolated_phpunit_2026-10-13/`](isolated_phpunit_2026-10-13/) (10 files, first run) and [`audit/isolated_phpunit_2026-10-14/`](isolated_phpunit_2026-10-14/) (5 files, repeat run) |
 
 The three result groups are reported separately on purpose. A suite that needed
 a prepared schema must not read as a suite that needed nothing, and a defect in
@@ -45,36 +45,74 @@ note the pattern carries no leading `/`, for the reason given below:
 git grep -c "<pattern>" 99e603c | awk -F: '{s+=$NF} END {print s+0}'
 ```
 
-| detail | prior occurrences | verdict |
+| detail | occurrences before this work | status now |
 |---|---|---|
-| executor install directory | 0 | **new**, redacted |
-| executor state directory | 0 | **new**, redacted |
-| executor config directory | 0 | **new**, redacted |
-| runner workspace directory | 0 | **new**, redacted |
-| runner checkout directory | 0 | **new**, redacted |
-| exact OS release | 0 | **new**, removed |
-| private container network address | **2, and both are byte matches inside the binary `app/images/user.pdf`; 0 in any text file** | never published in readable form; redacted |
-| live application directory | 13, including `.github/workflows/deploy-contabo.yml` | already published; may stay, placeholdered here anyway |
+| executor install directory | 0 | **published** in git history, see below |
+| executor state directory | 0 | **published** in git history, see below |
+| executor config directory | 0 | **published** in git history, see below |
+| runner workspace directory | 0 | **published** in git history, see below |
+| runner checkout directory | 0 | **published** in git history, see below |
+| exact OS release | 0 | **published** in git history, see below |
+| private container network address | 2, both byte matches inside the binary `app/images/user.pdf`; 0 in any text file | **published** in git history, see below |
+| live application directory | 13, including `.github/workflows/deploy-contabo.yml` | already published before this work; placeholdered here anyway |
 | `66.94.121.98` | 12 | already published; kept |
 | `vmi3554091…` | 4 | already published; kept |
 | `pruebas.camarapetrolera.app` | 33 | already published; kept |
 
-The search patterns for the redacted rows are the literal strings themselves,
-so they are **not** reproduced in this column — an earlier version of this table
-listed them and thereby republished, in the act of documenting the redaction,
-every string the redaction had just removed. Caught here before it was reviewed,
-and corrected in the commit that follows the one introducing it. Anyone with
-host access can rerun the command above with the real patterns; what matters for
-the finding this answers is that the measured values and the method are stated
-and that both files agree on them. The already-published rows keep their literal
-values, since the rule lets those stay.
+The search patterns for the first seven rows are the literal strings
+themselves, so they are not reproduced in this column: an earlier version of
+this table listed them and thereby republished, while documenting the
+redaction, every string the redaction had removed.
 
-The private address is the one row that is not simply "0", and verdict
-`6162548587` was right that the handoff narrative and this table disagreed
-about it: the narrative said every redacted item measured 0. The measured value
-is 2, both of them bytes inside a binary image, which is why it is treated as
-never published in readable form rather than as published. Both files now state
-that same value and the same command.
+### The exposure is in public history, and removing it from the working tree did not undo that
+
+Verdict `6162683638` was right, and it corrected a real understatement of mine.
+I had written that the republication was "caught before any review saw it",
+which implied the strings were never published. They were: I had already
+**pushed** the commit. A pushed commit on a public repository is world-readable
+immediately, and deleting the strings in a later commit removes them from the
+working tree, not from history.
+
+Measured across the pushed commits of this work, counting how many of the seven
+literals each one's tree contains:
+
+```
+integration branch, origin/feature/upgrade-filament-v3
+  650db29   7 of 7   the original delivery - where the exposure began
+  25e25c3   0        the redaction
+  20d3c12   0
+  179efa3   0
+  83c6de7   7 of 7   re-introduced by the redaction table itself
+  38c21bb   0        corrected
+  2303eda   0
+
+runner branch, origin/infra/contabo-test-runner
+  4045faa … d17854b  the two runner scratch paths, in 11 consecutive pushed
+                     commits; 04c1fbf9abcfa6847575368e5761482a8345ff2b removes
+                     them going forward only
+```
+
+So the honest classification is **published**, not "new, redacted", and not
+"never published in readable form". The redaction limits what a reader of the
+current tree sees; it does not limit what a reader of history sees. The same
+applies to the runner branch, which verdict `6162683638` could not inspect and
+said so — the record here covers it because the record should be complete, not
+because it was asked for.
+
+What the redaction still achieves: the current tree of both branches is clean
+(a grep for all seven returns 0 in `audit/`, `docs/` and `docker/`), and
+nothing further is added.
+
+### GATE F — remediation is the owner's decision, not taken here
+
+The options are a history rewrite, changing repository visibility, or accepting
+the exposure as it stands. **None is applied.** History rewriting and
+force-pushing are prohibited for this agent, and repository visibility is an
+owner decision, so this is reported for the owner to decide with an accurate
+record rather than acted on. Nothing about the exposed detail is a credential:
+the seven items are filesystem paths, a distribution name and a private subnet
+prefix. That is context for the decision, not an argument for any particular
+one.
 
 The first attempt at this measurement reported 0 for everything, including
 identifiers that are plainly in the deploy workflow. The cause was the command,
@@ -105,7 +143,7 @@ loud failure rather than a silent fallback to somebody's home directory, and a
 relative value is rejected. The live application directory keeps its default,
 since it is already published 13 times including in the deploy workflow, and
 `CPV_LIVE_APP_DIR` can override it. Fixed in
-`infra/contabo-test-runner` @ `04c1fbf`, and the run was repeated afterwards
+`infra/contabo-test-runner` @ `04c1fbf9abcfa6847575368e5761482a8345ff2b`, and the run was repeated afterwards
 (`20261014T063709Z-99e603cb4713`) to confirm the runner still works end to end
 with the path supplied from outside: isolation PASS (18 checks, 0 failed),
 schema preparation PASS (11 steps, 0 failed), 90 objects, suite RED again.
@@ -182,9 +220,9 @@ since verdict `6162548587` finding 4 asked for exactly that:
 | artifact set | run | runner commit |
 |---|---|---|
 | [`audit/isolated_phpunit_2026-10-13/`](isolated_phpunit_2026-10-13/) | `20261013T183459Z-99e603cb4713` | `d17854bd` |
-| [`audit/isolated_phpunit_2026-10-14/`](isolated_phpunit_2026-10-14/) | `20261014T063709Z-99e603cb4713` | `04c1fbf` |
+| [`audit/isolated_phpunit_2026-10-14/`](isolated_phpunit_2026-10-14/) | `20261014T063709Z-99e603cb4713` | `04c1fbf9abcfa6847575368e5761482a8345ff2b` |
 
-The patch files themselves are at `d17854bd` and unchanged by `04c1fbf`, which
+The patch files themselves are at `d17854bd` and unchanged by `04c1fbf9abcfa6847575368e5761482a8345ff2b`, which
 touched only the runner's path handling.
 
 The first set, under
@@ -212,7 +250,7 @@ used to compare the two runs' failing-test names.
 The three patches themselves, and the proposal that explains them, are in this
 same repository on the runner branch, at
 `infra/contabo-test-runner` @ `d17854bd875a68ce23ed7ec9a87f87046f00512f`
-(path handling later externalised at `04c1fbf`; the patches are identical in
+(path handling later externalised at `04c1fbf9abcfa6847575368e5761482a8345ff2b`; the patches are identical in
 both):
 
 ```
