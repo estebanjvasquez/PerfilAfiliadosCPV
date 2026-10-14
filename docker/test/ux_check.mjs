@@ -245,20 +245,77 @@ try {
             parentScrolls: ps ? ['auto', 'scroll'].includes(ps.overflowX) : false,
           };
         });
-        const body = document.body;
-        const text = document.querySelector('.manual-body, article, main') || body;
+
+        // WHO is actually wider than the viewport. Without this, an overflow
+        // report is a number with no lead: the first run said 111px and named
+        // nothing, so it could not be fixed from the evidence.
+        const vw = de.clientWidth;
+        const culprits = [];
+        for (const el of document.querySelectorAll('*')) {
+          const r = el.getBoundingClientRect();
+          if (r.width === 0 || r.height === 0) continue;
+          const right = r.right + window.scrollX;
+          if (right > vw + 2 || r.width > vw + 2) {
+            const cs = getComputedStyle(el);
+            // Skip elements that are legitimately clipped by a scrolling
+            // ancestor: those do not drag the page.
+            let clipped = false;
+            for (let a = el.parentElement; a; a = a.parentElement) {
+              const as = getComputedStyle(a);
+              if (['auto', 'scroll', 'hidden'].includes(as.overflowX)) { clipped = true; break; }
+            }
+            if (clipped) continue;
+            culprits.push({
+              tag: el.tagName.toLowerCase(),
+              cls: (el.className && String(el.className).slice(0, 80)) || null,
+              width: Math.round(r.width),
+              right: Math.round(right),
+              whiteSpace: cs.whiteSpace,
+              overflowX: cs.overflowX,
+              text: (el.textContent || '').trim().slice(0, 60),
+            });
+          }
+        }
+        // Deepest offenders first: an ancestor is usually only wide because a
+        // descendant forced it.
+        culprits.sort((a, b) => b.width - a.width);
+
+        // EFFECTIVE background: walk up until something is not transparent.
+        // body is transparent in this theme, so comparing against it produced a
+        // meaningless 1.00 ratio in the first run.
+        const effectiveBg = (start) => {
+          for (let el = start; el; el = el.parentElement) {
+            const bg = getComputedStyle(el).backgroundColor;
+            const m2 = String(bg).match(/-?\d+(\.\d+)?/g);
+            if (!m2) continue;
+            const alpha = m2.length > 3 ? parseFloat(m2[3]) : 1;
+            if (alpha > 0.1) return bg;
+          }
+          return getComputedStyle(document.documentElement).backgroundColor;
+        };
+
+        const text = document.querySelector('.manual-body, article, main') || document.body;
+        // A real paragraph, not the container: that is what a reader reads.
+        const para = text.querySelector('p') || text;
         return {
           scrollWidth: Math.round(de.scrollWidth),
           clientWidth: Math.round(de.clientWidth),
           tables,
-          color: getComputedStyle(text).color,
-          background: getComputedStyle(body).backgroundColor,
+          culprits: culprits.slice(0, 6),
+          color: getComputedStyle(para).color,
+          background: effectiveBg(para),
         };
       });
 
       const overflow = m.scrollWidth - m.clientWidth;
       record(`[${scheme}/${vp.label}] no horizontal page overflow`, overflow <= 2,
-        `scrollWidth=${m.scrollWidth} clientWidth=${m.clientWidth} diff=${overflow}px`);
+        `scrollWidth=${m.scrollWidth} clientWidth=${m.clientWidth} diff=${overflow}px` +
+        (overflow > 2 && m.culprits.length
+          ? ' | widest: ' + m.culprits.map((c) =>
+              `${c.tag}${c.cls ? '.' + String(c.cls).split(/\s+/)[0] : ''}=${c.width}px` +
+              (c.whiteSpace && c.whiteSpace !== 'normal' ? `(${c.whiteSpace})` : '')
+            ).join(', ')
+          : ''));
 
       const spilling = m.tables.filter(
         (t) => t.parentClient !== null && t.tableWidth > t.parentClient + 2 && !t.parentScrolls
