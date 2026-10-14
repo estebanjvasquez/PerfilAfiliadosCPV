@@ -752,7 +752,10 @@ note "Requested explicitly. The suite result below is 'not run', never 'green':"
 note "a run that did not execute the suite must not read like a run that did."
 else
 step "8. Run PHPUnit"
-ARGS=(vendor/bin/phpunit --do-not-cache-result)
+# --display-deprecations: the summary line has reported "PHPUnit Deprecations: 1"
+# on every run of this project and nothing said WHICH one, so review 6167931953
+# asked for it to be identified. It only adds output; it changes no result.
+ARGS=(vendor/bin/phpunit --do-not-cache-result --display-deprecations)
 #
 # WHICH SUITES CAN HONESTLY RUN
 #   17 test files use DatabaseTransactions, which wraps each test in a
