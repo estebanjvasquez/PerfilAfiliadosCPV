@@ -48,16 +48,20 @@ class SameSecondTimestampRegressionTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * Los mismos permisos que usa `TaxonomyConceptExplorerTest::reviewer()`: `freeze()` autoriza
+     * contra la policy del CANDIDATO, no contra la de la propuesta, así que
+     * `update_taxonomy::reviewed::proposal` no alcanzaba y el servicio devolvía UNAUTHORIZED con
+     * `proposal => null`. Los nombres salen del catálogo que siembran los seeders del proyecto.
+     */
     private function authorizedUser(): User
     {
         $user = User::factory()->create();
-        $role = Role::firstOrCreate(['name' => 'zzz_same_second_role', 'guard_name' => 'web']);
-        $user->assignRole($role);
-        $user->givePermissionTo(
-            \Spatie\Permission\Models\Permission::firstOrCreate(
-                ['name' => 'update_taxonomy::reviewed::proposal', 'guard_name' => 'web']
-            )
-        );
+        $user->givePermissionTo([
+            'view_any_taxonomy::candidate::concept::link',
+            'view_taxonomy::candidate::concept::link',
+            'update_taxonomy::candidate::concept::link',
+        ]);
 
         return $user->fresh();
     }
@@ -283,6 +287,15 @@ class SameSecondTimestampRegressionTest extends TestCase
             TaxonomyReviewedProposal::DECISION_MAP_TO_EXISTING,
             $user,
             ['term_id' => $candidate->term_id, 'target_concept_id' => $candidate->concept_id],
+        );
+
+        // Afirmar el resultado, no asumirlo: `freeze()` devuelve `proposal => null` con
+        // UNAUTHORIZED o NOT_FOUND, y tomarlo a ciegas convertía un problema de permisos del
+        // andamiaje en un TypeError ilegible en vez de decir qué pasó.
+        $this->assertSame(
+            ReviewedProposalService::RESULT_FROZEN,
+            $frozen['result'],
+            'El andamiaje no pudo congelar la propuesta: '.$frozen['result']
         );
 
         return $frozen['proposal'];
