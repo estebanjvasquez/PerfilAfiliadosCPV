@@ -4,10 +4,17 @@ Ronda única para revisión manual. Entorno aislado de Contabo. El orquestador
 autónomo sigue **suspendido**: esta ronda no hizo polling, no llamó a Anthropic
 y no disparó ninguna revisión automática.
 
-**Lo que esta ronda logró:** una base PostgreSQL vacía ahora se construye
-completa desde las migraciones, y la suite pasó de **25 fallos/errores a 4
-fallos y 0 errores** sin desactivar una sola restricción, sin omitir un solo
-test y sin tocar una aserción.
+**Lo que esta ronda logró:** una base PostgreSQL vacía se construye desde las
+migraciones, y la suite pasó de **25 fallos/errores a 4 fallos y 0 errores** sin
+desactivar una sola restricción, sin omitir un solo test y sin tocar una
+aserción.
+
+**Qué significa «se construye» aquí**, precisado tras la revisión `6167931953`:
+el juego de **tablas y migraciones probado**, no paridad con la base desplegada.
+Quedan fuera a propósito las 15 vistas exclusivas de MySQL (marcadas como
+corridas) y las 13 vistas PostgreSQL `2026_08_31_*` (sección 4), así que **este
+fixture no es vista por vista idéntico a Supabase**. Decir «esquema completo» sin
+esa salvedad sería inexacto.
 
 ---
 
@@ -23,11 +30,21 @@ test y sin tocar una aserción.
 | Rama hermana consultada | `feature/supplhi-postgres-buscador` @ `5df23fa9c5d0b93d5ccd0e155095a0e98726d6d0` |
 | `run_id` | `20261014T092024Z-d4ea4055ab96` |
 
-La rama base y el SHA probado tienen **código de aplicación idéntico** al SHA
-`99e603cb4713fe0a349f7958af44327e5ae34845` de la ronda anterior: entre ambos
-sólo cambiaron `docs/` y `audit/`, comprobable con
-`git diff 99e603cb..a6e9db4 -- app database tests config routes`, que sale
-vacío. Los números de esta ronda son comparables con los de la anterior.
+**Qué comparte y qué no con el SHA de la ronda anterior**, corregido tras la
+revisión `6167931953`: la versión previa de este párrafo decía que *la base y el
+SHA probado* tenían código idéntico a
+`99e603cb4713fe0a349f7958af44327e5ae34845`, y eso era falso para el SHA probado.
+
+* la **base** (`a6e9db4`) sí: entre `99e603cb` y ella sólo cambiaron `docs/` y
+  `audit/` — `git diff 99e603cb..a6e9db4 -- app database tests config routes`
+  sale vacío;
+* el **SHA probado** (`d4ea4055`) **no**: es precisamente el que **cambia el
+  juego de migraciones**. Lo que no cambia ahí es el código de **servicio** de la
+  aplicación (`app/`, sin contar lo que tocan los parches de esta ronda).
+
+Por tanto los números de la suite son comparables con los de la ronda anterior en
+cuanto al código de servicio, pero **no** se trata del mismo esquema: esa es la
+diferencia que esta ronda introduce a propósito.
 
 **Ninguna rama se fusionó.** `feature/isolated-test-readiness` no está mezclada
 en la rama de integración y el workflow de despliegue sólo dispara con push a
@@ -167,7 +184,28 @@ public function up(): void
 }
 ```
 
-**EFECTO SOBRE BASES YA EXISTENTES: ninguno.** Dos capas:
+**EFECTO SOBRE BASES YA EXISTENTES — la condición exacta, no un absoluto.**
+
+La versión anterior de este párrafo decía «ninguno», y la revisión `6167931953`
+objetó con razón que eso es un absoluto que ni siquiera es cierto al pie de la
+letra: **insertar la fila en la tabla `migrations` ya es un cambio**. Dicho con
+precisión:
+
+**Sobre el esquema y los datos no cambia nada, SI SE CUMPLE que** cada una de las
+cuatro restricciones ya existe con la misma columna, la misma columna
+referenciada y sin propagación. En ese caso `up()` las omite una por una y lo
+único que escribe en la base es su propia fila de registro en `migrations`.
+
+Si esa condición **no** se cumple, la migración **no** sigue en silencio:
+
+| estado encontrado | qué hace |
+|---|---|
+| las cuatro ya existen y son equivalentes | no toca nada (salvo la fila de `migrations`) |
+| falta una restricción | la crea — que es el objetivo |
+| falta una tabla referenciada | **levanta excepción**; antes era un `continue` que dejaba la base sin la clave y registraba la migración como aplicada |
+| existe una clave sobre la columna que **no** es equivalente (otra columna referenciada, o `ON DELETE CASCADE`) | **levanta excepción** en vez de apilar una segunda |
+
+Dos capas sostienen el caso normal:
 
 1. Las cuatro migraciones históricas **ya están registradas como corridas** en
    Supabase, así que editarlas es inerte allí: Laravel no las vuelve a ejecutar.
@@ -175,14 +213,19 @@ public function up(): void
    cambia su identidad en la tabla `migrations` y haría aparecer como pendiente
    algo ya aplicado en todas las bases existentes.
 2. La migración nueva **pregunta al catálogo del propio motor** vía
-   `Schema::getForeignKeys()`, que es consciente del driver, y omite cada
-   restricción que ya exista. En Supabase las cuatro existen (las creó la
-   migración de origen cuando corrió), así que es un no-op que sólo escribe su
-   fila en `migrations`.
+   `Schema::getForeignKeys()`, que es consciente del driver.
 
-La comparación es **por columna y tabla referenciada, no por nombre**: lo que no
-debe duplicarse es la relación, no la etiqueta. Si alguien recreó la
-restricción a mano con otro nombre, esto sigue detectándola.
+**Escenarios efectivamente probados** (en la base desechable, no en Supabase),
+en `DeferredForeignKeysMigrationTest`: réplica limpia; restricciones
+preexistentes con el nombre original y con uno alternativo, intactas y sin
+duplicar; `down()` sin borrar nada; `up()` repetido sin duplicar; filas
+sintéticas pobladas que sobreviven a up/down/up con la restricción aún activa; y
+los dos fallos declarados de la tabla anterior.
+
+La comparación es **por columna, columna referenciada y acciones referenciales,
+no por nombre**: lo que no debe duplicarse es la relación, no la etiqueta, pero
+una clave que propague borrados donde el objetivo no lo hace **no** cuenta como
+equivalente.
 
 La fecha `2022_12_02` está en el pasado a propósito. En una base ya migrada,
 Laravel ordena entre sí las **pendientes** sin importar su fecha respecto de las
@@ -459,11 +502,22 @@ postgres says bound t2 > bound t1       : NO
 La columna es `TIMESTAMP` (microsegundos en PostgreSQL); es el **formato de
 binding** de Laravel el que los descarta antes de guardar.
 
-Esto explica también por qué estos tests pasaban contra Supabase compartida: con
-una base remota cada operación tarda cientos de milisegundos, así que los dos
-instantes cruzaban el borde de segundo casi siempre. Contra un PostgreSQL local
-están en el mismo segundo casi siempre. **No eran tests deterministas; la
-latencia de la red los hacía pasar.**
+**Lo que esto establece y lo que no.** Establece que los tests **no son
+deterministas**: su resultado depende de si dos escrituras caen a ambos lados de
+un borde de segundo, y nada en ellos lo garantiza. Eso está medido.
+
+Una explicación *plausible* de por qué pasaban históricamente contra Supabase es
+que, con una base remota, cada operación tarda cientos de milisegundos y los dos
+instantes cruzaban el borde casi siempre, mientras que contra un PostgreSQL local
+caen en el mismo segundo casi siempre. **Pero es una inferencia, no una causa
+establecida para cada corrida vieja** — corregido tras la revisión `6167931953`,
+que señaló exactamente esta sobreafirmación. No instrumenté aquellas corridas y
+no puedo atribuirles la causa una por una.
+
+Lo que sí se puede afirmar sin inferir: con el reloj fijo, el fallo se reproduce
+siempre, y la corrección lo elimina siempre. Eso es lo que prueban las
+regresiones deterministas de `SameSecondTimestampRegressionTest`, que no usan
+`sleep()` ni dependen de la latencia.
 
 ### 7.1 `ReviewedProposalConfirmationTest::invalidating_is_recorded_as_its_own_distinguishable_audit_event`
 

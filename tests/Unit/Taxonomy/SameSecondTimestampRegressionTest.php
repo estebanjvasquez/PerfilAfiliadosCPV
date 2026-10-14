@@ -5,6 +5,7 @@ namespace Tests\Unit\Taxonomy;
 use App\Models\TaxonomyAuditLog;
 use App\Models\TaxonomyCanonicalConcept;
 use App\Models\TaxonomyReviewedProposal;
+use App\Models\TaxonomyTerm;
 use App\Models\User;
 use App\Services\Taxonomy\ReviewedProposalService;
 use App\Services\TaxonomyAuditLogger;
@@ -240,14 +241,20 @@ class SameSecondTimestampRegressionTest extends TestCase
 
     private function newCandidate(): object
     {
-        $term = DB::connection('pgsql')->table('taxonomy_terms')->insertGetId([
+        // Mismos atributos que usan los demás tests de taxonomía: `taxonomy_terms` no tiene
+        // columna `status`, y el modelo exige term_type / mapping_review_status.
+        $canonical = 'zzz_same_second_term_'.substr(uniqid('', true), -10);
+        $term = TaxonomyTerm::create([
             'external_id' => 'zzz-same-second-'.uniqid('', true),
-            'term' => 'zzz_same_second_term_'.uniqid('', true),
-            'canonical_term' => 'zzz_same_second_term_'.uniqid('', true),
+            'term' => $canonical,
             'language' => 'es',
-            'status' => 'active',
-            'created_at' => now(), 'updated_at' => now(),
-        ]);
+            'canonical_term' => $canonical,
+            'term_type' => TaxonomyTerm::TERM_TYPE_TECHNICAL,
+            'region' => [],
+            'negative_context' => [],
+            'positive_context' => [],
+            'mapping_review_status' => TaxonomyTerm::MAPPING_UNMAPPED,
+        ])->id;
         $concept = TaxonomyCanonicalConcept::create([
             'canonical_name_es' => 'zzz_same_second_target_'.uniqid('', true),
             'status' => TaxonomyCanonicalConcept::STATUS_ACTIVE,
