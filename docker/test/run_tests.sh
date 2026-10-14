@@ -38,12 +38,17 @@ FILTER=""
 # whole suite, which review 6171023438 explicitly did not want for screenshots.
 UX=no
 SKIP_SUITE=no
+PREFLIGHT=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --suite)  SUITE="${2:-}"; shift 2 ;;
     --filter) FILTER="${2:-}"; shift 2 ;;
     --ux)         UX=yes; shift ;;
     --skip-suite) SKIP_SUITE=yes; shift ;;
+    # Ejecuta un script de preflight de SOLO LECTURA del workspace contra la base
+    # desechable. Existe para que un preflight que se va a entregar para una base
+    # viva se haya ejecutado al menos una vez en algun lado seguro.
+    --preflight)  PREFLIGHT="${2:-}"; shift 2 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -1000,6 +1005,37 @@ printf("invisible to where(\"created_at\", \">\", reviewed_at). The column holds
 printf("microseconds; the binding format drops them before they are stored.\n");
 ' >"$ARTIFACTS/timestamp_probe.txt" 2>&1 || true
 sed 's/^/           /' "$ARTIFACTS/timestamp_probe.txt"
+
+# --- 8-quinquies. DEPLOY PREFLIGHT, DRY-RUN AGAINST THE DISPOSABLE DATABASE ---
+#
+# A read-only preflight written to be run against a LIVE database should not be
+# handed over having never executed anywhere. This runs it against the fixture.
+#
+# It also REFUSES a script that is not read-only: a preflight that can mutate is
+# not a preflight, and catching that here is cheaper than catching it in
+# production.
+if [ -n "$PREFLIGHT" ] && [ "$MIGRATE_OK" = "yes" ]; then
+  step "8-quinquies. Deploy preflight, executed against the disposable fixture"
+  PF="$WORKSPACE/$PREFLIGHT"
+  if [ ! -f "$PF" ]; then
+    pbad "preflight script not found at $PREFLIGHT inside the workspace"
+  elif grep -niE '^[[:space:]]*(insert|update|delete|alter|drop|create|truncate|grant|revoke)[[:space:]]' "$PF" >"$ARTIFACTS/preflight_mutation_scan.txt"; then
+    pbad "preflight is NOT read-only - it contains statements that could mutate:"
+    sed 's/^/           /' "$ARTIFACTS/preflight_mutation_scan.txt" | head -5
+  else
+    pok "preflight contains no mutating statement (read-only, as a preflight must be)"
+    if compose exec -T testdb psql -v ON_ERROR_STOP=1 -U cpv_test -d cpv_test \
+         < "$PF" >"$ARTIFACTS/preflight_output.txt" 2>&1; then
+      pok "preflight ran against the disposable fixture without error"
+      PF_STOP=$(grep -c 'PARAR' "$ARTIFACTS/preflight_output.txt" || true)
+      say "verdicts mentioning PARAR in the fixture: ${PF_STOP:-0} (the fixture is a FRESH build, so some differ from a live database by construction)"
+      grep -E 'veredicto|PARAR|OK' "$ARTIFACTS/preflight_output.txt" | head -12 | sed 's/^/           /'
+    else
+      pbad "the preflight script FAILED to execute - it cannot be handed over like this"
+      tail -8 "$ARTIFACTS/preflight_output.txt" | sed 's/^/           /'
+    fi
+  fi
+fi
 
 # --- 8-quater. NO TAXONOMY MUTATION -------------------------------------------
 #
