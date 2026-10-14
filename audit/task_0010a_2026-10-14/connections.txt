@@ -1,0 +1,27 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-ebbde360a200 Creating 
+ Container cpvtest-testapp-run-ebbde360a200 Created 
+== Resolved database connections, before any migration
+------------------------------------------------------------------------
+  APP_ENV                testing
+  default connection     'pgsql'
+  sqlite                 driver=sqlite   host=(none)                       database=/app/database/database.sqlite
+                         sqlite path inside the workspace
+  mysql                  driver=mysql    host=127.0.0.1                    database=forge
+                         unused placeholder: nothing listening on 127.0.0.1:3306
+  mariadb                driver=mariadb  host=127.0.0.1                    database=laravel
+                         unused placeholder: nothing listening on 127.0.0.1:3306
+  pgsql                  driver=pgsql    host=testdb                       database=cpv_test
+  sqlsrv                 driver=sqlsrv   host=localhost                    database=forge
+                         unused placeholder: nothing listening on localhost:1433
+------------------------------------------------------------------------
+  live current_database  cpv_test
+  live server address    <docker-bridge-ip>/32
+  live version           PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x8
+  tables in public       0
+------------------------------------------------------------------------
+connections inspected: 5
+
+SAFE: every resolved connection points at the disposable fixture database.

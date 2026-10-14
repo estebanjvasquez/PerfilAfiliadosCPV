@@ -1,0 +1,67 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-phpunit-20261014T121745Z-f53059292012 Creating 
+ Container cpvtest-phpunit-20261014T121745Z-f53059292012 Created 
+PHPUnit 11.5.56 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.34
+Configuration: /app/phpunit.xml
+
+...............................................................  63 / 431 ( 14%)
+..R.R.......................................................... 126 / 431 ( 29%)
+...........................................................F... 189 / 431 ( 43%)
+............................................................... 252 / 431 ( 58%)
+........................................F...................... 315 / 431 ( 73%)
+............................................................... 378 / 431 ( 87%)
+.F.........................................F.........           431 / 431 (100%)
+
+Time: 00:57.984, Memory: 115.00 MB
+
+There were 4 failures:
+
+1) Tests\Unit\Taxonomy\ReviewedProposalConfirmationTest::invalidating_is_recorded_as_its_own_distinguishable_audit_event
+Failed asserting that actual size 0 matches expected size 1.
+
+/app/tests/Unit/Taxonomy/ReviewedProposalConfirmationTest.php:669
+
+2) Tests\Unit\Taxonomy\ReviewedProposalSupersessionTest::the_state_delta_records_why_the_review_became_stale
+Failed asserting that an array contains 274.
+
+/app/tests/Unit/Taxonomy/ReviewedProposalSupersessionTest.php:430
+
+3) Tests\Feature\Filament\TaxonomyConceptExplorerTest::an_already_frozen_candidate_is_still_protected_from_a_second_freeze
+Failed asserting that a table action with name [freezeReview] is visible on the [App\Filament\Resources\TaxonomyCandidateConceptLinkResource\Pages\ListTaxonomyCandidateConceptLinks] component for record [{"id":415,"suggested_term_id":462,"suggested_concept_id":386,"suggested_new_concept_name":null,"signals":[],"confidence":0.5,"tier":"REVIEW","status":"pending","review_notes":null,"reviewed_by":null,"reviewed_at":null,"published_term_concept_id":null,"created_at":"2026-10-14T12:19:10.000000Z","updated_at":"2026-10-14T12:19:10.000000Z","taxonomy_state_fingerprint":null,"reviewed_proposals":[{"id":410,"proposal_type":"TERM_CONCEPT_LINK","candidate_link_id":415,"concept_relation_id":null,"decision":"MAP_TO_EXISTING","decision_payload":{"term_id":462,"target_concept_id":386},"payload_version":"taxonomy-reviewed-proposal\/c2-v1","taxonomy_state_fingerprint":"c6dabb8c9e98ace948fe38927db4a87d9b12d15dd041e00f42e68b947e7216d3","payload_fingerprint":"4c480fac5ae2a716e4ca4402ba2e550dbe410f609f493e39acfce6c2b9d36ca6","reviewer_id":249,"reviewed_at":"2026-10-14T12:19:11.000000Z","status":"PENDING_APPLY","applied_at":null,"authorization_reference":null,"target_environment":null,"application_result":null,"created_at":"2026-10-14T12:19:11.000000Z","updated_at":"2026-10-14T12:19:11.000000Z","requires_human_confirmation":false,"prepared_by_actor_type":"human_reviewer","prepared_via":"http","confirmed_by_id":null,"confirmed_at":null,"confirmation_reference":null,"confirmation_channel":null,"confirmation_note":null,"proposal_group_id":null,"confirmation_invalidated_at":null,"confirmation_invalidated_by_id":null,"confirmation_invalidation_actor_type":null,"confirmation_invalidation_channel":null,"confirmation_invalidation_reference":null,"confirmation_invalidation_reason":null,"invalidated_confirmation_snapshot":null,"superseded_at":null,"superseded_by_proposal_id":null,"supersedes_proposal_id":null,"inherited_decision_from_id":null,"supersession_reference":null,"supersession_reason":null,"supersession_actor_type":null,"supersession_by_id":null,"supersession_channel":null,"supersession_state_delta":null}]}].
+Failed asserting that true is false.
+
+/app/vendor/filament/tables/src/Testing/TestsActions.php:294
+/app/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:407
+/app/vendor/filament/tables/src/Testing/TestsActions.php:108
+/app/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:407
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:506
+
+4) Tests\Feature\Filament\TaxonomyReviewedProposalResourceTest::the_detail_page_of_a_superseded_proposal_renders_without_a_500
+El fixture tiene que producir un delta con la lista anidada, que es justo lo que se quiere renderizar.
+Failed asserting that an array is not empty.
+
+/app/tests/Feature/Filament/TaxonomyReviewedProposalResourceTest.php:216
+
+--
+
+There were 2 risky tests:
+
+1) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::dry_run_attaches_predicted_impact_to_every_scored_candidate
+This test did not perform any assertions
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:211
+
+2) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::propose_concept_relations_never_returns_directional_types
+This test did not perform any assertions
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:242
+
+FAILURES!
+Tests: 431, Assertions: 2405, Failures: 4, PHPUnit Deprecations: 1, Risky: 2.
+
