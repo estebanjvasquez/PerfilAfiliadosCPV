@@ -1,0 +1,125 @@
+{
+  "results": [
+    {
+      "check": "desktop: login 200",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "check": "desktop: login muestra el campo de correo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "desktop: login sin scroll horizontal",
+      "ok": true,
+      "detail": "exceso=0px"
+    },
+    {
+      "check": "desktop: manual titulo",
+      "ok": true,
+      "detail": "h1=Manual de usuario"
+    },
+    {
+      "check": "desktop: manual con CSS desplegado cargado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "desktop: manual muestra SOLICITUD_ACTION_LABEL",
+      "ok": true,
+      "detail": "apariciones=3"
+    },
+    {
+      "check": "desktop: manual muestra SOLICITUD_MODAL_HEADING",
+      "ok": true,
+      "detail": "apariciones=1"
+    },
+    {
+      "check": "desktop: manual muestra SOLICITUD_NECESIDAD_LABEL",
+      "ok": true,
+      "detail": "apariciones=1"
+    },
+    {
+      "check": "desktop: manual muestra SOLICITUD_JUSTIFICACION_LABEL",
+      "ok": true,
+      "detail": "apariciones=1"
+    },
+    {
+      "check": "desktop: manual muestra SOLICITUD_TERMINOS_LABEL",
+      "ok": true,
+      "detail": "apariciones=1"
+    },
+    {
+      "check": "desktop: manual sin scroll horizontal de pagina",
+      "ok": true,
+      "detail": "exceso=0px"
+    },
+    {
+      "check": "desktop: ninguna respuesta 5xx",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "mobile: login 200",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "check": "mobile: login muestra el campo de correo",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "mobile: login sin scroll horizontal",
+      "ok": true,
+      "detail": "exceso=0px"
+    },
+    {
+      "check": "mobile: manual titulo",
+      "ok": true,
+      "detail": "h1=Manual de usuario"
+    },
+    {
+      "check": "mobile: manual con CSS desplegado cargado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "mobile: manual muestra SOLICITUD_ACTION_LABEL",
+      "ok": true,
+      "detail": "apariciones=3"
+    },
+    {
+      "check": "mobile: manual muestra SOLICITUD_MODAL_HEADING",
+      "ok": true,
+      "detail": "apariciones=1"
+    },
+    {
+      "check": "mobile: manual muestra SOLICITUD_NECESIDAD_LABEL",
+      "ok": true,
+      "detail": "apariciones=1"
+    },
+    {
+      "check": "mobile: manual muestra SOLICITUD_JUSTIFICACION_LABEL",
+      "ok": true,
+      "detail": "apariciones=1"
+    },
+    {
+      "check": "mobile: manual muestra SOLICITUD_TERMINOS_LABEL",
+      "ok": true,
+      "detail": "apariciones=1"
+    },
+    {
+      "check": "mobile: manual sin scroll horizontal de pagina",
+      "ok": true,
+      "detail": "exceso=0px"
+    },
+    {
+      "check": "mobile: ninguna respuesta 5xx",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "failed": 0
+}

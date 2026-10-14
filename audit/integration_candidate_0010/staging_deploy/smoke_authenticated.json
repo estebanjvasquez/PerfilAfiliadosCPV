@@ -1,0 +1,127 @@
+{
+  "checks": [
+    {
+      "check": "transaccion READ ONLY",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "usuario afiliado existente con empresa vinculada",
+      "ok": true,
+      "detail": "roles=super_admin"
+    },
+    {
+      "check": "invitado -> manual redirige a login",
+      "ok": true,
+      "detail": "status=302"
+    },
+    {
+      "check": "login responde 200",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "check": "panel /admin autenticado responde 200",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "check": "manual autenticado responde 200",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "check": "manual cita SOLICITUD_ACTION_LABEL",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "manual cita SOLICITUD_MODAL_HEADING",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "manual cita SOLICITUD_NECESIDAD_LABEL",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "manual cita SOLICITUD_JUSTIFICACION_LABEL",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "manual cita SOLICITUD_TERMINOS_LABEL",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "manual sin marcador provisional",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "edicion de su empresa responde 200",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "check": "relation manager: boton con la etiqueta final",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "modal abierto (mountedTableActions)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "modal muestra SOLICITUD_MODAL_HEADING",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "modal muestra SOLICITUD_NECESIDAD_LABEL",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "modal muestra SOLICITUD_JUSTIFICACION_LABEL",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "modal muestra SOLICITUD_TERMINOS_LABEL",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "modal muestra la descripcion (no crea categoria)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "modal muestra el boton de envio (no pulsado)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "ninguna solicitud creada",
+      "ok": true,
+      "detail": "antes=0 despues=0"
+    },
+    {
+      "check": "ningun correo enviado ni encolado (fake)",
+      "ok": true,
+      "detail": "salientes=0"
+    },
+    {
+      "check": "HTML del manual redactado (nombre y correo ausentes)",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "passed": 24,
+  "failed": 0,
+  "manual_html_b64_omitted": "HTML del manual no versionado (bytes_b64=236180)"
+}

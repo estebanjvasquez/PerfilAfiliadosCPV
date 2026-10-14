@@ -1,0 +1,145 @@
+# PREFLIGHT DE SOLO LECTURA - instruccion 6174401867
+ejecutado_utc=2026-10-14T17:58:28Z
+sql_sha256=d70bb7a1ce284b66a6cf6303be7d6a4a9ba43832e307128c496cd5e831f69e3a
+bloques=13
+conexion=pgsql
+conexion_por_defecto=pgsql
+tabla_de_registro=migrations
+app_env=staging
+transaccion_read_only=on (verificado con SHOW antes del primer bloque)
+base_coincide_con_config_pgsql=true
+
+== 1 | Identidad de la base y modo de solo lectura
+filas=1
+  base=postgres | esquema=public | search_path=public | version_servidor=17.6 | transaccion_solo_lectura=on | en_recuperacion=false | tiene_migrations=true | tiene_taxonomy_categories=true | veredicto=OK
+
+== 2 | Migraciones nuevas del candidato: registradas o pendientes
+filas=9
+  nombre=2022_12_02_000000_restore_deferred_foreign_keys | carpeta=database/migrations | clase=nueva: reparacion de integridad | registrada=false | batch=NULL | veredicto=OK
+  nombre=2026_10_09_120000_create_taxonomy_category_requests_table | carpeta=database/migrations | clase=nueva: TASK-0010A | registrada=false | batch=NULL | veredicto=OK
+  nombre=2026_09_01_120000_create_supplier_categories_table | carpeta=database/migrations/pgsql | clase=IMPORTADA de supplhi: debe estar REGISTRADA | registrada=true | batch=15 | veredicto=OK
+  nombre=2026_09_01_120001_create_supplier_category_translations_table | carpeta=database/migrations/pgsql | clase=IMPORTADA de supplhi: debe estar REGISTRADA | registrada=true | batch=15 | veredicto=OK
+  nombre=2026_09_01_120002_create_supplier_category_synonyms_table | carpeta=database/migrations/pgsql | clase=IMPORTADA de supplhi: debe estar REGISTRADA | registrada=true | batch=15 | veredicto=OK
+  nombre=2026_09_01_120003_create_empresa_supplier_categories_table | carpeta=database/migrations/pgsql | clase=IMPORTADA de supplhi: debe estar REGISTRADA | registrada=true | batch=15 | veredicto=OK
+  nombre=2026_09_01_120004_create_empresa_catalog_items_table | carpeta=database/migrations/pgsql | clase=IMPORTADA de supplhi: debe estar REGISTRADA | registrada=true | batch=15 | veredicto=OK
+  nombre=2026_09_01_120005_create_empresa_catalog_item_category_table | carpeta=database/migrations/pgsql | clase=IMPORTADA de supplhi: debe estar REGISTRADA | registrada=true | batch=15 | veredicto=OK
+  nombre=2026_09_01_120006_create_category_mapping_audit_table | carpeta=database/migrations/pgsql | clase=IMPORTADA de supplhi: debe estar REGISTRADA | registrada=true | batch=15 | veredicto=OK
+
+== 2b | Conjunto completo de pendientes para migrate --force
+filas=2
+  nombre=2022_12_02_000000_restore_deferred_foreign_keys | veredicto=OK: pendiente esperada (nueva del candidato)
+  nombre=2026_10_09_120000_create_taxonomy_category_requests_table | veredicto=OK: pendiente esperada (nueva del candidato)
+
+== 2c | Filas del registro sin archivo en el candidato
+filas=21
+  nombre=2022_08_03_000000_create_vector_extension | batch=1 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_150839_create_jobs_table | batch=1 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_154307_add_deferred_foreign_keys_out_of_order_tables | batch=1 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_161504_create_sustainability_view_pgsql | batch=2 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_161706_create_management_view_pgsql | batch=3 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_161834_create_catalogo_view_pgsql | batch=4 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_180001_create_management_det_view_pgsql | batch=5 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_180500_create_resource_view_pgsql | batch=6 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_181000_create_machinery_view_pgsql | batch=7 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_181500_create_facility_view_pgsql | batch=8 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_182000_create_inventory_view_pgsql | batch=9 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_182500_create_clients_view_pgsql | batch=10 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_183000_create_experience_view_pgsql | batch=11 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_183500_create_presence_view_pgsql | batch=12 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_184000_create_capacity_view_pgsql | batch=13 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_08_31_184500_create_finance_view_pgsql | batch=14 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_09_19_100700_create_taxonomy_intent_types_table | batch=51 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_09_19_100800_add_intent_type_and_governance_columns_to_taxonomy_intent_markers_table | batch=51 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_09_19_100900_create_taxonomy_term_semantic_analyses_table | batch=51 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_09_19_101000_create_taxonomy_term_semantic_intents_table | batch=51 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+  nombre=2026_09_19_101100_create_taxonomy_candidate_concept_relations_table | batch=51 | veredicto=INFO: registrada sin archivo en el candidato; migrate --force no la toca
+
+== 3 | Migraciones modificadas: tienen que estar ya registradas
+filas=6
+  nombre=2022_05_31_223828_create_empresas_table | registrada=true | batch=1 | veredicto=OK
+  nombre=2022_06_13_231159_create_permission_tables | registrada=true | batch=1 | veredicto=OK
+  nombre=2022_08_12_145310_create_sustainabilities_table | registrada=true | batch=1 | veredicto=OK
+  nombre=2022_09_01_154856_create_infratypes_table | registrada=true | batch=1 | veredicto=OK
+  nombre=2022_09_01_185804_create_infrafacilities_table | registrada=true | batch=1 | veredicto=OK
+  nombre=2026_07_24_000001_add_sub_type_to_empresa_module_status_table | registrada=true | batch=1 | veredicto=OK
+
+== 4 | Objetos de TASK-0010A ausentes y singleton presente
+filas=7
+  objeto=columna taxonomy_selection_settings.category_request_recipient_email | existe=false | veredicto=OK
+  objeto=indice taxonomy_category_requests_empresa_idx | existe=false | veredicto=OK
+  objeto=indice taxonomy_category_requests_pkey | existe=false | veredicto=OK
+  objeto=indice taxonomy_category_requests_status_idx | existe=false | veredicto=OK
+  objeto=secuencia taxonomy_category_requests_id_seq | existe=false | veredicto=OK
+  objeto=tabla taxonomy_category_requests | existe=false | veredicto=OK
+  objeto=tabla taxonomy_selection_settings (singleton que se extiende) | existe=true | veredicto=OK
+
+== 4a | Filas del singleton (la app lee la primera; la migracion no lo crea)
+filas=1
+  filas=1 | veredicto=OK
+
+== 4b | Forma del singleton taxonomy_selection_settings
+filas=5
+  columna=created_at | tipo_esperado=timestamp without time zone | tipo_real=timestamp without time zone | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+  columna=id | tipo_esperado=bigint | tipo_real=bigint | nulable_esperado=NO | nulable_real=NO | veredicto=OK
+  columna=max_categorias_principales | tipo_esperado=smallint | tipo_real=smallint | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+  columna=max_categorias_secundarias | tipo_esperado=smallint | tipo_real=smallint | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+  columna=updated_at | tipo_esperado=timestamp without time zone | tipo_real=timestamp without time zone | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+
+== 4c | Destinos de las FK de taxonomy_category_requests
+filas=2
+  tabla=empresas | columna=id | tipo=bigint | pk_o_unique=true | veredicto=OK
+  tabla=users | columna=id | tipo=bigint | pk_o_unique=true | veredicto=OK
+
+== 5 | Claves foraneas aplazadas: esquema, columnas exactas, acciones y validez
+filas=4
+  tabla=empresas | columna=city_id | nombre_actual=empresas_city_id_foreign | nombre_es_el_de_laravel=true | esquema_local=public | columnas_locales=city_id | esquema_ref=public | tabla_ref=cities | columnas_ref=id | destino_de_la_migracion=cities(id) | on_delete=a | on_update=a | validada=true | diferible=false | claves_en_columna=1 | veredicto=OK: la migracion la omitira
+  tabla=infrafacilities | columna=infraregion_infrasystem_id | nombre_actual=infrafacilities_infraregion_infrasystem_id_foreign | nombre_es_el_de_laravel=true | esquema_local=public | columnas_locales=infraregion_infrasystem_id | esquema_ref=public | tabla_ref=infraregion_infrasystem | columnas_ref=id | destino_de_la_migracion=infraregion_infrasystem(id) | on_delete=a | on_update=a | validada=true | diferible=false | claves_en_columna=1 | veredicto=OK: la migracion la omitira
+  tabla=infratypes | columna=infrasectors_id | nombre_actual=infratypes_infrasectors_id_foreign | nombre_es_el_de_laravel=true | esquema_local=public | columnas_locales=infrasectors_id | esquema_ref=public | tabla_ref=infrasectors | columnas_ref=id | destino_de_la_migracion=infrasectors(id) | on_delete=a | on_update=a | validada=true | diferible=false | claves_en_columna=1 | veredicto=OK: la migracion la omitira
+  tabla=sustainabilities | columna=areas_id | nombre_actual=sustainabilities_areas_id_foreign | nombre_es_el_de_laravel=true | esquema_local=public | columnas_locales=areas_id | esquema_ref=public | tabla_ref=areas | columnas_ref=id | destino_de_la_migracion=areas(id) | on_delete=a | on_update=a | validada=true | diferible=false | claves_en_columna=1 | veredicto=OK: la migracion la omitira
+
+== 5b | Huerfanos por clave aplazada (conteo agregado)
+filas=4
+  relacion=empresas.city_id -> cities.id | no_nulos=383 | huerfanos=0 | veredicto=OK
+  relacion=infrafacilities.infraregion_infrasystem_id -> infraregion_infrasystem.id | no_nulos=1215 | huerfanos=0 | veredicto=OK
+  relacion=infratypes.infrasectors_id -> infrasectors.id | no_nulos=6 | huerfanos=0 | veredicto=OK
+  relacion=sustainabilities.areas_id -> areas.id | no_nulos=280 | huerfanos=0 | veredicto=OK
+
+== 6 | Tablas prerrequisito de las migraciones nuevas
+filas=10
+  nombre=areas | existe=true | veredicto=OK
+  nombre=cities | existe=true | veredicto=OK
+  nombre=empresas | existe=true | veredicto=OK
+  nombre=infrafacilities | existe=true | veredicto=OK
+  nombre=infraregion_infrasystem | existe=true | veredicto=OK
+  nombre=infrasectors | existe=true | veredicto=OK
+  nombre=infratypes | existe=true | veredicto=OK
+  nombre=sustainabilities | existe=true | veredicto=OK
+  nombre=taxonomy_selection_settings | existe=true | veredicto=OK
+  nombre=users | existe=true | veredicto=OK
+
+== 7 | Linea base de conteos protegidos (debe repetirse despues)
+filas=14
+  tabla=empresa_taxonomy_category | filas=767 | veredicto=BASELINE
+  tabla=empresas | filas=406 | veredicto=BASELINE
+  tabla=migrations | filas=127 | veredicto=BASELINE
+  tabla=migrations.max_batch | filas=58 | veredicto=BASELINE
+  tabla=taxonomy_audit_log | filas=163 | veredicto=BASELINE
+  tabla=taxonomy_candidate_concept_links | filas=10 | veredicto=BASELINE
+  tabla=taxonomy_canonical_concepts | filas=82 | veredicto=BASELINE
+  tabla=taxonomy_categories | filas=3497 | veredicto=BASELINE
+  tabla=taxonomy_reviewed_proposals | filas=15 | veredicto=BASELINE
+  tabla=taxonomy_selection_settings | filas=1 | veredicto=BASELINE
+  tabla=taxonomy_term_concepts | filas=145 | veredicto=BASELINE
+  tabla=taxonomy_term_cpv_relations | filas=9749 | veredicto=BASELINE
+  tabla=taxonomy_terms | filas=1893 | veredicto=BASELINE
+  tabla=users | filas=366 | veredicto=BASELINE
+
+transaccion_cerrada=ROLLBACK
+
+== RESUMEN
+veredicto_BASELINE=14
+veredicto_INFO=21
+veredicto_OK=51
+paradas=0
+resultado=COMPATIBLE
+codigo_salida=0

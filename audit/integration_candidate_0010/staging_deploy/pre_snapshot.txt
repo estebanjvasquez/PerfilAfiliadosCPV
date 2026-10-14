@@ -1,0 +1,60 @@
+# PREFLIGHT DE SOLO LECTURA - instruccion 6174401867
+ejecutado_utc=2026-10-14T17:58:29Z
+sql_sha256=d0562d4d0e8d9e48303311c130f4f67010c3b33a96fb1aaa023dbbffe719d216
+bloques=6
+conexion=pgsql
+conexion_por_defecto=pgsql
+tabla_de_registro=migrations
+app_env=staging
+transaccion_read_only=on (verificado con SHOW antes del primer bloque)
+base_coincide_con_config_pgsql=true
+
+== S1 | Identidad y solo lectura
+filas=1
+  base=postgres | esquema=public | transaccion_solo_lectura=on | veredicto=OK
+
+== S2 | Las cuatro FK aplazadas: oid y definicion exacta (un oid distinto = recreada)
+filas=4
+  tabla=empresas | conname=empresas_city_id_foreign | oid_restriccion=20006 | definicion=FOREIGN KEY (city_id) REFERENCES cities(id) | validada=true | veredicto=INFO
+  tabla=infrafacilities | conname=infrafacilities_infraregion_infrasystem_id_foreign | oid_restriccion=20011 | definicion=FOREIGN KEY (infraregion_infrasystem_id) REFERENCES infraregion_infrasystem(id) | validada=true | veredicto=INFO
+  tabla=infratypes | conname=infratypes_infrasectors_id_foreign | oid_restriccion=20021 | definicion=FOREIGN KEY (infrasectors_id) REFERENCES infrasectors(id) | validada=true | veredicto=INFO
+  tabla=sustainabilities | conname=sustainabilities_areas_id_foreign | oid_restriccion=20016 | definicion=FOREIGN KEY (areas_id) REFERENCES areas(id) | validada=true | veredicto=INFO
+
+== S3 | Singleton: todas sus columnas y valores (configuracion, no datos de clientes)
+filas=1
+  fila={"id": 1, "created_at": "2026-09-15T11:44:19", "updated_at": "2026-09-15T11:50:45", "max_categorias_principales": null, "max_categorias_secundarias": null} | veredicto=INFO
+
+== S4 | Registro de migraciones: conteo, lote maximo y contenido del lote maximo
+filas=1
+  migration=2026_10_02_160000_add_supersession_lifecycle_to_taxonomy_reviewed_proposals | batch=58 | total_registro=127 | veredicto=INFO
+
+== S5 | Tabla nueva: existencia y filas (consulta dinamica solo si existe)
+filas=1
+  existe=false | filas=NULL | veredicto=INFO
+
+== S6 | Conteos protegidos (comparar antes/despues)
+filas=14
+  tabla=empresa_taxonomy_category | filas=767 | veredicto=BASELINE
+  tabla=empresas | filas=406 | veredicto=BASELINE
+  tabla=migrations | filas=127 | veredicto=BASELINE
+  tabla=migrations.max_batch | filas=58 | veredicto=BASELINE
+  tabla=taxonomy_audit_log | filas=163 | veredicto=BASELINE
+  tabla=taxonomy_candidate_concept_links | filas=10 | veredicto=BASELINE
+  tabla=taxonomy_canonical_concepts | filas=82 | veredicto=BASELINE
+  tabla=taxonomy_categories | filas=3497 | veredicto=BASELINE
+  tabla=taxonomy_reviewed_proposals | filas=15 | veredicto=BASELINE
+  tabla=taxonomy_selection_settings | filas=1 | veredicto=BASELINE
+  tabla=taxonomy_term_concepts | filas=145 | veredicto=BASELINE
+  tabla=taxonomy_term_cpv_relations | filas=9749 | veredicto=BASELINE
+  tabla=taxonomy_terms | filas=1893 | veredicto=BASELINE
+  tabla=users | filas=366 | veredicto=BASELINE
+
+transaccion_cerrada=ROLLBACK
+
+== RESUMEN
+veredicto_BASELINE=14
+veredicto_INFO=7
+veredicto_OK=1
+paradas=0
+resultado=COMPATIBLE
+codigo_salida=0

@@ -1,0 +1,101 @@
+# PREFLIGHT DE SOLO LECTURA - instruccion 6174401867
+ejecutado_utc=2026-10-14T17:58:30Z
+sql_sha256=8d9f5cd13c991ef68310d080a4888039f27eda2eaa7348e23b36dccb0f1d769e
+bloques=9
+conexion=pgsql
+conexion_por_defecto=pgsql
+tabla_de_registro=migrations
+app_env=staging
+transaccion_read_only=on (verificado con SHOW antes del primer bloque)
+base_coincide_con_config_pgsql=true
+
+== V1 | Identidad y solo lectura
+filas=1
+  base=postgres | esquema=public | transaccion_solo_lectura=on | veredicto=OK
+
+== V2 | Las dos migraciones nuevas quedaron registradas, en el mismo lote, que es el maximo
+filas=2
+  nombre=2022_12_02_000000_restore_deferred_foreign_keys | batch=NULL | lote_maximo=58 | veredicto=PARAR: no quedo registrada
+  nombre=2026_10_09_120000_create_taxonomy_category_requests_table | batch=NULL | lote_maximo=58 | veredicto=PARAR: no quedo registrada
+
+== V3 | El ultimo lote contiene EXACTAMENTE esas dos (nada mas corrio)
+filas=1
+  migration=2026_10_02_160000_add_supersession_lifecycle_to_taxonomy_reviewed_proposals | veredicto=PARAR: corrio una migracion no esperada
+
+== V4 | Nada queda pendiente para migrate --force en el SHA desplegado
+filas=2
+  nombre=2022_12_02_000000_restore_deferred_foreign_keys | veredicto=PARAR: sigue pendiente despues del despliegue
+  nombre=2026_10_09_120000_create_taxonomy_category_requests_table | veredicto=PARAR: sigue pendiente despues del despliegue
+
+== V5 | Tabla nueva: columnas contra la migracion 2026_10_09_120000
+filas=16
+  columna=context_snapshot | tipo_esperado=jsonb | tipo_real=NULL | nulable_esperado=NO | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=created_at | tipo_esperado=timestamp without time zone | tipo_real=NULL | nulable_esperado=YES | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=delivery_error | tipo_esperado=character varying(255) | tipo_real=NULL | nulable_esperado=YES | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=delivery_status | tipo_esperado=character varying(20) | tipo_real=NULL | nulable_esperado=NO | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=detalle | tipo_esperado=text | tipo_real=NULL | nulable_esperado=NO | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=empresa_id | tipo_esperado=bigint | tipo_real=NULL | nulable_esperado=NO | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=id | tipo_esperado=bigint | tipo_real=NULL | nulable_esperado=NO | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=justificacion | tipo_esperado=character varying(40) | tipo_real=NULL | nulable_esperado=NO | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=mail_sent_at | tipo_esperado=timestamp without time zone | tipo_real=NULL | nulable_esperado=YES | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=necesidad | tipo_esperado=text | tipo_real=NULL | nulable_esperado=NO | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=recipient_email | tipo_esperado=character varying(255) | tipo_real=NULL | nulable_esperado=YES | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=request_status | tipo_esperado=character varying(30) | tipo_real=NULL | nulable_esperado=NO | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=submitted_at | tipo_esperado=timestamp without time zone | tipo_real=NULL | nulable_esperado=NO | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=terminos_probados | tipo_esperado=text | tipo_real=NULL | nulable_esperado=YES | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=updated_at | tipo_esperado=timestamp without time zone | tipo_real=NULL | nulable_esperado=YES | nulable_real=NULL | veredicto=PARAR: falta la columna
+  columna=user_id | tipo_esperado=bigint | tipo_real=NULL | nulable_esperado=YES | nulable_real=NULL | veredicto=PARAR: falta la columna
+
+== V6 | Tabla nueva: restricciones (PK, dos FK con sus acciones, dos CHECK)
+filas=2
+  nombre=faltantes | tipo=- | definicion=3 | veredicto=PARAR: falta alguna PK/FK declarada
+  nombre=total | tipo=- | definicion=0 | veredicto=PARAR: se esperaban 5 restricciones
+
+== V7 | Tabla nueva: indices (siempre devuelve el total, aunque no haya ninguno)
+filas=1
+  indexname=total | indexdef=0 | veredicto=PARAR: se esperaban 3 indices
+
+== V8 | Columna nueva del singleton: existe, nulable, sin valor (siempre una fila)
+filas=1
+  columna=category_request_recipient_email | tipo=NULL | nulable=NULL | filas_singleton=1 | filas_con_destinatario=NULL | veredicto=PARAR: la columna no existe
+
+== V9 | Las cuatro FK aplazadas siguen satisfaciendo el objetivo (mismo bloque 5 del preflight)
+filas=4
+  tabla=empresas | columna=city_id | conname=empresas_city_id_foreign | esquema_ref=public | tabla_ref=cities | columnas_ref=id | on_delete=a | on_update=a | validada=true | claves_en_columna=1 | veredicto=OK
+  tabla=infrafacilities | columna=infraregion_infrasystem_id | conname=infrafacilities_infraregion_infrasystem_id_foreign | esquema_ref=public | tabla_ref=infraregion_infrasystem | columnas_ref=id | on_delete=a | on_update=a | validada=true | claves_en_columna=1 | veredicto=OK
+  tabla=infratypes | columna=infrasectors_id | conname=infratypes_infrasectors_id_foreign | esquema_ref=public | tabla_ref=infrasectors | columnas_ref=id | on_delete=a | on_update=a | validada=true | claves_en_columna=1 | veredicto=OK
+  tabla=sustainabilities | columna=areas_id | conname=sustainabilities_areas_id_foreign | esquema_ref=public | tabla_ref=areas | columnas_ref=id | on_delete=a | on_update=a | validada=true | claves_en_columna=1 | veredicto=OK
+
+transaccion_cerrada=ROLLBACK
+
+== RESUMEN
+veredicto_OK=5
+veredicto_PARAR=25
+paradas=25
+  PARADA V2: 2022_12_02_000000_restore_deferred_foreign_keys -> PARAR: no quedo registrada
+  PARADA V2: 2026_10_09_120000_create_taxonomy_category_requests_table -> PARAR: no quedo registrada
+  PARADA V3: 2026_10_02_160000_add_supersession_lifecycle_to_taxonomy_reviewed_proposals -> PARAR: corrio una migracion no esperada
+  PARADA V4: 2022_12_02_000000_restore_deferred_foreign_keys -> PARAR: sigue pendiente despues del despliegue
+  PARADA V4: 2026_10_09_120000_create_taxonomy_category_requests_table -> PARAR: sigue pendiente despues del despliegue
+  PARADA V5: context_snapshot -> PARAR: falta la columna
+  PARADA V5: created_at -> PARAR: falta la columna
+  PARADA V5: delivery_error -> PARAR: falta la columna
+  PARADA V5: delivery_status -> PARAR: falta la columna
+  PARADA V5: detalle -> PARAR: falta la columna
+  PARADA V5: empresa_id -> PARAR: falta la columna
+  PARADA V5: id -> PARAR: falta la columna
+  PARADA V5: justificacion -> PARAR: falta la columna
+  PARADA V5: mail_sent_at -> PARAR: falta la columna
+  PARADA V5: necesidad -> PARAR: falta la columna
+  PARADA V5: recipient_email -> PARAR: falta la columna
+  PARADA V5: request_status -> PARAR: falta la columna
+  PARADA V5: submitted_at -> PARAR: falta la columna
+  PARADA V5: terminos_probados -> PARAR: falta la columna
+  PARADA V5: updated_at -> PARAR: falta la columna
+  PARADA V5: user_id -> PARAR: falta la columna
+  PARADA V6: faltantes -> PARAR: falta alguna PK/FK declarada
+  PARADA V6: total -> PARAR: se esperaban 5 restricciones
+  PARADA V7: total -> PARAR: se esperaban 3 indices
+  PARADA V8: category_request_recipient_email -> PARAR: la columna no existe
+resultado=PARADA
+codigo_salida=6

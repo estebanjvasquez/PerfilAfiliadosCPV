@@ -3029,7 +3029,23 @@
       "pending_for_migrate_force": ["2022_12_02_000000_restore_deferred_foreign_keys", "2026_10_09_120000_create_taxonomy_category_requests_table"],
       "report": "audit/integration_candidate_0010_live_preflight_2026-10-14.md",
       "artifacts": "audit/integration_candidate_0010/live_preflight/",
-      "note": "Read-only evidence only. No push to feature/upgrade-filament-v3, no deploy, no ledger or data change. The staging execution instruction is the orchestrator's to record."
+      "note": "Read-only evidence only. No push to feature/upgrade-filament-v3, no deploy, no ledger or data change. The staging execution instruction is the orchestrator's to record.",
+      "accepted_by_comment": 6174797031
+    },
+    "staging_deploy": {
+      "status": "DEPLOYED_FOR_OWNER_REVIEW_MANUAL",
+      "instruction_comment": 6174797031,
+      "deployed_sha": "9b447eb15e80bddc4958430a8fc60acf5150ff4d",
+      "runtime_branch_move": "feature/upgrade-filament-v3 a6e9db4..9b447eb, non-force fast-forward pushed by the owner from their own terminal (the session's permission classifier blocked the agent's push)",
+      "workflow_run": "https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/38612101908 (push, success, 18:04:53Z-18:05:31Z)",
+      "prepush_preflight": "2026-10-14T18:00:29Z COMPATIBLE 51 OK / 21 INFO / 14 BASELINE / 0 stops, identical to the accepted run",
+      "migrations_ran": ["2022_12_02_000000_restore_deferred_foreign_keys", "2026_10_09_120000_create_taxonomy_category_requests_table"],
+      "ledger": "127/58 -> 129/59",
+      "postdeploy_verification": "37 OK, 0 stops; four FKs same oid and definition; new table empty; settings unchanged plus null recipient column; protected counts identical",
+      "smoke": "HTTP 200/200/302; authenticated in-process READ ONLY 24/24 (user was super_admin, affiliate repeat blocked by permission classifier); login desktop/mobile OK; authenticated desktop/mobile rendering NOT verified on staging",
+      "previous_image_preserved_as": "perfilafiliados-app:pre-0010-004d24e (sha256:ce97a62f4d51)",
+      "report": "audit/integration_candidate_0010_staging_deploy_2026-10-14.md",
+      "artifacts": "audit/integration_candidate_0010/staging_deploy/"
     }
   },
   "agent_issue_write_access": "AVAILABLE since 2026-10-09 via docs/orquestador/post_issue_comment.ps1 and the purpose-built token in the out-of-repo store; verified again on 2026-10-14 (comments 6167868489, 6168251563, 6168437907, 6172040668, 6172055856, 6173789525).",

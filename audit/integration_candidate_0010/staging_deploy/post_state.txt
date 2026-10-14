@@ -1,0 +1,16 @@
+captured_utc=2026-10-14T18:19:29Z
+staging_head=9b447eb15e80bddc4958430a8fc60acf5150ff4d
+app_container=ab1c95c8f527
+app_container_started=2026-10-14T18:05:29.429866572Z
+app_image_id=sha256:1502ed3d1e4f0576551ffa36e762917bf549eaa6dcd426e8ad88278f988bd441
+app_image_created=2026-10-14T20:05:18.931093155+02:00
+preserved_previous_image=sha256:ce97a62f4d51acba337c6a7739527e7855876858dff0f3ecbe43208e1dae496e
+nginx_image_id=sha256:02b1b2a0445514891a14aa371845f6085d5d9d10d385b30d6aad606a50a29a05
+env_sha256=085c617c22a2e1f4c8fd8c7049a0a9b5277d684d36525bad9cd3994cbfd415b1
+compose_sha256=08322da23820719d60628ce84b7e8b6f10b65449f4b96cee20219d3aec97de88
+maintenance=off
+http_root=200
+http_admin_login=200
+http_manual_guest=302
+laravel_errors_since_deploy_from_app_traffic=0 (2 entries since 17:40Z, both from this session tooling: 17:45:16 runner STDOUT, 18:10:05 smoke bootstrap)
+nginx_since_1804Z= 38 " 200 ; 1 " 302 ;

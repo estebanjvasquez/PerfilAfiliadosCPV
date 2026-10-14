@@ -1,0 +1,82 @@
+# PREFLIGHT DE SOLO LECTURA - instruccion 6174401867
+ejecutado_utc=2026-10-14T18:07:22Z
+sql_sha256=8d9f5cd13c991ef68310d080a4888039f27eda2eaa7348e23b36dccb0f1d769e
+bloques=9
+conexion=pgsql
+conexion_por_defecto=pgsql
+tabla_de_registro=migrations
+app_env=staging
+transaccion_read_only=on (verificado con SHOW antes del primer bloque)
+base_coincide_con_config_pgsql=true
+
+== V1 | Identidad y solo lectura
+filas=1
+  base=postgres | esquema=public | transaccion_solo_lectura=on | veredicto=OK
+
+== V2 | Las dos migraciones nuevas quedaron registradas, en el mismo lote, que es el maximo
+filas=2
+  nombre=2022_12_02_000000_restore_deferred_foreign_keys | batch=59 | lote_maximo=59 | veredicto=OK
+  nombre=2026_10_09_120000_create_taxonomy_category_requests_table | batch=59 | lote_maximo=59 | veredicto=OK
+
+== V3 | El ultimo lote contiene EXACTAMENTE esas dos (nada mas corrio)
+filas=2
+  migration=2022_12_02_000000_restore_deferred_foreign_keys | veredicto=OK
+  migration=2026_10_09_120000_create_taxonomy_category_requests_table | veredicto=OK
+
+== V4 | Nada queda pendiente para migrate --force en el SHA desplegado
+filas=0
+
+== V5 | Tabla nueva: columnas contra la migracion 2026_10_09_120000
+filas=16
+  columna=context_snapshot | tipo_esperado=jsonb | tipo_real=jsonb | nulable_esperado=NO | nulable_real=NO | veredicto=OK
+  columna=created_at | tipo_esperado=timestamp without time zone | tipo_real=timestamp without time zone | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+  columna=delivery_error | tipo_esperado=character varying(255) | tipo_real=character varying(255) | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+  columna=delivery_status | tipo_esperado=character varying(20) | tipo_real=character varying(20) | nulable_esperado=NO | nulable_real=NO | veredicto=OK
+  columna=detalle | tipo_esperado=text | tipo_real=text | nulable_esperado=NO | nulable_real=NO | veredicto=OK
+  columna=empresa_id | tipo_esperado=bigint | tipo_real=bigint | nulable_esperado=NO | nulable_real=NO | veredicto=OK
+  columna=id | tipo_esperado=bigint | tipo_real=bigint | nulable_esperado=NO | nulable_real=NO | veredicto=OK
+  columna=justificacion | tipo_esperado=character varying(40) | tipo_real=character varying(40) | nulable_esperado=NO | nulable_real=NO | veredicto=OK
+  columna=mail_sent_at | tipo_esperado=timestamp without time zone | tipo_real=timestamp without time zone | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+  columna=necesidad | tipo_esperado=text | tipo_real=text | nulable_esperado=NO | nulable_real=NO | veredicto=OK
+  columna=recipient_email | tipo_esperado=character varying(255) | tipo_real=character varying(255) | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+  columna=request_status | tipo_esperado=character varying(30) | tipo_real=character varying(30) | nulable_esperado=NO | nulable_real=NO | veredicto=OK
+  columna=submitted_at | tipo_esperado=timestamp without time zone | tipo_real=timestamp without time zone | nulable_esperado=NO | nulable_real=NO | veredicto=OK
+  columna=terminos_probados | tipo_esperado=text | tipo_real=text | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+  columna=updated_at | tipo_esperado=timestamp without time zone | tipo_real=timestamp without time zone | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+  columna=user_id | tipo_esperado=bigint | tipo_real=bigint | nulable_esperado=YES | nulable_real=YES | veredicto=OK
+
+== V6 | Tabla nueva: restricciones (PK, dos FK con sus acciones, dos CHECK)
+filas=7
+  nombre=taxonomy_category_requests_delivery_status_check | tipo=c | definicion=CHECK (((delivery_status)::text = ANY ((ARRAY['pending'::character varying, 'sent'::character varying, 'failed'::character varying])::text[]))) | veredicto=OK
+  nombre=taxonomy_category_requests_empresa_id_fkey | tipo=f | definicion=FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE | veredicto=OK
+  nombre=taxonomy_category_requests_justificacion_check | tipo=c | definicion=CHECK (((justificacion)::text = ANY ((ARRAY['NO_ENCUENTRO_CATEGORIA'::character varying, 'DEMASIADO_GENERAL'::character varying, 'OTRO_NOMBRE'::character varying, 'NO_ESTOY_SEGURO'::character varying, 'CAPACIDAD_ESPECIALIZADA'::character varying, 'OTRO'::character varying])::text[]))) | veredicto=OK
+  nombre=taxonomy_category_requests_pkey | tipo=p | definicion=PRIMARY KEY (id) | veredicto=OK
+  nombre=taxonomy_category_requests_user_id_fkey | tipo=f | definicion=FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL | veredicto=OK
+  nombre=faltantes | tipo=- | definicion=0 | veredicto=OK
+  nombre=total | tipo=- | definicion=5 | veredicto=OK
+
+== V7 | Tabla nueva: indices (siempre devuelve el total, aunque no haya ninguno)
+filas=4
+  indexname=taxonomy_category_requests_empresa_idx | indexdef=CREATE INDEX taxonomy_category_requests_empresa_idx ON public.taxonomy_category_requests USING btree (empresa_id) | veredicto=OK
+  indexname=taxonomy_category_requests_pkey | indexdef=CREATE UNIQUE INDEX taxonomy_category_requests_pkey ON public.taxonomy_category_requests USING btree (id) | veredicto=OK
+  indexname=taxonomy_category_requests_status_idx | indexdef=CREATE INDEX taxonomy_category_requests_status_idx ON public.taxonomy_category_requests USING btree (request_status) | veredicto=OK
+  indexname=total | indexdef=3 | veredicto=OK
+
+== V8 | Columna nueva del singleton: existe, nulable, sin valor (siempre una fila)
+filas=1
+  columna=category_request_recipient_email | tipo=character varying(255) | nulable=true | filas_singleton=1 | filas_con_destinatario=0 | veredicto=OK
+
+== V9 | Las cuatro FK aplazadas siguen satisfaciendo el objetivo (mismo bloque 5 del preflight)
+filas=4
+  tabla=empresas | columna=city_id | conname=empresas_city_id_foreign | esquema_ref=public | tabla_ref=cities | columnas_ref=id | on_delete=a | on_update=a | validada=true | claves_en_columna=1 | veredicto=OK
+  tabla=infrafacilities | columna=infraregion_infrasystem_id | conname=infrafacilities_infraregion_infrasystem_id_foreign | esquema_ref=public | tabla_ref=infraregion_infrasystem | columnas_ref=id | on_delete=a | on_update=a | validada=true | claves_en_columna=1 | veredicto=OK
+  tabla=infratypes | columna=infrasectors_id | conname=infratypes_infrasectors_id_foreign | esquema_ref=public | tabla_ref=infrasectors | columnas_ref=id | on_delete=a | on_update=a | validada=true | claves_en_columna=1 | veredicto=OK
+  tabla=sustainabilities | columna=areas_id | conname=sustainabilities_areas_id_foreign | esquema_ref=public | tabla_ref=areas | columnas_ref=id | on_delete=a | on_update=a | validada=true | claves_en_columna=1 | veredicto=OK
+
+transaccion_cerrada=ROLLBACK
+
+== RESUMEN
+veredicto_OK=37
+paradas=0
+resultado=COMPATIBLE
+codigo_salida=0
