@@ -178,25 +178,39 @@ class TaxonomyCategoryRequestsMigrationTest extends TestCase
             'updated_at' => now(),
         ];
 
-        foreach ([
-            'justificacion' => ['justificacion' => 'NO_EXISTE_ESTE_MOTIVO'],
-            'delivery_status' => ['delivery_status' => 'quien_sabe'],
-        ] as $campo => $invalido) {
-            try {
-                DB::connection('pgsql')->table('taxonomy_category_requests')->insert($invalido + $fila);
-                $this->fail("El CHECK de {$campo} no está activo: la base aceptó un valor fuera de la lista.");
-            } catch (\Illuminate\Database\QueryException $e) {
-                $this->assertStringContainsString('23514', $e->getCode() ?? '', "Se esperaba una violación de CHECK para {$campo}.");
-            }
+        $this->assertRechaza('23514', ['justificacion' => 'NO_EXISTE_ESTE_MOTIVO'] + $fila, 'el CHECK de justificacion');
+        $this->assertRechaza('23514', ['delivery_status' => 'quien_sabe'] + $fila, 'el CHECK de delivery_status');
+        $this->assertRechaza('23503', ['empresa_id' => 0] + $fila, 'la clave foránea a empresas');
+    }
+
+    /**
+     * Comprueba que la base RECHAZA una fila con un SQLSTATE concreto.
+     *
+     * CADA inserción va en su propio SAVEPOINT. En PostgreSQL el primer error aborta la
+     * transacción entera y todo lo que sigue falla con `25P02` (`in_failed_sql_transaction`), así
+     * que sin esto sólo la primera comprobación mide algo y las demás miden el daño colateral de
+     * la primera - que es exactamente lo que pasó al escribir este test.
+     *
+     * `DB::transaction()` anidado dentro de la transacción de `DatabaseTransactions` emite un
+     * SAVEPOINT y vuelve a él al propagarse la excepción, dejando la transacción sana.
+     *
+     * @param  array<string, mixed>  $fila
+     */
+    private function assertRechaza(string $sqlstate, array $fila, string $queGarantia): void
+    {
+        $capturada = null;
+
+        try {
+            DB::connection('pgsql')->transaction(function () use ($fila) {
+                DB::connection('pgsql')->table('taxonomy_category_requests')->insert($fila);
+            });
+        } catch (\Illuminate\Database\QueryException $e) {
+            $capturada = $e;
         }
 
-        // Y la FK a empresas también sigue viva.
-        try {
-            DB::connection('pgsql')->table('taxonomy_category_requests')->insert(['empresa_id' => 0] + $fila);
-            $this->fail('La clave foránea a empresas no está activa.');
-        } catch (\Illuminate\Database\QueryException $e) {
-            $this->assertStringContainsString('23503', $e->getCode() ?? '', 'Se esperaba una violación de clave foránea.');
-        }
+        $this->assertNotNull($capturada, "No está activa {$queGarantia}: la base aceptó una fila inválida.");
+        $this->assertSame($sqlstate, (string) $capturada->getCode(),
+            "Se esperaba SQLSTATE {$sqlstate} por {$queGarantia}, llegó {$capturada->getCode()}.");
     }
 
     /** @return array<int, string> */
