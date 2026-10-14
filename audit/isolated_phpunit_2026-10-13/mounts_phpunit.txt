@@ -1,0 +1,1 @@
+bind <workspace> -> /app rw=true

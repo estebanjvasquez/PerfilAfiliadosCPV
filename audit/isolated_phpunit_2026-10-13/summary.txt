@@ -1,0 +1,22 @@
+run_id=20261013T183459Z-99e603cb4713
+sha=99e603cb4713fe0a349f7958af44327e5ae34845
+phpunit_exit=2
+suites_run=Unit+Feature (full suite)
+findings=1
+-- isolation --
+isolation_passed=18
+isolation_failed=0
+-- schema preparation --
+schema_fix_applied=defer_four_fks.patch,align_permission_migration_to_v6.patch,portable_index_check.patch
+pgsql_bootstrap_from=feature/supplhi-postgres-buscador@5df23fa9c5d0b93d5ccd0e155095a0e98726d6d0
+pgsql_bootstrap_migrations=21
+migration_ordering_violations=4
+migrate_ok=yes
+prep_passed=11
+prep_failed=0
+fixture_tables=90
+-- tests --
+staging_before=200
+staging_after=200
+php_version=8.2.34
+extensions=pdo_pgsql,intl,zip,gd,bcmath

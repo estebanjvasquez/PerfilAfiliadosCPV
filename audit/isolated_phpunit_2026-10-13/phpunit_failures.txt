@@ -1,0 +1,290 @@
+There were 5 errors:
+
+1) Tests\Unit\Taxonomy\CanonicalConceptApplyServiceTest::apply_persists_the_authorization_reference_and_target_environment_as_structured_audit_columns
+Illuminate\Database\Eloquent\ModelNotFoundException: No query results for model [App\Models\TaxonomyConceptRelation].
+
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:780
+/app/tests/Unit/Taxonomy/CanonicalConceptApplyServiceTest.php:414
+
+2) Tests\Unit\Taxonomy\ValidationCorpusTest::corpus_case_f_same_cpv_leaf_without_identity_never_auto_accepts_alone
+Illuminate\Database\QueryException: SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column "cpv_code" of relation "taxonomy_term_cpv_relations" violates not-null constraint
+DETAIL:  Failing row contains (3, 414, null, 0, category, exact, 0.9000, 0.9000, null, validation_corpus_test, approved, null, null, 2026-10-13 18:36:16, 2026-10-13 18:36:16, null). (Connection: pgsql, Host: testdb, Port: 5432, Database: cpv_test, SQL: insert into "taxonomy_term_cpv_relations" ("term_id", "cpv_code", "category_id", "level", "relation_type", "weight", "confidence", "status", "source", "updated_at", "created_at") values (414, ?, 0, category, exact, 0.9, 0.9, approved, validation_corpus_test, 2026-10-13 18:36:16, 2026-10-13 18:36:16) returning "id")
+
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:411
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:398
+/app/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/PostgresProcessor.php:24
+/app/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4170
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2237
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1436
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1401
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1240
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1219
+/app/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1218
+/app/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:23
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2544
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2560
+/app/tests/Unit/Taxonomy/ValidationCorpusTest.php:110
+/app/tests/Unit/Taxonomy/ValidationCorpusTest.php:199
+
+Caused by
+PDOException: SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column "cpv_code" of relation "taxonomy_term_cpv_relations" violates not-null constraint
+DETAIL:  Failing row contains (3, 414, null, 0, category, exact, 0.9000, 0.9000, null, validation_corpus_test, approved, null, null, 2026-10-13 18:36:16, 2026-10-13 18:36:16, null).
+
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:425
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:827
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:411
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:398
+/app/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/PostgresProcessor.php:24
+/app/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4170
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2237
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1436
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1401
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1240
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1219
+/app/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1218
+/app/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:23
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2544
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2560
+/app/tests/Unit/Taxonomy/ValidationCorpusTest.php:110
+/app/tests/Unit/Taxonomy/ValidationCorpusTest.php:199
+
+3) Tests\Unit\Taxonomy\ValidationCorpusTest::corpus_case_j_embedding_plus_cpv_agreement_corroborate_but_result_is_measured_not_forced
+Illuminate\Database\QueryException: SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column "cpv_code" of relation "taxonomy_term_cpv_relations" violates not-null constraint
+DETAIL:  Failing row contains (4, 417, null, 0, category, exact, 1.0000, 1.0000, null, validation_corpus_test, approved, null, null, 2026-10-13 18:36:16, 2026-10-13 18:36:16, null). (Connection: pgsql, Host: testdb, Port: 5432, Database: cpv_test, SQL: insert into "taxonomy_term_cpv_relations" ("term_id", "cpv_code", "category_id", "level", "relation_type", "weight", "confidence", "status", "source", "updated_at", "created_at") values (417, ?, 0, category, exact, 1, 1, approved, validation_corpus_test, 2026-10-13 18:36:16, 2026-10-13 18:36:16) returning "id")
+
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:411
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:398
+/app/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/PostgresProcessor.php:24
+/app/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4170
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2237
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1436
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1401
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1240
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1219
+/app/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1218
+/app/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:23
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2544
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2560
+/app/tests/Unit/Taxonomy/ValidationCorpusTest.php:110
+/app/tests/Unit/Taxonomy/ValidationCorpusTest.php:279
+
+Caused by
+PDOException: SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column "cpv_code" of relation "taxonomy_term_cpv_relations" violates not-null constraint
+DETAIL:  Failing row contains (4, 417, null, 0, category, exact, 1.0000, 1.0000, null, validation_corpus_test, approved, null, null, 2026-10-13 18:36:16, 2026-10-13 18:36:16, null).
+
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:425
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:827
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:411
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:398
+/app/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/PostgresProcessor.php:24
+/app/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4170
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2237
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1436
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1401
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1240
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1219
+/app/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1218
+/app/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:23
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2544
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2560
+/app/tests/Unit/Taxonomy/ValidationCorpusTest.php:110
+/app/tests/Unit/Taxonomy/ValidationCorpusTest.php:279
+
+4) Tests\Feature\Filament\TaxonomyConceptExplorerTest::diagnostics_expose_the_governed_cpv_associations_of_the_selected_concept
+ErrorException: Undefined array key 0
+
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:303
+
+5) Tests\Feature\Filament\TaxonomyConceptExplorerTest::a_cpv_relation_that_is_not_approved_is_not_presented_as_reachable
+ErrorException: Undefined array key 0
+
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:327
+
+--
+
+There were 21 failures:
+
+1) Tests\Unit\Taxonomy\CanonicalConceptApplyServiceTest::apply_creates_relations_as_candidate_never_approved
+Failed asserting that 0 is identical to 1.
+
+/app/tests/Unit/Taxonomy/CanonicalConceptApplyServiceTest.php:216
+
+2) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::predict_affected_companies_counts_direct_companies_deduplicated_by_empresa_id
+Se necesita al menos una empresa real en la BD de pruebas para este test.
+Failed asserting that null is not null.
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:159
+
+3) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::predict_affected_companies_breaks_down_direct_evidence_by_origen
+Se necesitan al menos 2 empresas reales en la BD de pruebas para este test.
+Failed asserting that actual size 0 matches expected size 2.
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:184
+
+4) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::validate_concept_relation_proposal_rejects_exact_duplicate
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'DUPLICATE'
++'UNKNOWN_OR_INACTIVE_RELATION_TYPE'
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:298
+
+5) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::validate_concept_relation_proposal_rejects_symmetric_duplicate_in_reverse_order
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'DUPLICATE_VIA_SYMMETRY'
++'UNKNOWN_OR_INACTIVE_RELATION_TYPE'
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:315
+
+6) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::validate_concept_relation_proposal_rejects_duplicate_via_inverse_directional_type
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'DUPLICATE_VIA_INVERSE'
++'UNKNOWN_OR_INACTIVE_RELATION_TYPE'
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:332
+
+7) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::validate_concept_relation_proposal_detects_a_cycle_in_hierarchical_relations
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'CYCLE_DETECTED'
++'UNKNOWN_OR_INACTIVE_RELATION_TYPE'
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:351
+
+8) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::validate_concept_relation_proposal_allows_a_genuinely_new_valid_relation
+Failed asserting that false is true.
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:362
+
+9) Tests\Unit\Taxonomy\ReviewedProposalConfirmationTest::invalidating_is_recorded_as_its_own_distinguishable_audit_event
+Failed asserting that actual size 0 matches expected size 1.
+
+/app/tests/Unit/Taxonomy/ReviewedProposalConfirmationTest.php:669
+
+10) Tests\Unit\Taxonomy\ReviewedProposalPreflightTest::preflight_runs_the_real_server_side_relation_validation
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'READY_TO_APPLY'
++'RELATION_VALIDATION_FAILED'
+
+/app/tests/Unit/Taxonomy/ReviewedProposalPreflightTest.php:434
+
+11) Tests\Unit\Taxonomy\ReviewedProposalServiceTest::apply_publish_relation_approves_the_relation_after_server_side_revalidation
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'APPLIED'
++'ABORTED'
+
+/app/tests/Unit/Taxonomy/ReviewedProposalServiceTest.php:847
+
+12) Tests\Unit\Taxonomy\ReviewedProposalSupersessionTest::the_state_delta_records_why_the_review_became_stale
+Failed asserting that an array contains 274.
+
+/app/tests/Unit/Taxonomy/ReviewedProposalSupersessionTest.php:430
+
+13) Tests\Unit\Taxonomy\ValidationCorpusTest::corpus_case_k_subject_vs_intent_subject_contamination_is_penalized
+Failed asserting that 0.0 is identical to 1.0.
+
+/app/tests/Unit/Taxonomy/ValidationCorpusTest.php:308
+
+14) Tests\Feature\Filament\TaxonomyConceptExplorerTest::every_cpv_category_beyond_the_preview_is_reachable_by_paginating
+Precondición: hacen falta 18 categorías reales de referencia.
+Failed asserting that actual size 0 matches expected size 18.
+
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:349
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:360
+
+15) Tests\Feature\Filament\TaxonomyConceptExplorerTest::the_cpv_status_line_declares_the_total_and_position
+Precondición: hacen falta 18 categorías reales de referencia.
+Failed asserting that actual size 0 matches expected size 18.
+
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:349
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:381
+
+16) Tests\Feature\Filament\TaxonomyConceptExplorerTest::cpv_categories_can_be_filtered_by_code_without_hiding_the_real_total
+Precondición: hacen falta 18 categorías reales de referencia.
+Failed asserting that actual size 0 matches expected size 18.
+
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:349
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:396
+
+17) Tests\Feature\Filament\TaxonomyConceptExplorerTest::an_already_frozen_candidate_is_still_protected_from_a_second_freeze
+Failed asserting that a table action with name [freezeReview] is visible on the [App\Filament\Resources\TaxonomyCandidateConceptLinkResource\Pages\ListTaxonomyCandidateConceptLinks] component for record [{"id":415,"suggested_term_id":456,"suggested_concept_id":384,"suggested_new_concept_name":null,"signals":[],"confidence":0.5,"tier":"REVIEW","status":"pending","review_notes":null,"reviewed_by":null,"reviewed_at":null,"published_term_concept_id":null,"created_at":"2026-10-13T18:36:27.000000Z","updated_at":"2026-10-13T18:36:27.000000Z","taxonomy_state_fingerprint":null,"reviewed_proposals":[{"id":410,"proposal_type":"TERM_CONCEPT_LINK","candidate_link_id":415,"concept_relation_id":null,"decision":"MAP_TO_EXISTING","decision_payload":{"term_id":456,"target_concept_id":384},"payload_version":"taxonomy-reviewed-proposal\/c2-v1","taxonomy_state_fingerprint":"22b2a80f56a0f55def1de0ba0d48b231a4c46068d00ac7e4eac322a4996703e2","payload_fingerprint":"2d8af84ffd57167bd225623b0fed30876d0250caadd34ae5bb975591924399f8","reviewer_id":235,"reviewed_at":"2026-10-13T18:36:28.000000Z","status":"PENDING_APPLY","applied_at":null,"authorization_reference":null,"target_environment":null,"application_result":null,"created_at":"2026-10-13T18:36:28.000000Z","updated_at":"2026-10-13T18:36:28.000000Z","requires_human_confirmation":false,"prepared_by_actor_type":"human_reviewer","prepared_via":"http","confirmed_by_id":null,"confirmed_at":null,"confirmation_reference":null,"confirmation_channel":null,"confirmation_note":null,"proposal_group_id":null,"confirmation_invalidated_at":null,"confirmation_invalidated_by_id":null,"confirmation_invalidation_actor_type":null,"confirmation_invalidation_channel":null,"confirmation_invalidation_reference":null,"confirmation_invalidation_reason":null,"invalidated_confirmation_snapshot":null,"superseded_at":null,"superseded_by_proposal_id":null,"supersedes_proposal_id":null,"inherited_decision_from_id":null,"supersession_reference":null,"supersession_reason":null,"supersession_actor_type":null,"supersession_by_id":null,"supersession_channel":null,"supersession_state_delta":null}]}].
+Failed asserting that true is false.
+
+/app/vendor/filament/tables/src/Testing/TestsActions.php:294
+/app/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:407
+/app/vendor/filament/tables/src/Testing/TestsActions.php:108
+/app/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:407
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:506
+
+18) Tests\Feature\Filament\TaxonomyConceptExplorerTest::the_review_ui_lets_the_reviewer_inspect_a_cpv_category_beyond_the_first_page
+Precondición: hacen falta 18 categorías reales de referencia.
+Failed asserting that actual size 0 matches expected size 18.
+
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:349
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:590
+
+19) Tests\Feature\Filament\TaxonomyConceptExplorerTest::the_review_ui_lets_the_reviewer_filter_cpv_categories_to_reach_a_hidden_one
+Precondición: hacen falta 18 categorías reales de referencia.
+Failed asserting that actual size 0 matches expected size 18.
+
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:349
+/app/tests/Feature/Filament/TaxonomyConceptExplorerTest.php:629
+
+20) Tests\Feature\Filament\TaxonomyConceptRelationValidationTest::creating_a_valid_non_duplicate_relation_succeeds
+Failed asserting that 0 is identical to 1.
+
+/app/tests/Feature/Filament/TaxonomyConceptRelationValidationTest.php:213
+
+21) Tests\Feature\Filament\TaxonomyReviewedProposalResourceTest::the_detail_page_of_a_superseded_proposal_renders_without_a_500
+El fixture tiene que producir un delta con la lista anidada, que es justo lo que se quiere renderizar.
+Failed asserting that an array is not empty.
+
+/app/tests/Feature/Filament/TaxonomyReviewedProposalResourceTest.php:216
+
+--
+
+There were 2 risky tests:
+
+1) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::dry_run_attaches_predicted_impact_to_every_scored_candidate
+This test did not perform any assertions
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:211
+
+2) Tests\Unit\Taxonomy\CanonicalConceptBuilderServiceTest::propose_concept_relations_never_returns_directional_types
+This test did not perform any assertions
+
+/app/tests/Unit/Taxonomy/CanonicalConceptBuilderServiceTest.php:242
+
+ERRORS!
+Tests: 419, Assertions: 2157, Errors: 5, Failures: 21, PHPUnit Deprecations: 1, Skipped: 2, Risky: 2.
+

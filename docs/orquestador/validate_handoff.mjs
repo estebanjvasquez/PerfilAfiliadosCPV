@@ -68,10 +68,25 @@ const strict = flag('--strict');
 const useGithub = flag('--github');
 const parked = flag('--parked');
 const checkDocs = flag('--docs');
-const expectedHead = args[args.indexOf('--head') + 1] && args.includes('--head')
-  ? args[args.indexOf('--head') + 1] : null;
-const branchArg = args.includes('--branch') && args[args.indexOf('--branch') + 1]
-  ? args[args.indexOf('--branch') + 1] : null;
+// A FLAG THAT ASKS FOR A CHECK MUST NOT BE ABLE TO DISAPPEAR.
+// The previous form, `args[args.indexOf('--head') + 1] && ...`, resolved to
+// null when the flag was passed last or followed by another flag: the requested
+// check was then silently skipped and the gate still printed PASS. That is a
+// false-PASS path in the one script written to have none - reported as finding
+// 4 of verdict 6152642797. A value-less flag is now a usage error, exit 2.
+const valueOf = (name) => {
+  const i = args.indexOf(name);
+  if (i === -1) return null;
+  const value = args[i + 1];
+  if (value === undefined || value.startsWith('--')) {
+    console.error(name + ' requires a value; refusing to run a check that was ' +
+                  'asked for and would be silently skipped.');
+    process.exit(2);
+  }
+  return value;
+};
+const expectedHead = valueOf('--head');
+const branchArg = valueOf('--branch');
 
 let failures = 0, warnings = 0, unchecked = 0;
 const pass = (m) => console.log('  [PASS] ' + m);
@@ -193,8 +208,23 @@ else fail('review_state ' + JSON.stringify(handoff.review_state) + ' is not one 
 // --- 4. does the pointer already have a verdict? ----------------------------
 // Exact, not inferred. The executor derives its publication marker as
 // sha256(repo|task|branch|sha) truncated to 32 hex chars, so the same marker
-// is recomputed here and searched for in the real thread. Reproduction of
-// three known markers was verified before this check was trusted.
+// is recomputed here and searched for in the real thread.
+//
+// RECORDED EVIDENCE for that reproduction, because the earlier wording claimed
+// "three known markers were verified" without saying which - finding 4 of
+// verdict 6152642797. Every marker the executor has ever published, scanned
+// from the live thread on 2026-10-13, is one comment each, zero duplicates:
+//
+//   0fe1d67931a6292e23aa25a593d9fc24  ->  comment 6126109865
+//   6bb53e8da12657087e4d17c469ab07f7  ->  comment 6126388084
+//   e42da6e8b079e882c3db2e3eccdfab38  ->  comment 6126473713
+//   c1c3f220934942a28cab139264deb8f2  ->  comment 6126785198
+//   083e6a696dda71f8e761bed3834c9e16  ->  comment 6126887825
+//   e28fb1167b6b5866edff851e2eea2115  ->  comment 6143456158
+//   ac6200348544573b58dbee9673f68072  ->  comment 6152642797
+//
+// Cross-check: the executor's own durable state holds 6 review requests with
+// those first six markers and attempts=1 on each; the seventh is this round's.
 
 section('4. Verdict already published for review_head?');
 const repoSlug = (() => {

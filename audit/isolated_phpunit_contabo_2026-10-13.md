@@ -6,14 +6,17 @@ tied to the tested SHA; review migration dependencies and propose a minimal
 correction; execute it only against the disposable PostgreSQL; keep isolation,
 schema preparation and test results separate).
 
+Corrected after verdict `6152642797`. See **Redaction** and **Where the
+artifacts are** below for findings 1 and 3 of that verdict.
+
 | | |
 |---|---|
 | SHA under test | `99e603cb4713fe0a349f7958af44327e5ae34845` (`feature/upgrade-filament-v3`) |
 | Test runner | `infra/contabo-test-runner` @ `d17854bd875a68ce23ed7ec9a87f87046f00512f` |
 | Run id | `20261013T183459Z-99e603cb4713` |
-| Host | Contabo `66.94.121.98`, AlmaLinux 10.2 |
+| Host | the project staging VPS, `66.94.121.98` (already recorded in `PROJECT_KNOWLEDGE.md`) |
 | Runtime | PHP 8.2.34 · `pdo_pgsql,intl,zip,gd,bcmath` · PostgreSQL 16.15 (`pgvector/pgvector:pg16`) |
-| Artifacts | `/root/cpv-test/artifacts/20261013T183459Z-99e603cb4713/` — 18 files |
+| Artifacts | 18 files on the host; the 10 checkable ones are committed, redacted, under [`audit/isolated_phpunit_2026-10-13/`](isolated_phpunit_2026-10-13/) |
 
 The three result groups are reported separately on purpose. A suite that needed
 a prepared schema must not read as a suite that needed nothing, and a defect in
@@ -26,11 +29,51 @@ RESULT  test suite     : RED (exit 2)      [Unit+Feature, full suite]
 RESULT  findings in the repository under test: 1 reported by the run itself
 ```
 
+## Redaction
+
+This repository is **public**, and `PROJECT_KNOWLEDGE.md`'s visibility notice
+allows already-published infrastructure identifiers to stay but forbids adding
+new detail — system users, database hosts, internal paths. The first version of
+this document broke that rule, which verdict `6152642797` reported as a major
+finding. It was right.
+
+Measured at `99e603cb`, so that redaction follows the rule rather than a
+feeling about it:
+
+| detail | prior occurrences | verdict |
+|---|---|---|
+| executor install, state and config directories | 0 | **new**, redacted |
+| runner workspace and checkout paths under the host account | 0 | **new**, redacted |
+| exact OS release | 0 | **new**, removed |
+| private container network address | 2, both byte matches inside a binary `.pdf` | not published in any readable form; redacted |
+| live application directory | 13, including `.github/workflows/deploy-contabo.yml` | already published; may stay, placeholdered here anyway |
+| `66.94.121.98`, `vmi3554091...`, staging hostname | 12 / 4 / 33 | already published; kept |
+
+The first attempt at this measurement reported 0 for everything, including
+identifiers that are plainly in the deploy workflow. The cause was the command,
+not the repository: `git grep -- "/pattern" <rev>` makes git read the pattern as
+a pathspec, so it searched for files with those names and matched nothing. The
+table above comes from the corrected form. The wrong numbers were never
+published; they are recorded here because a redaction justified by a broken
+measurement would be worth no more than an unredacted document.
+
+So absolute host paths, the OS release, the service account and the private
+container address are replaced throughout, here and in the committed artifacts,
+by role-based placeholders: `<runner checkout>`, `<workspace>`,
+`<artifacts dir>`, `<live app dir>`, `<executor install dir>`,
+`<executor state dir>`, `<executor config dir>`, `<private network address>`.
+The unredacted originals stay on the host, outside this repository.
+
+The one place this costs evidence is `mounts.txt`, where the workspace path is
+now a placeholder, so a reader cannot see for themselves that it is disjoint
+from the live application directory. The runner asserts exactly that, by exact
+string, and records the assertion in `summary.txt` as part of the 18 isolation
+checks.
+
 ## Reproducing it
 
 ```bash
-# on the host, as root
-cd /root/cpv-runner
+# in the runner checkout on the host
 git fetch origin infra/contabo-test-runner
 git checkout --detach origin/infra/contabo-test-runner
 ./docker/test/run_tests.sh 99e603cb4713fe0a349f7958af44327e5ae34845
@@ -42,22 +85,62 @@ node docker/test/migration_deps.mjs database/migrations database/migrations/pgsq
 Exit codes: `0` all three groups good, `3` isolation held but the schema could
 not be prepared so the suite says nothing about the code, `1` anything else.
 
+## Where the artifacts are
+
+Verdict `6152642797`, finding 3, asked for the evidence to be checkable from
+the repository rather than cited by hash. Committed under
+[`audit/isolated_phpunit_2026-10-13/`](isolated_phpunit_2026-10-13/):
+
+| file | what it holds |
+|---|---|
+| `summary.txt` | the three groups' counters, machine-readable |
+| `mounts.txt` | mounts of the service container, from `docker inspect` |
+| `mounts_phpunit.txt` | mounts of the container that ran PHPUnit — byte-identical to the above |
+| `connections.txt` | every resolved connection and the pre-flight verdict |
+| `constraints.txt` | the four re-created constraints as `pg_constraint` reports them |
+| `db_ports.json` | published ports of the fixture database |
+| `migration_deps.txt` | the dependency analysis at the tested SHA |
+| `fixture_rows.txt` | what data the fixture actually held |
+| `phpunit_failures.txt` | the full failing-test section of the suite output |
+| `schema_fix_applied.diff` | the three patches' net effect on `database/migrations` |
+
+The three patches themselves, and the proposal that explains them, are in this
+same repository on the runner branch, at
+`infra/contabo-test-runner` @ `d17854bd875a68ce23ed7ec9a87f87046f00512f`:
+
+```
+docker/test/schema_fix/README.md                          the proposal, with both promotion routes
+docker/test/schema_fix/defer_four_fks.patch               defect 1
+docker/test/schema_fix/align_permission_migration_to_v6.patch   defect 2
+docker/test/schema_fix/portable_index_check.patch         defect 3
+docker/test/schema_fix/restore_four_fks.sql               re-creates the four constraints
+docker/test/schema_fix/verify_constraints.sql             asks the catalogue, raises if one is missing
+docker/test/migration_deps.mjs                            the dependency analyser
+docker/test/run_tests.sh                                  the runner
+```
+
+They are deliberately **not** on the integration branch: committing executable
+files there would make the next push a mixed commit, and `paths-ignore` is
+all-or-nothing over the whole push, so staging would rebuild.
+
 ---
 
 ## Group 1 — Isolation: 18 checks, 0 failed
 
 Asserted from Docker's own view, never claimed. Both listings below are
-byte-identical (`sha256` `0a46bebbd6a5971e` for each), one taken from the
-service container and one from **the container that actually ran PHPUnit**:
+byte-identical, one taken from the service container and one from **the
+container that actually ran PHPUnit**:
 
 ```
-bind /root/cpv-test/20261013T183459Z-99e603cb4713 -> /app rw=true
+bind <workspace> -> /app rw=true
 ```
 
 Exactly one bind mount, and it is this run's disposable workspace. The guard
 requires that mount by exact source and destination, requires the listing to be
 non-empty, and requires the bind count to be exactly 1 — an unexpected host path
-is a failure rather than an extra line nobody reads.
+is a failure rather than an extra line nobody reads. It also asserts, by exact
+string, that no mount references the live application directory, its
+`storage`, its `bootstrap/cache`, its `public` or its `.env`.
 
 * **Fixture database publishes no host port**: `db_ports.json` is
   `{"5432/tcp":null}`. Reachable only by service name on the private network.
@@ -71,7 +154,7 @@ is a failure rather than an extra line nobody reads.
                          unused placeholder: nothing listening on 127.0.0.1:3306   (mariadb)
                          unused placeholder: nothing listening on localhost:1433   (sqlsrv)
   live current_database  cpv_test
-  live server address    172.21.0.2/32
+  live server address    <private network address>
   live version           PostgreSQL 16.15
   tables in public       0
   SAFE: every resolved connection points at the disposable fixture database.
@@ -85,15 +168,16 @@ is a failure rather than an extra line nobody reads.
 * **`vendor/` and `bootstrap/cache` are created inside the workspace**, never
   shared with the live app. Writing package-discovery cache through a shared
   `bootstrap/cache` mount has previously produced live HTTP 500s; here the
-  target is `/root/cpv-test/<run>/bootstrap/cache`, and the isolation is proven
-  from `docker inspect` rather than from the absence of an incident.
+  target is inside the disposable workspace, and the isolation is proven from
+  `docker inspect` rather than from the absence of an incident.
 * **Staging smoke before and after**: `200` / `200` on
   `https://pruebas.camarapetrolera.app/`.
-* **Live stack untouched**: `app` started `2026-10-06T11:43:57Z`, `nginx`
-  `2026-09-22T20:55:52Z`, `RestartCount=0` for both, measured after the run.
+* **Live stack untouched**: the serving containers report `RestartCount=0` and
+  start times of `2026-10-06T11:43:57Z` and `2026-09-22T20:55:52Z`, measured
+  after the run.
 * **No deployment was triggered by any of this work.** The most recent
   `Deploy a Contabo` workflow run is `004d24e9` of `2026-10-06T11:43:21Z`, which
-  matches the `app` container's start time; there have been none since. Every
+  matches the serving container's start time; there have been none since. Every
   commit of this delivery touches only `docs/**` and `audit/**` on the
   integration branch, and the runner lives on a branch the workflow does not
   watch.
@@ -126,10 +210,10 @@ claimed.
 The four ordering violations, from `migration_deps.txt`:
 
 ```
-2022_05_31_223828_create_empresas_table.php:36        needs cities                  (2022_07_28)
-2022_08_12_145310_create_sustainabilities_table.php:19 needs areas                  (2022_08_15)
-2022_09_01_154856_create_infratypes_table.php:18      needs infrasectors            (2022_09_06)
-2022_09_01_185804_create_infrafacilities_table.php:18 needs infraregion_infrasystem (2022_12_01)
+2022_05_31_223828_create_empresas_table.php:36         needs cities                  (2022_07_28)
+2022_08_12_145310_create_sustainabilities_table.php:19 needs areas                   (2022_08_15)
+2022_09_01_154856_create_infratypes_table.php:18       needs infrasectors            (2022_09_06)
+2022_09_01_185804_create_infrafacilities_table.php:18  needs infraregion_infrasystem (2022_12_01)
 ```
 
 ### Defect 4 is a branch that is not merged, not schema to invent
@@ -146,10 +230,11 @@ propio mecanismo)".
 
 So the fixture is built from the **union of both sets**, taken at
 `feature/supplhi-postgres-buscador@5df23fa9c5d0b93d5ccd0e155095a0e98726d6d0`
-(21 files, listed in `pgsql_bootstrap_migrations.txt`). Laravel sorts migrations
-by filename across every `--path`, so the dates reproduce the historical order:
-base tables (2022–) → pgsql views (2026-08-31) → Phase 4 (2026-09-01) → the
-rework (2026-09-07) → the migrations that reference them (2026-09-11+).
+(21 files, listed by the runner into `pgsql_bootstrap_migrations.txt`). Laravel
+sorts migrations by filename across every `--path`, so the dates reproduce the
+historical order: base tables (2022–) → pgsql views (2026-08-31) → Phase 4
+(2026-09-01) → the rework (2026-09-07) → the migrations that reference them
+(2026-09-11+).
 
 **Whether that branch should be merged is the owner's decision, not this
 script's.** The run states the dependency instead of hiding it.
@@ -167,7 +252,13 @@ script's.** The run states the dependency instead of hiding it.
   fit the SHA fails loudly instead of being forced onto a mangled tree.
 * No test, fixture row or expected result is edited to make anything pass.
 * The three patches apply cleanly to a tree at `99e603cb`, individually and
-  together in order — verified separately from the run.
+  together in order. Reproduce it from this repository:
+  ```bash
+  git checkout 99e603cb -- database/migrations
+  for p in defer_four_fks align_permission_migration_to_v6 portable_index_check; do
+    git show "infra/contabo-test-runner:docker/test/schema_fix/$p.patch" | git apply --check -
+  done
+  ```
 
 ### Result: an empty database builds, with integrity intact
 
@@ -190,8 +281,8 @@ NOTICE:  all four deferred foreign keys are present
 
 Because the PostgreSQL view migrations now run, the fixture **has** the 13
 views. The earlier stated limit — that the MySQL-only view migrations are
-marked as run and their views therefore absent — no longer applies to the
-views themselves.
+marked as run and their views therefore absent — no longer applies to the views
+themselves.
 
 ---
 
@@ -204,7 +295,7 @@ Tests: 419, Assertions: 2157, Errors: 5, Failures: 21,
 
 393 of 419 pass. For scale: before the schema was complete the same suite
 produced 265 errors and 395 assertions, so the schema work moved assertions from
-395 to 2157.
+395 to 2157. The full failing section is committed as `phpunit_failures.txt`.
 
 **Seven of the 26 declare a data precondition in their own failure message**,
 and these strings are in the tests at this SHA:
@@ -247,8 +338,9 @@ remaining 19 are not real code defects.
    independent causes, three fixed by minimal patches applied only to the test
    path, one (defect 4) caused by `feature/supplhi-postgres-buscador` not being
    merged. **Decision needed:** whether to promote the three patches into the
-   repository, and whether that branch should be merged. `schema_fix/README.md`
-   gives both promotion routes; neither is applied.
+   repository, and whether that branch should be merged.
+   `docker/test/schema_fix/README.md` on the runner branch gives both promotion
+   routes; neither is applied.
 2. **The suite depends on data, not only on schema.** Seven tests say so
    themselves. A green full suite in isolation needs a data load — factories,
    seeders written for the purpose, or an anonymised extract. Authoring that
@@ -259,7 +351,7 @@ remaining 19 are not real code defects.
    The runner calls `migrate:install` first. On an existing database this is
    invisible.
 4. **`.gitignore`'s blanket `*.sql` silently excluded the bootstrap SQL.**
-   `git add` reported nothing and the run failed on the server with
+   `git add` reported nothing and the run failed on the host with
    `restore_four_fks.sql: No such file or directory` after a successful replay.
    A negation rule now keeps those two files.
 
@@ -279,42 +371,31 @@ remaining 19 are not real code defects.
   schema and the 13 views; it has none of the data.
 * Not that the remaining 19 assertion mismatches are data-caused.
 
-## Artifact inventory
-
-`/root/cpv-test/artifacts/20261013T183459Z-99e603cb4713/`, `sha256` prefixes:
-
-| file | sha256 (16) | what it holds |
-|---|---|---|
-| `summary.txt` | `fbb339459d6b3b7e` | the three groups' counters, machine-readable |
-| `mounts.txt` | `0a46bebbd6a5971e` | mounts of the service container |
-| `mounts_phpunit.txt` | `0a46bebbd6a5971e` | mounts of the container that ran PHPUnit |
-| `connections.txt` | `5f7cbfad613e69b2` | every resolved connection, pre-flight verdict |
-| `constraints.txt` | `99cc24d19fe55929` | the four constraints from `pg_constraint`, FK totals |
-| `migration_deps.txt` | `638d18e32e1b68bf` | the dependency analysis at this SHA |
-| `fixture_rows.txt` | `253c949bc925480c` | what data the fixture held |
-| `phpunit.txt` | `5933301d641e2fba` | the full suite output |
-| `db_ports.json` | | published ports of the fixture database |
-| `schema_fix_applied.diff` | | the patches' net effect on `database/migrations` |
-| `pgsql_bootstrap_migrations.txt` | | the 21 files taken from the sibling branch |
-| `migrate.log`, `seed.log`, `composer.log`, `build.log`, `schema_fix_sql.log`, `schema_fix.log`, `run.log` | | step logs |
-
 ## Executor state at delivery
 
 Unrelated to the test runs, recorded because the infrastructure acceptance asks
 for it.
 
 * **Deployed version, proven byte-identical** rather than asserted: all ten
-  modules under `/opt/cpv-orchestrator/cpv_orchestrator/` have `git hash-object`
-  blob ids equal to those committed at
+  modules in the executor's install directory have `git hash-object` blob ids
+  equal to those committed at
   `SISTEG-Agent-Orchestrator@b126bc11e9f2d927c616b7230c98b316ab7786e2`
   (`feature/cpv-executor-contabo`, pushed).
 * **Cadence**: `cycle_complete` every 120 s to the second
   (…17:29:51, 17:31:51, 17:33:51, 17:35:51, 17:37:52, 17:39:51Z), 1.3–2.1 s per
   cycle, `health: ok`, service `active` and `enabled`.
-* **Counters** from `/var/lib/cpv-orchestrator/state.db`: 6 review requests, 6
-  distinct markers, `attempts=1` on every one, and `review_budget` totals 6
-  (4+1+1 by hour) — one model call per request, no retries, no duplicates.
+* **Counters** from the executor's durable state: 6 review requests before this
+  round, 6 distinct markers, `attempts=1` on every one, and the hourly review
+  budget totalling 6 — one model call per request, no retries, no duplicates.
+  Every marker the executor has ever published maps to exactly one comment;
+  the seven pairs are recorded in `validate_handoff.mjs` beside the check that
+  relies on them.
 * **Fault injector disabled**: `CPV_FAULT_INJECT` appears in no unit file, no
-  config under `/etc/cpv-orchestrator/`, and not in the unit's `Environment`.
-* The review pointer was not advanced by any of this work until the delivery
-  commit, so no review was spent on an intermediate state.
+  file in the executor's config directory, and not in the unit's `Environment`.
+* **Evidence truncation, disclosed:** the review of `650db29c` reported
+  `evidence_chars 234361` against a 220000 cap, so 14361 characters were
+  dropped. Truncation takes the tail and inserts an explicit marker telling the
+  reviewer that evidence was omitted, so what was lost is the end of the recent
+  issue thread and the closing instruction line; the request, governance,
+  handoff excerpt and full diff come first and survived. The reviewer recorded
+  the same limitation itself.
