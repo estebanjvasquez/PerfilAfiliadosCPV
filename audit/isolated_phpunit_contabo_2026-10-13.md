@@ -45,18 +45,29 @@ note the pattern carries no leading `/`, for the reason given below:
 git grep -c "<pattern>" 99e603c | awk -F: '{s+=$NF} END {print s+0}'
 ```
 
-| detail (pattern) | prior occurrences | verdict |
+| detail | prior occurrences | verdict |
 |---|---|---|
-| executor install dir (`opt/cpv-orchestrator`) | 0 | **new**, redacted |
-| executor state dir (`var/lib/cpv-orchestrator`) | 0 | **new**, redacted |
-| executor config dir (`etc/cpv-orchestrator`) | 0 | **new**, redacted |
-| runner workspace (`root/cpv-test`) and checkout (`root/cpv-runner`) | 0 and 0 | **new**, redacted |
-| exact OS release (`AlmaLinux`) | 0 | **new**, removed |
-| private container network address (`172.21.`) | **2, and both are byte matches inside the binary `app/images/user.pdf`; 0 in any text file** | never published in readable form; redacted |
-| live application directory (`opt/perfilafiliados`) | 13, including `.github/workflows/deploy-contabo.yml` | already published; may stay, placeholdered here anyway |
-| host IP (`66.94.121.98`) | 12 | already published; kept |
-| host name (`vmi3554091`) | 4 | already published; kept |
-| staging hostname (`pruebas.camarapetrolera.app`) | 33 | already published; kept |
+| executor install directory | 0 | **new**, redacted |
+| executor state directory | 0 | **new**, redacted |
+| executor config directory | 0 | **new**, redacted |
+| runner workspace directory | 0 | **new**, redacted |
+| runner checkout directory | 0 | **new**, redacted |
+| exact OS release | 0 | **new**, removed |
+| private container network address | **2, and both are byte matches inside the binary `app/images/user.pdf`; 0 in any text file** | never published in readable form; redacted |
+| live application directory | 13, including `.github/workflows/deploy-contabo.yml` | already published; may stay, placeholdered here anyway |
+| `66.94.121.98` | 12 | already published; kept |
+| `vmi3554091…` | 4 | already published; kept |
+| `pruebas.camarapetrolera.app` | 33 | already published; kept |
+
+The search patterns for the redacted rows are the literal strings themselves,
+so they are **not** reproduced in this column — an earlier version of this table
+listed them and thereby republished, in the act of documenting the redaction,
+every string the redaction had just removed. Caught here before it was reviewed,
+and corrected in the commit that follows the one introducing it. Anyone with
+host access can rerun the command above with the real patterns; what matters for
+the finding this answers is that the measured values and the method are stated
+and that both files agree on them. The already-published rows keep their literal
+values, since the rule lets those stay.
 
 The private address is the one row that is not simply "0", and verdict
 `6162548587` was right that the handoff narrative and this table disagreed
