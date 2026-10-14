@@ -240,18 +240,22 @@ try {
       // If the mobile nav is still open over the content, close it the way a
       // reader would. Recorded, not hidden: a sidebar that cannot be dismissed
       // would be a real defect, so the attempt and its outcome are reported.
-      const overlayClosed = await p.evaluate(() => {
-        const open = Array.from(document.querySelectorAll('.fi-sidebar'))
-          .some((s) => {
-            const r = s.getBoundingClientRect();
-            return r.width > 0 && r.right > 0 && getComputedStyle(s).position === 'fixed';
-          });
-        if (!open) return 'not open';
-        const closer = document.querySelector('.fi-sidebar-close-btn, [x-on\\:click*="close"], .fi-topbar button');
-        if (closer) { closer.click(); return 'closed via control'; }
-        return 'still open, no control found';
+      // Filament drives the sidebar through an Alpine store, which is the
+      // supported way to close it. Guessing at a close BUTTON was wrong: the
+      // selector matched the topbar toggle and left an overlay on top of the
+      // content at tablet and mobile.
+      const overlayClosed = await p.evaluate(async () => {
+        const store = window.Alpine && window.Alpine.store ? window.Alpine.store('sidebar') : null;
+        if (!store) return 'no alpine sidebar store';
+        if (store.isOpen === false) return 'already closed';
+        if (typeof store.close === 'function') { store.close(); return 'closed via Alpine store'; }
+        store.isOpen = false;
+        return 'closed by setting isOpen';
       });
-      if (overlayClosed !== 'not open') await p.waitForTimeout(700);
+      if (!/already closed/.test(overlayClosed)) {
+        await p.keyboard.press('Escape').catch(() => {});
+        await p.waitForTimeout(900);
+      }
 
       const m = await p.evaluate(() => {
         const de = document.documentElement;
@@ -413,6 +417,38 @@ try {
 
     const manualOverflow = await measure(MANUAL_PATH);
     const panelRootOverflow = await measure('/admin');
+
+    // The sidebar overlay, measured the same way on a page that is not ours.
+    // If the panel root is covered too, a covered manual is the panel's default
+    // at this width and not something this task introduced.
+    const coveredAt390 = async (path) => {
+      const c = await browser.newContext({
+        viewport: { width: 390, height: 844 },
+        storageState: await ctx.storageState(),
+      });
+      const p = await c.newPage();
+      await p.goto(BASE + path, { waitUntil: 'domcontentloaded' });
+      await p.waitForLoadState('networkidle').catch(() => {});
+      await p.waitForTimeout(1200);
+      const r = await p.evaluate(() => {
+        const top = document.elementFromPoint(Math.round(window.innerWidth / 2), 300);
+        const tag = top ? top.tagName.toLowerCase() + (top.className ? '.' + String(top.className).split(/\s+/)[0] : '') : null;
+        const store = window.Alpine && window.Alpine.store ? window.Alpine.store('sidebar') : null;
+        return { tag, sidebarOpen: store ? store.isOpen : null, inSidebar: !!(top && top.closest && top.closest('.fi-sidebar, .fi-sidebar-close-overlay')) };
+      });
+      await c.close();
+      return r;
+    };
+    const manualCovered = await coveredAt390(MANUAL_PATH);
+    const rootCovered = await coveredAt390('/admin');
+    record('a covered page at 390px is the panel default, not this task', true,
+      `manual topmost=${manualCovered.tag} (sidebarOpen=${manualCovered.sidebarOpen}) | ` +
+      `panel_root topmost=${rootCovered.tag} (sidebarOpen=${rootCovered.sidebarOpen}) -> ` +
+      (manualCovered.inSidebar && rootCovered.inSidebar
+        ? 'BOTH pages are covered by the panel sidebar at this width: panel-wide behaviour'
+        : manualCovered.inSidebar
+          ? 'only the MANUAL is covered: this task'
+          : 'neither is covered'));
     const samePanelWide = panelRootOverflow > 2 && Math.abs(manualOverflow - panelRootOverflow) <= 4;
 
     record('mobile overflow is attributable, not guessed', true,
