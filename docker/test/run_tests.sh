@@ -751,6 +751,42 @@ else
   say "[SUITE RED] phpunit exited $PHPUNIT_EXIT (recorded, not hidden)"
 fi
 
+# --- 8-bis. TIMESTAMP RESOLUTION PROBE ---------------------------------------
+#
+# WHY THIS EXISTS. Three tests assert that a taxonomy change made after a review
+# is visible in the supersession delta, and the delta derives that from
+# `where('created_at', '>', $reviewedAt)`. Those three were the ones left failing
+# once the schema and the fixture were right, and one of them is intermittent -
+# it failed on 2026-10-13, passed on 2026-10-14 at the same SHA.
+#
+# An intermittent failure is worth nothing as evidence until the mechanism is
+# measured, so this probe asks the question directly and WITHOUT WRITING A ROW:
+# does a value captured microseconds after another compare as strictly greater,
+# once it has gone through the binding format Laravel uses for this connection?
+#
+# It touches no table. It is a measurement, not a test, and it runs after the
+# suite so it can never affect it.
+step "8-bis. Timestamp resolution probe (a measurement, not a test)"
+compose run --rm -T testapp php -r '
+require "vendor/autoload.php"; $a = require "bootstrap/app.php";
+$a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$c   = DB::connection("pgsql");
+$fmt = $c->getQueryGrammar()->getDateFormat();
+$t1  = now(); usleep(2000); $t2 = now();
+printf("binding date format for this connection : %s\n", $fmt);
+printf("php captured t1                         : %s\n", $t1->format("Y-m-d H:i:s.u"));
+printf("php captured t2 (2ms later)             : %s\n", $t2->format("Y-m-d H:i:s.u"));
+printf("t2 is after t1 in PHP                   : %s\n", $t2 > $t1 ? "yes" : "no");
+$b1 = $t1->format($fmt); $b2 = $t2->format($fmt);
+printf("what the query builder actually binds   : %s  |  %s\n", $b1, $b2);
+$visible = $c->select("select (?::timestamp > ?::timestamp) as v", [$b2, $b1])[0]->v;
+printf("postgres says bound t2 > bound t1       : %s\n", $visible ? "yes" : "NO");
+printf("\nCONSEQUENCE: a row written in the same WHOLE SECOND as the review is\n");
+printf("invisible to where(\"created_at\", \">\", reviewed_at). The column holds\n");
+printf("microseconds; the binding format drops them before they are stored.\n");
+' >"$ARTIFACTS/timestamp_probe.txt" 2>&1 || true
+sed 's/^/           /' "$ARTIFACTS/timestamp_probe.txt"
+
 # --- 9. staging smoke, after -------------------------------------------------
 
 step "9. Staging smoke AFTER"
