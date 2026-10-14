@@ -1,0 +1,72 @@
+== 1. Identidad de la base, para no correr esto contra la que no es ==
+   base   | esquema |                                                            motor                                                             
+----------+---------+------------------------------------------------------------------------------------------------------------------------------
+ cpv_test | public  | PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+(1 row)
+
+== 2. Migraciones nuevas del candidato: registradas o pendientes ==
+                            nombre                             |                                clase                                 | registrada | batch |                              veredicto                               
+---------------------------------------------------------------+----------------------------------------------------------------------+------------+-------+----------------------------------------------------------------------
+ 2022_12_02_000000_restore_deferred_foreign_keys               | nueva de este candidato: reparacion de integridad, idempotente       | t          |     2 | ATENCION: ya registrada; revisar por que antes de volver a aplicarla
+ 2026_09_01_120000_create_supplier_categories_table            | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+ 2026_09_01_120001_create_supplier_category_translations_table | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+ 2026_09_01_120002_create_supplier_category_synonyms_table     | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+ 2026_09_01_120003_create_empresa_supplier_categories_table    | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+ 2026_09_01_120004_create_empresa_catalog_items_table          | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+ 2026_09_01_120005_create_empresa_catalog_item_category_table  | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+ 2026_09_01_120006_create_category_mapping_audit_table         | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+ 2026_10_09_120000_create_taxonomy_category_requests_table     | nueva de este candidato: tabla nueva + columna nueva en el singleton | t          |     2 | ATENCION: ya registrada; revisar por que antes de volver a aplicarla
+(9 rows)
+
+== 3. Migraciones modificadas: tienen que estar ya registradas ==
+                            nombre                             | registrada | veredicto 
+---------------------------------------------------------------+------------+-----------
+ 2022_05_31_223828_create_empresas_table                       | t          | OK
+ 2022_06_13_231159_create_permission_tables                    | t          | OK
+ 2022_08_12_145310_create_sustainabilities_table               | t          | OK
+ 2022_09_01_154856_create_infratypes_table                     | t          | OK
+ 2022_09_01_185804_create_infrafacilities_table                | t          | OK
+ 2026_07_24_000001_add_sub_type_to_empresa_module_status_table | t          | OK
+(6 rows)
+
+== 4. Objetos nuevos de TASK-0010A: no deben existir aun ==
+                                 objeto                                 | existe |                                veredicto                                 
+------------------------------------------------------------------------+--------+--------------------------------------------------------------------------
+ taxonomy_category_requests (tabla)                                     | t      | ATENCION: ya existe; comparar su forma con la migracion antes de aplicar
+ taxonomy_selection_settings.category_request_recipient_email (columna) | t      | ATENCION: la columna ya existe; `ADD COLUMN IF NOT EXISTS` la omitira
+ taxonomy_selection_settings (tabla, prerrequisito)                     | t      | OK
+(3 rows)
+
+== 5. Las cuatro claves foraneas aplazadas: existencia, destino y acciones ==
+      tabla       |          columna           |                   nombre_actual                    |    referencia_actual    | on_delete | on_update |                veredicto                 
+------------------+----------------------------+----------------------------------------------------+-------------------------+-----------+-----------+------------------------------------------
+ empresas         | city_id                    | empresas_city_id_foreign                           | cities                  | a         | a         | OK: se omitira, ya satisface el objetivo
+ infrafacilities  | infraregion_infrasystem_id | infrafacilities_infraregion_infrasystem_id_foreign | infraregion_infrasystem | a         | a         | OK: se omitira, ya satisface el objetivo
+ infratypes       | infrasectors_id            | infratypes_infrasectors_id_foreign                 | infrasectors            | a         | a         | OK: se omitira, ya satisface el objetivo
+ sustainabilities | areas_id                   | sustainabilities_areas_id_foreign                  | areas                   | a         | a         | OK: se omitira, ya satisface el objetivo
+(4 rows)
+
+== 6. Tablas que la reparacion de integridad necesita ==
+         nombre          | existe | veredicto 
+-------------------------+--------+-----------
+ areas                   | t      | OK
+ cities                  | t      | OK
+ empresas                | t      | OK
+ infrafacilities         | t      | OK
+ infraregion_infrasystem | t      | OK
+ infrasectors            | t      | OK
+ infratypes              | t      | OK
+ sustainabilities        | t      | OK
+(8 rows)
+
+== 7. Conteo de control de las tablas gobernadas (debe ser identico despues) ==
+            tabla            | filas 
+-----------------------------+-------
+ empresas                    |     4
+ empresa_taxonomy_category   |     0
+ taxonomy_canonical_concepts |     0
+ taxonomy_categories         |    26
+ taxonomy_term_concepts      |     0
+ taxonomy_term_cpv_relations |     0
+(6 rows)
+

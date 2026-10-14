@@ -1,0 +1,7 @@
+taxonomy_categories                26
+taxonomy_category_translations     0
+taxonomy_term_cpv_relations        0
+taxonomy_canonical_concepts        0
+taxonomy_term_concepts             0
+taxonomy_concept_relations         0
+empresa_taxonomy_category          0

@@ -1,0 +1,12 @@
+error: patch failed: database/migrations/2022_05_31_223828_create_empresas_table.php:33
+error: database/migrations/2022_05_31_223828_create_empresas_table.php: patch does not apply
+error: patch failed: database/migrations/2022_08_12_145310_create_sustainabilities_table.php:16
+error: database/migrations/2022_08_12_145310_create_sustainabilities_table.php: patch does not apply
+error: patch failed: database/migrations/2022_09_01_154856_create_infratypes_table.php:15
+error: database/migrations/2022_09_01_154856_create_infratypes_table.php: patch does not apply
+error: patch failed: database/migrations/2022_09_01_185804_create_infrafacilities_table.php:15
+error: database/migrations/2022_09_01_185804_create_infrafacilities_table.php: patch does not apply
+error: patch failed: database/migrations/2022_06_13_231159_create_permission_tables.php:16
+error: database/migrations/2022_06_13_231159_create_permission_tables.php: patch does not apply
+error: patch failed: database/migrations/2026_07_24_000001_add_sub_type_to_empresa_module_status_table.php:77
+error: database/migrations/2026_07_24_000001_add_sub_type_to_empresa_module_status_table.php: patch does not apply

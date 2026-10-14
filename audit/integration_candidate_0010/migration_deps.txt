@@ -1,0 +1,18 @@
+paths scanned               : /w/database/migrations
+migrations scanned          : 100
+tables created by migrations: 65
+foreign key references      : 66 (26 with an inferred table name)
+  satisfied at replay time  : 62
+  ORDERING VIOLATIONS       : 0
+  MISSING tables            : 4 (1 distinct)
+  unresolved                : 0
+
+MISSING - referenced, but NO scanned migration creates them.
+No reordering can fix this: the creating migration is not in this set.
+  "taxonomy_categories" referenced by 4 place(s):
+      2026_09_11_090000_create_taxonomy_category_embeddings_table.php:52
+      2026_09_12_120000_create_service_taxonomy_homologacion_table.php:30
+      2026_09_18_090300_create_taxonomy_term_cpv_relations_table.php:37
+      2026_09_18_090500_create_legacy_service_cpv_relations_table.php:29
+
+RESULT: 1 missing table(s).

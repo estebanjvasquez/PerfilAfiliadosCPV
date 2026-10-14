@@ -1,0 +1,338 @@
+CPV isolated test run
+  run id   : 20261014T172522Z-6c25bb3b55f2
+  sha      : 6c25bb3b55f2c8b825da5246fb40a2235c557e81
+  workspace: <CPV_TEST_ROOT>/20261014T172522Z-6c25bb3b55f2
+  artifacts: <CPV_TEST_ROOT>/artifacts/20261014T172522Z-6c25bb3b55f2
+
+== 1. Staging smoke BEFORE
+  GET https://pruebas.camarapetrolera.app/ -> 200
+  [PASS] staging healthy before the run
+
+== 2. Disposable workspace at the exact candidate SHA
+  [PASS] workspace is at 6c25bb3b55f2c8b825da5246fb40a2235c557e81
+  [PASS] workspace path is disjoint from <LIVE_APP_DIR>
+  [PASS] workspace has its own storage and bootstrap/cache
+  [PASS] connection verifier injected into the workspace (not taken from the SHA)
+  [PASS] ephemeral APP_KEY and fixture DB password generated for this run only
+         Not a secret change to any real system: both exist only in this process
+         and the disposable containers, and die with them. Never written to disk.
+  [PASS] no .env in the workspace: configuration comes from the environment only
+
+== 3. Build the test image and start the fixture database
+  [PASS] test image built (log: <CPV_TEST_ROOT>/artifacts/20261014T172522Z-6c25bb3b55f2/build.log)
+  [PASS] fixture database is healthy
+
+== 4. Mount and port isolation, from docker inspect
+  mounts (testapp service container):
+           bind <CPV_TEST_ROOT>/20261014T172522Z-6c25bb3b55f2 -> /app rw=true
+  [PASS] testapp service container: exactly one bind mount, and it is this run's workspace at /app
+  [PASS] testapp service container: no mount references <LIVE_APP_DIR> (storage, bootstrap/cache, public, .env included)
+  fixture db published ports: {"5432/tcp":null}
+  [PASS] the fixture database publishes no host port
+
+== 5. Install dependencies INSIDE the workspace (dev included)
+  [PASS] dependencies installed from dist
+  [PASS] phpunit present in the workspace vendor
+  [PASS] package discovery written inside the workspace
+         This is the step that once wrote through a SHARED bootstrap/cache mount
+         and produced live HTTP 500s. Here the target is <CPV_TEST_ROOT>/20261014T172522Z-6c25bb3b55f2/bootstrap/cache.
+           total 40
+           drwxrwxrwx. 2 root root    64 Oct 14 19:25 .
+           drwxr-xr-x. 3 root root    51 Oct 14 19:25 ..
+           -rwxrwxrwx. 1 root root    14 Oct 14 19:25 .gitignore
+           -rwxr-xr-x. 1 root root  5742 Oct 14 19:25 packages.php
+           -rwxr-xr-x. 1 root root 25551 Oct 14 19:25 services.php
+
+== 6. Verify EVERY resolved connection BEFORE migrating
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-0553a581c110 Creating 
+ Container cpvtest-testapp-run-0553a581c110 Created 
+== Resolved database connections, before any migration
+------------------------------------------------------------------------
+  APP_ENV                testing
+  default connection     'pgsql'
+  sqlite                 driver=sqlite   host=(none)                       database=/app/database/database.sqlite
+                         sqlite path inside the workspace
+  mysql                  driver=mysql    host=127.0.0.1                    database=forge
+                         unused placeholder: nothing listening on 127.0.0.1:3306
+  mariadb                driver=mariadb  host=127.0.0.1                    database=laravel
+                         unused placeholder: nothing listening on 127.0.0.1:3306
+  pgsql                  driver=pgsql    host=testdb                       database=cpv_test
+  sqlsrv                 driver=sqlsrv   host=localhost                    database=forge
+                         unused placeholder: nothing listening on localhost:1433
+------------------------------------------------------------------------
+  live current_database  cpv_test
+  live server address    <docker-bridge-ip>/32
+  live version           PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x8
+  tables in public       0
+------------------------------------------------------------------------
+connections inspected: 5
+
+SAFE: every resolved connection points at the disposable fixture database.
+  [PASS] pre-flight passed: all connections point at the disposable fixture
+
+== 7. SCHEMA PREPARATION (its own phase: not isolation, not the suite)
+  [FINDING] 0 migration ordering violation(s) at this SHA (migration_deps.txt)
+  [PREP PASS] defer_four_fks.patch is ALREADY PRESENT at 6c25bb3b55f2c8b825da5246fb40a2235c557e81 - nothing to apply
+  [PREP PASS] align_permission_migration_to_v6.patch is ALREADY PRESENT at 6c25bb3b55f2c8b825da5246fb40a2235c557e81 - nothing to apply
+  [PREP PASS] portable_index_check.patch is ALREADY PRESENT at 6c25bb3b55f2c8b825da5246fb40a2235c557e81 - nothing to apply
+         already in the code under test: defer_four_fks.patch,align_permission_migration_to_v6.patch,portable_index_check.patch
+  net effect on migrations: 
+         Applied to <CPV_TEST_ROOT>/20261014T172522Z-6c25bb3b55f2 only. No existing database and no branch is touched.
+         NOTHING was patched: the suite below runs 6c25bb3b55f2c8b825da5246fb40a2235c557e81 exactly as committed.
+  [PREP PASS] the category-creating migration is ALREADY at this SHA (2026_09_01_120000_create_supplier_categories_table.php)
+         nothing borrowed from feature/supplhi-postgres-buscador; database/migrations/pgsql holds 8 file(s)
+  [PREP PASS] migrations table created (the empty fixture had none)
+         STATED LIMIT of this fixture: the 15 MySQL-only view migrations are marked
+         as run, so those views do NOT exist here. In Supabase they were created by
+         another mechanism. No test references them (grep over tests/ and app/), but
+         the fixture is therefore not view-for-view identical to the shared database.
+  [PREP PASS] all migrations replayed into the empty fixture
+  [PREP PASS] the four deferred foreign keys exist already after the replay - no out-of-band SQL run
+  [PREP PASS] catalogue confirms all four constraints exist, with their definitions
+            empresas_city_id_foreign                           | FOREIGN KEY (city_id) REFERENCES cities(id)
+            infrafacilities_infraregion_infrasystem_id_foreign | FOREIGN KEY (infraregion_infrasystem_id) REFERENCES infraregion_infrasystem(id)
+            infratypes_infrasectors_id_foreign                 | FOREIGN KEY (infrasectors_id) REFERENCES infrasectors(id)
+            sustainabilities_areas_id_foreign                  | FOREIGN KEY (areas_id) REFERENCES areas(id)
+            foreign_keys_total 
+            BASE TABLE | 78
+  [PREP PASS] seeded Phase3PermissionsSeeder
+  [PREP PASS] seeded TaxonomyV2PermissionsSeeder
+  [PREP PASS] ran taxonomy:seed-concept-vocabulary (the project's own versioned catalogue)
+  permission catalogue: 16 permissions, 0 roles
+
+== 7-bis. FIXTURE LOAD (its own phase: not schema, not the suite)
+  [FIXTURE PASS] synthetic fixture loaded and its own shape assertions passed
+           NOTICE:  fixture ok: 26 categories (2/4/20), 3 empresas, leaf=7 family=3 group=1 sibling=8 other_family_child=12
+           -- precondition: >= 1 empresa (predict_affected_companies_counts_direct_companies_deduplicated_by_empresa_id)
+           PASS  empresas >= 1  (have 3)
+           -- precondition: >= 2 empresas (predict_affected_companies_breaks_down_direct_evidence_by_origen)
+           PASS  empresas >= 2  (have 3)
+           -- precondition: >= 18 categories with a code (TaxonomyConceptExplorerTest::existingCategoryIds)
+           PASS  categories with code >= 18  (have 26)
+           -- precondition: >= 1 level-2 category (ValidationCorpusTest::anyLeafCategoryId)
+           PASS  level-2 categories >= 1  (have 20)
+           -- precondition: the first level-2 category has a sibling (siblingCategoryUnderSameFamily)
+           PASS  siblings of the first leaf  (have 4)
+           -- precondition: a second family under the same group has a child (categoryInDifferentFamilySameGroup)
+           PASS  children of the other family  (have 5)
+           -- precondition: the relation-type catalogue is populated and active (validateConceptRelationProposal)
+           PASS  active relation types >= 5  (have 5)
+           -- precondition: intent markers exist (corpus case K intent_contamination_penalty)
+           PASS  intent markers >= 1  (have 9)
+  [FIXTURE PASS] all 8 declared test preconditions are satisfied by the fixture
+  fixture data inventory (rows):
+           empresas                       3
+           taxonomy_categories            26
+           taxonomy_terms                 0
+           taxonomy_canonical_concepts    0
+           taxonomy_term_cpv_relations    0
+           users                          0
+           permissions                    16
+           roles                          0
+           taxonomy_concept_types         9
+           taxonomy_concept_relation_types 5
+           taxonomy_intent_markers        9
+           empresa_taxonomy_category      0
+  [PREP PASS] fixture schema ready: 78 tables
+
+== 8. Run PHPUnit
+  command: vendor/bin/phpunit --do-not-cache-result --display-deprecations --display-phpunit-deprecations
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-phpunit-20261014T172522Z-6c25bb3b55f2 Creating 
+ Container cpvtest-phpunit-20261014T172522Z-6c25bb3b55f2 Created 
+PHPUnit 11.5.56 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.34
+Configuration: /app/phpunit.xml
+
+...............................................................  63 / 465 ( 13%)
+............................................................... 126 / 465 ( 27%)
+............................................................... 189 / 465 ( 40%)
+............................................................... 252 / 465 ( 54%)
+............................................................... 315 / 465 ( 67%)
+............................................................... 378 / 465 ( 81%)
+............................................................... 441 / 465 ( 94%)
+........................                                        465 / 465 (100%)
+
+Time: 01:01.423, Memory: 117.00 MB
+
+OK (465 tests, 2698 assertions)
+  mounts (the container that ran PHPUnit):
+           bind <CPV_TEST_ROOT>/20261014T172522Z-6c25bb3b55f2 -> /app rw=true
+  [PASS] the container that ran PHPUnit: exactly one bind mount, and it is this run's workspace at /app
+  [PASS] the container that ran PHPUnit: no mount references <LIVE_APP_DIR> (storage, bootstrap/cache, public, .env included)
+  phpunit exit status: 0
+           ........................                                        465 / 465 (100%)
+           
+           Time: 01:01.423, Memory: 117.00 MB
+           
+           OK (465 tests, 2698 assertions)
+  [SUITE GREEN] phpunit exited 0
+
+== 8-ter. UX check in a real browser (its own group)
+  [UX PASS] synthetic affiliate and company created for the browser check
+            Container cpvtest-testapp-run-2fbce5887742 Created 
+           ux user id=321 empresa id=23 linked=1
+  [UX PASS] Filament assets published into the workspace public/ (no frontend build)
+  [UX PASS] the application is serving inside the disposable stack (no host port published)
+  [UX PASS] playwright client 1.49.1 already cached
+           PASS  guest is blocked from the manual  :: status=200 final_url=http://cpvtest-uxserve-20261014t172522z-6c25bb3b55f2:8000/admin/login
+           PASS  guest never sees manual content  :: checked for the taxonomy hierarchy text in the guest response
+           PASS  synthetic affiliate can log in  :: landed on http://cpvtest-uxserve-20261014t172522z-6c25bb3b55f2:8000/admin
+           PASS  manual is reachable from the panel navigation  :: navigation link visible at desktop width
+           PASS  manual page opens for the affiliate  :: h1="Manual de usuario"
+           PASS  no internal markers or paths in the rendered page  :: checked 8 strings
+           PASS  the manual shows the final TASK-0010A labels  :: all 5 labels rendered
+           PASS  the manual states the request does not create a category  :: checked the rendered text, not the markdown source
+           PASS  table of contents has links  :: 14 in-page links
+           PASS  no table-of-contents link is broken  :: 14 anchors all resolve
+           PASS  every anchor target is visible, not hidden content  :: all targets rendered and non-zero height
+           PASS  keyboard Tab reaches the in-page section links  :: 2 focusable stops traversed
+           PASS  focused elements show a visible focus indicator  :: outline or box-shadow present on at least one focused element
+           PASS  [light/desktop] no horizontal page overflow  :: scrollWidth=1440 clientWidth=1440 diff=0px
+           PASS  [light/desktop] tables stay inside their container  :: 1 table(s), 0 overflowing without a scroll container
+           PASS  [light/desktop] body text contrast >= 4.5:1  :: ratio=14.89 fg=rgb(39, 39, 42) bg=rgb(255, 255, 255)
+           PASS  [light/desktop] manual content is visible, not covered by panel chrome  :: content width=752px, topmost at its centre=article.cpv-manual__content, sidebar=closed via Alpine store
+           PASS  [light/tablet] no horizontal page overflow  :: scrollWidth=820 clientWidth=820 diff=0px
+           PASS  [light/tablet] tables stay inside their container  :: 1 table(s), 0 overflowing without a scroll container
+           PASS  [light/tablet] body text contrast >= 4.5:1  :: ratio=14.89 fg=rgb(39, 39, 42) bg=rgb(255, 255, 255)
+           PASS  [light/tablet] manual content is visible, not covered by panel chrome  :: content width=772px, topmost at its centre=p, sidebar=closed via Alpine store
+           PASS  [light/mobile] no horizontal page overflow  :: scrollWidth=390 clientWidth=390 diff=0px
+           PASS  [light/mobile] tables stay inside their container  :: 1 table(s), 0 overflowing without a scroll container
+           PASS  [light/mobile] body text contrast >= 4.5:1  :: ratio=14.89 fg=rgb(39, 39, 42) bg=rgb(255, 255, 255)
+           PASS  [light/mobile] manual content is visible, not covered by panel chrome  :: content width=358px, topmost at its centre=p, sidebar=closed via Alpine store
+           PASS  [dark/desktop] no horizontal page overflow  :: scrollWidth=1440 clientWidth=1440 diff=0px
+           PASS  [dark/desktop] tables stay inside their container  :: 1 table(s), 0 overflowing without a scroll container
+           PASS  [dark/desktop] body text contrast >= 4.5:1  :: ratio=13.96 fg=rgb(228, 228, 231) bg=rgb(24, 24, 27)
+           PASS  [dark/desktop] manual content is visible, not covered by panel chrome  :: content width=752px, topmost at its centre=article.cpv-manual__content, sidebar=closed via Alpine store
+           PASS  [dark/tablet] no horizontal page overflow  :: scrollWidth=820 clientWidth=820 diff=0px
+           PASS  [dark/tablet] tables stay inside their container  :: 1 table(s), 0 overflowing without a scroll container
+           PASS  [dark/tablet] body text contrast >= 4.5:1  :: ratio=13.96 fg=rgb(228, 228, 231) bg=rgb(24, 24, 27)
+           PASS  [dark/tablet] manual content is visible, not covered by panel chrome  :: content width=772px, topmost at its centre=p, sidebar=closed via Alpine store
+           PASS  [dark/mobile] no horizontal page overflow  :: scrollWidth=390 clientWidth=390 diff=0px
+           PASS  [dark/mobile] tables stay inside their container  :: 1 table(s), 0 overflowing without a scroll container
+           PASS  [dark/mobile] body text contrast >= 4.5:1  :: ratio=13.96 fg=rgb(228, 228, 231) bg=rgb(24, 24, 27)
+           PASS  [dark/mobile] manual content is visible, not covered by panel chrome  :: content width=358px, topmost at its centre=p, sidebar=closed via Alpine store
+           PASS  a covered page at 390px is the panel default, not this task  :: manual topmost=nav.fi-sidebar-nav (sidebarOpen=true) | panel_root topmost=nav.fi-sidebar-nav (sidebarOpen=true) -> BOTH pages are covered by the panel sidebar at this width: panel-wide behaviour
+           PASS  mobile overflow is attributable, not guessed  :: manual=0px panel_root=0px -> no overflow on either
+           PASS  the manual adds no horizontal overflow of its own at 390px  :: manual=0px vs panel_root=0px
+           
+           40/40 checks passed
+  [UX PASS] browser checks passed (see ux/ux_results.json and the screenshots)
+           control-_admin-390.png
+           control-_admin_manual_de_usuario-390.png
+           dark-desktop-1440x900.png
+           dark-mobile-390x844.png
+           dark-tablet-820x1180.png
+           filament_assets.log
+           light-desktop-1440x900.png
+           light-mobile-390x844.png
+           light-tablet-820x1180.png
+           seed_user.log
+           ux_check.log
+           ux_results.json
+
+== 8-bis. Timestamp resolution probe (a measurement, not a test)
+            Container cpvtest-testdb-1 Running 
+            Container cpvtest-testdb-1 Waiting 
+            Container cpvtest-testdb-1 Healthy 
+            Container cpvtest-testapp-run-4eb9838efabd Creating 
+            Container cpvtest-testapp-run-4eb9838efabd Created 
+           binding date format for this connection : Y-m-d H:i:s
+           php captured t1                         : 2026-10-14 17:27:41.301610
+           php captured t2 (2ms later)             : 2026-10-14 17:27:41.303789
+           t2 is after t1 in PHP                   : yes
+           what the query builder actually binds   : 2026-10-14 17:27:41  |  2026-10-14 17:27:41
+           postgres says bound t2 > bound t1       : NO
+           
+           CONSEQUENCE: a row written in the same WHOLE SECOND as the review is
+           invisible to where("created_at", ">", reviewed_at). The column holds
+           microseconds; the binding format drops them before they are stored.
+
+== 8-quinquies. Deploy preflight, executed against the disposable fixture
+  [PREP PASS] preflight contains no mutating statement (read-only, as a preflight must be)
+  [PREP PASS] preflight ran against the disposable fixture without error
+  verdicts mentioning PARAR in the fixture: 0 (the fixture is a FRESH build, so some differ from a live database by construction)
+                                       nombre                             |                                clase                                 | registrada | batch |                              veredicto                               
+            2026_09_01_120000_create_supplier_categories_table            | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+            2026_09_01_120001_create_supplier_category_translations_table | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+            2026_09_01_120002_create_supplier_category_synonyms_table     | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+            2026_09_01_120003_create_empresa_supplier_categories_table    | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+            2026_09_01_120004_create_empresa_catalog_items_table          | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+            2026_09_01_120005_create_empresa_catalog_item_category_table  | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+            2026_09_01_120006_create_category_mapping_audit_table         | IMPORTADA de supplhi: debe estar REGISTRADA                          | t          |     2 | OK
+                                       nombre                             | registrada | veredicto 
+            2022_05_31_223828_create_empresas_table                       | t          | OK
+            2022_06_13_231159_create_permission_tables                    | t          | OK
+            2022_08_12_145310_create_sustainabilities_table               | t          | OK
+
+== 8-quater. Governed taxonomy tables unchanged by the run
+           taxonomy_categories                26
+           taxonomy_category_translations     0
+           taxonomy_term_cpv_relations        0
+           taxonomy_canonical_concepts        0
+           taxonomy_term_concepts             0
+           taxonomy_concept_relations         0
+           empresa_taxonomy_category          0
+  [PREP PASS] taxonomy_categories unchanged by the suite (26 rows, as the fixture loaded)
+  [PREP PASS] every other governed taxonomy table is still empty: nothing was published
+
+== 9. Staging smoke AFTER
+  GET https://pruebas.camarapetrolera.app/ -> 200
+  [PASS] staging still healthy after the run
+
+== Teardown (only resources belonging to this run)
+  compose project cpvtest removed, including its volumes
+  live stack: app:Up 8 days nginx:Up 3 weeks 
+  workspace <CPV_TEST_ROOT>/20261014T172522Z-6c25bb3b55f2 removed
+  artifacts kept at <CPV_TEST_ROOT>/artifacts/20261014T172522Z-6c25bb3b55f2
+
+----------------------------------------------------------------------
+run_id=20261014T172522Z-6c25bb3b55f2
+sha=6c25bb3b55f2c8b825da5246fb40a2235c557e81
+phpunit_exit=0
+suites_run=Unit+Feature (full suite)
+findings=1
+-- isolation --
+isolation_passed=19
+isolation_failed=0
+-- schema preparation --
+schema_fix_applied=(none: already in the code under test)
+schema_fix_already_present=defer_four_fks.patch,align_permission_migration_to_v6.patch,portable_index_check.patch
+deferred_fks_restored_by=not needed (the replay itself created all four)
+pgsql_bootstrap_from=feature/supplhi-postgres-buscador@not needed at this SHA
+pgsql_bootstrap_migrations=8
+migration_ordering_violations=0
+migrate_ok=yes
+prep_passed=16
+prep_failed=0
+fixture_tables=78
+-- fixture load --
+fixture_loaded=yes
+fixture_source=docker/test/fixtures/synthetic_fixture.sql (synthetic, no copied data)
+preconditions_passed=8
+preconditions_failed=0
+-- ux / browser --
+ux_checked=yes
+ux_passed=5
+ux_failed=0
+ux_viewports=1440x900,820x1180,390x844
+ux_schemes=light,dark
+ux_served=php artisan serve inside the disposable container, private network, no host port
+-- tests --
+staging_before=200
+staging_after=200
+php_version=8.2.34
+extensions=pdo_pgsql,intl,zip,gd,bcmath
+----------------------------------------------------------------------
+RESULT  isolation      : PASS (19 checks)
+RESULT  schema prep    : PASS (16 steps)   [no patch needed; the corrections are committed at this SHA]
+RESULT  fixture load   : PASS (2 checks)   [yes; 8 precondition(s) satisfied]
+RESULT  test suite     : GREEN   [Unit+Feature (full suite)]
+RESULT  ux / browser   : PASS (5 checks)   [real authenticated page, 3 widths x 2 schemes]
+RESULT  findings in the repository under test: 1
