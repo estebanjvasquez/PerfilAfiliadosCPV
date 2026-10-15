@@ -1,11 +1,11 @@
 {
-  "current_task": "TASK-0010C deployed to staging (a5772345, run 38612101908) for owner functional testing. TASK-0010A/B + test-readiness deployed at 9b447eb. Next action: none for the agent until an explicit instruction; see docs/orquestador/SESSION_RESUME.md section 4.",
-  "current_status": "TASK_0010C_DEPLOYED_FOR_OWNER_REVIEW_MANUAL__AUTOMATION_SUSPENDED",
+  "current_task": "CPV-MAIL-DOCS-AND-USER-MANUAL (instruction 6189493183): user manual completed against public/user.pdf@e398bbc, system mail documented (activation PENDING owner configuration), documentation rule added. Branch feature/mail-docs-and-user-manual, TESTED_HEAD 433fbf05; NOT deployed. TASK-0010C deployed (a5772345) and owner-reported UAT PASS.",
+  "current_status": "MAIL_DOCS_AND_USER_MANUAL_READY_FOR_REVIEW_MANUAL__MAIL_ACTIVATION_PENDING_OWNER__AUTOMATION_SUSPENDED",
   "superseded_current_fields_2026_10_15": {
     "note": "Values these fields held before the 2026-10-15 checkpoint (instructions 6188413270 / 6188477132). Kept as history.",
     "current_task": "ORCHESTRATION INFRASTRUCTURE (authorized 6085642297): persistent executor on the Contabo VPS plus isolated PHPUnit. TASK-0010A and TASK-0010B are AUTHORIZED BUT HELD and NOT STARTED by owner decision.",
     "current_status": "ORCHESTRATOR_SUSPENDED_BY_OWNER__CPV_MANUAL_LOOP_RESUMED__TASK_0010AB_RESUMED_UNDER_MANUAL_REVIEW",
-    "review_state": "OWNER_FUNCTIONAL_TESTING_OF_TASK_0010C",
+    "review_state": "MANUAL_REVIEW_OF_MAIL_DOCS_AND_USER_MANUAL",
     "development_loop_mode": "MANUAL_REVIEW_ONLY__AUTONOMOUS_EXECUTOR_SUSPENDED",
     "resume_read_order": ["docs/orquestador/SESSION_RESUME.md", "docs/orquestador/AUTONOMOUS_DEV_LOOP.md", "docs/orquestador/current_task.md", "audit/orchestrator_handoff.json current_* fields", "latest orchestrator comment in Issue #2"]
   },
@@ -3044,7 +3044,20 @@
       "followup_2026_10_15": "request #1 recorded as failed/recipient_not_configured; no recipient; MAIL_MAILER=log; counts unchanged but requests 0->1 (feature/integration-candidate-0010 @ 8a7664f)"
     }
   },
+  "mail_docs_and_user_manual": {
+    "status": "READY_FOR_REVIEW_MANUAL",
+    "instruction_comment": 6189493183,
+    "branch": "feature/mail-docs-and-user-manual",
+    "created_from": "0becd37d2d0e022a5ffe235643949ce59a8bcce3 (deployed a5772345 + docs/audit only)",
+    "tested_head": "433fbf05d4a82600f75e3bd1c31672112bda61c0",
+    "pdf_baseline": "public/user.pdf @ e398bbc (22 pages); app/images/user.pdf is an unrelated third-party PDF",
+    "checks": "focused PHPUnit OK (45 tests, 510 assertions); manual browser check 40/40; run 20261015T101317Z-433fbf05d4a8",
+    "mail": "GLOBAL MAIL ACTIVATION PENDING owner provider/configuration/credentials; staging MAIL_MAILER=log; docs/deploy/CORREO_DEL_SISTEMA.md",
+    "deployed": false,
+    "report": "audit/mail_docs_user_manual_2026-10-15.md"
+  },
   "task_0010c": {
+    "owner_reported_uat": "PASS (comment 6189493183); owner report, not an automated run",
     "status": "DEPLOYED_FOR_OWNER_REVIEW_MANUAL",
     "accepted_by_comment": 6188413270,
     "deploy_authorized_by_comment": 6188477132,

@@ -1,7 +1,10 @@
 # CPV — Punto de reanudación maestro
 
-**Checkpoint:** 2026-10-15, ~09:15 UTC. TASK-0010C está **desplegada en staging** y espera la prueba funcional del propietario.
-Las §0 a §6 son la primera lectura. Lo que viene después de la línea «Historia» es el checkpoint del 2026-10-08, que **ya no rige** y se conserva como historia.
+**Checkpoint:** 2026-10-15, ~10:30 UTC.
+- TASK-0010C está desplegada y el propietario informó su prueba manual como **OK**.
+- La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** (manual completo + documentación del correo) está **READY_FOR_REVIEW — MANUAL** y **no se ha desplegado**.
+
+Las §0 a §6 son la primera lectura. Lo que está después de la línea «Historia» es el checkpoint del 2026-10-08, que **ya no rige** y se conserva como historia.
 
 > Si algo de aquí contradice GitHub o la base viva, prevalece la evidencia viva. Registrar la discrepancia antes de actuar.
 > Las filas marcadas «registrado» son hechos con fecha, **no** estado vivo verificado en esta lectura.
@@ -14,65 +17,67 @@ Las §0 a §6 son la primera lectura. Lo que viene después de la línea «Histo
 
 | Tema | Estado |
 |---|---|
-| Runtime de staging | `feature/upgrade-filament-v3` = **`a5772345ff0a52bd79a5b29ab063991960109271`**. Desplegado el 2026-10-15 09:07Z, run `38612101908` **success**. Su código es el TESTED_HEAD de C (`349ea61`). |
-| TASK-0010A/B + test-readiness | Integradas, aceptadas y desplegadas el 2026-10-14 (`9b447eb`). |
-| TASK-0010C | Aceptada (`6188413270`) y desplegada con la autorización `6188477132`. **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**. Espera la prueba funcional del propietario. |
-| Solicitud #1 | `pending_review`, aviso `failed` / `recipient_not_configured`. La migración le agregó **una fila `historical`** en el historial. Su contenido no cambió: misma huella md5, verificada a las 09:08Z. **No hay reintento autorizado.** |
-| Correo | `MAIL_MAILER=log` y **sin destinatario** (registrado 2026-10-15 09:08Z). No se ha enviado ningún correo real. |
-| Automatización | El ejecutor autónomo está **suspendido** desde el 2026-10-14. No hay procesos de IA en segundo plano ni sondeos programados. |
+| Runtime de staging | `feature/upgrade-filament-v3` = **`a5772345ff0a52bd79a5b29ab063991960109271`**. Desplegado el 2026-10-15 09:07Z, run `38612101908` success. |
+| TASK-0010A/B/C | Desplegadas. C fue aceptada (`6188413270`) y el propietario informó su prueba manual como **OK** (`6189493183`, `OWNER_REPORTED_UAT_PASS`; es un informe del propietario, no un test automático). |
+| Ronda manual + correo | **READY_FOR_REVIEW — MANUAL**, sin desplegar. Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo y regla de documentación. |
+| Correo del sistema | **ACTIVACIÓN GLOBAL PENDIENTE: espera proveedor, configuración y credenciales del propietario.** Staging en modo sin envío (`MAIL_MAILER=log`, comprobado el 2026-10-15 con `docs/deploy/mail_status_readonly.php`). Sin destinatario configurado. No se ha enviado ningún correo real. |
+| Solicitud #1 | `failed`/`recipient_not_configured`, con una fila histórica. Sin reintento autorizado. |
+| Automatización | El ejecutor autónomo está **suspendido**. No hay IA en segundo plano ni sondeos. |
 
 ## 2. SHAs y ramas
 
-- **Desplegado / runtime:** `a5772345ff0a52bd79a5b29ab063991960109271` (= REVIEW_HEAD aceptado de C; el delta frente a TESTED_HEAD es solo `audit/**`).
-- **C, TESTED_HEAD:** `349ea61078fe5b6b88abc0a90333958c0ea9f220` (`OK 481 tests, 2869 assertions`; navegador 55/55).
-- **Rama de C:** `feature/task-0010c-request-operations`. El commit de checkpoint es el que introduce este texto; su SHA está en el comentario de entrega.
-- **Integración 0010:** `feature/integration-candidate-0010` @ `8a7664f` (incluye el seguimiento de la #1).
+- **Runtime desplegado:** `a5772345ff0a52bd79a5b29ab063991960109271` (= REVIEW_HEAD de C; su código es el TESTED_HEAD `349ea61`).
+- **Ronda manual + correo:** rama `feature/mail-docs-and-user-manual`.
+  - Base `0becd37` (checkpoint de C).
+  - **TESTED_HEAD `433fbf05d4a82600f75e3bd1c31672112bda61c0`**.
+  - REVIEW_HEAD = el commit que introduce este texto; su SHA está en el comentario de entrega.
+- **Rama de C:** `feature/task-0010c-request-operations` @ `0becd37` (checkpoint).
 - **Arnés aislado:** `infra/contabo-test-runner` @ `246b0d0`.
-- **Imágenes de recuperación en el VPS:**
-  - `perfilafiliados-app:pre-0010c-9b447eb`: runtime anterior a C.
-  - `perfilafiliados-app:pre-0010-004d24e`: runtime anterior a 0010.
+- **Imágenes de recuperación en el VPS:** `perfilafiliados-app:pre-0010c-9b447eb`, `perfilafiliados-app:pre-0010-004d24e`.
 
 ## 3. Evidencia (enlazar, no copiar)
 
-- Informe de C, con el despliegue y la guía de prueba del propietario: `audit/task_0010c_request_operations_2026-10-15.md`.
-- Despliegue de C (preflight, verificación posterior y prueba de humo): `audit/task_0010c/staging_deploy_2026-10-15/`.
-- Despliegue de 0010 y seguimiento: `audit/integration_candidate_0010_staging_deploy_2026-10-1{4,5}*.md`, en la rama de integración.
+- Ronda manual + correo, con la matriz de cobertura del PDF: `audit/mail_docs_user_manual_2026-10-15.md`.
+- Correo del sistema (mecanismo real, aprovisionamiento, chequeo seguro, vuelta atrás, requisitos): `docs/deploy/CORREO_DEL_SISTEMA.md`.
+- C (despliegue y guía de prueba): `audit/task_0010c_request_operations_2026-10-15.md`.
 - Issue #2:
-  - aceptación de C y requisitos de checkpoint: `6188413270`;
-  - autorización de despliegue: `6188477132`;
-  - entrega de C: `6188344669`.
+  - instrucción de esta ronda: `6189493183`;
+  - aceptación de C: `6188413270`;
+  - autorización de despliegue de C: `6188477132`;
+  - entrega del despliegue de C: `6188643243`.
 
 ## 4. Siguiente acción
 
-- **Propietario:** probar las pantallas según la guía del informe de C («Guía de prueba»).
-- **Agente:** **ninguna** hasta una nueva instrucción. Cualquier código nuevo exige una ronda manual completa:
-  1. rama propia;
-  2. entorno aislado;
-  3. revisión;
-  4. preflight de solo lectura;
-  5. autorización explícita antes de tocar `feature/upgrade-filament-v3`.
-- **Decisiones del propietario pendientes:**
-  - destinatario y SMTP (proveedor, destinatario y aprovisionamiento seguro);
-  - si se reintenta la #1.
+- **Orquestador/propietario:** revisar la entrega de esta ronda. Para desplegar el manual hace falta una autorización explícita, porque `resources/manual/` es contenido desplegado y su push dispara el workflow.
+- **Agente:** **ninguna** hasta una nueva instrucción. No activar correo, no desplegar y no tocar secretos.
+- **Propietario, cuando lo tenga:** proveedor de correo, remitente y dominio (SPF/DKIM/DMARC), destinatario responsable, aprovisionamiento seguro en el `.env` del servidor y una prueba controlada (ver `CORREO_DEL_SISTEMA.md` §6). También: decidir si se reintenta la #1.
 
 ## 5. Pendientes y limitaciones (no arrancan solos)
 
-- **`EmpresaPgsql` no compila** (fatal latente desde `a5265ce`). Cargar esa clase es un error fatal. Necesita su tarea propia.
-- **Reserva del aviso.** Mientras está vigente, la reserva de 10 minutos impide envíos concurrentes. **No garantiza un único envío** si el proceso cae después de que el servidor de correo aceptó el mensaje, si el transporte falla de forma ambigua, o si la reserva expira con un envío a medias. Hay que revisarlo al activar SMTP. La ayuda de administración dice «se rechaza para no enviar dos avisos»; ese texto se precisa en la próxima ronda de código, sin redesplegar ahora.
-- Los avisos `simulated` no se pueden reintentar con el contrato actual.
-- La concurrencia está probada a nivel de la reserva, no con dos procesos reales.
-- El validador del handoff, del loop retirado, falla en la regla histórica `6080004466`. No bloquea nada.
+- **Correo:** activación pendiente (§1).
+  - En modo sin envío, un usuario nuevo **no recibe** la verificación y no puede entrar al panel.
+  - El panel no tiene acción para verificar a mano.
+- **Reserva del aviso:** impide envíos concurrentes mientras está vigente, pero **no garantiza un único envío** tras una caída posterior a la aceptación SMTP, una falla ambigua o una expiración durante un envío a medias. La redacción de la ayuda se precisa en la próxima ronda de código.
+- Los avisos `simulated` no se pueden reintentar.
+- **`EmpresaPgsql` no compila:** fatal latente desde `a5265ce`; necesita su propia tarea.
+- **Defectos de interfaz vistos al revisar el manual:**
+  - la casilla `ovid` dice «COVID.»;
+  - ISO 9001 e ISO 17025 no tienen etiqueta explícita.
+- `app/images/user.pdf` es un PDF ajeno (manual de un plugin de audio). Retirarlo lo decide el propietario.
+- El validador del handoff (del loop retirado) falla en la regla histórica `6080004466`. No bloquea.
+- **Regla vigente:** toda ronda que cambie el comportamiento actualiza el manual o la ayuda en la misma entrega (`ACCESS_BOOTSTRAP.md` §8).
 
 ## 6. Accesos (solo nombres; nunca valores)
 
 | Capacidad | Mecanismo establecido | Verificación barata | 2026-10-15 |
 |---|---|---|---|
-| `git fetch`/`push` | Git Credential Manager (Windows) | `git ls-remote origin` | verificado (push 09:06Z) |
+| `git fetch`/`push` | Git Credential Manager (Windows) | `git ls-remote origin` | verificado |
 | Leer el Issue #2 | API anónima | `bootstrap_access.ps1 -Verify` | verificado |
 | Escribir en el Issue #2 | `CPV_GITHUB_TOKEN` en `%USERPROFILE%\.cpv\credentials.env`, fuera de git, cargado con el bootstrap; publicar con `docs\orquestador\post_issue_comment.ps1 -BodyFile` | `-Verify` muestra SET/MISSING | verificado |
-| SSH al VPS de staging | clave OpenSSH en `%USERPROFILE%\.ssh\` (el nombre está en la memoria privada local del agente) | `ssh … true` | verificado |
-| Entorno aislado (PHPUnit y navegador) | runner en el VPS (ruta y raíz en la memoria privada) | una corrida `--skip-suite` | verificado (corridas del 2026-10-15) |
+| SSH al VPS de staging | clave OpenSSH en `%USERPROFILE%\.ssh\` (el nombre está en la memoria privada local) | `ssh … true` | verificado |
+| Entorno aislado | runner en el VPS (ruta en la memoria privada) | una corrida focalizada | verificado (corrida 10:13Z) |
 | Despliegue | workflow «Deploy a Contabo» con los secretos del repo | estado del run en la API | verificado (`38612101908`) |
+| **Correo del sistema** | `MAIL_*` en el `.env` del despliegue de cada entorno (fuera de git) | `mail_status_readonly.php` (configurado/falta) | **pendiente del propietario**; modo `log` |
 | Credenciales del ejecutor del servidor | quedan **en el servidor**; no se copian | — | no revisado (ejecutor suspendido) |
 
 - Las variables exportadas **no sobreviven** a una shell nueva: cada comando que las necesite empieza con `. docs\orquestador\bootstrap_access.ps1 -Quiet;`.
@@ -80,6 +85,7 @@ Las §0 a §6 son la primera lectura. Lo que viene después de la línea «Histo
 - No crear, rotar, revelar ni reaprovisionar secretos sin una instrucción explícita.
 
 ---
+
 
 # Historia: checkpoint del 2026-10-08 (superado; se conserva)
 
