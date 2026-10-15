@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación maestro
 
-**Checkpoint:** 2026-10-15, ~11:35 UTC.
+**Checkpoint:** 2026-10-15, ~12:00 UTC.
 - TASK-0010C está desplegada y el propietario informó su prueba manual como **OK**.
 - La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** fue aceptada (`6190018710`) y está **desplegada en staging** (`d23c0e6`, **MANUAL_SSH_DEPLOY** por la vía `6190372221`): **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**.
 - El propietario lo revisó y lo vio igual: el índice seguía centrado en la taxonomía. Se reorganizó por módulo del sistema en `4b7cab6` y está **desplegado** (`37e3b71`, run `38727131820`; el propietario lo autorizó por chat; informe §10).
@@ -51,7 +51,10 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 
 ## 4. Siguiente acción
 
-- **Propietario:** abrir «Manual de usuario» y revisar el índice por módulo (18 secciones).
+- **Propietario:** abrir «Manual de usuario» y revisar el índice por módulo (18 secciones). Dijo que «ya se ve bastante bien» y que lo llevará a revisión del cliente.
+- **Propuesta CPV-TAXONOMY-MAP** (mapa de la taxonomía para afiliados): `docs/propuestas/mapa_taxonomia.md`, **solo propuesta, sin código**.
+  - Decisiones del propietario: D1, mostrar las Familias o Grupos vacíos como «sin categorías todavía»; D2, no agrupar los Grupos por áreas.
+  - Espera la revisión del orquestador. No implementar hasta que haya una instrucción en el Issue #2.
 - **Agente:** **ninguna** hasta una nueva instrucción. No activar correo y no tocar secretos.
 - **Propietario, cuando lo tenga:** proveedor de correo, remitente y dominio (SPF/DKIM/DMARC), destinatario responsable, aprovisionamiento seguro en el `.env` del servidor y una prueba controlada (ver `CORREO_DEL_SISTEMA.md` §6). También: decidir si se reintenta la #1.
 
