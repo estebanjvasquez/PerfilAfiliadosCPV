@@ -150,6 +150,26 @@ class TaxonomyCategoryRequestOperationsTest extends TestCase
     }
 
     #[Test]
+    public function the_detail_keeps_line_breaks_and_escapes_what_the_affiliate_wrote(): void
+    {
+        $this->destinatario(null);
+        [$empresa, $afiliado] = $this->empresaConAfiliado();
+        Mail::fake();
+        $solicitud = app(TaxonomyCategoryRequestService::class)->submit($empresa, $afiliado, [
+            'detalle' => "Primera línea <script>alert(1)</script>\nSegunda línea con <b>negrita</b>",
+        ] + self::DATOS);
+
+        $admin = $this->superAdmin();
+        $this->actingAs($admin);
+
+        Livewire::actingAs($admin)->test(ViewTaxonomyCategoryRequest::class, ['record' => $solicitud->getKey()])
+            ->assertSee('Primera línea &lt;script&gt;alert(1)&lt;/script&gt;<br />', escape: false)
+            ->assertSee('Segunda línea con &lt;b&gt;negrita&lt;/b&gt;', escape: false)
+            ->assertDontSee('<script>alert(1)</script>', escape: false)
+            ->assertDontSee('<b>negrita</b>', escape: false);
+    }
+
+    #[Test]
     public function an_affiliate_cannot_reach_the_list_the_detail_the_settings_or_the_help_even_by_direct_url(): void
     {
         [$solicitud, , $afiliado] = $this->solicitudFallida();

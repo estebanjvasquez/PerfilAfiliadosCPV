@@ -13,6 +13,9 @@ class ListTaxonomyCategoryRequests extends ListRecords
 {
     protected static string $resource = TaxonomyCategoryRequestResource::class;
 
+    // Sin esto Filament pone en mayúscula cada palabra: "Solicitudes De Categoría".
+    protected static ?string $title = 'Solicitudes de categoría';
+
     protected function getHeaderActions(): array
     {
         return [

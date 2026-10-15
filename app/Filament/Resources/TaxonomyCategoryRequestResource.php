@@ -51,6 +51,9 @@ class TaxonomyCategoryRequestResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Solicitudes de categoría';
 
+    // Sin esto Filament pone en mayúscula cada palabra: "Solicitudes De Categoría".
+    protected static ?string $breadcrumb = 'Solicitudes de categoría';
+
     protected static ?string $slug = 'solicitudes-de-categoria';
 
     protected static ?int $navigationSort = 4;
@@ -163,8 +166,10 @@ class TaxonomyCategoryRequestResource extends Resource
                     TextEntry::make('justificacion')->label('Motivo')->columnSpanFull()
                         ->formatStateUsing(fn (?string $state) => TaxonomyCategoryRequest::JUSTIFICACIONES[$state] ?? $state),
                     TextEntry::make('necesidad')->label('Qué necesita representar')->columnSpanFull(),
+                    // Saltos de línea del texto original como <br>, con el texto ESCAPADO antes. Con
+                    // `white-space: pre-line` se veían también los saltos de la plantilla.
                     TextEntry::make('detalle')->label('Detalle')->columnSpanFull()
-                        ->extraAttributes(['style' => 'white-space: pre-line']),
+                        ->formatStateUsing(fn (?string $state) => new HtmlString(nl2br(e((string) $state)))),
                     TextEntry::make('terminos_probados')->label('Palabras que probó al buscar')->placeholder('—')->columnSpanFull(),
                 ]),
 
