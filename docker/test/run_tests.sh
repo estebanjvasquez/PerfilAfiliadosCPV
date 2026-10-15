@@ -1114,13 +1114,28 @@ if [ "$MIGRATE_OK" = "yes" ] && [ "$FIXTURE_LOADED" = "yes" ]; then
   compose run --rm -T testapp php -r '
 require "vendor/autoload.php"; $a=require "bootstrap/app.php";
 $a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+// Rows written ON PURPOSE by --ux-seed carry source_version "ux-synthetic-*". They are
+// committed seed data, not a test escaping its transaction, so they are left out of this
+// comparison and counted on their own (stderr -> taxonomy_seed_rows.txt).
+$seed = fn () => DB::table("taxonomy_categories")->where("source_version", "like", "ux-synthetic-%")->select("id");
 foreach (["taxonomy_categories","taxonomy_category_translations","taxonomy_term_cpv_relations",
           "taxonomy_canonical_concepts","taxonomy_term_concepts","taxonomy_concept_relations",
           "empresa_taxonomy_category"] as $t) {
-    try { printf("%-34s %d\n", $t, DB::table($t)->count()); }
+    try {
+        $q = DB::table($t);
+        if ($t === "taxonomy_categories") { $q->where(fn ($w) => $w->whereNull("source_version")->orWhere("source_version", "not like", "ux-synthetic-%")); }
+        if ($t === "taxonomy_category_translations") { $q->whereNotIn("category_id", $seed()); }
+        printf("%-34s %d\n", $t, $q->count());
+    }
     catch (Throwable $e) { printf("%-34s (unreadable)\n", $t); }
-}' 2>/dev/null | tr -d '\r' > "$ARTIFACTS/taxonomy_after_suite.txt"
+}
+try {
+    fprintf(STDERR, "ux_seed_taxonomy_categories %d\nux_seed_translations %d\n",
+        $seed()->count(), DB::table("taxonomy_category_translations")->whereIn("category_id", $seed())->count());
+} catch (Throwable $e) {}
+' 2>"$ARTIFACTS/taxonomy_seed_rows.txt" | tr -d '\r' > "$ARTIFACTS/taxonomy_after_suite.txt"
   sed 's/^/           /' "$ARTIFACTS/taxonomy_after_suite.txt"
+  grep '^ux_seed_' "$ARTIFACTS/taxonomy_seed_rows.txt" 2>/dev/null | sed 's/^/           (excluded, written on purpose by --ux-seed) /'
 
   # taxonomy_categories is the one the fixture populated; the rest started empty
   # and must still be empty. Compared against fixture_rows.txt, not retyped.

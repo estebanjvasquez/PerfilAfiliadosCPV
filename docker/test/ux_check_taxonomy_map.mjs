@@ -67,13 +67,13 @@ async function ready(page, timeout = 20000) {
 // Visible counts after a filter (hidden attribute on the node itself or on an ancestor).
 const state = (page) => page.evaluate(() => {
   const vis = (el) => !el.closest('[hidden]');
-  const groups = [...document.querySelectorAll('[data-map-node="group"]')];
+  const groups = [...document.querySelectorAll('.cpv-map__group')];
   return {
     groups: groups.length,
     visibleGroups: groups.filter(vis).length,
     openGroups: groups.filter((g) => vis(g) && g.open).length,
-    visibleFamilies: [...document.querySelectorAll('[data-map-node="family"]')].filter(vis).length,
-    visibleCategories: [...document.querySelectorAll('[data-map-node="category"]')].filter(vis).length,
+    visibleFamilies: [...document.querySelectorAll('.cpv-map__fam')].filter(vis).length,
+    visibleCategories: [...document.querySelectorAll('.cpv-map__cat')].filter(vis).length,
     marks: [...document.querySelectorAll('.cpv-map mark')].map((m) => m.textContent),
     status: document.querySelector('#cpv-map-status')?.textContent.trim() || '',
     noResults: (() => { const el = [...document.querySelectorAll('.cpv-map__hint')].find((h) => h.textContent.includes('Ningún nombre del mapa')); return !!el && getComputedStyle(el).display !== 'none'; })(),
@@ -156,9 +156,9 @@ try {
         decoded_body_bytes: e.decodedBodySize,
         transfer_bytes: e.transferSize,
         dom_elements: document.getElementsByTagName('*').length,
-        groups: document.querySelectorAll('[data-map-node="group"]').length,
-        families: document.querySelectorAll('[data-map-node="family"]').length,
-        categories: document.querySelectorAll('[data-map-node="category"]').length,
+        groups: document.querySelectorAll('.cpv-map__group').length,
+        families: document.querySelectorAll('.cpv-map__fam').length,
+        categories: document.querySelectorAll('.cpv-map__cat').length,
         empty_labels: document.querySelectorAll('.cpv-map__empty').length,
         intro: document.querySelector('.cpv-map__intro p')?.textContent.replace(/\s+/g, ' ').trim(),
       };
@@ -168,8 +168,9 @@ try {
     record('payload measured', html.length > 0, `html=${html.length} B, gzip-6 computed=${metrics.desktop.html_gzip6_bytes_computed} B, DOM elements=${nav.dom_elements}`);
     record('production-size synthetic data is on the page', nav.groups >= 48 && nav.families >= 333 && nav.categories >= 2418,
       `groups=${nav.groups} families=${nav.families} categories=${nav.categories}`);
-    const fmt = (n) => n.toLocaleString('es');
-    record('intro totals equal the rendered tree', nav.intro.includes(`${fmt(nav.groups)} Grupos`) && nav.intro.includes(`${fmt(nav.families)} Familias`) && nav.intro.includes(`${fmt(nav.categories)} Categorías`), nav.intro);
+    // Digits only: the page writes 2.438 (thousands dot) and Node's 'es' locale writes 2438.
+    const introDigits = nav.intro.replace(/(d).(d)/g, '$1$2');
+    record('intro totals equal the rendered tree', introDigits.includes(`${nav.groups} Grupos`) && introDigits.includes(`${nav.families} Familias`) && introDigits.includes(`${nav.categories} Categorías`), nav.intro);
     record('empty groups/families keep their label', nav.empty_labels >= 56, `labels=${nav.empty_labels}`);
     const text = await page.evaluate(() => document.body.innerText);
     const leaked = FORBIDDEN.filter((f) => text.includes(f));
@@ -182,9 +183,9 @@ try {
 
     s = await type(page, 'zigurat');
     const famOfMatch = await page.evaluate(() => {
-      const c = [...document.querySelectorAll('[data-map-node="category"]')].find((n) => !n.closest('[hidden]'));
-      const fam = c?.closest('[data-map-node="family"]');
-      return { open: !!fam?.querySelector('details')?.open, size: fam ? fam.querySelectorAll('[data-map-node="category"]').length : 0 };
+      const c = [...document.querySelectorAll('.cpv-map__cat')].find((n) => !n.closest('[hidden]'));
+      const fam = c?.closest('.cpv-map__fam');
+      return { open: !!fam?.querySelector('details')?.open, size: fam ? fam.querySelectorAll('.cpv-map__cat').length : 0 };
     });
     record('category match: one group, its family open, only the matching category, highlighted',
       s.visibleGroups === 1 && s.openGroups === 1 && s.visibleCategories === 1 && famOfMatch.open && s.marks.join('|').toLowerCase() === 'zigurat',
@@ -193,8 +194,8 @@ try {
 
     s = await type(page, 'quetzal');
     const quetzal = await page.evaluate(() => {
-      const f = [...document.querySelectorAll('[data-map-node="family"]')].find((n) => n.textContent.includes('Quetzal'));
-      const cats = [...f.querySelectorAll('[data-map-node="category"]')];
+      const f = [...document.querySelectorAll('.cpv-map__fam')].find((n) => n.textContent.includes('Quetzal'));
+      const cats = [...f.querySelectorAll('.cpv-map__cat')];
       return { open: !!f.querySelector('details')?.open, total: cats.length, visible: cats.filter((c) => !c.closest('[hidden]')).length };
     });
     record('family match: the family open with ALL its categories, group as context',
@@ -203,8 +204,8 @@ try {
 
     s = await type(page, 'xilofono');
     const xil = await page.evaluate(() => {
-      const g = [...document.querySelectorAll('[data-map-node="group"]')].find((n) => !n.hidden);
-      const fams = [...g.querySelectorAll('[data-map-node="family"]')];
+      const g = [...document.querySelectorAll('.cpv-map__group')].find((n) => !n.hidden);
+      const fams = [...g.querySelectorAll('.cpv-map__fam')];
       return { open: g.open, total: fams.length, visible: fams.filter((f) => !f.hidden).length };
     });
     record('group match (typed without accent): group open with ALL its families, name highlighted',
@@ -215,7 +216,7 @@ try {
     s = await type(page, 'negrita');
     const esc = await page.evaluate(() => ({
       injected: document.querySelectorAll('.cpv-map b').length,
-      shown: [...document.querySelectorAll('[data-map-node="category"]')].filter((c) => !c.closest('[hidden]')).map((c) => c.querySelector('[data-map-name]').textContent),
+      shown: [...document.querySelectorAll('.cpv-map__cat')].filter((c) => !c.closest('[hidden]')).map((c) => c.querySelector('.cpv-map__n').textContent),
     }));
     record('a name with HTML characters stays text, also when highlighted', esc.injected === 0 && esc.shown.some((t) => t.includes('<b>negrita</b> & "comillas"')), JSON.stringify(esc.shown));
 
@@ -273,14 +274,14 @@ try {
       await page.evaluate((dark) => document.documentElement.classList.toggle('dark', dark), scheme === 'dark');
       const ok = await ready(page);
       await page.evaluate(() => {
-        const g = document.querySelector('[data-map-node="group"]');
+        const g = document.querySelector('.cpv-map__group');
         g.open = true;
-        const f = g.querySelector('[data-map-node="family"] details');
+        const f = g.querySelector('.cpv-map__fam details');
         if (f) f.open = true;
       });
       await page.waitForTimeout(200);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-      const ratio = await contrast(page, '[data-map-node="category"] [data-map-name]');
+      const ratio = await contrast(page, '.cpv-map__cat .cpv-map__n');
       record(`[${scheme}/${label}] ready, no horizontal overflow with a group open`, ok && overflow <= 1, `excess=${overflow}px`);
       record(`[${scheme}/${label}] category text contrast >= 4.5:1`, ratio !== null && ratio >= 4.5, `ratio=${ratio}`);
       await page.screenshot({ path: `${OUT}/map-${scheme}-${label}-${viewport.width}x${viewport.height}.png` });
@@ -329,23 +330,27 @@ try {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, storageState: storage, javaScriptEnabled: false });
     const page = await ctx.newPage();
     await page.goto(BASE + MAP, { waitUntil: 'load' });
-    const groups = await page.locator('[data-map-node="group"]').count();
+    const groups = await page.locator('.cpv-map__group').count();
     const filterShown = await page.locator('#cpv-map-filter').isVisible().catch(() => false);
-    await page.locator('[data-map-node="group"] > summary').first().click();
-    const opened = await page.evaluate(() => document.querySelector('[data-map-node="group"]').open);
-    const noscript = await page.getByText('El filtro necesita JavaScript').isVisible().catch(() => false);
+    await page.locator('.cpv-map__group > summary').first().click();
+    const opened = await page.evaluate(() => document.querySelector('.cpv-map__group').open);
+    // Playwright disables script EXECUTION but the HTML parser still runs with scripting on, so
+    // <noscript> content is not rendered here even though a real no-JS browser shows it. What can
+    // be checked is that the notice is in the page.
+    const noscript = (await page.content()).includes('El filtro necesita JavaScript');
     record('without JavaScript: groups render and open natively; the filter is not offered', groups >= 48 && opened && !filterShown && noscript,
       `groups=${groups} opened=${opened} filterShown=${filterShown} noscript=${noscript}`);
     await page.screenshot({ path: `${OUT}/map-05-mobile-no-js.png` });
     await ctx.close();
   }
 
-  // 6. THE COMPANY TAB LINK
+  // 6. THE COMPANY TAB LINK. As the synthetic Super Admin: the synthetic affiliate has no role, so
+  // it cannot list companies in this stack (real affiliates get theirs through their role).
   {
-    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, storageState: storage });
-    const page = await ctx.newPage();
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const page = await login(ctx, ADMIN);
     await page.goto(BASE + '/admin/empresas', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(1500);
+    await page.locator('a[href*="/admin/empresas/"][href$="/edit"]').first().waitFor({ timeout: 20000 }).catch(() => {});
     const editHref = await page.locator('a[href*="/admin/empresas/"][href$="/edit"]').first().getAttribute('href').catch(() => null);
     if (editHref) {
       await page.goto(new URL(editHref, BASE).href, { waitUntil: 'networkidle' });
@@ -361,7 +366,7 @@ try {
       record('the "Categorías CPV" tab links to the map in a new tab', !!href && href.endsWith(MAP) && target === '_blank', `href=${href} target=${target}`);
       await page.screenshot({ path: `${OUT}/map-06-company-tab-link.png` });
     } else {
-      record('the "Categorías CPV" tab links to the map in a new tab', false, 'no company edit link found for the synthetic affiliate');
+      record('the "Categorías CPV" tab links to the map in a new tab', false, 'no company edit link found for the synthetic admin');
     }
     await ctx.close();
   }
