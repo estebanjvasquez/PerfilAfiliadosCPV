@@ -174,13 +174,21 @@ $admin = App\Models\User::where('email', 'zzz-ux-admin@example.test')->first();
 $empresa = App\Models\Empresa::whereRaw('upper(name) like ?', ['ZZZ UX EMPRESA FICTICIA%'])->first()
     ?? App\Models\Empresa::where('rif', 'like', 'J%000000009')->first();
 echo 'ux admin found: ', (int) (bool) $admin, ' synthetic company found: ', (int) (bool) $empresa, "\n";
-if ($admin && $empresa && ! $empresa->users()->where('users.id', $admin->id)->exists()) {
-    // Empresa's model hooks read Auth::user()->id (the same pre-existing trait run_tests.sh
-    // documents for the synthetic company), so the link is made as the synthetic admin.
-    Illuminate\Support\Facades\Auth::login($admin);
-    $empresa->users()->attach($admin->id);
+// Empresa::users() itself dereferences Auth::User()->id (pre-existing; it fails with no logged-in
+// user), so every use of that relation below runs logged in as the synthetic admin.
+// Laravel's handler renders an uncaught error and still exits 0, so failures here are explicit.
+try {
+    if ($admin) {
+        Illuminate\Support\Facades\Auth::login($admin);
+    }
+    if ($admin && $empresa && ! $empresa->users()->where('users.id', $admin->id)->exists()) {
+        $empresa->users()->attach($admin->id);
+    }
+    echo 'ux admin linked to the synthetic company: ', (int) ($admin && $empresa && $empresa->users()->where('users.id', $admin->id)->exists()), "\n";
+} catch (Throwable $e) {
+    fwrite(STDERR, 'could not link the synthetic admin: '.get_class($e).': '.$e->getMessage()."\n");
+    exit(4);
 }
-echo 'ux admin linked to the synthetic company: ', (int) ($admin && $empresa && $empresa->users()->where('users.id', $admin->id)->exists()), "\n";
 
 $m = app(App\Support\Taxonomy\TaxonomyMapBuilder::class);
 $t0 = hrtime(true);
