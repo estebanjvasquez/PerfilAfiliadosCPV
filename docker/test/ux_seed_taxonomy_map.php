@@ -184,6 +184,15 @@ try {
     if ($admin && $empresa && ! $empresa->users()->where('users.id', $admin->id)->exists()) {
         $empresa->users()->attach($admin->id);
     }
+    // EmpresaPolicy asks for Shield permissions that production keeps in its database and this
+    // stack does not seed (super_admin has no gate bypass: define_via_gate = false). Grant the
+    // two the company screen needs to the synthetic admin only.
+    if ($admin) {
+        foreach (['view_any_empresa', 'view_empresa', 'update_empresa'] as $permission) {
+            $admin->givePermissionTo(Spatie\Permission\Models\Permission::findOrCreate($permission, 'web'));
+        }
+        app(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    }
     echo 'ux admin linked to the synthetic company: ', (int) ($admin && $empresa && $empresa->users()->where('users.id', $admin->id)->exists()), "\n";
 } catch (Throwable $e) {
     fwrite(STDERR, 'could not link the synthetic admin: '.get_class($e).': '.$e->getMessage()."\n");
