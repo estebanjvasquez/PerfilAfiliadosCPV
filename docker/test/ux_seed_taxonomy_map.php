@@ -193,6 +193,16 @@ try {
         }
         app(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     }
+    // EditEmpresa::getSteps() reads the LAST row of a loop over cities as `$value` (pre-existing),
+    // so with an empty `cities` table the company page fails before its tabs render. Production
+    // has cities; this stack gets one synthetic country/state/city if there is none.
+    $main = Illuminate\Support\Facades\DB::connection();
+    if ($main->table('cities')->count() === 0) {
+        $countryId = $main->table('countries')->insertGetId(['country_name' => 'ZZZ País sintético', 'created_at' => now(), 'updated_at' => now()]);
+        $stateId = $main->table('states')->insertGetId(['country_id' => $countryId, 'state_name' => 'ZZZ Estado sintético', 'created_at' => now(), 'updated_at' => now()]);
+        $main->table('cities')->insert(['country_id' => $countryId, 'states_id' => $stateId, 'city_name' => 'ZZZ Ciudad sintética', 'created_at' => now(), 'updated_at' => now()]);
+        echo "synthetic city added for the company page\n";
+    }
     echo 'ux admin linked to the synthetic company: ', (int) ($admin && $empresa && $empresa->users()->where('users.id', $admin->id)->exists()), "\n";
 } catch (Throwable $e) {
     fwrite(STDERR, 'could not link the synthetic admin: '.get_class($e).': '.$e->getMessage()."\n");
