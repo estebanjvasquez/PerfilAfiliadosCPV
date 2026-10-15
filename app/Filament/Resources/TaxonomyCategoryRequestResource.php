@@ -206,7 +206,10 @@ class TaxonomyCategoryRequestResource extends Resource
                         ->state(fn (TaxonomyCategoryRequest $record) => self::guidance($record)),
                     TextEntry::make('recipient_email')->label('Destinatario del último intento')->placeholder('—'),
                     TextEntry::make('delivery_transport')->label('Modo de envío del último intento')->placeholder('—'),
-                    TextEntry::make('mail_sent_at')->label('Aceptado por el servidor de correo')->dateTime('d/m/Y H:i')->placeholder('—'),
+                    // La etiqueta NO repite el texto del estado "Aceptado por el servidor de correo":
+                    // en un aviso simulado o fallido se leía como si se hubiera aceptado (lo detectó
+                    // el chequeo de navegador). Es solo la fecha, y queda en "—" si no la hubo.
+                    TextEntry::make('mail_sent_at')->label('Fecha en que el servidor de correo lo recibió')->dateTime('d/m/Y H:i')->placeholder('—'),
                 ]),
 
             Section::make('Historial de avisos')
