@@ -37,6 +37,9 @@ FILTER=""
 # leaves PHPUnit out. Together they give the UX evidence without rerunning the
 # whole suite, which review 6171023438 explicitly did not want for screenshots.
 UX=no
+# --ux-script <file.mjs> elige el chequeo de navegador (por defecto ux_check.mjs,
+# el del manual). Implica --ux. Solo nombres de archivo de docker/test/.
+UX_SCRIPT=ux_check.mjs
 SKIP_SUITE=no
 PREFLIGHT=""
 while [ $# -gt 0 ]; do
@@ -44,6 +47,7 @@ while [ $# -gt 0 ]; do
     --suite)  SUITE="${2:-}"; shift 2 ;;
     --filter) FILTER="${2:-}"; shift 2 ;;
     --ux)         UX=yes; shift ;;
+    --ux-script)  UX=yes; UX_SCRIPT="${2:-}"; shift 2 ;;
     --skip-suite) SKIP_SUITE=yes; shift ;;
     # Ejecuta un script de preflight de SOLO LECTURA del workspace contra la base
     # desechable. Existe para que un preflight que se va a entregar para una base
@@ -53,6 +57,11 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+case "$UX_SCRIPT" in
+  *[!a-z0-9_.]*|"") echo "--ux-script must be a plain file name in docker/test/" >&2; exit 2 ;;
+  *.mjs) ;;
+  *) echo "--ux-script must be a .mjs file" >&2; exit 2 ;;
+esac
 [ -n "$SHA" ] || { echo "usage: $0 <sha> [--suite Unit|Feature] [--filter <pattern>] [--ux] [--skip-suite]" >&2; exit 2; }
 case "$SHA" in *[!0-9a-f]*|"") echo "sha must be lowercase hex" >&2; exit 2 ;; esac
 [ "${#SHA}" -eq 40 ] || { echo "sha must be 40 characters" >&2; exit 2; }
@@ -847,8 +856,11 @@ if [ "$UX" = "yes" ] && [ "$MIGRATE_OK" = "yes" ]; then
   # data: the password is generated for this run and dies with it.
   UX_PASSWORD="$(head -c 18 /dev/urandom | od -An -tx1 | tr -d ' \n')"
   UX_EMAIL="zzz-ux-affiliate@example.test"
+  UX_ADMIN_EMAIL="zzz-ux-admin@example.test"
+  [ -f "$COMPOSE_DIR/$UX_SCRIPT" ] || uxbad "browser check script not found: $UX_SCRIPT"
   if compose run --rm -T \
        -e CPV_UX_EMAIL="$UX_EMAIL" -e CPV_UX_PASSWORD="$UX_PASSWORD" \
+       -e CPV_UX_ADMIN_EMAIL="$UX_ADMIN_EMAIL" \
        testapp php -r '
 require "vendor/autoload.php"; $a=require "bootstrap/app.php";
 $a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
@@ -867,6 +879,27 @@ Illuminate\Support\Facades\Auth::login($u);
 $e = App\Models\Empresa::firstOrCreate(["rif" => "J-00000000-9"], ["name" => "ZZZ UX Empresa Ficticia"]);
 echo "ux user id=", $u->id, " empresa id=", $e->id,
      " linked=", (int) $e->users()->where("users.id", $u->id)->exists(), "\n";
+// Super Admin sintetico (TASK-0010C): las pantallas de solicitudes son solo suyas.
+$admin = App\Models\User::firstOrCreate(
+  ["email" => getenv("CPV_UX_ADMIN_EMAIL")],
+  ["name" => "ZZZ UX Super Admin", "password" => Illuminate\Support\Facades\Hash::make(getenv("CPV_UX_PASSWORD")),
+   "email_verified_at" => now()]
+);
+$admin->forceFill(["password" => Illuminate\Support\Facades\Hash::make(getenv("CPV_UX_PASSWORD")), "email_verified_at" => now()])->save();
+$admin->assignRole(Spatie\Permission\Models\Role::findOrCreate(config("filament-shield.super_admin.name"), "web"));
+echo "ux admin id=", $admin->id, "\n";
+// Una solicitud sintetica FALLIDA por falta de destinatario, como la #1 de staging, solo si
+// el codigo bajo prueba tiene TASK-0010C. Transporte "array": nada sale del contenedor.
+if (class_exists(App\Models\TaxonomyCategoryRequestDeliveryAttempt::class)) {
+  App\Models\TaxonomySelectionSettings::current()->update(["category_request_recipient_email" => null]);
+  $r = app(App\Services\TaxonomyCategoryRequestService::class)->submit($e, $u, [
+    "necesidad" => "ZZZ inspeccion sintetica de recipientes a presion",
+    "justificacion" => "CAPACIDAD_ESPECIALIZADA",
+    "detalle" => "Solicitud sintetica creada por el arnes para el chequeo de navegador.",
+    "terminos_probados" => "zzz, sintetico",
+  ]);
+  echo "ux request id=", $r->id, " delivery=", $r->delivery_status, " error=", $r->delivery_error, "\n";
+}
 ' >"$ARTIFACTS/ux/seed_user.log" 2>&1; then
     uxok "synthetic affiliate and company created for the browser check"
     sed 's/^/           /' "$ARTIFACTS/ux/seed_user.log" | tail -2
@@ -949,11 +982,12 @@ echo "ux user id=", $u->id, " empresa id=", $e->id,
     docker run --rm \
       --network "${PROJECT}_cpvtest_internal" \
       -v "$PW_CACHE/node_modules:/pw/node_modules:ro" \
-      -v "$COMPOSE_DIR/ux_check.mjs:/pw/ux_check.mjs:ro" \
+      -v "$COMPOSE_DIR/$UX_SCRIPT:/pw/ux_check.mjs:ro" \
       -v "$ARTIFACTS/ux:/out" \
       -w /pw \
       -e BASE_URL="http://${UX_SERVER}:8000" \
       -e UX_EMAIL="$UX_EMAIL" -e UX_PASSWORD="$UX_PASSWORD" \
+      -e UX_ADMIN_EMAIL="$UX_ADMIN_EMAIL" \
       mcr.microsoft.com/playwright:v${PW_VERSION}-jammy \
       node /pw/ux_check.mjs >"$ARTIFACTS/ux/ux_check.log" 2>&1
     UX_EXIT=$?
