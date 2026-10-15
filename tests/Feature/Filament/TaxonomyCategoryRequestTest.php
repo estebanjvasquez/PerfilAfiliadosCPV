@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Filament\Pages\CategoryRequestSettingsPage;
 use App\Filament\Pages\TaxonomySelectionSettingsPage;
 use App\Filament\Resources\EmpresaResource\Pages\EditEmpresa;
 use App\Filament\Resources\EmpresaResource\RelationManagers\TaxonomyCategoriesRelationManager;
@@ -138,6 +139,9 @@ class TaxonomyCategoryRequestTest extends TestCase
     public function an_authenticated_company_user_can_submit_for_its_accessible_company(): void
     {
         Mail::fake();
+        // TASK-0010C: `sent` exige un transporte que envíe hacia afuera. PHPUnit usa `array`, con el
+        // que ahora el resultado honesto es `simulated`; Mail::fake/shouldReceive impiden el envío real.
+        config(['mail.default' => 'smtp']);
         $this->configurarDestinatario('camara-categorias@ejemplo.test');
         [$empresa, $user] = $this->empresaConUsuario();
 
@@ -346,6 +350,9 @@ class TaxonomyCategoryRequestTest extends TestCase
     #[Test]
     public function the_request_is_persisted_before_and_independently_of_the_mail_attempt(): void
     {
+        // TASK-0010C: `sent` exige un transporte que envíe hacia afuera. PHPUnit usa `array`, con el
+        // que ahora el resultado honesto es `simulated`; Mail::fake/shouldReceive impiden el envío real.
+        config(['mail.default' => 'smtp']);
         $this->configurarDestinatario('camara-categorias@ejemplo.test');
         [$empresa, $user] = $this->empresaConUsuario();
 
@@ -526,6 +533,12 @@ class TaxonomyCategoryRequestTest extends TestCase
         $this->assertSame(0, TaxonomyCategoryRequest::query()->where('empresa_id', $empresa->id)->count());
     }
 
+    /**
+     * TASK-0010C movió el campo de "Límites de selección" a "Configuración de solicitudes", que es
+     * donde el propietario lo buscó. Este test sigue comprobando lo mismo (validación, guardado,
+     * acceso), ahora en la página nueva, y además que la página vieja ya no tiene el campo y que
+     * guardar los límites no borra el destinatario.
+     */
     #[Test]
     public function super_admin_can_configure_a_validated_recipient_email_on_the_settings_page(): void
     {
@@ -533,21 +546,33 @@ class TaxonomyCategoryRequestTest extends TestCase
         $admin->assignRole(Role::findOrCreate(config('filament-shield.super_admin.name'), 'web'));
         $this->actingAs($admin);
 
-        Livewire::actingAs($admin)->test(TaxonomySelectionSettingsPage::class)
+        Livewire::actingAs($admin)->test(CategoryRequestSettingsPage::class)
             ->assertFormFieldExists('category_request_recipient_email')
             ->fillForm(['category_request_recipient_email' => 'no-es-un-correo'])
             ->call('save')
             ->assertHasFormErrors(['category_request_recipient_email' => 'email']);
 
-        Livewire::actingAs($admin)->test(TaxonomySelectionSettingsPage::class)
+        Livewire::actingAs($admin)->test(CategoryRequestSettingsPage::class)
             ->fillForm(['category_request_recipient_email' => 'responsable@ejemplo.test'])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertSame('responsable@ejemplo.test', TaxonomySelectionSettings::current()->category_request_recipient_email);
 
+        // Un solo campo autorizado: la página de límites ya no lo tiene, y guardarla no lo pisa.
+        Livewire::actingAs($admin)->test(TaxonomySelectionSettingsPage::class)
+            ->assertFormFieldDoesNotExist('category_request_recipient_email')
+            ->fillForm(['max_categorias_principales' => 4])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $settings = TaxonomySelectionSettings::current();
+        $this->assertSame(4, $settings->max_categorias_principales);
+        $this->assertSame('responsable@ejemplo.test', $settings->category_request_recipient_email);
+
         $comun = User::factory()->create();
         $this->actingAs($comun);
+        $this->assertFalse(CategoryRequestSettingsPage::canAccess());
         $this->assertFalse(TaxonomySelectionSettingsPage::canAccess());
     }
 }

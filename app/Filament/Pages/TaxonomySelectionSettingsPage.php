@@ -6,10 +6,12 @@ use App\Models\TaxonomySelectionSettings;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 
 /**
  * Fase 4 del proyecto de taxonomía: los 2 límites del buscador de autocarga
@@ -45,7 +47,6 @@ class TaxonomySelectionSettingsPage extends Page implements HasForms
         $this->form->fill(TaxonomySelectionSettings::current()->only([
             'max_categorias_principales',
             'max_categorias_secundarias',
-            'category_request_recipient_email',
         ]));
     }
 
@@ -65,21 +66,29 @@ class TaxonomySelectionSettingsPage extends Page implements HasForms
                     ->minValue(1)
                     ->nullable()
                     ->helperText('Vacío = sin tope.'),
-                // TASK-0010A: destinatario de las solicitudes "No encuentro la categoría / Solicitar
-                // revisión" (TaxonomyCategoriesRelationManager). Configuración operativa, no un secreto.
-                TextInput::make('category_request_recipient_email')
+                // TASK-0010C: el correo responsable de las solicitudes se movió a "Configuración de
+                // solicitudes" (CategoryRequestSettingsPage), donde se busca. Aquí solo queda el
+                // enlace: un único campo, para que nunca haya dos valores que se contradigan. Como el
+                // formulario ya no tiene ese campo, guardar los límites no lo toca.
+                Placeholder::make('correo_solicitudes')
                     ->label('Correo responsable de solicitudes de categorías')
-                    ->email()
-                    ->maxLength(255)
-                    ->nullable()
-                    ->helperText('Recibe las solicitudes de revisión de categoría CPV enviadas por las empresas. Vacío = las solicitudes se registran igual, pero no se envía correo.'),
+                    ->content(fn () => new HtmlString(
+                        'Se configura en <a class="underline" href="'
+                        .e(CategoryRequestSettingsPage::getUrl())
+                        .'">Configuración de solicitudes</a>.'
+                    )),
             ])
             ->statePath('data');
     }
 
     public function save(): void
     {
-        TaxonomySelectionSettings::current()->update($this->form->getState());
+        // Solo las dos claves de límites: el correo de solicitudes se guarda en su propia página.
+        $state = $this->form->getState();
+        TaxonomySelectionSettings::current()->update([
+            'max_categorias_principales' => $state['max_categorias_principales'] ?? null,
+            'max_categorias_secundarias' => $state['max_categorias_secundarias'] ?? null,
+        ]);
 
         Notification::make()->success()->title('Límites actualizados')->send();
     }

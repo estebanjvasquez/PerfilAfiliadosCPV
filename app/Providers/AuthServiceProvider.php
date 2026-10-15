@@ -14,6 +14,9 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         'Spatie\Permission\Models\Role' => 'App\Policies\RolePolicy',
+        // TASK-0010C: explícita para no depender del descubrimiento automático en algo que protege
+        // datos de otras empresas.
+        'App\Models\TaxonomyCategoryRequest' => 'App\Policies\TaxonomyCategoryRequestPolicy',
     ];
 
     /**

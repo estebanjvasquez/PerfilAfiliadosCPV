@@ -19,8 +19,42 @@ class TaxonomyCategoryRequest extends Model
     public const STATUS_PENDING_REVIEW = 'pending_review';
 
     public const DELIVERY_PENDING = 'pending';
+    /**
+     * TASK-0010C: el transporte de correo ACEPTÓ el mensaje para enviarlo. No confirma que haya
+     * llegado al buzón: ningún transporte lo garantiza.
+     */
     public const DELIVERY_SENT = 'sent';
     public const DELIVERY_FAILED = 'failed';
+    /**
+     * TASK-0010C: el transporte configurado no envía hacia afuera (`log`, `array`): el mensaje quedó
+     * en el log del servidor o en memoria. La solicitud está registrada, pero la Cámara NO recibió
+     * ningún correo. Antes esto quedaba como `sent`.
+     */
+    public const DELIVERY_SIMULATED = 'simulated';
+
+    /** Etiquetas del panel de administración (las del afiliado viven en el RelationManager). */
+    public const DELIVERY_LABELS = [
+        self::DELIVERY_PENDING => 'Pendiente',
+        self::DELIVERY_SENT => 'Aceptado por el servidor de correo',
+        self::DELIVERY_SIMULATED => 'Simulado: registrado en el servidor, no se envió',
+        self::DELIVERY_FAILED => 'Falló',
+    ];
+
+    /** Códigos de falla guardados en `delivery_error` y su explicación para el administrador. */
+    public const ERROR_SIN_DESTINATARIO = 'recipient_not_configured';
+    public const ERROR_ENVIO = 'mail_send_failed';
+
+    public const ERROR_LABELS = [
+        self::ERROR_SIN_DESTINATARIO => 'No hay correo responsable configurado.',
+        self::ERROR_ENVIO => 'El servidor de correo rechazó el envío o no respondió.',
+    ];
+
+    public const REQUEST_STATUS_LABELS = [
+        self::STATUS_PENDING_REVIEW => 'Pendiente de revisión',
+    ];
+
+    /** Estados desde los que se puede pedir un reintento manual del aviso. */
+    public const RETRYABLE_DELIVERY = [self::DELIVERY_FAILED, self::DELIVERY_PENDING];
 
     /** Lista cerrada de justificaciones (código => etiqueta visible). */
     public const JUSTIFICACIONES = [
@@ -48,12 +82,16 @@ class TaxonomyCategoryRequest extends Model
         'recipient_email',
         'submitted_at',
         'mail_sent_at',
+        'delivery_transport',
+        'delivery_claim_token',
+        'delivery_claimed_at',
     ];
 
     protected $casts = [
         'context_snapshot' => 'array',
         'submitted_at' => 'datetime',
         'mail_sent_at' => 'datetime',
+        'delivery_claimed_at' => 'datetime',
     ];
 
     public function empresa()
@@ -66,8 +104,37 @@ class TaxonomyCategoryRequest extends Model
         return $this->belongsTo(UserPgsql::class, 'user_id');
     }
 
+    public function deliveryAttempts()
+    {
+        return $this->hasMany(TaxonomyCategoryRequestDeliveryAttempt::class, 'request_id')->orderBy('attempt_number');
+    }
+
     public function justificacionLabel(): string
     {
         return self::JUSTIFICACIONES[$this->justificacion] ?? $this->justificacion;
+    }
+
+    public function deliveryLabel(): string
+    {
+        return self::DELIVERY_LABELS[$this->delivery_status] ?? (string) $this->delivery_status;
+    }
+
+    public function deliveryErrorLabel(): ?string
+    {
+        if (blank($this->delivery_error)) {
+            return null;
+        }
+
+        return self::ERROR_LABELS[$this->delivery_error] ?? $this->delivery_error;
+    }
+
+    public function requestStatusLabel(): string
+    {
+        return self::REQUEST_STATUS_LABELS[$this->request_status] ?? (string) $this->request_status;
+    }
+
+    public function isRetryable(): bool
+    {
+        return in_array($this->delivery_status, self::RETRYABLE_DELIVERY, true);
     }
 }

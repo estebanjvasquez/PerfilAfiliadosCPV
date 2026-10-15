@@ -400,19 +400,26 @@ class TaxonomyCategoriesRelationManager extends RelationManager
 
     public const SOLICITUD_ERROR_BODY = 'Ocurrió un problema al guardar su solicitud. Intente nuevamente en unos minutos.';
 
-    /** Notificación al usuario según el resultado de la entrega - nunca expone detalle técnico. */
+    /**
+     * Notificación al usuario según el resultado de la entrega - nunca expone detalle técnico.
+     *
+     * TASK-0010C: solo `sent` (el servidor de correo aceptó el aviso) usa el mensaje de éxito. Un
+     * aviso `simulated` (el servidor no envía correos hacia afuera) o `failed` usa el de aviso
+     * pendiente: decirle al afiliado que se envió a la Cámara sería falso. Al afiliado no se le
+     * explica el modo del servidor; solo que su solicitud está registrada y que la Cámara la verá.
+     */
     public static function notificacionSolicitud(TaxonomyCategoryRequest $solicitud): Notification
     {
         if ($solicitud->delivery_status === TaxonomyCategoryRequest::DELIVERY_SENT) {
             return Notification::make()->success()
                 ->title(self::SOLICITUD_OK_TITLE)
-                ->body("Su solicitud #{$solicitud->id} fue registrada y enviada para revisión. No se creó ninguna categoría: la Cámara verificará si una categoría existente cubre su necesidad y podrá contactarle para aclarar detalles.")
+                ->body("Su solicitud #{$solicitud->id} fue registrada y se envió el aviso a la Cámara. Guarde el número #{$solicitud->id} como referencia. No se creó ninguna categoría: la Cámara verificará si una categoría existente cubre su necesidad y podrá contactarle para aclarar detalles.")
                 ->persistent();
         }
 
         return Notification::make()->warning()
             ->title(self::SOLICITUD_WARNING_TITLE)
-            ->body("Su solicitud #{$solicitud->id} quedó registrada, pero no se pudo completar el aviso por correo a la Cámara. La solicitud no se perdió y queda guardada para su revisión. No se creó ninguna categoría.")
+            ->body("Su solicitud #{$solicitud->id} quedó registrada, pero el aviso por correo a la Cámara no salió en este momento. La solicitud no se perdió: la Cámara la verá y la revisará igual, y no hace falta enviarla de nuevo. Guarde el número #{$solicitud->id} como referencia. No se creó ninguna categoría.")
             ->persistent();
     }
 

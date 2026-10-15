@@ -6,13 +6,17 @@ use App\Filament\Resources\EmpresaResource;
 use App\Mail\TaxonomyCategoryRequestMail;
 use App\Models\Empresa;
 use App\Models\EmpresaTaxonomyCategory;
+use App\Exceptions\CategoryRequestNoticeException;
 use App\Models\TaxonomyCategoryRequest;
+use App\Models\TaxonomyCategoryRequestDeliveryAttempt;
 use App\Models\TaxonomySelectionSettings;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Throwable;
 
@@ -38,8 +42,14 @@ class TaxonomyCategoryRequestService
     public const TERMINOS_MAX = 500;
 
     /** Motivos de falla de entrega guardados en la fila (códigos, nunca el mensaje de la excepción). */
-    public const ERROR_SIN_DESTINATARIO = 'recipient_not_configured';
-    public const ERROR_ENVIO = 'mail_send_failed';
+    public const ERROR_SIN_DESTINATARIO = TaxonomyCategoryRequest::ERROR_SIN_DESTINATARIO;
+    public const ERROR_ENVIO = TaxonomyCategoryRequest::ERROR_ENVIO;
+
+    /** TASK-0010C: transportes que no envían nada fuera del servidor. */
+    public const SIMULATED_TRANSPORTS = ['log', 'array'];
+
+    /** TASK-0010C: minutos tras los cuales una reserva de aviso abandonada deja de bloquear. */
+    public const CLAIM_TTL_MINUTES = 10;
 
     /**
      * @param  array<string, mixed>  $data  Datos del formulario - cualquier clave fuera de las 4 declaradas se ignora.
@@ -76,7 +86,18 @@ class TaxonomyCategoryRequestService
             'submitted_at' => now(),
         ]);
 
-        $this->deliver($request, $empresa);
+        // El aviso NUNCA puede hacer perder la solicitud: ya está guardada. Si el intento mismo falla
+        // de forma inesperada (no un error de correo, que deliverNotice registra), la solicitud
+        // queda `pending` y se puede reintentar desde el panel.
+        try {
+            $this->deliverNotice($request, TaxonomyCategoryRequestDeliveryAttempt::KIND_INITIAL, $user, [TaxonomyCategoryRequest::DELIVERY_PENDING]);
+        } catch (Throwable $e) {
+            Log::error('TASK-0010C: no se pudo completar el intento inicial de aviso; la solicitud queda registrada como pendiente.', [
+                'taxonomy_category_request_id' => $request->id,
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
+        }
 
         return $request->refresh();
     }
@@ -177,60 +198,201 @@ class TaxonomyCategoryRequestService
         ];
     }
 
-    private function deliver(TaxonomyCategoryRequest $request, Empresa $empresa): void
+    /**
+     * TASK-0010C: reintento MANUAL del aviso de una solicitud ya registrada.
+     *
+     * Reutiliza la solicitud tal como está guardada (su snapshot de empresa/usuario/categorías y el
+     * mismo Mailable): no crea otra solicitud ni reescribe su contenido. Solo Super Admin, y el
+     * chequeo vive AQUÍ además de en la policy, para que ninguna ruta del panel lo saltee.
+     *
+     * @throws AuthorizationException si el actor no es Super Admin.
+     * @throws CategoryRequestNoticeException si no hay destinatario, el estado no admite reintento
+     *                                        o ya hay un intento en curso.
+     */
+    public function retryNotice(TaxonomyCategoryRequest $request, User $actor): TaxonomyCategoryRequestDeliveryAttempt
+    {
+        if (! $actor->hasRole(config('filament-shield.super_admin.name'))) {
+            throw new AuthorizationException('Solo Super Admin puede reintentar avisos de solicitudes.');
+        }
+
+        $request->refresh();
+
+        if (! $request->isRetryable()) {
+            throw CategoryRequestNoticeException::notRetryable();
+        }
+
+        // Sin destinatario el reintento solo produciría otro fallo idéntico: se rechaza sin
+        // registrar intento y el panel explica qué configurar.
+        if (self::configuredRecipient() === null) {
+            throw CategoryRequestNoticeException::recipientMissing();
+        }
+
+        return $this->deliverNotice(
+            $request,
+            TaxonomyCategoryRequestDeliveryAttempt::KIND_MANUAL_RETRY,
+            $actor,
+            TaxonomyCategoryRequest::RETRYABLE_DELIVERY,
+        );
+    }
+
+    /** Destinatario configurado y válido, o null. Nunca se inventa uno. */
+    public static function configuredRecipient(): ?string
     {
         $recipient = TaxonomySelectionSettings::current()->category_request_recipient_email;
 
-        if (blank($recipient) || ! filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+        return filled($recipient) && filter_var($recipient, FILTER_VALIDATE_EMAIL) ? $recipient : null;
+    }
+
+    /**
+     * Modo de transporte del correo por defecto (`smtp`, `log`, `array`, ...). Solo el NOMBRE del
+     * modo: nunca host, usuario ni credenciales, así que se puede mostrar al administrador.
+     */
+    public static function transportMode(): string
+    {
+        $mailer = (string) config('mail.default');
+        $transport = config("mail.mailers.{$mailer}.transport");
+
+        return is_string($transport) && $transport !== '' ? $transport : $mailer;
+    }
+
+    /**
+     * Explicación del modo de transporte para el ADMINISTRADOR (nunca para el afiliado). Solo dice
+     * el nombre del modo y qué significa un resultado; no revela ninguna configuración del servidor.
+     */
+    public static function transportDescription(): string
+    {
+        $mode = self::transportMode();
+
+        if (! self::transportSendsExternally($mode)) {
+            return "Simulado (modo «{$mode}»): los avisos quedan registrados en el servidor y NO se envían a ningún buzón. "
+                .'Activar el envío real requiere configurar el servidor de correo, que es una decisión aparte.';
+        }
+
+        return "Envío real (modo «{$mode}»): un aviso «aceptado» significa que el servidor de correo recibió el mensaje para enviarlo. "
+            .'No confirma que haya llegado al buzón del destinatario.';
+    }
+
+    /** `log` y `array` no envían nada fuera del servidor: un "éxito" con ellos es una simulación. */
+    public static function transportSendsExternally(?string $transport = null): bool
+    {
+        return ! in_array($transport ?? self::transportMode(), self::SIMULATED_TRANSPORTS, true);
+    }
+
+    /**
+     * Un intento de aviso, inicial o manual, con exclusión mutua y sin transacción abierta durante
+     * el envío.
+     *
+     * 1. RESERVA: un único UPDATE condicional marca la solicitud con un token, sólo si su estado está
+     *    en `$eligible` y no hay otra reserva vigente. Dos llamadas simultáneas: una afecta 1 fila y
+     *    la otra 0, y la segunda se rechaza sin enviar nada. El bloqueo de fila dura lo que esa
+     *    sentencia, no el envío.
+     * 2. ENVÍO: fuera de cualquier transacción. Si el proceso muere aquí, la reserva vence a los
+     *    CLAIM_TTL_MINUTES y la solicitud vuelve a poder reintentarse: nunca queda trabada.
+     * 3. CIERRE: una transacción corta registra el intento y actualiza la solicitud SOLO si la
+     *    reserva sigue siendo de este intento.
+     *
+     * @param  array<int, string>  $eligible
+     */
+    private function deliverNotice(TaxonomyCategoryRequest $request, string $kind, ?User $actor, array $eligible): TaxonomyCategoryRequestDeliveryAttempt
+    {
+        $token = (string) Str::uuid();
+
+        $claimed = TaxonomyCategoryRequest::query()
+            ->whereKey($request->getKey())
+            ->whereIn('delivery_status', $eligible)
+            ->where(fn ($q) => $q->whereNull('delivery_claimed_at')
+                ->orWhere('delivery_claimed_at', '<', now()->subMinutes(self::CLAIM_TTL_MINUTES)))
+            ->update(['delivery_claim_token' => $token, 'delivery_claimed_at' => now()]);
+
+        if ($claimed !== 1) {
+            throw CategoryRequestNoticeException::inProgress();
+        }
+
+        $startedAt = now();
+        $recipient = self::configuredRecipient();
+        $transport = self::transportMode();
+        $error = null;
+
+        if ($recipient === null) {
             Log::warning('TASK-0010A: solicitud de revisión de categoría registrada sin correo - destinatario no configurado o inválido en taxonomy_selection_settings.category_request_recipient_email.', [
                 'taxonomy_category_request_id' => $request->id,
                 'empresa_id' => $request->empresa_id,
+                'kind' => $kind,
             ]);
-
-            $request->update([
-                'delivery_status' => TaxonomyCategoryRequest::DELIVERY_FAILED,
-                'delivery_error' => self::ERROR_SIN_DESTINATARIO,
-                'recipient_email' => null,
-            ]);
-
-            return;
+            $result = TaxonomyCategoryRequest::DELIVERY_FAILED;
+            $error = self::ERROR_SIN_DESTINATARIO;
+        } else {
+            try {
+                Mail::to($recipient)->send(new TaxonomyCategoryRequestMail($request->fresh(), $this->adminUrl((int) $request->empresa_id)));
+                $result = self::transportSendsExternally($transport)
+                    ? TaxonomyCategoryRequest::DELIVERY_SENT
+                    : TaxonomyCategoryRequest::DELIVERY_SIMULATED;
+            } catch (Throwable $e) {
+                Log::error('TASK-0010A: falló el envío del correo de solicitud de revisión de categoría (la solicitud SÍ quedó registrada).', [
+                    'taxonomy_category_request_id' => $request->id,
+                    'empresa_id' => $request->empresa_id,
+                    'kind' => $kind,
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage(),
+                ]);
+                $result = TaxonomyCategoryRequest::DELIVERY_FAILED;
+                $error = self::ERROR_ENVIO;
+            }
         }
 
-        $request->update(['recipient_email' => $recipient]);
-
-        try {
-            Mail::to($recipient)->send(new TaxonomyCategoryRequestMail($request, $this->adminUrl($empresa)));
-        } catch (Throwable $e) {
-            Log::error('TASK-0010A: falló el envío del correo de solicitud de revisión de categoría (la solicitud SÍ quedó registrada).', [
-                'taxonomy_category_request_id' => $request->id,
-                'empresa_id' => $request->empresa_id,
-                'exception' => get_class($e),
-                'message' => $e->getMessage(),
+        return DB::connection('pgsql')->transaction(function () use ($request, $kind, $actor, $token, $startedAt, $recipient, $transport, $result, $error) {
+            $attempt = TaxonomyCategoryRequestDeliveryAttempt::create([
+                'request_id' => $request->getKey(),
+                'attempt_number' => (int) TaxonomyCategoryRequestDeliveryAttempt::query()->where('request_id', $request->getKey())->max('attempt_number') + 1,
+                'kind' => $kind,
+                'actor_user_id' => $actor?->getKey(),
+                'recipient_email' => $recipient,
+                'transport' => $transport,
+                'result' => $result,
+                'error_code' => $error,
+                'started_at' => $startedAt,
+                'finished_at' => now(),
             ]);
 
-            $request->update([
-                'delivery_status' => TaxonomyCategoryRequest::DELIVERY_FAILED,
-                'delivery_error' => self::ERROR_ENVIO,
-            ]);
+            $changes = [
+                'delivery_status' => $result,
+                'delivery_error' => $error,
+                'recipient_email' => $recipient,
+                'delivery_transport' => $transport,
+                'delivery_claim_token' => null,
+                'delivery_claimed_at' => null,
+            ];
+            // `mail_sent_at` = cuando el transporte ACEPTÓ el mensaje. Una simulación no envió nada.
+            if ($result === TaxonomyCategoryRequest::DELIVERY_SENT) {
+                $changes['mail_sent_at'] = now();
+            }
 
-            return;
-        }
+            $owned = TaxonomyCategoryRequest::query()
+                ->whereKey($request->getKey())
+                ->where('delivery_claim_token', $token)
+                ->update($changes);
 
-        $request->update([
-            'delivery_status' => TaxonomyCategoryRequest::DELIVERY_SENT,
-            'delivery_error' => null,
-            'mail_sent_at' => now(),
-        ]);
+            if ($owned !== 1) {
+                // Sólo pasa si la reserva venció mientras este proceso seguía vivo y otro intento la
+                // tomó. El intento queda registrado igual; el estado lo decide el intento vigente.
+                Log::warning('TASK-0010C: la reserva del aviso venció antes de cerrar el intento; se registra el intento sin pisar el estado vigente.', [
+                    'taxonomy_category_request_id' => $request->id,
+                    'attempt_number' => $attempt->attempt_number,
+                ]);
+            }
+
+            return $attempt;
+        });
     }
 
     /** Enlace a la ficha de la empresa en el panel admin, o null si no se puede generar de forma segura. */
-    private function adminUrl(Empresa $empresa): ?string
+    private function adminUrl(int $empresaId): ?string
     {
         try {
-            return EmpresaResource::getUrl('edit', ['record' => $empresa->getKey()], panel: 'admin');
+            return EmpresaResource::getUrl('edit', ['record' => $empresaId], panel: 'admin');
         } catch (Throwable $e) {
             Log::info('TASK-0010A: no se pudo generar el enlace al panel para la solicitud de categoría.', [
-                'empresa_id' => $empresa->getKey(),
+                'empresa_id' => $empresaId,
                 'exception' => get_class($e),
             ]);
 

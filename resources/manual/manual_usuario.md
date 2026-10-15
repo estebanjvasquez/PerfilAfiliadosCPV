@@ -238,14 +238,15 @@ No necesita escribir los datos de su empresa ni sus datos de usuario: el sistema
 
 ### Qué pasa después {#despues-de-la-solicitud}
 
-- La solicitud queda registrada y la Cámara recibe el aviso.
+- La solicitud queda registrada con un **número de solicitud** (por ejemplo, **#12**) que aparece en el mensaje de confirmación. Anótelo: es la referencia de su solicitud si necesita consultarla con la Cámara.
+- La Cámara ve todas las solicitudes registradas en su propio panel y además suele recibir un aviso por correo.
 - La Cámara revisa primero si alguna categoría existente ya cubre su necesidad. Si es así, le indicará cuál usar.
 - La Cámara puede contactarle para pedirle más detalles.
 - Si la Cámara concluye que hace falta una categoría nueva, la decisión y su incorporación siguen el proceso de la Cámara.
 
 > **IMPORTANTE:** Una solicitud de revisión **no crea ni publica una categoría automáticamente**, y no agrega ninguna categoría a su empresa. Mientras tanto, mantenga vinculadas las categorías existentes que sí describen su actividad.
 
-> **NOTA:** Si el sistema le indica que la solicitud quedó registrada pero que no se pudo enviar la notificación, su solicitud no se perdió. Si necesita una respuesta urgente, contacte a la Cámara. Si no ve la opción **No encuentro la categoría / Solicitar revisión** en su pantalla, contacte directamente a la Cámara.
+> **NOTA:** Si el mensaje dice **Solicitud registrada, aviso por correo pendiente**, su solicitud no se perdió: quedó registrada con su número y la Cámara la revisará igual. Solo significa que el aviso por correo a la Cámara no salió en ese momento. No hace falta enviarla de nuevo. Si necesita una respuesta urgente, contacte a la Cámara e indique su número de solicitud. Si no ve la opción **No encuentro la categoría / Solicitar revisión** en su pantalla, contacte directamente a la Cámara.
 
 ## Resto del perfil {#resto-del-perfil}
 
