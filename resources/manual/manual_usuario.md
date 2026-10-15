@@ -83,6 +83,14 @@ Al entrar verá la pantalla inicial, llamada **Escritorio**, y a la izquierda el
 - **Si la Cámara todavía no asoció su usuario con su empresa**, el menú no le mostrará su empresa. Es normal en el primer ingreso: avise a la Cámara indicando el nombre y el RIF de la empresa (ver [Si su empresa no aparece](#empresa-no-asociada)).
 - **Cuando la Cámara ya lo asoció**, el menú le muestra **Empresas**, desde donde trabaja con los datos de su empresa, y **Manual de usuario**, que es esta guía.
 
+En el Escritorio verá estas tarjetas:
+
+- **Bienvenida/o**, con su nombre y el botón **Salir** para cerrar la sesión.
+- **Ayuda para completar su perfil**, con dos botones: **Manual de usuario**, que abre esta guía, y **Mapa de la taxonomía**, que muestra todas las categorías de la Taxonomía CPV para que se ubique antes de elegir (ver [Mapa de la taxonomía](#mapa-taxonomia)). El mapa no agrega categorías a su empresa: eso se hace desde la pestaña **Categorías CPV (taxonomía nueva)** de su empresa.
+- Los avisos sobre la **veracidad de la información** que su empresa registra.
+
+> **CONSEJO:** En el teléfono, donde el menú lateral está oculto, los botones de la tarjeta **Ayuda para completar su perfil** son la forma más rápida de llegar al manual y al mapa.
+
 ### Si su empresa no aparece {#empresa-no-asociada}
 
 En el menú **Empresas** solo aparecen las empresas asociadas a su usuario. Si la lista está vacía, o si no ve la empresa que le corresponde, la Cámara todavía no ha asociado su usuario con esa empresa. Contacte a la Cámara indicando el nombre y el RIF de la empresa.

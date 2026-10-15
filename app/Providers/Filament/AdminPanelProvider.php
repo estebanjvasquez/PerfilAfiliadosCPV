@@ -6,6 +6,7 @@ use App\Filament\Pages\Login;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Filament\Pages\Register;
 use App\Filament\Resources\EmpresaResource;
+use App\Filament\Widgets\ProfileHelpWidget;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
@@ -121,9 +122,11 @@ class AdminPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            // CPV-HOME-USEFUL-HELP: la tarjeta promocional de Filament (FilamentInfoWidget) se
+            // reemplaza por accesos útiles para el afiliado (manual y mapa de la taxonomía).
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                ProfileHelpWidget::class,
                 EmpresaResource\Widgets\StatsOverview::class,
             ])
             ->middleware([
