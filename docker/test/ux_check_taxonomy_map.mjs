@@ -360,7 +360,11 @@ try {
         await tab.click();
         await page.waitForTimeout(2500);
       }
+      // The relation manager loads on demand (Livewire), below the wizard: wait for it.
       const link = page.getByRole('link', { name: 'Ver mapa de la taxonomía' }).first();
+      await link.waitFor({ state: 'attached', timeout: 20000 }).catch(() => {});
+      await link.scrollIntoViewIfNeeded().catch(() => {});
+      await page.waitForTimeout(500);
       const href = await link.getAttribute('href').catch(() => null);
       const target = await link.getAttribute('target').catch(() => null);
       record('the "Categorías CPV" tab links to the map in a new tab', !!href && href.endsWith(MAP) && target === '_blank', `href=${href} target=${target}`);
