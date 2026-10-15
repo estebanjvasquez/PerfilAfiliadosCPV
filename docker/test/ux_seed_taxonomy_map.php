@@ -169,7 +169,11 @@ $db->transaction(function () use ($GROUPS, $familiesPerGroup, $familyIndex, $siz
 // Admin to the synthetic company (both created by run_tests.sh) so the browser check can open the
 // company's "Categorías CPV" tab. Synthetic rows only, inside the disposable stack.
 $admin = App\Models\User::where('email', 'zzz-ux-admin@example.test')->first();
-$empresa = App\Models\Empresa::where('rif', 'J-00000000-9')->first();
+// By name, case-insensitive: the model normalizes the RIF it was created with (J-00000000-9) and
+// stores the company name in upper case.
+$empresa = App\Models\Empresa::whereRaw('upper(name) like ?', ['ZZZ UX EMPRESA FICTICIA%'])->first()
+    ?? App\Models\Empresa::where('rif', 'like', 'J%000000009')->first();
+echo 'ux admin found: ', (int) (bool) $admin, ' synthetic company found: ', (int) (bool) $empresa, "\n";
 if ($admin && $empresa && ! $empresa->users()->where('users.id', $admin->id)->exists()) {
     $empresa->users()->attach($admin->id);
 }
