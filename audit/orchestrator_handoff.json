@@ -1,6 +1,6 @@
 {
-  "current_task": "CPV-MAIL-DOCS-AND-USER-MANUAL: d23c0e6 deployed (MANUAL_SSH_DEPLOY). Owner feedback: the index was unchanged and taxonomy-centred. Reorganized by system module at 4b7cab6 (isolated green, 45 tests, browser 40/40); READY_FOR_REVIEW, NOT deployed.",
-  "current_status": "MAIL_DOCS_AND_USER_MANUAL_REORGANIZED_READY_FOR_REVIEW_MANUAL__RUNTIME_D23C0E6__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
+  "current_task": "CPV-MAIL-DOCS-AND-USER-MANUAL: manual reorganized by system module (4b7cab6) and DEPLOYED to staging at 37e3b71 via the normal workflow (run 38727131820), authorized by the owner in chat. Awaiting owner review.",
+  "current_status": "MAIL_DOCS_AND_USER_MANUAL_REORGANIZED_DEPLOYED_FOR_OWNER_REVIEW__RUNTIME_37E3B71__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
   "superseded_current_fields_2026_10_15": {
     "note": "Values these fields held before the 2026-10-15 checkpoint (instructions 6188413270 / 6188477132). Kept as history.",
     "current_task": "ORCHESTRATION INFRASTRUCTURE (authorized 6085642297): persistent executor on the Contabo VPS plus isolated PHPUnit. TASK-0010A and TASK-0010B are AUTHORIZED BUT HELD and NOT STARTED by owner decision.",
@@ -3102,8 +3102,15 @@
       "run": "20261015T111556Z-4b7cab66e4f5",
       "phpunit": "OK (45 tests, 532 assertions)",
       "browser": "40/40",
-      "deployed": false,
-      "deploy_trigger_note": "touches tests/**, so a push to the deploy branch triggers the normal workflow"
+      "deployed": true,
+      "deploy_trigger_note": "touches tests/**, so a push to the deploy branch triggers the normal workflow",
+      "deployed_sha": "37e3b7186bd7babef07392c09f80d134db4833f8",
+      "workflow_run": "https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/38727131820",
+      "authorization": "owner in chat (Claude Code session), recorded in Issue #2",
+      "smoke": {
+        "manual": "14/14",
+        "task_0010c": "18/18"
+      }
     }
   },
   "task_0010c": {

@@ -1,9 +1,9 @@
 # CPV — Punto de reanudación maestro
 
-**Checkpoint:** 2026-10-15, ~11:25 UTC.
+**Checkpoint:** 2026-10-15, ~11:35 UTC.
 - TASK-0010C está desplegada y el propietario informó su prueba manual como **OK**.
 - La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** fue aceptada (`6190018710`) y está **desplegada en staging** (`d23c0e6`, **MANUAL_SSH_DEPLOY** por la vía `6190372221`): **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**.
-- El propietario lo revisó y lo vio igual: el índice seguía centrado en la taxonomía. Se reorganizó por módulo del sistema en `4b7cab6`, que está **READY_FOR_REVIEW — MANUAL** y **sin desplegar** (informe §10).
+- El propietario lo revisó y lo vio igual: el índice seguía centrado en la taxonomía. Se reorganizó por módulo del sistema en `4b7cab6` y está **desplegado** (`37e3b71`, run `38727131820`; el propietario lo autorizó por chat; informe §10).
 
 Las §0 a §6 son la primera lectura. Lo que está después de la línea «Historia» es el checkpoint del 2026-10-08, que **ya no rige** y se conserva como historia.
 
@@ -18,9 +18,9 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 
 | Tema | Estado |
 |---|---|
-| Runtime de staging | **`d23c0e6ffac8e7b5105370bedade3475105e0fff`**: rama `feature/upgrade-filament-v3`, checkout del VPS y contenedor `app` recreado el 2026-10-15 a las 11:05:37Z (imagen `b66d8024…`). Desplegado **por SSH con el script literal del workflow**, sin run de GitHub Actions. Smoke del manual 14/14 y de C 18/18. |
+| Runtime de staging | **`37e3b7186bd7babef07392c09f80d134db4833f8`** (manual ordenado por módulo). Desplegado el 2026-10-15 a las 11:25Z por el workflow normal, run `38727131820` success. Smoke del manual 14/14 y de C 18/18. La versión anterior, `d23c0e6`, se desplegó por SSH (informe §9). |
 | TASK-0010A/B/C | Desplegadas. C fue aceptada (`6188413270`) y el propietario informó su prueba manual como **OK** (`6189493183`, `OWNER_REPORTED_UAT_PASS`; es un informe del propietario, no un test automático). |
-| Ronda manual + correo | **Aceptada** (`6190018710`) y **desplegada** (2026-10-15 11:05Z; informe §9), + **reorganización por módulo** `4b7cab66e4f580da5854a1f97afde3cac30822aa` (feedback del propietario, informe §10): verde aislado (45 tests, navegador 40/40), **sin desplegar**. Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo (con la secuencia correcta: recrear `app` y luego `config:cache`, para activar y para volver atrás) y regla de documentación. |
+| Ronda manual + correo | **Aceptada** (`6190018710`) y **desplegada** (2026-10-15 11:05Z; informe §9), + **reorganización por módulo** `4b7cab66e4f580da5854a1f97afde3cac30822aa` (feedback del propietario, informe §10): verde aislado (45 tests, navegador 40/40), **desplegado** en `37e3b71`. Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo (con la secuencia correcta: recrear `app` y luego `config:cache`, para activar y para volver atrás) y regla de documentación. |
 | Correo del sistema | **ACTIVACIÓN GLOBAL PENDIENTE: espera proveedor, configuración y credenciales del propietario.** Staging en modo sin envío (`MAIL_MAILER=log`, comprobado el 2026-10-15 con `docs/deploy/mail_status_readonly.php`). Sin destinatario configurado. No se ha enviado ningún correo real. |
 | Solicitud #1 | `failed`/`recipient_not_configured`, con una fila histórica. Sin reintento autorizado. |
 | Automatización | El ejecutor autónomo está **suspendido**. No hay IA en segundo plano ni sondeos. |
@@ -51,7 +51,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 
 ## 4. Siguiente acción
 
-- **Orquestador/propietario:** revisar `4b7cab6` (manual ordenado por módulo) y, si procede, autorizar su despliegue. Como toca `tests/**`, el push a `feature/upgrade-filament-v3` dispara el workflow normal.
+- **Propietario:** abrir «Manual de usuario» y revisar el índice por módulo (18 secciones).
 - **Agente:** **ninguna** hasta una nueva instrucción. No activar correo y no tocar secretos.
 - **Propietario, cuando lo tenga:** proveedor de correo, remitente y dominio (SPF/DKIM/DMARC), destinatario responsable, aprovisionamiento seguro en el `.env` del servidor y una prueba controlada (ver `CORREO_DEL_SISTEMA.md` §6). También: decidir si se reintenta la #1.
 

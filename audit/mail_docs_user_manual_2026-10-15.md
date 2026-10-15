@@ -275,4 +275,10 @@ Isolated run `20261015T101317Z-433fbf05d4a8` at TESTED_HEAD, harness `infra/cont
   - the only "finding" is informational ("0 migration ordering violations"), the same as the accepted run;
   - staging 200 before and after.
   - Evidence: `audit/runs/mail_docs_user_manual/run_4b7cab6/`.
-- **Not deployed.** Staging is still on `d23c0e6`. Because this commit touches `tests/**`, the push to the deployment branch **does** trigger the normal workflow; no SSH route is needed. Deploying needs authorization.
+- **Deployed** on 2026-10-15 at 11:25Z. The owner authorized it **in chat** in the Claude Code session, and it is recorded in Issue #2.
+  - Route: fast-forward `d23c0e6..37e3b71` of `feature/upgrade-filament-v3`, which triggered workflow run `38727131820` (**success**).
+  - Verification: the checkout is at `37e3b71`; `app` was recreated at 11:25:04Z; maintenance is off; `/` and `/admin/login` return 200; 0 pending migrations; the `.env` is unchanged.
+  - Manual smoke **14/14**: the source equals the candidate (sha256 `97d55d3b…`) and the index links all 18 sections.
+  - Guests get `302 → /admin/login`. The 0010C smoke is **18/18**, with request #1 fingerprint unchanged.
+  - Mail is `log` and simulated, unchanged.
+  - Evidence: `audit/runs/manual_reorg_deploy_2026-10-15/`.

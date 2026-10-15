@@ -1,0 +1,17 @@
+method=GitHub Actions workflow (push fast-forward d23c0e6..37e3b71), run 38727131820 success
+authorization=owner in chat (Claude Code session), 2026-10-15; recorded in Issue #2
+head=37e3b7186bd7babef07392c09f80d134db4833f8
+app_started=2026-10-15T11:25:04.748099155Z
+maintenance=off
+http_root=200
+http_login=200
+env_sha256=085c617c22a2
+pending=0
+guest /admin/manual-de-usuario 302 -> https://pruebas.camarapetrolera.app/admin/login
+guest /admin/ayuda-solicitudes-de-categoria 302 -> https://pruebas.camarapetrolera.app/admin/login
+mailer_por_defecto=log
+transporte=log
+envia_fuera_del_servidor=no (simulado)
+configuracion_cacheada=si
+remitente_direccion=configurado
+remitente_nombre=configurado
