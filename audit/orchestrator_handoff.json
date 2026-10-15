@@ -1,13 +1,19 @@
 {
-  "current_task": "CPV-MAIL-DOCS-AND-USER-MANUAL (instruction 6189493183): user manual completed against public/user.pdf@e398bbc, system mail documented (activation PENDING owner configuration), documentation rule added. Branch feature/mail-docs-and-user-manual, TESTED_HEAD 433fbf05; NOT deployed. TASK-0010C deployed (a5772345) and owner-reported UAT PASS.",
-  "current_status": "MAIL_DOCS_AND_USER_MANUAL_READY_FOR_REVIEW_MANUAL__MAIL_ACTIVATION_PENDING_OWNER__AUTOMATION_SUSPENDED",
+  "current_task": "CPV-MAIL-DOCS-AND-USER-MANUAL: accepted at d23c0e6 (6190018710); staging deployment authorized (6190034071) but BLOCKED. Deploy branch fast-forwarded to d23c0e6, workflow not run (push matched paths-ignore; workflow_dispatch 403 needs actions=write; main has no workflow file). Runtime still a5772345.",
+  "current_status": "MAIL_DOCS_AND_USER_MANUAL_DEPLOY_BLOCKED_MANUAL__RUNTIME_A5772345__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
   "superseded_current_fields_2026_10_15": {
     "note": "Values these fields held before the 2026-10-15 checkpoint (instructions 6188413270 / 6188477132). Kept as history.",
     "current_task": "ORCHESTRATION INFRASTRUCTURE (authorized 6085642297): persistent executor on the Contabo VPS plus isolated PHPUnit. TASK-0010A and TASK-0010B are AUTHORIZED BUT HELD and NOT STARTED by owner decision.",
     "current_status": "ORCHESTRATOR_SUSPENDED_BY_OWNER__CPV_MANUAL_LOOP_RESUMED__TASK_0010AB_RESUMED_UNDER_MANUAL_REVIEW",
     "review_state": "MANUAL_REVIEW_OF_MAIL_DOCS_AND_USER_MANUAL",
     "development_loop_mode": "MANUAL_REVIEW_ONLY__AUTONOMOUS_EXECUTOR_SUSPENDED",
-    "resume_read_order": ["docs/orquestador/SESSION_RESUME.md", "docs/orquestador/AUTONOMOUS_DEV_LOOP.md", "docs/orquestador/current_task.md", "audit/orchestrator_handoff.json current_* fields", "latest orchestrator comment in Issue #2"]
+    "resume_read_order": [
+      "docs/orquestador/SESSION_RESUME.md",
+      "docs/orquestador/AUTONOMOUS_DEV_LOOP.md",
+      "docs/orquestador/current_task.md",
+      "audit/orchestrator_handoff.json current_* fields",
+      "latest orchestrator comment in Issue #2"
+    ]
   },
   "autonomous_loop_status": "SUSPENDED_BY_OWNER_DECISION_2026-10-14 - the executor is stopped, disabled at boot and blocked from starting by an additive, reversible systemd drop-in; 0 processes; pending jobs: none, all 10 requests are terminal PUBLISHED with no lease held; no Anthropic call was made to produce or confirm the suspension. Full checkpoint in audit/orchestrator_suspended_2026-10-14.md, which also records that a verification start briefly ran the service for 39 seconds and produced NO API call, evidenced by one idle cycle and an unchanged hourly budget. REVIEWS ARE NOW MANUAL: no polling, no automatic rounds, and review_head must not be advanced to request one.",
   "current_hold_in_force": false,
@@ -2913,7 +2919,6 @@
       "COST_SECURITY_OR_IRREVERSIBLE_EXTERNAL_ACTION"
     ]
   },
-
   "review_state": "OWNER_GATE_REQUIRED",
   "open_owner_gate_f_history_exposure": "GATE F, OPEN AND AWAITING THE OWNER, raised by AUTOMATED verdict 6162770894 (OWNER_GATE_REQUIRED for content commit 58a6e1a6, which also recorded all six corrections of 6162683638 as addressed). DECISION NEEDED: how to remediate internal infrastructure detail already published in the git history of this PUBLIC repository - executor install/state/config paths, runner paths, the exact OS release and a private subnet prefix - reachable at feature/upgrade-filament-v3 commits 650db29 and 83c6de7, and at infra/contabo-test-runner from 4045faa through d17854bd875a68ce23ed7ec9a87f87046f00512f. OPTIONS AS THE REVIEWER FRAMED THEM: (a) authorise a history rewrite with force-push and accept its coordination cost; (b) change repository visibility to private, NOTING THE SIDE EFFECT that the anonymous Issue #2 read fallback then breaks unless a read-capable token is provisioned - this overlaps the visibility decision already pending under ACCESS_BOOTSTRAP.md section 7; (c) explicitly accept the exposure as it stands. NOT ACTED ON, and the agent is prohibited from acting: history rewriting and force-pushing are forbidden here, and visibility is an owner decision. The current tree of both branches is clean (grep for all seven literals returns 0 across audit/, docs/ and docker/), so this gate concerns history only. Context for the decision, not an argument for an outcome: none of the seven items is a credential. TWO NON-BLOCKING COSMETIC ITEMS from the same verdict were fixed WITHOUT advancing the pointer, deliberately, so that no paid review is spent on cosmetics: the per-run risky counts are now spelled out in failing_test_name_diff.txt (run 1 = 5+21+2 = 28, run 2 = 5+20+2 = 27) and the two remaining short d17854bd references are now full 40-character shas. They will ride along with the next substantive delivery.",
   "isolated_phpunit_contabo_2026_10_13": "DELIVERY OF THE PHPUNIT ISOLATION BLOCKER, full evidence in audit/isolated_phpunit_contabo_2026-10-13.md. Run 20261013T183459Z-99e603cb4713 on Contabo, runner infra/contabo-test-runner@d17854bd875a68ce23ed7ec9a87f87046f00512f, SHA under test 99e603cb4713fe0a349f7958af44327e5ae34845. THREE GROUPS KEPT SEPARATE as instructed: isolation PASS (18 checks, 0 failed), schema preparation PASS (11 steps, 0 failed), test suite RED (phpunit exit 2). ISOLATION, asserted from docker inspect and not claimed: exactly ONE bind mount, this run's disposable workspace at /app, and the listing from the service container is byte-identical (sha256 0a46bebbd6a5971e) to the listing from the container that actually ran PHPUnit; the fixture database publishes no host port ({\"5432/tcp\":null}); every resolved connection is the fixture, a sqlite file inside the workspace, or a loopback placeholder with NOTHING LISTENING, attempted with a 0.5s connect rather than assumed, with supabase/pooler/amazonaws rejected for every driver and any connection carrying a url rejected; vendor and bootstrap/cache live inside the workspace; staging 200 before and 200 after; live app/nginx RestartCount=0 and started 2026-10-06/2026-09-22. NO DEPLOYMENT WAS TRIGGERED: the newest Deploy a Contabo run is 004d24e9 of 2026-10-06T11:43:21Z, matching the app container's start time, and there have been none since. SCHEMA BOOTSTRAP SOLVED, which was the actual blocker: replaying into an empty database was impossible for FOUR independent reasons, each found by running and none worked around - (1) four foreign keys reference tables that later migrations create, died at migration 7 of 98; (2) the published spatie/laravel-permission migration is the v5 stub while composer.lock installs 6.25.0, died at 8; (3) information_schema.statistics, a MySQL-only view, in a 2026-07-24 migration, died at 36; (4) nothing in this branch creates taxonomy_categories, referenced in 4 places. Defect 4 is NOT schema to invent: 6aca79e moved the 20 creating migrations into database/migrations/pgsql/ and git branch --contains puts that commit ONLY on origin/feature/supplhi-postgres-buscador, which is not merged here - matching the repository's own note that the views were created by that branch 'con su propio mecanismo'. The fixture is therefore built from the union of both sets, taken at feature/supplhi-postgres-buscador@5df23fa9c5d0b93d5ccd0e155095a0e98726d6d0 (21 files), with Laravel sorting by filename across every --path so the dates reproduce the historical order. CORRECTIONS ARE MINIMAL AND PRESERVE INTEGRITY: three patches (4 files, 3 insertions, 4 deletions for the first; two locals the installed stub itself uses for the second; one method body to Schema::hasIndex() for the third), all git apply --check'ed, all applied to the DISPOSABLE WORKSPACE ONLY, with the four deferred constraints re-created in SQL under Laravel's own names and then CONFIRMED FROM pg_constraint by SQL that RAISES if one is missing. No foreign key disabled, no migration reordered or renamed, nothing applied to any existing database, no test or expected result edited. RESULT: all 104 migrations replay into an empty database, 90 objects (77 tables + 13 views), 82 foreign keys. THE SUITE RAN IN FULL: 419 tests, 2157 assertions, 5 errors, 21 failures, 2 skipped, 2 risky, 57s - 393 of 419 pass, and for scale the same suite produced 265 errors and 395 assertions before the schema work. WHAT REMAINS IS DATA, NOT SCHEMA, and seven tests say so in their own failure messages ('Precondición: hacen falta 18 categorías reales de referencia' x5, 'Se necesitan al menos 2 empresas reales en la BD de pruebas' x1, 'Se necesita al menos una empresa real' x1); the fixture measured 0 empresas, 0 taxonomy_categories, 0 taxonomy_terms, 0 users, 16 permissions from the project's OWN idempotent seeders, 0 roles. CLAIM BOUNDARY STATED RATHER THAN BLURRED: 7 of the 26 declare a data precondition; the other 19 are assertion mismatches whose shape is consistent with an empty dataset but that has NOT been verified test by test and is NOT claimed, so nothing here establishes that those 19 are not real code defects. TWO CLAIMS CORRECTED after the orchestrator's observation, both overstated by the developer: 'cannot build from zero in ANY engine' is now measured on PostgreSQL 16.15 only, and DatabaseTransactions plus the commented-out sqlite override establish that those tests need a pre-existing schema and that DB_CONNECTION comes from the environment but do NOT identify which database any historical run used - the 197/197 stands as evidence of that execution, just not of migrations rebuilding an empty database. FOUR FINDINGS FOR DECISION, none taken unilaterally: promote the three patches or not; merge feature/supplhi-postgres-buscador or not; the suite needs a data load that is outside a minimal correction; and db:skip-mysql-only-view-migrations cannot run on a new pgsql database despite its docblock saying to run it once per new database, because it reads max(batch) from migrations before anything creates that table.",
@@ -2942,7 +2947,7 @@
   "superseded_verdict_consumed_6126388084": "Round responding to AUTOMATED verdict 6126388084, read directly from Issue #2 with no owner relay. Its four findings were verified in the files and all four were real. The major one was a genuine hazard: two subsections of current_task.md were still labelled estado vivo while carrying PRE-APPLY numbers (142 TERM->CONCEPT, 81 concepts, \"ningun APPLY ocurrio nunca\"), so a resuming session could have concluded the 2026-10-07 APPLY never ran. Relabelling the H1 headings in the previous round did not neutralise a subsection that called itself live state. Also fixed: a TASK-0006E row still reading READY_FOR_REVIEW though closed in 5994449681, and a reference to a heading the previous round had renamed. The reviewer additionally made a structural point that is adopted: fields without a self-reference problem belong in the content commit, not the pointer commit.",
   "superseded_verdict_consumed_6126473713": "Round responding to AUTOMATED verdict 6126473713 (content commit eda579f). Two actionable findings, both real: a cross-reference that an earlier fix had repointed from nowhere to an unrelated section, now naming the TASK-0006D historical section and the audit path; and the knowledge/project-context HEAD stated two ways on the resume path, unified to 44db2fa after verifying with git ls-remote, with 2d53b0c kept and labelled as the creation head. This narrative was missing at the time because that round left the consumed-verdict field stale, which is precisely what 6126785198 then reported.",
   "loop_first_full_round": "2026-10-09. First complete autonomous round: agent published 6084535525/6084542694, orchestrator audited and published verdict 6084707259, agent read it directly and returned corrections. The owner relayed nothing. NOT yet demonstrated: persistent polling, restart recovery, or a continuously running cloud orchestrator - per the orchestrator's own caveat, successful Issue writes alone do not establish those.",
-  "agent_issue_write_access": "AVAILABLE",
+  "agent_issue_write_access": "AVAILABLE since 2026-10-09 via docs/orquestador/post_issue_comment.ps1 and the purpose-built token in the out-of-repo store; verified again on 2026-10-14 (comments 6167868489, 6168251563, 6168437907, 6172040668, 6172055856, 6173789525).",
   "agent_issue_write_enabled_at": "2026-10-09",
   "agent_issue_write_supersedes_comment": 6079826097,
   "agent_issue_write_verified_how": "End-to-end probe: a comment was created and then deleted, and the thread returned to its prior count of 68. Then two real comments were posted, 6084535525 and 6084542694, bringing the thread to 70, and both were read back to confirm UTF-8 integrity (no mojibake, section marks and emoji intact).",
@@ -2987,7 +2992,10 @@
       "contribution_rules": "Each author owns its own files and never edits the other's. Discrepancies go in ORCHESTRATOR_CORRECTIONS.md rather than overwriting. No force-push or rebase. Fast-forward before writing. Zero secrets. Every non-trivial claim carries a confidence mark.",
       "requested_from_orchestrator": "Issue #2 comment 6084542694"
     },
-    "issue_comments_posted_this_round": [6084535525, 6084542694],
+    "issue_comments_posted_this_round": [
+      6084535525,
+      6084542694
+    ],
     "post_issue_comment_bug_fixed": "post_issue_comment.ps1 sent {\"body\":{\"value\":...,\"Length\":...}} instead of a plain JSON string and GitHub rejected it with 422, because Get-Content -Raw decorates its output with PS* properties and ConvertTo-Json -Depth 3 expanded them. Fixed by reading with [System.IO.File]::ReadAllText with explicit UTF-8, which also removes an encoding ambiguity, plus a guard that aborts if the payload is not a plain string.",
     "loader_verified": "bootstrap_access.ps1 executed successfully: anonymous GitHub API PASS, staging HTTP 200, Worker HTTP 200, PATH and .env detection working, no value printed.",
     "findings": {
@@ -3006,7 +3014,6 @@
       }
     }
   },
-
   "review_workflow": "MANUAL. The autonomous executor stays SUSPENDED (see orchestrator_suspended_2026-10-14.md): no polling, no automated Anthropic reviews, no pointer-driven review requests. Rounds are delivered by publishing a READY_FOR_REVIEW - MANUAL comment on Issue #2 and stopping; the owner relays the link and ChatGPT reviews on GitHub. The TASK-0010A side of this merge carried the SUPERSEDED autonomous narrative (WAITING_ORCHESTRATOR_REVIEW set after 60 minutes of polling, review_head badce535, agent_issue_write_access UNAVAILABLE) and it was deliberately NOT carried forward: polling no longer happens, that review_head is three accepted rounds stale, and Issue #2 write access has worked since 2026-10-09.",
   "integration_candidate": {
     "branch": "feature/integration-candidate-0010",
@@ -3031,7 +3038,10 @@
       "runner_sha256": "562d852c67702e5f9b51b1c4338de6daca555efc060751865678b1d8d4be09f7",
       "target": "database resolved by staging's pgsql connection, inside the running app container; one READ ONLY transaction, ROLLBACK",
       "staging_deployed_sha": "f8a98df5ff5e90a05849c709f3a5847f6945d198 (runtime code identical to a6e9db4; the difference is docs/audit only)",
-      "pending_for_migrate_force": ["2022_12_02_000000_restore_deferred_foreign_keys", "2026_10_09_120000_create_taxonomy_category_requests_table"],
+      "pending_for_migrate_force": [
+        "2022_12_02_000000_restore_deferred_foreign_keys",
+        "2026_10_09_120000_create_taxonomy_category_requests_table"
+      ],
       "report": "audit/integration_candidate_0010_live_preflight_2026-10-14.md",
       "artifacts": "audit/integration_candidate_0010/live_preflight/",
       "note": "Read-only evidence only. No push to feature/upgrade-filament-v3, no deploy, no ledger or data change. The staging execution instruction is the orchestrator's to record."
@@ -3057,7 +3067,20 @@
     "correction_comment": 6189828037,
     "correction": "env_file refresh + cache sequence + rollback documented (recreate app, then config:cache in the refreshed container); verified against compose/workflow/Dockerfile and a disposable compose demo with non-secret markers; live environment untouched",
     "previous_review_head": "73765eac26a9578223c2cf2ac73692843d5e1215",
-    "report": "audit/mail_docs_user_manual_2026-10-15.md"
+    "report": "audit/mail_docs_user_manual_2026-10-15.md",
+    "accepted_review_head": "d23c0e6ffac8e7b5105370bedade3475105e0fff",
+    "acceptance_comment": "6190018710",
+    "deployment": {
+      "authorization_comment": "6190034071",
+      "outcome": "BLOCKED",
+      "deploy_branch_head": "d23c0e6ffac8e7b5105370bedade3475105e0fff",
+      "runtime": "a5772345ff0a52bd79a5b29ab063991960109271",
+      "workflow_run": null,
+      "blocker": "all changed paths match paths-ignore (docs/**, audit/**, **.md); resources/ is baked into the image so a full workflow run is required; CPV_GITHUB_TOKEN dispatch returned 403 (actions=write); Run workflow button absent because main has no workflow file",
+      "recovery_image": "perfilafiliados-app:pre-manual-a577234",
+      "pre_state": "audit/runs/manual_deploy_2026-10-15/pre_state.txt",
+      "mail": "PENDING_OWNER_CONFIGURATION; unchanged (transport log, simulated)"
+    }
   },
   "task_0010c": {
     "owner_reported_uat": "PASS (comment 6189493183); owner report, not an automated run",
@@ -3084,7 +3107,6 @@
     "report": "audit/task_0010c_request_operations_2026-10-15.md",
     "note": "Deployed for owner functional testing. No SMTP, no real mail, no recipient change, no retry of request #1, no secrets."
   },
-  "agent_issue_write_access": "AVAILABLE since 2026-10-09 via docs/orquestador/post_issue_comment.ps1 and the purpose-built token in the out-of-repo store; verified again on 2026-10-14 (comments 6167868489, 6168251563, 6168437907, 6172040668, 6172055856, 6173789525).",
   "agent_review_polling_policy": {
     "status": "RETIRED_2026-10-14",
     "policy": "NO POLLING. The owner suspended the autonomous loop on 2026-10-14 and every round since is delivered manually: publish one READY_FOR_REVIEW - MANUAL comment on Issue #2 and STOP active work. The agent does not wait, does not re-check on a timer and does not trigger automated reviews.",
