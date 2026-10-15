@@ -299,6 +299,9 @@ try {
     await page.goto(BASE + MAP, { waitUntil: 'load' });
     const ok = await ready(page, 40000);
     const tReady = Date.now() - t0;
+    // The panel opens its sidebar over the page in this mobile context; close it, as a user would.
+    await page.evaluate(() => window.Alpine?.store('sidebar')?.close?.());
+    await page.waitForTimeout(300);
     const nav = await page.evaluate(() => {
       const e = performance.getEntriesByType('navigation')[0];
       return { dom_content_loaded_ms: Math.round(e.domContentLoadedEventEnd), load_ms: Math.round(e.loadEventEnd) };
