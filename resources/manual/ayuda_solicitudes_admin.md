@@ -60,3 +60,13 @@ Qué ocurre:
 ## Qué ve la empresa {#que-ve-la-empresa}
 
 Al enviar la solicitud, la empresa recibe su **número de solicitud** como referencia. Si el aviso no se pudo enviar, ve que la solicitud quedó registrada y que el aviso por correo está pendiente. No ve el modo del servidor ni ningún detalle técnico.
+
+## El correo del sistema {#correo-del-sistema}
+
+El sistema tiene **una sola configuración de correo**, común a todo lo que envía: los avisos de solicitudes y el correo de verificación que recibe una persona al crear su cuenta. Esa configuración no se cambia desde el panel: la aplica quien administra el servidor, y nunca se escriben claves en el panel, en el chat ni en los informes.
+
+- **Configuración de solicitudes** solo define **a quién** avisar. No decide si el correo sale.
+- **Modo de envío del servidor** (en la misma página) muestra el modo actual. Si dice **Simulado**, no sale ningún correo: los avisos quedan registrados en el historial como simulados.
+- Mientras el modo sea simulado, una persona que crea su cuenta **no recibe** el correo de verificación, y sin él no puede entrar al panel. Tome nota de quién se registra en ese periodo para resolverlo cuando se active el envío real.
+
+> **NOTA:** Activar el envío real es una decisión aparte de la Cámara: elegir el proveedor de correo y el remitente, configurar el dominio y hacer una prueba controlada. Hasta entonces, el sistema funciona y registra todo, pero no envía correos.

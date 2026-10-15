@@ -6,7 +6,9 @@ Esta guía explica cómo usar el **Perfil de Afiliados** de la Cámara Petrolera
 
 El Perfil de Afiliados es el sistema donde cada empresa afiliada a la Cámara registra y mantiene su información: datos generales, lo que ofrece (categorías de la Taxonomía CPV), contactos, recursos, sistemas de gestión, presencia internacional, experiencia y enfoques de sostenibilidad.
 
-La Cámara usa esta información para conocer las capacidades de sus afiliados, preparar reportes y responder búsquedas de proveedores, incluidas las que se hacen con sus herramientas de consulta (por ejemplo, el asistente CIRA).
+La Cámara usa esta información para conocer las capacidades de sus afiliados, preparar reportes y responder búsquedas de proveedores, incluidas las que se hacen con sus herramientas de consulta (por ejemplo, el asistente CIRA). El objetivo es dar a conocer a sus afiliados ante las empresas interesadas en contratar empresas del sector en Venezuela.
+
+Cada persona de su empresa que vaya a trabajar en el sistema necesita **su propio usuario**. La Cámara autoriza cada usuario y lo asocia con la empresa que le corresponde.
 
 **Por qué mantenerla al día:**
 
@@ -20,7 +22,7 @@ La Cámara usa esta información para conocer las capacidades de sus afiliados, 
 
 ### Ingresar al sistema {#ingresar}
 
-1. Abra la pantalla de acceso del sistema.
+1. Abra en su navegador la dirección del sistema que le indicó la Cámara. Verá la pantalla **Entre a su cuenta**.
 2. Escriba su **Correo electrónico** y su **Contraseña**. Puede hacer clic en el ícono del ojo para ver la contraseña mientras la escribe.
 3. Marque **Recordarme** solo si usa un equipo personal.
 4. Complete la verificación anti-bot que aparece en la pantalla.
@@ -34,9 +36,20 @@ La Cámara usa esta información para conocer las capacidades de sus afiliados, 
 2. Complete **Nombre**, **Correo electrónico**, **Contraseña** y **Confirmar contraseña**.
 3. Complete la verificación anti-bot y presione **Registrarse**.
 
-El sistema exige que su correo electrónico esté verificado para trabajar en el panel. Si recibe un correo de verificación, abra el enlace que contiene (revise también la carpeta de correo no deseado).
+El sistema exige que su correo electrónico esté verificado para trabajar en el panel. Después de registrarse:
+
+1. Busque en su correo el mensaje de verificación y abra el enlace que contiene.
+2. Si no lo ve después de un tiempo prudencial, revise la carpeta de correo no deseado («spam»).
+3. Si aun así no le llegó, **contacte a la Cámara** e indique el correo con el que se registró. Sin el correo verificado no podrá entrar al panel.
 
 > **IMPORTANTE:** Crear una cuenta no le da acceso automático a los datos de su empresa. La Cámara debe asociar su usuario con la empresa correspondiente. Después de registrarse, avise a la Cámara.
+
+### Primer ingreso: el Escritorio {#escritorio}
+
+Al entrar verá la pantalla inicial, llamada **Escritorio**, y a la izquierda el **menú lateral**. En el teléfono, el menú está oculto: ábralo con el ícono de tres líneas (☰), arriba a la izquierda.
+
+- **Si la Cámara todavía no asoció su usuario con su empresa**, el menú no le mostrará su empresa. Es normal en el primer ingreso: avise a la Cámara indicando el nombre y el RIF de la empresa (ver [Si su empresa no aparece](#empresa-no-asociada)).
+- **Cuando la Cámara ya lo asoció**, el menú le muestra **Empresas**, desde donde trabaja con los datos de su empresa, y **Manual de usuario**, que es esta guía.
 
 ### Si olvidó su contraseña {#olvido-contrasena}
 
@@ -72,7 +85,10 @@ Los datos generales se completan en un formulario de 4 pasos. Avance con **Sigui
     - **Sectores de actividad económica (máximo 2)**: **Sector principal** y **Sector secundario (opcional)**.
     - **Operaciones en Venezuela**: **Facturación anual promedio (últimos 5 años)**, **Empleados** y **Estatus actual**.
     - **Capital de la empresa**: **Propiedad** (Privado o Público) y **Origen** (Nacional o Internacional).
-4. **4 - Clientes**: **Principales clientes en los últimos 15 años**. Use **Añadir cliente** para agregar una línea con **Nombre del cliente** y **País**.
+4. **4 - Clientes**: **Principales clientes en los últimos 15 años**.
+    - Escriba el **Nombre del cliente** (texto libre) y elija su **País**; el país es obligatorio.
+    - Use **Añadir cliente** para agregar otra línea, una por cliente.
+    - Para quitar una línea, use el ícono de la papelera de esa línea.
 
 ### Datos que administra la Cámara {#datos-de-la-camara}
 
@@ -252,6 +268,16 @@ No necesita escribir los datos de su empresa ni sus datos de usuario: el sistema
 
 Debajo del formulario de datos generales aparecen varias pestañas. Según los permisos de su cuenta, puede ver algunas o todas. Cada acción de estas pestañas se guarda en el momento en que usted la confirma.
 
+### Los botones de las ventanas {#botones-ventanas}
+
+Muchas pestañas abren una ventana para agregar datos. Los botones del pie se repiten:
+
+- **Crear** o **Vincular**: guarda lo que escribió o eligió y cierra la ventana.
+- **Crear y crear otro** o **Vincular y vincular otro**: guarda y deja la ventana abierta y vacía para cargar el siguiente. Úselo cuando tiene varios registros seguidos.
+- **Cancelar**: cierra la ventana sin guardar.
+
+Un aviso en la esquina de la pantalla confirma que la acción quedó guardada. Si un campo obligatorio está vacío o mal escrito, la ventana no se cierra y el campo aparece marcado en rojo: corríjalo y vuelva a confirmar.
+
 ### Cámaras {#camaras}
 
 Muestra las cámaras en las que participa su empresa (la pestaña puede aparecer con el título «Chambers»).
@@ -269,6 +295,8 @@ Muestra las personas de contacto de su empresa (la pestaña puede aparecer con e
 
 > **NOTA:** Los contactos no se editan después de creados. Para corregir uno, desvincúlelo y vuelva a crearlo con los datos correctos. Cada empresa carga sus propios contactos; otros afiliados no los ven.
 
+> **NOTA:** Si usted atiende varias empresas afiliadas, cargue el contacto en cada una por separado. La opción de traer un contacto ya creado en otra empresa ya no está disponible.
+
 ### Usuarios {#usuarios}
 
 Muestra los usuarios que tienen acceso a su empresa (la pestaña puede aparecer con el título «Users»). Para dar acceso a un nuevo usuario de su empresa o retirarlo, contacte a la Cámara.
@@ -279,20 +307,33 @@ Muestra la clasificación anterior de sectores y servicios de su empresa, **solo
 
 ### Recursos en Venezuela {#recursos}
 
-Tiene cuatro botones, uno por tipo de recurso. Cada uno abre una ventana para agregar o editar los datos:
+Aquí se declaran los recursos de los que su empresa dispone **en Venezuela**: personal, maquinaria y equipos, instalaciones e inventario. La pestaña tiene cuatro botones, uno por tipo de recurso. Cada uno abre una ventana para agregar o editar los datos:
 
-- **Recursos humanos**: **Tipo de recurso** y cantidad por nivel (**Junior**, **Medium**, **Senior**).
-- **Maquinaria y equipos**: **Equipo**, **Cantidad (n)** y **Valor estimado** (por rangos).
-- **Instalaciones**: **Tipo de instalación**, **Cantidad**, **Sup (mt2)** y **Tipo de Propiedad** (Propia, Alquilada o Ambas).
-- **Inventario**: **Tipo de inventario**, **Cantidad (n)**, **Unidad** y **Valor actual estimado** (por rangos).
+- **Recursos humanos**: elija el **Tipo de recurso** (Bachilleres, Técnicos, Ingenieros, Administrativo, Gerencial o Directivo) y escriba cuántas personas tiene en cada nivel: **Junior**, **Medium** y **Senior**. Agregue una línea por cada tipo de personal.
+- **Maquinaria y equipos**: elija el **Equipo** por categoría (equipos de medición y levantamiento; marino-costeros, fluviales o costa afuera; movimiento de tierra y construcción; equipos menores de construcción; fabricación metalmecánica, electromecánica o electrónica; montaje eléctrico o mecánico; máquinas herramientas; almacenamiento y transporte; servicios a pozos e instalaciones petroleras), la **Cantidad (n)** y el **Valor estimado**.
+- **Instalaciones**: elija el **Tipo de instalación** (Oficinas, Talleres, Manufactura o fábrica industrial, Almacenes y depósitos, Laboratorios, Facilidades marinas y muelles, u Otros), y escriba la **Cantidad**, la superficie en metros cuadrados (**Sup (mt2)**) y el **Tipo de Propiedad** (Propia, Alquilada o Ambas).
+- **Inventario**: elija **Materia Prima** o **Producto terminado**, la **Cantidad (n)**, la **Unidad** (por ejemplo, toneladas o piezas) y el **Valor actual estimado**.
+
+Las cantidades y los valores de maquinaria e inventario se eligen **por rangos (orden de magnitud)**, no como cifras exactas: elija el rango que corresponde.
 
 Dentro de cada ventana hay un interruptor **No Aplica** para declarar que ese tipo de recurso no corresponde a su empresa.
 
 ### Sistemas de gestión {#sistemas-de-gestion}
 
-Tiene seis botones: **Calidad**, **Ambiente**, **Credibilidad y transparencia**, **Seguridad**, **Gestión de proyectos** y **Seguridad de la información**. En cada uno marque las certificaciones o sistemas que su empresa tiene; use **Otros (especifíque)** para indicar uno que no esté en la lista. Cada ventana también tiene su interruptor **No Aplica**.
+Aquí se indican los sistemas de gestión y las certificaciones que su empresa tiene implementados. Tiene seis botones, uno por grupo:
+
+- **Calidad** (por ejemplo, ISO 9001 o ISO 17025).
+- **Ambiente** (por ejemplo, ISO 14001 o ISO 50001).
+- **Credibilidad y transparencia** (por ejemplo, Dun & Bradstreet o ISO 37001).
+- **Seguridad** (por ejemplo, ISO 45001).
+- **Gestión de proyectos** (por ejemplo, Project Management Professional).
+- **Seguridad de la información** (por ejemplo, ISO 27001).
+
+En cada ventana marque los que su empresa tiene. Si tiene uno que no está en la lista, active **Otros (especifíque)** y escriba su nombre. Cada ventana también tiene su interruptor **No Aplica**.
 
 ### Experiencia relevante {#experiencia}
+
+Resume los proyectos relevantes de su empresa en los sectores de infraestructura del país durante los **últimos 10 años**. Registre una experiencia por proyecto.
 
 Presione **Agregar experiencia** y complete:
 
@@ -310,7 +351,7 @@ Cada experiencia registrada tiene las acciones **Editar** y **Eliminar**.
 Use el botón **Crear** de la pestaña (solo aparece si su empresa todavía no tiene este registro). El formulario tiene dos pasos:
 
 1. **¿Tiene presencia formal en otros países?**: active **Tiene oficinas o sucursales fuera de Venezuela** y complete **Datos de oficinas** (**País**, **Superficie (㎡)**, **Empleados (n)** y **Activa?**).
-2. **¿Tiene experiencia desarrollando proyectos en otros países?**: active **Tiene experiencia desarrollando proyectos fuera de Venezuela** y complete **Datos de experiencia** (**País**, **Nro. de proyectos**, **Rol**, **Monto total ejecutado**, **Empleados (n)** y **Principales clientes**).
+2. **¿Tiene experiencia desarrollando proyectos en otros países?**: active **Tiene experiencia desarrollando proyectos fuera de Venezuela** y complete **Datos de experiencia** (**País**, **Nro. de proyectos**, **Rol**, **Monto total ejecutado**, **Empleados (n)** y **Principales clientes**). Se refiere a los **últimos 20 años** y se carga **por país, no por proyecto**: sume en una sola línea los proyectos de cada país. En **Rol** indique si participó como subcontratista, como contratista principal o en ambos papeles; el **Monto total ejecutado** se elige por rangos.
 
 Después puede usar **Editar** o **Borrar** sobre el registro.
 
@@ -318,7 +359,25 @@ Después puede usar **Editar** o **Borrar** sobre el registro.
 
 ### Enfoque de sostenibilidad {#sostenibilidad}
 
-Use el botón **Crear** de la pestaña, elija el **Area** (al elegirla verá su descripción) e indique el **Status**: **No**, **Sí: Inactivo** o **Sí: Activo**. Cada enfoque registrado puede borrarse con **Borrar**.
+La Cámara pide que su empresa responda **cada uno** de los ocho enfoques de sostenibilidad, **incluso los que no aplica** (en ese caso, con **No**):
+
+1. Maximización de la eficiencia material y energética: hacer más con menos recursos, con menos residuos, emisiones y contaminación.
+2. Creación de valor a partir de los desechos: una estrategia para manejar los desechos y reducir los que deben procesarse o desecharse.
+3. Uso de energías renovables y procesos naturales: depender menos de insumos finitos o difíciles de obtener.
+4. Funcionalidad en vez de propiedad: atender a sus clientes sin que tengan que comprar los equipos físicos, aprovechando al máximo la maquinaria.
+5. Participación proactiva con las partes interesadas: esfuerzos reconocidos por el cuidado a largo plazo de un recurso o de una comunidad.
+6. Fomento de la suficiencia: reducir el consumo y la producción, y promover esa conducta entre clientes y consumidores.
+7. Reorientación del objeto por y para la sociedad o el ambiente: dar prioridad al valor social o ambiental sobre el beneficio económico.
+8. Desarrollo de soluciones a escala: llevar soluciones locales que funcionan a una escala mayor.
+
+Para registrar cada uno:
+
+1. Presione el botón **Crear** de la pestaña.
+2. Elija el **Area**. Al elegirla, verá su descripción.
+3. Indique el **Status**: **Sí: Activo** si su empresa lo aplica hoy; **Sí: Inactivo** si lo tiene, pero no lo está aplicando en este momento; **No** si no lo aplica.
+4. Confirme. Repita hasta registrar los ocho.
+
+Cada enfoque registrado puede borrarse con **Borrar**.
 
 ### La opción «No Aplica» {#no-aplica}
 
@@ -356,11 +415,16 @@ Una sección cuenta como completa si tiene datos cargados o si está marcada **N
 | No estoy seguro de si se guardaron los cambios | En el formulario de datos generales debe presionar **Guardar cambios** en el último paso y ver el aviso **Guardado**. En las pestañas, cada acción se guarda al confirmarla. |
 | El RIF o el Sector principal están bloqueados | Es intencional: solo la Cámara los modifica. Contáctela si hay un error. |
 | La lista de Empresas está vacía | Su usuario todavía no está asociado a su empresa. Contacte a la Cámara. |
+| No me llegó el correo de verificación | Revise la carpeta de correo no deseado. Si no está, contacte a la Cámara e indique el correo con el que se registró. |
+| Usé «Crear y crear otro» y la ventana no se cerró | Es lo esperado: lo cargado ya quedó guardado y la ventana queda vacía para el siguiente registro. Presione **Cancelar** cuando termine. |
+| No encuentro cómo traer un contacto de otra empresa que también atiendo | Esa opción ya no existe. Cree el contacto en cada empresa por separado. |
+| La ventana no se cierra al presionar **Crear** | Hay un campo obligatorio vacío o mal escrito, marcado en rojo. Corríjalo y vuelva a presionar **Crear**. |
 | Una cámara no aparece al buscarla para vincular | Su empresa ya está vinculada a esa cámara. |
 
 ### Cuándo contactar a la Cámara {#contactar-camara}
 
 - Su usuario no está asociado a su empresa o necesita dar acceso a otra persona.
+- No le llegó el correo de verificación de su cuenta.
 - Olvidó su contraseña.
 - El RIF, el nombre o el Sector principal de su empresa tienen un error.
 - Su empresa necesita más categorías que el límite configurado.
@@ -369,7 +433,7 @@ Una sección cuenta como completa si tiene datos cargados o si está marcada **N
 
 ## Privacidad y buenas prácticas {#privacidad}
 
-- **Información veraz**: registre solo información verdadera y verificable sobre su empresa.
+- **Información veraz**: registre solo información verdadera y verificable sobre su empresa. Como lo indica el propio sistema, la empresa afiliada es responsable de la veracidad de la información que suministra de manera directa y voluntaria, y la Cámara no se hace responsable de ella.
 - **Sin inflar el perfil**: no agregue categorías solo para aparecer en más búsquedas. Una categoría que su empresa no ofrece genera coincidencias falsas y puede afectar la credibilidad de su perfil ante la Cámara y ante quienes buscan proveedores.
 - **Datos de cuenta y contactos al día**: mantenga actualizados su nombre, su correo y los contactos de su empresa. Registre como contacto solo a personas que estén de acuerdo en serlo.
 - **Su cuenta es personal**: no comparta su contraseña. Si otra persona de su empresa necesita acceso, debe crear su propia cuenta y pedir a la Cámara que la asocie con la empresa.

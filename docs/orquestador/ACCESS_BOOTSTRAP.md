@@ -50,9 +50,12 @@ Qué se puede hacer, con qué credencial, y de dónde sale el valor.
 | 9 | Deploy / secretos del Worker (`wrangler`) | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | almacén local (§3) | ⬜ no configurado |
 | 10 | API de gestión de Supabase | `SUPABASE_ACCESS_TOKEN` | almacén local (§3) | ⬜ opcional |
 | 11 | Flujo n8n / CIRA (UAT) | credenciales de n8n | propiedad del propietario | 🔒 fuera del agente |
+| 12 | **Correo del sistema** (verificación de registro, avisos de solicitudes) | `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_ENCRYPTION`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME` | `.env` del directorio de despliegue de cada entorno, en el servidor (fuera de git), inyectado con `env_file` | ⏳ **pendiente del propietario**: staging en modo sin envío (`log`). Ver `docs/deploy/CORREO_DEL_SISTEMA.md` |
 
 Leyenda: ✅ funciona · ⚠️ limitación conocida · ⬜ no configurado, se configura si se necesita ·
-🔒 deliberadamente fuera del alcance del agente.
+🔒 deliberadamente fuera del alcance del agente · ⏳ esperando una decisión o entrega del propietario.
+
+> **Correo del sistema (fila 12):** la configuración de `config/mail.php` es una sola y global. El **destinatario** de las solicitudes de categoría es otra cosa: un dato de negocio que Super Admin edita en el panel. El agente no crea, rota ni lee credenciales de correo. Para validar, usa `docs/deploy/mail_status_readonly.php`, que solo informa configurado o falta.
 
 ### 2.1 Notas por credencial
 
@@ -377,3 +380,12 @@ Luego leer en el orden de `PROJECT_KNOWLEDGE.md` §9 y entrar al loop si hay tar
 
 **Al terminar cualquier ronda:** working tree limpio, commit + push, `current_task.md` y
 `orchestrator_handoff.json` actualizados, y **cero secretos persistidos**.
+
+**Regla de documentación (vigente desde 2026-10-15, instrucción `6189493183`):** toda ronda que cambie el comportamiento del sistema:
+
+1. evalúa su impacto en la documentación de usuario y de administración;
+2. actualiza **en la misma entrega** el manual en línea (`resources/manual/manual_usuario.md`) y/o la ayuda de administración (`resources/manual/ayuda_solicitudes_admin.md` u otra ayuda de administrador que corresponda);
+3. informa qué secciones del manual cambiaron y a qué parte de la funcionalidad corresponden;
+4. si el cambio no tiene efecto visible para usuarios o administradores, lo deja escrito con el motivo, en lugar de hacer un retoque cosmético al manual.
+
+Un cambio visible para el usuario **no está terminado** mientras sus instrucciones estén desactualizadas. Se mantiene una sola fuente del manual en línea; el PDF histórico (`public/user.pdf`) no se regenera salvo pedido expreso.

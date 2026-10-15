@@ -327,6 +327,8 @@ Vigentes hasta nueva autorización explícita del propietario:
   `STALE_TAXONOMY_STATE`;
 - no migraciones destructivas; no borrar ni recrear historia;
 - **no adivinar decisiones ambiguas — reportarlas.**
+- **documentación en la misma entrega** (desde 2026-10-15, `6189493183`): toda ronda que cambie el comportamiento del sistema evalúa su impacto en el manual en línea (`resources/manual/manual_usuario.md`) y en la ayuda de administración, y los actualiza en esa misma entrega. Informa las secciones cambiadas y su correspondencia con la funcionalidad. Si no hay efecto visible, lo deja escrito con el motivo. Un cambio visible no está terminado con instrucciones desactualizadas. Hay una sola fuente del manual en línea; el PDF histórico no se regenera. Detalle en `ACCESS_BOOTSTRAP.md` §8;
+- **correo del sistema**: una sola configuración global de Laravel (`config/mail.php` ← `MAIL_*` del `.env` de cada entorno). Hoy staging está en modo sin envío y la activación está **pendiente del propietario**. Ver `docs/deploy/CORREO_DEL_SISTEMA.md`. No crear un segundo almacén SMTP ni poner credenciales en una funcionalidad.
 
 El protocolo de autonomía y los gates A–F están en `docs/orquestador/AUTONOMOUS_DEV_LOOP.md`.
 
@@ -334,8 +336,10 @@ El protocolo de autonomía y los gates A–F están en `docs/orquestador/AUTONOM
 
 ## 9. Orden de lectura al reanudar
 
+> **Vigente desde 2026-10-15:** primero `SESSION_RESUME.md` §0–§6 y los comentarios del Issue #2 enlazados ahí. El loop autónomo está suspendido, así que los puntos 2 a 4 de abajo son historia y contexto, no instrucciones de arranque.
+
 1. `docs/orquestador/SESSION_RESUME.md` — estado y punto de reanudación maestro
-2. `docs/orquestador/AUTONOMOUS_DEV_LOOP.md` — protocolo del loop y gates
+2. `docs/orquestador/AUTONOMOUS_DEV_LOOP.md` — protocolo del loop y gates (loop suspendido)
 3. `docs/orquestador/current_task.md` — encabezado con la tarea activa
 4. `audit/orchestrator_handoff.json` — campos `current_*` y `review_*`
 5. último comentario del orquestador en Issue #2
