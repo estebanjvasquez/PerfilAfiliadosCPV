@@ -1,0 +1,224 @@
+method=MANUAL_SSH_DEPLOY (no GitHub Actions run; authorization 6190034071, route 6190372221 option c)
+script=literal 'script:' block of .github/workflows/deploy-contabo.yml @ d23c0e6, YAML indentation removed, sha256 49ec7d8411b35084fdc866e687d36ab21c1a9c6dfc2121b23976b97c0c0f074f
+
+start_utc=2026-10-15T11:04:35Z
+HEAD is now at d23c0e6 docs(mail): recreate the app before regenerating the config cache, to activate and to roll back
+ Image perfilafiliados-app Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 496B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile:
+#2 transferring dockerfile: 1.33kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/php:8.2-fpm
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/composer:2
+#4 DONE 0.7s
+
+#3 [internal] load metadata for docker.io/library/php:8.2-fpm
+#3 DONE 0.7s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [base 1/8] FROM docker.io/library/php:8.2-fpm@sha256:faf32167826a68cb7c595793e2e508164a24cac187be60ed8de9c81b17236048
+#6 resolve docker.io/library/php:8.2-fpm@sha256:faf32167826a68cb7c595793e2e508164a24cac187be60ed8de9c81b17236048 0.0s done
+#6 DONE 0.0s
+
+#7 FROM docker.io/library/composer:2@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac
+#7 resolve docker.io/library/composer:2@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 7.76MB 0.2s done
+#8 DONE 0.2s
+
+#9 [base 3/8] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#9 CACHED
+
+#10 [base 4/8] WORKDIR /var/www/html
+#10 CACHED
+
+#11 [base 5/8] COPY composer.json composer.lock ./
+#11 CACHED
+
+#12 [base 2/8] RUN apt-get update && apt-get install -y         libpq-dev         libicu-dev         libzip-dev         libpng-dev         libonig-dev         libxml2-dev         git         unzip     && docker-php-ext-install -j$(nproc)         pdo_pgsql         intl         zip         gd         bcmath     && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [base 6/8] RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-scripts --no-interaction
+#13 CACHED
+
+#14 [base 7/8] COPY . .
+#14 DONE 1.8s
+
+#15 [base 8/8] RUN composer dump-autoload --optimize     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+#15 0.629 The repository at "/var/www/html" does not have the correct ownership and git refuses to use it:
+#15 0.629 
+#15 0.629 fatal: detected dubious ownership in repository at '/var/www/html'
+#15 0.629 To add an exception for this directory, call:
+#15 0.629 
+#15 0.629 git config --global --add safe.directory /var/www/html
+#15 0.629 
+#15 0.699 Generating optimized autoload files
+#15 4.691 > Illuminate\Foundation\ComposerScripts::postAutoloadDump
+#15 4.773 > @php artisan package:discover --ansi
+#15 5.073 
+#15 5.073    INFO  Discovering packages.  
+#15 5.073 
+#15 5.077   3x1io/filament-user ... DONE
+#15 5.077   alperenersoy/filament-export ... DONE
+#15 5.078   anourvalar/eloquent-serialize ... DONE
+#15 5.078   barryvdh/laravel-dompdf ... DONE
+#15 5.079   bezhansalleh/filament-shield ... DONE
+#15 5.079   blade-ui-kit/blade-heroicons ... DONE
+#15 5.079   blade-ui-kit/blade-icons ... DONE
+#15 5.080   filament/actions ... DONE
+#15 5.080   filament/filament ... DONE
+#15 5.080   filament/forms ... DONE
+#15 5.081   filament/infolists ... DONE
+#15 5.081   filament/notifications ... DONE
+#15 5.084   filament/support ... DONE
+#15 5.084   filament/tables ... DONE
+#15 5.084   filament/widgets ... DONE
+#15 5.084   jeffgreco13/filament-breezy ... DONE
+#15 5.084   jenssegers/agent ... DONE
+#15 5.084   kirschbaum-development/eloquent-power-joins ... DONE
+#15 5.084   lab404/laravel-impersonate ... DONE
+#15 5.084   laravel/sanctum ... DONE
+#15 5.084   laravel/tinker ... DONE
+#15 5.085   livewire/livewire ... DONE
+#15 5.085   maatwebsite/excel ... DONE
+#15 5.086   nesbot/carbon ... DONE
+#15 5.086   nunomaduro/termwind ... DONE
+#15 5.088   phpsa/filament-password-reveal ... DONE
+#15 5.088   queents/console-helpers ... DONE
+#15 5.088   ryangjchandler/blade-capture-directive ... DONE
+#15 5.088   spatie/laravel-permission ... DONE
+#15 5.088   stechstudio/filament-impersonate ... DONE
+#15 5.088 
+#15 5.099 Generated optimized autoload files containing 8628 classes
+#15 DONE 5.7s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 2.3s done
+#16 exporting manifest sha256:2c3a7b9b4eae22335965785e3f8398a1f8ff64ab0428c1eebb581106b93be7b9 done
+#16 exporting config sha256:181918e2970f794649ab1bcd56e2c4540f0e4d7eda5ad9c44855e78f2e9db481 done
+#16 exporting attestation manifest sha256:15989efa1129d69fffa41313ce604f2dcd2f14b3db36cdf43f3ac7a3c70425da done
+#16 exporting manifest list sha256:b66d8024b04aa73b25c260b4a5b9275d07e6bab267347339ec51ebe904625d64 done
+#16 naming to docker.io/library/perfilafiliados-app:latest done
+#16 unpacking to docker.io/library/perfilafiliados-app:latest
+#16 unpacking to docker.io/library/perfilafiliados-app:latest 0.8s done
+#16 DONE 3.2s
+
+#17 resolving provenance for metadata file
+#17 DONE 0.0s
+ Image perfilafiliados-app Built 
+ Container perfilafiliados-app-run-dd27435f5622 Creating 
+ Container perfilafiliados-app-run-dd27435f5622 Created 
+
+   INFO  Application is now in maintenance mode.  
+
+
+   INFO  Discovering packages.  
+
+  3x1io/filament-user ... DONE
+  alperenersoy/filament-export ... DONE
+  anourvalar/eloquent-serialize ... DONE
+  barryvdh/laravel-dompdf ... DONE
+  bezhansalleh/filament-shield ... DONE
+  blade-ui-kit/blade-heroicons ... DONE
+  blade-ui-kit/blade-icons ... DONE
+  filament/actions ... DONE
+  filament/filament ... DONE
+  filament/forms ... DONE
+  filament/infolists ... DONE
+  filament/notifications ... DONE
+  filament/support ... DONE
+  filament/tables ... DONE
+  filament/widgets ... DONE
+  jeffgreco13/filament-breezy ... DONE
+  jenssegers/agent ... DONE
+  kirschbaum-development/eloquent-power-joins ... DONE
+  lab404/laravel-impersonate ... DONE
+  laravel/sanctum ... DONE
+  laravel/tinker ... DONE
+  livewire/livewire ... DONE
+  maatwebsite/excel ... DONE
+  nesbot/carbon ... DONE
+  nunomaduro/termwind ... DONE
+  phpsa/filament-password-reveal ... DONE
+  queents/console-helpers ... DONE
+  ryangjchandler/blade-capture-directive ... DONE
+  spatie/laravel-permission ... DONE
+  stechstudio/filament-impersonate ... DONE
+
+2022_10_19_213831_create_catalogo_view: ya estaba marcada, sin cambios.
+2022_11_06_185050_create_capacity_view: ya estaba marcada, sin cambios.
+2022_11_08_224546_create_management_view: ya estaba marcada, sin cambios.
+2022_11_10_200304_create_sustainability_view: ya estaba marcada, sin cambios.
+2022_11_10_211023_create_finance_view: ya estaba marcada, sin cambios.
+2022_11_13_181946_create_clients_view: ya estaba marcada, sin cambios.
+2022_11_16_204956_create_experience_view: ya estaba marcada, sin cambios.
+2022_12_03_003734_create_experience_view: ya estaba marcada, sin cambios.
+2023_05_10_181749_create_resource_view: ya estaba marcada, sin cambios.
+2023_05_25_223154_create_machinery_view: ya estaba marcada, sin cambios.
+2023_05_26_204049_create_facility_view: ya estaba marcada, sin cambios.
+2023_05_31_233119_create_inventory_view: ya estaba marcada, sin cambios.
+2023_06_02_204233_create_management_det_view: ya estaba marcada, sin cambios.
+2023_09_15_225003_create_presence_view: ya estaba marcada, sin cambios.
+2026_08_04_000001_fix_null_bucket_defaults_in_report_views: ya estaba marcada, sin cambios.
+
+   INFO  Nothing to migrate.  
+
+  ⇂ public/js/filament/forms/components/color-picker.js  
+  ⇂ public/js/filament/forms/components/date-time-picker.js  
+  ⇂ public/js/filament/forms/components/file-upload.js  
+  ⇂ public/js/filament/forms/components/key-value.js  
+  ⇂ public/js/filament/forms/components/markdown-editor.js  
+  ⇂ public/js/filament/forms/components/rich-editor.js  
+  ⇂ public/js/filament/forms/components/select.js  
+  ⇂ public/js/filament/forms/components/tags-input.js  
+  ⇂ public/js/filament/forms/components/textarea.js  
+  ⇂ public/js/filament/tables/components/table.js  
+  ⇂ public/js/filament/widgets/components/chart.js  
+  ⇂ public/js/filament/widgets/components/stats-overview/stat/chart.js  
+  ⇂ public/js/app/filament-export-0.3.0.js  
+  ⇂ public/js/filament/filament/app.js  
+  ⇂ public/js/filament/filament/echo.js  
+  ⇂ public/js/filament/notifications/notifications.js  
+  ⇂ public/js/filament/support/support.js  
+  ⇂ public/css/app/filament-export-0.3.0.css  
+  ⇂ public/css/app/panel-custom.css  
+  ⇂ public/css/filament/forms/forms.css  
+  ⇂ public/css/filament/support/support.css  
+  ⇂ public/css/filament/filament/app.css  
+
+   INFO  Successfully published assets!  
+
+
+   INFO  Configuration cached successfully.  
+
+
+
+   INFO  Blade templates cached successfully.  
+
+exit_status=0
+end_utc=2026-10-15T11:04:56Z
+--- completion (lines skipped because docker compose run consumed stdin) start_utc=2026-10-15T11:05:35Z
+ Container perfilafiliados-nginx-1 Running 
+ Container perfilafiliados-app-1 Recreate 
+ Container perfilafiliados-app-1 Recreated 
+ Container perfilafiliados-app-1 Starting 
+ Container perfilafiliados-app-1 Started 
+2026/10/15 11:05:38 [notice] 446#446: signal process started
+
+   INFO  Application is now live.  
+
+exit_status=0
+end_utc=2026-10-15T11:05:38Z

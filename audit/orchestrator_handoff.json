@@ -1,6 +1,6 @@
 {
-  "current_task": "CPV-MAIL-DOCS-AND-USER-MANUAL: accepted at d23c0e6 (6190018710); staging deployment authorized (6190034071) but BLOCKED. Deploy branch fast-forwarded to d23c0e6, workflow not run (push matched paths-ignore; workflow_dispatch 403 needs actions=write; main has no workflow file). Runtime still a5772345.",
-  "current_status": "MAIL_DOCS_AND_USER_MANUAL_DEPLOY_BLOCKED_MANUAL__RUNTIME_A5772345__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
+  "current_task": "CPV-MAIL-DOCS-AND-USER-MANUAL: accepted at d23c0e6 (6190018710) and DEPLOYED to staging on 2026-10-15 11:05Z by MANUAL_SSH_DEPLOY (route 6190372221; no GitHub Actions run). Awaiting owner review of the online manual.",
+  "current_status": "MAIL_DOCS_AND_USER_MANUAL_DEPLOYED_FOR_OWNER_REVIEW_MANUAL__RUNTIME_D23C0E6__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
   "superseded_current_fields_2026_10_15": {
     "note": "Values these fields held before the 2026-10-15 checkpoint (instructions 6188413270 / 6188477132). Kept as history.",
     "current_task": "ORCHESTRATION INFRASTRUCTURE (authorized 6085642297): persistent executor on the Contabo VPS plus isolated PHPUnit. TASK-0010A and TASK-0010B are AUTHORIZED BUT HELD and NOT STARTED by owner decision.",
@@ -3072,14 +3072,29 @@
     "acceptance_comment": "6190018710",
     "deployment": {
       "authorization_comment": "6190034071",
-      "outcome": "BLOCKED",
+      "outcome": "DEPLOYED_FOR_OWNER_REVIEW",
       "deploy_branch_head": "d23c0e6ffac8e7b5105370bedade3475105e0fff",
-      "runtime": "a5772345ff0a52bd79a5b29ab063991960109271",
+      "runtime": "d23c0e6ffac8e7b5105370bedade3475105e0fff",
       "workflow_run": null,
       "blocker": "all changed paths match paths-ignore (docs/**, audit/**, **.md); resources/ is baked into the image so a full workflow run is required; CPV_GITHUB_TOKEN dispatch returned 403 (actions=write); Run workflow button absent because main has no workflow file",
       "recovery_image": "perfilafiliados-app:pre-manual-a577234",
       "pre_state": "audit/runs/manual_deploy_2026-10-15/pre_state.txt",
-      "mail": "PENDING_OWNER_CONFIGURATION; unchanged (transport log, simulated)"
+      "mail": "PENDING_OWNER_CONFIGURATION; unchanged (transport log, simulated)",
+      "method": "MANUAL_SSH_DEPLOY",
+      "route_comment": "6190372221",
+      "blocked_comment": "6190243300",
+      "deployed_sha": "d23c0e6ffac8e7b5105370bedade3475105e0fff",
+      "deployed_at_utc": "2026-10-15T11:05:38Z",
+      "app_image": "sha256:b66d8024b04aa73b25c260b4a5b9275d07e6bab267347339ec51ebe904625d64",
+      "execution_note": "docker compose run consumed the stdin script; up -d, nginx reload and artisan up were completed with stdin closed; about 1 minute of maintenance",
+      "smoke": {
+        "manual": "14/14",
+        "task_0010c": "18/18",
+        "guest": "302 -> /admin/login",
+        "request_1_fingerprint": "2e64f23555b01ad30f845bdd53cedc15"
+      },
+      "evidence": "audit/runs/manual_deploy_2026-10-15/",
+      "future_maintenance": "paths-ignore **.md suppresses deploys of served resources/manual/*.md"
     }
   },
   "task_0010c": {

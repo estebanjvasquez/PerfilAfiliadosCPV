@@ -1,0 +1,96 @@
+{
+    "checks": [
+        {
+            "check": "transaccion READ ONLY",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: lista 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: lista con titulo y aviso de destinatario ausente",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: detalle #1 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: detalle muestra #1, Falló y el motivo",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: detalle muestra la fila histórica",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: detalle ofrece Reintentar aviso (no pulsado)",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: guía con enlace a la configuración",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: configuración 200 y modo simulado log",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: ayuda 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: límites 200 y enlaza a la configuración",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "no-admin: 403 en \/admin\/solicitudes-de-categoria",
+            "ok": true,
+            "detail": "status=403"
+        },
+        {
+            "check": "no-admin: 403 en \/admin\/solicitudes-de-categoria\/1",
+            "ok": true,
+            "detail": "status=403"
+        },
+        {
+            "check": "no-admin: 403 en \/admin\/configuracion-de-solicitudes",
+            "ok": true,
+            "detail": "status=403"
+        },
+        {
+            "check": "no-admin: 403 en \/admin\/ayuda-solicitudes-de-categoria",
+            "ok": true,
+            "detail": "status=403"
+        },
+        {
+            "check": "#1 con la misma huella antes y después",
+            "ok": true,
+            "detail": "huella=2e64f23555b01ad30f845bdd53cedc15"
+        },
+        {
+            "check": "historial sin intentos nuevos",
+            "ok": true,
+            "detail": "antes=1 despues=1"
+        },
+        {
+            "check": "ningún correo",
+            "ok": true,
+            "detail": "salientes=0"
+        }
+    ],
+    "passed": 18,
+    "failed": 0
+}

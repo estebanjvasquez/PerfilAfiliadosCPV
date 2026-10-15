@@ -3,7 +3,7 @@
 - **Instruction:** Issue #2 comment `6189493183`. It records that the owner reported all of TASK-0010C's manual tests as passed (**OWNER_REPORTED_UAT_PASS**). That is the owner's report, not an additional automated run.
 - **Branch:** `feature/mail-docs-and-user-manual`, created from `0becd37`. That commit is the C checkpoint: the deployed `a5772345` plus docs/audit only. Verified: it descends from `a5772345`, and there are no changes outside `docs/` and `audit/`.
 - **TESTED_HEAD:** `433fbf05d4a82600f75e3bd1c31672112bda61c0` (manual, help and documentation). **REVIEW_HEAD:** the commit that adds this report and the checkpoint (audit/docs only on top of TESTED_HEAD).
-- **Deployed:** **NO**. Staging is still on `a5772345`. The manual and the help live in `resources/manual/`, which is deployed content, so this branch is the candidate for a later, bounded deployment.
+- **Deployed:** **YES**, on 2026-10-15 at 11:05Z. Staging runs `d23c0e6` (accepted in `6190018710`, authorized in `6190034071`). The method was **MANUAL_SSH_DEPLOY** (route `6190372221`) with no GitHub Actions run. See §9.
 - **Mail:** **PENDING_OWNER_CONFIGURATION**. Staging stays in non-sending mode (`log`). No SMTP, secrets, recipient, real send or retry of #1 was touched.
 
 ## 1. PDF baseline
@@ -197,3 +197,39 @@ Isolated run `20261015T101317Z-433fbf05d4a8` at TESTED_HEAD, harness `infra/cont
 - **Not touched:** the live `.env`, `MAIL_MAILER`, the recipient, the cache and the staging containers.
 - **Not rerun:** the suite and the browser checks. There are no code or manual changes; only these two documents.
 - The manual content and the PDF matrix (§1–§3) are **unchanged**.
+
+## 9. Staging deployment (MANUAL_SSH_DEPLOY, 2026-10-15)
+
+- **Why manual:**
+  - The push did not trigger the workflow. All changed paths match `paths-ignore`, including `resources/manual/*.md`.
+  - `workflow_dispatch` returned 403 (`actions=write`), and `main` has no workflow file.
+  - Blocker report: `6190243300`. Route authorized: `6190372221` option (c).
+- **Preconditions (all passed):**
+  - The deployment branch and the candidate were both at `d23c0e6`; the runtime was `a5772345`.
+  - There were 0 tracked modifications. The untracked paths are only the published `public/css|js` assets.
+  - The recovery image `perfilafiliados-app:pre-manual-a577234` equals the image that was in use.
+  - 0 pending migrations, and no concurrent deploy.
+  - The runtime diff was only `resources/manual/manual_usuario.md` and `ayuda_solicitudes_admin.md`.
+- **Execution:** the literal `script:` block of the workflow at `d23c0e6`, with only the YAML indentation removed (sha256 `49ec7d84…`), sent over SSH as `bash -s`.
+  - Steps that ran: reset to `d23c0e6`, `chown`, build (new image `b66d8024…`), then `run --rm` with `down`, `package:discover`, `db:skip-mysql-only-view-migrations`, `migrate --force` ("Nothing to migrate"), `filament:assets`, `config:cache`, `view:cache`.
+  - **Defect in this route:** `docker compose run` read the rest of the script from stdin, so `up -d`, the nginx reload and `artisan up` **did not run**. The exit code was still 0, which hid it. The site was left in maintenance (503) with the old container.
+  - **Recovery:** those three literal lines were run once more, with stdin closed. `app` was recreated, nginx reloaded and the site was live at 11:05:38Z.
+  - Maintenance window: about 1 minute.
+  - For the future: do not send this script over stdin. Pass it as a file, or close stdin on `run`. The workflow (`appleboy/ssh-action`) does not have this problem.
+- **Post-state:**
+  - The checkout is at `d23c0e6` with 0 tracked modifications.
+  - `app` was recreated at 11:05:37Z with image `b66d8024…`.
+  - The `.env` sha256 is unchanged.
+  - Maintenance is off, `/` and `/admin/login` return 200, there are 0 pending migrations and 0 new `ERROR` entries in the log.
+- **Manual smoke** (`docs/deploy/smoke_manual_readonly.php`, in-memory users, READ ONLY + ROLLBACK): **14/14**.
+  - The deployed source equals the candidate (sha256 `738ef1bf…`).
+  - Affiliate and admin both get 200; the 15 new or expanded anchors are present; the index links the 11 level-2 sections (subsections hang under them by design); the mobile viewport is declared.
+  - The panel links to the manual. The admin help returns 200 with `#correo-del-sistema` for admins and 403 for affiliates.
+  - No mail was sent.
+  - Guests, checked with real HTTP: `302 → /admin/login` on the manual and on the help.
+  - The first run of this smoke failed 4 checks, all problems in the test, not the site: it expected `###` headings in the index, and the in-process guest request without a session returned 500, while real HTTP returns 302. Both were fixed and the smoke was rerun.
+- **0010C smoke (existing): 18/18.** Request #1 keeps fingerprint `2e64f23555b01ad30f845bdd53cedc15`, there are no new attempts and no mail was sent.
+- **Mobile:** layout covered by the accepted isolated check (`run_433fbf0`, 40/40, 3 widths; the content is identical). No new browser run.
+- **Mail:** PENDING_OWNER_CONFIGURATION, unchanged: `log`, simulated, cached, sender configured.
+- **Evidence:** `audit/runs/manual_deploy_2026-10-15/` (`pre_state.txt`, `deploy_run.log` sanitized, `post_state.txt`, `smoke_manual.json`, `smoke_0010c.json`).
+- **Maintenance pending, not fixed in this delivery:** the workflow filters ignore Markdown that is served from `resources/manual/`. A manual-only change never deploys automatically.

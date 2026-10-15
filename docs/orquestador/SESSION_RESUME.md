@@ -1,8 +1,8 @@
 # CPV — Punto de reanudación maestro
 
-**Checkpoint:** 2026-10-15, ~10:45 UTC.
+**Checkpoint:** 2026-10-15, ~11:15 UTC.
 - TASK-0010C está desplegada y el propietario informó su prueba manual como **OK**.
-- La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** fue aceptada (`6190018710`) y su despliegue autorizado (`6190034071`). El despliegue quedó **BLOCKED — MANUAL**: la rama de despliegue ya está en `d23c0e6`, pero el workflow no se ejecutó y el runtime sigue en `a5772345` (§4).
+- La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** fue aceptada (`6190018710`) y está **desplegada en staging** (`d23c0e6`, **MANUAL_SSH_DEPLOY** por la vía `6190372221`): **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**. Falta que el propietario revise el manual.
 
 Las §0 a §6 son la primera lectura. Lo que está después de la línea «Historia» es el checkpoint del 2026-10-08, que **ya no rige** y se conserva como historia.
 
@@ -17,16 +17,16 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 
 | Tema | Estado |
 |---|---|
-| Runtime de staging | **`a5772345ff0a52bd79a5b29ab063991960109271`** (checkout del VPS y contenedor `app` del 2026-10-15 09:07Z, run `38710541839` success). La **rama** `feature/upgrade-filament-v3` está en `d23c0e6` desde el 2026-10-15 ~10:40Z (fast-forward, sin force), **sin desplegar**. |
+| Runtime de staging | **`d23c0e6ffac8e7b5105370bedade3475105e0fff`**: rama `feature/upgrade-filament-v3`, checkout del VPS y contenedor `app` recreado el 2026-10-15 a las 11:05:37Z (imagen `b66d8024…`). Desplegado **por SSH con el script literal del workflow**, sin run de GitHub Actions. Smoke del manual 14/14 y de C 18/18. |
 | TASK-0010A/B/C | Desplegadas. C fue aceptada (`6188413270`) y el propietario informó su prueba manual como **OK** (`6189493183`, `OWNER_REPORTED_UAT_PASS`; es un informe del propietario, no un test automático). |
-| Ronda manual + correo | **Aceptada** (`6190018710`); despliegue **BLOCKED** (§4). Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo (con la secuencia correcta: recrear `app` y luego `config:cache`, para activar y para volver atrás) y regla de documentación. |
+| Ronda manual + correo | **Aceptada** (`6190018710`) y **desplegada** (2026-10-15 11:05Z; informe §9), en espera de la revisión del propietario. Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo (con la secuencia correcta: recrear `app` y luego `config:cache`, para activar y para volver atrás) y regla de documentación. |
 | Correo del sistema | **ACTIVACIÓN GLOBAL PENDIENTE: espera proveedor, configuración y credenciales del propietario.** Staging en modo sin envío (`MAIL_MAILER=log`, comprobado el 2026-10-15 con `docs/deploy/mail_status_readonly.php`). Sin destinatario configurado. No se ha enviado ningún correo real. |
 | Solicitud #1 | `failed`/`recipient_not_configured`, con una fila histórica. Sin reintento autorizado. |
 | Automatización | El ejecutor autónomo está **suspendido**. No hay IA en segundo plano ni sondeos. |
 
 ## 2. SHAs y ramas
 
-- **Runtime desplegado:** `a5772345ff0a52bd79a5b29ab063991960109271` (= REVIEW_HEAD de C; su código es el TESTED_HEAD `349ea61`).
+- **Runtime desplegado:** `d23c0e6ffac8e7b5105370bedade3475105e0fff`. Es el manual aceptado; el código de la aplicación es el mismo de C, `a5772345` / TESTED_HEAD `349ea61`.
 - **Ronda manual + correo:** rama `feature/mail-docs-and-user-manual`.
   - Base `0becd37` (checkpoint de C).
   - **TESTED_HEAD `433fbf05d4a82600f75e3bd1c31672112bda61c0`**.
@@ -34,7 +34,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
   - Corrección: solo `docs/deploy/CORREO_DEL_SISTEMA.md` y el informe.
 - **Rama de C:** `feature/task-0010c-request-operations` @ `0becd37` (checkpoint).
 - **Arnés aislado:** `infra/contabo-test-runner` @ `246b0d0`.
-- **Imágenes de recuperación en el VPS:** `perfilafiliados-app:pre-manual-a577234` (imagen en uso, etiquetada antes del intento de despliegue del manual), `perfilafiliados-app:pre-0010c-9b447eb`, `perfilafiliados-app:pre-0010-004d24e`.
+- **Imágenes de recuperación en el VPS:** `perfilafiliados-app:pre-manual-a577234` (imagen anterior al manual, `fd4441da…`), `perfilafiliados-app:pre-0010c-9b447eb`, `perfilafiliados-app:pre-0010-004d24e`.
 
 ## 3. Evidencia (enlazar, no copiar)
 
@@ -42,28 +42,22 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 - Correo del sistema (mecanismo real, aprovisionamiento, chequeo seguro, vuelta atrás, requisitos): `docs/deploy/CORREO_DEL_SISTEMA.md`.
 - C (despliegue y guía de prueba): `audit/task_0010c_request_operations_2026-10-15.md`.
 - Issue #2:
-  - instrucción de esta ronda: `6189493183`; corrección: `6189828037`; aceptación: `6190018710`; autorización de despliegue: `6190034071`;
-  - estado previo al intento: `audit/runs/manual_deploy_2026-10-15/pre_state.txt`;
+  - instrucción de esta ronda: `6189493183`; corrección: `6189828037`; aceptación: `6190018710`; autorización de despliegue: `6190034071`; bloqueo: `6190243300`; vía SSH: `6190372221`;
+  - evidencia del despliegue: `audit/runs/manual_deploy_2026-10-15/` (estado previo y posterior, log saneado, smokes);
   - aceptación de C: `6188413270`;
   - autorización de despliegue de C: `6188477132`;
   - entrega del despliegue de C: `6188643243`.
 
 ## 4. Siguiente acción
 
-- **Bloqueo del despliegue del manual (2026-10-15):**
-  - El push **no** dispara el workflow: todos los archivos cambiados coinciden con `paths-ignore` (`docs/**`, `audit/**`, `**.md`, incluido `resources/manual/*.md`).
-  - `resources/` va **dentro de la imagen** (`COPY . .`), así que hace falta el workflow completo (build).
-  - `workflow_dispatch`: el token del agente (`CPV_GITHUB_TOKEN`) devuelve 403 y pide `actions=write`. El botón «Run workflow» no aparece porque `main` no tiene el archivo del workflow.
-  - Vías para el propietario (cualquiera desbloquea):
-    1. dar `Actions: write` al token del agente (cambio de credencial; requiere su autorización);
-    2. lanzarlo él mismo por API, `gh workflow run deploy-contabo.yml --ref feature/upgrade-filament-v3`;
-    3. autorizar que el agente ejecute por SSH el mismo script del workflow;
-    4. dejarlo para el próximo push que sí dispare un despliegue: la rama ya contiene el manual.
+- **Propietario:** abrir «Manual de usuario» desde el perfil y revisar las secciones ampliadas y el índice.
 - **Agente:** **ninguna** hasta una nueva instrucción. No activar correo y no tocar secretos.
 - **Propietario, cuando lo tenga:** proveedor de correo, remitente y dominio (SPF/DKIM/DMARC), destinatario responsable, aprovisionamiento seguro en el `.env` del servidor y una prueba controlada (ver `CORREO_DEL_SISTEMA.md` §6). También: decidir si se reintenta la #1.
 
 ## 5. Pendientes y limitaciones (no arrancan solos)
 
+- **Filtros del workflow (mantenimiento futuro, no corregido):** `paths-ignore` (`**.md`) ignora el Markdown servido desde `resources/manual/`, así que un cambio que solo toca el manual nunca se despliega solo. El agente no puede lanzar `workflow_dispatch` (403, `actions=write`), y `main` no tiene el workflow.
+- **Vía SSH manual:** no enviar el script por stdin (`bash -s`). `docker compose run` se come el resto del script y la salida es 0 igual; pasó el 2026-10-15 y dejó 1 minuto de mantenimiento (informe §9).
 - **Correo:** activación pendiente (§1).
   - En modo sin envío, un usuario nuevo **no recibe** la verificación y no puede entrar al panel.
   - El panel no tiene acción para verificar a mano.

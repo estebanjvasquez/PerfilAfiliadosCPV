@@ -1,0 +1,21 @@
+captured_utc=2026-10-15T11:06:30Z
+staging_head=d23c0e6ffac8e7b5105370bedade3475105e0fff
+tracked_modifications=0
+app_container=8c6bbb3eec19
+app_started=2026-10-15T11:05:37.984353922Z
+app_image=sha256:b66d8024b04aa73b25c260b4a5b9275d07e6bab267347339ec51ebe904625d64
+env_sha256=085c617c22a2e1f4c8fd8c7049a0a9b5277d684d36525bad9cd3994cbfd415b1
+maintenance=off
+http_root=200
+http_admin_login=200
+http_manual_guest=302
+pending_migrations=0
+app_errors_since_deploy=0
+mailer_por_defecto=log
+transporte=log
+envia_fuera_del_servidor=no (simulado)
+configuracion_cacheada=si
+remitente_direccion=configurado
+remitente_nombre=configurado
+guest_http /admin/manual-de-usuario 302 -> https://pruebas.camarapetrolera.app/admin/login
+guest_http /admin/ayuda-solicitudes-de-categoria 302 -> https://pruebas.camarapetrolera.app/admin/login

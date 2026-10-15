@@ -1,0 +1,76 @@
+{
+    "checks": [
+        {
+            "check": "transaccion READ ONLY",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "fuente desplegada = candidata",
+            "ok": true,
+            "detail": "sha256=738ef1bfbfcde9ec673ecde6edbe1d7cf05385c036766fcb699f5cfce57a5b85"
+        },
+        {
+            "check": "afiliado: manual 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "afiliado: secciones ampliadas presentes",
+            "ok": true,
+            "detail": "faltan="
+        },
+        {
+            "check": "afiliado: índice enlaza a las 11 secciones de nivel 2",
+            "ok": true,
+            "detail": "faltan="
+        },
+        {
+            "check": "afiliado: viewport móvil declarado",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: manual 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: secciones ampliadas presentes",
+            "ok": true,
+            "detail": "faltan="
+        },
+        {
+            "check": "admin: índice enlaza a las 11 secciones de nivel 2",
+            "ok": true,
+            "detail": "faltan="
+        },
+        {
+            "check": "admin: viewport móvil declarado",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: el panel enlaza al manual",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: ayuda 200 con la sección de correo",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "afiliado: ayuda de administración 403",
+            "ok": true,
+            "detail": "status=403"
+        },
+        {
+            "check": "ningún correo",
+            "ok": true,
+            "detail": "salientes=0"
+        }
+    ],
+    "passed": 14,
+    "failed": 0
+}
