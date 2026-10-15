@@ -1,4 +1,4 @@
-Esta guía explica cómo usar el **Perfil de Afiliados** de la Cámara Petrolera de Venezuela (la Cámara o CPV): cómo ingresar, cómo mantener al día los datos de su empresa y, sobre todo, cómo describir lo que su empresa ofrece usando la **Taxonomía CPV**. Use el índice para ir directamente a la sección que necesita.
+Esta guía explica cómo usar el **Perfil de Afiliados** de la Cámara Petrolera de Venezuela (la Cámara o CPV): cómo ingresar, cómo moverse por el sistema, cómo mantener al día cada parte del perfil de su empresa (datos generales, cámaras, contactos, recursos, sistemas de gestión, experiencia, presencia internacional y sostenibilidad) y cómo describir lo que su empresa ofrece con la **Taxonomía CPV**. Use el índice para ir directamente a la sección que necesita.
 
 > **NOTA:** Los nombres de botones, pestañas y campos que aparecen **en negrita** en este manual son los que usted verá en pantalla. Algunas opciones solo aparecen si su cuenta tiene permiso para usarlas.
 
@@ -17,6 +17,26 @@ Cada persona de su empresa que vaya a trabajar en el sistema necesita **su propi
 - La Cámara toma decisiones y prepara información con base en lo que usted registra.
 
 > **CONSEJO:** Revise su perfil cada vez que su empresa cambie de actividad, incorpore un servicio nuevo, obtenga una certificación o cambie de contacto.
+
+### Qué puede hacer en el sistema {#mapa-del-sistema}
+
+| Tarea | Dónde se hace | Sección de este manual |
+|---|---|---|
+| Entrar, registrarse y cambiar su nombre, correo o contraseña | Pantalla de acceso y **Mi perfil** | [Ingreso y cuenta](#ingreso-y-cuenta) |
+| Ubicarse en el sistema | **Escritorio** y menú lateral | [El Escritorio y el menú](#escritorio) |
+| Registrar RIF, dirección, contacto web, operaciones y clientes | **Empresas** > su empresa, formulario por pasos | [Datos generales de la empresa](#datos-generales) |
+| Descargar el perfil de su empresa en PDF | **Empresas**, columna **PDF** | [Abrir su empresa](#abrir-empresa) |
+| Indicar en qué cámaras participa su empresa | Pestaña **Cámaras** | [Cámaras](#camaras) |
+| Registrar las personas de contacto | Pestaña **Contactos** | [Contactos](#contactos) |
+| Ver quién tiene acceso a su empresa | Pestaña **Usuarios** | [Usuarios](#usuarios) |
+| Consultar la clasificación anterior | Pestaña **Sectores y servicios** | [Sectores y servicios](#sectores-y-servicios) |
+| Declarar lo que su empresa ofrece | Pestaña **Categorías CPV (taxonomía nueva)** | [Categorías CPV (Taxonomía)](#taxonomia-cpv) |
+| Declarar personal, maquinaria, instalaciones e inventario | Pestaña **Recursos en Venezuela** | [Recursos en Venezuela](#recursos) |
+| Indicar certificaciones y sistemas de gestión | Pestaña **Sistemas de gestión** | [Sistemas de gestión](#sistemas-de-gestion) |
+| Registrar proyectos de los últimos 10 años | Pestaña **Experiencia relevante** | [Experiencia relevante](#experiencia) |
+| Registrar oficinas y proyectos fuera de Venezuela | Pestaña **Presencia internacional** | [Presencia internacional](#presencia-internacional) |
+| Responder los ocho enfoques de sostenibilidad | Pestaña **Enfoque de sostenibilidad** | [Enfoque de sostenibilidad](#sostenibilidad) |
+| Saber qué le falta completar | Indicadores **Completado** | [Completitud del perfil y «No Aplica»](#completitud-y-no-aplica) |
 
 ## Ingreso y cuenta {#ingreso-y-cuenta}
 
@@ -44,13 +64,6 @@ El sistema exige que su correo electrónico esté verificado para trabajar en el
 
 > **IMPORTANTE:** Crear una cuenta no le da acceso automático a los datos de su empresa. La Cámara debe asociar su usuario con la empresa correspondiente. Después de registrarse, avise a la Cámara.
 
-### Primer ingreso: el Escritorio {#escritorio}
-
-Al entrar verá la pantalla inicial, llamada **Escritorio**, y a la izquierda el **menú lateral**. En el teléfono, el menú está oculto: ábralo con el ícono de tres líneas (☰), arriba a la izquierda.
-
-- **Si la Cámara todavía no asoció su usuario con su empresa**, el menú no le mostrará su empresa. Es normal en el primer ingreso: avise a la Cámara indicando el nombre y el RIF de la empresa (ver [Si su empresa no aparece](#empresa-no-asociada)).
-- **Cuando la Cámara ya lo asoció**, el menú le muestra **Empresas**, desde donde trabaja con los datos de su empresa, y **Manual de usuario**, que es esta guía.
-
 ### Si olvidó su contraseña {#olvido-contrasena}
 
 La pantalla de acceso no ofrece hoy una opción para recuperar la contraseña por su cuenta. Si la olvidó, contacte a la Cámara.
@@ -61,6 +74,13 @@ Desde el menú de usuario (arriba a la derecha) abra **Mi perfil**:
 
 - **Información personal**: actualice su nombre y su correo, y presione **Actualizar**.
 - **Contraseña**: la nueva contraseña debe tener al menos 8 caracteres y el sistema le pedirá su contraseña actual. Presione **Modificar** para guardarla.
+
+## El Escritorio y el menú {#escritorio}
+
+Al entrar verá la pantalla inicial, llamada **Escritorio**, y a la izquierda el **menú lateral**. En el teléfono, el menú está oculto: ábralo con el ícono de tres líneas (☰), arriba a la izquierda.
+
+- **Si la Cámara todavía no asoció su usuario con su empresa**, el menú no le mostrará su empresa. Es normal en el primer ingreso: avise a la Cámara indicando el nombre y el RIF de la empresa (ver [Si su empresa no aparece](#empresa-no-asociada)).
+- **Cuando la Cámara ya lo asoció**, el menú le muestra **Empresas**, desde donde trabaja con los datos de su empresa, y **Manual de usuario**, que es esta guía.
 
 ### Si su empresa no aparece {#empresa-no-asociada}
 
@@ -104,9 +124,52 @@ Al presionar **Siguiente**, el sistema revisa los campos obligatorios del paso a
 
 > **IMPORTANTE:** Las pestañas que aparecen debajo del formulario (Categorías CPV, contactos, recursos, etc.) guardan cada acción por separado, en el momento en que usted la confirma. No dependen del botón **Guardar cambios** del formulario.
 
-## Taxonomía CPV {#taxonomia-cpv}
+## Las pestañas de su empresa {#resto-del-perfil}
+
+Debajo del formulario de datos generales aparecen varias pestañas, en este orden: **Cámaras**, **Contactos**, **Usuarios**, **Sectores y servicios**, **Categorías CPV (taxonomía nueva)**, **Recursos en Venezuela**, **Sistemas de gestión**, **Experiencia relevante**, **Presencia internacional** y **Enfoque de sostenibilidad**. Cada una tiene su propia sección en este manual. Según los permisos de su cuenta, puede ver algunas o todas. Cada acción de estas pestañas se guarda en el momento en que usted la confirma.
+
+### Los botones de las ventanas {#botones-ventanas}
+
+Muchas pestañas abren una ventana para agregar datos. Los botones del pie se repiten:
+
+- **Crear** o **Vincular**: guarda lo que escribió o eligió y cierra la ventana.
+- **Crear y crear otro** o **Vincular y vincular otro**: guarda y deja la ventana abierta y vacía para cargar el siguiente. Úselo cuando tiene varios registros seguidos.
+- **Cancelar**: cierra la ventana sin guardar.
+
+Un aviso en la esquina de la pantalla confirma que la acción quedó guardada. Si un campo obligatorio está vacío o mal escrito, la ventana no se cierra y el campo aparece marcado en rojo: corríjalo y vuelva a confirmar.
+
+## Cámaras {#camaras}
+
+Muestra las cámaras en las que participa su empresa (la pestaña puede aparecer con el título «Chambers»).
+
+- **Vincular**: elija una cámara de la lista y confirme. Las cámaras en las que su empresa ya está vinculada no aparecen en la lista.
+- **Desvincular**: retira la cámara de su empresa.
+
+## Contactos {#contactos}
+
+Muestra las personas de contacto de su empresa (la pestaña puede aparecer con el título «Contacts»).
+
+- Use el botón **Crear** de la pestaña y complete **Nombre**, **Posición**, **Teléfono** y **Email**.
+- **Marcar como principal**: define el contacto principal de la empresa, el que la Cámara usa en reportes y gráficas. Solo hay un contacto principal a la vez.
+- **Desvincular**: retira el contacto de su empresa.
+
+> **NOTA:** Los contactos no se editan después de creados. Para corregir uno, desvincúlelo y vuelva a crearlo con los datos correctos. Cada empresa carga sus propios contactos; otros afiliados no los ven.
+
+> **NOTA:** Si usted atiende varias empresas afiliadas, cargue el contacto en cada una por separado. La opción de traer un contacto ya creado en otra empresa ya no está disponible.
+
+## Usuarios {#usuarios}
+
+Muestra los usuarios que tienen acceso a su empresa (la pestaña puede aparecer con el título «Users»). Para dar acceso a un nuevo usuario de su empresa o retirarlo, contacte a la Cámara.
+
+## Sectores y servicios {#sectores-y-servicios}
+
+Muestra la clasificación anterior de sectores y servicios de su empresa, **solo para consulta**: ya no se puede modificar desde aquí. Para describir lo que su empresa ofrece, use la pestaña **Categorías CPV (taxonomía nueva)** (ver [Cómo agregar categorías CPV](#agregar-categorias)).
+
+## Categorías CPV (Taxonomía) {#taxonomia-cpv}
 
 La **Taxonomía CPV** es la lista oficial y ordenada de productos, servicios y capacidades que la Cámara usa para clasificar lo que ofrecen sus afiliados. En lugar de que cada empresa describa su actividad con palabras distintas, todas eligen de la misma lista. Así, cuando alguien busca un servicio, el sistema puede encontrar a todas las empresas que lo ofrecen, aunque cada una lo llame de forma diferente.
+
+Las categorías se agregan en la pestaña **Categorías CPV (taxonomía nueva)** de su empresa. Esta sección explica qué es la taxonomía, cómo agregar categorías, qué significa Principal y Secundaria, y qué hacer si no encuentra una categoría.
 
 ### Grupo, Familia y Categoría {#grupo-familia-categoria}
 
@@ -131,9 +194,9 @@ Usted escribe palabras solamente para **buscar** la categoría. Lo que queda reg
 
 > **CONSEJO:** Elija las categorías que describen lo que su empresa **realmente ofrece hoy**, no lo que podría hacer algún día ni lo que hacen sus proveedores.
 
-## Cómo agregar categorías CPV a su empresa {#agregar-categorias}
+### Cómo agregar categorías CPV a su empresa {#agregar-categorias}
 
-### Paso a paso {#paso-a-paso}
+#### Paso a paso {#paso-a-paso}
 
 1. Entre a **Empresas** y abra su empresa.
 2. Debajo del formulario, abra la pestaña **Categorías CPV (taxonomía nueva)**.
@@ -144,7 +207,7 @@ Usted escribe palabras solamente para **buscar** la categoría. Lo que queda reg
 
 > **IMPORTANTE:** El tipo elegido en **Guardar como** se aplica a **todas** las categorías marcadas en esa misma ventana. Si quiere agregar categorías principales y secundarias, hágalo en dos rondas: primero unas, luego las otras.
 
-### Búsqueda libre {#busqueda-libre}
+#### Búsqueda libre {#busqueda-libre}
 
 En el campo **¿Qué ofrece su empresa? (texto libre, español o inglés)** escriba lo que su empresa ofrece, por ejemplo «mantenimiento de válvulas», «cabezales» o «perforación direccional».
 
@@ -155,7 +218,7 @@ En el campo **¿Qué ofrece su empresa? (texto libre, español o inglés)** escr
 
 > **NOTA:** Si elige un resultado que es una Familia completa, el sistema no lo agrega. Lo quita de su selección, le muestra el aviso **Elija categorías específicas, no la Familia completa** y abre abajo el listado de categorías de esa Familia para que marque las que correspondan.
 
-### Explorar una Familia {#explorar-familia}
+#### Explorar una Familia {#explorar-familia}
 
 Si prefiere recorrer la lista en vez de buscar:
 
@@ -164,7 +227,7 @@ Si prefiere recorrer la lista en vez de buscar:
 
 Puede combinar ambas formas en la misma ventana: lo que marque en la búsqueda libre y lo que marque en la Familia se guardan juntos.
 
-### Límites de selección {#limites}
+#### Límites de selección {#limites}
 
 La Cámara puede fijar un máximo de categorías **principales** y otro de categorías **secundarias** por empresa. Si al agregar categorías (o al marcar una como principal) se supera ese máximo, el sistema no guarda el cambio y muestra el aviso **Límite alcanzado**, con un texto como: «Esta empresa ya tiene 3 categoría(s) principales — el máximo configurado es 3».
 
@@ -174,11 +237,11 @@ Si llega al límite:
 - Quite las categorías que ya no correspondan.
 - Si su empresa necesita más categorías de las permitidas, consulte a la Cámara.
 
-### Categorías ya vinculadas {#ya-vinculadas}
+#### Categorías ya vinculadas {#ya-vinculadas}
 
 Si marca una categoría que su empresa ya tiene, el sistema no la duplica: solo agrega las nuevas. Sin embargo, todas las categorías marcadas en la ventana cuentan para revisar el límite, así que conviene marcar solo las que todavía no tiene.
 
-### La tabla de categorías de su empresa {#tabla-categorias}
+#### La tabla de categorías de su empresa {#tabla-categorias}
 
 La pestaña muestra una fila por categoría vinculada, con estas columnas:
 
@@ -189,7 +252,7 @@ La pestaña muestra una fila por categoría vinculada, con estas columnas:
     - **Sugerida (sin confirmar)**: la propuso el sistema o la Cámara y espera su revisión.
     - **Confirmada**: la sugerencia ya fue confirmada.
 
-### Confirmar sugerencias, cambiar el tipo o quitar {#confirmar-reclasificar-quitar}
+#### Confirmar sugerencias, cambiar el tipo o quitar {#confirmar-reclasificar-quitar}
 
 Cada fila tiene estas acciones:
 
@@ -199,7 +262,7 @@ Cada fila tiene estas acciones:
 
 > **NOTA:** No existe una acción para «mover» una categoría a otra. Si eligió una categoría equivocada, quítela y agregue la correcta con **Buscar y agregar categoría**.
 
-## Qué significa Principal y Secundaria {#principal-secundaria}
+### Qué significa Principal y Secundaria {#principal-secundaria}
 
 El sistema usa estas definiciones al guardar:
 
@@ -210,7 +273,7 @@ El sistema usa estas definiciones al guardar:
 
 > **CONSEJO:** Una buena prueba: si un cliente le pidiera hoy ese servicio, ¿lo prestaría con su propia gente y equipos? Si la respuesta es sí y es parte de su actividad habitual, es principal. Si lo hace a veces o a través de terceros, es secundaria. Si no lo hace, no la agregue.
 
-## Cómo le beneficia una taxonomía correcta {#beneficios}
+### Cómo le beneficia una taxonomía correcta {#beneficios}
 
 Elegir bien sus categorías tiene ventajas prácticas:
 
@@ -222,18 +285,18 @@ Elegir bien sus categorías tiene ventajas prácticas:
 
 > **NOTA:** Una clasificación correcta mejora la calidad de las coincidencias, pero no garantiza una posición determinada en los resultados ni la llegada de clientes u oportunidades comerciales.
 
-## No encuentro una categoría {#no-encuentro-categoria}
+### No encuentro una categoría {#no-encuentro-categoria}
 
 No encontrar una categoría al primer intento **no significa necesariamente** que no exista en la taxonomía. Muchas veces la categoría sí está, pero con otro nombre, en otro idioma o dentro de una Familia que no esperaba.
 
-### Antes de pedir ayuda {#antes-de-pedir-ayuda}
+#### Antes de pedir ayuda {#antes-de-pedir-ayuda}
 
 1. Pruebe con sinónimos, con un término más general o con el nombre en inglés.
 2. Pruebe con el nombre técnico o comercial del producto o servicio.
 3. Use **¿Prefiere explorar una Familia completa en vez de buscar?** y recorra las Familias relacionadas.
 4. Si encuentra una categoría que describe lo que hace, aunque el nombre no sea idéntico, elíjala.
 
-### Solicitar revisión a la Cámara {#solicitar-revision}
+#### Solicitar revisión a la Cámara {#solicitar-revision}
 
 Si aun así no encuentra una categoría que describa lo que su empresa ofrece, use la opción **No encuentro la categoría / Solicitar revisión** de la pestaña **Categorías CPV (taxonomía nueva)**. Se abre una ventana titulada **Solicitar revisión de categoría a la Cámara**.
 
@@ -252,7 +315,7 @@ En el formulario de la solicitud:
 
 No necesita escribir los datos de su empresa ni sus datos de usuario: el sistema los toma automáticamente, junto con las categorías que su empresa ya tiene.
 
-### Qué pasa después {#despues-de-la-solicitud}
+#### Qué pasa después {#despues-de-la-solicitud}
 
 - La solicitud queda registrada con un **número de solicitud** (por ejemplo, **#12**) que aparece en el mensaje de confirmación. Anótelo: es la referencia de su solicitud si necesita consultarla con la Cámara.
 - La Cámara ve todas las solicitudes registradas en su propio panel y además suele recibir un aviso por correo.
@@ -264,48 +327,7 @@ No necesita escribir los datos de su empresa ni sus datos de usuario: el sistema
 
 > **NOTA:** Si el mensaje dice **Solicitud registrada, aviso por correo pendiente**, su solicitud no se perdió: quedó registrada con su número y la Cámara la revisará igual. Solo significa que el aviso por correo a la Cámara no salió en ese momento. No hace falta enviarla de nuevo. Si necesita una respuesta urgente, contacte a la Cámara e indique su número de solicitud. Si no ve la opción **No encuentro la categoría / Solicitar revisión** en su pantalla, contacte directamente a la Cámara.
 
-## Resto del perfil {#resto-del-perfil}
-
-Debajo del formulario de datos generales aparecen varias pestañas. Según los permisos de su cuenta, puede ver algunas o todas. Cada acción de estas pestañas se guarda en el momento en que usted la confirma.
-
-### Los botones de las ventanas {#botones-ventanas}
-
-Muchas pestañas abren una ventana para agregar datos. Los botones del pie se repiten:
-
-- **Crear** o **Vincular**: guarda lo que escribió o eligió y cierra la ventana.
-- **Crear y crear otro** o **Vincular y vincular otro**: guarda y deja la ventana abierta y vacía para cargar el siguiente. Úselo cuando tiene varios registros seguidos.
-- **Cancelar**: cierra la ventana sin guardar.
-
-Un aviso en la esquina de la pantalla confirma que la acción quedó guardada. Si un campo obligatorio está vacío o mal escrito, la ventana no se cierra y el campo aparece marcado en rojo: corríjalo y vuelva a confirmar.
-
-### Cámaras {#camaras}
-
-Muestra las cámaras en las que participa su empresa (la pestaña puede aparecer con el título «Chambers»).
-
-- **Vincular**: elija una cámara de la lista y confirme. Las cámaras en las que su empresa ya está vinculada no aparecen en la lista.
-- **Desvincular**: retira la cámara de su empresa.
-
-### Contactos {#contactos}
-
-Muestra las personas de contacto de su empresa (la pestaña puede aparecer con el título «Contacts»).
-
-- Use el botón **Crear** de la pestaña y complete **Nombre**, **Posición**, **Teléfono** y **Email**.
-- **Marcar como principal**: define el contacto principal de la empresa, el que la Cámara usa en reportes y gráficas. Solo hay un contacto principal a la vez.
-- **Desvincular**: retira el contacto de su empresa.
-
-> **NOTA:** Los contactos no se editan después de creados. Para corregir uno, desvincúlelo y vuelva a crearlo con los datos correctos. Cada empresa carga sus propios contactos; otros afiliados no los ven.
-
-> **NOTA:** Si usted atiende varias empresas afiliadas, cargue el contacto en cada una por separado. La opción de traer un contacto ya creado en otra empresa ya no está disponible.
-
-### Usuarios {#usuarios}
-
-Muestra los usuarios que tienen acceso a su empresa (la pestaña puede aparecer con el título «Users»). Para dar acceso a un nuevo usuario de su empresa o retirarlo, contacte a la Cámara.
-
-### Sectores y servicios {#sectores-y-servicios}
-
-Muestra la clasificación anterior de sectores y servicios de su empresa, **solo para consulta**: ya no se puede modificar desde aquí. Para describir lo que su empresa ofrece, use la pestaña **Categorías CPV (taxonomía nueva)** (ver [Cómo agregar categorías CPV](#agregar-categorias)).
-
-### Recursos en Venezuela {#recursos}
+## Recursos en Venezuela {#recursos}
 
 Aquí se declaran los recursos de los que su empresa dispone **en Venezuela**: personal, maquinaria y equipos, instalaciones e inventario. La pestaña tiene cuatro botones, uno por tipo de recurso. Cada uno abre una ventana para agregar o editar los datos:
 
@@ -318,7 +340,7 @@ Las cantidades y los valores de maquinaria e inventario se eligen **por rangos (
 
 Dentro de cada ventana hay un interruptor **No Aplica** para declarar que ese tipo de recurso no corresponde a su empresa.
 
-### Sistemas de gestión {#sistemas-de-gestion}
+## Sistemas de gestión {#sistemas-de-gestion}
 
 Aquí se indican los sistemas de gestión y las certificaciones que su empresa tiene implementados. Tiene seis botones, uno por grupo:
 
@@ -331,7 +353,7 @@ Aquí se indican los sistemas de gestión y las certificaciones que su empresa t
 
 En cada ventana marque los que su empresa tiene. Si tiene uno que no está en la lista, active **Otros (especifíque)** y escriba su nombre. Cada ventana también tiene su interruptor **No Aplica**.
 
-### Experiencia relevante {#experiencia}
+## Experiencia relevante {#experiencia}
 
 Resume los proyectos relevantes de su empresa en los sectores de infraestructura del país durante los **últimos 10 años**. Registre una experiencia por proyecto.
 
@@ -346,7 +368,7 @@ Presione **Agregar experiencia** y complete:
 
 Cada experiencia registrada tiene las acciones **Editar** y **Eliminar**.
 
-### Presencia internacional {#presencia-internacional}
+## Presencia internacional {#presencia-internacional}
 
 Use el botón **Crear** de la pestaña (solo aparece si su empresa todavía no tiene este registro). El formulario tiene dos pasos:
 
@@ -357,7 +379,7 @@ Después puede usar **Editar** o **Borrar** sobre el registro.
 
 > **CONSEJO:** La experiencia en proyectos en otro país cuenta aunque su empresa no tenga oficina allí.
 
-### Enfoque de sostenibilidad {#sostenibilidad}
+## Enfoque de sostenibilidad {#sostenibilidad}
 
 La Cámara pide que su empresa responda **cada uno** de los ocho enfoques de sostenibilidad, **incluso los que no aplica** (en ese caso, con **No**):
 
@@ -378,6 +400,10 @@ Para registrar cada uno:
 4. Confirme. Repita hasta registrar los ocho.
 
 Cada enfoque registrado puede borrarse con **Borrar**.
+
+## Completitud del perfil y «No Aplica» {#completitud-y-no-aplica}
+
+El sistema le indica cuánto de su perfil está completo y le permite declarar las secciones que no corresponden a su empresa.
 
 ### La opción «No Aplica» {#no-aplica}
 

@@ -28,15 +28,21 @@ class UserManualContentTest extends TestCase
         return html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
-    /** Texto de la sección cuyo título h2 tiene el id dado (hasta el próximo h2). */
+    /**
+     * Texto de la sección cuyo título (h2, h3 o h4) tiene el id dado, hasta el próximo título del
+     * mismo nivel o superior. Desde que el manual se ordena por módulo del sistema, las partes de la
+     * taxonomía son subsecciones (h3) de «Categorías CPV».
+     */
     private function section(string $html, string $id): string
     {
-        $this->assertMatchesRegularExpression('/<h2 id="'.preg_quote($id, '/').'">/', $html, "Falta la sección #{$id}.");
+        $this->assertMatchesRegularExpression('/<h([234]) id="'.preg_quote($id, '/').'">/', $html, "Falta la sección #{$id}.");
+        preg_match('/<h([234]) id="'.preg_quote($id, '/').'">/', $html, $m, PREG_OFFSET_CAPTURE);
+        $level = (int) $m[1][0];
+        $start = $m[0][1];
 
-        $start = strpos($html, '<h2 id="'.$id.'">');
-        $next = strpos($html, '<h2 ', $start + 1);
+        $next = preg_match('/<h[2-'.$level.'][ >]/', $html, $n, PREG_OFFSET_CAPTURE, $start + 1) ? $n[0][1] : null;
 
-        return $this->plainText(substr($html, $start, $next === false ? null : $next - $start));
+        return $this->plainText(substr($html, $start, $next === null ? null : $next - $start));
     }
 
     private function relationManagerSource(): string
@@ -49,21 +55,38 @@ class UserManualContentTest extends TestCase
     {
         $manual = $this->manual();
 
+        // El índice sigue los módulos del sistema en el orden en que aparecen en pantalla (pedido del
+        // propietario tras ver el despliegue de d23c0e6): la taxonomía es UNA entrada, no la mitad.
         $this->assertSame([
             'que-es',
             'ingreso-y-cuenta',
+            'escritorio',
             'datos-generales',
-            'taxonomia-cpv',
-            'agregar-categorias',
-            'principal-secundaria',
-            'beneficios',
-            'no-encuentro-categoria',
             'resto-del-perfil',
+            'camaras',
+            'contactos',
+            'usuarios',
+            'sectores-y-servicios',
+            'taxonomia-cpv',
+            'recursos',
+            'sistemas-de-gestion',
+            'experiencia',
+            'presencia-internacional',
+            'sostenibilidad',
+            'completitud-y-no-aplica',
             'errores-frecuentes',
             'privacidad',
         ], array_column($manual['toc'], 'id'));
 
-        foreach (['grupo-familia-categoria', 'busqueda-libre', 'explorar-familia', 'limites', 'confirmar-reclasificar-quitar', 'solicitar-revision', 'no-aplica', 'completitud'] as $anchor) {
+        // Cada pestaña de la empresa tiene su sección de nivel 2, en el orden real de las pestañas.
+        $tabs = array_map(fn ($rm) => class_basename($rm), \App\Filament\Resources\EmpresaResource::getRelations());
+        $this->assertSame([
+            'ChambersRelationManager', 'ContactsRelationManager', 'UsersRelationManager', 'ServicesRelationManager',
+            'TaxonomyCategoriesRelationManager', 'AssetsRelationManager', 'ManagementRelationManager',
+            'ExperiencesRelationManager', 'PresenceRelationManager', 'SustainabilitiesRelationManager',
+        ], $tabs, 'Cambiaron las pestañas de la empresa: actualice el orden de las secciones del manual.');
+
+        foreach (['agregar-categorias', 'principal-secundaria', 'beneficios', 'no-encuentro-categoria', 'grupo-familia-categoria', 'busqueda-libre', 'explorar-familia', 'limites', 'confirmar-reclasificar-quitar', 'solicitar-revision', 'no-aplica', 'completitud', 'mapa-del-sistema', 'botones-ventanas'] as $anchor) {
             $this->assertStringContainsString('id="'.$anchor.'"', $manual['html'], "Falta el ancla estable #{$anchor}.");
         }
 
