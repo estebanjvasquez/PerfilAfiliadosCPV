@@ -1,0 +1,30 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-7d89a41f2749 Creating 
+ Container cpvtest-testapp-run-7d89a41f2749 Created 
+  ⇂ public/js/filament/forms/components/color-picker.js  
+  ⇂ public/js/filament/forms/components/date-time-picker.js  
+  ⇂ public/js/filament/forms/components/file-upload.js  
+  ⇂ public/js/filament/forms/components/key-value.js  
+  ⇂ public/js/filament/forms/components/markdown-editor.js  
+  ⇂ public/js/filament/forms/components/rich-editor.js  
+  ⇂ public/js/filament/forms/components/select.js  
+  ⇂ public/js/filament/forms/components/tags-input.js  
+  ⇂ public/js/filament/forms/components/textarea.js  
+  ⇂ public/js/filament/tables/components/table.js  
+  ⇂ public/js/filament/widgets/components/chart.js  
+  ⇂ public/js/filament/widgets/components/stats-overview/stat/chart.js  
+  ⇂ public/jsfilament-export-0.3.0.js  
+  ⇂ public/js/filament/filament/app.js  
+  ⇂ public/js/filament/filament/echo.js  
+  ⇂ public/js/filament/notifications/notifications.js  
+  ⇂ public/js/filament/support/support.js  
+  ⇂ public/cssfilament-export-0.3.0.css  
+  ⇂ public/csspanel-custom.css  
+  ⇂ public/css/filament/forms/forms.css  
+  ⇂ public/css/filament/support/support.css  
+  ⇂ public/css/filament/filament/app.css  
+
+   INFO  Successfully published assets!  
+

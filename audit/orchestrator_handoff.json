@@ -3030,7 +3030,31 @@
       "report": "audit/integration_candidate_0010_live_preflight_2026-10-14.md",
       "artifacts": "audit/integration_candidate_0010/live_preflight/",
       "note": "Read-only evidence only. No push to feature/upgrade-filament-v3, no deploy, no ledger or data change. The staging execution instruction is the orchestrator's to record."
+    },
+    "staging_deploy": {
+      "status": "DEPLOYED_FOR_OWNER_REVIEW_MANUAL",
+      "deployed_sha": "9b447eb15e80bddc4958430a8fc60acf5150ff4d",
+      "workflow_run": "https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/38612101908",
+      "report": "audit/integration_candidate_0010_staging_deploy_2026-10-14.md (on feature/integration-candidate-0010 @ f940dc1)",
+      "followup_2026_10_15": "request #1 recorded as failed/recipient_not_configured; no recipient; MAIL_MAILER=log; counts unchanged but requests 0->1 (feature/integration-candidate-0010 @ 8a7664f)"
     }
+  },
+  "task_0010c": {
+    "status": "READY_FOR_REVIEW_MANUAL",
+    "instruction_comment": 6187768951,
+    "branch": "feature/task-0010c-request-operations",
+    "created_from": "origin/feature/upgrade-filament-v3 @ 9b447eb15e80bddc4958430a8fc60acf5150ff4d",
+    "tested_head": "349ea61078fe5b6b88abc0a90333958c0ea9f220",
+    "harness": "infra/contabo-test-runner @ 246b0d073ae486cfe27d97f3a2e6268328a3b8cd, run 20261015T085118Z-349ea61078fe",
+    "result": "OK (481 tests, 2869 assertions); browser 55/55; taxonomy unchanged",
+    "pending_migration_if_deployed": "2026_10_15_120000_add_delivery_operations_to_taxonomy_category_requests (additive; would insert one historical attempt row for staging request #1, never updating it)",
+    "findings": [
+      "EmpresaPgsql does not compile (taxonomyCategories() incompatible with Empresa::taxonomyCategories(): HasMany); dormant since a5265ce; needs its own task",
+      "concurrency verified at claim level, not with two real processes",
+      "simulated notices are not retryable; a decision is needed if SMTP is later enabled"
+    ],
+    "report": "audit/task_0010c_request_operations_2026-10-15.md",
+    "note": "Not deployed. No SMTP, no real mail, no retry of request #1, no secrets."
   },
   "agent_issue_write_access": "AVAILABLE since 2026-10-09 via docs/orquestador/post_issue_comment.ps1 and the purpose-built token in the out-of-repo store; verified again on 2026-10-14 (comments 6167868489, 6168251563, 6168437907, 6172040668, 6172055856, 6173789525).",
   "agent_review_polling_policy": {

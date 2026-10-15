@@ -1,0 +1,56 @@
+PASS  guest is sent to login from /admin/solicitudes-de-categoria  :: http://cpvtest-uxserve-20261015t085118z-349ea61078fe:8000/admin/login
+PASS  guest is sent to login from /admin/configuracion-de-solicitudes  :: http://cpvtest-uxserve-20261015t085118z-349ea61078fe:8000/admin/login
+PASS  guest is sent to login from /admin/ayuda-solicitudes-de-categoria  :: http://cpvtest-uxserve-20261015t085118z-349ea61078fe:8000/admin/login
+PASS  synthetic affiliate can log in  :: http://cpvtest-uxserve-20261015t085118z-349ea61078fe:8000/admin
+PASS  affiliate sidebar was actually read  :: chars=1859
+PASS  affiliate navigation has no "Solicitudes de categoría"
+PASS  affiliate gets 403 on /admin/solicitudes-de-categoria  :: status=403
+PASS  affiliate sees no request content on /admin/solicitudes-de-categoria
+PASS  affiliate gets 403 on /admin/configuracion-de-solicitudes  :: status=403
+PASS  affiliate sees no request content on /admin/configuracion-de-solicitudes
+PASS  affiliate gets 403 on /admin/ayuda-solicitudes-de-categoria  :: status=403
+PASS  affiliate sees no request content on /admin/ayuda-solicitudes-de-categoria
+PASS  mobile: synthetic super admin can log in
+PASS  mobile list: content visible  :: opacity=1 visible=true
+PASS  mobile list: no page-level horizontal overflow  :: excess=0px
+PASS  mobile list: no internal strings  :: none
+PASS  mobile list: missing-recipient warning shown
+PASS  a request detail link exists in the list  :: /admin/solicitudes-de-categoria/26
+PASS  mobile detail: content visible  :: opacity=1 visible=true
+PASS  mobile detail: no page-level horizontal overflow  :: excess=0px
+PASS  mobile detail: no internal strings  :: none
+PASS  mobile detail: retry is visible and disabled without recipient  :: disabled=true
+PASS  mobile settings: content visible  :: opacity=1 visible=true
+PASS  mobile settings: no page-level horizontal overflow  :: excess=0px
+PASS  mobile settings: no internal strings  :: none
+PASS  mobile help: content visible  :: opacity=1 visible=true
+PASS  mobile help: no page-level horizontal overflow  :: excess=0px
+PASS  mobile help: no internal strings  :: none
+PASS  desktop navigation shows "Solicitudes de categoría"
+PASS  desktop navigation shows "Configuración de solicitudes"
+PASS  desktop list: content visible  :: opacity=1 visible=true
+PASS  desktop list: no page-level horizontal overflow  :: excess=0px
+PASS  desktop list: no internal strings  :: none
+PASS  desktop list: failed badge shown in the table row
+PASS  limits page links to "Configuración de solicitudes" instead of a second field
+PASS  desktop settings: content visible  :: opacity=1 visible=true
+PASS  desktop settings: no page-level horizontal overflow  :: excess=0px
+PASS  desktop settings: no internal strings  :: none
+PASS  settings: transport shown as simulated
+PASS  settings: saved notification
+PASS  desktop detail: content visible  :: opacity=1 visible=true
+PASS  desktop detail: no page-level horizontal overflow  :: excess=0px
+PASS  desktop detail: no internal strings  :: none
+PASS  detail: still failed after saving the recipient (no automatic resend)
+PASS  detail: retry enabled once a recipient exists
+PASS  confirmation names the recipient
+PASS  confirmation explains the simulated transport
+PASS  confirmation says no new request is created
+PASS  result notified as simulated, not as sent
+PASS  detail now shows the simulated status
+PASS  no "Aceptado por el servidor de correo" shown for a simulated notice
+PASS  history shows the manual retry  :: entries=1
+PASS  desktop help: content visible  :: opacity=1 visible=true
+PASS  desktop help: no page-level horizontal overflow  :: excess=0px
+PASS  desktop help: no internal strings  :: none
+passed=55 failed=0

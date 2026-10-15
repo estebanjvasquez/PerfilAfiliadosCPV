@@ -1,0 +1,131 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-d1cf6b734ea6 Creating 
+ Container cpvtest-testapp-run-d1cf6b734ea6 Created 
+
+   INFO  Migration table created successfully.  
+
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-557dc6e0bbe3 Creating 
+ Container cpvtest-testapp-run-557dc6e0bbe3 Created 
+2022_10_19_213831_create_catalogo_view: marcada como ya corrida en pgsql.
+2022_11_06_185050_create_capacity_view: marcada como ya corrida en pgsql.
+2022_11_08_224546_create_management_view: marcada como ya corrida en pgsql.
+2022_11_10_200304_create_sustainability_view: marcada como ya corrida en pgsql.
+2022_11_10_211023_create_finance_view: marcada como ya corrida en pgsql.
+2022_11_13_181946_create_clients_view: marcada como ya corrida en pgsql.
+2022_11_16_204956_create_experience_view: marcada como ya corrida en pgsql.
+2022_12_03_003734_create_experience_view: marcada como ya corrida en pgsql.
+2023_05_10_181749_create_resource_view: marcada como ya corrida en pgsql.
+2023_05_25_223154_create_machinery_view: marcada como ya corrida en pgsql.
+2023_05_26_204049_create_facility_view: marcada como ya corrida en pgsql.
+2023_05_31_233119_create_inventory_view: marcada como ya corrida en pgsql.
+2023_06_02_204233_create_management_det_view: marcada como ya corrida en pgsql.
+2023_09_15_225003_create_presence_view: marcada como ya corrida en pgsql.
+2026_08_04_000001_fix_null_bucket_defaults_in_report_views: marcada como ya corrida en pgsql.
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-aed47dd4d1b7 Creating 
+ Container cpvtest-testapp-run-aed47dd4d1b7 Created 
+
+   INFO  Running migrations.  
+
+  2014_10_12_000000_create_users_table .......................... 10.70ms DONE
+  2014_10_12_100000_create_password_resets_table ................. 6.31ms DONE
+  2019_08_19_000000_create_failed_jobs_table ..................... 4.99ms DONE
+  2019_12_14_000001_create_personal_access_tokens_table .......... 5.66ms DONE
+  2022_05_01_225251_create_countries_table ....................... 3.46ms DONE
+  2022_05_30_225501_create_customers_table ....................... 5.07ms DONE
+  2022_05_31_223828_create_empresas_table ........................ 6.60ms DONE
+  2022_06_13_231159_create_permission_tables .................... 41.22ms DONE
+  2022_06_24_212129_create_contacts_table ........................ 5.24ms DONE
+  2022_06_25_213756_create_contact_empresa_table ................ 14.86ms DONE
+  2022_06_26_150338_create_sectors_table ......................... 5.95ms DONE
+  2022_06_26_150408_create_services_table ....................... 10.85ms DONE
+  2022_06_27_215545_create_empresa_sector_service_table ......... 11.12ms DONE
+  2022_06_28_144255_create_empresa_user_table ................... 12.67ms DONE
+  2022_07_28_181005_create_states_table .......................... 6.42ms DONE
+  2022_07_28_183312_create_cities_table ......................... 10.72ms DONE
+  2022_08_03_154019_create_assets_table ......................... 14.80ms DONE
+  2022_08_12_145310_create_sustainabilities_table ................ 9.02ms DONE
+  2022_08_15_005221_create_areas_table ........................... 7.05ms DONE
+  2022_08_16_204943_create_presences_table ...................... 10.16ms DONE
+  2022_08_22_140750_create_management_table ..................... 17.51ms DONE
+  2022_08_26_200657_create_experiences_table ..................... 9.41ms DONE
+  2022_09_01_154856_create_infratypes_table ...................... 2.82ms DONE
+  2022_09_01_182509_create_infrasystems_table .................... 3.86ms DONE
+  2022_09_01_184733_create_infraregions_table .................... 3.11ms DONE
+  2022_09_01_185804_create_infrafacilities_table ................. 2.44ms DONE
+  2022_09_06_153218_create_infrasectors_table .................... 6.13ms DONE
+  2022_11_17_222317_create_chambers_table ........................ 5.05ms DONE
+  2022_11_17_222702_create_chamber_empresa_table ................. 8.69ms DONE
+  2022_12_01_222538_create_infraregion_infrasystem_table ........ 13.15ms DONE
+  2022_12_02_000000_restore_deferred_foreign_keys ............... 63.61ms DONE
+  2026_06_12_000001_add_sector_principal_secundario_to_empresas_table  7.37ms DONE
+  2026_06_12_000002_create_empresa_module_status_table ........... 7.10ms DONE
+  2026_07_24_000001_add_sub_type_to_empresa_module_status_table . 11.15ms DONE
+  2026_09_01_120000_create_supplier_categories_table ............. 8.87ms DONE
+  2026_09_01_120001_create_supplier_category_translations_table .. 5.88ms DONE
+  2026_09_01_120002_create_supplier_category_synonyms_table ...... 7.15ms DONE
+  2026_09_01_120003_create_empresa_supplier_categories_table ..... 6.52ms DONE
+  2026_09_01_120004_create_empresa_catalog_items_table ........... 5.27ms DONE
+  2026_09_01_120005_create_empresa_catalog_item_category_table ... 5.80ms DONE
+  2026_09_01_120006_create_category_mapping_audit_table .......... 5.40ms DONE
+  2026_09_01_130000_add_completion_percentage_to_empresas_table .. 2.57ms DONE
+  2026_09_04_083547_add_is_principal_to_contact_empresa_table .... 2.41ms DONE
+  2026_09_07_090000_rework_taxonomy_categories_structure ........ 22.24ms DONE
+  2026_09_11_090000_create_taxonomy_category_embeddings_table ... 32.05ms DONE
+  2026_09_11_150000_create_service_embeddings_table .............. 6.53ms DONE
+  2026_09_12_120000_create_service_taxonomy_homologacion_table ... 6.29ms DONE
+  2026_09_15_090000_create_taxonomy_selection_settings_table ..... 3.01ms DONE
+  2026_09_15_090100_add_es_principal_to_empresa_taxonomy_category  0.98ms DONE
+  2026_09_16_100000_create_empresa_certifications_table .......... 5.21ms DONE
+  2026_09_16_100100_create_sustainability_areas_table ............ 9.73ms DONE
+  2026_09_16_100200_create_empresa_sustainability_areas_table .... 5.88ms DONE
+  2026_09_16_100300_create_empresa_experiencias_table ............ 4.82ms DONE
+  2026_09_16_100400_create_empresa_experiencia_embeddings_table .. 4.10ms DONE
+  2026_09_16_110000_create_empresa_search_documents_table ........ 5.61ms DONE
+  2026_09_18_090000_create_taxonomy_sources_table ................ 3.36ms DONE
+  2026_09_18_090100_create_taxonomy_terms_table ................. 21.12ms DONE
+  2026_09_18_090200_create_taxonomy_term_aliases_table ........... 6.05ms DONE
+  2026_09_18_090300_create_taxonomy_term_cpv_relations_table ..... 9.91ms DONE
+  2026_09_18_090400_create_legacy_services_table ................. 4.78ms DONE
+  2026_09_18_090500_create_legacy_service_cpv_relations_table .... 9.13ms DONE
+  2026_09_18_090600_create_taxonomy_term_service_relations_table  12.11ms DONE
+  2026_09_18_090700_create_taxonomy_settings_table ............... 6.45ms DONE
+  2026_09_18_090800_create_taxonomy_audit_log_table .............. 7.23ms DONE
+  2026_09_18_090900_create_taxonomy_crawl_runs_table ............. 8.09ms DONE
+  2026_09_18_091000_create_taxonomy_candidate_terms_table ....... 10.74ms DONE
+  2026_09_18_091100_create_company_crawl_runs_table .............. 8.71ms DONE
+  2026_09_18_091200_create_company_pages_table ................... 4.53ms DONE
+  2026_09_18_091300_create_company_term_matches_table ............ 5.71ms DONE
+  2026_09_18_091400_create_taxonomy_term_source_bindings_table ... 8.08ms DONE
+  2026_09_18_091500_add_provenance_columns_to_taxonomy_terms_table  4.03ms DONE
+  2026_09_18_091600_widen_taxonomy_terms_mapping_review_status ... 4.53ms DONE
+  2026_09_18_091700_clean_up_taxonomy_terms_mapping_review_status  8.26ms DONE
+  2026_09_18_091800_add_actor_columns_to_taxonomy_audit_log_table  8.15ms DONE
+  2026_09_18_091900_create_taxonomy_canonical_concepts_table .... 12.00ms DONE
+  2026_09_18_092000_create_taxonomy_term_concepts_table .......... 7.19ms DONE
+  2026_09_18_092100_add_evidence_to_taxonomy_term_cpv_relations_table  2.37ms DONE
+  2026_09_18_092200_add_visible_text_to_company_pages_table ...... 1.49ms DONE
+  2026_09_19_100000_add_concept_type_and_domain_to_taxonomy_canonical_concepts_table  3.91ms DONE
+  2026_09_19_100100_create_taxonomy_concept_types_table .......... 5.09ms DONE
+  2026_09_19_100200_create_taxonomy_concept_relation_types_table . 3.52ms DONE
+  2026_09_19_100300_create_taxonomy_concept_relations_table ..... 11.74ms DONE
+  2026_09_19_100400_create_taxonomy_candidate_concept_links_table  7.84ms DONE
+  2026_09_19_100500_create_taxonomy_term_embeddings_table ........ 7.73ms DONE
+  2026_09_19_100600_create_taxonomy_intent_markers_table ......... 7.08ms DONE
+  2026_09_23_180000_add_taxonomy_state_fingerprint_to_candidate_concept_links_table  0.77ms DONE
+  2026_09_28_165653_add_unique_constraints_to_taxonomy_candidate_concept_links  2.41ms DONE
+  2026_09_28_211540_add_execution_context_to_taxonomy_audit_log_table  3.33ms DONE
+  2026_09_29_193000_create_taxonomy_reviewed_proposals_table .... 11.96ms DONE
+  2026_10_01_180000_add_human_confirmation_and_bilingual_group_to_taxonomy_reviewed_proposals  7.51ms DONE
+  2026_10_01_210000_add_confirmation_invalidation_to_taxonomy_reviewed_proposals  7.07ms DONE
+  2026_10_02_160000_add_supersession_lifecycle_to_taxonomy_reviewed_proposals  7.57ms DONE
+  2026_10_09_120000_create_taxonomy_category_requests_table ...... 9.56ms DONE
+  2026_10_15_120000_add_delivery_operations_to_taxonomy_category_requests  13.91ms DONE
+

@@ -1,0 +1,261 @@
+{
+  "results": [
+    {
+      "name": "guest is sent to login from /admin/solicitudes-de-categoria",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t085118z-349ea61078fe:8000/admin/login"
+    },
+    {
+      "name": "guest is sent to login from /admin/configuracion-de-solicitudes",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t085118z-349ea61078fe:8000/admin/login"
+    },
+    {
+      "name": "guest is sent to login from /admin/ayuda-solicitudes-de-categoria",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t085118z-349ea61078fe:8000/admin/login"
+    },
+    {
+      "name": "synthetic affiliate can log in",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t085118z-349ea61078fe:8000/admin"
+    },
+    {
+      "name": "affiliate sidebar was actually read",
+      "pass": true,
+      "detail": "chars=1859"
+    },
+    {
+      "name": "affiliate navigation has no \"Solicitudes de categoría\"",
+      "pass": true
+    },
+    {
+      "name": "affiliate gets 403 on /admin/solicitudes-de-categoria",
+      "pass": true,
+      "detail": "status=403"
+    },
+    {
+      "name": "affiliate sees no request content on /admin/solicitudes-de-categoria",
+      "pass": true
+    },
+    {
+      "name": "affiliate gets 403 on /admin/configuracion-de-solicitudes",
+      "pass": true,
+      "detail": "status=403"
+    },
+    {
+      "name": "affiliate sees no request content on /admin/configuracion-de-solicitudes",
+      "pass": true
+    },
+    {
+      "name": "affiliate gets 403 on /admin/ayuda-solicitudes-de-categoria",
+      "pass": true,
+      "detail": "status=403"
+    },
+    {
+      "name": "affiliate sees no request content on /admin/ayuda-solicitudes-de-categoria",
+      "pass": true
+    },
+    {
+      "name": "mobile: synthetic super admin can log in",
+      "pass": true
+    },
+    {
+      "name": "mobile list: content visible",
+      "pass": true,
+      "detail": "opacity=1 visible=true"
+    },
+    {
+      "name": "mobile list: no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "mobile list: no internal strings",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "mobile list: missing-recipient warning shown",
+      "pass": true
+    },
+    {
+      "name": "a request detail link exists in the list",
+      "pass": true,
+      "detail": "/admin/solicitudes-de-categoria/26"
+    },
+    {
+      "name": "mobile detail: content visible",
+      "pass": true,
+      "detail": "opacity=1 visible=true"
+    },
+    {
+      "name": "mobile detail: no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "mobile detail: no internal strings",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "mobile detail: retry is visible and disabled without recipient",
+      "pass": true,
+      "detail": "disabled=true"
+    },
+    {
+      "name": "mobile settings: content visible",
+      "pass": true,
+      "detail": "opacity=1 visible=true"
+    },
+    {
+      "name": "mobile settings: no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "mobile settings: no internal strings",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "mobile help: content visible",
+      "pass": true,
+      "detail": "opacity=1 visible=true"
+    },
+    {
+      "name": "mobile help: no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "mobile help: no internal strings",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "desktop navigation shows \"Solicitudes de categoría\"",
+      "pass": true
+    },
+    {
+      "name": "desktop navigation shows \"Configuración de solicitudes\"",
+      "pass": true
+    },
+    {
+      "name": "desktop list: content visible",
+      "pass": true,
+      "detail": "opacity=1 visible=true"
+    },
+    {
+      "name": "desktop list: no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "desktop list: no internal strings",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "desktop list: failed badge shown in the table row",
+      "pass": true
+    },
+    {
+      "name": "limits page links to \"Configuración de solicitudes\" instead of a second field",
+      "pass": true
+    },
+    {
+      "name": "desktop settings: content visible",
+      "pass": true,
+      "detail": "opacity=1 visible=true"
+    },
+    {
+      "name": "desktop settings: no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "desktop settings: no internal strings",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "settings: transport shown as simulated",
+      "pass": true
+    },
+    {
+      "name": "settings: saved notification",
+      "pass": true
+    },
+    {
+      "name": "desktop detail: content visible",
+      "pass": true,
+      "detail": "opacity=1 visible=true"
+    },
+    {
+      "name": "desktop detail: no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "desktop detail: no internal strings",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "detail: still failed after saving the recipient (no automatic resend)",
+      "pass": true
+    },
+    {
+      "name": "detail: retry enabled once a recipient exists",
+      "pass": true
+    },
+    {
+      "name": "confirmation names the recipient",
+      "pass": true
+    },
+    {
+      "name": "confirmation explains the simulated transport",
+      "pass": true
+    },
+    {
+      "name": "confirmation says no new request is created",
+      "pass": true
+    },
+    {
+      "name": "result notified as simulated, not as sent",
+      "pass": true
+    },
+    {
+      "name": "detail now shows the simulated status",
+      "pass": true
+    },
+    {
+      "name": "no \"Aceptado por el servidor de correo\" shown for a simulated notice",
+      "pass": true
+    },
+    {
+      "name": "history shows the manual retry",
+      "pass": true,
+      "detail": "entries=1"
+    },
+    {
+      "name": "desktop help: content visible",
+      "pass": true,
+      "detail": "opacity=1 visible=true"
+    },
+    {
+      "name": "desktop help: no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "desktop help: no internal strings",
+      "pass": true,
+      "detail": "none"
+    }
+  ],
+  "passed": 55,
+  "failed": 0
+}
