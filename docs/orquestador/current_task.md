@@ -6,6 +6,9 @@
 > - **El aviso «EN ESPERA / NO INICIADAS» de más abajo está SUPERADO**: A/B se reanudaron el 2026-10-14 bajo revisión manual y hoy están desplegadas.
 > - El loop autónomo está **suspendido**: ninguna sesión entra a un loop ni arranca tareas por su cuenta.
 > - **2026-10-15, después:** el propietario informó la prueba manual de C como **OK** (`6189493183`). La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** (rama `feature/mail-docs-and-user-manual`) está **READY_FOR_REVIEW — MANUAL** y **no se ha desplegado**. La activación del correo está **pendiente del propietario**.
+> - **Más tarde ese día:**
+>   - el manual reorganizado está desplegado (`37e3b71`);
+>   - **CPV-TAXONOMY-MAP** («Mapa de la taxonomía», autorizada en `6191513374`) está **READY_FOR_REVIEW — MANUAL** en `feature/taxonomy-map`, **sin desplegar**.
 > - Siguiente acción y pendientes: `SESSION_RESUME.md` §4 y §5.
 >
 > Todo lo que sigue es la historia de TASK-0010 y se conserva sin cambios.

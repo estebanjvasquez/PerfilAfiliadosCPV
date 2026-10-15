@@ -1,6 +1,6 @@
 {
-  "current_task": "CPV-MAIL-DOCS-AND-USER-MANUAL: manual reorganized by system module (4b7cab6) and DEPLOYED to staging at 37e3b71 via the normal workflow (run 38727131820), authorized by the owner in chat. Awaiting owner review.",
-  "current_status": "MAIL_DOCS_AND_USER_MANUAL_REORGANIZED_DEPLOYED_FOR_OWNER_REVIEW__RUNTIME_37E3B71__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
+  "current_task": "CPV-TAXONOMY-MAP (authorized 6191513374, corrections 6191485610): read-only taxonomy map for affiliates on feature/taxonomy-map, TESTED_HEAD 0fb38e2 (full isolated 492 tests OK; browser 39/39 at production-size synthetic data). READY_FOR_REVIEW, NOT deployed. Runtime 37e3b71.",
+  "current_status": "TAXONOMY_MAP_READY_FOR_REVIEW_MANUAL__RUNTIME_37E3B71__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
   "superseded_current_fields_2026_10_15": {
     "note": "Values these fields held before the 2026-10-15 checkpoint (instructions 6188413270 / 6188477132). Kept as history.",
     "current_task": "ORCHESTRATION INFRASTRUCTURE (authorized 6085642297): persistent executor on the Contabo VPS plus isolated PHPUnit. TASK-0010A and TASK-0010B are AUTHORIZED BUT HELD and NOT STARTED by owner decision.",
@@ -3343,5 +3343,25 @@
     "production_deploy_authorized": false,
     "merge_main_authorized": false,
     "owner_notification": "Only when integrated staging is ready for owner verification, or OWNER_GATE_REQUIRED/external blocker."
+  },
+  "taxonomy_map": {
+    "authorization": "6191513374",
+    "review_corrections": "6191485610",
+    "proposal_delivery": "6191417709",
+    "branch": "feature/taxonomy-map",
+    "base_sha": "f4eb859ab02ecaf10963da0ce8052e22e96dee0f",
+    "tested_head": "0fb38e2050ce24792dde36132c90f666c71157cf",
+    "full_run": "20261015T133707Z-0fb38e2050ce: OK (492 tests, 2979 assertions)",
+    "browser_run": "20261015T140345Z-0fb38e2050ce: 39/39 (harness 3dff19a)",
+    "measured": {
+      "html_bytes": 591529,
+      "gzip6_computed_bytes": 41445,
+      "dom_elements": 9683,
+      "desktop_filter_ms": "4-27",
+      "mobile_cpu4x_filter_ms": "30-158 (final run)"
+    },
+    "live_rules_aggregate": "48/333/2418, empty families 55, empty groups 1, excluded 0",
+    "deployed": false,
+    "report": "audit/taxonomy_map_2026-10-15.md"
   }
 }

@@ -1,0 +1,7 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-bd1c27896677 Creating 
+ Container cpvtest-testapp-run-bd1c27896677 Created 
+ux_seed_taxonomy_categories 3497
+ux_seed_translations 3497

@@ -1,0 +1,10 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-0f13d9a934f6 Creating 
+ Container cpvtest-testapp-run-0f13d9a934f6 Created 
+seeded groups=48 families=333 categories_active=2418 categories_inactive=698 empty_families=55 no_type=3
+ux admin found: 1 synthetic company found: 1
+synthetic city added for the company page
+ux admin linked to the synthetic company: 1
+map totals {"groups":50,"families":337,"categories":2438,"empty_groups":1,"empty_families":55,"bien":1584,"servicio":831,"otro":23} build_ms=15.4

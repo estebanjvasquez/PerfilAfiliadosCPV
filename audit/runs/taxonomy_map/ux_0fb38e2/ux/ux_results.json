@@ -1,0 +1,234 @@
+{
+  "results": [
+    {
+      "name": "guest is sent to login from the map",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t140345z-0fb38e2050ce:8000/admin/login"
+    },
+    {
+      "name": "synthetic affiliate can log in",
+      "pass": true
+    },
+    {
+      "name": "the map has no sidebar item",
+      "pass": true,
+      "detail": "sidebar chars=1859"
+    },
+    {
+      "name": "the manual shows the \"Ver mapa de la taxonomía\" button",
+      "pass": true
+    },
+    {
+      "name": "SPA navigation from the manual lands on a working map (filter loaded)",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t140345z-0fb38e2050ce:8000/admin/mapa-de-la-taxonomia"
+    },
+    {
+      "name": "the map has a \"Volver al manual\" link",
+      "pass": true
+    },
+    {
+      "name": "full load: the filter becomes ready",
+      "pass": true,
+      "detail": "wall ms to ready=336"
+    },
+    {
+      "name": "payload measured",
+      "pass": true,
+      "detail": "html=591529 B, gzip-6 computed=41445 B, DOM elements=9683"
+    },
+    {
+      "name": "production-size synthetic data is on the page",
+      "pass": true,
+      "detail": "groups=50 families=337 categories=2438"
+    },
+    {
+      "name": "intro totals equal the rendered tree",
+      "pass": true,
+      "detail": "Este mapa muestra toda la Taxonomía CPV publicada: 50 Grupos, 337 Familias y 2.438 Categorías. Abra un Grupo para ver sus Familias, y una Familia para ver sus Categorías."
+    },
+    {
+      "name": "empty groups/families keep their label",
+      "pass": true,
+      "detail": "labels=56"
+    },
+    {
+      "name": "no codes, inactive names or internal markers on the page",
+      "pass": true,
+      "detail": "none"
+    },
+    {
+      "name": "< 3 letters: guidance, nothing filtered",
+      "pass": true,
+      "detail": "Escriba al menos 3 letras para filtrar."
+    },
+    {
+      "name": "category match: one group, its family open, only the matching category, highlighted",
+      "pass": true,
+      "detail": "1 coincidencia: 0 Grupos, 0 Familias y 1 Categoría. | family size=26 | marks=Zigurat"
+    },
+    {
+      "name": "family match: the family open with ALL its categories, group as context",
+      "pass": true,
+      "detail": "1 coincidencia: 0 Grupos, 1 Familia y 0 Categorías. | categories 2/2"
+    },
+    {
+      "name": "group match (typed without accent): group open with ALL its families, name highlighted",
+      "pass": true,
+      "detail": "1 coincidencia: 1 Grupo, 0 Familias y 0 Categorías. | families 7/7 | marks=Zigurat|Xilófono"
+    },
+    {
+      "name": "a name with HTML characters stays text, also when highlighted",
+      "pass": true,
+      "detail": "[\"<b>negrita</b> & \\\"comillas\\\" de prueba\"]"
+    },
+    {
+      "name": "no results: message shown, nothing visible",
+      "pass": true,
+      "detail": "Ninguna coincidencia."
+    },
+    {
+      "name": "Esc clears: everything visible again, closed, no highlight",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "\"Limpiar filtro\" resets and returns focus to the field",
+      "pass": true,
+      "detail": "focus=cpv-map-filter"
+    },
+    {
+      "name": "filter cost measured (desktop)",
+      "pass": true,
+      "detail": "{\"valv\":17.8,\"sistemas\":19.5,\"de alta\":26.7,\"zigurat\":6.1,\"qqqzzzx\":4,\"(clear)\":14.3}"
+    },
+    {
+      "name": "keyboard: Tab reaches a group and Enter opens it",
+      "pass": true
+    },
+    {
+      "name": "[light/desktop] ready, no horizontal overflow with a group open",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[light/desktop] category text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=14.89"
+    },
+    {
+      "name": "[dark/desktop] ready, no horizontal overflow with a group open",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[dark/desktop] category text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=13.96"
+    },
+    {
+      "name": "[light/tablet] ready, no horizontal overflow with a group open",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[light/tablet] category text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=14.89"
+    },
+    {
+      "name": "[dark/tablet] ready, no horizontal overflow with a group open",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[dark/tablet] category text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=13.96"
+    },
+    {
+      "name": "[light/mobile] ready, no horizontal overflow with a group open",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[light/mobile] category text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=14.89"
+    },
+    {
+      "name": "[dark/mobile] ready, no horizontal overflow with a group open",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[dark/mobile] category text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=13.96"
+    },
+    {
+      "name": "mobile 390px, CPU 4x: map ready and filter cost measured",
+      "pass": true,
+      "detail": "{\"dom_content_loaded_ms\":1054,\"load_ms\":1128,\"wall_ms_to_filter_ready\":1679,\"filter_ms\":{\"valv\":157.7,\"sistemas\":44.7,\"de alta\":46.9,\"zigurat\":30,\"(clear)\":75.7}}"
+    },
+    {
+      "name": "mobile: filtered view has no horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "without JavaScript: groups render and open natively; the filter is not offered",
+      "pass": true,
+      "detail": "groups=50 opened=true filterShown=false noscript=true"
+    },
+    {
+      "name": "the \"Categorías CPV\" tab links to the map in a new tab",
+      "pass": true,
+      "detail": "href=http://cpvtest-uxserve-20261015t140345z-0fb38e2050ce:8000/admin/mapa-de-la-taxonomia target=_blank"
+    },
+    {
+      "name": "the admin can open the map too",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "desktop": {
+      "ttfb_ms": 130,
+      "response_end_ms": 135,
+      "dom_content_loaded_ms": 229,
+      "load_ms": 233,
+      "decoded_body_bytes": 591529,
+      "transfer_bytes": 591829,
+      "dom_elements": 9683,
+      "groups": 50,
+      "families": 337,
+      "categories": 2438,
+      "empty_labels": 56,
+      "intro": "Este mapa muestra toda la Taxonomía CPV publicada: 50 Grupos, 337 Familias y 2.438 Categorías. Abra un Grupo para ver sus Familias, y una Familia para ver sus Categorías.",
+      "wall_ms_to_load_event": 235,
+      "wall_ms_to_filter_ready": 336,
+      "html_bytes": 591529,
+      "html_gzip6_bytes_computed": 41445,
+      "filter_ms": {
+        "valv": 17.8,
+        "sistemas": 19.5,
+        "de alta": 26.7,
+        "zigurat": 6.1,
+        "qqqzzzx": 4,
+        "(clear)": 14.3
+      }
+    },
+    "mobile_cpu4x": {
+      "dom_content_loaded_ms": 1054,
+      "load_ms": 1128,
+      "wall_ms_to_filter_ready": 1679,
+      "filter_ms": {
+        "valv": 157.7,
+        "sistemas": 44.7,
+        "de alta": 46.9,
+        "zigurat": 30,
+        "(clear)": 75.7
+      }
+    }
+  }
+}

@@ -1,9 +1,12 @@
 # CPV — Punto de reanudación maestro
 
-**Checkpoint:** 2026-10-15, ~12:00 UTC.
+**Checkpoint:** 2026-10-15, ~14:15 UTC.
 - TASK-0010C está desplegada y el propietario informó su prueba manual como **OK**.
 - La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** fue aceptada (`6190018710`) y está **desplegada en staging** (`d23c0e6`, **MANUAL_SSH_DEPLOY** por la vía `6190372221`): **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**.
 - El propietario lo revisó y lo vio igual: el índice seguía centrado en la taxonomía. Se reorganizó por módulo del sistema en `4b7cab6` y está **desplegado** (`37e3b71`, run `38727131820`; el propietario lo autorizó por chat; informe §10).
+- **CPV-TAXONOMY-MAP** («Mapa de la taxonomía» para afiliados), autorizada en `6191513374` con las correcciones de `6191485610`, está implementada en `feature/taxonomy-map` y queda **READY_FOR_REVIEW — MANUAL**, **sin desplegar**.
+  - TESTED_HEAD `0fb38e2`: suite completa aislada OK (492 tests) y navegador 39/39 con una taxonomía sintética de tamaño real.
+  - Informe: `audit/taxonomy_map_2026-10-15.md`.
 
 Las §0 a §6 son la primera lectura. Lo que está después de la línea «Historia» es el checkpoint del 2026-10-08, que **ya no rige** y se conserva como historia.
 
@@ -21,20 +24,24 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 | Runtime de staging | **`37e3b7186bd7babef07392c09f80d134db4833f8`** (manual ordenado por módulo). Desplegado el 2026-10-15 a las 11:25Z por el workflow normal, run `38727131820` success. Smoke del manual 14/14 y de C 18/18. La versión anterior, `d23c0e6`, se desplegó por SSH (informe §9). |
 | TASK-0010A/B/C | Desplegadas. C fue aceptada (`6188413270`) y el propietario informó su prueba manual como **OK** (`6189493183`, `OWNER_REPORTED_UAT_PASS`; es un informe del propietario, no un test automático). |
 | Ronda manual + correo | **Aceptada** (`6190018710`) y **desplegada** (2026-10-15 11:05Z; informe §9), + **reorganización por módulo** `4b7cab66e4f580da5854a1f97afde3cac30822aa` (feedback del propietario, informe §10): verde aislado (45 tests, navegador 40/40), **desplegado** en `37e3b71`. Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo (con la secuencia correcta: recrear `app` y luego `config:cache`, para activar y para volver atrás) y regla de documentación. |
+| Mapa de la taxonomía | **READY_FOR_REVIEW — MANUAL, sin desplegar.** Rama `feature/taxonomy-map`. Página de solo lectura `/admin/mapa-de-la-taxonomia`, con el mismo acceso que el manual y enlaces desde el manual y la pestaña «Categorías CPV». Árbol publicado según `is_active` y ancestros visibles; sin caché ni escrituras. Sobre staging, en solo lectura, las reglas darían 48/333/2.418, con 55 Familias y 1 Grupo vacíos. |
 | Correo del sistema | **ACTIVACIÓN GLOBAL PENDIENTE: espera proveedor, configuración y credenciales del propietario.** Staging en modo sin envío (`MAIL_MAILER=log`, comprobado el 2026-10-15 con `docs/deploy/mail_status_readonly.php`). Sin destinatario configurado. No se ha enviado ningún correo real. |
 | Solicitud #1 | `failed`/`recipient_not_configured`, con una fila histórica. Sin reintento autorizado. |
 | Automatización | El ejecutor autónomo está **suspendido**. No hay IA en segundo plano ni sondeos. |
 
 ## 2. SHAs y ramas
 
-- **Runtime desplegado:** `d23c0e6ffac8e7b5105370bedade3475105e0fff`. Es el manual aceptado; el código de la aplicación es el mismo de C, `a5772345` / TESTED_HEAD `349ea61`.
+- **Runtime desplegado:** `37e3b7186bd7babef07392c09f80d134db4833f8`: manual ordenado por módulo; el código de la aplicación es el mismo de C, `a5772345` / TESTED_HEAD `349ea61`.
+- **Mapa de la taxonomía:** rama `feature/taxonomy-map`.
+  - BASE `f4eb859`, que es `37e3b71` más solo docs/audit.
+  - **TESTED_HEAD `0fb38e2050ce24792dde36132c90f666c71157cf`**. El REVIEW_HEAD es el commit que introduce este texto; su SHA está en el comentario de entrega.
 - **Ronda manual + correo:** rama `feature/mail-docs-and-user-manual`.
   - Base `0becd37` (checkpoint de C).
   - **TESTED_HEAD `433fbf05d4a82600f75e3bd1c31672112bda61c0`**.
   - REVIEW_HEAD aceptado **`d23c0e6ffac8e7b5105370bedade3475105e0fff`** (anterior `73765ea`, corrección `6189828037`).
   - Corrección: solo `docs/deploy/CORREO_DEL_SISTEMA.md` y el informe.
 - **Rama de C:** `feature/task-0010c-request-operations` @ `0becd37` (checkpoint).
-- **Arnés aislado:** `infra/contabo-test-runner` @ `246b0d0`.
+- **Arnés aislado:** `infra/contabo-test-runner` @ `3dff19a`. Agrega `--ux-seed`, la semilla sintética y el chequeo de navegador del mapa; el chequeo de fugas excluye las filas `ux-synthetic-*`.
 - **Imágenes de recuperación en el VPS:** `perfilafiliados-app:pre-manual-a577234` (imagen anterior al manual, `fd4441da…`), `perfilafiliados-app:pre-0010c-9b447eb`, `perfilafiliados-app:pre-0010-004d24e`.
 
 ## 3. Evidencia (enlazar, no copiar)
@@ -42,19 +49,24 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 - Ronda manual + correo, con la matriz de cobertura del PDF: `audit/mail_docs_user_manual_2026-10-15.md`.
 - Correo del sistema (mecanismo real, aprovisionamiento, chequeo seguro, vuelta atrás, requisitos): `docs/deploy/CORREO_DEL_SISTEMA.md`.
 - C (despliegue y guía de prueba): `audit/task_0010c_request_operations_2026-10-15.md`.
+- Mapa de la taxonomía:
+  - informe, con mediciones, reproducción y hallazgos: `audit/taxonomy_map_2026-10-15.md`;
+  - propuesta corregida (A–F): `docs/propuestas/mapa_taxonomia.md`;
+  - evidencia: `audit/runs/taxonomy_map/`.
 - Issue #2:
   - instrucción de esta ronda: `6189493183`; corrección: `6189828037`; aceptación: `6190018710`; autorización de despliegue: `6190034071`; bloqueo: `6190243300`; vía SSH: `6190372221`;
   - evidencia del despliegue: `audit/runs/manual_deploy_2026-10-15/` (estado previo y posterior, log saneado, smokes);
   - aceptación de C: `6188413270`;
   - autorización de despliegue de C: `6188477132`;
-  - entrega del despliegue de C: `6188643243`.
+  - entrega del despliegue de C: `6188643243`;
+  - mapa: propuesta `6191417709`, revisión con correcciones A–F `6191485610`, autorización de desarrollo `6191513374` (sin despliegue).
 
 ## 4. Siguiente acción
 
 - **Propietario:** abrir «Manual de usuario» y revisar el índice por módulo (18 secciones). Dijo que «ya se ve bastante bien» y que lo llevará a revisión del cliente.
-- **Propuesta CPV-TAXONOMY-MAP** (mapa de la taxonomía para afiliados): `docs/propuestas/mapa_taxonomia.md`, **solo propuesta, sin código**.
-  - Decisiones del propietario: D1, mostrar las Familias o Grupos vacíos como «sin categorías todavía»; D2, no agrupar los Grupos por áreas.
-  - Espera la revisión del orquestador. No implementar hasta que haya una instrucción en el Issue #2.
+- **CPV-TAXONOMY-MAP:** el orquestador revisa la entrega (READY_FOR_REVIEW — MANUAL).
+  - Desplegar requiere una autorización explícita.
+  - Como el cambio toca `app/**`, un fast-forward de `feature/upgrade-filament-v3` dispara el workflow normal, sin necesidad de la vía SSH.
 - **Agente:** **ninguna** hasta una nueva instrucción. No activar correo y no tocar secretos.
 - **Propietario, cuando lo tenga:** proveedor de correo, remitente y dominio (SPF/DKIM/DMARC), destinatario responsable, aprovisionamiento seguro en el `.env` del servidor y una prueba controlada (ver `CORREO_DEL_SISTEMA.md` §6). También: decidir si se reintenta la #1.
 
@@ -73,6 +85,11 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
   - ISO 9001 e ISO 17025 no tienen etiqueta explícita.
 - `app/images/user.pdf` es un PDF ajeno (manual de un plugin de audio). Retirarlo lo decide el propietario.
 - El validador del handoff (del loop retirado) falla en la regla histórica `6080004466`. No bloquea.
+- **Hallazgos de la ronda del mapa** (informe §7, no corregidos):
+  - `Empresa::users()` lee `Auth::User()->id` y falla si no hay un usuario autenticado;
+  - `EditEmpresa::getSteps()` usa `$value` de un bucle sobre `cities` y falla si la tabla está vacía;
+  - el buscador de categorías no verifica que los ancestros estén activos (latente: 0 casos hoy en staging).
+- **Limitación del mapa:** a 390 px la introducción ocupa la primera pantalla, así que los resultados del filtro quedan debajo (la línea de estado sí se ve).
 - **Regla vigente:** toda ronda que cambie el comportamiento actualiza el manual o la ayuda en la misma entrega (`ACCESS_BOOTSTRAP.md` §8).
 
 ## 6. Accesos (solo nombres; nunca valores)
