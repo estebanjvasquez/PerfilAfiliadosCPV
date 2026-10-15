@@ -40,6 +40,10 @@ UX=no
 # --ux-script <file.mjs> elige el chequeo de navegador (por defecto ux_check.mjs,
 # el del manual). Implica --ux. Solo nombres de archivo de docker/test/.
 UX_SCRIPT=ux_check.mjs
+# --ux-seed <file.php> (CPV-TAXONOMY-MAP) corre ese PHP de docker/test/ dentro de la app
+# desechable, despues de crear los usuarios sinteticos y antes de servir la app: datos
+# SINTETICOS de tamano real para medir la pagina (nunca datos copiados de una base viva).
+UX_SEED=""
 SKIP_SUITE=no
 PREFLIGHT=""
 while [ $# -gt 0 ]; do
@@ -48,6 +52,7 @@ while [ $# -gt 0 ]; do
     --filter) FILTER="${2:-}"; shift 2 ;;
     --ux)         UX=yes; shift ;;
     --ux-script)  UX=yes; UX_SCRIPT="${2:-}"; shift 2 ;;
+    --ux-seed)    UX=yes; UX_SEED="${2:-}"; shift 2 ;;
     --skip-suite) SKIP_SUITE=yes; shift ;;
     # Ejecuta un script de preflight de SOLO LECTURA del workspace contra la base
     # desechable. Existe para que un preflight que se va a entregar para una base
@@ -62,7 +67,13 @@ case "$UX_SCRIPT" in
   *.mjs) ;;
   *) echo "--ux-script must be a .mjs file" >&2; exit 2 ;;
 esac
-[ -n "$SHA" ] || { echo "usage: $0 <sha> [--suite Unit|Feature] [--filter <pattern>] [--ux] [--skip-suite]" >&2; exit 2; }
+case "$UX_SEED" in
+  "") ;;
+  *[!a-z0-9_.]*) echo "--ux-seed must be a plain file name in docker/test/" >&2; exit 2 ;;
+  *.php) ;;
+  *) echo "--ux-seed must be a .php file" >&2; exit 2 ;;
+esac
+[ -n "$SHA" ] || { echo "usage: $0 <sha> [--suite Unit|Feature] [--filter <pattern>] [--ux] [--ux-script <f.mjs>] [--ux-seed <f.php>] [--skip-suite]" >&2; exit 2; }
 case "$SHA" in *[!0-9a-f]*|"") echo "sha must be lowercase hex" >&2; exit 2 ;; esac
 [ "${#SHA}" -eq 40 ] || { echo "sha must be 40 characters" >&2; exit 2; }
 
@@ -906,6 +917,21 @@ if (class_exists(App\Models\TaxonomyCategoryRequestDeliveryAttempt::class)) {
   else
     uxbad "could not create the synthetic affiliate"
     tail -6 "$ARTIFACTS/ux/seed_user.log" | sed 's/^/           /'
+  fi
+
+  # Optional synthetic data for this browser check (--ux-seed). Runs as the app,
+  # inside the disposable stack, reading the file on stdin: nothing from a live
+  # database, nothing persisted outside this run.
+  if [ -n "$UX_SEED" ]; then
+    if [ ! -f "$COMPOSE_DIR/$UX_SEED" ]; then
+      uxbad "ux seed not found: $UX_SEED"
+    elif compose run --rm -T testapp php <"$COMPOSE_DIR/$UX_SEED" >"$ARTIFACTS/ux/ux_seed.log" 2>&1; then
+      uxok "synthetic ux seed applied: $UX_SEED"
+      tail -3 "$ARTIFACTS/ux/ux_seed.log" | sed 's/^/           /'
+    else
+      uxbad "ux seed failed: $UX_SEED"
+      tail -8 "$ARTIFACTS/ux/ux_seed.log" | sed 's/^/           /'
+    fi
   fi
 
   # Publish Filament's own CSS/JS into the workspace's public/ before serving.
