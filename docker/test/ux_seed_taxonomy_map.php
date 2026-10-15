@@ -165,6 +165,16 @@ $db->transaction(function () use ($GROUPS, $familiesPerGroup, $familyIndex, $siz
         ' no_type=', $noType, "\n";
 });
 
+// The company list only shows companies linked to the current user. Link the synthetic Super
+// Admin to the synthetic company (both created by run_tests.sh) so the browser check can open the
+// company's "Categorías CPV" tab. Synthetic rows only, inside the disposable stack.
+$admin = App\Models\User::where('email', 'zzz-ux-admin@example.test')->first();
+$empresa = App\Models\Empresa::where('rif', 'J-00000000-9')->first();
+if ($admin && $empresa && ! $empresa->users()->where('users.id', $admin->id)->exists()) {
+    $empresa->users()->attach($admin->id);
+}
+echo 'ux admin linked to the synthetic company: ', (int) ($admin && $empresa && $empresa->users()->where('users.id', $admin->id)->exists()), "\n";
+
 $m = app(App\Support\Taxonomy\TaxonomyMapBuilder::class);
 $t0 = hrtime(true);
 $tree = $m->build();

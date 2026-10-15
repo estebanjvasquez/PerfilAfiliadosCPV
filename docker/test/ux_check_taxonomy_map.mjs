@@ -169,7 +169,7 @@ try {
     record('production-size synthetic data is on the page', nav.groups >= 48 && nav.families >= 333 && nav.categories >= 2418,
       `groups=${nav.groups} families=${nav.families} categories=${nav.categories}`);
     // Digits only: the page writes 2.438 (thousands dot) and Node's 'es' locale writes 2438.
-    const introDigits = nav.intro.replace(/(d).(d)/g, '$1$2');
+    const introDigits = nav.intro.replace(/(\d)\.(\d)/g, '$1$2');
     record('intro totals equal the rendered tree', introDigits.includes(`${nav.groups} Grupos`) && introDigits.includes(`${nav.families} Familias`) && introDigits.includes(`${nav.categories} Categorías`), nav.intro);
     record('empty groups/families keep their label', nav.empty_labels >= 56, `labels=${nav.empty_labels}`);
     const text = await page.evaluate(() => document.body.innerText);
