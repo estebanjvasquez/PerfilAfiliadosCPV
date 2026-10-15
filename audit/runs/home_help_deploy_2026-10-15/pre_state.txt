@@ -1,0 +1,15 @@
+captured_utc=2026-10-15T15:39:25Z
+staging_head=9e7e379530612ec15f25e65ca472d9a57cd676dd
+tracked_modifications=0
+app_image=sha256:fac25f43d65ed4893dfe3eb616c618326f659431926759955e172f0a6a09974a
+env_sha256=085c617c22a2e1f4
+http_root=200
+pending_migrations=0
+concurrent_deploy=0
+preserved_image_tag=perfilafiliados-app:pre-home-9e7e379
+mailer_por_defecto=log
+transporte=log
+envia_fuera_del_servidor=no (simulado)
+configuracion_cacheada=si
+remitente_direccion=configurado
+remitente_nombre=configurado

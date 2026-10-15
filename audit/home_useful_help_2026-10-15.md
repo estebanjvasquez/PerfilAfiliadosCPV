@@ -8,7 +8,8 @@
   - No unreviewed runtime change is stacked.
 - **TESTED_HEAD:** `dc584e36cbea75852f0094e9053d9291b41e288e`.
 - **REVIEW_HEAD:** the commit that adds this report (docs/audit only on top of TESTED_HEAD).
-- **Deployed:** **NO**.
+- **Deployed:** **YES**, on 2026-10-15 at 15:40Z, at REVIEW_HEAD `c02d4ec` (§6).
+  - Accepted in `6195972738`; the deployment was authorized by the owner in chat.
 
 ## 1. Target verified against the real dashboard
 
@@ -82,3 +83,36 @@ They were fixed and rerun at TESTED_HEAD.
 
 - In the stack, the synthetic affiliate has no role, so its sidebar shows only «Escritorio» and «Manual de usuario». Real affiliates also see «Empresas» through their role. That is unrelated to this change.
 - Not deployed. On authorization, the change touches `app/**`, so a fast-forward of `feature/upgrade-filament-v3` triggers the normal workflow.
+
+## 6. Staging deployment (2026-10-15)
+
+- **Acceptance:** `6195972738` (PASS; deployment reserved for the owner).
+- **Authorization:** the owner, **in chat** in the Claude Code session ("autorizo el despliegue"). It is recorded in Issue #2 with that provenance.
+- **Preconditions (all passed):**
+  - The deploy branch and the runtime were both at `9e7e379`, with 0 tracked modifications.
+  - `c02d4ec` is a fast-forward of it. The runtime diff is only the accepted files.
+  - 0 migrations in the diff and 0 pending on staging; no concurrent deploy.
+  - Recovery image: `perfilafiliados-app:pre-home-9e7e379`.
+- **Route:** fast-forward `9e7e379..c02d4ec` (no force), then workflow run [`38762292519`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/38762292519), **success**.
+- **Post-state:**
+  - the checkout is at `c02d4ec`; `app` was recreated at 15:40:23Z;
+  - maintenance is off; `/` and `/admin/login` return 200;
+  - 0 pending migrations, 0 new log errors, and the `.env` hash is unchanged;
+  - a guest on `/admin` is redirected (`302 → /admin/login`).
+- **Smoke** (`docs/deploy/smoke_home_help_readonly.php`, in-memory users, READ ONLY + ROLLBACK): **21/21**.
+  - The panel registers the account card, the help card and the company widget, and no longer registers `FilamentInfoWidget`.
+  - For both the affiliate and the admin:
+    - the dashboard returns 200;
+    - the card «Ayuda para completar su perfil» links to the manual and the map;
+    - there is no Filament card;
+    - the account card and «Salir» are present;
+    - the company widget is present (lazy);
+    - both destinations return 200.
+  - The manual's «Escritorio» section describes the card. No mail was sent.
+- **Preserved:**
+  - mail `log`/simulated (unchanged);
+  - the 0010C smoke is 18/18 before and after (request #1 intact);
+  - the published taxonomy aggregate is identical before and after;
+  - credentials untouched.
+- **Not verified live:** the in-browser look (verified 47/47 in isolation). It is left to the owner.
+- Evidence: `audit/runs/home_help_deploy_2026-10-15/`.

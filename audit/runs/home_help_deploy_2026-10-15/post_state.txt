@@ -1,0 +1,20 @@
+method=GitHub Actions workflow, push fast-forward 9e7e379..c02d4ec, run 38762292519 success
+authorization=owner in chat (Claude Code session) 2026-10-15, after PASS 6195972738; recorded in Issue #2
+captured_utc=2026-10-15T15:41:10Z
+staging_head=c02d4ec8f578b25f8101ac3109c7931e23298f2b
+tracked_modifications=0
+app_started=2026-10-15T15:40:23.220711531Z
+app_image=sha256:9723650173077836f15db21d8a3652f678e6d1ea1bf401032dd8ee0310e29e24
+env_sha256=085c617c22a2e1f4
+maintenance=off
+http_root=200
+http_login=200
+pending_migrations=0
+errors_since_deploy=0
+guest /admin 302 -> https://pruebas.camarapetrolera.app/admin/login
+mailer_por_defecto=log
+transporte=log
+envia_fuera_del_servidor=no (simulado)
+configuracion_cacheada=si
+remitente_direccion=configurado
+remitente_nombre=configurado

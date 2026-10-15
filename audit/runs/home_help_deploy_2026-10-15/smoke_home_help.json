@@ -1,0 +1,111 @@
+{
+    "checks": [
+        {
+            "check": "transaccion READ ONLY",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "registro: sin FilamentInfoWidget",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "registro: cuenta, ayuda y widget de empresa",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: Escritorio 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "afiliado: tarjeta «Ayuda para completar su perfil»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: enlace al manual y al mapa",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: sin la tarjeta de Filament",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: tarjeta de cuenta con «Salir»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: widget de empresa presente (diferido)",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: destino manual 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "afiliado: destino mapa 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: Escritorio 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: tarjeta «Ayuda para completar su perfil»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: enlace al manual y al mapa",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: sin la tarjeta de Filament",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: tarjeta de cuenta con «Salir»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: widget de empresa presente (diferido)",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: destino manual 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: destino mapa 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "manual: Escritorio describe la tarjeta",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "ningún correo",
+            "ok": true,
+            "detail": "salientes=0"
+        }
+    ],
+    "passed": 21,
+    "failed": 0
+}
