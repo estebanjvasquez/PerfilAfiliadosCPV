@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Support\UserManual\UserManualRenderer;
+use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,6 +34,19 @@ class UserManual extends Page
     public static function canAccess(): bool
     {
         return Auth::check();
+    }
+
+    /** CPV-TAXONOMY-MAP: el manual lleva al mapa (la sección `#mapa-taxonomia` explica el botón). */
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('verMapaTaxonomia')
+                ->label('Ver mapa de la taxonomía')
+                ->icon('heroicon-o-map')
+                ->color('gray')
+                ->url(TaxonomyMapPage::getUrl())
+                ->visible(fn () => TaxonomyMapPage::canAccess()),
+        ];
     }
 
     protected function getViewData(): array

@@ -31,6 +31,7 @@ Cada persona de su empresa que vaya a trabajar en el sistema necesita **su propi
 | Ver quién tiene acceso a su empresa | Pestaña **Usuarios** | [Usuarios](#usuarios) |
 | Consultar la clasificación anterior | Pestaña **Sectores y servicios** | [Sectores y servicios](#sectores-y-servicios) |
 | Declarar lo que su empresa ofrece | Pestaña **Categorías CPV (taxonomía nueva)** | [Categorías CPV (Taxonomía)](#taxonomia-cpv) |
+| Ver toda la Taxonomía CPV para ubicarse | Botón **Ver mapa de la taxonomía** | [Mapa de la taxonomía](#mapa-taxonomia) |
 | Declarar personal, maquinaria, instalaciones e inventario | Pestaña **Recursos en Venezuela** | [Recursos en Venezuela](#recursos) |
 | Indicar certificaciones y sistemas de gestión | Pestaña **Sistemas de gestión** | [Sistemas de gestión](#sistemas-de-gestion) |
 | Registrar proyectos de los últimos 10 años | Pestaña **Experiencia relevante** | [Experiencia relevante](#experiencia) |
@@ -193,6 +194,32 @@ Elegir una categoría no es lo mismo que escribir palabras clave:
 Usted escribe palabras solamente para **buscar** la categoría. Lo que queda registrado en su empresa es la categoría elegida, no el texto que escribió.
 
 > **CONSEJO:** Elija las categorías que describen lo que su empresa **realmente ofrece hoy**, no lo que podría hacer algún día ni lo que hacen sus proveedores.
+
+### Mapa de la taxonomía {#mapa-taxonomia}
+
+La taxonomía es grande: decenas de Grupos, cientos de Familias y miles de Categorías. El **Mapa de la taxonomía** la muestra completa, para que pueda ver qué existe y dónde está antes de elegir.
+
+**Cómo abrirlo:** con el botón **Ver mapa de la taxonomía**, arriba de este manual, o con el mismo botón de la pestaña **Categorías CPV (taxonomía nueva)** de su empresa, que lo abre en otra pestaña del navegador para que no pierda lo que estaba haciendo. Para volver al manual use **Volver al manual**.
+
+**Cómo se recorre:**
+
+1. Cada Grupo aparece como una tarjeta con su nombre, cuántas Familias y Categorías tiene, y cuántas de esas Categorías son bienes y cuántas servicios.
+2. Abra un Grupo para ver sus Familias, con el número de Categorías de cada una.
+3. Abra una Familia para ver sus Categorías. Cada una indica si es un **Bien** o un **Servicio**.
+
+Todo aparece en orden alfabético.
+
+**El filtro:** en **Filtrar el mapa por nombre** escriba al menos 3 letras. El mapa deja a la vista lo que contiene esas letras, con su contexto:
+
+- si coincide un Grupo, se ven todas sus Familias;
+- si coincide una Familia, se ven todas sus Categorías;
+- si coincide una Categoría, se ve con su Familia y su Grupo.
+
+Las letras que coinciden quedan resaltadas. No importa si escribe con o sin tildes, ni en mayúsculas o minúsculas. Para volver a ver el mapa completo presione **Limpiar filtro** (o la tecla Esc).
+
+> **IMPORTANTE:** El mapa es solo para ubicarse: **desde el mapa no se agregan categorías**. Para agregarlas use **Buscar y agregar categoría** (ver [Cómo agregar categorías CPV](#agregar-categorias)). El filtro del mapa solo busca las letras en los nombres que se ven; **Buscar y agregar categoría** busca de otra forma: también reconoce sinónimos y términos en inglés. Si el filtro no encuentra algo, pruebe con el buscador.
+
+> **NOTA:** Un Grupo o una Familia marcados **sin categorías todavía** no tienen Categorías publicadas, así que no hay nada que elegir allí, y su empresa nunca se vincula a un Grupo ni a una Familia completos. Si lo que ofrece estaría en ese lugar, busque una Categoría relacionada o solicite una revisión (ver [No encuentro una categoría](#no-encuentro-categoria)).
 
 ### Cómo agregar categorías CPV a su empresa {#agregar-categorias}
 
@@ -436,6 +463,8 @@ Una sección cuenta como completa si tiene datos cargados o si está marcada **N
 | La categoría ya estaba vinculada | El sistema no duplica categorías: solo agrega las nuevas. Quite de la selección las que ya tiene, porque igual cuentan para revisar el límite. |
 | No sé cuál categoría corresponde | Elija la más específica que describa lo que su empresa realmente hace. Si duda entre varias, revise la ruta Grupo > Familia > Categoría de cada una. Si sigue sin estar seguro, solicite revisión a la Cámara con el motivo «No estoy seguro de cuál categoría corresponde». |
 | Tengo una categoría «Sugerida (sin confirmar)» | Revísela: si describe a su empresa, presione **Confirmar**; si no, presione **Quitar**. |
+| En el mapa, una Familia dice «sin categorías todavía» | No tiene Categorías publicadas, así que no se puede elegir. Busque una Categoría relacionada o solicite una revisión a la Cámara (ver [Mapa de la taxonomía](#mapa-taxonomia)). |
+| El filtro del mapa no encuentra lo que busco | El filtro solo mira las letras de los nombres del mapa. Use **Buscar y agregar categoría**, que también reconoce sinónimos y términos en inglés. |
 | No puedo avanzar con **Siguiente** | Hay un campo obligatorio vacío o con formato incorrecto en el paso actual; el sistema lo marca en rojo. Si el campo marcado es **Sector principal** y aparece bloqueado, contacte a la Cámara para que lo asigne. |
 | Aparece «Su empresa tiene servicios en más de 2 sectores» al guardar | Su clasificación anterior incluye servicios de un sector distinto de los dos elegidos. Como la pestaña **Sectores y servicios** ahora es solo de consulta, contacte a la Cámara para resolverlo o revise el **Sector secundario** elegido. |
 | No estoy seguro de si se guardaron los cambios | En el formulario de datos generales debe presionar **Guardar cambios** en el último paso y ver el aviso **Guardado**. En las pestañas, cada acción se guarda al confirmarla. |

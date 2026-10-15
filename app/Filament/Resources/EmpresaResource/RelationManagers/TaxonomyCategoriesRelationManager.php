@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmpresaResource\RelationManagers;
 
+use App\Filament\Pages\TaxonomyMapPage;
 use App\Models\EmpresaTaxonomyCategory;
 use App\Models\TaxonomyCategory;
 use App\Models\TaxonomyCategoryRequest;
@@ -88,6 +89,7 @@ class TaxonomyCategoriesRelationManager extends RelationManager
             ->headerActions([
                 $this->buscarYAgregarAction(),
                 $this->solicitarRevisionAction(),
+                $this->verMapaAction(),
             ])
             ->actions([
                 Tables\Actions\Action::make('confirmar')
@@ -275,6 +277,23 @@ class TaxonomyCategoriesRelationManager extends RelationManager
 
                 Notification::make()->success()->title('Categorías agregadas')->send();
             });
+    }
+
+    /**
+     * CPV-TAXONOMY-MAP: solo un enlace al «Mapa de la taxonomía», abierto en otra pestaña para no
+     * perder la edición de la empresa. No ejecuta nada sobre la empresa ni amplía ningún permiso: se
+     * ve si el usuario ya puede usar esta pestaña y además puede abrir el mapa (mismo acceso que el
+     * manual).
+     */
+    private function verMapaAction(): Tables\Actions\Action
+    {
+        return Tables\Actions\Action::make('verMapaTaxonomia')
+            ->label('Ver mapa de la taxonomía')
+            ->icon('heroicon-o-map')
+            ->color('gray')
+            ->url(fn () => TaxonomyMapPage::getUrl())
+            ->openUrlInNewTab()
+            ->visible(fn () => TaxonomyMapPage::canAccess());
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Filament\Pages\Login;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Filament\Pages\Register;
 use App\Filament\Resources\EmpresaResource;
+use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Http\Middleware\Authenticate;
@@ -74,10 +75,20 @@ class AdminPanelProvider extends PanelProvider
         // cambie automaticamente cada vez que este CSS se edita y se despliega (git deja el mtime
         // en el momento del `git reset --hard` del deploy), forzando a Cloudflare/navegador a
         // pedir el archivo de nuevo en vez de reusar el cache viejo.
-        FilamentAsset::appVersion((string) filemtime(public_path('css/filament/custom/panel.css')));
+        //
+        // CPV-TAXONOMY-MAP: la versión es la del archivo propio más reciente de los que se
+        // registran acá, para que editar solo el JS del mapa también cambie la URL.
+        FilamentAsset::appVersion((string) max(
+            filemtime(public_path('css/filament/custom/panel.css')),
+            filemtime(resource_path('js/components/taxonomy-map.js')),
+        ));
 
         FilamentAsset::register([
             Css::make('panel-custom', public_path('css/filament/custom/panel.css')),
+            // Filtro del «Mapa de la taxonomía» (TaxonomyMapPage). `filament:assets`, que corre en
+            // cada despliegue, lo publica en public/js/app/components/; la vista lo carga bajo
+            // demanda con x-load, que funciona con la navegación SPA del panel.
+            AlpineComponent::make('taxonomy-map', resource_path('js/components/taxonomy-map.js')),
         ]);
     }
 
