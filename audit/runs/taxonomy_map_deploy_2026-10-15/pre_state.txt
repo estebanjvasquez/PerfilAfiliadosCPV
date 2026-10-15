@@ -1,0 +1,17 @@
+captured_utc=2026-10-15T14:42:15Z
+staging_head=37e3b7186bd7babef07392c09f80d134db4833f8
+tracked_modifications=0
+app_started=2026-10-15T11:25:04.748099155Z
+app_image=sha256:88438b5b735e17e1ee475b8f0345563ee2f20a10f43987186672d7b6c69dbe73
+env_sha256=085c617c22a2e1f4
+maintenance=off
+http_root=200
+pending_migrations=0
+concurrent_deploy=0
+preserved_image_tag=perfilafiliados-app:pre-taxmap-37e3b71
+mailer_por_defecto=log
+transporte=log
+envia_fuera_del_servidor=no (simulado)
+configuracion_cacheada=si
+remitente_direccion=configurado
+remitente_nombre=configurado

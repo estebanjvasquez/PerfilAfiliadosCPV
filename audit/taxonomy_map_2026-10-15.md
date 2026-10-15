@@ -7,7 +7,8 @@
   - Verified before branching: the deploy branch and the VPS checkout were both at `37e3b71`, with 0 tracked modifications; the local worktree was clean; no other delivery was pending on this baseline.
 - **TESTED_HEAD:** `0fb38e2050ce24792dde36132c90f666c71157cf` (code).
 - **REVIEW_HEAD:** the commit that adds this report. On top of TESTED_HEAD it changes only `docs/**` and `audit/**`.
-- **Deployed:** **NO**. Staging stays at `37e3b71`. Nothing was pushed to `feature/upgrade-filament-v3` or `main`.
+- **Deployed:** **YES**, on 2026-10-15 at 14:43Z, at REVIEW_HEAD `9e7e379` through the normal workflow (§9).
+  - Accepted in `6194751263`; the deployment was authorized by the owner in chat.
 - **Mail:** PENDING_OWNER_CONFIGURATION, unchanged and untouched.
 
 ## 1. What was built
@@ -190,3 +191,36 @@ No existing check was weakened. The leak check still compares every non-seed row
 - **No-JS evidence:** Playwright disables script execution but parses with scripting on, so the `<noscript>` notice could be checked for presence only, not for visibility.
 - **«(sin nombre)» fallback:** exercised only by the harness fixture. Staging has no active node without a name (§3).
 - **Not covered:** a screen-reader audit, and real users.
+
+## 9. Staging deployment (2026-10-15)
+
+- **Acceptance:** `6194751263` (PASS; deployment reserved for the owner).
+- **Authorization:** the owner, **in chat** in the Claude Code session ("Está autorizado el despliegue"). It is recorded in Issue #2 with that provenance.
+- **Preconditions (all passed):**
+  - The deploy branch and the runtime were both at `37e3b71`, with 0 tracked modifications.
+  - `9e7e379` is a fast-forward of it. The runtime diff is only the accepted files: `app/**`, `resources/**`, `tests/**` and the manual.
+  - 0 migrations in the diff and 0 pending on staging; no concurrent deploy.
+  - Recovery image: `perfilafiliados-app:pre-taxmap-37e3b71`.
+- **Route:** fast-forward `37e3b71..9e7e379` (no force), then workflow run [`38753813135`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/38753813135), **success**.
+- **Post-state:**
+  - the checkout is at `9e7e379` with 0 tracked modifications;
+  - `app` was recreated at 14:43:16Z;
+  - maintenance is off; `/` and `/admin/login` return 200;
+  - 0 pending migrations, 0 new `ERROR` entries in the log, and the `.env` hash is unchanged.
+- **Smoke** (`docs/deploy/smoke_taxonomy_map_readonly.php`, in-memory users, READ ONLY + ROLLBACK): **20/20**.
+  - Affiliate and admin both get 200.
+  - The intro totals equal the pre-deploy aggregate: **48 Grupos, 333 Familias, 2.418 Categorías**.
+  - 57 «sin categorías todavía» labels (55 families + 1 group + the intro mention).
+  - No codes or internal fields; the return link is present; the filter is on the page.
+  - The manual offers «Ver mapa de la taxonomía» and has `#mapa-taxonomia`.
+  - The filter component is published (`/js/app/components/taxonomy-map.js`, 8,236 B) and **served by nginx: 200, application/javascript**.
+  - No mail was sent.
+- Guests are redirected (`302 → /admin/login`) on the map and on the manual.
+- **Preserved:**
+  - mail is `log` and simulated (unchanged);
+  - the 0010C smoke is **18/18** before and after, with request #1's fingerprint `2e64f23555b01ad30f845bdd53cedc15`;
+  - the published taxonomy aggregate is **identical before and after**.
+- **Not checked on staging, left to the owner's UAT:**
+  - **The company-tab link** needs a real company page, and the smoke does not read real companies. It was verified in the isolated browser check and in PHPUnit.
+  - **The filter's in-browser behaviour**: there is no live browser run. The asset is served, and its behaviour was verified 39/39 in isolation.
+- Evidence: `audit/runs/taxonomy_map_deploy_2026-10-15/`.

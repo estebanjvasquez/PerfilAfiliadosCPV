@@ -1,6 +1,6 @@
 {
-  "current_task": "CPV-TAXONOMY-MAP (authorized 6191513374, corrections 6191485610): read-only taxonomy map for affiliates on feature/taxonomy-map, TESTED_HEAD 0fb38e2 (full isolated 492 tests OK; browser 39/39 at production-size synthetic data). READY_FOR_REVIEW, NOT deployed. Runtime 37e3b71.",
-  "current_status": "TAXONOMY_MAP_READY_FOR_REVIEW_MANUAL__RUNTIME_37E3B71__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
+  "current_task": "CPV-TAXONOMY-MAP accepted (6194751263) and DEPLOYED to staging at 9e7e379 via the normal workflow (run 38753813135), authorized by the owner in chat. Awaiting owner UAT.",
+  "current_status": "TAXONOMY_MAP_DEPLOYED_FOR_OWNER_REVIEW__RUNTIME_9E7E379__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
   "superseded_current_fields_2026_10_15": {
     "note": "Values these fields held before the 2026-10-15 checkpoint (instructions 6188413270 / 6188477132). Kept as history.",
     "current_task": "ORCHESTRATION INFRASTRUCTURE (authorized 6085642297): persistent executor on the Contabo VPS plus isolated PHPUnit. TASK-0010A and TASK-0010B are AUTHORIZED BUT HELD and NOT STARTED by owner decision.",
@@ -3361,7 +3361,20 @@
       "mobile_cpu4x_filter_ms": "30-158 (final run)"
     },
     "live_rules_aggregate": "48/333/2418, empty families 55, empty groups 1, excluded 0",
-    "deployed": false,
-    "report": "audit/taxonomy_map_2026-10-15.md"
+    "deployed": true,
+    "report": "audit/taxonomy_map_2026-10-15.md",
+    "acceptance": "6194751263",
+    "review_head": "9e7e379530612ec15f25e65ca472d9a57cd676dd",
+    "deployed_sha": "9e7e379530612ec15f25e65ca472d9a57cd676dd",
+    "workflow_run": "https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/38753813135",
+    "deploy_authorization": "owner in chat (Claude Code session), recorded in Issue #2",
+    "recovery_image": "perfilafiliados-app:pre-taxmap-37e3b71",
+    "smoke": {
+      "map": "20/20",
+      "task_0010c": "18/18",
+      "taxonomy_aggregate_unchanged": true,
+      "asset_http": "200 application/javascript"
+    },
+    "evidence": "audit/runs/taxonomy_map_deploy_2026-10-15/"
   }
 }

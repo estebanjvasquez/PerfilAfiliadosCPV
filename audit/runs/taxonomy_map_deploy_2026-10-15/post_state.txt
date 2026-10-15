@@ -1,0 +1,22 @@
+method=GitHub Actions workflow, push fast-forward 37e3b71..9e7e379, run 38753813135 success
+authorization=owner in chat (Claude Code session) 2026-10-15, after PASS 6194751263; recorded in Issue #2
+captured_utc=2026-10-15T14:44:05Z
+staging_head=9e7e379530612ec15f25e65ca472d9a57cd676dd
+tracked_modifications=0
+app_started=2026-10-15T14:43:16.790046981Z
+app_image=sha256:fac25f43d65ed4893dfe3eb616c618326f659431926759955e172f0a6a09974a
+env_sha256=085c617c22a2e1f4
+maintenance=off
+http_root=200
+http_login=200
+pending_migrations=0
+errors_since_deploy=0
+guest /admin/mapa-de-la-taxonomia 302 -> https://pruebas.camarapetrolera.app/admin/login
+guest /admin/manual-de-usuario 302 -> https://pruebas.camarapetrolera.app/admin/login
+mailer_por_defecto=log
+transporte=log
+envia_fuera_del_servidor=no (simulado)
+configuracion_cacheada=si
+remitente_direccion=configurado
+remitente_nombre=configurado
+asset_http 200 8236B application/javascript

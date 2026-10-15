@@ -1,0 +1,28 @@
+{
+    "read_only": "on",
+    "visible": {
+        "groups": 48,
+        "families": 333,
+        "categories": 2418,
+        "bien": 1572,
+        "servicio": 846,
+        "otro": 0,
+        "empty_families": 55,
+        "empty_groups": 1
+    },
+    "excluded_active": {
+        "cat_under_inactive_family": 0,
+        "cat_under_inactive_group": 0,
+        "family_under_inactive_group": 0,
+        "malformed_or_orphan": 0,
+        "group_with_parent": 0,
+        "other_level": 0
+    },
+    "names": {
+        "active_without_es": 0,
+        "active_without_any_name": 0
+    },
+    "search_reachable_but_not_on_map": {
+        "n": 0
+    }
+}

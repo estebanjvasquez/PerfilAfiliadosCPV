@@ -1,0 +1,107 @@
+{
+    "checks": [
+        {
+            "check": "transaccion READ ONLY",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: mapa 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "afiliado: los totales del mapa coinciden con el agregado previo",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: etiquetas «sin categorías todavía» presentes",
+            "ok": true,
+            "detail": "ocurrencias=57"
+        },
+        {
+            "check": "afiliado: sin códigos ni campos internos",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: enlace de vuelta al manual",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: el filtro está en la página",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: el manual ofrece «Ver mapa de la taxonomía»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: el manual tiene la sección del mapa",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: mapa 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: los totales del mapa coinciden con el agregado previo",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: etiquetas «sin categorías todavía» presentes",
+            "ok": true,
+            "detail": "ocurrencias=57"
+        },
+        {
+            "check": "admin: sin códigos ni campos internos",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: enlace de vuelta al manual",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: el filtro está en la página",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: el manual ofrece «Ver mapa de la taxonomía»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: el manual tiene la sección del mapa",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "se obtuvo la URL del componente del filtro",
+            "ok": true,
+            "detail": "\/js\/app\/components\/taxonomy-map.js"
+        },
+        {
+            "check": "el JS del filtro está publicado en public\/",
+            "ok": true,
+            "detail": "bytes=8236"
+        },
+        {
+            "check": "ningún correo",
+            "ok": true,
+            "detail": "salientes=0"
+        }
+    ],
+    "passed": 20,
+    "failed": 0,
+    "asset_path": "\/js\/app\/components\/taxonomy-map.js"
+}
