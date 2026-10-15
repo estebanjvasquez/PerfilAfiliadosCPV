@@ -54,6 +54,26 @@ class TaxonomyCategoryRequestsMigrationTest extends TestCase
         return require database_path('migrations/'.self::MIGRATION);
     }
 
+    /**
+     * TASK-0010C agregó una migración POSTERIOR cuya tabla de historial tiene una FK a
+     * `taxonomy_category_requests`. Un rollback real va en orden inverso: primero se revierte esa y
+     * después esta. Los ciclos de este test hacen lo mismo, y al final la vuelven a aplicar, para
+     * que el esquema termine igual que como lo deja `migrate`.
+     */
+    private const MIGRATION_POSTERIOR = '2026_10_15_120000_add_delivery_operations_to_taxonomy_category_requests.php';
+
+    private function revertirPosterior(): void
+    {
+        if (Schema::connection('pgsql')->hasTable('taxonomy_category_request_delivery_attempts')) {
+            (require database_path('migrations/'.self::MIGRATION_POSTERIOR))->down();
+        }
+    }
+
+    private function reaplicarPosterior(): void
+    {
+        (require database_path('migrations/'.self::MIGRATION_POSTERIOR))->up();
+    }
+
     private function tablaExiste(): bool
     {
         return Schema::connection('pgsql')->hasTable('taxonomy_category_requests');
@@ -82,7 +102,8 @@ class TaxonomyCategoryRequestsMigrationTest extends TestCase
         $categoriasAntes = DB::connection('pgsql')->table('taxonomy_categories')->count();
         $this->assertGreaterThan(0, $empresasAntes, 'El fixture sintético debería haber cargado empresas.');
 
-        // --- DOWN: los dos objetos de esta tarea desaparecen ---
+        // --- DOWN: los dos objetos de esta tarea desaparecen (tras revertir la posterior) ---
+        $this->revertirPosterior();
         $migration->down();
 
         $this->assertFalse($this->tablaExiste(), 'down() tiene que soltar la tabla.');
@@ -103,6 +124,7 @@ class TaxonomyCategoryRequestsMigrationTest extends TestCase
 
         // --- UP otra vez: se reconstruye todo ---
         $migration->up();
+        $this->reaplicarPosterior();
 
         $this->assertTrue($this->tablaExiste());
         $this->assertTrue($this->columnaExiste());
@@ -160,8 +182,10 @@ class TaxonomyCategoryRequestsMigrationTest extends TestCase
     public function the_check_constraints_survive_a_down_and_up_cycle(): void
     {
         $migration = $this->migration();
+        $this->revertirPosterior();
         $migration->down();
         $migration->up();
+        $this->reaplicarPosterior();
 
         $empresaId = DB::connection('pgsql')->table('empresas')->orderBy('id')->value('id');
         $fila = [

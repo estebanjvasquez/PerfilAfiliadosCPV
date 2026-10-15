@@ -505,8 +505,10 @@ class TaxonomyCategoryRequestTest extends TestCase
         app(TaxonomyCategoryRequestService::class)->submit($empresa, $user, self::DATOS_VALIDOS);
 
         $this->assertNotEmpty($escrituras);
+        // TASK-0010C: el historial de avisos (`taxonomy_category_request_delivery_attempts`) es la
+        // única tabla nueva que se escribe además de la solicitud. Ninguna de taxonomía.
         foreach ($escrituras as $sql) {
-            $this->assertMatchesRegularExpression('/^\s*(insert into|update)\s+"taxonomy_category_requests"/i', $sql, "Escritura inesperada: {$sql}");
+            $this->assertMatchesRegularExpression('/^\s*(insert into|update)\s+"taxonomy_category_request(s|_delivery_attempts)"/i', $sql, "Escritura inesperada: {$sql}");
         }
         $this->assertSame($antes, $contar());
     }

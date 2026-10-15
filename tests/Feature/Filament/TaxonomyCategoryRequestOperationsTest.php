@@ -127,7 +127,9 @@ class TaxonomyCategoryRequestOperationsTest extends TestCase
 
         $this->assertTrue(TaxonomyCategoryRequestResource::canAccess());
 
+        // El panel aplica deferLoading() a todas las tablas: hay que disparar la carga.
         Livewire::actingAs($admin)->test(ListTaxonomyCategoryRequests::class)
+            ->call('loadTable')
             ->assertCanSeeTableRecords([$solicitud])
             ->assertSee('No hay correo responsable configurado');
 
@@ -399,7 +401,7 @@ class TaxonomyCategoryRequestOperationsTest extends TestCase
         $solicitud = TaxonomyCategoryRequest::query()->where('empresa_id', $empresa->id)->sole();
         $this->assertSame(TaxonomyCategoryRequest::DELIVERY_SIMULATED, $solicitud->delivery_status);
 
-        $aviso = json_encode(TaxonomyCategoriesRelationManager::notificacionSolicitud($solicitud)->toArray());
+        $aviso = json_encode(TaxonomyCategoriesRelationManager::notificacionSolicitud($solicitud)->toArray(), JSON_UNESCAPED_UNICODE);
         $this->assertStringContainsString("#{$solicitud->id}", $aviso);
         // El afiliado no ve el modo del servidor ni la palabra "simulado": solo que está registrada.
         $this->assertStringNotContainsString('servidor', $aviso);
