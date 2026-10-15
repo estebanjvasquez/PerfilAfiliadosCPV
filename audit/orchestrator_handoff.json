@@ -1,6 +1,6 @@
 {
-  "current_task": "CPV-MAIL-DOCS-AND-USER-MANUAL: accepted at d23c0e6 (6190018710) and DEPLOYED to staging on 2026-10-15 11:05Z by MANUAL_SSH_DEPLOY (route 6190372221; no GitHub Actions run). Awaiting owner review of the online manual.",
-  "current_status": "MAIL_DOCS_AND_USER_MANUAL_DEPLOYED_FOR_OWNER_REVIEW_MANUAL__RUNTIME_D23C0E6__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
+  "current_task": "CPV-MAIL-DOCS-AND-USER-MANUAL: d23c0e6 deployed (MANUAL_SSH_DEPLOY). Owner feedback: the index was unchanged and taxonomy-centred. Reorganized by system module at 4b7cab6 (isolated green, 45 tests, browser 40/40); READY_FOR_REVIEW, NOT deployed.",
+  "current_status": "MAIL_DOCS_AND_USER_MANUAL_REORGANIZED_READY_FOR_REVIEW_MANUAL__RUNTIME_D23C0E6__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
   "superseded_current_fields_2026_10_15": {
     "note": "Values these fields held before the 2026-10-15 checkpoint (instructions 6188413270 / 6188477132). Kept as history.",
     "current_task": "ORCHESTRATION INFRASTRUCTURE (authorized 6085642297): persistent executor on the Contabo VPS plus isolated PHPUnit. TASK-0010A and TASK-0010B are AUTHORIZED BUT HELD and NOT STARTED by owner decision.",
@@ -3095,6 +3095,15 @@
       },
       "evidence": "audit/runs/manual_deploy_2026-10-15/",
       "future_maintenance": "paths-ignore **.md suppresses deploys of served resources/manual/*.md"
+    },
+    "reorganization": {
+      "trigger": "owner chat feedback after the d23c0e6 deployment",
+      "tested_head": "4b7cab66e4f580da5854a1f97afde3cac30822aa",
+      "run": "20261015T111556Z-4b7cab66e4f5",
+      "phpunit": "OK (45 tests, 532 assertions)",
+      "browser": "40/40",
+      "deployed": false,
+      "deploy_trigger_note": "touches tests/**, so a push to the deploy branch triggers the normal workflow"
     }
   },
   "task_0010c": {

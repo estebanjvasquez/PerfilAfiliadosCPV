@@ -1,0 +1,42 @@
+PASS  guest is blocked from the manual  :: status=200 final_url=http://cpvtest-uxserve-20261015t111556z-4b7cab66e4f5:8000/admin/login
+PASS  guest never sees manual content  :: checked for the taxonomy hierarchy text in the guest response
+PASS  synthetic affiliate can log in  :: landed on http://cpvtest-uxserve-20261015t111556z-4b7cab66e4f5:8000/admin
+PASS  manual is reachable from the panel navigation  :: navigation link visible at desktop width
+PASS  manual page opens for the affiliate  :: h1="Manual de usuario"
+PASS  no internal markers or paths in the rendered page  :: checked 8 strings
+PASS  the manual shows the final TASK-0010A labels  :: all 5 labels rendered
+PASS  the manual states the request does not create a category  :: checked the rendered text, not the markdown source
+PASS  table of contents has links  :: 25 in-page links
+PASS  no table-of-contents link is broken  :: 25 anchors all resolve
+PASS  every anchor target is visible, not hidden content  :: all targets rendered and non-zero height
+PASS  keyboard Tab reaches the in-page section links  :: 2 focusable stops traversed
+PASS  focused elements show a visible focus indicator  :: outline or box-shadow present on at least one focused element
+PASS  [light/desktop] no horizontal page overflow  :: scrollWidth=1440 clientWidth=1440 diff=0px
+PASS  [light/desktop] tables stay inside their container  :: 2 table(s), 0 overflowing without a scroll container
+PASS  [light/desktop] body text contrast >= 4.5:1  :: ratio=14.89 fg=rgb(39, 39, 42) bg=rgb(255, 255, 255)
+PASS  [light/desktop] manual content is visible, not covered by panel chrome  :: content width=752px, topmost at its centre=article.cpv-manual__content, sidebar=closed via Alpine store
+PASS  [light/tablet] no horizontal page overflow  :: scrollWidth=820 clientWidth=820 diff=0px
+PASS  [light/tablet] tables stay inside their container  :: 2 table(s), 0 overflowing without a scroll container
+PASS  [light/tablet] body text contrast >= 4.5:1  :: ratio=14.89 fg=rgb(39, 39, 42) bg=rgb(255, 255, 255)
+PASS  [light/tablet] manual content is visible, not covered by panel chrome  :: content width=772px, topmost at its centre=p, sidebar=closed via Alpine store
+PASS  [light/mobile] no horizontal page overflow  :: scrollWidth=390 clientWidth=390 diff=0px
+PASS  [light/mobile] tables stay inside their container  :: 2 table(s), 0 overflowing without a scroll container
+PASS  [light/mobile] body text contrast >= 4.5:1  :: ratio=14.89 fg=rgb(39, 39, 42) bg=rgb(255, 255, 255)
+PASS  [light/mobile] manual content is visible, not covered by panel chrome  :: content width=358px, topmost at its centre=p, sidebar=closed via Alpine store
+PASS  [dark/desktop] no horizontal page overflow  :: scrollWidth=1440 clientWidth=1440 diff=0px
+PASS  [dark/desktop] tables stay inside their container  :: 2 table(s), 0 overflowing without a scroll container
+PASS  [dark/desktop] body text contrast >= 4.5:1  :: ratio=13.96 fg=rgb(228, 228, 231) bg=rgb(24, 24, 27)
+PASS  [dark/desktop] manual content is visible, not covered by panel chrome  :: content width=752px, topmost at its centre=article.cpv-manual__content, sidebar=closed via Alpine store
+PASS  [dark/tablet] no horizontal page overflow  :: scrollWidth=820 clientWidth=820 diff=0px
+PASS  [dark/tablet] tables stay inside their container  :: 2 table(s), 0 overflowing without a scroll container
+PASS  [dark/tablet] body text contrast >= 4.5:1  :: ratio=13.96 fg=rgb(228, 228, 231) bg=rgb(24, 24, 27)
+PASS  [dark/tablet] manual content is visible, not covered by panel chrome  :: content width=772px, topmost at its centre=p, sidebar=closed via Alpine store
+PASS  [dark/mobile] no horizontal page overflow  :: scrollWidth=390 clientWidth=390 diff=0px
+PASS  [dark/mobile] tables stay inside their container  :: 2 table(s), 0 overflowing without a scroll container
+PASS  [dark/mobile] body text contrast >= 4.5:1  :: ratio=13.96 fg=rgb(228, 228, 231) bg=rgb(24, 24, 27)
+PASS  [dark/mobile] manual content is visible, not covered by panel chrome  :: content width=358px, topmost at its centre=p, sidebar=closed via Alpine store
+PASS  a covered page at 390px is the panel default, not this task  :: manual topmost=nav.fi-sidebar-nav (sidebarOpen=true) | panel_root topmost=nav.fi-sidebar-nav (sidebarOpen=true) -> BOTH pages are covered by the panel sidebar at this width: panel-wide behaviour
+PASS  mobile overflow is attributable, not guessed  :: manual=0px panel_root=0px -> no overflow on either
+PASS  the manual adds no horizontal overflow of its own at 390px  :: manual=0px vs panel_root=0px
+
+40/40 checks passed

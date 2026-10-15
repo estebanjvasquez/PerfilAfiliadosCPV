@@ -1,0 +1,230 @@
+{
+  "base_url_shape": "http://<disposable-container>:8000 (private compose network, no host port)",
+  "manual_path": "/admin/manual-de-usuario",
+  "viewports": [
+    {
+      "label": "desktop",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "label": "tablet",
+      "width": 820,
+      "height": 1180
+    },
+    {
+      "label": "mobile",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "schemes": [
+    "light",
+    "dark"
+  ],
+  "total": 40,
+  "passed": 40,
+  "failed": 0,
+  "results": [
+    {
+      "name": "guest is blocked from the manual",
+      "pass": true,
+      "detail": "status=200 final_url=http://cpvtest-uxserve-20261015t111556z-4b7cab66e4f5:8000/admin/login"
+    },
+    {
+      "name": "guest never sees manual content",
+      "pass": true,
+      "detail": "checked for the taxonomy hierarchy text in the guest response"
+    },
+    {
+      "name": "synthetic affiliate can log in",
+      "pass": true,
+      "detail": "landed on http://cpvtest-uxserve-20261015t111556z-4b7cab66e4f5:8000/admin"
+    },
+    {
+      "name": "manual is reachable from the panel navigation",
+      "pass": true,
+      "detail": "navigation link visible at desktop width"
+    },
+    {
+      "name": "manual page opens for the affiliate",
+      "pass": true,
+      "detail": "h1=\"Manual de usuario\""
+    },
+    {
+      "name": "no internal markers or paths in the rendered page",
+      "pass": true,
+      "detail": "checked 8 strings"
+    },
+    {
+      "name": "the manual shows the final TASK-0010A labels",
+      "pass": true,
+      "detail": "all 5 labels rendered"
+    },
+    {
+      "name": "the manual states the request does not create a category",
+      "pass": true,
+      "detail": "checked the rendered text, not the markdown source"
+    },
+    {
+      "name": "table of contents has links",
+      "pass": true,
+      "detail": "25 in-page links"
+    },
+    {
+      "name": "no table-of-contents link is broken",
+      "pass": true,
+      "detail": "25 anchors all resolve"
+    },
+    {
+      "name": "every anchor target is visible, not hidden content",
+      "pass": true,
+      "detail": "all targets rendered and non-zero height"
+    },
+    {
+      "name": "keyboard Tab reaches the in-page section links",
+      "pass": true,
+      "detail": "2 focusable stops traversed"
+    },
+    {
+      "name": "focused elements show a visible focus indicator",
+      "pass": true,
+      "detail": "outline or box-shadow present on at least one focused element"
+    },
+    {
+      "name": "[light/desktop] no horizontal page overflow",
+      "pass": true,
+      "detail": "scrollWidth=1440 clientWidth=1440 diff=0px"
+    },
+    {
+      "name": "[light/desktop] tables stay inside their container",
+      "pass": true,
+      "detail": "2 table(s), 0 overflowing without a scroll container"
+    },
+    {
+      "name": "[light/desktop] body text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=14.89 fg=rgb(39, 39, 42) bg=rgb(255, 255, 255)"
+    },
+    {
+      "name": "[light/desktop] manual content is visible, not covered by panel chrome",
+      "pass": true,
+      "detail": "content width=752px, topmost at its centre=article.cpv-manual__content, sidebar=closed via Alpine store"
+    },
+    {
+      "name": "[light/tablet] no horizontal page overflow",
+      "pass": true,
+      "detail": "scrollWidth=820 clientWidth=820 diff=0px"
+    },
+    {
+      "name": "[light/tablet] tables stay inside their container",
+      "pass": true,
+      "detail": "2 table(s), 0 overflowing without a scroll container"
+    },
+    {
+      "name": "[light/tablet] body text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=14.89 fg=rgb(39, 39, 42) bg=rgb(255, 255, 255)"
+    },
+    {
+      "name": "[light/tablet] manual content is visible, not covered by panel chrome",
+      "pass": true,
+      "detail": "content width=772px, topmost at its centre=p, sidebar=closed via Alpine store"
+    },
+    {
+      "name": "[light/mobile] no horizontal page overflow",
+      "pass": true,
+      "detail": "scrollWidth=390 clientWidth=390 diff=0px"
+    },
+    {
+      "name": "[light/mobile] tables stay inside their container",
+      "pass": true,
+      "detail": "2 table(s), 0 overflowing without a scroll container"
+    },
+    {
+      "name": "[light/mobile] body text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=14.89 fg=rgb(39, 39, 42) bg=rgb(255, 255, 255)"
+    },
+    {
+      "name": "[light/mobile] manual content is visible, not covered by panel chrome",
+      "pass": true,
+      "detail": "content width=358px, topmost at its centre=p, sidebar=closed via Alpine store"
+    },
+    {
+      "name": "[dark/desktop] no horizontal page overflow",
+      "pass": true,
+      "detail": "scrollWidth=1440 clientWidth=1440 diff=0px"
+    },
+    {
+      "name": "[dark/desktop] tables stay inside their container",
+      "pass": true,
+      "detail": "2 table(s), 0 overflowing without a scroll container"
+    },
+    {
+      "name": "[dark/desktop] body text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=13.96 fg=rgb(228, 228, 231) bg=rgb(24, 24, 27)"
+    },
+    {
+      "name": "[dark/desktop] manual content is visible, not covered by panel chrome",
+      "pass": true,
+      "detail": "content width=752px, topmost at its centre=article.cpv-manual__content, sidebar=closed via Alpine store"
+    },
+    {
+      "name": "[dark/tablet] no horizontal page overflow",
+      "pass": true,
+      "detail": "scrollWidth=820 clientWidth=820 diff=0px"
+    },
+    {
+      "name": "[dark/tablet] tables stay inside their container",
+      "pass": true,
+      "detail": "2 table(s), 0 overflowing without a scroll container"
+    },
+    {
+      "name": "[dark/tablet] body text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=13.96 fg=rgb(228, 228, 231) bg=rgb(24, 24, 27)"
+    },
+    {
+      "name": "[dark/tablet] manual content is visible, not covered by panel chrome",
+      "pass": true,
+      "detail": "content width=772px, topmost at its centre=p, sidebar=closed via Alpine store"
+    },
+    {
+      "name": "[dark/mobile] no horizontal page overflow",
+      "pass": true,
+      "detail": "scrollWidth=390 clientWidth=390 diff=0px"
+    },
+    {
+      "name": "[dark/mobile] tables stay inside their container",
+      "pass": true,
+      "detail": "2 table(s), 0 overflowing without a scroll container"
+    },
+    {
+      "name": "[dark/mobile] body text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=13.96 fg=rgb(228, 228, 231) bg=rgb(24, 24, 27)"
+    },
+    {
+      "name": "[dark/mobile] manual content is visible, not covered by panel chrome",
+      "pass": true,
+      "detail": "content width=358px, topmost at its centre=p, sidebar=closed via Alpine store"
+    },
+    {
+      "name": "a covered page at 390px is the panel default, not this task",
+      "pass": true,
+      "detail": "manual topmost=nav.fi-sidebar-nav (sidebarOpen=true) | panel_root topmost=nav.fi-sidebar-nav (sidebarOpen=true) -> BOTH pages are covered by the panel sidebar at this width: panel-wide behaviour"
+    },
+    {
+      "name": "mobile overflow is attributable, not guessed",
+      "pass": true,
+      "detail": "manual=0px panel_root=0px -> no overflow on either"
+    },
+    {
+      "name": "the manual adds no horizontal overflow of its own at 390px",
+      "pass": true,
+      "detail": "manual=0px vs panel_root=0px"
+    }
+  ]
+}

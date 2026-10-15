@@ -233,3 +233,46 @@ Isolated run `20261015T101317Z-433fbf05d4a8` at TESTED_HEAD, harness `infra/cont
 - **Mail:** PENDING_OWNER_CONFIGURATION, unchanged: `log`, simulated, cached, sender configured.
 - **Evidence:** `audit/runs/manual_deploy_2026-10-15/` (`pre_state.txt`, `deploy_run.log` sanitized, `post_state.txt`, `smoke_manual.json`, `smoke_0010c.json`).
 - **Maintenance pending, not fixed in this delivery:** the workflow filters ignore Markdown that is served from `resources/manual/`. A manual-only change never deploys automatically.
+
+## 10. Owner feedback after the deployment: the manual is organized by system module
+
+- **Owner (chat, 2026-10-15, after the deployment):** "the manual looks exactly the same, and the index focuses on the taxonomy, grouping everything else under 'Resto del perfil'". The manual must cover the whole system: what the 2022 manual had, plus the taxonomy.
+- **Cause, confirmed:**
+  - The level-2 index was **identical** at `a5772345` and at `d23c0e6`: 11 entries, **5 of them taxonomy**.
+  - The 64 new lines went into level-3 subsections under "Ingreso y cuenta" and "Resto del perfil", and the index only shows level 2 (`UserManualRenderer`).
+  - So the content was there, but it could not be seen from the index.
+- **Change** (`4b7cab66e4f580da5854a1f97afde3cac30822aa`, `resources/manual/manual_usuario.md` only):
+  - The index now has 18 entries, one per system module, in the **real order of the company tabs**:
+    1. Qué es;
+    2. Ingreso y cuenta;
+    3. El Escritorio y el menú;
+    4. Datos generales;
+    5. Las pestañas de su empresa;
+    6. Cámaras;
+    7. Contactos;
+    8. Usuarios;
+    9. Sectores y servicios;
+    10. **Categorías CPV (Taxonomía)**;
+    11. Recursos en Venezuela;
+    12. Sistemas de gestión;
+    13. Experiencia relevante;
+    14. Presencia internacional;
+    15. Enfoque de sostenibilidad;
+    16. Completitud y «No Aplica»;
+    17. Errores frecuentes;
+    18. Privacidad.
+  - **The taxonomy is one entry**, and its former 5 sections are now its subsections.
+  - New: the table "Qué puede hacer en el sistema" (`#mapa-del-sistema`) maps each task to its screen and section.
+  - **Text:** a diff of the non-heading lines shows that only the opening paragraph and the "pestañas" paragraph were rewritten; the system map, the taxonomy intro and the "Completitud y «No Aplica»" intro are new lines. Every existing anchor is kept, so internal links still work.
+- **Test contract** (`tests/Feature/Filament/UserManualContentTest.php`):
+  - The index list was updated to the 18 sections.
+  - New assertion: the order of `EmpresaResource::getRelations()`. If a tab is added or moved, the test fails and asks for the manual to be updated.
+  - `section()` now finds sections at any heading level.
+- **Checks:** isolated run `20261015T111556Z-4b7cab66e4f5` (harness `246b0d0`):
+  - PHPUnit `UserManual|TaxonomyCategoryRequestOperations|TaxonomyCategoryRequestTest`: **OK (45 tests, 532 assertions)**;
+  - browser check of the manual **40/40** (3 widths × light/dark, every index link, no overflow);
+  - isolation 19/19, schema 14/14, fixtures 8/8;
+  - the only "finding" is informational ("0 migration ordering violations"), the same as the accepted run;
+  - staging 200 before and after.
+  - Evidence: `audit/runs/mail_docs_user_manual/run_4b7cab6/`.
+- **Not deployed.** Staging is still on `d23c0e6`. Because this commit touches `tests/**`, the push to the deployment branch **does** trigger the normal workflow; no SSH route is needed. Deploying needs authorization.
