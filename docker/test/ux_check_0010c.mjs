@@ -95,7 +95,8 @@ try {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await login(ctx, AFFILIATE);
     record('synthetic affiliate can log in', !/\/admin\/login/.test(page.url()), page.url().replace(BASE, ''));
-    const nav = await page.evaluate(() => document.querySelector('nav, aside')?.innerText || '');
+    const nav = await page.evaluate(() => document.querySelector('.fi-sidebar')?.textContent || '');
+    record('affiliate sidebar was actually read', nav.includes('Manual de usuario'), `chars=${nav.length}`);
     record('affiliate navigation has no "Solicitudes de categoría"', !nav.includes('Solicitudes de categoría'));
     for (const path of [LIST, SETTINGS, HELP]) {
       const resp = await open(page, path);
@@ -150,13 +151,13 @@ try {
   {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await login(ctx, ADMIN);
-    const nav = await page.evaluate(() => document.querySelector('nav, aside')?.innerText || '');
+    const nav = await page.evaluate(() => document.querySelector('.fi-sidebar')?.textContent || '');
     record('desktop navigation shows "Solicitudes de categoría"', nav.includes('Solicitudes de categoría'));
     record('desktop navigation shows "Configuración de solicitudes"', nav.includes('Configuración de solicitudes'));
 
     await open(page, LIST);
     await shown(page, 'desktop list', page.getByText(SYNTH_NEED));
-    record('desktop list: failed badge shown', await page.getByText('Falló', { exact: true }).first().isVisible());
+    record('desktop list: failed badge shown in the table row', await page.locator('.fi-ta-content').getByText('Falló', { exact: true }).first().isVisible());
     await page.screenshot({ path: `${OUT}/0010c-06-list-desktop.png`, fullPage: false });
 
     await open(page, LIMITS);
