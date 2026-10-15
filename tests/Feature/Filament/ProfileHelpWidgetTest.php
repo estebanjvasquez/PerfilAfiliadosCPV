@@ -9,6 +9,7 @@ use App\Filament\Widgets\ProfileHelpWidget;
 use App\Models\User;
 use App\Support\UserManual\UserManualRenderer;
 use Filament\Facades\Filament;
+use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -48,8 +49,9 @@ class ProfileHelpWidgetTest extends TestCase
     {
         $this->assertMatchesRegularExpression('/cpv-profile-help-widget/', $html, 'La tarjeta de ayuda no está en el Escritorio.');
         $start = strpos($html, 'cpv-profile-help-widget');
+        $end = strpos($html, '</section>', $start);
 
-        return substr($html, $start, 4000);
+        return substr($html, $start, ($end === false ? strlen($html) : $end) - $start);
     }
 
     #[Test]
@@ -107,7 +109,8 @@ class ProfileHelpWidgetTest extends TestCase
     #[Test]
     public function a_guest_is_sent_to_login_and_the_card_follows_the_existing_access_checks(): void
     {
-        $this->get(Filament::getPanel('admin')->getUrl())
+        // La URL del Escritorio en sí: para un invitado, Panel::getUrl() ya resuelve al login.
+        $this->get(Dashboard::getUrl())
             ->assertRedirect(Filament::getPanel('admin')->getLoginUrl());
 
         $this->assertSame(UserManual::canAccess(), ProfileHelpWidget::canView());

@@ -176,8 +176,13 @@ class TaxonomyMapPageTest extends TestCase
         $this->actingAs($this->affiliate());
         $this->assertFalse(TaxonomyMapPage::shouldRegisterNavigation());
 
+        // Solo el MENÚ LATERAL: desde CPV-HOME-USEFUL-HELP la tarjeta de ayuda del Escritorio enlaza
+        // el mapa a propósito, así que la página completa sí contiene su URL.
         $dashboard = $this->get(Filament::getPanel('admin')->getUrl())->assertOk()->getContent();
-        $this->assertStringNotContainsString('mapa-de-la-taxonomia', $dashboard, 'El mapa no debe tener ítem en el menú lateral.');
+        $this->assertMatchesRegularExpression('/<nav[^>]*fi-sidebar-nav.*?<\/nav>/s', $dashboard, 'No se encontró el menú lateral.');
+        preg_match('/<nav[^>]*fi-sidebar-nav.*?<\/nav>/s', $dashboard, $sidebar);
+        $this->assertStringContainsString('manual-de-usuario', $sidebar[0], 'El menú lateral leído no es el del panel.');
+        $this->assertStringNotContainsString('mapa-de-la-taxonomia', $sidebar[0], 'El mapa no debe tener ítem en el menú lateral.');
 
         $this->get(UserManual::getUrl())->assertOk()
             ->assertSee(TaxonomyMapPage::getUrl(), false)
