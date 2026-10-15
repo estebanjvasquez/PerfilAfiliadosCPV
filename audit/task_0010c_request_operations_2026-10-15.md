@@ -181,3 +181,81 @@ The harness gained `--ux-script` and the synthetic Super Admin and request seed 
 - Request #1 and the data on staging were not changed. The only reads were aggregates in a READ ONLY transaction.
 - No secrets read or changed (only the `MAIL_MAILER` key). No taxonomy APPLY. No merge of unrelated branches. No orchestrator reactivation.
 - One foreground session, no subagents, no polling and no Anthropic reviews.
+
+---
+
+# Staging deployment (2026-10-15), instruction `6188477132`
+
+**Result: DEPLOYED_FOR_OWNER_REVIEW — MANUAL.**
+
+## Before the push
+- **Read-only preflight:** `docs/deploy/preflight_task_0010c.sql`, 09:06:21Z, as `www-data`, READ ONLY with ROLLBACK. **COMPATIBLE: 12 OK, 0 stops.**
+  - Runtime observed: `9b447eb`.
+  - Exactly **one** pending migration: `2026_10_15_120000_…`.
+  - None of the objects the migration creates existed yet.
+  - The CHECK was still 0010A's, and no row fell outside it.
+  - Prerequisites present.
+  - **#1:** `failed`/`recipient_not_configured`, md5 fingerprint of its original columns `2e64f23555b01ad30f845bdd53cedc15`.
+  - No recipient configured, both limits `NULL`, protected counts recorded.
+- **Recovery point:** image `sha256:1502ed3d…` tagged `perfilafiliados-app:pre-0010c-9b447eb`. `.env` and `docker-compose.yml` hashes recorded.
+- **Ancestry:** `9b447eb` is an ancestor of `a577234` (fast-forward), and `349ea61..a577234` touches only `audit/**`.
+
+## Deployment
+- Non-force push `9b447eb..a577234` to `feature/upgrade-filament-v3`, done by the agent.
+- Run **`38612101908`** (push), **success**, 09:06:51Z to 09:07:25Z. https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/38612101908
+- The status check was bounded: every 20 s, stopping on completion.
+
+## Verification (`docs/deploy/postdeploy_task_0010c.sql`, 09:08Z): 7 OK, 0 stops
+- Batch **60** contains **only** `2026_10_15_120000_…`. The ledger went 129 → 130.
+- The history table exists, with 6 constraints and 3 indexes.
+- **Exactly one `historical` row for #1**: attempt 1, `failed`, `recipient_not_configured`, mode not recorded, no recipient.
+- **#1 has the same fingerprint** (`2e64f235…`). Its new columns are empty.
+- The CHECK now allows `simulated`.
+- Still **no recipient**.
+- Protected counts identical; the only addition is the history table (0 → 1).
+- Server:
+  - HEAD `a577234`;
+  - new container started 09:07:22Z, image `fd4441da…`;
+  - `.env` and compose **with the same hashes**, so `MAIL_MAILER=log` is unchanged;
+  - maintenance off;
+  - guest `/` 200 and `/admin/login` 200;
+  - the 3 new screens redirect a guest to login (302).
+
+## Authenticated smoke test (`docs/deploy/smoke_task_0010c_readonly.php`): 18/18
+It ran inside the container as `www-data`, in a READ ONLY transaction ending in ROLLBACK, with session and cache in memory and `Mail::fake`. **No real account was used:** two users were built **in memory**, one carrying the `super_admin` role read from `roles` and one with no roles. Nothing was submitted and "Reintentar aviso" was not pressed.
+- Super Admin, all 200:
+  - the list, with the missing-recipient warning;
+  - **the #1 detail**, with "Falló", the reason, **the historical row** and the link to settings;
+  - "Reintentar aviso" offered;
+  - settings showing "Simulado (modo «log»)";
+  - help;
+  - "Límites", linking to settings.
+- The user with no roles gets **403** on the list, the #1 detail, settings and help.
+- #1 has the same fingerprint before and after, the history has no new attempts, and no mail went out.
+- Logs: **0** Laravel errors since 09:00Z; nginx since the deploy shows only 200 and 302.
+
+## Limitations of this verification
+- The visual check of the authenticated screens **on staging** was not repeated in a browser; that would need a real session. It was checked in the isolated environment (55/55). The owner's test covers it.
+- Concurrency of the reservation (from review `6188413270`): **while the 10-minute reservation is in force, it prevents competing sends.** It does **not** guarantee a single send if the process crashes after the mail server accepted the message, if the transport fails ambiguously, or if the reservation expires during an unfinished send. This has to be revisited **before enabling SMTP**. The admin help says the second attempt "se rechaza para no enviar dos avisos". That holds while the reservation is in force. The wording will be made more precise in the next code round, without redeploying now.
+- The dormant `EmpresaPgsql` fatal remains a separate task.
+
+## Owner test guide (in Spanish)
+
+1. Entre a https://pruebas.camarapetrolera.app/admin con su usuario **Super Admin**.
+2. En el menú lateral, abra **Taxonomía CPV → Solicitudes de categoría**.
+   - Arriba verá el aviso de que **no hay correo responsable configurado** y de que el servidor está en **modo de envío simulado**.
+   - La solicitud **#1** aparece en la lista con aviso **Falló**. Si no la ve, busque «1» en el buscador.
+3. Abra la **#1** (icono del ojo o clic en la fila). Revise:
+   - que el contenido es el que usted envió;
+   - **Aviso a la Cámara**: **Falló** / «No hay correo responsable configurado.», con el enlace a la configuración;
+   - **Historial de avisos**: una fila «Registrado antes del historial», resultado **Falló**, modo «no registrado».
+   - El botón **Reintentar aviso** aparece **desactivado** porque no hay destinatario. **No hace falta pulsarlo.**
+4. Abra **Taxonomía CPV → Configuración de solicitudes**. Ahí está el único campo del correo responsable y el **Modo de envío del servidor: Simulado (modo «log»)**. **No es necesario guardar nada para esta prueba.**
+5. Desde la lista, pulse **Ayuda** y revise que la explicación se entienda.
+6. Opcional: con un usuario **no** administrador, compruebe que **Solicitudes de categoría** no aparece en el menú y que la dirección `/admin/solicitudes-de-categoria` da «403 Prohibido».
+
+Para tener en cuenta:
+- En modo **log** el servidor **no envía correos**: los registra. Ver las pantallas no requiere ninguna configuración de correo.
+- **Configurar un destinatario no reenvía** las solicitudes anteriores. Configurar el destinatario o **reintentar la #1** son acciones aparte que usted decide. No son parte de esta prueba ni condición para que el despliegue esté sano. Si las hace, el resultado en modo log será «Simulado», no un correo real.
+
+Qué reportar: si alguna pantalla no carga o da error; si algún texto no se entiende o confunde; si la #1 muestra algo distinto de lo descrito; si un usuario no administrador logra ver las solicitudes.

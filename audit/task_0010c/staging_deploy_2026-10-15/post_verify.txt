@@ -1,0 +1,66 @@
+# PREFLIGHT DE SOLO LECTURA - instruccion 6174401867
+ejecutado_utc=2026-10-15T09:08:36Z
+sql_sha256=83d4a277c16f0a7b23844ea21b3909fce1ec8a075dfd7878a36576cb6b2b69d9
+bloques=8
+conexion=pgsql
+conexion_por_defecto=pgsql
+tabla_de_registro=migrations
+app_env=staging
+transaccion_read_only=on (verificado con SHOW antes del primer bloque)
+base_coincide_con_config_pgsql=true
+
+== D1 | Identidad y solo lectura
+filas=1
+  base=postgres | esquema=public | transaccion_solo_lectura=on | veredicto=OK
+
+== D2 | El ultimo lote contiene EXACTAMENTE la migracion de 0010C
+filas=1
+  migration=2026_10_15_120000_add_delivery_operations_to_taxonomy_category_requests | batch=60 | total_registro=130 | veredicto=OK
+
+== D3 | La tabla de historial y sus restricciones existen
+filas=1
+  tabla=true | restricciones=6 | indices=3 | veredicto=OK
+
+== D4 | Historial: exactamente una fila historica por solicitud ya evaluada, y ninguna otra
+filas=1
+  request_id=1 | attempt_number=1 | kind=historical | result=failed | codigo=recipient_not_configured | transporte=(no registrado) | con_destinatario=false | veredicto=OK
+
+== D5 | Solicitudes: misma huella de columnas originales y columnas nuevas vacias
+filas=1
+  id=1 | request_status=pending_review | delivery_status=failed | codigo=recipient_not_configured | huella=2e64f23555b01ad30f845bdd53cedc15 | delivery_transport=NULL | delivery_claim_token=NULL | delivery_claimed_at=NULL | veredicto=OK
+
+== D6 | El CHECK admite simulated
+filas=1
+  definicion=CHECK (((delivery_status)::text = ANY ((ARRAY['pending'::character varying, 'sent'::character varying, 'failed'::character varying, 'simulated'::character varying])::text[]))) | veredicto=OK
+
+== D7 | Configuracion sin cambios: sin destinatario
+filas=1
+  filas=1 | con_destinatario=0 | veredicto=OK
+
+== D8 | Conteos protegidos (comparar con la linea base del preflight)
+filas=16
+  tabla=empresa_taxonomy_category | filas=767 | veredicto=BASELINE
+  tabla=empresas | filas=406 | veredicto=BASELINE
+  tabla=migrations | filas=130 | veredicto=BASELINE
+  tabla=migrations.max_batch | filas=60 | veredicto=BASELINE
+  tabla=taxonomy_audit_log | filas=163 | veredicto=BASELINE
+  tabla=taxonomy_candidate_concept_links | filas=10 | veredicto=BASELINE
+  tabla=taxonomy_canonical_concepts | filas=82 | veredicto=BASELINE
+  tabla=taxonomy_categories | filas=3497 | veredicto=BASELINE
+  tabla=taxonomy_category_request_delivery_attempts | filas=1 | veredicto=BASELINE
+  tabla=taxonomy_category_requests | filas=1 | veredicto=BASELINE
+  tabla=taxonomy_reviewed_proposals | filas=15 | veredicto=BASELINE
+  tabla=taxonomy_selection_settings | filas=1 | veredicto=BASELINE
+  tabla=taxonomy_term_concepts | filas=145 | veredicto=BASELINE
+  tabla=taxonomy_term_cpv_relations | filas=9749 | veredicto=BASELINE
+  tabla=taxonomy_terms | filas=1893 | veredicto=BASELINE
+  tabla=users | filas=366 | veredicto=BASELINE
+
+transaccion_cerrada=ROLLBACK
+
+== RESUMEN
+veredicto_BASELINE=16
+veredicto_OK=7
+paradas=0
+resultado=COMPATIBLE
+codigo_salida=0

@@ -1,4 +1,18 @@
-# TASK-0010 — DOS SUBTAREAS AUTORIZADAS, **EN ESPERA / NO INICIADAS**
+# Tarea actual: ver `SESSION_RESUME.md` §1 (checkpoint 2026-10-15)
+
+> **Estado vigente (registrado el 2026-10-15):**
+> - TASK-0010A/B + test-readiness están integradas y desplegadas (`9b447eb`).
+> - **TASK-0010C está desplegada** (`a5772345`, run `38612101908`) y espera la prueba funcional del propietario.
+> - **El aviso «EN ESPERA / NO INICIADAS» de más abajo está SUPERADO**: A/B se reanudaron el 2026-10-14 bajo revisión manual y hoy están desplegadas.
+> - El loop autónomo está **suspendido**: ninguna sesión entra a un loop ni arranca tareas por su cuenta.
+> - Siguiente acción y pendientes: `SESSION_RESUME.md` §4 y §5.
+>
+> Todo lo que sigue es la historia de TASK-0010 y se conserva sin cambios.
+
+---
+
+## (Histórico) TASK-0010 — DOS SUBTAREAS AUTORIZADAS, EN ESPERA / NO INICIADAS (superado)
+
 
 **Autorización del propietario:** Issue #2 comentario `6079956985`.
 **Protocolo:** `docs/orquestador/AUTONOMOUS_DEV_LOOP.md`.

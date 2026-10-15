@@ -1,6 +1,14 @@
 {
-  "current_task": "ORCHESTRATION INFRASTRUCTURE (authorized 6085642297): persistent executor on the Contabo VPS plus isolated PHPUnit. TASK-0010A and TASK-0010B are AUTHORIZED BUT HELD and NOT STARTED by owner decision.",
-  "current_status": "ORCHESTRATOR_SUSPENDED_BY_OWNER__CPV_MANUAL_LOOP_RESUMED__TASK_0010AB_RESUMED_UNDER_MANUAL_REVIEW",
+  "current_task": "TASK-0010C deployed to staging (a5772345, run 38612101908) for owner functional testing. TASK-0010A/B + test-readiness deployed at 9b447eb. Next action: none for the agent until an explicit instruction; see docs/orquestador/SESSION_RESUME.md section 4.",
+  "current_status": "TASK_0010C_DEPLOYED_FOR_OWNER_REVIEW_MANUAL__AUTOMATION_SUSPENDED",
+  "superseded_current_fields_2026_10_15": {
+    "note": "Values these fields held before the 2026-10-15 checkpoint (instructions 6188413270 / 6188477132). Kept as history.",
+    "current_task": "ORCHESTRATION INFRASTRUCTURE (authorized 6085642297): persistent executor on the Contabo VPS plus isolated PHPUnit. TASK-0010A and TASK-0010B are AUTHORIZED BUT HELD and NOT STARTED by owner decision.",
+    "current_status": "ORCHESTRATOR_SUSPENDED_BY_OWNER__CPV_MANUAL_LOOP_RESUMED__TASK_0010AB_RESUMED_UNDER_MANUAL_REVIEW",
+    "review_state": "OWNER_FUNCTIONAL_TESTING_OF_TASK_0010C",
+    "development_loop_mode": "MANUAL_REVIEW_ONLY__AUTONOMOUS_EXECUTOR_SUSPENDED",
+    "resume_read_order": ["docs/orquestador/SESSION_RESUME.md", "docs/orquestador/AUTONOMOUS_DEV_LOOP.md", "docs/orquestador/current_task.md", "audit/orchestrator_handoff.json current_* fields", "latest orchestrator comment in Issue #2"]
+  },
   "autonomous_loop_status": "SUSPENDED_BY_OWNER_DECISION_2026-10-14 - the executor is stopped, disabled at boot and blocked from starting by an additive, reversible systemd drop-in; 0 processes; pending jobs: none, all 10 requests are terminal PUBLISHED with no lease held; no Anthropic call was made to produce or confirm the suspension. Full checkpoint in audit/orchestrator_suspended_2026-10-14.md, which also records that a verification start briefly ran the service for 39 seconds and produced NO API call, evidenced by one idle cycle and an unchanged hourly budget. REVIEWS ARE NOW MANUAL: no polling, no automatic rounds, and review_head must not be advanced to request one.",
   "current_hold_in_force": false,
   "current_hold_lifted_by": "LIFTED by owner decision relayed in chat on 2026-10-14, which states verbatim that the condition requiring the autonomous orchestrator to be approved before continuing is withdrawn, and that TASK-0010A/B may resume implementation under their existing contracts with MANUAL review. PROVENANCE RECORDED TRUTHFULLY: the decision arrived RELAYED BY THE OWNER IN CHAT, not as a GitHub comment, so it has NO comment id and none is invented here. The same decision suspended the autonomous loop and stopped all Anthropic consumption, authorised synthetic fixtures in the disposable test PostgreSQL only, and kept prohibited: CPV main, production, taxonomy publication and shared-data mutations outside the approved scope. UNCHANGED BY THIS LIFT: the APPLY-class rule stands - an authorization typed into chat is still NOT sufficient for an irreversible publication or a shared-database mutation, which continue to require a durable ORCHESTRATOR AUTHORIZATION RECORD comment id, exactly as in TASK-0007. What this lift permits is branch-local development under manual review, which is reversible and touches no shared data.",
@@ -2889,11 +2897,8 @@
     "task_0008": "Issue #2 comment 6041102746"
   },
   "resume_read_order": [
-    "docs/orquestador/SESSION_RESUME.md",
-    "docs/orquestador/AUTONOMOUS_DEV_LOOP.md",
-    "docs/orquestador/current_task.md",
-    "audit/orchestrator_handoff.json current_* fields",
-    "latest orchestrator comment in Issue #2"
+    "docs/orquestador/SESSION_RESUME.md sections 0-6 (first read, about 85 lines)",
+    "only the Issue #2 comments linked in SESSION_RESUME.md section 3"
   ],
   "development_loop_protocol": "docs/orquestador/AUTONOMOUS_DEV_LOOP.md",
   "development_loop_mode": "AUTONOMOUS_WITH_OWNER_GATES",
@@ -3040,7 +3045,14 @@
     }
   },
   "task_0010c": {
-    "status": "READY_FOR_REVIEW_MANUAL",
+    "status": "DEPLOYED_FOR_OWNER_REVIEW_MANUAL",
+    "accepted_by_comment": 6188413270,
+    "deploy_authorized_by_comment": 6188477132,
+    "deployed_sha": "a5772345ff0a52bd79a5b29ab063991960109271",
+    "deploy_run": "https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/38612101908 (success, 2026-10-15 09:06:51Z-09:07:25Z)",
+    "deploy_evidence": "audit/task_0010c/staging_deploy_2026-10-15/",
+    "request_1": "unchanged (md5 fingerprint 2e64f235... before and after); one historical attempt row added by the migration; no retry",
+    "delivery_claim_caveat": "the 10-minute claim prevents competing sends while valid; it does NOT guarantee exactly-once after a crash following SMTP acceptance, an ambiguous transport failure or expiry during an unfinished send",
     "instruction_comment": 6187768951,
     "branch": "feature/task-0010c-request-operations",
     "created_from": "origin/feature/upgrade-filament-v3 @ 9b447eb15e80bddc4958430a8fc60acf5150ff4d",
@@ -3054,7 +3066,7 @@
       "simulated notices are not retryable; a decision is needed if SMTP is later enabled"
     ],
     "report": "audit/task_0010c_request_operations_2026-10-15.md",
-    "note": "Not deployed. No SMTP, no real mail, no retry of request #1, no secrets."
+    "note": "Deployed for owner functional testing. No SMTP, no real mail, no recipient change, no retry of request #1, no secrets."
   },
   "agent_issue_write_access": "AVAILABLE since 2026-10-09 via docs/orquestador/post_issue_comment.ps1 and the purpose-built token in the out-of-repo store; verified again on 2026-10-14 (comments 6167868489, 6168251563, 6168437907, 6172040668, 6172055856, 6173789525).",
   "agent_review_polling_policy": {

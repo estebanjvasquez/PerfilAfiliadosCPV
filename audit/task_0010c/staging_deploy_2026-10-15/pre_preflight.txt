@@ -1,0 +1,76 @@
+# PREFLIGHT DE SOLO LECTURA - instruccion 6174401867
+ejecutado_utc=2026-10-15T09:06:22Z
+sql_sha256=2f69744d2117b1e72252841199ca14e2a9ba4f17b14ed870bba482fb8695e2c7
+bloques=9
+conexion=pgsql
+conexion_por_defecto=pgsql
+tabla_de_registro=migrations
+app_env=staging
+transaccion_read_only=on (verificado con SHOW antes del primer bloque)
+base_coincide_con_config_pgsql=true
+
+== C1 | Identidad y solo lectura
+filas=1
+  base=postgres | esquema=public | transaccion_solo_lectura=on | veredicto=OK
+
+== C2 | La migracion de 0010C todavia no esta registrada
+filas=1
+  nombre=2026_10_15_120000_add_delivery_operations_to_taxonomy_category_requests | registrada=false | veredicto=OK
+
+== C3 | Conjunto completo de pendientes para migrate --force en el candidato
+filas=1
+  nombre=2026_10_15_120000_add_delivery_operations_to_taxonomy_category_requests | veredicto=OK: pendiente esperada (0010C)
+
+== C4 | Objetos que la migracion va a crear: no deben existir
+filas=6
+  objeto=columna delivery_claim_token | existe=false | veredicto=OK
+  objeto=columna delivery_claimed_at | existe=false | veredicto=OK
+  objeto=columna delivery_transport | existe=false | veredicto=OK
+  objeto=indice tcr_delivery_attempts_request_idx | existe=false | veredicto=OK
+  objeto=secuencia taxonomy_category_request_delivery_attempts_id_seq | existe=false | veredicto=OK
+  objeto=tabla taxonomy_category_request_delivery_attempts | existe=false | veredicto=OK
+
+== C5 | El CHECK actual de delivery_status es el de 0010A y ninguna fila lo viola
+filas=1
+  conname=taxonomy_category_requests_delivery_status_check | definicion=CHECK (((delivery_status)::text = ANY ((ARRAY['pending'::character varying, 'sent'::character varying, 'failed'::character varying])::text[]))) | filas_fuera=0 | veredicto=OK
+
+== C6 | Prerrequisitos de la tabla nueva
+filas=2
+  nombre=taxonomy_category_requests | existe=true | veredicto=OK
+  nombre=users | existe=true | veredicto=OK
+
+== C7 | Solicitudes existentes: estado y HUELLA de las columnas originales (sin contenido)
+filas=1
+  id=1 | request_status=pending_review | delivery_status=failed | codigo=recipient_not_configured | con_destinatario=false | huella=2e64f23555b01ad30f845bdd53cedc15 | recibira_fila_historica=true | veredicto=INFO
+
+== C8 | Configuracion: destinatario si/no y limites (no son datos personales)
+filas=1
+  filas=1 | con_destinatario=0 | max_principales=NULL | max_secundarias=NULL | veredicto=INFO
+
+== C9 | Linea base de conteos protegidos
+filas=15
+  tabla=empresa_taxonomy_category | filas=767 | veredicto=BASELINE
+  tabla=empresas | filas=406 | veredicto=BASELINE
+  tabla=migrations | filas=129 | veredicto=BASELINE
+  tabla=migrations.max_batch | filas=59 | veredicto=BASELINE
+  tabla=taxonomy_audit_log | filas=163 | veredicto=BASELINE
+  tabla=taxonomy_candidate_concept_links | filas=10 | veredicto=BASELINE
+  tabla=taxonomy_canonical_concepts | filas=82 | veredicto=BASELINE
+  tabla=taxonomy_categories | filas=3497 | veredicto=BASELINE
+  tabla=taxonomy_category_requests | filas=1 | veredicto=BASELINE
+  tabla=taxonomy_reviewed_proposals | filas=15 | veredicto=BASELINE
+  tabla=taxonomy_selection_settings | filas=1 | veredicto=BASELINE
+  tabla=taxonomy_term_concepts | filas=145 | veredicto=BASELINE
+  tabla=taxonomy_term_cpv_relations | filas=9749 | veredicto=BASELINE
+  tabla=taxonomy_terms | filas=1893 | veredicto=BASELINE
+  tabla=users | filas=366 | veredicto=BASELINE
+
+transaccion_cerrada=ROLLBACK
+
+== RESUMEN
+veredicto_BASELINE=15
+veredicto_INFO=2
+veredicto_OK=12
+paradas=0
+resultado=COMPATIBLE
+codigo_salida=0

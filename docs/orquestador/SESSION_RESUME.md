@@ -1,5 +1,90 @@
 # CPV — Punto de reanudación maestro
 
+**Checkpoint:** 2026-10-15, ~09:15 UTC. TASK-0010C está **desplegada en staging** y espera la prueba funcional del propietario.
+Las §0 a §6 son la primera lectura. Lo que viene después de la línea «Historia» es el checkpoint del 2026-10-08, que **ya no rige** y se conserva como historia.
+
+> Si algo de aquí contradice GitHub o la base viva, prevalece la evidencia viva. Registrar la discrepancia antes de actuar.
+> Las filas marcadas «registrado» son hechos con fecha, **no** estado vivo verificado en esta lectura.
+
+## 0. Indicación para una sesión nueva
+
+> Lee `docs/orquestador/SESSION_RESUME.md` §0 a §6 y solo los comentarios del Issue #2 enlazados en §3. Carga los accesos con `. docs\orquestador\bootstrap_access.ps1 -Quiet;` y, si hace falta, `-Verify`. Verifica la rama, el HEAD y el working tree. No releas el hilo completo ni cargues logs grandes. Ejecuta **solo** la siguiente acción autorizada explícitamente en el Issue #2; si no hay ninguna, espera.
+
+## 1. Estado (registrado el 2026-10-15)
+
+| Tema | Estado |
+|---|---|
+| Runtime de staging | `feature/upgrade-filament-v3` = **`a5772345ff0a52bd79a5b29ab063991960109271`**. Desplegado el 2026-10-15 09:07Z, run `38612101908` **success**. Su código es el TESTED_HEAD de C (`349ea61`). |
+| TASK-0010A/B + test-readiness | Integradas, aceptadas y desplegadas el 2026-10-14 (`9b447eb`). |
+| TASK-0010C | Aceptada (`6188413270`) y desplegada con la autorización `6188477132`. **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**. Espera la prueba funcional del propietario. |
+| Solicitud #1 | `pending_review`, aviso `failed` / `recipient_not_configured`. La migración le agregó **una fila `historical`** en el historial. Su contenido no cambió: misma huella md5, verificada a las 09:08Z. **No hay reintento autorizado.** |
+| Correo | `MAIL_MAILER=log` y **sin destinatario** (registrado 2026-10-15 09:08Z). No se ha enviado ningún correo real. |
+| Automatización | El ejecutor autónomo está **suspendido** desde el 2026-10-14. No hay procesos de IA en segundo plano ni sondeos programados. |
+
+## 2. SHAs y ramas
+
+- **Desplegado / runtime:** `a5772345ff0a52bd79a5b29ab063991960109271` (= REVIEW_HEAD aceptado de C; el delta frente a TESTED_HEAD es solo `audit/**`).
+- **C, TESTED_HEAD:** `349ea61078fe5b6b88abc0a90333958c0ea9f220` (`OK 481 tests, 2869 assertions`; navegador 55/55).
+- **Rama de C:** `feature/task-0010c-request-operations`. El commit de checkpoint es el que introduce este texto; su SHA está en el comentario de entrega.
+- **Integración 0010:** `feature/integration-candidate-0010` @ `8a7664f` (incluye el seguimiento de la #1).
+- **Arnés aislado:** `infra/contabo-test-runner` @ `246b0d0`.
+- **Imágenes de recuperación en el VPS:**
+  - `perfilafiliados-app:pre-0010c-9b447eb`: runtime anterior a C.
+  - `perfilafiliados-app:pre-0010-004d24e`: runtime anterior a 0010.
+
+## 3. Evidencia (enlazar, no copiar)
+
+- Informe de C, con el despliegue y la guía de prueba del propietario: `audit/task_0010c_request_operations_2026-10-15.md`.
+- Despliegue de C (preflight, verificación posterior y prueba de humo): `audit/task_0010c/staging_deploy_2026-10-15/`.
+- Despliegue de 0010 y seguimiento: `audit/integration_candidate_0010_staging_deploy_2026-10-1{4,5}*.md`, en la rama de integración.
+- Issue #2:
+  - aceptación de C y requisitos de checkpoint: `6188413270`;
+  - autorización de despliegue: `6188477132`;
+  - entrega de C: `6188344669`.
+
+## 4. Siguiente acción
+
+- **Propietario:** probar las pantallas según la guía del informe de C («Guía de prueba»).
+- **Agente:** **ninguna** hasta una nueva instrucción. Cualquier código nuevo exige una ronda manual completa:
+  1. rama propia;
+  2. entorno aislado;
+  3. revisión;
+  4. preflight de solo lectura;
+  5. autorización explícita antes de tocar `feature/upgrade-filament-v3`.
+- **Decisiones del propietario pendientes:**
+  - destinatario y SMTP (proveedor, destinatario y aprovisionamiento seguro);
+  - si se reintenta la #1.
+
+## 5. Pendientes y limitaciones (no arrancan solos)
+
+- **`EmpresaPgsql` no compila** (fatal latente desde `a5265ce`). Cargar esa clase es un error fatal. Necesita su tarea propia.
+- **Reserva del aviso.** Mientras está vigente, la reserva de 10 minutos impide envíos concurrentes. **No garantiza un único envío** si el proceso cae después de que el servidor de correo aceptó el mensaje, si el transporte falla de forma ambigua, o si la reserva expira con un envío a medias. Hay que revisarlo al activar SMTP. La ayuda de administración dice «se rechaza para no enviar dos avisos»; ese texto se precisa en la próxima ronda de código, sin redesplegar ahora.
+- Los avisos `simulated` no se pueden reintentar con el contrato actual.
+- La concurrencia está probada a nivel de la reserva, no con dos procesos reales.
+- El validador del handoff, del loop retirado, falla en la regla histórica `6080004466`. No bloquea nada.
+
+## 6. Accesos (solo nombres; nunca valores)
+
+| Capacidad | Mecanismo establecido | Verificación barata | 2026-10-15 |
+|---|---|---|---|
+| `git fetch`/`push` | Git Credential Manager (Windows) | `git ls-remote origin` | verificado (push 09:06Z) |
+| Leer el Issue #2 | API anónima | `bootstrap_access.ps1 -Verify` | verificado |
+| Escribir en el Issue #2 | `CPV_GITHUB_TOKEN` en `%USERPROFILE%\.cpv\credentials.env`, fuera de git, cargado con el bootstrap; publicar con `docs\orquestador\post_issue_comment.ps1 -BodyFile` | `-Verify` muestra SET/MISSING | verificado |
+| SSH al VPS de staging | clave OpenSSH en `%USERPROFILE%\.ssh\` (el nombre está en la memoria privada local del agente) | `ssh … true` | verificado |
+| Entorno aislado (PHPUnit y navegador) | runner en el VPS (ruta y raíz en la memoria privada) | una corrida `--skip-suite` | verificado (corridas del 2026-10-15) |
+| Despliegue | workflow «Deploy a Contabo» con los secretos del repo | estado del run en la API | verificado (`38612101908`) |
+| Credenciales del ejecutor del servidor | quedan **en el servidor**; no se copian | — | no revisado (ejecutor suspendido) |
+
+- Las variables exportadas **no sobreviven** a una shell nueva: cada comando que las necesite empieza con `. docs\orquestador\bootstrap_access.ps1 -Quiet;`.
+- El clasificador de permisos de la sesión puede rechazar un push a `feature/upgrade-filament-v3`. En ese caso lo ejecuta el propietario. **Un rechazo de permisos se reporta; no se rodea.**
+- No crear, rotar, revelar ni reaprovisionar secretos sin una instrucción explícita.
+
+---
+
+# Historia: checkpoint del 2026-10-08 (superado; se conserva)
+
+## (Encabezado original del 2026-10-08)
+
 **Fecha del checkpoint:** 2026-10-08  
 **Proyecto:** PerfilAfiliadosCPV / CIRA / Taxonomía CPV  
 **Repositorio principal:** `estebanjvasquez/PerfilAfiliadosCPV`  
