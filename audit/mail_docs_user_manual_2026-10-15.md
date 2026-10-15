@@ -87,8 +87,15 @@ Not exposed to the affiliate: transport, simulation, "servidor de correo", retri
   - Installed: Laravel 12 with `symfony/mailer`. Template: `.env.example`.
 - **Persistent source:** the `.env` in each environment's deployment directory on the server. It is outside git (checked: `.gitignore` matches `.env`) and is maintained by the owner or operator.
 - **Injection:** `docker-compose.yml` → `env_file: .env` for the `app` service.
-- **Generated cache:** `config:cache` (run by the deploy) writes `bootstrap/cache/config.php`, values included. **It is not the store:** it is ignored by git (`bootstrap/cache/.gitignore: *`, checked), it is a host mount, it is never read or copied, and it must be regenerated after changing the `.env`.
-- **Applying a change:** an authorized operator edits the `.env`, then runs `config:cache` in the container as `www-data` (or redeploys) and validates. No restart is needed.
+- **Generated cache:** `config:cache` (run by the deploy) writes `bootstrap/cache/config.php`, values included. **It is not the store:** it is ignored by git (`bootstrap/cache/.gitignore: *`, checked), it is a host mount, it is never read or copied, and after changing the `.env` the **container must be recreated first and the cache regenerated inside it** (corrected; see §8).
+- **Applying a change (corrected, §8):** a future authorized change follows this order:
+  1. edit the `.env`;
+  2. `docker compose config --quiet`;
+  3. **recreate** `app` (`up -d --no-deps --no-build --force-recreate app`), which refreshes the environment;
+  4. `config:cache` **in the refreshed container**;
+  5. validate.
+
+  Editing the `.env` and running `exec … config:cache` in the existing container regenerates the **old** configuration, and `restart` does not reload `env_file`.
 - **Safe check:** `docs/deploy/mail_status_readonly.php`, reporting configured/missing only. **Run on staging on 2026-10-15:**
 
   ```
@@ -108,7 +115,7 @@ Not exposed to the affiliate: transport, simulation, "servidor de correo", retri
 
   All use the default mailer. **No overrides** (no `Mail::mailer(...)`).
 - **Business setting ≠ transport:** the request recipient lives in the database (singleton) and is edited by Super Admin under "Configuración de solicitudes".
-- **Rollback:** `MAIL_MAILER=log`, then `config:cache`.
+- **Rollback (corrected, §8):** restore the `.env` (or set `MAIL_MAILER=log`) and apply **the same full sequence**. Validate that `transporte=log`; until then, assume the system can still send.
 - **Activation prerequisites:**
   - provider, sender and recipient;
   - SPF/DKIM/DMARC;
@@ -142,3 +149,51 @@ Isolated run `20261015T101317Z-433fbf05d4a8` at TESTED_HEAD, harness `infra/cont
 2. **Management systems label:** the `ovid` checkbox is labelled **"COVID."** in `ManagementRelationManager`, while the PDF shows "OVID". This looks like a typo in the UI. The ISO 9001 and ISO 17025 checkboxes have no explicit label (the default label from the field name would be shown). The manual avoids both. They need a code round.
 3. **Registration verification under non-sending mode:** a new user does not get the email, the panel requires a verified email, and there is no action for the Chamber to verify them by hand. It is recorded as a dependency of the mail activation.
 4. Earlier findings still open: `EmpresaPgsql` (a dormant fatal); the notice reservation does not guarantee a single send; simulated notices cannot be retried.
+
+## 8. Correction of review `6189828037`: refreshing the environment and the cache
+
+**What was wrong:**
+- `CORREO_DEL_SISTEMA.md` §4 and §6, and this report's §4, said to edit the `.env`, run `config:cache` with `docker compose exec`, and that there was "no need to restart".
+- With `env_file: .env`, the environment is injected **when the container is created**:
+  - editing the file does not change the running container;
+  - `restart` does not reload it;
+  - `config:cache` in that container rewrites the **old** configuration.
+- The rollback had the same flaw: it promised to stop sending without actually doing so.
+
+**What it says now** (`CORREO_DEL_SISTEMA.md` §3, §4.1–§4.3, §6.6):
+- **Separation:**
+  - the container environment, refreshed only by **creating** a container;
+  - Laravel's cache in the shared `bootstrap/cache` mount, regenerated **in a container that already has the new environment**.
+- **Sequence for this application** (a future change, not executed):
+  1. edit the `.env`;
+  2. `docker compose config --quiet` (without `--quiet` it prints values: not to be used);
+  3. `docker compose up -d --no-deps --no-build --force-recreate app`;
+  4. `docker compose exec -T -u www-data app php artisan config:cache`;
+  5. validate with `mail_status_readonly.php`, the container start time, HTTP 200 and the logs.
+- **Prerequisites:** authorization; checkout and image equal to the deployed SHA; a `.env` backup on the server; and a window of a few seconds during which nginx may answer 502.
+- **Consistency window:** until the cache is regenerated, the app keeps using the old cache, so the old behaviour holds consistently.
+- **The deploy workflow** regenerates in a fresh container (`docker compose run --rm`) and then runs `docker compose up -d`. It also resets the branch, rebuilds and migrates, so it is not the route for a config-only change, and even when used the recreation must be confirmed.
+- **Rollback** applies the same full sequence, and is not considered done until the validation shows `log`.
+- The unconditional "no need to restart" is removed. **Restarting** (the same container) and **recreating** (a new container) are kept distinct.
+
+**What was checked:**
+
+*Against the source:*
+- `docker-compose.yml`: `app.env_file: .env`, and the mounts for `bootstrap/cache`, `storage` and `public`;
+- `.github/workflows/deploy-contabo.yml`: `build`, then `run --rm app sh -c '... config:cache ...'`, then `up -d`;
+- `Dockerfile`: no opcache extension or ini, so `config.php` is reread on every request (not measured live).
+
+*Disposable demonstration:* a separate Compose project on the VPS (Compose 5.5.0), `alpine:3.20` image, a single non-secret marker variable, removed afterwards. It did not touch the staging app, its `.env` or its cache.
+
+| Step | Value the container sees |
+|---|---|
+| initial | old |
+| `.env` edited + `exec` | **old** |
+| `restart` | **old** |
+| `run --rm` | new |
+| `up -d` (detected the change and recreated) | new |
+| `up -d --no-deps --no-build --force-recreate` with a third value | third |
+
+- **Not touched:** the live `.env`, `MAIL_MAILER`, the recipient, the cache and the staging containers.
+- **Not rerun:** the suite and the browser checks. There are no code or manual changes; only these two documents.
+- The manual content and the PDF matrix (§1–§3) are **unchanged**.

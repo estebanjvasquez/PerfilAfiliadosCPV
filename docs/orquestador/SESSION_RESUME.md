@@ -1,8 +1,8 @@
 # CPV — Punto de reanudación maestro
 
-**Checkpoint:** 2026-10-15, ~10:30 UTC.
+**Checkpoint:** 2026-10-15, ~10:40 UTC.
 - TASK-0010C está desplegada y el propietario informó su prueba manual como **OK**.
-- La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** (manual completo + documentación del correo) está **READY_FOR_REVIEW — MANUAL** y **no se ha desplegado**.
+- La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** (manual completo + documentación del correo) tiene aplicada la corrección de la revisión `6189828037` (cómo refrescar el entorno y la caché). Está **READY_FOR_REVIEW — MANUAL** y **no se ha desplegado**.
 
 Las §0 a §6 son la primera lectura. Lo que está después de la línea «Historia» es el checkpoint del 2026-10-08, que **ya no rige** y se conserva como historia.
 
@@ -19,7 +19,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 |---|---|
 | Runtime de staging | `feature/upgrade-filament-v3` = **`a5772345ff0a52bd79a5b29ab063991960109271`**. Desplegado el 2026-10-15 09:07Z, run `38612101908` success. |
 | TASK-0010A/B/C | Desplegadas. C fue aceptada (`6188413270`) y el propietario informó su prueba manual como **OK** (`6189493183`, `OWNER_REPORTED_UAT_PASS`; es un informe del propietario, no un test automático). |
-| Ronda manual + correo | **READY_FOR_REVIEW — MANUAL**, sin desplegar. Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo y regla de documentación. |
+| Ronda manual + correo | **READY_FOR_REVIEW — MANUAL** tras la corrección `6189828037`, sin desplegar. Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo (con la secuencia correcta: recrear `app` y luego `config:cache`, para activar y para volver atrás) y regla de documentación. |
 | Correo del sistema | **ACTIVACIÓN GLOBAL PENDIENTE: espera proveedor, configuración y credenciales del propietario.** Staging en modo sin envío (`MAIL_MAILER=log`, comprobado el 2026-10-15 con `docs/deploy/mail_status_readonly.php`). Sin destinatario configurado. No se ha enviado ningún correo real. |
 | Solicitud #1 | `failed`/`recipient_not_configured`, con una fila histórica. Sin reintento autorizado. |
 | Automatización | El ejecutor autónomo está **suspendido**. No hay IA en segundo plano ni sondeos. |
@@ -30,7 +30,8 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 - **Ronda manual + correo:** rama `feature/mail-docs-and-user-manual`.
   - Base `0becd37` (checkpoint de C).
   - **TESTED_HEAD `433fbf05d4a82600f75e3bd1c31672112bda61c0`**.
-  - REVIEW_HEAD = el commit que introduce este texto; su SHA está en el comentario de entrega.
+  - REVIEW_HEAD anterior `73765ea` (corrección pedida en `6189828037`). El REVIEW_HEAD nuevo es el commit que introduce este texto; su SHA está en el comentario de entrega.
+  - Corrección: solo `docs/deploy/CORREO_DEL_SISTEMA.md` y el informe.
 - **Rama de C:** `feature/task-0010c-request-operations` @ `0becd37` (checkpoint).
 - **Arnés aislado:** `infra/contabo-test-runner` @ `246b0d0`.
 - **Imágenes de recuperación en el VPS:** `perfilafiliados-app:pre-0010c-9b447eb`, `perfilafiliados-app:pre-0010-004d24e`.
@@ -41,7 +42,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 - Correo del sistema (mecanismo real, aprovisionamiento, chequeo seguro, vuelta atrás, requisitos): `docs/deploy/CORREO_DEL_SISTEMA.md`.
 - C (despliegue y guía de prueba): `audit/task_0010c_request_operations_2026-10-15.md`.
 - Issue #2:
-  - instrucción de esta ronda: `6189493183`;
+  - instrucción de esta ronda: `6189493183`; corrección: `6189828037`;
   - aceptación de C: `6188413270`;
   - autorización de despliegue de C: `6188477132`;
   - entrega del despliegue de C: `6188643243`.
@@ -77,7 +78,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 | SSH al VPS de staging | clave OpenSSH en `%USERPROFILE%\.ssh\` (el nombre está en la memoria privada local) | `ssh … true` | verificado |
 | Entorno aislado | runner en el VPS (ruta en la memoria privada) | una corrida focalizada | verificado (corrida 10:13Z) |
 | Despliegue | workflow «Deploy a Contabo» con los secretos del repo | estado del run en la API | verificado (`38612101908`) |
-| **Correo del sistema** | `MAIL_*` en el `.env` del despliegue de cada entorno (fuera de git) | `mail_status_readonly.php` (configurado/falta) | **pendiente del propietario**; modo `log` |
+| **Correo del sistema** | `MAIL_*` en el `.env` del despliegue de cada entorno (fuera de git); un cambio exige **recrear `app` y después `config:cache`** (`CORREO_DEL_SISTEMA.md` §4) | `mail_status_readonly.php` (configurado/falta) | **pendiente del propietario**; modo `log` |
 | Credenciales del ejecutor del servidor | quedan **en el servidor**; no se copian | — | no revisado (ejecutor suspendido) |
 
 - Las variables exportadas **no sobreviven** a una shell nueva: cada comando que las necesite empieza con `. docs\orquestador\bootstrap_access.ps1 -Quiet;`.

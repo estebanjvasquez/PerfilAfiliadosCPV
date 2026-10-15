@@ -52,17 +52,53 @@ Configurar el destinatario **no** activa el envío, y activar el envío **no** f
 
 - **Fuente persistente (staging):** el archivo `.env` del directorio de despliegue en el VPS de staging. Está fuera de git (el repo lo ignora). Lo mantiene el propietario o el operador del servidor. Producción tendrá su propio `.env` equivalente cuando exista.
 - **Cómo llega al contenedor:** `docker-compose.yml` declara `env_file: .env` para el servicio `app`, así que el contenedor recibe esas variables como entorno.
-- **Caché generada, NO es el almacén:** el despliegue ejecuta `php artisan config:cache`, que escribe `bootstrap/cache/config.php` con la configuración **resuelta**, valores incluidos. Ese archivo es un artefacto generado: no se edita a mano, no se usa como fuente, no se copia y no se versiona (`bootstrap/cache` está montado desde el host y fuera de git). Si cambia el `.env`, hay que regenerar la caché, porque si no la app sigue usando los valores viejos.
+- **Caché generada, NO es el almacén:** el despliegue ejecuta `php artisan config:cache`, que escribe `bootstrap/cache/config.php` con la configuración **resuelta**, valores incluidos. Ese archivo es un artefacto generado: no se edita a mano, no se usa como fuente, no se copia y no se versiona (`bootstrap/cache` está montado desde el host y fuera de git). Si cambia el `.env`, hay que **recrear el contenedor y después regenerar la caché dentro de él** (§4). Regenerarla en el contenedor viejo vuelve a escribir los valores viejos.
 - **El repositorio público** contiene solo nombres (`.env.example`, este documento). Las credenciales no van a git, ni a informes, ni a comentarios del Issue, ni a la ayuda en pantalla.
 - **No confundir con los secretos del workflow de despliegue** (`CONTABO_*` en GitHub), que solo sirven para entrar al servidor por SSH. No contienen ni deben contener credenciales de correo.
 
-## 4. Cómo aplica un cambio un operador autorizado
+## 4. Cómo aplica un cambio un operador autorizado (cambio FUTURO, no autorizado todavía)
 
-1. Editar el `.env` del directorio de despliegue con las variables `MAIL_*`, en el servidor y sin copiar los valores a ninguna otra parte.
-2. Regenerar la configuración dentro del contenedor de la app, como `www-data`:
+Esta sección describe el procedimiento para cuando el propietario autorice un cambio de configuración de correo. **No se ha ejecutado** y no se ejecuta como parte de esta documentación.
+
+### 4.1 Dos cosas distintas que hay que refrescar
+
+| | Qué es | Qué lo actualiza | Qué **NO** lo actualiza |
+|---|---|---|---|
+| **Entorno del contenedor** | las variables `MAIL_*` que ve el proceso, tomadas de `env_file: .env` **al crear** el contenedor | crear un contenedor nuevo: `docker compose up` cuando lo **recrea**, o `docker compose run --rm` (contenedor efímero) | editar el `.env` en el host; `docker compose restart` (reinicia el **mismo** contenedor, con el entorno viejo) |
+| **Caché de configuración de Laravel** | `bootstrap/cache/config.php`, en un montaje **compartido** desde el host; es lo que la app usa de verdad mientras exista | `php artisan config:cache` ejecutado **en un contenedor que ya tiene el entorno nuevo** | `config:cache` ejecutado en el contenedor viejo: vuelve a escribir la configuración **vieja** |
+
+Comprobado el 2026-10-15 con un proyecto Compose desechable y valores marcadores no secretos (Compose 5.5.0 del VPS; detalle en el informe de esta ronda). Al editar el `.env`, `exec` y `restart` seguían viendo el valor viejo, mientras que `run --rm`, `up -d` (que recreó el contenedor al detectar el cambio) y `up -d --force-recreate` veían el nuevo.
+
+Datos de esta aplicación que importan aquí:
+- **La configuración está cacheada** en staging, así que la app **no** lee las variables de entorno en cada petición: lee `config.php`. Cambiar el entorno sin regenerar la caché no cambia el comportamiento, y regenerarla con el entorno viejo tampoco.
+- **La imagen no habilita opcache.** El `Dockerfile` no lo instala ni lo configura, así que PHP-FPM vuelve a leer `config.php` en cada petición: una caché regenerada surte efecto sin reiniciar PHP-FPM. Esto se verificó en el código fuente, no se midió en vivo.
+- **nginx no usa estas variables.** Solo el servicio `app` tiene `env_file`.
+
+### 4.2 Requisitos previos
+
+1. Autorización explícita del propietario para ese cambio.
+2. El checkout del directorio de despliegue y la imagen en uso corresponden al SHA desplegado (`git rev-parse HEAD`, y la imagen del contenedor `app` creada por el último despliegue). Así, recrear el contenedor no cambia el código.
+3. Una copia de respaldo del `.env` actual, **en el servidor** y fuera de git, para poder volver atrás.
+4. Aceptar una ventana breve de indisponibilidad: unos segundos mientras se recrea `app`, durante los que nginx puede responder 502.
+
+### 4.3 Secuencia recomendada (desde el directorio de despliegue)
+
+1. Editar el `.env` con las variables `MAIL_*`, sin copiar los valores a otra parte.
+2. Validar que el archivo se lee sin errores y **sin imprimir valores**: `docker compose config --quiet`. (`docker compose config` sin `--quiet` imprime el entorno resuelto, credenciales incluidas: **no usarlo**.)
+3. **Refrescar el entorno**: recrear solo `app`, con la imagen existente y sin reconstruir:
+   `docker compose up -d --no-deps --no-build --force-recreate app`
+   Hasta el paso 4, la app sigue usando la caché vieja: el comportamiento es el anterior, de forma consistente.
+4. **Regenerar la caché en el contenedor ya refrescado:**
    `docker compose exec -T -u www-data app php artisan config:cache`
-   Otra opción: volver a ejecutar el workflow de despliegue, que también ejecuta `config:cache`.
-3. Validar con el chequeo seguro (§5). No hace falta reiniciar el contenedor: PHP-FPM lee la caché en cada petición.
+5. **Validar:**
+   - `docker compose exec -T -u www-data app php < docs/deploy/mail_status_readonly.php` debe mostrar el transporte y los campos esperados como «configurado», sin valores;
+   - la fecha de inicio del contenedor `app` cambió (`docker inspect --format '{{.State.StartedAt}}' $(docker compose ps -q app)`);
+   - HTTP 200 en `/` y en `/admin/login`;
+   - sin errores nuevos en el log de la app.
+
+   La prueba de envío real es un paso aparte (§6).
+
+**Sobre volver a ejecutar el workflow de despliegue:** ejecuta `config:cache` dentro de `docker compose run --rm` (un contenedor nuevo, que sí lee el `.env` actual) y luego `docker compose up -d`. En la demostración, `up -d` recreó el contenedor al cambiar el `.env`. Aun así, el workflow además hace `git reset` a la rama, reconstruye la imagen, entra en modo mantenimiento y ejecuta migraciones. **No es la vía para un cambio solo de configuración**: úsese solo cuando también esté autorizado un despliegue, y compruébese igualmente que `app` fue recreado (fecha de inicio).
 
 ## 5. Validación segura (sin valores)
 
@@ -91,4 +127,4 @@ Informa:
    - Los avisos **simulados** no se pueden reintentar hoy.
    - Hay que decidir si se reintenta la solicitud **#1**.
    - Los usuarios registrados durante el modo sin envío no pudieron verificar su correo.
-6. **Vuelta atrás:** poner `MAIL_MAILER=log` en el `.env` y ejecutar `config:cache` (§4). La app vuelve a no enviar, y los avisos quedan como simulados.
+6. **Vuelta atrás al modo sin envío:** restaurar el `.env` de respaldo, o poner `MAIL_MAILER=log`, y aplicar la **misma secuencia completa de §4.3**: `docker compose config --quiet`, recrear `app` (`up -d --no-deps --no-build --force-recreate app`), `config:cache` en el contenedor refrescado y validar que `mail_status_readonly.php` muestre `transporte=log` y `envia_fuera_del_servidor=no (simulado)`. **Editar el `.env` y ejecutar `config:cache` con `exec` en el contenedor existente NO desactiva el envío**: regenera la configuración con el entorno viejo. Hasta que la validación muestre `log`, hay que asumir que el sistema todavía puede enviar.

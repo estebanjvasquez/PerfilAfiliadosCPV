@@ -3054,6 +3054,9 @@
     "checks": "focused PHPUnit OK (45 tests, 510 assertions); manual browser check 40/40; run 20261015T101317Z-433fbf05d4a8",
     "mail": "GLOBAL MAIL ACTIVATION PENDING owner provider/configuration/credentials; staging MAIL_MAILER=log; docs/deploy/CORREO_DEL_SISTEMA.md",
     "deployed": false,
+    "correction_comment": 6189828037,
+    "correction": "env_file refresh + cache sequence + rollback documented (recreate app, then config:cache in the refreshed container); verified against compose/workflow/Dockerfile and a disposable compose demo with non-secret markers; live environment untouched",
+    "previous_review_head": "73765eac26a9578223c2cf2ac73692843d5e1215",
     "report": "audit/mail_docs_user_manual_2026-10-15.md"
   },
   "task_0010c": {
