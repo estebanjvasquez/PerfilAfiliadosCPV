@@ -281,7 +281,8 @@ class TaxonomyMapPageTest extends TestCase
         $this->assertMatchesRegularExpression('/familia dos '.$this->u.'<\/span>\s*<span class="cpv-map__empty">— sin categorías todavía/u', $html);
         $this->assertMatchesRegularExpression('/'.preg_quote($this->n('Grupo vacio'), '/').'<\/span>.*?sin categorías todavía/su', $html);
         // Una Familia vacía no se presenta como algo que se pueda abrir ni elegir.
-        $this->assertDoesNotMatchRegularExpression('/<summary>\s*<span class="cpv-map__name" data-map-name>familia dos '.$this->u.'/u', $html);
+        $this->assertDoesNotMatchRegularExpression('/<summary>\s*<span class="cpv-map__n">familia dos '.$this->u.'/u', $html);
+        $this->assertStringContainsString('<div class="cpv-map__fam-empty"><span class="cpv-map__n">familia dos '.$this->u.'</span>', $html);
     }
 
     #[Test]

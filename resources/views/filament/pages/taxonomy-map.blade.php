@@ -46,12 +46,19 @@
         .dark .cpv-map__hint { color: rgb(var(--gray-400)); }
         .cpv-map__status { font-weight: 600; min-height: 1.5em; }
 
+        /*
+            Nombres de clase CORTOS en los nodos que se repiten miles de veces (medido: con los
+            nombres largos y la indentación de la plantilla, el HTML de un árbol de tamaño real
+            pesaba 1,48 MB). Equivalencias:
+              __group  Grupo (<details>)        __fam  Familia (<li>)       __cat  Categoría (<li>)
+              __n      nombre (el filtro lo lee y lo resalta)               __b    insignia Bien/Servicio
+        */
         .cpv-map__groups { margin-top: 1rem; display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
         .cpv-map__group { border: 1px solid rgb(var(--gray-200)); border-radius: 0.75rem; background: #fff; min-width: 0; }
         .dark .cpv-map__group { border-color: rgba(255, 255, 255, 0.1); background: rgb(var(--gray-900)); }
         .cpv-map__group[open] { grid-column: 1 / -1; }
         .cpv-map__group > summary { padding: 0.8rem 1rem; cursor: pointer; display: grid; gap: 0.15rem; }
-        .cpv-map__group > summary .cpv-map__name { font-weight: 700; font-size: 1rem; }
+        .cpv-map__group > summary .cpv-map__n { font-weight: 700; font-size: 1rem; }
         .cpv-map summary:focus-visible { outline: 2px solid rgb(var(--primary-600)); outline-offset: 2px; border-radius: 0.5rem; }
         .cpv-map__meta { font-size: 0.85rem; color: rgb(var(--gray-600)); }
         .dark .cpv-map__meta { color: rgb(var(--gray-400)); }
@@ -59,21 +66,21 @@
         .dark .cpv-map__empty { color: rgb(var(--gray-400)); }
 
         .cpv-map__families { list-style: none; margin: 0; padding: 0 1rem 1rem; display: grid; gap: 0.35rem; }
-        .cpv-map__family > details > summary, .cpv-map__family-empty { padding: 0.45rem 0.6rem; border-radius: 0.5rem; background: rgb(var(--gray-50)); }
-        .dark .cpv-map__family > details > summary, .dark .cpv-map__family-empty { background: rgb(var(--gray-800)); }
-        .cpv-map__family > details > summary { cursor: pointer; }
-        .cpv-map__family .cpv-map__name { font-weight: 600; }
-        .cpv-map__categories { list-style: none; margin: 0.35rem 0 0.5rem; padding: 0 0 0 1rem; display: grid; gap: 0.2rem; }
-        .cpv-map__category { display: flex; gap: 0.5rem; align-items: baseline; justify-content: space-between; padding: 0.15rem 0.25rem; border-bottom: 1px dashed rgb(var(--gray-200)); }
-        .dark .cpv-map__category { border-bottom-color: rgba(255, 255, 255, 0.08); }
-        .cpv-map__category .cpv-map__name { overflow-wrap: anywhere; }
-        .cpv-map__badge { flex: none; font-size: 0.75rem; font-weight: 600; padding: 0.05rem 0.45rem; border-radius: 999px; border: 1px solid currentColor; }
-        .cpv-map__badge--bien { color: rgb(var(--info-700)); }
-        .cpv-map__badge--servicio { color: rgb(var(--success-700)); }
-        .cpv-map__badge--otro { color: rgb(var(--gray-600)); }
-        .dark .cpv-map__badge--bien { color: rgb(var(--info-300)); }
-        .dark .cpv-map__badge--servicio { color: rgb(var(--success-300)); }
-        .dark .cpv-map__badge--otro { color: rgb(var(--gray-300)); }
+        .cpv-map__fam > details > summary, .cpv-map__fam-empty { padding: 0.45rem 0.6rem; border-radius: 0.5rem; background: rgb(var(--gray-50)); }
+        .dark .cpv-map__fam > details > summary, .dark .cpv-map__fam-empty { background: rgb(var(--gray-800)); }
+        .cpv-map__fam > details > summary { cursor: pointer; }
+        .cpv-map__fam .cpv-map__n { font-weight: 600; }
+        .cpv-map__cats { list-style: none; margin: 0.35rem 0 0.5rem; padding: 0 0 0 1rem; display: grid; gap: 0.2rem; }
+        .cpv-map__cat { display: flex; gap: 0.5rem; align-items: baseline; justify-content: space-between; padding: 0.15rem 0.25rem; border-bottom: 1px dashed rgb(var(--gray-200)); }
+        .dark .cpv-map__cat { border-bottom-color: rgba(255, 255, 255, 0.08); }
+        .cpv-map__cat .cpv-map__n { font-weight: 400; overflow-wrap: anywhere; }
+        .cpv-map__b { flex: none; font-size: 0.75rem; font-weight: 600; padding: 0.05rem 0.45rem; border-radius: 999px; border: 1px solid currentColor; }
+        .cpv-map__b--bien { color: rgb(var(--info-700)); }
+        .cpv-map__b--servicio { color: rgb(var(--success-700)); }
+        .cpv-map__b--otro { color: rgb(var(--gray-600)); }
+        .dark .cpv-map__b--bien { color: rgb(var(--info-300)); }
+        .dark .cpv-map__b--servicio { color: rgb(var(--success-300)); }
+        .dark .cpv-map__b--otro { color: rgb(var(--gray-300)); }
         .cpv-map mark { background: rgb(var(--warning-200)); color: rgb(var(--gray-950)); border-radius: 0.15rem; padding: 0 0.05rem; }
     </style>
 
@@ -139,47 +146,26 @@
             </noscript>
         </section>
 
+        {{-- Las Categorías (miles) van en una sola línea por Familia, sin indentación: Blade copia los espacios de la plantilla tal cual. --}}
         <div class="cpv-map__groups">
             @foreach ($groups as $group)
-                <details class="cpv-map__group" data-map-node="group">
+                <details class="cpv-map__group">
                     <summary>
-                        <span class="cpv-map__name" data-map-name>{{ $group['name'] }}</span>
-                        <span class="cpv-map__meta">
-                            {{ $plural($group['counts']['families'], 'Familia', 'Familias') }} ·
-                            {{ $plural($group['counts']['categories'], 'Categoría', 'Categorías') }}
-                        </span>
+                        <span class="cpv-map__n">{{ $group['name'] }}</span>
+                        <span class="cpv-map__meta">{{ $plural($group['counts']['families'], 'Familia', 'Familias') }} · {{ $plural($group['counts']['categories'], 'Categoría', 'Categorías') }}</span>
                         @if ($group['counts']['categories'] === 0)
                             <span class="cpv-map__empty">sin categorías todavía</span>
                         @else
                             <span class="cpv-map__meta">{{ $split($group['counts']) }}</span>
                         @endif
                     </summary>
-
                     <ul class="cpv-map__families">
                         @forelse ($group['families'] as $family)
-                            <li class="cpv-map__family" data-map-node="family">
-                                @if ($family['counts']['categories'] > 0)
-                                    <details>
-                                        <summary>
-                                            <span class="cpv-map__name" data-map-name>{{ $family['name'] }}</span>
-                                            <span class="cpv-map__meta">— {{ $plural($family['counts']['categories'], 'Categoría', 'Categorías') }}</span>
-                                        </summary>
-                                        <ul class="cpv-map__categories">
-                                            @foreach ($family['categories'] as $category)
-                                                <li class="cpv-map__category" data-map-node="category">
-                                                    <span class="cpv-map__name" data-map-name>{{ $category['name'] }}</span>
-                                                    <span class="cpv-map__badge cpv-map__badge--{{ $category['tipo'] }}">{{ $badge[$category['tipo']] }}</span>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    </details>
-                                @else
-                                    <div class="cpv-map__family-empty">
-                                        <span class="cpv-map__name" data-map-name>{{ $family['name'] }}</span>
-                                        <span class="cpv-map__empty">— sin categorías todavía</span>
-                                    </div>
-                                @endif
-                            </li>
+                            @if ($family['counts']['categories'] > 0)
+<li class="cpv-map__fam"><details><summary><span class="cpv-map__n">{{ $family['name'] }}</span> <span class="cpv-map__meta">— {{ $plural($family['counts']['categories'], 'Categoría', 'Categorías') }}</span></summary><ul class="cpv-map__cats">@foreach ($family['categories'] as $category)<li class="cpv-map__cat"><span class="cpv-map__n">{{ $category['name'] }}</span> <span class="cpv-map__b cpv-map__b--{{ $category['tipo'] }}">{{ $badge[$category['tipo']] }}</span></li>@endforeach</ul></details></li>
+                            @else
+<li class="cpv-map__fam"><div class="cpv-map__fam-empty"><span class="cpv-map__n">{{ $family['name'] }}</span> <span class="cpv-map__empty">— sin categorías todavía</span></div></li>
+                            @endif
                         @empty
                             <li class="cpv-map__empty">Este Grupo no tiene Familias publicadas: sin categorías todavía.</li>
                         @endforelse

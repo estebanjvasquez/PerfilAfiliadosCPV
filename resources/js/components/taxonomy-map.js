@@ -40,9 +40,9 @@ function foldWithMap(text) {
 
 function node(el, nameEl) {
     const text = nameEl ? nameEl.textContent : ''
-    const { folded, map } = foldWithMap(text)
 
-    return { el, nameEl, text, folded, map, highlighted: false }
+    // `map` (plegado -> índice original) se calcula solo si hace falta resaltar este nodo.
+    return { el, nameEl, text, folded: fold(text), map: null, highlighted: false }
 }
 
 function highlight(item, q) {
@@ -55,6 +55,9 @@ function highlight(item, q) {
             item.highlighted = false
         }
         return
+    }
+    if (!item.map) {
+        item.map = foldWithMap(item.text).map
     }
 
     const fragment = document.createDocumentFragment()
@@ -79,6 +82,20 @@ function highlight(item, q) {
     item.highlighted = true
 }
 
+// Escrituras al DOM solo cuando el valor cambia (medido: con ~2.400 Categorías, reescribir todo en
+// cada tecla costaba ~300 ms a 390 px con la CPU 4x más lenta).
+function setHidden(el, hidden) {
+    if (el.hidden !== hidden) {
+        el.hidden = hidden
+    }
+}
+
+function setOpen(details, open) {
+    if (details && details.open !== open) {
+        details.open = open
+    }
+}
+
 function plural(n, one, many) {
     return `${n.toLocaleString('es')} ${n === 1 ? one : many}`
 }
@@ -93,13 +110,12 @@ export default function cpvTaxonomyMap() {
         groups: [],
 
         init() {
-            const name = (el) => el.querySelector('[data-map-name]')
-            this.groups = [...this.$el.querySelectorAll('[data-map-node="group"]')].map((g) => {
-                const group = node(g, g.querySelector(':scope > summary [data-map-name]'))
-                group.families = [...g.querySelectorAll('[data-map-node="family"]')].map((f) => {
-                    const family = node(f, name(f))
+            this.groups = [...this.$el.querySelectorAll('.cpv-map__group')].map((g) => {
+                const group = node(g, g.querySelector(':scope > summary > .cpv-map__n'))
+                group.families = [...g.querySelectorAll('.cpv-map__fam')].map((f) => {
+                    const family = node(f, f.querySelector('.cpv-map__n'))
                     family.details = f.querySelector('details')
-                    family.categories = [...f.querySelectorAll('[data-map-node="category"]')].map((c) => node(c, name(c)))
+                    family.categories = [...f.querySelectorAll('.cpv-map__cat')].map((c) => node(c, c.querySelector('.cpv-map__n')))
 
                     return family
                 })
@@ -111,17 +127,15 @@ export default function cpvTaxonomyMap() {
 
         reset() {
             for (const g of this.groups) {
-                g.el.hidden = false
-                g.el.open = false
+                setHidden(g.el, false)
+                setOpen(g.el, false)
                 highlight(g, null)
                 for (const f of g.families) {
-                    f.el.hidden = false
-                    if (f.details) {
-                        f.details.open = false
-                    }
+                    setHidden(f.el, false)
+                    setOpen(f.details, false)
                     highlight(f, null)
                     for (const c of f.categories) {
-                        c.el.hidden = false
+                        setHidden(c.el, false)
                         highlight(c, null)
                     }
                 }
@@ -146,41 +160,46 @@ export default function cpvTaxonomyMap() {
             let categoryHits = 0
 
             for (const g of this.groups) {
+                // 1) Coincidencias (solo JavaScript, sin tocar el DOM).
                 const groupMatch = g.folded.includes(q)
                 let anyFamilyVisible = false
-
-                for (const f of g.families) {
+                const families = g.families.map((f) => {
                     const familyMatch = f.folded.includes(q)
-                    let anyCategoryMatch = false
+                    const categoryMatches = f.categories.map((c) => c.folded.includes(q))
+                    const anyCategoryMatch = categoryMatches.includes(true)
+                    const visible = familyMatch || groupMatch || anyCategoryMatch
+                    familyHits += familyMatch ? 1 : 0
+                    categoryHits += categoryMatches.filter(Boolean).length
+                    anyFamilyVisible = anyFamilyVisible || visible
 
-                    for (const c of f.categories) {
-                        const categoryMatch = c.folded.includes(q)
-                        c.el.hidden = !(categoryMatch || familyMatch || groupMatch)
-                        highlight(c, categoryMatch ? q : null)
-                        if (categoryMatch) {
-                            categoryHits++
-                            anyCategoryMatch = true
-                        }
-                    }
+                    return { f, familyMatch, categoryMatches, anyCategoryMatch, visible }
+                })
+                const groupVisible = groupMatch || anyFamilyVisible
+                groupHits += groupMatch ? 1 : 0
 
-                    const familyVisible = familyMatch || groupMatch || anyCategoryMatch
-                    f.el.hidden = !familyVisible
-                    if (f.details) {
-                        f.details.open = familyMatch || anyCategoryMatch
-                    }
-                    highlight(f, familyMatch ? q : null)
-                    if (familyMatch) {
-                        familyHits++
-                    }
-                    anyFamilyVisible = anyFamilyVisible || familyVisible
+                // 2) DOM. Lo que queda dentro de un nodo oculto no se toca: no se ve, y se recalcula
+                // completo la próxima vez que su padre vuelva a verse.
+                setHidden(g.el, !groupVisible)
+                setOpen(g.el, groupVisible)
+                highlight(g, groupMatch ? q : null)
+                if (!groupVisible) {
+                    continue
                 }
 
-                const groupVisible = groupMatch || anyFamilyVisible
-                g.el.hidden = !groupVisible
-                g.el.open = groupVisible
-                highlight(g, groupMatch ? q : null)
-                if (groupMatch) {
-                    groupHits++
+                for (const { f, familyMatch, categoryMatches, anyCategoryMatch, visible } of families) {
+                    setHidden(f.el, !visible)
+                    highlight(f, familyMatch ? q : null)
+                    if (!visible) {
+                        continue
+                    }
+                    setOpen(f.details, familyMatch || anyCategoryMatch)
+                    // Solo se ocultan Categorías en una Familia abierta por coincidir alguna de
+                    // ellas; si coincide la Familia o el Grupo, se ven todas.
+                    const onlyMatches = anyCategoryMatch && !familyMatch && !groupMatch
+                    f.categories.forEach((c, i) => {
+                        setHidden(c.el, onlyMatches && !categoryMatches[i])
+                        highlight(c, categoryMatches[i] ? q : null)
+                    })
                 }
             }
 
