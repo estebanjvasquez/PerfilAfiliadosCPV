@@ -366,7 +366,10 @@ try {
       record('the "Categorías CPV" tab links to the map in a new tab', !!href && href.endsWith(MAP) && target === '_blank', `href=${href} target=${target}`);
       await page.screenshot({ path: `${OUT}/map-06-company-tab-link.png` });
     } else {
-      record('the "Categorías CPV" tab links to the map in a new tab', false, 'no company edit link found for the synthetic admin');
+      const hrefs = await page.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')).filter((h) => h.includes('empresa')).slice(0, 12));
+      const rows = await page.evaluate(() => document.querySelectorAll('.fi-ta-row').length);
+      await page.screenshot({ path: `${OUT}/map-06-company-list-debug.png` });
+      record('the "Categorías CPV" tab links to the map in a new tab', false, `no company edit link found for the synthetic admin; rows=${rows} hrefs=${JSON.stringify(hrefs)}`);
     }
     await ctx.close();
   }
