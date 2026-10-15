@@ -175,6 +175,9 @@ $empresa = App\Models\Empresa::whereRaw('upper(name) like ?', ['ZZZ UX EMPRESA F
     ?? App\Models\Empresa::where('rif', 'like', 'J%000000009')->first();
 echo 'ux admin found: ', (int) (bool) $admin, ' synthetic company found: ', (int) (bool) $empresa, "\n";
 if ($admin && $empresa && ! $empresa->users()->where('users.id', $admin->id)->exists()) {
+    // Empresa's model hooks read Auth::user()->id (the same pre-existing trait run_tests.sh
+    // documents for the synthetic company), so the link is made as the synthetic admin.
+    Illuminate\Support\Facades\Auth::login($admin);
     $empresa->users()->attach($admin->id);
 }
 echo 'ux admin linked to the synthetic company: ', (int) ($admin && $empresa && $empresa->users()->where('users.id', $admin->id)->exists()), "\n";
