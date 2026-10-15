@@ -1,0 +1,50 @@
+# PREFLIGHT DE SOLO LECTURA - instruccion 6174401867
+ejecutado_utc=2026-10-15T08:25:46Z
+sql_sha256=e4269e6f059b09a46478c5a8d266dfb62b7a99248dff34f94c38a4348689c6e4
+bloques=4
+conexion=pgsql
+conexion_por_defecto=pgsql
+tabla_de_registro=migrations
+app_env=staging
+transaccion_read_only=on (verificado con SHOW antes del primer bloque)
+base_coincide_con_config_pgsql=true
+
+== F1 | Identidad y solo lectura
+filas=1
+  base=postgres | esquema=public | transaccion_solo_lectura=on | veredicto=OK
+
+== F2 | Solicitudes por estado de revision y de aviso (solo conteos y codigos)
+filas=1
+  request_status=pending_review | delivery_status=failed | codigo_error=recipient_not_configured | solicitudes=1 | id_minimo=1 | id_maximo=1 | con_destinatario_guardado=0 | con_fecha_de_envio=0 | veredicto=INFO
+
+== F3 | Destinatario configurado en el singleton (si/no, nunca el valor)
+filas=1
+  filas_singleton=1 | con_destinatario=0 | veredicto=INFO
+
+== F4 | Conteos protegidos de nuevo (comparar con la linea base del despliegue)
+filas=15
+  tabla=empresa_taxonomy_category | filas=767 | veredicto=BASELINE
+  tabla=empresas | filas=406 | veredicto=BASELINE
+  tabla=migrations | filas=129 | veredicto=BASELINE
+  tabla=migrations.max_batch | filas=59 | veredicto=BASELINE
+  tabla=taxonomy_audit_log | filas=163 | veredicto=BASELINE
+  tabla=taxonomy_candidate_concept_links | filas=10 | veredicto=BASELINE
+  tabla=taxonomy_canonical_concepts | filas=82 | veredicto=BASELINE
+  tabla=taxonomy_categories | filas=3497 | veredicto=BASELINE
+  tabla=taxonomy_category_requests | filas=1 | veredicto=BASELINE
+  tabla=taxonomy_reviewed_proposals | filas=15 | veredicto=BASELINE
+  tabla=taxonomy_selection_settings | filas=1 | veredicto=BASELINE
+  tabla=taxonomy_term_concepts | filas=145 | veredicto=BASELINE
+  tabla=taxonomy_term_cpv_relations | filas=9749 | veredicto=BASELINE
+  tabla=taxonomy_terms | filas=1893 | veredicto=BASELINE
+  tabla=users | filas=366 | veredicto=BASELINE
+
+transaccion_cerrada=ROLLBACK
+
+== RESUMEN
+veredicto_BASELINE=15
+veredicto_INFO=2
+veredicto_OK=1
+paradas=0
+resultado=COMPATIBLE
+codigo_salida=0

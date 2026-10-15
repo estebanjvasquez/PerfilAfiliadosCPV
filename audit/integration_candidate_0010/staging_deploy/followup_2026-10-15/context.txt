@@ -1,0 +1,5 @@
+staging_head=9b447eb15e80bddc4958430a8fc60acf5150ff4d
+MAIL_MAILER=log (solo esta clave leida de .env; ningun valor SMTP existe ni se leyo)
+runner_exit=0
+sql_sha256=e4269e6f059b09a46478c5a8d266dfb62b7a99248dff34f94c38a4348689c6e4
+laravel_log_TASK-0010A=1 WARNING 2026-10-15 08:16:02 "registrada sin correo - destinatario no configurado" (solo prefijo leido)
