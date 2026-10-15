@@ -18,6 +18,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 
@@ -91,7 +92,18 @@ class TaxonomyCategoryRequestResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')->label('N.º')->prefix('#')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('submitted_at')->label('Enviada')->dateTime('d/m/Y H:i')->sortable(),
-                Tables\Columns\TextColumn::make('empresa.name')->label('Empresa')->searchable()->limit(40)->wrap(),
+                // Nombre del SNAPSHOT (la empresa tal como estaba al enviar), no de la relación
+                // `empresa`: esa relación usa EmpresaPgsql, cuya clase no compila hoy
+                // (EmpresaPgsql::taxonomyCategories() es incompatible con Empresa::taxonomyCategories():
+                // HasMany) y cargarla es un error fatal. Defecto previo, reportado aparte.
+                Tables\Columns\TextColumn::make('context_snapshot.empresa.name')
+                    ->label('Empresa')
+                    ->searchable(query: fn (Builder $query, string $search) => $query->whereRaw(
+                        "context_snapshot->'empresa'->>'name' ILIKE ?",
+                        ['%'.str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search).'%']
+                    ))
+                    ->limit(40)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('necesidad')->label('Necesidad')->searchable()->limit(60)->wrap(),
                 Tables\Columns\TextColumn::make('justificacion')
                     ->label('Motivo')
