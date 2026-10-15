@@ -360,8 +360,14 @@ try {
         await tab.click();
         await page.waitForTimeout(2500);
       }
-      // The relation manager loads on demand (Livewire), below the wizard: wait for it.
+      // The relation manager is lazy (Livewire loads it when it scrolls into view), below the
+      // wizard: scroll down, then wait for it.
       const link = page.getByRole('link', { name: 'Ver mapa de la taxonomía' }).first();
+      for (let i = 0; i < 6; i++) {
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        await page.waitForTimeout(800);
+        if (await link.count()) break;
+      }
       await link.waitFor({ state: 'attached', timeout: 20000 }).catch(() => {});
       await link.scrollIntoViewIfNeeded().catch(() => {});
       await page.waitForTimeout(500);
