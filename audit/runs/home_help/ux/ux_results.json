@@ -1,0 +1,223 @@
+{
+  "results": [
+    {
+      "name": "guest is sent to login from the dashboard",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/login"
+    },
+    {
+      "name": "[affiliate/light/desktop] help card visible with both links",
+      "pass": true,
+      "detail": "Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu"
+    },
+    {
+      "name": "[affiliate/light/desktop] no Filament promotional card",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] account card (Salir) still shown",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/light/desktop] card text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=4.83"
+    },
+    {
+      "name": "[affiliate/light/desktop] \"Manual de usuario\" opens the manual",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/manual-de-usuario"
+    },
+    {
+      "name": "[affiliate/light/desktop] \"Mapa de la taxonomía\" opens the map",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/mapa-de-la-taxonomia"
+    },
+    {
+      "name": "[affiliate/light/desktop] keyboard: a card link is reachable with Tab and opens with Enter",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/manual-de-usuario"
+    },
+    {
+      "name": "[affiliate/dark/desktop] help card visible with both links",
+      "pass": true,
+      "detail": "Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu"
+    },
+    {
+      "name": "[affiliate/dark/desktop] no Filament promotional card",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/desktop] account card (Salir) still shown",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/desktop] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/dark/desktop] card text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=6.91"
+    },
+    {
+      "name": "[affiliate/light/mobile] help card visible with both links",
+      "pass": true,
+      "detail": "Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu"
+    },
+    {
+      "name": "[affiliate/light/mobile] no Filament promotional card",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/mobile] account card (Salir) still shown",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/mobile] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/light/mobile] card text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=4.83"
+    },
+    {
+      "name": "[affiliate/dark/mobile] help card visible with both links",
+      "pass": true,
+      "detail": "Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu"
+    },
+    {
+      "name": "[affiliate/dark/mobile] no Filament promotional card",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/mobile] account card (Salir) still shown",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/mobile] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/dark/mobile] card text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=6.91"
+    },
+    {
+      "name": "[admin/light/desktop] help card visible with both links",
+      "pass": true,
+      "detail": "Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu"
+    },
+    {
+      "name": "[admin/light/desktop] no Filament promotional card",
+      "pass": true
+    },
+    {
+      "name": "[admin/light/desktop] account card (Salir) still shown",
+      "pass": true
+    },
+    {
+      "name": "[admin/light/desktop] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/light/desktop] card text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=4.83"
+    },
+    {
+      "name": "[admin/light/desktop] \"Manual de usuario\" opens the manual",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/manual-de-usuario"
+    },
+    {
+      "name": "[admin/light/desktop] \"Mapa de la taxonomía\" opens the map",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/mapa-de-la-taxonomia"
+    },
+    {
+      "name": "[admin/light/desktop] keyboard: a card link is reachable with Tab and opens with Enter",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/manual-de-usuario"
+    },
+    {
+      "name": "[admin/dark/desktop] help card visible with both links",
+      "pass": true,
+      "detail": "Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu"
+    },
+    {
+      "name": "[admin/dark/desktop] no Filament promotional card",
+      "pass": true
+    },
+    {
+      "name": "[admin/dark/desktop] account card (Salir) still shown",
+      "pass": true
+    },
+    {
+      "name": "[admin/dark/desktop] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/dark/desktop] card text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=6.91"
+    },
+    {
+      "name": "[admin/light/mobile] help card visible with both links",
+      "pass": true,
+      "detail": "Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu"
+    },
+    {
+      "name": "[admin/light/mobile] no Filament promotional card",
+      "pass": true
+    },
+    {
+      "name": "[admin/light/mobile] account card (Salir) still shown",
+      "pass": true
+    },
+    {
+      "name": "[admin/light/mobile] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/light/mobile] card text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=4.83"
+    },
+    {
+      "name": "[admin/dark/mobile] help card visible with both links",
+      "pass": true,
+      "detail": "Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu"
+    },
+    {
+      "name": "[admin/dark/mobile] no Filament promotional card",
+      "pass": true
+    },
+    {
+      "name": "[admin/dark/mobile] account card (Salir) still shown",
+      "pass": true
+    },
+    {
+      "name": "[admin/dark/mobile] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/dark/mobile] card text contrast >= 4.5:1",
+      "pass": true,
+      "detail": "ratio=6.91"
+    }
+  ]
+}

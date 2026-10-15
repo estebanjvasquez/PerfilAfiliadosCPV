@@ -1,0 +1,49 @@
+PASS  guest is sent to login from the dashboard  :: http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/login
+PASS  [affiliate/light/desktop] help card visible with both links  :: Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu
+PASS  [affiliate/light/desktop] no Filament promotional card
+PASS  [affiliate/light/desktop] account card (Salir) still shown
+PASS  [affiliate/light/desktop] no page-level horizontal overflow  :: excess=0px
+PASS  [affiliate/light/desktop] card text contrast >= 4.5:1  :: ratio=4.83
+PASS  [affiliate/light/desktop] "Manual de usuario" opens the manual  :: http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/manual-de-usuario
+PASS  [affiliate/light/desktop] "Mapa de la taxonomía" opens the map  :: http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/mapa-de-la-taxonomia
+PASS  [affiliate/light/desktop] keyboard: a card link is reachable with Tab and opens with Enter  :: http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/manual-de-usuario
+PASS  [affiliate/dark/desktop] help card visible with both links  :: Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu
+PASS  [affiliate/dark/desktop] no Filament promotional card
+PASS  [affiliate/dark/desktop] account card (Salir) still shown
+PASS  [affiliate/dark/desktop] no page-level horizontal overflow  :: excess=0px
+PASS  [affiliate/dark/desktop] card text contrast >= 4.5:1  :: ratio=6.91
+PASS  [affiliate/light/mobile] help card visible with both links  :: Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu
+PASS  [affiliate/light/mobile] no Filament promotional card
+PASS  [affiliate/light/mobile] account card (Salir) still shown
+PASS  [affiliate/light/mobile] no page-level horizontal overflow  :: excess=0px
+PASS  [affiliate/light/mobile] card text contrast >= 4.5:1  :: ratio=4.83
+PASS  [affiliate/dark/mobile] help card visible with both links  :: Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu
+PASS  [affiliate/dark/mobile] no Filament promotional card
+PASS  [affiliate/dark/mobile] account card (Salir) still shown
+PASS  [affiliate/dark/mobile] no page-level horizontal overflow  :: excess=0px
+PASS  [affiliate/dark/mobile] card text contrast >= 4.5:1  :: ratio=6.91
+PASS  [admin/light/desktop] help card visible with both links  :: Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu
+PASS  [admin/light/desktop] no Filament promotional card
+PASS  [admin/light/desktop] account card (Salir) still shown
+PASS  [admin/light/desktop] no page-level horizontal overflow  :: excess=0px
+PASS  [admin/light/desktop] card text contrast >= 4.5:1  :: ratio=4.83
+PASS  [admin/light/desktop] "Manual de usuario" opens the manual  :: http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/manual-de-usuario
+PASS  [admin/light/desktop] "Mapa de la taxonomía" opens the map  :: http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/mapa-de-la-taxonomia
+PASS  [admin/light/desktop] keyboard: a card link is reachable with Tab and opens with Enter  :: http://cpvtest-uxserve-20261015t153038z-dc584e36cbea:8000/admin/manual-de-usuario
+PASS  [admin/dark/desktop] help card visible with both links  :: Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu
+PASS  [admin/dark/desktop] no Filament promotional card
+PASS  [admin/dark/desktop] account card (Salir) still shown
+PASS  [admin/dark/desktop] no page-level horizontal overflow  :: excess=0px
+PASS  [admin/dark/desktop] card text contrast >= 4.5:1  :: ratio=6.91
+PASS  [admin/light/mobile] help card visible with both links  :: Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu
+PASS  [admin/light/mobile] no Filament promotional card
+PASS  [admin/light/mobile] account card (Salir) still shown
+PASS  [admin/light/mobile] no page-level horizontal overflow  :: excess=0px
+PASS  [admin/light/mobile] card text contrast >= 4.5:1  :: ratio=4.83
+PASS  [admin/dark/mobile] help card visible with both links  :: Ayuda para completar su perfil Antes de actualizar el perfil de su empresa, consulte la gu
+PASS  [admin/dark/mobile] no Filament promotional card
+PASS  [admin/dark/mobile] account card (Salir) still shown
+PASS  [admin/dark/mobile] no page-level horizontal overflow  :: excess=0px
+PASS  [admin/dark/mobile] card text contrast >= 4.5:1  :: ratio=6.91
+
+47/47 checks passed

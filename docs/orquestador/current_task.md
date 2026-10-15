@@ -9,6 +9,9 @@
 > - **Más tarde ese día:**
 >   - el manual reorganizado está desplegado (`37e3b71`);
 >   - **CPV-TAXONOMY-MAP** («Mapa de la taxonomía», autorizada en `6191513374`) está **READY_FOR_REVIEW — MANUAL** en `feature/taxonomy-map`, **sin desplegar**.
+> - **15:40Z:**
+>   - el mapa está desplegado (`9e7e379`);
+>   - **CPV-HOME-USEFUL-HELP** (tarjeta «Ayuda para completar su perfil» en el Escritorio) está **READY_FOR_REVIEW — MANUAL** en `feature/home-useful-help`, sin desplegar.
 > - Siguiente acción y pendientes: `SESSION_RESUME.md` §4 y §5.
 >
 > Todo lo que sigue es la historia de TASK-0010 y se conserva sin cambios.

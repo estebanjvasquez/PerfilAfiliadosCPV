@@ -1,6 +1,6 @@
 {
-  "current_task": "CPV-TAXONOMY-MAP accepted (6194751263) and DEPLOYED to staging at 9e7e379 via the normal workflow (run 38753813135), authorized by the owner in chat. Awaiting owner UAT.",
-  "current_status": "TAXONOMY_MAP_DEPLOYED_FOR_OWNER_REVIEW__RUNTIME_9E7E379__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
+  "current_task": "CPV-HOME-USEFUL-HELP (6195707471): FilamentInfoWidget replaced by «Ayuda para completar su perfil» (manual + taxonomy map) on feature/home-useful-help, TESTED_HEAD dc584e3; READY_FOR_REVIEW, NOT deployed. Runtime 9e7e379 (taxonomy map deployed).",
+  "current_status": "HOME_USEFUL_HELP_READY_FOR_REVIEW_MANUAL__RUNTIME_9E7E379__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
   "superseded_current_fields_2026_10_15": {
     "note": "Values these fields held before the 2026-10-15 checkpoint (instructions 6188413270 / 6188477132). Kept as history.",
     "current_task": "ORCHESTRATION INFRASTRUCTURE (authorized 6085642297): persistent executor on the Contabo VPS plus isolated PHPUnit. TASK-0010A and TASK-0010B are AUTHORIZED BUT HELD and NOT STARTED by owner decision.",
@@ -3376,5 +3376,15 @@
       "asset_http": "200 application/javascript"
     },
     "evidence": "audit/runs/taxonomy_map_deploy_2026-10-15/"
+  },
+  "home_useful_help": {
+    "instruction": "6195707471",
+    "branch": "feature/home-useful-help",
+    "base_sha": "2e38c603d1df91bf167a77a13d833b2ef990b894",
+    "tested_head": "dc584e36cbea75852f0094e9053d9291b41e288e",
+    "checks": "focused OK (32 tests, 297 assertions); browser 47/47; run 20261015T153038Z-dc584e36cbea",
+    "ui": "promotional card removed; useful replacement present",
+    "deployed": false,
+    "report": "audit/home_useful_help_2026-10-15.md"
   }
 }
