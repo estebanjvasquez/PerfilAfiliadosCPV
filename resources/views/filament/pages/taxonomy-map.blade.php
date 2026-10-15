@@ -55,6 +55,8 @@
         */
         .cpv-map__groups { margin-top: 1rem; display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
         .cpv-map__group { border: 1px solid rgb(var(--gray-200)); border-radius: 0.75rem; background: #fff; min-width: 0; }
+        /* El navegador no calcula la disposición de los Grupos fuera de pantalla (medido en móvil lento). */
+        .cpv-map__group { content-visibility: auto; contain-intrinsic-size: auto 7rem; }
         .dark .cpv-map__group { border-color: rgba(255, 255, 255, 0.1); background: rgb(var(--gray-900)); }
         .cpv-map__group[open] { grid-column: 1 / -1; }
         .cpv-map__group > summary { padding: 0.8rem 1rem; cursor: pointer; display: grid; gap: 0.15rem; }
