@@ -227,14 +227,28 @@ class FirstSaveModulesTest extends TestCase
         $entries = $empresa->experiences()->firstOrFail()->exp_year;
         $this->assertCount(2, $entries);
 
-        $firstKey = (string) array_key_first($entries);
-        $rm->actWith('editar', $firstKey, data: ['exp_year' => '2021', 'Descripcion' => 'ZZZ proyecto uno editado'])->assertHasNoTableActionErrors();
+        // Como la interfaz: la acción recibe la fila de la tabla, y Filament usa su clave. Cada fila
+        // virtual tiene que tener una clave propia, el UUID de su entrada.
+        $rows = $rm->instance()->getTableRecords();
+        $this->assertEqualsCanonicalizing(
+            array_map('strval', array_keys($entries)),
+            $rows->map(fn ($r) => (string) $r->getKey())->all(),
+            'Cada fila virtual usa el UUID de su entrada como clave (sin colisiones por cast a entero).'
+        );
+        $target = $rows->first(fn ($r) => ($r->row_data['Descripcion'] ?? null) === 'ZZZ proyecto uno');
+        $firstKey = (string) $target->getKey();
+        $otherKey = (string) collect(array_keys($entries))->first(fn ($k) => (string) $k !== $firstKey);
+
+        $rm->actWith('editar', $target, data: ['exp_year' => '2021', 'Descripcion' => 'ZZZ proyecto uno editado'])->assertHasNoTableActionErrors();
         $entries = $empresa->experiences()->firstOrFail()->exp_year;
         $this->assertSame('2021', (string) $entries[$firstKey]['data']['exp_year']);
         $this->assertSame('ZZZ proyecto uno editado', $entries[$firstKey]['data']['Descripcion']);
+        $this->assertSame('ZZZ proyecto dos', $entries[$otherKey]['data']['Descripcion'], 'Editar una experiencia no toca la otra.');
 
-        $rm->actWith('eliminar', $firstKey);
-        $this->assertCount(1, $empresa->experiences()->firstOrFail()->exp_year);
+        $target = $rm->instance()->getTableRecords()->first(fn ($r) => (string) $r->getKey() === $firstKey);
+        $rm->actWith('eliminar', $target);
+        $entries = $empresa->experiences()->firstOrFail()->exp_year;
+        $this->assertSame([$otherKey], array_map('strval', array_keys($entries)), 'Se elimina exactamente la experiencia elegida.');
         $this->assertCount(1, $this->rows('experiences', $empresa));
     }
 

@@ -186,6 +186,11 @@ class ExperiencesRelationManager extends RelationManager
 
         $row = new Experience();
         $row->exists = false;
+        // CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY: la clave de la fila virtual es el UUID de la entrada. Con
+        // el tipo de clave por defecto (int), getKey() convertía «9f3c…» en 9 y «e1…» en 0, así que dos
+        // entradas podían compartir clave, y editar o eliminar caía sobre la entrada equivocada.
+        $row->setKeyType('string');
+        $row->setIncrementing(false);
         $row->id = $key;
         $row->empresa_id = $this->ownerRecord->id;
         $row->created_at = $parent?->created_at;
