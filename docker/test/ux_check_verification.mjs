@@ -30,7 +30,13 @@ const record = (name, pass, detail) => {
   results.push({ name, pass: !!pass, detail });
   console.log(`${pass ? 'PASS' : 'FAIL'}  ${name}${detail !== undefined ? '  :: ' + detail : ''}`);
 };
-const step = async (name, fn) => { try { await fn(); } catch (e) { record(`${name} (crashed)`, false, String(e && e.message || e).split(/\r?\n/)[0]); } };
+let current = null; // the page of the running step, for a screenshot if it crashes
+const step = async (name, fn) => {
+  try { await fn(); } catch (e) {
+    record(`${name} (crashed)`, false, String(e && e.message || e).split(/\r?\n/)[0]);
+    if (current) await current.screenshot({ path: `${OUT}/crash-${name.replace(/[^a-z0-9]+/gi, '-')}.png` }).catch(() => {});
+  }
+};
 const path = (page) => new URL(page.url()).pathname;
 const PROMPT = '/admin/email-verification/prompt';
 
@@ -69,6 +75,7 @@ try {
   {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'light' });
     let page = await login(ctx, UNVERIFIED);
+    current = page;
     const tag = '[unverified/light/desktop]';
 
     await step(`${tag} prompt`, async () => {
@@ -108,8 +115,9 @@ try {
 
     await step(`${tag} verification link`, async () => {
       page = await login(ctx, UNVERIFIED);
-      await page.goto(LINK, { waitUntil: 'networkidle' });
-      record(`${tag} the signed link leaves the verification page and opens the panel`, path(page).startsWith('/admin') && path(page) !== PROMPT && path(page) !== '/admin/login', path(page));
+      const vr = await page.goto(LINK, { waitUntil: 'networkidle' });
+      const landed = path(page);
+      record(`${tag} the signed link verifies and opens the panel`, !landed.includes('/email-verification/') && landed.startsWith('/admin') && landed !== '/admin/login', `${vr.status()} ${landed.includes('/email-verification/verify/') ? '(still on the verify URL)' : landed}`);
       const resp = await page.goto(BASE + '/admin/empresas', { waitUntil: 'networkidle' });
       const text = (await page.locator('main').first().innerText().catch(() => '')).replace(/\s+/g, ' ');
       record(`${tag} after verifying: Empresas opens (200)`, resp.status() === 200 && path(page) === '/admin/empresas', `${resp.status()} ${path(page)}`);
@@ -125,6 +133,7 @@ try {
     const ctx = await browser.newContext({ viewport, colorScheme: scheme });
     await ctx.addInitScript((s) => { try { localStorage.setItem('theme', s); } catch (e) {} }, scheme);
     const page = await login(ctx, AFFILIATE);
+    current = page;
     await step(`${tag} No Aplica`, async () => {
       await page.goto(BASE + '/admin/empresas', { waitUntil: 'networkidle' });
       const edit = page.locator('a[href*="/admin/empresas/"][href$="/edit"]').first();

@@ -966,7 +966,10 @@ if (class_exists(App\Models\TaxonomyCategoryRequestDeliveryAttempt::class)) {
   # Serve the app inside the workspace container, detached, no host port.
   UX_SERVER="${PROJECT}-uxserve-${RUN_ID}"
   docker rm -f "$UX_SERVER" >/dev/null 2>&1 || true
-  compose run -d --name "$UX_SERVER" -e SESSION_DRIVER=file -T testapp \
+  # CACHE_DRIVER=file too: `php artisan serve` handles each request in a new process, so the
+  # compose default (`array`) forgets rate-limiter hits between clicks and a throttle could
+  # never be seen in the browser.
+  compose run -d --name "$UX_SERVER" -e SESSION_DRIVER=file -e CACHE_DRIVER=file -T testapp \
     php artisan serve --host=0.0.0.0 --port=8000 >/dev/null 2>&1 || true
   # Wait for it, from inside the network rather than guessing with a sleep.
   UX_UP=no

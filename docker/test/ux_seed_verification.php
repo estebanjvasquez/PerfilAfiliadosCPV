@@ -54,7 +54,9 @@ $management = $empresa->management()->first() ?? $empresa->management()->create(
 $management->update(['iso9001' => true]);
 Illuminate\Support\Facades\Auth::logout();
 
-Illuminate\Support\Facades\URL::forceRootUrl($base);
+// Lower case: the host name carries the run id (with T and Z), and browsers send the Host header in lower
+// case. A signed URL is checked against the request URL, so it must use the same spelling.
+Illuminate\Support\Facades\URL::forceRootUrl(strtolower($base));
 echo 'VERIFY_LINK=', Filament\Facades\Filament::getPanel('admin')->getVerifyEmailUrl($unverified), "\n";
 echo 'unverified user id=', $unverified->id, ' roles=', $unverified->getRoleNames()->count(), ' companies=', $unverified->empresas()->count(), "\n";
 echo 'empresa id=', $empresa->id, ' gestion iso9001=', (int) $management->fresh()->iso9001,
