@@ -46,6 +46,8 @@ async function openManagementTab(page) {
   const href = await edit.getAttribute('href').catch(() => null);
   if (!href) return false;
   await page.goto(new URL(href, BASE).href, { waitUntil: 'networkidle' });
+  // Below lg the sidebar is an overlay that would intercept clicks.
+  if (page.viewportSize().width < 1024) await page.evaluate(() => window.Alpine?.store('sidebar')?.close?.());
   await page.waitForTimeout(800);
   const tab = page.getByRole('tab', { name: /Sistemas de gestión/ }).first();
   for (let i = 0; i < 6 && !(await tab.isVisible().catch(() => false)); i++) {
@@ -85,6 +87,7 @@ try {
       for (const scheme of ['light', 'dark']) {
         const tag = `[${who}/${scheme}/${label}]`;
         const ctx = await browser.newContext({ viewport, colorScheme: scheme });
+        try {
         const page = await login(ctx, email);
         await page.evaluate((dark) => document.documentElement.classList.toggle('dark', dark), scheme === 'dark');
         const ready = await openManagementTab(page);
@@ -133,7 +136,10 @@ try {
           modal = await openModal(page, 'Seguridad');
           record(`${tag} the affiliate's OVID save is visible to the admin`, await modal.getByLabel('OVID', { exact: true }).isChecked().catch(() => false));
         }
-        await ctx.close();
+        } catch (e) {
+          record(`${tag} crashed`, false, String(e && e.message || e).split(/\r?\n/)[0]);
+        }
+        await ctx.close().catch(() => {});
       }
     }
   }
