@@ -12,6 +12,7 @@ use Filament\Facades\Filament;
 use Filament\Pages\Dashboard as FilamentDashboard;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -131,15 +132,28 @@ class HomeBrandingLayoutTest extends TestCase
 
             $account = strpos($html, 'fi-account-widget');
             $help = strpos($html, 'cpv-profile-help-widget');
-            $notices = strpos($html, 'cpv-home-notice');
+            // Los avisos son un widget diferido: en el HTML inicial está su componente, no su contenido.
+            $notices = strpos($html, 'empresa-resource.widgets.stats-overview');
             $this->assertNotFalse($account, "{$who}: falta la tarjeta de la cuenta.");
             $this->assertNotFalse($help, "{$who}: falta la tarjeta de ayuda.");
             $this->assertNotFalse($notices, "{$who}: faltan los avisos.");
             $this->assertTrue($account < $help && $help < $notices, "{$who}: el orden debe ser cuenta, ayuda, avisos.");
-            $this->assertSame(2, substr_count($html, 'cpv-home-notice'), "{$who}: deben estar los dos avisos.");
             $this->assertStringContainsString(Filament::getPanel('admin')->getLogoutUrl(), $html);
-            $this->assertStringContainsString('md:grid-cols-2', $html, "{$who}: los avisos van en 2 columnas.");
         }
+    }
+
+    #[Test]
+    public function the_two_notices_render_side_by_side_with_their_text_unchanged(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $html = Livewire::actingAs($user)->test(StatsOverview::class)->html();
+
+        $this->assertSame(2, substr_count($html, 'cpv-home-notice'), 'Deben estar los dos avisos.');
+        $this->assertStringContainsString('md:grid-cols-2', $html, 'Los avisos van en 2 columnas.');
+        $this->assertStringContainsString('La Cámara Petrolera de Venezuela no se hace responsable de la veracidad', $html);
+        $this->assertStringContainsString('La empresa afiliada es responsable de la veracidad de la información suministrada', $html);
     }
 
     #[Test]
