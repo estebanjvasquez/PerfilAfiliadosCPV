@@ -1,0 +1,9 @@
+PASS  [affiliate/light/desktop] Presencia: first create (now in the action transaction) closes the modal
+PASS  [affiliate/light/desktop] Presencia: success notification  :: Creado
+PASS  [affiliate/light/desktop] Presencia: one record and «Crear» hidden afterwards  :: rows=1 createHidden=true
+PASS  [affiliate/light/desktop] Presencia: the record is still there after a reload (committed)  :: rows=1
+PASS  [affiliate/light/desktop] Sostenibilidad: first create (now in the action transaction) closes the modal
+PASS  [affiliate/light/desktop] Sostenibilidad: success notification  :: Creado
+PASS  [affiliate/light/desktop] Sostenibilidad: one row after a reload (committed)  :: rows=1
+
+7/7 checks passed

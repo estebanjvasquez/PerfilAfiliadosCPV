@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-16 ~11:00Z, en la rama `fix/first-save-postgres`. Sale de `fix/model-compatibility-labels` @ `0895258` (aceptada en `6212784682`), que a su vez sale de `docs/session-continuity` @ `28014c2`.
+**Checkpoint:** 2026-10-16 ~12:00Z, en la rama `fix/first-save-postgres`. Sale de `fix/model-compatibility-labels` @ `0895258` (aceptada en `6212784682`), que a su vez sale de `docs/session-continuity` @ `28014c2`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -57,21 +57,13 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ### En curso: candidato integrado CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (READY_FOR_REVIEW — MANUAL, sin desplegar)
 
-- **Autorización:** `6212967641`. Prerrequisito aceptado: `0895258` (`6212784682`).
+- **Autorización:** `6212967641`; corrección de atomicidad `6214463281`. Prerrequisito aceptado: `0895258` (`6212784682`).
 - **Rama:** `fix/first-save-postgres`. BASE `0895258`.
-- **TESTED_HEAD:** `fea53554f35170470802a8637989190bbe17818e`. El código de runtime es igual a `e67c3ca`.
-- **Qué incluye:**
-  - el arreglo aceptado de `EmpresaPgsql` y de las etiquetas OVID/ISO;
-  - los cinco hooks: el actor va en el INSERT (`creating`), sin el `update … set <tabla>.user_id` que PostgreSQL rechazaba;
-  - transacciones acotadas en los helpers de Gestión, Recursos y Experiencia;
-  - la clave de las filas virtuales de Experiencia como string.
-- **Pruebas en aislamiento:**
-  - antes del arreglo, reproducido: 42703 y una fila parcial por módulo;
-  - enfocadas 93 OK;
-  - suite completa **533 OK**;
-  - navegador 40/40.
-- **Informe:** `audit/first_save_postgres_2026-10-16.md` (matriz en §3). **Evidencia:** `audit/runs/first_save/`.
-- **Antes:** CPV-MODEL-COMPATIBILITY-AND-LABELS (`audit/model_compat_labels_2026-10-16.md`), incluida en este candidato.
+- **TESTED_HEAD:** `b9b41a0ee6dcef0323a52537cfe067dd2a187f8a`.
+- **Incluye:** `EmpresaPgsql` + etiquetas; actor en el INSERT (`creating`); transacciones en los helpers y `->databaseTransaction()` de Filament en Presencia/Sostenibilidad; clave string en Experiencia.
+- **Pruebas en `b9b41a0`:** fallas inyectadas tras el INSERT (5 primeros guardados + 4 edición/borrado) con rollback y reintento OK, en `pgsql` (8 en rojo antes, `19a67bb`); enfocadas 107 OK; suite completa **547 OK**; navegador 7/7.
+- **Informe:** `audit/first_save_postgres_2026-10-16.md` (matriz §3, atomicidad §12). **Evidencia:** `audit/runs/first_save/`.
+- **Bloqueante aparte:** el 500 del usuario sin verificar (§5). El alta completa de afiliados no está lista.
 
 ### Anteriores
 
@@ -93,13 +85,13 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 ## 4. Worktrees en uso (no tocar sin instrucción)
 
 - `..\wt-task-0010a` (`b43737e`) y `..\wt-task-0010b` (`964550d`) son históricos.
-- El runner aislado es `infra/contabo-test-runner` @ `a7c6673`.
-  - Tiene `ux_check_first_save.mjs` y `ux_seed_first_save.php`.
-  - `457d445` le sube a phpunit el `memory_limit` a 512M, porque la suite completa superó los 128M.
+- El runner aislado es `infra/contabo-test-runner` @ `5b6171c`.
+  - `457d445` le sube a phpunit el `memory_limit` a 512M. `5b6171c` agrega `ux_check_first_save_tx.mjs`.
 
 ## 5. Pendientes conocidos (no arrancan solos)
 
-- **Hallazgo para el alta de usuarios nuevos:** un usuario **sin verificar** que abre el panel recibe **500** (`Route [verification.notice] not defined`). Pasa porque se usa el middleware de Laravel sin `->emailVerification()` de Filament (informe §5). Importa antes de activar el correo.
+- **Bloqueante de release, tarea aparte:** un usuario **sin verificar** que abre el panel recibe **500** (`Route [verification.notice] not defined`). Falta `->emailVerification()` de Filament (informe §5). La próxima tarea es el flujo real registro → verificación → panel, con SMTP pendiente; la autoriza el propietario.
+- **`NoAplicaAction` al desmarcar:** no refresca el porcentaje cacheado (informe §12). Fuera de alcance.
 - **Datos históricos (solo lectura, sin acción):**
   - 1 fila de `assets` con actor NULL;
   - 1 empresa con 2 filas de `assets` (informe §8).

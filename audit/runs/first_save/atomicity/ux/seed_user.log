@@ -1,0 +1,8 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-493999e26a8b Creating 
+ Container cpvtest-testapp-run-493999e26a8b Created 
+ux user id=1 empresa id=4 linked=1
+ux admin id=2
+ux request id=1 delivery=failed error=recipient_not_configured

@@ -6,11 +6,11 @@
 - **BASE_SHA:** `0895258670f0bbf18476a33d20c361b674b471d5`. It contains the accepted EmpresaPgsql/labels repair and the continuity startup files.
   - Verified before branching (10:02Z, read-only): the remote `feature/upgrade-filament-v3` and the staging checkout are both at `0f8bdad`, with 0 modifications.
   - No other local work was touched. The worktrees are untouched.
-- **TESTED_HEAD:** `fea53554f35170470802a8637989190bbe17818e`.
-  - The runtime code (`app/`, `resources/`) is identical to `e67c3ca`; `git diff e67c3ca fea5355` is one test assertion, the completion cache.
-  - The full suite ran at `e67c3ca`; the focused first-save tests ran again at `fea5355`.
+- **Correction round:** Issue #2 `6214463281` (manual review of delivery `6213980289`, CORRECTIONS_REQUIRED): failure-path atomicity. See §12.
+- **TESTED_HEAD:** `b9b41a0ee6dcef0323a52537cfe067dd2a187f8a`, which includes this correction. Focused, full-suite and browser runs were all made at this SHA (§12).
+  - The first delivery's TESTED_HEAD was `fea5355`; the full suite then ran at `e67c3ca`. That history is kept in §7.
   - Later commits are docs/audit only.
-- **REVIEW_HEAD:** the commit that adds this report.
+- **REVIEW_HEAD:** the commit that adds this report revision.
 - **Deployed:** NO.
 
 ## 1. Investigation: exact SQL and event paths
@@ -29,7 +29,7 @@
 
 **Defects:**
 1. **The SQL is rejected.** PostgreSQL rejects a table-qualified SET target with `SQLSTATE[42703] column "<table>" of relation "<table>" does not exist`.
-2. **It is not atomic.** `created` fires **after** the INSERT has already committed. Neither Filament table actions nor the panel use a transaction: `CanUseDatabaseTransactions` defaults to false, and only page actions call it. So the first save fails **after** leaving a committed partial row: `user_id` NULL, and the module's «No aplica» is not cleared.
+2. **It is not atomic.** `created` fires **after** the INSERT, and with no enclosing transaction the INSERT has already committed by then. Neither Filament table actions nor the panel use a transaction: `CanUseDatabaseTransactions` defaults to false, and only page actions call it. So the first save fails **after** leaving a committed partial row: `user_id` NULL, and the module's «No aplica» is not cleared.
 3. **The row scope is too wide.** `where empresa_id = ?` rewrites the actor of **every** row of the company, not just the created one. This matters for Sostenibilidad, which has several rows per company.
 
 **Who creates what (the real UI actions):**
@@ -57,7 +57,7 @@ What this preserves and changes:
 
 **Narrow transactions** (only where one user action runs several statements):
 - `ManagementRelationManager::saveFieldsWithNoAplica`, `AssetsRelationManager::saveFieldWithNoAplica` and `ExperiencesRelationManager::saveEntry` wrap section status + first insert (with its hook) + update in `DB::transaction`.
-- The Filament `CreateAction`s of Presencia and Sostenibilidad are a single INSERT plus the status hook. They are left as they are, and there is no application-wide transaction rewrite.
+- *(Corrected in §12.)* The first delivery left the Filament `CreateAction`s of Presencia and Sostenibilidad without a transaction and called them «a single INSERT». That was wrong. After the INSERT, they also run the `created` status hook (a DELETE on `empresa_module_status`) and the `saved` completion refresh (an UPDATE on `empresas`). Since `b9b41a0` they use Filament's action transaction. There is still no application-wide transaction rewrite.
 
 **Found while covering the Experiencia update path, and fixed** (`ExperiencesRelationManager::buildRow`):
 - The virtual table rows use the entry's UUID as `id`, but `Experience` casts its key to `int`. So `getKey()` turned «9f3c…» into 9 and «e1…» into 0, and two entries could share a key; **Editar/Eliminar could act on the wrong experience**.
@@ -75,7 +75,7 @@ Diff: `git diff 0895258..e67c3ca -- app` covers the 5 models and 3 relation mana
 
 All test rows are created through the **real** relation-manager actions (Livewire), with **real events**, on disposable PostgreSQL with synthetic users, companies and catalogs. The only raw inserts are the catalogs (`tests/Feature/Filament/Concerns/ProfileModuleFixtures.php`). Tests:
 - `FirstSaveModulesTest` (16, transactional);
-- `FirstSaveAtomicityTest` (1, **non-transactional**, cleans up after itself);
+- `FirstSaveAtomicityTest` (15, **non-transactional**, cleans up after itself): 1 success/retry test, 10 injected post-INSERT failures and 4 injected update/delete failures (§12);
 - `NewAffiliateOnboardingTest` (1).
 
 | Module | First-create action (company with no row) | Options exercised | Update path | Permissions | Result | Evidence |
@@ -87,7 +87,8 @@ All test rows are created through the **real** relation-manager actions (Livewir
 | Sostenibilidad | Crear (area, status) | a 2nd row by **another user of the same company** keeps each row's own actor; a missing status is rejected; several rows remain possible | create/delete only | no policy exists in the app (none required) | **pass**: 2 rows `[owner, colleague]` | `sustainability_*`; browser «Sostenibilidad» (2 rows) |
 | Isolation | — | 2 companies, 2 users: A's save does not touch B; B's edit page returns **404** for A; A's own page returns 200 | — | company visibility through the `empresa_user` link (`EmpresaResource::getEloquentQuery`) | **pass** | `two_companies_do_not_leak_*` |
 | No session | — | `management()->create()` with no authenticated user → row created with `user_id` NULL, no user invented (the column is nullable; the UI always has a session) | — | — | **pass** | `without_a_session_*` |
-| Atomicity / retry | all 5 first saves, with the module «No aplica» set beforehand | — | retry: one-row modules stay at 1; Sostenibilidad goes to 2, which is legitimate | — | **pass**: exactly 1 committed row with the actor, «No aplica» cleared, the cached `completion_percentage` equal to a fresh computation | `FirstSaveAtomicityTest` |
+| Atomicity / retry | all 5 first saves, with the module «No aplica» set beforehand | — | retry: one-row modules stay at 1; Sostenibilidad goes to 2, which is legitimate | — | **pass**: exactly 1 committed row with the actor, «No aplica» cleared, the cached `completion_percentage` equal to a fresh computation | `FirstSaveAtomicityTest` (success path) |
+| Failure after the INSERT | all 5 first saves × 2 injected steps (after the `created` status hook; after the completion write) | other company with its own row and «No aplica» | Presencia edit and delete, Sostenibilidad delete, Experiencia eliminar, each failing after the completion write | — | **pass at `b9b41a0`**: nothing committed, «No aplica» and the cached completion unchanged, the other company unchanged, then a clean retry. Red before the correction for the 4 Presencia/Sostenibilidad cases and the 4 update/delete cases | `FirstSaveAtomicityTest` (§12) |
 | Previous repair | EmpresaPgsql relations, OVID/ISO labels, request #1 flow, manual/map/home | — | — | — | **pass** | `EmpresaPgsqlCompatibility`, `ManagementLabels`, `TaxonomyCategoryRequest`, `TaxonomyCategoriesRelationManager`, `UserManual`, `ProfileHelpWidget`, `HomeBranding`, `CompanyCrawl` (focused run) |
 
 ## 4. Reproduction before the fix, and atomicity
@@ -113,6 +114,9 @@ Pre-fix SHA `009e088` contains the tests and the original models (`audit/runs/fi
 - An **unverified** user who opens the panel gets **HTTP 500** (`Route [verification.notice] not defined`). The panel's `authMiddleware` uses Laravel's `EnsureEmailIsVerified`, but the panel has no `->emailVerification()`, so that route is missing.
 - The test only asserts that such a user does not get in.
 - **Fix candidate** for a separate round: enable Filament's email verification or point the middleware at an existing route. It matters as soon as registration mail is activated.
+- **Release blocker (`6214463281`):** this candidate is **not** ready for full new-affiliate onboarding while that 500 exists. The test bypasses verification on purpose.
+  - The real flow, registration → verification → panel, is a separate next task. SMTP is still pending.
+  - The owner decides whether to authorize it. The module repair can be reviewed on its own.
 
 ## 6. Browser (runner `infra/contabo-test-runner` @ `a7c6673`, `ux_check_first_save.mjs` + `ux_seed_first_save.php`): **40/40**
 
@@ -141,6 +145,7 @@ Pre-fix SHA `009e088` contains the tests and the original models (`audit/runs/fi
 | Full, first attempt | `e67c3ca` | aborted: PHP **memory_limit 128M exhausted** after 428 passing tests (a harness limit: the previous full run already peaked at 123 MB) | `full_oom/` |
 | **Full isolated suite** (harness `457d445`: phpunit with `-d memory_limit=512M`; the project's `phpunit.xml` is untouched) | `e67c3ca` | **OK (533 tests, 3,484 assertions)**, peak 135 MB | `full/` |
 | Focused first-save tests, with the completion-cache assertion | `fea5355` (test-only change over `e67c3ca`) | **OK (18 tests, 332 assertions)** | `focused_completion/` |
+| Correction `6214463281`: before / focused / Feature / **full** / browser | `19a67bb` / `b9b41a0` | 8 expected failures / OK 107 / OK 218 / **OK 547** / 7/7 | §12, `atomicity/` |
 
 **Reproduce:**
 - `run_tests.sh <sha> --suite Feature --filter "<pattern>"`;
@@ -179,5 +184,107 @@ No instruction changes: same buttons, same fields, same steps. This is a reliabi
 - Not verified on staging, because it is not deployed.
 - The browser and admin checks use Shield permissions granted inside the disposable stack. Production role permissions were not inspected.
 - The unverified-user 500 (§5) and the two historical asset anomalies (§8) are reported, not fixed.
-- Presencia/Sostenibilidad `CreateAction` are not wrapped in a transaction. Only the status hook follows their INSERT.
+- **A successful path is not proof of rollback.** Rollback is claimed only for the failure points injected in §12: after the `created` status hook, and after the completion write.
+- **The transaction contract covers the supported UI/application actions** listed in §12. A direct model-level create, outside these actions (for example `Presence::create()` from a console or a seeder), is **not** wrapped. Its INSERT, hook and completion refresh commit separately unless the caller opens a transaction.
+- **No concurrency, idempotency or exactly-once claim.** The retries are sequential, in a single process. Two simultaneous first saves of a one-row module were not exercised. Only Gestión, Recursos, Experiencia and Presencia have a `unique (empresa_id, user_id)` index, and it does not stop two users of the same company from both inserting.
+- **New-affiliate onboarding is not ready:** see §5 and §12. The unverified-user 500 is a separate release blocker.
+- **Historical data:** «0 NULL actors since 2026-09-01» does not by itself prove there is no historical partial data. §8 stays a proposal for manual review.
 - Not exercised: the real registration form (captcha), real email delivery, and every other application feature. This is measured coverage of the paths above, not a guarantee of zero bugs.
+
+## 12. Correction round `6214463281`: failure-path atomicity
+
+**Review finding (accepted):**
+- Presencia/Sostenibilidad are **not** «a single INSERT». After the INSERT, they run:
+  - `created` → `EmpresaModuleStatus::setStatus(…, false)`, a DELETE on `empresa_module_status`;
+  - `saved` → `EmpresaCompletionObserver` → `Empresa::refreshCompletionPercentage()`, an UPDATE on `empresas`.
+- With no enclosing transaction, a failure there would leave a committed row and stale state.
+- The first delivery's tests only covered successful saves and retries.
+
+**Runtime change (`b9b41a0`, 3 files, +19/−4):**
+- **Presencia:** `CreateAction`, `EditAction` and `DeleteAction` use `->databaseTransaction()`. This is the installed Filament 3.3 mechanism, `MountableAction::databaseTransaction()`.
+  - `HasActions::callMountedTableAction()` then calls `DB::beginTransaction()` before the action, `commit` after `callAfter()`, and `rollBack` on any `Throwable`, including validation errors.
+- **Sostenibilidad:** `CreateAction` and `DeleteAction`, same mechanism.
+- **Experiencia:** `deleteEntry` (UPDATE of the entries + completion) is now in `DB::transaction`, like `saveEntry`.
+- **Not done:**
+  - no model or global transaction change;
+  - `NoAplicaAction` is unchanged: it is not a first-save path, and it is outside this correction;
+  - no migration, data change or skipped event.
+
+**Update/delete paths: what they actually do, and what protects them:**
+
+| Path | Writes | Protection |
+|---|---|---|
+| Gestión, any section, also later saves | section status, `create([])` + hooks on the first save, `update`, completion | `DB::transaction` in `saveFieldsWithNoAplica` (first delivery) |
+| Recursos, any type | same | `DB::transaction` in `saveFieldWithNoAplica` |
+| Experiencia, Agregar / Editar | first `create` + hooks, `update(exp_year)`, completion | `DB::transaction` in `saveEntry` |
+| Experiencia, Eliminar | `update(exp_year)`, completion | **new:** `DB::transaction` in `deleteEntry` |
+| Presencia, Crear / Editar / Eliminar | INSERT/UPDATE/DELETE + status hook (create) + completion | **new:** Filament action transaction |
+| Sostenibilidad, Crear / Eliminar | INSERT/DELETE + status hook (create) + completion | **new:** Filament action transaction |
+
+**Connection scope, measured, not assumed.** Inside the injected step, each case records the connection of:
+- the module model;
+- the default connection that `DB::transaction` / Filament use;
+- `Empresa`, which holds the completion;
+- `EmpresaModuleStatus`.
+
+In all 14 cases the four are **`pgsql`**, and the transaction level on the model's connection is **1**. None of these models sets `$connection`, so all use the default, which is `pgsql` in the runner and on staging.
+
+**Injected failures** (`FirstSaveAtomicityTest`):
+- **Setup:** no outer test transaction; real Eloquent events; synthetic data cleaned up in `tearDown()`.
+- **Injection, test-only:**
+  - `created`: a temporary `eloquent.created: <Model>` listener. It is registered after the model's own `created` hook, so it fails right after the status DELETE.
+  - `completion`: a container double of `EmpresaCompletionObserver`. It calls the real `saved()`/`deleted()` (the completion UPDATE) and then throws.
+  - Production code is not patched.
+- **Before:**
+  - the company has the module «No aplica»;
+  - the cached `completion_percentage` is set to a sentinel (1), so the refresh written inside is observable (13–25 measured inside);
+  - a second company has its own row and «No aplica».
+- **Asserted after the failure:**
+  - the exception surfaced;
+  - the INSERT had run inside (1 row seen in the transaction);
+  - nothing is committed (full snapshot of the five module tables, status rows and cached completion);
+  - «No aplica» is still set and the completion is still the sentinel;
+  - the other company is identical.
+- **Then the retry, without the injection:**
+  - 1 row with the actor;
+  - «No aplica» cleared;
+  - the cached completion equals a fresh computation;
+  - the other company is still identical.
+
+| Case | Before the correction (`19a67bb`, runtime = `dbda7ce`) | After (`b9b41a0`) |
+|---|---|---|
+| Gestión @ created / @ completion | rolled back (helper `DB::transaction`, level 1); retry OK | same |
+| Recursos @ created / @ completion | rolled back (level 1); retry OK | same |
+| Experiencia @ created / @ completion | rolled back (level 1); retry OK | same |
+| Presencia @ created | **level 0: committed `rows 1`, «No aplica» cleared** | rolled back (level 1); retry OK |
+| Presencia @ completion | **level 0: `rows 1`, «No aplica» cleared, completion 25** | rolled back; retry OK |
+| Sostenibilidad @ created | **level 0: `rows 1`, «No aplica» cleared** | rolled back; retry OK |
+| Sostenibilidad @ completion | **level 0: `rows 1`, «No aplica» cleared, completion 25** | rolled back; retry OK |
+| Presencia Editar @ completion | **level 0: row changed, completion 25** | rolled back |
+| Presencia Eliminar @ completion | **level 0: row deleted, completion 13** | rolled back |
+| Sostenibilidad Eliminar @ completion | **level 0: row deleted, completion 13** | rolled back |
+| Experiencia Eliminar @ completion | **level 0: entries changed, completion 25** | rolled back |
+
+Evidence: `audit/runs/first_save/atomicity/`.
+- `prefix/phpunit.txt`: 15 tests, 8 failures, exactly the bold cells.
+- `focused/phpunit.txt`: the `ATOMICITY …` lines carry each measured probe.
+
+**Tests at `b9b41a0` (isolated runner `infra/contabo-test-runner` @ `457d445`, browser @ `5b6171c`; staging 200 before and after each run):**
+
+| Run | Result | Evidence |
+|---|---|---|
+| Before the correction, `19a67bb` (tests only) | 15 tests, **8 failures** (expected red, above) | `atomicity/prefix/` |
+| Focused (same pattern as §7) | **OK (107 tests, 1,476 assertions)** | `atomicity/focused/` |
+| Feature suite | **OK (218 tests, 2,147 assertions)** | `atomicity/full_feature/` |
+| **Full isolated suite** (Unit+Feature, at the final code SHA) | **OK (547 tests, 3,870 assertions)** | `atomicity/full/` |
+| Browser, short (`ux_check_first_save_tx.mjs` + `ux_seed_first_save.php`; the company starts with 0 rows) | **7/7**: Presencia first create closes, «Creado», 1 row, «Crear» hidden, still there after reload; Sostenibilidad first create closes, «Creado», 1 row after reload | `atomicity/ux/` (2 screenshots) |
+
+The full visual matrix of §6 (40/40, 3 widths × 2 schemes) was not repeated; the forms are unchanged.
+
+**What this proves, and what it does not:**
+- **Proved:** for the 5 supported first-save UI paths and the 4 update/delete paths above, a failure after the INSERT at the two identified steps leaves no committed change, and a later sequential retry succeeds. Measured on PostgreSQL, single connection.
+- **Not proved:**
+  - other failure points, such as a database crash or a failure between COMMIT and the HTTP response;
+  - concurrency, idempotency or exactly-once behaviour;
+  - direct model-level creates outside these actions (§11).
+- **Pre-existing, not fixed, out of scope:** `EmpresaModuleStatus::setStatus(…, false)` deletes through the query builder, so it fires no model event. Turning «No aplica» off from `NoAplicaAction` therefore does not refresh the cached completion by itself. It is noted here for a separate round.

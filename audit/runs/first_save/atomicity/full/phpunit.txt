@@ -1,0 +1,37 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-phpunit-20261016T114659Z-b9b41a0ee6dc Creating 
+ Container cpvtest-phpunit-20261016T114659Z-b9b41a0ee6dc Created 
+PHPUnit 11.5.56 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.34
+Configuration: /app/phpunit.xml
+
+...............................................................  63 / 547 ( 11%)
+............................................................... 126 / 547 ( 23%)
+............................................................... 189 / 547 ( 34%)
+............................................................... 252 / 547 ( 46%)
+............................................................... 315 / 547 ( 57%)
+.................................ATOMICITY management @ created | {"step":"created","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":1} | rolled back; retry OK
+.ATOMICITY management @ completion | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":13} | rolled back; retry OK
+.ATOMICITY assets @ created | {"step":"created","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":1} | rolled back; retry OK
+.ATOMICITY assets @ completion | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":13} | rolled back; retry OK
+.ATOMICITY experiences @ created | {"step":"created","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":1} | rolled back; retry OK
+.ATOMICITY experiences @ completion | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":25} | rolled back; retry OK
+.ATOMICITY presences @ created | {"step":"created","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":1} | rolled back; retry OK
+.ATOMICITY presences @ completion | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":25} | rolled back; retry OK
+.ATOMICITY sustainabilities @ created | {"step":"created","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":1} | rolled back; retry OK
+.ATOMICITY sustainabilities @ completion | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":25} | rolled back; retry OK
+.ATOMICITY presences | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":25} | rolled back
+.ATOMICITY presences | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":0,"completion_inside":13} | rolled back
+.ATOMICITY sustainabilities | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":0,"completion_inside":13} | rolled back
+.ATOMICITY experiences | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":25} | rolled back
+................. 378 / 547 ( 69%)
+............................................................... 441 / 547 ( 80%)
+............................................................... 504 / 547 ( 92%)
+...........................................                     547 / 547 (100%)
+
+Time: 01:54.557, Memory: 143.00 MB
+
+OK (547 tests, 3870 assertions)
