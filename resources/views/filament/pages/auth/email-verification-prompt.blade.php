@@ -18,7 +18,10 @@
                 ¿No le llegó? {{ $this->resendNotificationAction }}
             </p>
         @else
-            <div class="rounded-lg border border-warning-300 bg-warning-50 p-3 text-warning-800 dark:border-warning-500/40 dark:bg-warning-500/10 dark:text-warning-200" role="status">
+            {{-- Colores con las variables de Filament (--warning-500), que existen en claro y oscuro sin depender de
+                 un build propio de Tailwind. --}}
+            <div class="rounded-lg border p-3 text-gray-950 dark:text-white" role="status"
+                 style="border-color: rgba(var(--warning-500), 0.45); background-color: rgba(var(--warning-500), 0.12);">
                 <p class="font-medium">El sistema todavía no envía correos.</p>
                 <p class="mt-1">
                     El mensaje con el enlace de verificación no llegará a su buzón por ahora.
