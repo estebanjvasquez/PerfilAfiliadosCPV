@@ -1,0 +1,183 @@
+{
+  "results": [
+    {
+      "name": "[affiliate/light/desktop] Gestión: «Otros» without a name is rejected with visible feedback and keeps the modal",
+      "pass": true,
+      "detail": "native: Please fill out this field."
+    },
+    {
+      "name": "[affiliate/light/desktop] Gestión: first save (Calidad + Otros) closes the modal",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Gestión: summary shows ISO 9001 and the «Otros» name",
+      "pass": true,
+      "detail": "Sistemas de gestión Completado: 17% No Aplica Calidad Ambiente Credibilidad y transparencia Seguridad Gestión de proyectos Seguridad de la información Calidad A"
+    },
+    {
+      "name": "[affiliate/light/desktop] Gestión: re-opened Calidad keeps ISO 9001 after saving Seguridad",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Gestión: «No Aplica» on Ambiente persists",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Gestión: reverting «No Aplica» and ticking ISO 14001 persists",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Recursos: first save (Recursos humanos) closes the modal",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Recursos: second type (Inventario) saves into the same record",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Recursos: summary shows both types",
+      "pass": true,
+      "detail": "Recursos en Venezuela Completado: 50% No Aplica Recursos humanos Maquinaria y equipos Instalaciones Inventario Recursos humanos Maquinaria y equipos Instalacion"
+    },
+    {
+      "name": "[affiliate/light/desktop] Experiencia: missing year shows a validation error",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Experiencia: first add closes the modal",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Experiencia: two experiences listed",
+      "pass": true,
+      "detail": "rows=2"
+    },
+    {
+      "name": "[affiliate/light/desktop] Experiencia: editing one entry changes only that one",
+      "pass": true,
+      "detail": "Experiencia relevante Completado: 100% No Aplica Agregar experiencia Año Registrado Actualización 2023 16/10/2026 10:37 16/10/2026 10:37 Editar Eliminar 2021 16"
+    },
+    {
+      "name": "[affiliate/light/desktop] Presencia: first create closes the modal",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Presencia: one record and «Crear» hidden afterwards",
+      "pass": true,
+      "detail": "rows=1 createHidden=true"
+    },
+    {
+      "name": "[affiliate/light/desktop] Presencia: edit (international experience) saves",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Sostenibilidad: missing status shows a validation error",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Sostenibilidad: create #1 closes the modal",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Sostenibilidad: create #2 closes the modal",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] Sostenibilidad: two rows (several are legitimate)",
+      "pass": true,
+      "detail": "rows=2"
+    },
+    {
+      "name": "[admin/light/desktop] sees the affiliate's Gestión data",
+      "pass": true
+    },
+    {
+      "name": "[admin/light/desktop] admin update persists",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/desktop] Sostenibilidad lists the two saved rows",
+      "pass": true,
+      "detail": "rows=2"
+    },
+    {
+      "name": "[affiliate/dark/desktop] create modal opens without page overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/dark/desktop] Gestión Calidad shows the saved ISO 9001",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/mobile] Sostenibilidad lists the two saved rows",
+      "pass": true,
+      "detail": "rows=2"
+    },
+    {
+      "name": "[affiliate/light/mobile] create modal opens without page overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/light/mobile] Gestión Calidad shows the saved ISO 9001",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/mobile] Sostenibilidad lists the two saved rows",
+      "pass": true,
+      "detail": "rows=2"
+    },
+    {
+      "name": "[affiliate/dark/mobile] create modal opens without page overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/dark/mobile] Gestión Calidad shows the saved ISO 9001",
+      "pass": true
+    },
+    {
+      "name": "[admin/dark/desktop] Sostenibilidad lists the two saved rows",
+      "pass": true,
+      "detail": "rows=2"
+    },
+    {
+      "name": "[admin/dark/desktop] create modal opens without page overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/dark/desktop] Gestión Calidad shows the saved ISO 9001",
+      "pass": true
+    },
+    {
+      "name": "[admin/light/mobile] Sostenibilidad lists the two saved rows",
+      "pass": true,
+      "detail": "rows=2"
+    },
+    {
+      "name": "[admin/light/mobile] create modal opens without page overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/light/mobile] Gestión Calidad shows the saved ISO 9001",
+      "pass": true
+    },
+    {
+      "name": "[admin/dark/mobile] Sostenibilidad lists the two saved rows",
+      "pass": true,
+      "detail": "rows=2"
+    },
+    {
+      "name": "[admin/dark/mobile] create modal opens without page overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/dark/mobile] Gestión Calidad shows the saved ISO 9001",
+      "pass": true
+    }
+  ]
+}

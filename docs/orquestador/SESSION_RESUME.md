@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-16 ~09:45Z, en la rama `fix/model-compatibility-labels`. Sale de `docs/session-continuity` @ `28014c2`, aceptada en `6211970495`.
+**Checkpoint:** 2026-10-16 ~11:00Z, en la rama `fix/first-save-postgres`. Sale de `fix/model-compatibility-labels` @ `0895258` (aceptada en `6212784682`), que a su vez sale de `docs/session-continuity` @ `28014c2`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,10 +32,10 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** la de la tarea en curso, **`fix/model-compatibility-labels`**.
-  - Contiene `docs/session-continuity` @ `28014c2` completa.
+- **Rama canónica:** la de la tarea en curso, **`fix/first-save-postgres`**. Es el candidato integrado.
+  - Contiene `fix/model-compatibility-labels` @ `0895258` y `docs/session-continuity` @ `28014c2`.
   - Es el candidato de runtime que **lleva los archivos de arranque**: `CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo.
-  - Esos archivos existen solo en estas dos ramas. Llegan a `feature/upgrade-filament-v3` únicamente si este candidato se despliega con una autorización.
+  - Esos archivos existen solo en estas ramas. Llegan a `feature/upgrade-filament-v3` únicamente si este candidato se despliega con una autorización.
   - Una sesión abierta en otra rama o en un checkout viejo no los carga sola.
 - **Cómo situarse sin perder trabajo:**
   1. `git status -sb`. Si hay cambios, **no** se descartan: se commitean en su rama o se usa un worktree aparte.
@@ -44,31 +44,34 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `fix/model-compatibility-labels` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabajá en la rama `fix/first-save-postgres` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
 | Hecho | Valor | Fuente y fecha |
 |---|---|---|
-| HEAD remoto de `feature/upgrade-filament-v3` | `0f8bdad97590676c966048e18afa35f76110ff1f` | `git ls-remote`, 2026-10-16 ~09:04Z |
-| Código en staging (checkout del VPS) | `0f8bdad`, 0 modificaciones, imagen `sha256:37e023fd…` | SSH de solo lectura, 09:05:16Z |
+| HEAD remoto de `feature/upgrade-filament-v3` | `0f8bdad97590676c966048e18afa35f76110ff1f` | `git ls-remote`, 2026-10-16 ~10:02Z |
+| Código en staging (checkout del VPS) | `0f8bdad`, 0 modificaciones, imagen `sha256:37e023fd…` | SSH de solo lectura, 10:02:05Z |
 | Workflow del último despliegue | run `38873194879`, success, 08:22Z | `6211360371` |
 | Imagen de recuperación | `perfilafiliados-app:pre-branding-c02d4ec` | creada ~08:11Z |
 
-### En curso: CPV-MODEL-COMPATIBILITY-AND-LABELS (READY_FOR_REVIEW — MANUAL, sin desplegar)
+### En curso: candidato integrado CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (READY_FOR_REVIEW — MANUAL, sin desplegar)
 
-- **Autorización:** `6211997650`. Referencia directa: `6190871814`.
-- **Rama:** `fix/model-compatibility-labels`. BASE `28014c2`.
-- **TESTED_HEAD:** `2f1e6fdd9a363bfa57c1a8e523375e6e963bcbd1`. Los commits posteriores son solo docs y audit.
-- **Cambios:**
-  - `EmpresaPgsql` hereda `taxonomyCategories(): HasMany` del padre, porque el override incompatible daba un error fatal al cargar;
-  - las etiquetas pasan a OVID, ISO 9001 e ISO 17025;
-  - el manual dice «ISO 45001 u OVID».
+- **Autorización:** `6212967641`. Prerrequisito aceptado: `0895258` (`6212784682`).
+- **Rama:** `fix/first-save-postgres`. BASE `0895258`.
+- **TESTED_HEAD:** `fea53554f35170470802a8637989190bbe17818e`. El código de runtime es igual a `e67c3ca`.
+- **Qué incluye:**
+  - el arreglo aceptado de `EmpresaPgsql` y de las etiquetas OVID/ISO;
+  - los cinco hooks: el actor va en el INSERT (`creating`), sin el `update … set <tabla>.user_id` que PostgreSQL rechazaba;
+  - transacciones acotadas en los helpers de Gestión, Recursos y Experiencia;
+  - la clave de las filas virtuales de Experiencia como string.
 - **Pruebas en aislamiento:**
-  - enfocadas 61 OK;
-  - suite completa **515 OK**;
-  - navegador 51/51.
-- **Informe:** `audit/model_compat_labels_2026-10-16.md`. **Evidencia:** `audit/runs/model_compat_labels/`.
+  - antes del arreglo, reproducido: 42703 y una fila parcial por módulo;
+  - enfocadas 93 OK;
+  - suite completa **533 OK**;
+  - navegador 40/40.
+- **Informe:** `audit/first_save_postgres_2026-10-16.md` (matriz en §3). **Evidencia:** `audit/runs/first_save/`.
+- **Antes:** CPV-MODEL-COMPATIBILITY-AND-LABELS (`audit/model_compat_labels_2026-10-16.md`), incluida en este candidato.
 
 ### Anteriores
 
@@ -80,7 +83,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Orquestador/propietario:** revisar la entrega de CPV-MODEL-COMPATIBILITY-AND-LABELS. Desplegarla requiere una autorización aparte del propietario. El push a la rama de despliegue puede tener que hacerlo el propietario.
+- **Orquestador/propietario:** revisión manual del candidato integrado. Desplegarlo requiere una autorización aparte del propietario. El push a la rama de despliegue puede tener que hacerlo el propietario.
 - **Propietario:**
   - UAT de Inicio en staging;
   - el correo (proveedor, credenciales, prueba controlada);
@@ -90,13 +93,16 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 ## 4. Worktrees en uso (no tocar sin instrucción)
 
 - `..\wt-task-0010a` (`b43737e`) y `..\wt-task-0010b` (`964550d`) son históricos.
-- El runner aislado es `infra/contabo-test-runner` @ `fc1100b`. Tiene `ux_check_management.mjs` y `ux_seed_management.php`.
+- El runner aislado es `infra/contabo-test-runner` @ `a7c6673`.
+  - Tiene `ux_check_first_save.mjs` y `ux_seed_first_save.php`.
+  - `457d445` le sube a phpunit el `memory_limit` a 512M, porque la suite completa superó los 128M.
 
 ## 5. Pendientes conocidos (no arrancan solos)
 
-- **Nuevo, con prioridad:** los hooks `created` de `Management`, `Asset`, `Experience`, `Presence` y `Sustainability` hacen `update <tabla> set <tabla>.user_id`. PostgreSQL lo rechaza (42703).
-  - Staging usa pgsql, así que el **primer guardado** de esos módulos probablemente falla allí. No se verificó en vivo.
-  - Necesita su propia ronda autorizada (informe §6).
+- **Hallazgo para el alta de usuarios nuevos:** un usuario **sin verificar** que abre el panel recibe **500** (`Route [verification.notice] not defined`). Pasa porque se usa el middleware de Laravel sin `->emailVerification()` de Filament (informe §5). Importa antes de activar el correo.
+- **Datos históricos (solo lectura, sin acción):**
+  - 1 fila de `assets` con actor NULL;
+  - 1 empresa con 2 filas de `assets` (informe §8).
 - **Despliegue:**
   - `paths-ignore` no despliega un cambio que solo toque `resources/manual/*.md`;
   - el agente no puede lanzar `workflow_dispatch` (403);

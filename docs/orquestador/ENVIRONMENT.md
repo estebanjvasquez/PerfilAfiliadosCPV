@@ -29,7 +29,7 @@ Esta página se consulta bajo demanda, no en el arranque. Se creó el 2026-10-16
 | ssh | sí, para VPS | AVAILABLE OpenSSH 9.5p2 | n/a | — |
 | node | opcional | AVAILABLE v24.19.0 | NOT_CHECKED | parseo de JSON también con `ConvertFrom-Json` |
 | php | opcional en WIN | AVAILABLE 8.2.33, **sin `ext-intl`** | dentro del contenedor `app` | PHPUnit **solo en TEST** |
-| PHPUnit | sí, para tests | no se usa: la base compartida es remota y no hay intl | no hay (`--no-dev`) | **TEST**: `run_tests.sh <sha> --filter …` |
+| PHPUnit | sí, para tests | no se usa: la base compartida es remota y no hay intl | no hay (`--no-dev`) | **TEST**: `run_tests.sh <sha> --filter …`. La suite completa, en un solo proceso, pasó los 128M de memoria por defecto (2026-10-16, 533 tests, pico de 135 MB); el runner pasa `-d memory_limit=512M` (`457d445`) |
 | docker | opcional en WIN | AVAILABLE 29.8.1 (cliente; daemon NOT_CHECKED) | AVAILABLE 29.7.2 | — |
 | gh | **no** | NOT_ON_PATH (también lo vio el propietario el 2026-10-15) | NOT_ON_PATH | lectura: API REST anónima; escritura: `post_issue_comment.ps1` |
 | python / python3 | **no** | **STORE_ALIAS**, código de salida nativo **9009**: `python --version` responde «Python was not found… Microsoft Store» (medido de nuevo 2026-10-16 ~08:55Z) | AVAILABLE `python3` 3.12.14 | PowerShell, node, o un contenedor DOC/TEST |

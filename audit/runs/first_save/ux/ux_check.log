@@ -1,0 +1,42 @@
+PASS  [affiliate/light/desktop] Gestión: «Otros» without a name is rejected with visible feedback and keeps the modal  :: native: Please fill out this field.
+PASS  [affiliate/light/desktop] Gestión: first save (Calidad + Otros) closes the modal
+PASS  [affiliate/light/desktop] Gestión: summary shows ISO 9001 and the «Otros» name  :: Sistemas de gestión Completado: 17% No Aplica Calidad Ambiente Credibilidad y transparencia Seguridad Gestión de proyectos Seguridad de la información Calidad A
+PASS  [affiliate/light/desktop] Gestión: re-opened Calidad keeps ISO 9001 after saving Seguridad
+PASS  [affiliate/light/desktop] Gestión: «No Aplica» on Ambiente persists
+PASS  [affiliate/light/desktop] Gestión: reverting «No Aplica» and ticking ISO 14001 persists
+PASS  [affiliate/light/desktop] Recursos: first save (Recursos humanos) closes the modal
+PASS  [affiliate/light/desktop] Recursos: second type (Inventario) saves into the same record
+PASS  [affiliate/light/desktop] Recursos: summary shows both types  :: Recursos en Venezuela Completado: 50% No Aplica Recursos humanos Maquinaria y equipos Instalaciones Inventario Recursos humanos Maquinaria y equipos Instalacion
+PASS  [affiliate/light/desktop] Experiencia: missing year shows a validation error
+PASS  [affiliate/light/desktop] Experiencia: first add closes the modal
+PASS  [affiliate/light/desktop] Experiencia: two experiences listed  :: rows=2
+PASS  [affiliate/light/desktop] Experiencia: editing one entry changes only that one  :: Experiencia relevante Completado: 100% No Aplica Agregar experiencia Año Registrado Actualización 2023 16/10/2026 10:37 16/10/2026 10:37 Editar Eliminar 2021 16
+PASS  [affiliate/light/desktop] Presencia: first create closes the modal
+PASS  [affiliate/light/desktop] Presencia: one record and «Crear» hidden afterwards  :: rows=1 createHidden=true
+PASS  [affiliate/light/desktop] Presencia: edit (international experience) saves
+PASS  [affiliate/light/desktop] Sostenibilidad: missing status shows a validation error
+PASS  [affiliate/light/desktop] Sostenibilidad: create #1 closes the modal
+PASS  [affiliate/light/desktop] Sostenibilidad: create #2 closes the modal
+PASS  [affiliate/light/desktop] Sostenibilidad: two rows (several are legitimate)  :: rows=2
+PASS  [admin/light/desktop] sees the affiliate's Gestión data
+PASS  [admin/light/desktop] admin update persists
+PASS  [affiliate/dark/desktop] Sostenibilidad lists the two saved rows  :: rows=2
+PASS  [affiliate/dark/desktop] create modal opens without page overflow  :: excess=0px
+PASS  [affiliate/dark/desktop] Gestión Calidad shows the saved ISO 9001
+PASS  [affiliate/light/mobile] Sostenibilidad lists the two saved rows  :: rows=2
+PASS  [affiliate/light/mobile] create modal opens without page overflow  :: excess=0px
+PASS  [affiliate/light/mobile] Gestión Calidad shows the saved ISO 9001
+PASS  [affiliate/dark/mobile] Sostenibilidad lists the two saved rows  :: rows=2
+PASS  [affiliate/dark/mobile] create modal opens without page overflow  :: excess=0px
+PASS  [affiliate/dark/mobile] Gestión Calidad shows the saved ISO 9001
+PASS  [admin/dark/desktop] Sostenibilidad lists the two saved rows  :: rows=2
+PASS  [admin/dark/desktop] create modal opens without page overflow  :: excess=0px
+PASS  [admin/dark/desktop] Gestión Calidad shows the saved ISO 9001
+PASS  [admin/light/mobile] Sostenibilidad lists the two saved rows  :: rows=2
+PASS  [admin/light/mobile] create modal opens without page overflow  :: excess=0px
+PASS  [admin/light/mobile] Gestión Calidad shows the saved ISO 9001
+PASS  [admin/dark/mobile] Sostenibilidad lists the two saved rows  :: rows=2
+PASS  [admin/dark/mobile] create modal opens without page overflow  :: excess=0px
+PASS  [admin/dark/mobile] Gestión Calidad shows the saved ISO 9001
+
+40/40 checks passed

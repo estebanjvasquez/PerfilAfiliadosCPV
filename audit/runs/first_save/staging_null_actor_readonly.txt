@@ -1,0 +1,6 @@
+read_only=on
+management: total=99 null_actor=0 null_actor_since_2026-09-01=0 companies=99
+assets: total=114 null_actor=1 null_actor_since_2026-09-01=0 companies=113
+experiences: total=94 null_actor=0 null_actor_since_2026-09-01=0 companies=94
+presences: total=53 null_actor=0 null_actor_since_2026-09-01=0 companies=53
+sustainabilities: total=280 null_actor=0 null_actor_since_2026-09-01=0 companies=96

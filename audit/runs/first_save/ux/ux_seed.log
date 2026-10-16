@@ -1,0 +1,6 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-106d5f3c0087 Creating 
+ Container cpvtest-testapp-run-106d5f3c0087 Created 
+empresa id=4 admin linked=1 module rows before={"management":0,"assets":0,"experiences":0,"presences":0,"sustainabilities":0}
