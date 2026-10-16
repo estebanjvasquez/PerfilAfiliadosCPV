@@ -101,8 +101,11 @@ try {
       await page.waitForTimeout(500);
       await addItem(page, modal);
       await submit(page, modal);
+      // The required field is enforced first by the browser (native constraint validation, a bubble),
+      // or by the server (Filament message) if the browser lets it through. Either is visible feedback.
       const err = await modal.locator('.fi-fo-field-wrp-error-message').first().innerText().catch(() => '');
-      record(`${tag} Gestión: «Otros» without a name shows a validation error and keeps the modal`, !(await closed(modal)) && err.length > 0, err);
+      const native = await modal.getByLabel('Calidad: otros').first().evaluate((el) => el.validationMessage).catch(() => '');
+      record(`${tag} Gestión: «Otros» without a name is rejected with visible feedback and keeps the modal`, !(await closed(modal)) && (err.length > 0 || native.length > 0), err || `native: ${native}`);
       await page.screenshot({ path: `${OUT}/fs-gestion-validation.png` });
       // Fill the name and save: FIRST save of the module.
       await modal.getByLabel('Calidad: otros').first().fill('ZZZ NORMA PROPIA');
