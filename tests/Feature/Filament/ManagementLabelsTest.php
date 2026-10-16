@@ -48,13 +48,16 @@ class ManagementLabelsTest extends TestCase
     private function empresaConUsuario(array $management = [], bool $superAdmin = false): array
     {
         $user = User::factory()->create();
+        // Los permisos de Shield que ManagementPolicy exige para ver y editar la pestaña. El afiliado los
+        // tiene directos; el Super Admin, por su rol (en este proyecto Shield no lo deja pasar por la gate:
+        // define_via_gate = false).
+        $permissions = array_map(fn ($p) => Permission::findOrCreate($p, 'web'), ['view_any_management', 'view_management', 'create_management', 'update_management']);
         if ($superAdmin) {
-            $user->assignRole(Role::findOrCreate(config('filament-shield.super_admin.name'), 'web'));
+            $role = Role::findOrCreate(config('filament-shield.super_admin.name'), 'web');
+            $role->givePermissionTo($permissions);
+            $user->assignRole($role);
         } else {
-            // Afiliado: los permisos de Shield que ManagementPolicy exige para ver y editar la pestaña.
-            foreach (['view_any_management', 'view_management', 'create_management', 'update_management'] as $permission) {
-                $user->givePermissionTo(Permission::findOrCreate($permission, 'web'));
-            }
+            $user->givePermissionTo($permissions);
         }
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->actingAs($user);
