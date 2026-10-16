@@ -334,6 +334,69 @@ class FirstSaveAtomicityTest extends TestCase
     }
 
     /**
+     * CPV-VERIFICATION-FLOW-AND-COMPLETION (`6215451160`, B.3): «No Aplica» del módulo, encender y apagar.
+     * La marca y el porcentaje cacheado se confirman juntos o no se confirma ninguno.
+     */
+    public static function noAplicaFailureCases(): array
+    {
+        return [
+            'gestion on' => [ManagementRelationManager::class, EmpresaModuleStatus::MODULE_GESTION, true],
+            'gestion off' => [ManagementRelationManager::class, EmpresaModuleStatus::MODULE_GESTION, false],
+            'sostenibilidad on' => [SustainabilitiesRelationManager::class, EmpresaModuleStatus::MODULE_SOSTENIBILIDAD, true],
+            'sostenibilidad off' => [SustainabilitiesRelationManager::class, EmpresaModuleStatus::MODULE_SOSTENIBILIDAD, false],
+        ];
+    }
+
+    #[Test]
+    #[\PHPUnit\Framework\Attributes\DataProvider('noAplicaFailureCases')]
+    public function a_failure_after_the_completion_refresh_rolls_back_the_no_aplica_toggle(string $manager, string $module, bool $on): void
+    {
+        [$empresa, $user] = $this->freshCompany();
+        [$other] = $this->freshCompany();
+        EmpresaModuleStatus::setStatus($other->id, $module, true);
+        if (! $on) {
+            EmpresaModuleStatus::setStatus($empresa->id, $module, true);
+        }
+        DB::connection()->table('empresas')->whereIn('id', [$empresa->id, $other->id])->update(['completion_percentage' => self::SENTINEL]);
+        $before = $this->snapshot($empresa);
+        $otherBefore = $this->snapshot($other);
+        $updatedAt = DB::connection()->table('empresas')->where('id', $empresa->id)->value('updated_at');
+
+        $this->inject(EmpresaModuleStatus::class, 'completion', [$on ? 'saved' : 'deleted']);
+        $error = null;
+        try {
+            $this->withoutExceptionHandling();
+            $this->manager($manager, $empresa, $user)->actWith('no_aplica', data: ['no_aplica' => $on]);
+        } catch (Throwable $e) {
+            $error = $e;
+        }
+
+        $label = $module.' '.($on ? 'on' : 'off');
+        $after = $this->snapshot($empresa);
+        $this->assertSame(
+            ['injected' => true, 'no_aplica' => ! $on, 'completion' => self::SENTINEL],
+            ['injected' => $error instanceof \RuntimeException, 'no_aplica' => EmpresaModuleStatus::isNoAplica($empresa->id, $module), 'completion' => (int) $after['completion']],
+            "{$label}: committed state after the failure (transaction level measured inside: ".($this->probe['transaction_level'] ?? 'n/a: the completion step never ran').')'
+        );
+        $this->assertNotSame(self::SENTINEL, $this->probe['completion_inside'], "{$label}: the refresh had been written inside");
+        $this->assertSame($this->probe['model_connection'], $this->probe['empresa_connection'], "{$label}: same connection");
+        $this->assertGreaterThanOrEqual(1, $this->probe['transaction_level'], "{$label}: inside an application transaction");
+        $this->assertSame($before, $after, "{$label}: nothing committed");
+        $this->assertSame($otherBefore, $this->snapshot($other), "{$label}: other company unchanged");
+
+        // Sin la falla: se confirma la marca y el cache queda igual a un cálculo fresco, sin tocar updated_at.
+        $this->armed = false;
+        $this->manager($manager, $empresa, $user)->actWith('no_aplica', data: ['no_aplica' => $on])->assertHasNoTableActionErrors();
+        $this->assertSame($on, EmpresaModuleStatus::isNoAplica($empresa->id, $module));
+        $cached = (int) DB::connection()->table('empresas')->where('id', $empresa->id)->value('completion_percentage');
+        $this->assertSame(Empresa::query()->withCompletionData()->findOrFail($empresa->id)->completionPercentage(), $cached, "{$label}: cache refreshed on retry");
+        $this->assertSame($updatedAt, DB::connection()->table('empresas')->where('id', $empresa->id)->value('updated_at'), "{$label}: updated_at untouched");
+        $this->assertSame($otherBefore, $this->snapshot($other), "{$label}: other company still unchanged");
+
+        $this->report("no_aplica {$label}", 'rolled back; retry OK');
+    }
+
+    /**
      * Caminos de actualización y borrado que escriben la fila y DESPUÉS el porcentaje cacheado.
      * (Gestión, Recursos y la edición de Experiencia pasan por los helpers ya cubiertos arriba.)
      */
