@@ -28,7 +28,10 @@ if (app()->environment() !== 'testing' || ($cfg['host'] ?? null) !== 'testdb' ||
 
 $affiliate = App\Models\User::where('email', 'zzz-ux-affiliate@example.test')->first();
 $admin = App\Models\User::where('email', 'zzz-ux-admin@example.test')->first();
-$empresa = App\Models\Empresa::where('rif', 'J-00000000-9')->first();
+// By name, case-insensitive: the model normalizes the RIF and stores the name in upper case (same as
+// ux_seed_taxonomy_map.php).
+$empresa = App\Models\Empresa::whereRaw('upper(name) like ?', ['ZZZ UX EMPRESA FICTICIA%'])->first()
+    ?? App\Models\Empresa::where('rif', 'like', 'J%000000009')->first();
 if (! $affiliate || ! $admin || ! $empresa) {
     fwrite(fopen('php://stderr', 'w'), "synthetic affiliate, admin or company missing\n");
     exit(4);
