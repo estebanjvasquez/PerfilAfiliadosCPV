@@ -784,7 +784,12 @@ step "8. Run PHPUnit"
 # triggered BY TEST CODE, while a "PHPUnit deprecation" is deprecated PHPUnit
 # usage (configuration, attributes) and needs --display-phpunit-deprecations.
 # Both only add output; neither changes a result.
-ARGS=(vendor/bin/phpunit --do-not-cache-result --display-deprecations --display-phpunit-deprecations)
+#
+# MEMORY (2026-10-16, CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY): the full suite runs in ONE php process.
+# At 515 tests it peaked at 123 MB against the CLI default of 128 MB; at 533 it died with "Allowed memory
+# size of 134217728 bytes exhausted" after 428 passing tests. That is a limit of this harness, not a
+# test result, so the runner raises it for phpunit only. The project's phpunit.xml is not touched.
+ARGS=(php -d memory_limit=512M vendor/bin/phpunit --do-not-cache-result --display-deprecations --display-phpunit-deprecations)
 #
 # WHICH SUITES CAN HONESTLY RUN
 #   17 test files use DatabaseTransactions, which wraps each test in a
