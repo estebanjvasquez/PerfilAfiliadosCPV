@@ -124,7 +124,7 @@ class ManagementDetExport implements FromCollection, ShouldAutoSize, WithHeading
         return [
             ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
             ["", "", "Calidad", "", "", "Ambiente", "", "", "Credibilidad y Transparencia", "", "", "Seguridad", "", "", "Gestión de Proyectos", "", "Seguridad de la Información", "", ""],
-            ["ID", "NOMBRE", "ISO9001", "ISO17025", "CALIDAD: OTROS", "ISO14001", "ISO50001", "AMBIENTE: OTROS", "DUN", "ISO37001", "CREDIBILIDAD: OTROS", "ISO45001", "COVID", "SEGURIDAD: OTROS", "PMI", "PMI: OTROS", "ISO27001", "SEGURIDAD: OTROS"],
+            ["ID", "NOMBRE", "ISO9001", "ISO17025", "CALIDAD: OTROS", "ISO14001", "ISO50001", "AMBIENTE: OTROS", "DUN", "ISO37001", "CREDIBILIDAD: OTROS", "ISO45001", "OVID", "SEGURIDAD: OTROS", "PMI", "PMI: OTROS", "ISO27001", "SEGURIDAD: OTROS"],
         ];
     }
 

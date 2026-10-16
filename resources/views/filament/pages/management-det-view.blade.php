@@ -29,7 +29,7 @@
                                         <TH class="border px-6 py-2 text-sm text-gray-500">ISO37001</TH>
                                         <th class="border px-6 py-2 text-sm text-gray-500">CREDIBILIDAD: OTROS</th>
                                         <TH class="border px-6 py-2 text-sm text-gray-500">ISO45001</TH>
-                                        <th class="border px-6 py-2 text-sm text-gray-500">COVID</th>
+                                        <th class="border px-6 py-2 text-sm text-gray-500">OVID</th>
                                         <TH class="border px-6 py-2 text-sm text-gray-500">SEGURIDAD: OTROS</TH>
                                         <th class="border px-6 py-2 text-sm text-gray-500">PMI</th>
                                         <TH class="border px-6 py-2 text-sm text-gray-500">PMI: OTROS</TH>

@@ -384,7 +384,7 @@ Aquí se indican los sistemas de gestión y las certificaciones que su empresa t
 - **Calidad** (por ejemplo, ISO 9001 o ISO 17025).
 - **Ambiente** (por ejemplo, ISO 14001 o ISO 50001).
 - **Credibilidad y transparencia** (por ejemplo, Dun & Bradstreet o ISO 37001).
-- **Seguridad** (por ejemplo, ISO 45001).
+- **Seguridad** (por ejemplo, ISO 45001 u OVID).
 - **Gestión de proyectos** (por ejemplo, Project Management Professional).
 - **Seguridad de la información** (por ejemplo, ISO 27001).
 

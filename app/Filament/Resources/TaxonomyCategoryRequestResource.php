@@ -96,9 +96,8 @@ class TaxonomyCategoryRequestResource extends Resource
                 Tables\Columns\TextColumn::make('id')->label('N.º')->prefix('#')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('submitted_at')->label('Enviada')->dateTime('d/m/Y H:i')->sortable(),
                 // Nombre del SNAPSHOT (la empresa tal como estaba al enviar), no de la relación
-                // `empresa`: esa relación usa EmpresaPgsql, cuya clase no compila hoy
-                // (EmpresaPgsql::taxonomyCategories() es incompatible con Empresa::taxonomyCategories():
-                // HasMany) y cargarla es un error fatal. Defecto previo, reportado aparte.
+                // `empresa`: la solicitud conserva lo que se envió aunque la empresa cambie después.
+                // (Antes, además, EmpresaPgsql no compilaba; se reparó en CPV-MODEL-COMPATIBILITY-AND-LABELS.)
                 Tables\Columns\TextColumn::make('context_snapshot.empresa.name')
                     ->label('Empresa')
                     ->searchable(query: fn (Builder $query, string $search) => $query->whereRaw(

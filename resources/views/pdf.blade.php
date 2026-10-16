@@ -1086,9 +1086,9 @@
                         <input type="checkbox" disabled name="iso45001">ISO 45001:2018 Seguridad y Salud en el Trabajo<br>
                         @endif
                         @if ($datos[0]->ovid == 'SÍ')
-                        <input type="checkbox" disabled checked name="ovid">COVID<br>
+                        <input type="checkbox" disabled checked name="ovid">OVID<br>
                         @else
-                        <input type="checkbox" disabled name="ovid">COVID<br>
+                        <input type="checkbox" disabled name="ovid">OVID<br>
                         @endif
                         <br>
                         @if ($datos[0]->security_otros != 'NO')

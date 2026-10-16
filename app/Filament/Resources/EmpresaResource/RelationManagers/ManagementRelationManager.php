@@ -130,7 +130,7 @@ class ManagementRelationManager extends RelationManager
                 ], 'credibility_data'),
                 static::summaryColumn('seguridad', 'seguridad', 'Seguridad', [
                     'iso45001' => 'ISO 45001:2018',
-                    'ovid' => 'COVID',
+                    'ovid' => 'OVID',
                 ], 'security_data'),
                 static::summaryColumn('proyectos', 'proyectos', 'Gestión de proyectos', [
                     'pmi' => 'PMI',
@@ -150,8 +150,8 @@ class ManagementRelationManager extends RelationManager
                     ->form([
                         static::noAplicaToggle('calidad'),
                         Group::make([
-                            Checkbox::make('iso9001'),
-                            Checkbox::make('iso17025'),
+                            Checkbox::make('iso9001')->label('ISO 9001'),
+                            Checkbox::make('iso17025')->label('ISO 17025'),
                             Toggle::make('quality_otros')->label('Otros (especifíque)')->reactive(),
                             Repeater::make('quality_data')
                                 ->schema([
@@ -229,7 +229,7 @@ class ManagementRelationManager extends RelationManager
                         static::noAplicaToggle('seguridad'),
                         Group::make([
                             Checkbox::make('iso45001')->label('ISO 45001:2018 seguridad y salud en el trabajo.'),
-                            Checkbox::make('ovid')->label('COVID.'),
+                            Checkbox::make('ovid')->label('OVID'),
                             Toggle::make('security_otros')->label('Otros (especifíque)')->reactive(),
                             Repeater::make('security_data')
                                 ->schema([

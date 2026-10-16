@@ -23,13 +23,11 @@ class EmpresaPgsql extends Empresa
     // fija explícitamente, así que hay que declararla a mano al heredar con otro nombre de clase.
     protected $table = 'empresas';
 
-    public function taxonomyCategories()
-    {
-        return $this->belongsToMany(
-            TaxonomyCategory::class,
-            'empresa_taxonomy_category',
-            'empresa_id',
-            'category_id'
-        )->withPivot(['origen', 'approved_by', 'approved_at'])->withTimestamps();
-    }
+    // CPV-MODEL-COMPATIBILITY-AND-LABELS (Issue #2 `6211997650`, investigación `6190871814`): esta clase
+    // redefinía taxonomyCategories() como belongsToMany(TaxonomyCategory) sin tipo de retorno. Eso es
+    // incompatible con Empresa::taxonomyCategories(): HasMany, y PHP lo rechaza con un error fatal al
+    // cargar la clase, antes de cualquier consulta. Ningún consumidor usaba la variante de categorías
+    // directas: el relation manager de Categorías CPV y la solicitud de categoría trabajan con los
+    // registros de vínculo (EmpresaTaxonomyCategory, con origen, es_principal y aprobación). Por eso
+    // se hereda la relación del padre tal cual, y no se agrega una API nueva sin uso.
 }
