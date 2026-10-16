@@ -14,7 +14,9 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
+use App\Filament\Pages\Dashboard;
+use Filament\View\PanelsRenderHook;
+use Illuminate\Contracts\View\View;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Tables\Table;
@@ -118,9 +120,14 @@ class AdminPanelProvider extends PanelProvider
             ->spa()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->pages([
-                Pages\Dashboard::class,
-            ])
+            // CPV-HOME-BRANDING-AND-LAYOUT: la página de inicio es App\Filament\Pages\Dashboard («Inicio» con
+            // el logo), que extiende la de Filament y entra por discoverPages(); la de Filament ya no se
+            // registra, para que no haya dos con la misma ruta. Sus estilos solo se inyectan en ella.
+            ->renderHook(
+                PanelsRenderHook::PAGE_START,
+                fn (): View => view('filament.pages.home-styles'),
+                scopes: Dashboard::class,
+            )
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             // CPV-HOME-USEFUL-HELP: la tarjeta promocional de Filament (FilamentInfoWidget) se
             // reemplaza por accesos útiles para el afiliado (manual y mapa de la taxonomía).

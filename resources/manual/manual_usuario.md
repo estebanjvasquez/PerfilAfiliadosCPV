@@ -23,7 +23,7 @@ Cada persona de su empresa que vaya a trabajar en el sistema necesita **su propi
 | Tarea | Dónde se hace | Sección de este manual |
 |---|---|---|
 | Entrar, registrarse y cambiar su nombre, correo o contraseña | Pantalla de acceso y **Mi perfil** | [Ingreso y cuenta](#ingreso-y-cuenta) |
-| Ubicarse en el sistema | **Escritorio** y menú lateral | [El Escritorio y el menú](#escritorio) |
+| Ubicarse en el sistema | **Inicio** y menú lateral | [Inicio y el menú](#escritorio) |
 | Registrar RIF, dirección, contacto web, operaciones y clientes | **Empresas** > su empresa, formulario por pasos | [Datos generales de la empresa](#datos-generales) |
 | Descargar el perfil de su empresa en PDF | **Empresas**, columna **PDF** | [Abrir su empresa](#abrir-empresa) |
 | Indicar en qué cámaras participa su empresa | Pestaña **Cámaras** | [Cámaras](#camaras) |
@@ -76,18 +76,20 @@ Desde el menú de usuario (arriba a la derecha) abra **Mi perfil**:
 - **Información personal**: actualice su nombre y su correo, y presione **Actualizar**.
 - **Contraseña**: la nueva contraseña debe tener al menos 8 caracteres y el sistema le pedirá su contraseña actual. Presione **Modificar** para guardarla.
 
-## El Escritorio y el menú {#escritorio}
+## Inicio y el menú {#escritorio}
 
-Al entrar verá la pantalla inicial, llamada **Escritorio**, y a la izquierda el **menú lateral**. En el teléfono, el menú está oculto: ábralo con el ícono de tres líneas (☰), arriba a la izquierda.
+Al entrar verá la pantalla de **Inicio**, encabezada por el logo de **Perfil de Afiliados**, y a la izquierda el **menú lateral**. En el teléfono, el menú está oculto: ábralo con el ícono de tres líneas (☰), arriba a la izquierda.
 
 - **Si la Cámara todavía no asoció su usuario con su empresa**, el menú no le mostrará su empresa. Es normal en el primer ingreso: avise a la Cámara indicando el nombre y el RIF de la empresa (ver [Si su empresa no aparece](#empresa-no-asociada)).
 - **Cuando la Cámara ya lo asoció**, el menú le muestra **Empresas**, desde donde trabaja con los datos de su empresa, y **Manual de usuario**, que es esta guía.
 
-En el Escritorio verá estas tarjetas:
+En Inicio verá estas tarjetas, en este orden:
 
 - **Bienvenida/o**, con su nombre y el botón **Salir** para cerrar la sesión.
-- **Ayuda para completar su perfil**, con dos botones: **Manual de usuario**, que abre esta guía, y **Mapa de la taxonomía**, que muestra todas las categorías de la Taxonomía CPV para que se ubique antes de elegir (ver [Mapa de la taxonomía](#mapa-taxonomia)). El mapa no agrega categorías a su empresa: eso se hace desde la pestaña **Categorías CPV (taxonomía nueva)** de su empresa.
-- Los avisos sobre la **veracidad de la información** que su empresa registra.
+- **Ayuda para completar su perfil**, con dos botones: **Manual de usuario**, que abre esta guía, y **Mapa de la taxonomía**, que muestra todas las categorías de la Taxonomía CPV para que se ubique antes de elegir (ver [Mapa de la taxonomía](#mapa-taxonomia)). El mapa no agrega categorías a su empresa: eso se hace desde la pestaña **Categorías CPV (taxonomía nueva)** de su empresa. En la computadora está a la derecha de la tarjeta **Bienvenida/o**.
+- Debajo, a todo el ancho, los avisos sobre la **veracidad de la información** que su empresa registra.
+
+En el teléfono las tarjetas se ven una debajo de otra, en el mismo orden: primero **Bienvenida/o**, luego **Ayuda para completar su perfil** y al final los avisos. Para volver a Inicio desde cualquier parte del sistema, use la opción **Inicio** del menú lateral.
 
 > **CONSEJO:** En el teléfono, donde el menú lateral está oculto, los botones de la tarjeta **Ayuda para completar su perfil** son la forma más rápida de llegar al manual y al mapa.
 

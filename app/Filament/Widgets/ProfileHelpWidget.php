@@ -23,6 +23,9 @@ class ProfileHelpWidget extends Widget
 {
     protected static ?int $sort = -2;
 
+    /** CPV-HOME-BRANDING-AND-LAYOUT: 2 de las 3 columnas de Inicio en pantallas anchas, junto a la cuenta. */
+    protected int|string|array $columnSpan = ['default' => 1, 'lg' => 2];
+
     protected static bool $isLazy = false;
 
     protected static string $view = 'filament.widgets.profile-help-widget';
