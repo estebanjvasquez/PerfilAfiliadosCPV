@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Support\UserManual\UserManualRenderer;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -28,11 +29,20 @@ class ManagementLabelsTest extends TestCase
     {
         parent::setUp();
 
+        // Una excepción dentro de una llamada de Livewire debe verse tal cual, no como un 500.
+        $this->withoutExceptionHandling();
         Filament::setCurrentPanel(Filament::getPanel('admin'));
     }
 
-    /** @return array{0: Empresa, 1: User} */
-    private function empresaConUsuario(): array
+    /**
+     * La fila de `management` se inserta SIN eventos de Eloquent. `Management::created()` ejecuta
+     * `update management set management.user_id = ...`, que PostgreSQL rechaza (SQLSTATE 42703). Es un
+     * defecto previo, fuera de esta ronda y reportado aparte. Así el guardado se prueba por la vía de
+     * actualización, que es la que ejercitan estas etiquetas.
+     *
+     * @return array{0: Empresa, 1: User}
+     */
+    private function empresaConUsuario(array $management = []): array
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -42,6 +52,7 @@ class ManagementLabelsTest extends TestCase
             'phone' => '0212-5551234',
             'website' => 'https://ejemplo.test',
         ]);
+        DB::table('management')->insert(['empresa_id' => $empresa->id, 'created_at' => now(), 'updated_at' => now()] + $management);
 
         return [$empresa, $user];
     }
@@ -96,8 +107,7 @@ class ManagementLabelsTest extends TestCase
     #[Test]
     public function the_summary_column_and_the_other_outputs_say_ovid(): void
     {
-        [$empresa, $user] = $this->empresaConUsuario();
-        $empresa->management()->create(['ovid' => true]);
+        [$empresa, $user] = $this->empresaConUsuario(['ovid' => true]);
 
         $this->manager($empresa, $user)->assertSee('OVID')->assertDontSee('COVID');
 
