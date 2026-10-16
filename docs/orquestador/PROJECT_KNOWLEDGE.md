@@ -2,9 +2,8 @@
 
 **Versión:** 1.0
 **Fecha:** 2026-10-09
-**Propósito:** permitir que un orquestador autónomo (o cualquier sesión nueva del agente de desarrollo)
-adquiera el conocimiento técnico del proyecto sin releer el histórico completo de Issue #2 ni la
-conversación de ChatGPT.
+**Propósito:** conocimiento técnico del proyecto, que se consulta **bajo demanda**. No forma parte del
+arranque, que está en `SESSION_RESUME.md` §0.
 
 Este documento describe **qué existe y cómo funciona**.
 Los accesos y su persistencia están en `docs/orquestador/ACCESS_BOOTSTRAP.md`.
@@ -285,10 +284,12 @@ Dos consecuencias operativas:
 
 ## 7. Limitaciones conocidas del entorno de desarrollo (Windows)
 
-Esto ahorra horas a una sesión nueva:
+Esto ahorra horas a una sesión nueva. Estado por herramienta y entorno, con fecha: `ENVIRONMENT.md` §2.
+Los puntos de abajo son observaciones registradas en su momento, no un supuesto global de cualquier máquina.
 
-- **`php.exe` está bloqueado por Application Control** en esta máquina → PHPUnit no es ejecutable
-  localmente. Y en staging no hay phpunit (`--no-dev`). Es un límite declarado, no una omisión.
+- **Registrado 2026-10-09:** `php.exe` estaba bloqueado por Application Control. **El 2026-10-16** PHP 8.2.33
+  responde en el equipo Windows actual, todavía sin `ext-intl`. PHPUnit se corre **solo** en el runner
+  aislado; en staging no hay phpunit (`--no-dev`).
 - **Falta `ext-intl`** → las páginas de Filament dan 500 en tests.
 - **PowerShell 5.1 no conserva estado entre llamadas.** Hay que fijar `PATH` en cada comando
   (`bootstrap_access.ps1` lo resuelve, ver `ACCESS_BOOTSTRAP.md`).
@@ -336,15 +337,16 @@ El protocolo de autonomía y los gates A–F están en `docs/orquestador/AUTONOM
 
 ## 9. Orden de lectura al reanudar
 
-> **Vigente desde 2026-10-15:** primero `SESSION_RESUME.md` §0–§6 y los comentarios del Issue #2 enlazados ahí. El loop autónomo está suspendido, así que los puntos 2 a 4 de abajo son historia y contexto, no instrucciones de arranque.
+> **Vigente desde 2026-10-16 (`6210552318`):** el arranque es **solo** el de `SESSION_RESUME.md` §0. Eso es
+> ese archivo, el estado de git y el comentario del Issue #2 asignado. La lista anterior, que incluía el
+> protocolo autónomo, `current_task.md` completo y el handoff JSON, queda reemplazada. Está en el historial de git.
 
-1. `docs/orquestador/SESSION_RESUME.md` — estado y punto de reanudación maestro
-2. `docs/orquestador/AUTONOMOUS_DEV_LOOP.md` — protocolo del loop y gates (loop suspendido)
-3. `docs/orquestador/current_task.md` — encabezado con la tarea activa
-4. `audit/orchestrator_handoff.json` — campos `current_*` y `review_*`
-5. último comentario del orquestador en Issue #2
-6. **este archivo** — cuando haga falta conocimiento técnico, no estado
-7. `docs/orquestador/ACCESS_BOOTSTRAP.md` — cuando haga falta un acceso
+Bajo demanda y solo si la tarea lo pide:
+- **este archivo**, para conocimiento técnico (no estado);
+- `ACCESS_BOOTSTRAP.md`, para un acceso;
+- `ENVIRONMENT.md`, para herramientas por entorno;
+- `AUTONOMOUS_DEV_LOOP.md`, solo como referencia histórica (suspendido);
+- `audit/orchestrator_handoff.json`, solo campos concretos y nunca completo (515 KB).
 
 Si algo aquí contradice GitHub o la base viva, **prevalece la evidencia viva** y la discrepancia debe
 registrarse antes de seguir.

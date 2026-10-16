@@ -1,5 +1,13 @@
 # Protocolo de loop autónomo — Orquestador ↔ Agente de desarrollo
 
+> ## ⏸ SUSPENDIDO desde 2026-10-14. Referencia histórica opcional
+>
+> El propietario detuvo el loop autónomo (`audit/orchestrator_suspended_2026-10-14.md`). Nada de este documento
+> es una instrucción de arranque. Una sesión **no** entra a un loop, no lee revisiones por su cuenta, no sondea el
+> Issue #2 y no adelanta `review_head`. Cada ronda es manual: una instrucción, una entrega, y se detiene
+> (`SESSION_RESUME.md` §0). Se reactiva solo con un registro explícito del propietario. Los gates A–F siguen
+> como vocabulario de gobierno.
+
 **Versión:** 1.0  
 **Fecha:** 2026-10-09  
 **Objetivo:** reducir al mínimo la intervención del propietario durante desarrollo, pruebas y correcciones, manteniendo control humano sólo en decisiones críticas o cambios de alcance/fase.

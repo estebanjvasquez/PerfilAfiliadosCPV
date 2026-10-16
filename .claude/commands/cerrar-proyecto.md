@@ -2,6 +2,10 @@
 description: Cierra la jornada de trabajo en PerfilAfiliadosCPV — actualiza docs/task.md y Notion con lo hecho hoy
 ---
 
+> **Desde 2026-10-16 (`6210552318`):** el checkpoint compartido es `docs/orquestador/SESSION_RESUME.md` (corto,
+> ≤8 KB) más `current_task.md`, y se actualiza en la rama de la tarea. `docs/task.md` y Notion son notas locales
+> opcionales del propietario: no reemplazan ese checkpoint ni son parte del arranque.
+
 Cierra el día de trabajo en este proyecto (PerfilAfiliadosCPV). Hacé lo siguiente, en orden:
 
 ## 1. Reconstruir qué se hizo hoy

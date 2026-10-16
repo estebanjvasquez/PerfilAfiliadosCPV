@@ -2,8 +2,10 @@
 
 **Versión:** 1.0
 **Fecha:** 2026-10-09
-**Propósito:** que el orquestador autónomo y **cada sesión nueva del agente de desarrollo** recuperen
-sus accesos sin que el propietario los reconfigure a mano cada vez.
+**Propósito:** que **cada sesión nueva del agente de desarrollo** recupere sus accesos sin que el
+propietario los reconfigure a mano cada vez. Se consulta bajo demanda; el arranque está en
+`SESSION_RESUME.md` §0. Las menciones al orquestador autónomo son históricas: está suspendido desde el
+2026-10-14.
 
 > ## ⚠️ ESTE ARCHIVO NO CONTIENE NINGÚN SECRETO Y NUNCA DEBE CONTENERLO
 >
@@ -262,6 +264,10 @@ coincide con un patrón de secreto, porque el Issue es público. Si no hay token
 
 ## 6. Bootstrap del orquestador autónomo
 
+> **HISTÓRICO (suspendido desde 2026-10-14).** Este apartado describe al ejecutor autónomo del VPS, que está
+> detenido por decisión del propietario. No es una secuencia de arranque para sesiones de desarrollo. Se reactiva
+> solo con un registro explícito del propietario.
+
 El orquestador **no** debe heredar las llaves del agente ni leer `.env` de nadie. Usa su propio
 almacén (variables de entorno del proceso, GitHub Actions secrets, o el *secret manager* de su
 plataforma) con estos nombres:
@@ -367,19 +373,24 @@ Esto se registra como recomendación. **No se ejecuta ningún cambio de visibili
 
 ## 8. Checklist para una sesión nueva del agente
 
-```powershell
-# 1. Sincronizar y situarse
-. C:\Proyectos\GitHub\PerfilAfiliadosCPV\docs\orquestador\bootstrap_access.ps1 -Quiet
-cd C:\Proyectos\GitHub\PerfilAfiliadosCPV; git fetch origin; git status --short
+> **Vigente desde 2026-10-16 (`6210552318`):** el arranque es el de `SESSION_RESUME.md` §0. Ya **no** se entra a
+> ningún loop: el protocolo autónomo está suspendido y es referencia histórica opcional. La versión anterior de este
+> checklist, que mandaba «entrar al loop si hay tarea activa autorizada», está en
+> `history/SESSION_RESUME_hasta_2026-10-16.md` y en el historial de git.
 
-# 2. Ver qué accesos hay (sin exponer valores)
-. C:\Proyectos\GitHub\PerfilAfiliadosCPV\docs\orquestador\bootstrap_access.ps1 -Verify
+```powershell
+# Solo si la tarea necesita un acceso (por comando; no es un paso obligatorio del arranque)
+. .\docs\orquestador\bootstrap_access.ps1 -Quiet; <comando>
+# Ver qué accesos hay, sin exponer valores. Hace llamadas de red: solo cuando haga falta
+. .\docs\orquestador\bootstrap_access.ps1 -Verify
 ```
 
-Luego leer en el orden de `PROJECT_KNOWLEDGE.md` §9 y entrar al loop si hay tarea activa autorizada.
+Presencia, autenticación y permiso para cada acción se distinguen en `ENVIRONMENT.md` §3. El checklist para
+una máquina nueva está en `ENVIRONMENT.md` §4.
 
-**Al terminar cualquier ronda:** working tree limpio, commit + push, `current_task.md` y
-`orchestrator_handoff.json` actualizados, y **cero secretos persistidos**.
+**Al terminar cualquier ronda:** working tree limpio, commit y push a la rama de la tarea, el checkpoint corto
+(`SESSION_RESUME.md` y `current_task.md`) actualizado, una entrega en el Issue #2 y **cero secretos
+persistidos**. `orchestrator_handoff.json` ya no es canal de entrega.
 
 **Regla de documentación (vigente desde 2026-10-15, instrucción `6189493183`):** toda ronda que cambie el comportamiento del sistema:
 

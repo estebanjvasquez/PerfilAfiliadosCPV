@@ -1,0 +1,35 @@
+{
+  "manifest": "STARTUP_DRY_RUN",
+  "task": "CPV-SESSION-CONTINUITY",
+  "authorization": "Issue #2 comment 6210552318",
+  "measured_utc": "2026-10-16T08:40:00Z",
+  "measured_at_branch": "docs/session-continuity",
+  "method": "deterministic: byte sizes of the files as committed on this branch; no AI session or subagent was launched to prove it",
+  "budget": { "minutes_target": 5, "project_docs_bytes_target": 10240 },
+  "auto_loaded_by_tool": [
+    { "tool": "Claude Code", "file": "CLAUDE.md", "range": "all", "bytes": 1044, "note": "repo root; there is no CLAUDE.md in ancestor directories or in the user profile (checked 2026-10-16)" },
+    { "tool": "Claude Code", "file": "<executor private memory>/MEMORY.md", "range": "all", "bytes": 1097, "note": "local, private, outside git; index only" },
+    { "tool": "Claude Code", "file": ".claude/settings.json", "range": "permissions only", "bytes": null, "note": "permission rules, not instructions; its Python, xampp and OneDrive paths come from another machine and account and prove nothing about tools today" },
+    { "tool": "Codex/other agents", "file": "AGENTS.md", "range": "all", "bytes": 697, "note": "same rules as CLAUDE.md, single source in SESSION_RESUME.md" }
+  ],
+  "startup_reads": [
+    { "step": 1, "file": "docs/orquestador/SESSION_RESUME.md", "range": "all (116 lines)", "bytes": 7292 },
+    { "step": 3, "file": "Issue #2 assigned comment (example: 6210552318)", "range": "body only", "bytes": 8922, "note": "task input, not project documentation; size varies per task" }
+  ],
+  "project_docs_bytes_total": 8336,
+  "project_docs_bytes_breakdown": "CLAUDE.md 1044 + SESSION_RESUME.md 7292",
+  "commands": [
+    { "step": 2, "shell": "PowerShell", "command": "git status -sb; git branch --show-current; git rev-parse HEAD", "network": false },
+    { "step": 3, "shell": "PowerShell", "command": "curl.exe -s -H \"Accept: application/vnd.github+json\" https://api.github.com/repos/estebanjvasquez/PerfilAfiliadosCPV/issues/comments/<id> -o <scratch>\\c.json; then ConvertFrom-Json and save .body with -Encoding utf8", "network": true, "auth": "none (public repo)" },
+    { "step": 4, "shell": "PowerShell", "command": ". .\\docs\\orquestador\\bootstrap_access.ps1 -Quiet; <command>", "when": "only for commands that need git push, the Issue #2 token or SSH", "network": false },
+    { "step": 5, "shell": "PowerShell", "command": ".\\docs\\orquestador\\check_tools.ps1 -Name <tool> -Version", "when": "only for tools the task needs", "network": false }
+  ],
+  "not_read_at_startup": [
+    "docs/orquestador/history/** (26889 + 114367 bytes)",
+    "docs/orquestador/current_task.md (2051 bytes; on demand)",
+    "docs/orquestador/ENVIRONMENT.md, ACCESS_BOOTSTRAP.md, PROJECT_KNOWLEDGE.md, AUTONOMOUS_DEV_LOOP.md (on demand)",
+    "audit/orchestrator_handoff.json (515767 bytes; selected fields only, never whole)",
+    "audit/**, the full Issue #2 thread, test suites, server logs"
+  ],
+  "next_authorized_action": "owner: fast-forward feature/upgrade-filament-v3 to 0f8bdad97590676c966048e18afa35f76110ff1f (deploy of CPV-HOME-BRANDING-AND-LAYOUT approved in chat 2026-10-16; the agent's push was denied by the permission classifier); orchestrator/owner: review deliveries 6210758420 and the CPV-SESSION-CONTINUITY comment; agent: nothing else without a new Issue #2 instruction"
+}

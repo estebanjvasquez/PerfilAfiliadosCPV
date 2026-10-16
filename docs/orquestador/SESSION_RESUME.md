@@ -1,439 +1,116 @@
-# CPV — Punto de reanudación maestro
+# CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-16, ~07:55 UTC.
-- **CPV-HOME-BRANDING-AND-LAYOUT** (`6210321522`, del propietario): la página de inicio se llama **Inicio**, su título visible es el logo de Perfil de Afiliados y las tarjetas van cuenta → ayuda → avisos.
-  - Rama `feature/home-branding-layout`, BASE `6e26302` (= `c02d4ec` desplegado más audit/docs), TESTED_HEAD `17e2b07`.
-  - 40 tests enfocados OK y navegador 135/135 (aislado). **READY_FOR_REVIEW — MANUAL, sin desplegar.**
-  - Informe: `audit/home_branding_layout_2026-10-16.md`; evidencia y capturas: `audit/runs/home_branding/`.
-- TASK-0010C está desplegada y el propietario informó su prueba manual como **OK**.
-- La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** fue aceptada (`6190018710`) y está **desplegada en staging** (`d23c0e6`, **MANUAL_SSH_DEPLOY** por la vía `6190372221`): **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**.
-- El propietario lo revisó y lo vio igual: el índice seguía centrado en la taxonomía. Se reorganizó por módulo del sistema en `4b7cab6` y está **desplegado** (`37e3b71`, run `38727131820`; el propietario lo autorizó por chat; informe §10).
-- **CPV-TAXONOMY-MAP** («Mapa de la taxonomía» para afiliados), autorizada en `6191513374` con las correcciones de `6191485610`, se aceptó en `6194751263` y está **desplegada en staging** (`9e7e379`, run `38753813135`; el propietario la autorizó por chat): **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**.
-- **CPV-HOME-USEFUL-HELP** (`6195707471`): en el Escritorio, la tarjeta promocional de Filament se reemplaza por «Ayuda para completar su perfil», con los botones del manual y del mapa.
-  - Rama `feature/home-useful-help`, TESTED_HEAD `dc584e3`.
-  - Aceptada en `6195972738` y **desplegada** (`c02d4ec`, run `38762292519`; el propietario la autorizó por chat): **DEPLOYED_FOR_OWNER_REVIEW**. Informe: `audit/home_useful_help_2026-10-15.md`.
-  - TESTED_HEAD `0fb38e2`: suite completa aislada OK (492 tests) y navegador 39/39 con una taxonomía sintética de tamaño real.
-  - Informe: `audit/taxonomy_map_2026-10-15.md`.
+**Checkpoint:** 2026-10-16 ~08:40Z. Lo anterior, completo y sin cambios, está en
+[`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 
-Las §0 a §6 son la primera lectura. Lo que está después de la línea «Historia» es el checkpoint del 2026-10-08, que **ya no rige** y se conserva como historia.
+> **Prioridad:** las instrucciones del usuario y del comentario del Issue #2 asignado prevalecen sobre este
+> archivo. Si algo de aquí contradice GitHub o el servidor, prevalece la evidencia viva: se registra la
+> discrepancia y se sigue en forma acotada. Las filas con fecha son hechos observados entonces, **no** estado
+> vivo.
 
-> Si algo de aquí contradice GitHub o la base viva, prevalece la evidencia viva. Registrar la discrepancia antes de actuar.
-> Las filas marcadas «registrado» son hechos con fecha, **no** estado vivo verificado en esta lectura.
+## 0. Arranque (presupuesto: ≤5 min, ≤~10 KB de documentación)
 
-## 0. Indicación para una sesión nueva
+1. Este archivo, completo. No leer el historial, el hilo del Issue #2, los informes ni `audit/**`.
+2. `git status -sb`, `git branch --show-current`, `git rev-parse HEAD`. No cambiar de rama, no `pull`, no
+   descartar cambios ajenos.
+3. **Solo** el comentario del Issue #2 que asigne el usuario, leído completo (API anónima, ver
+   [`ENVIRONMENT.md`](ENVIRONMENT.md) §3). Más comentarios, solo si ese comentario los cita.
+4. Accesos, por comando y solo si la tarea los necesita: `. docs\orquestador\bootstrap_access.ps1 -Quiet; <cmd>`.
+5. Herramientas, solo las que la tarea necesita: `docs\orquestador\check_tools.ps1 -Name <tool>` (solo nombres y
+   estado, sin instalar nada).
 
-> Lee `docs/orquestador/SESSION_RESUME.md` §0 a §6 y solo los comentarios del Issue #2 enlazados en §3. Carga los accesos con `. docs\orquestador\bootstrap_access.ps1 -Quiet;` y, si hace falta, `-Verify`. Verifica la rama, el HEAD y el working tree. No releas el hilo completo ni cargues logs grandes. Ejecuta **solo** la siguiente acción autorizada explícitamente en el Issue #2; si no hay ninguna, espera.
+**No** se arranca con: loops automáticos, agentes o subagentes, sondeos, suites de tests, volcados de logs,
+auditorías del código, escaneo del disco o de transcripciones, ni lectura completa de
+`audit/orchestrator_handoff.json` (515 KB; si hace falta, solo campos concretos). El protocolo autónomo está
+**suspendido** desde el 2026-10-14 y queda como referencia histórica.
 
-## 1. Estado (registrado el 2026-10-15)
+Manifiesto de este arranque, con archivos y bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.json).
 
-| Tema | Estado |
-|---|---|
-| Runtime de staging | **`c02d4ec8f578b25f8101ac3109c7931e23298f2b`** (Escritorio con «Ayuda para completar su perfil», sobre el mapa `9e7e379`). Desplegado el 2026-10-15 a las 15:40Z por el workflow normal, run `38762292519` success. Smoke del Escritorio 21/21 y de C 18/18; la taxonomía no cambió. |
-| TASK-0010A/B/C | Desplegadas. C fue aceptada (`6188413270`) y el propietario informó su prueba manual como **OK** (`6189493183`, `OWNER_REPORTED_UAT_PASS`; es un informe del propietario, no un test automático). |
-| Ronda manual + correo | **Aceptada** (`6190018710`) y **desplegada** (2026-10-15 11:05Z; informe §9), + **reorganización por módulo** `4b7cab66e4f580da5854a1f97afde3cac30822aa` (feedback del propietario, informe §10): verde aislado (45 tests, navegador 40/40), **desplegado** en `37e3b71`. Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo (con la secuencia correcta: recrear `app` y luego `config:cache`, para activar y para volver atrás) y regla de documentación. |
-| Mapa de la taxonomía | **Aceptado (`6194751263`) y desplegado (`9e7e379`).** Rama `feature/taxonomy-map`. Página de solo lectura `/admin/mapa-de-la-taxonomia`, con el mismo acceso que el manual y enlaces desde el manual y la pestaña «Categorías CPV». Árbol publicado según `is_active` y ancestros visibles; sin caché ni escrituras. Sobre staging, en solo lectura, las reglas darían 48/333/2.418, con 55 Familias y 1 Grupo vacíos. |
-| Inicio con logo y orden de tarjetas | **READY_FOR_REVIEW — MANUAL, sin desplegar** (2026-10-16). Rama `feature/home-branding-layout` @ TESTED_HEAD `17e2b076f221f36037a193b8fcab58a11d243009`, base `6e26302`. «Escritorio» → «Inicio» (misma URL y ruta), logo en el `<h1>` (superficie blanca en oscuro), 3 columnas en escritorio. Manual §`#escritorio` actualizado (ancla conservada). |
-| Inicio útil (Escritorio) | **Aceptado (`6195972738`) y desplegado (`c02d4ec`).** Rama `feature/home-useful-help` @ TESTED_HEAD `dc584e36cbea75852f0094e9053d9291b41e288e`, base `2e38c60` (= `9e7e379` más docs). 32 tests enfocados OK y navegador 47/47. |
-| Correo del sistema | **ACTIVACIÓN GLOBAL PENDIENTE: espera proveedor, configuración y credenciales del propietario.** Staging en modo sin envío (`MAIL_MAILER=log`, comprobado el 2026-10-15 con `docs/deploy/mail_status_readonly.php`). Sin destinatario configurado. No se ha enviado ningún correo real. |
-| Solicitud #1 | `failed`/`recipient_not_configured`, con una fila histórica. Sin reintento autorizado. |
-| Automatización | El ejecutor autónomo está **suspendido**. No hay IA en segundo plano ni sondeos. |
+## 1. Estado, con cada SHA por separado
 
-## 2. SHAs y ramas
+| Hecho | Valor | Observado |
+|---|---|---|
+| HEAD remoto de la rama de despliegue `feature/upgrade-filament-v3` | `c02d4ec8f578b25f8101ac3109c7931e23298f2b` | 2026-10-16 08:10Z (`git ls-remote`) |
+| Código corriendo en staging (checkout del VPS) | `c02d4ec`, 0 modificaciones | 2026-10-16 08:10Z (SSH, solo lectura) |
+| Imagen del contenedor `app` en staging | `sha256:97236501…`, arrancado 2026-10-15 15:40:23Z | 2026-10-16 08:10Z |
+| Imagen de recuperación | `perfilafiliados-app:pre-branding-c02d4ec` (= la imagen de arriba) | creada 2026-10-16 ~08:11Z |
 
-- **Runtime desplegado:** `c02d4ec8f578b25f8101ac3109c7931e23298f2b`: el inicio útil (TESTED_HEAD `dc584e3`) sobre `9e7e379`, que es el mapa (TESTED_HEAD `0fb38e2`) sobre el manual por módulo (`37e3b71`).
-- **Inicio con logo y orden de tarjetas:** rama `feature/home-branding-layout`, BASE `6e26302`, **TESTED_HEAD `17e2b076f221f36037a193b8fcab58a11d243009`**; REVIEW_HEAD = el commit del informe. El chequeo de navegador es `ux_check_home_branding.mjs` en `infra/contabo-test-runner` @ `ac4fc4f`.
-- **Mapa de la taxonomía:** rama `feature/taxonomy-map`.
-  - BASE `f4eb859`, que es `37e3b71` más solo docs/audit.
-  - **TESTED_HEAD `0fb38e2050ce24792dde36132c90f666c71157cf`**. REVIEW_HEAD aceptado y desplegado **`9e7e379`**.
-- **Ronda manual + correo:** rama `feature/mail-docs-and-user-manual`.
-  - Base `0becd37` (checkpoint de C).
-  - **TESTED_HEAD `433fbf05d4a82600f75e3bd1c31672112bda61c0`**.
-  - REVIEW_HEAD aceptado **`d23c0e6ffac8e7b5105370bedade3475105e0fff`** (anterior `73765ea`, corrección `6189828037`).
-  - Corrección: solo `docs/deploy/CORREO_DEL_SISTEMA.md` y el informe.
-- **Rama de C:** `feature/task-0010c-request-operations` @ `0becd37` (checkpoint).
-- **Arnés aislado:** `infra/contabo-test-runner` @ `8b707d1`. Agrega `ux_check_home_help.mjs`; antes, `3dff19a` agregó la semilla y el chequeo del mapa. Agrega `--ux-seed`, la semilla sintética y el chequeo de navegador del mapa; el chequeo de fugas excluye las filas `ux-synthetic-*`.
-- **Imágenes de recuperación en el VPS:** `perfilafiliados-app:pre-home-9e7e379` (imagen anterior al inicio útil), `perfilafiliados-app:pre-taxmap-37e3b71` (imagen anterior al mapa), `perfilafiliados-app:pre-manual-a577234` (imagen anterior al manual, `fd4441da…`), `perfilafiliados-app:pre-0010c-9b447eb`, `perfilafiliados-app:pre-0010-004d24e`.
+Una rama remota no prueba un despliegue: el estado de staging sale del VPS.
 
-## 3. Evidencia (enlazar, no copiar)
+### Tarea de producto en curso: CPV-HOME-BRANDING-AND-LAYOUT
 
-- Ronda manual + correo, con la matriz de cobertura del PDF: `audit/mail_docs_user_manual_2026-10-15.md`.
-- Correo del sistema (mecanismo real, aprovisionamiento, chequeo seguro, vuelta atrás, requisitos): `docs/deploy/CORREO_DEL_SISTEMA.md`.
-- C (despliegue y guía de prueba): `audit/task_0010c_request_operations_2026-10-15.md`.
-- Mapa de la taxonomía:
-  - informe, con mediciones, reproducción y hallazgos: `audit/taxonomy_map_2026-10-15.md`;
-  - propuesta corregida (A–F): `docs/propuestas/mapa_taxonomia.md`;
-  - evidencia: `audit/runs/taxonomy_map/`.
-- Issue #2:
-  - instrucción de esta ronda: `6189493183`; corrección: `6189828037`; aceptación: `6190018710`; autorización de despliegue: `6190034071`; bloqueo: `6190243300`; vía SSH: `6190372221`;
-  - evidencia del despliegue: `audit/runs/manual_deploy_2026-10-15/` (estado previo y posterior, log saneado, smokes);
-  - aceptación de C: `6188413270`;
-  - autorización de despliegue de C: `6188477132`;
-  - entrega del despliegue de C: `6188643243`;
-  - mapa: propuesta `6191417709`, revisión con correcciones A–F `6191485610`, autorización de desarrollo `6191513374`, entrega `6194134316`, aceptación `6194751263`; despliegue autorizado por el propietario en el chat;
-  - inicio con logo: instrucción `6210321522`; informe `audit/home_branding_layout_2026-10-16.md`; evidencia `audit/runs/home_branding/`;
-  - inicio útil: instrucción `6195707471`, entrega `6195905470`, aceptación `6195972738`, despliegue autorizado por el propietario en el chat (evidencia `audit/runs/home_help_deploy_2026-10-15/`); informe `audit/home_useful_help_2026-10-15.md`; evidencia `audit/runs/home_help/`;
-  - evidencia del despliegue del mapa: `audit/runs/taxonomy_map_deploy_2026-10-15/` (informe §9).
+- **Instrucción:** `6210321522` (propietario). **Entrega:** `6210758420` (READY_FOR_REVIEW — MANUAL).
+- **Rama:** `feature/home-branding-layout`. BASE `6e26302` (= `c02d4ec` más audit/docs). **TESTED_HEAD
+  `17e2b076f221f36037a193b8fcab58a11d243009`**, **REVIEW_HEAD `0f8bdad97590676c966048e18afa35f76110ff1f`**.
+- **Qué hace:** «Escritorio» pasa a «Inicio», el logo va como título y las tarjetas siguen el orden cuenta → ayuda → avisos.
+  Se probó en aislamiento: 40 tests y 135/135 en navegador. Informe: `audit/home_branding_layout_2026-10-16.md`.
+- **Despliegue:** el propietario lo **aprobó en el chat** el 2026-10-16. Las precondiciones pasaron:
+  - estado previo en `audit/runs/home_branding_deploy_2026-10-16/`;
+  - el smoke de 0010C dio 18/18;
+  - 0 migraciones pendientes y 0 runs en curso.
+  - El fast-forward `c02d4ec..0f8bdad` a la rama de despliegue lo **rechazó el clasificador de permisos**, así que **NO está desplegado**.
+- **Smoke posterior preparado:** `docs/deploy/smoke_home_branding_readonly.php`.
 
-## 4. Siguiente acción
+### Tarea de continuidad: CPV-SESSION-CONTINUITY
 
-- **Propietario:** abrir «Manual de usuario» y revisar el índice por módulo (18 secciones). Dijo que «ya se ve bastante bien» y que lo llevará a revisión del cliente.
-- **Propietario, prueba del Escritorio:** al entrar, la tarjeta «Ayuda para completar su perfil» lleva al manual y al mapa, y la tarjeta de la cuenta conserva «Salir».
-- **Propietario, prueba del mapa:**
-  - abrir «Manual de usuario» → **Ver mapa de la taxonomía**;
-  - recorrer Grupos y Familias y probar el filtro, también en el teléfono;
-  - comprobar el enlace desde la pestaña «Categorías CPV» de una empresa.
-  - Ninguna de las dos cosas se verificó en vivo: la pestaña y el filtro en un navegador real.
-- **Propietario/orquestador:** revisar la entrega de CPV-HOME-BRANDING-AND-LAYOUT en el Issue #2 (capturas en `audit/runs/home_branding/ux/`). No está desplegada: el despliegue necesita autorización aparte.
-- **Agente:** **ninguna** hasta una nueva instrucción. No activar correo y no tocar secretos.
-- **Propietario, cuando lo tenga:** proveedor de correo, remitente y dominio (SPF/DKIM/DMARC), destinatario responsable, aprovisionamiento seguro en el `.env` del servidor y una prueba controlada (ver `CORREO_DEL_SISTEMA.md` §6). También: decidir si se reintenta la #1.
+- Instrucción `6210552318`. Rama `docs/session-continuity` (sale de `0f8bdad`). Solo documentación, sin desplegar.
+- Informe: `audit/session_continuity_2026-10-16.md`.
 
-## 5. Pendientes y limitaciones (no arrancan solos)
+### Ya desplegado y aceptado (registrado)
 
-- **Filtros del workflow (mantenimiento futuro, no corregido):** `paths-ignore` (`**.md`) ignora el Markdown servido desde `resources/manual/`, así que un cambio que solo toca el manual nunca se despliega solo. El agente no puede lanzar `workflow_dispatch` (403, `actions=write`), y `main` no tiene el workflow.
-- **Vía SSH manual:** no enviar el script por stdin (`bash -s`). `docker compose run` se come el resto del script y la salida es 0 igual; pasó el 2026-10-15 y dejó 1 minuto de mantenimiento (informe §9).
-- **Correo:** activación pendiente (§1).
-  - En modo sin envío, un usuario nuevo **no recibe** la verificación y no puede entrar al panel.
-  - El panel no tiene acción para verificar a mano.
-- **Reserva del aviso:** impide envíos concurrentes mientras está vigente, pero **no garantiza un único envío** tras una caída posterior a la aceptación SMTP, una falla ambigua o una expiración durante un envío a medias. La redacción de la ayuda se precisa en la próxima ronda de código.
-- Los avisos `simulated` no se pueden reintentar.
-- **`EmpresaPgsql` no compila:** fatal latente desde `a5265ce`; necesita su propia tarea.
-- **Defectos de interfaz vistos al revisar el manual:**
+- **Inicio útil:** `c02d4ec`.
+- **Mapa de la taxonomía:** `9e7e379`.
+- **Manual por módulo:** `37e3b71`.
+- **TASK-0010A/B/C:** el propietario informó la prueba de C como OK (`6189493183`).
+- **Correo del sistema:** sigue en modo `log` y la activación está **pendiente del propietario** (`docs/deploy/CORREO_DEL_SISTEMA.md`).
+- **Ejecutor autónomo del VPS:** **suspendido**. No se reactiva sin un registro del propietario.
+
+## 2. Siguiente acción
+
+- **Propietario:** ejecutar el despliegue aprobado, que es un fast-forward sin forzar:
+  `git push origin 0f8bdad97590676c966048e18afa35f76110ff1f:refs/heads/feature/upgrade-filament-v3`.
+  El workflow «Deploy a Contabo» se dispara solo. Después, un agente puede capturar el estado posterior y
+  correr `smoke_home_branding_readonly.php` y `smoke_task_0010c_readonly.php`. Esos smokes son de solo lectura y van
+  como `www-data` dentro de `app`.
+- **Propietario/orquestador:** revisar `6210758420` (producto) y la entrega de CPV-SESSION-CONTINUITY.
+- **Agente:** ninguna otra cosa sin una instrucción nueva del Issue #2.
+
+## 3. Ramas y worktrees en uso (no tocar sin instrucción)
+
+| Ubicación | Rama | Nota |
+|---|---|---|
+| repo principal | la de la tarea asignada | ver `git branch --show-current` |
+| `..\wt-task-0010a` | `feature/task-0010a-category-request` @ `b43737e` | histórico, sin trabajo pendiente conocido |
+| `..\wt-task-0010b` | `feature/task-0010b-online-manual` @ `964550d` | histórico |
+| worktree temporal del runner | `infra/contabo-test-runner` @ `ac4fc4f` | arnés de tests aislado |
+
+## 4. Pendientes conocidos (no arrancan solos)
+
+- **Workflow:** `paths-ignore` (`**.md`) no despliega un cambio que solo toque `resources/manual/*.md`. El agente no puede lanzar `workflow_dispatch` (403).
+- **Vía SSH manual de despliegue:** nunca enviar el script por stdin con `bash -s` (2026-10-15).
+- **Correo pendiente:** sin correo, un usuario nuevo no recibe la verificación.
+- **Reserva de avisos:** no garantiza un único envío.
+- **`EmpresaPgsql` no compila** (desde `a5265ce`).
+- **Defectos ya vistos en la interfaz:**
   - la casilla `ovid` dice «COVID.»;
-  - ISO 9001 e ISO 17025 no tienen etiqueta explícita.
-- `app/images/user.pdf` es un PDF ajeno (manual de un plugin de audio). Retirarlo lo decide el propietario.
-- El validador del handoff (del loop retirado) falla en la regla histórica `6080004466`. No bloquea.
-- **Hallazgos de la ronda del mapa** (informe §7, no corregidos):
-  - `Empresa::users()` lee `Auth::User()->id` y falla si no hay un usuario autenticado;
-  - `EditEmpresa::getSteps()` usa `$value` de un bucle sobre `cities` y falla si la tabla está vacía;
-  - el buscador de categorías no verifica que los ancestros estén activos (latente: 0 casos hoy en staging).
-- **Limitación del mapa:** a 390 px la introducción ocupa la primera pantalla, así que los resultados del filtro quedan debajo (la línea de estado sí se ve).
-- **Regla vigente:** toda ronda que cambie el comportamiento actualiza el manual o la ayuda en la misma entrega (`ACCESS_BOOTSTRAP.md` §8).
-
-## 6. Accesos (solo nombres; nunca valores)
-
-| Capacidad | Mecanismo establecido | Verificación barata | 2026-10-15 |
-|---|---|---|---|
-| `git fetch`/`push` | Git Credential Manager (Windows) | `git ls-remote origin` | verificado |
-| Leer el Issue #2 | API anónima | `bootstrap_access.ps1 -Verify` | verificado |
-| Escribir en el Issue #2 | `CPV_GITHUB_TOKEN` en `%USERPROFILE%\.cpv\credentials.env`, fuera de git, cargado con el bootstrap; publicar con `docs\orquestador\post_issue_comment.ps1 -BodyFile` | `-Verify` muestra SET/MISSING | verificado |
-| SSH al VPS de staging | clave OpenSSH en `%USERPROFILE%\.ssh\` (el nombre está en la memoria privada local) | `ssh … true` | verificado |
-| Entorno aislado | runner en el VPS (ruta en la memoria privada) | una corrida focalizada | verificado (corrida 10:13Z) |
-| Despliegue | workflow «Deploy a Contabo» con los secretos del repo | estado del run en la API | verificado (`38612101908`) |
-| **Correo del sistema** | `MAIL_*` en el `.env` del despliegue de cada entorno (fuera de git); un cambio exige **recrear `app` y después `config:cache`** (`CORREO_DEL_SISTEMA.md` §4) | `mail_status_readonly.php` (configurado/falta) | **pendiente del propietario**; modo `log` |
-| Credenciales del ejecutor del servidor | quedan **en el servidor**; no se copian | — | no revisado (ejecutor suspendido) |
-
-- Las variables exportadas **no sobreviven** a una shell nueva: cada comando que las necesite empieza con `. docs\orquestador\bootstrap_access.ps1 -Quiet;`.
-- El clasificador de permisos de la sesión puede rechazar un push a `feature/upgrade-filament-v3`. En ese caso lo ejecuta el propietario. **Un rechazo de permisos se reporta; no se rodea.**
-- No crear, rotar, revelar ni reaprovisionar secretos sin una instrucción explícita.
-
----
-
-
-# Historia: checkpoint del 2026-10-08 (superado; se conserva)
-
-## (Encabezado original del 2026-10-08)
-
-**Fecha del checkpoint:** 2026-10-08  
-**Proyecto:** PerfilAfiliadosCPV / CIRA / Taxonomía CPV  
-**Repositorio principal:** `estebanjvasquez/PerfilAfiliadosCPV`  
-**Rama activa:** `feature/upgrade-filament-v3`  
-**HEAD aceptado al crear este checkpoint:** `bdfefa97cda9cc812ae86fb4080989ccbb2182f2`  
-**Runtime Laravel desplegado en staging:** `004d24e98159bf152c741bd9f0ee698b43139d87`  
-**Worker repo:** `estebanjvasquez/perfilafiliados-mcp`  
-**Worker source HEAD conocido:** `29de993c12fbdadf0577c3630cc07611af020a46`
-
-> Este archivo es el punto de entrada para retomar el proyecto sin releer toda la conversación ni todo
-> el Issue #2. Si cualquier dato de aquí contradice GitHub o la base viva, prevalece la evidencia viva y
-> debe registrarse la discrepancia antes de seguir.
-
----
-
-## 1. Estado actual
-
-### TASK-0007 — APPLY atómico de taxonomía
-
-**CLOSED / PASS.** Cierre formal del orquestador: Issue #2 comentario `6035642794`.
-
-Resultado publicado en staging:
-- 12 propuestas `APPLIED`
-- 3 propuestas históricas `SUPERSEDED`
-- 0 `PENDING_APPLY`
-- 0 `ABORTED`
-- 10 candidate links = 3 `published` + 7 `context_required`
-- 2 concept relations = 2 `rejected`
-- canonical concepts = 82
-- TERM→CONCEPT = 145
-- TERM→CPV = 9.749
-- regresión congelada = 32/32, 288 campos, 0 diffs
-- targeted E2E `pipeline` / `refinery` / `refinería` = PASS
-
-No ejecutar otro APPLY sin una nueva autorización explícita.
-
-### TASK-0008 — UAT cliente + revisión taxonómica del pasante
-
-**CLOSED / PASS.** Cierre formal del orquestador: Issue #2 comentario `6041102746`.
-
-Paquete aceptado en `docs/uat/`:
-1. `README.md`
-2. `GUIA_PRUEBAS_BUSCADOR_CLIENTE.md`
-3. `FORMATO_RESULTADOS_BUSCADOR_CLIENTE.csv`
-4. `FORMATO_RESULTADOS_BUSCADOR_CLIENTE.md`
-5. `GUIA_CLASIFICACION_RESULTADOS_UAT.md`
-6. `RESUMEN_UAT_CLIENTE_TEMPLATE.md`
-7. `GUIA_ASIGNACION_PASANTE_REVISION_TAXONOMICA.md`
-8. `FORMATO_REVISION_TAXONOMICA_PASANTE.csv`
-9. `FORMATO_REVISION_TAXONOMICA_PASANTE.md`
-10. `RESUMEN_LOTE_REVISION_TAXONOMICA_TEMPLATE.md`
-
-**Estado operativo actual:** esperando dos entradas externas:
-- resultados de la UAT del buscador por parte del cliente;
-- primer lote de calibración del pasante: 30–50 relaciones, estrictamente REVIEW-ONLY.
-
-El pasante NO está autorizado a usar `Aprobar`, `Rechazar`, `Editar`, `Eliminar` ni acciones
-masivas durante la calibración. Sus cinco decisiones se registran sólo en la planilla.
-
-### TASK-0010 — solicitud de categoría + manual en línea
-
-**AUTORIZADA PERO EN ESPERA — NO INICIADA.** Autorización: `6079956985`. Espera registrada en la
-revisión `6084707259` y reafirmada en `6085642297`.
-
-**No entrar al loop por estas dos subtareas.** La instrucción de §8 de entrar directamente al loop
-cuando hay una tarea autorizada **no aplica** acá: el propietario frenó TASK-0010A/B hasta que la
-infraestructura de orquestación funcione y pase revisión. Hace falta revisión PASS **más** un record
-explícito del propietario que levante la espera; ninguno de los dos existe todavía.
-
-### Trabajo activo: infraestructura de orquestación
-
-Autorizada en `6085642297`, contrato en el repo privado `estebanjvasquez/SISTEG-Agent-Orchestrator`,
-`docs/CPV_EXECUTOR_CONTABO_CONTRACT.md`. Dos workstreams: ejecutor persistente en el VPS de Contabo
-(systemd, estado durable, revisión por SHA exacto, write-back autenticado, recuperación tras caída) y
-PHPUnit aislado en el mismo servidor con PostgreSQL desechable.
-
----
-
-## 2. Próximo trabajo cuando llegue feedback
-
-No abrir una corrección de búsqueda a ciegas.
-
-### Si llega la planilla UAT del cliente
-
-Abrir **TASK-0009 — UAT TRIAGE**:
-- clasificar cada observación;
-- separar `FALSO_POSITIVO`, `FALSO_NEGATIVO`, `RANKING`, `TERMINO_TAXONOMIA`,
-  `MAPEO_CPV`, `DATOS_EMPRESA`, `EVIDENCIA_WEB_FALTANTE`, `CONSULTA_AMBIGUA`,
-  `UI_USABILIDAD`, `OTRO`;
-- no corregir nada en la misma ronda de diagnóstico;
-- producir backlog priorizado y resumen de aceptación.
-
-### Si llega el lote del pasante
-
-Revisar primero la calibración:
-- comparar `Decision` vs `Decision_Final`;
-- excluir casos genuinamente ambiguos del denominador;
-- calcular tasa de coincidencia;
-- referencia de calidad: ≥90% en casos no ambiguos;
-- buscar patrones de sobre-aprobación;
-- registrar términos ambiguos y categorías faltantes.
-
-Sólo después, si el propietario lo autoriza, abrir una tarea separada para permisos operativos
-controlados del pasante. TASK-0008 NO concede esos permisos.
-
-### Trabajo posterior ya identificado
-
-- ampliar cobertura TERM→CPV gobernada;
-- Fase E: crawler de contenido web de empresas;
-- Fase F: integración crawler → evidencia/taxonomía;
-- Fases G/H: refinamiento retrieval híbrido / ranking sólo con evidencia real;
-- Fase I: benchmark y gate de producción.
-
----
-
-## 3. Estado de datos que debe verificarse al reanudar
-
-Último estado aceptado:
-
-TERM→CPV:
-- total: 9.749
-- approved: 212
-- candidate: 17
-- needs_review: 9.282
-- deprecated: 238
-
-Reviewed proposals:
-- APPLIED: 12
-- SUPERSEDED: 3
-- PENDING_APPLY: 0
-- ABORTED: 0
-
-Último `taxonomy_audit_log.id` aceptado: **5260**.
-
-Al reanudar después de una pausa larga, hacer una lectura de solo consulta para confirmar que estos
-valores no cambiaron antes de asumir continuidad.
-
----
-
-## 4. Accesos y rutas conocidas
-
-### GitHub
-
-Conector confirmado con lectura y escritura:
-- principal: `estebanjvasquez/PerfilAfiliadosCPV`
-- Worker: `estebanjvasquez/perfilafiliados-mcp`
-- hilo de gobierno: **Issue #2** del repo principal
-
-Loop del desarrollador (protocolo completo en `AUTONOMOUS_DEV_LOOP.md`):
-1. agente trabaja;
-2. agente hace commit/push y publica `READY_FOR_REVIEW / Issue #2 / HEAD <sha>`;
-3. orquestador lee código/docs reales en ese HEAD;
-4. orquestador publica auditoría completa directamente en Issue #2;
-5. **el agente lee esa auditoría directamente de Issue #2** y, si es `CORRECTIONS_REQUIRED`, aplica las
-   correcciones y devuelve un HEAD nuevo.
-
-**El propietario no retransmite comentarios.** Interviene sólo ante un gate A–F, un bloqueo externo que
-requiera su acción, o un `PASS / CLOSED`. Desde el 2026-10-09 el agente también **escribe** en Issue #2
-(`CPV_GITHUB_TOKEN`), así que el loop cierra en ambas direcciones; si ese token falta o caduca, el
-fallback es `AUTONOMOUS_DEV_LOOP.md` §11, donde la señal de ida es el handoff más el HEAD remoto.
-
-### Supabase
-
-Proyecto conectado:
-- project id: `mrquhxwvcrbwbuqafjee`
-
-Usar el conector para lectura/auditoría y sólo hacer mutaciones con autorización explícita.
-
-### Staging
-
-- app: `https://pruebas.camarapetrolera.app`
-- UAT CIRA: `https://pruebas.camarapetrolera.app/cira-test/`
-- VPS conocido: `66.94.121.98`
-
-Último deploy Laravel aceptado:
-- `004d24e98159bf152c741bd9f0ee698b43139d87`
-- GitHub Actions run `37458287882`
-
-### Worker / Cloudflare
-
-- Worker: `perfilafiliados-mcp`
-- endpoint: `https://perfilafiliados-mcp.sisteg.workers.dev`
-- Hyperdrive: `perfilafiliados-taxonomy`
-- Hyperdrive id: `f16a1ab0a9514504b80bd14138699d4c`
-
-**No guardar secretos en este archivo.**
-El `DEBUG_TOKEN` fue rotado para TASK-0007 y existe como secret del Worker, pero su plaintext no debe
-considerarse recuperable desde GitHub ni desde este checkpoint. Si se necesita de nuevo, seguir un flujo
-de autorización de secretos explícito.
-
-No tocar la configuración Hyperdrive no relacionada `talento-cpv-db`.
-
-### n8n / CIRA
-
-La página de UAT llama al flujo clonado de pruebas. Antes de una sesión UAT confirmar que el workflow
-está activo; si está detenido, todas las consultas pueden fallar igual y producir un falso diagnóstico
-de caída del buscador.
-
----
-
-## 5. Restricciones de continuidad
-
-Hasta nueva autorización:
-- no merge a `main`;
-- no deploy a producción;
-- no otro APPLY/replay;
-- no aprobación masiva de TERM→CPV;
-- no cambios de ranking/pesos para “mejorar” una consulta aislada;
-- no cambios de secretos;
-- no otorgar al pasante permiso operativo de publicación;
-- no tocar baseline `audit/regression_baseline_2026-09-23.json`.
-
-Toda corrección de ranking/search debe cerrar con nueva regresión contra la línea base congelada.
-
----
-
-## 6. Loop autónomo Orquestador ↔ Agente
-
-El protocolo vigente está en `docs/orquestador/AUTONOMOUS_DEV_LOOP.md`.
-
-Regla resumida:
-- el propietario autoriza una tarea/fase una vez;
-- dentro de ese alcance, implementación, pruebas, correcciones, commits, pushes y re-revisiones fluyen
-  entre orquestador y agente sin usar al propietario como mensajero;
-- sólo se vuelve al propietario ante gates críticos (nueva tarea/fase, producción/main, datos
-  destructivos/publicación masiva, secretos/permisos, decisión de negocio/dominio, coste/seguridad/acción
-  externa irreversible);
-- al terminar, el orquestador informa `PASS / CLOSED` y propone la siguiente tarea si corresponde.
-
----
-
-## 7. Cómo debe reanudar ChatGPT
-
-Cuando se abra este proyecto desde otro dispositivo o desde la app de escritorio:
-
-1. Abrir el proyecto **CPV - INVESTIGACIONES**.
-2. Abrir esta conversación si está disponible; si se inicia un chat nuevo, indicar:
-   **“Retoma CPV desde docs/orquestador/SESSION_RESUME.md; verifica HEAD, Issue #2 y estado vivo antes de actuar.”**
-3. Leer solamente, en este orden:
-   - este archivo;
-   - `docs/orquestador/current_task.md`;
-   - `audit/orchestrator_handoff.json`;
-   - último comentario del orquestador en Issue #2.
-4. Verificar el HEAD remoto de `feature/upgrade-filament-v3`.
-5. Si se va a tocar taxonomía, hacer una lectura de solo consulta de los conteos de §3.
-6. Sólo si hay discrepancias, reconstruir contexto desde comentarios anteriores.
-
-No releer todo el Issue #2 por defecto.
-
----
-
-## 8. Cómo debe reanudar el agente desarrollador
-
-Al iniciar una nueva sesión del agente:
-
-1. `git fetch origin`
-2. cambiar a `feature/upgrade-filament-v3`
-3. verificar que el working tree esté limpio
-4. leer, en este orden:
-   - `docs/orquestador/SESSION_RESUME.md`
-   - `docs/orquestador/AUTONOMOUS_DEV_LOOP.md`
-   - `docs/orquestador/current_task.md`
-   - `audit/orchestrator_handoff.json`
-   - último comentario del orquestador en Issue #2
-5. confirmar el HEAD remoto antes de modificar archivos
-6. no reconstruir decisiones históricas si estos cuatro puntos son consistentes
-7. si existe discrepancia entre documentación y repo/base viva, detenerse y reportarla
-8. si hay una tarea/fase ya autorizada, entrar directamente al loop de `AUTONOMOUS_DEV_LOOP.md`:
-   - implementar/probar/corregir sin pedir autorización por fallos ordinarios;
-   - commit + push;
-   - actualizar `current_task.md` y `orchestrator_handoff.json`;
-   - leer directamente la última auditoría del orquestador en Issue #2;
-   - aplicar `CORRECTIONS_REQUIRED` sin que el propietario retransmita mensajes;
-   - detenerse sólo ante un `OWNER_GATE_REQUIRED`, bloqueo externo real o `PASS / CLOSED`;
-   - nunca persistir tokens, contraseñas ni claves.
-
----
-
-## 9. Comentarios de gobierno clave
-
-No hace falta leerlos todos al reanudar, pero son las referencias autoritativas:
-
-- TASK-0007 owner APPLY authorization: `6032819854`
-- TASK-0007 final closure: `6035642794`
-- TASK-0008 open: `6035726459`
-- TASK-0008 intern extension: `6035827197`
-- TASK-0008 corrections: `6036293989`
-- TASK-0008 final closure: `6041102746`
-
----
-
-## 10. Regla maestra
-
-**No confiar sólo en la memoria de una conversación o de un agente.**
-
-La continuidad se establece con:
-1. Git HEAD;
-2. este checkpoint;
-3. `current_task.md`;
-4. `orchestrator_handoff.json`;
-5. Issue #2;
-6. estado vivo de Supabase cuando corresponda.
-
-Esa combinación permite retomar el trabajo de forma rápida y auditable sin releer toda la historia.
+  - ISO 9001/17025 no tienen etiqueta;
+  - `app/images/user.pdf` es un PDF ajeno.
+- **Fallas latentes:**
+  - `Empresa::users()` falla si no hay sesión;
+  - `EditEmpresa::getSteps()` falla si `cities` está vacía;
+  - `StatsOverview` divide por cero si `empresas` está vacía.
+
+## 5. Reglas vigentes (resumen; el detalle está en `PROJECT_KNOWLEDGE.md` §8)
+
+- **Secretos:** ningún secreto en git, chat, Issue ni logs. No crear, rotar ni ampliar permisos sin una instrucción explícita.
+- **Permisos:** un rechazo de permisos se **reporta, no se rodea**. Si rechaza el push a `feature/upgrade-filament-v3`, lo ejecuta el propietario.
+- **Documentación:** toda ronda que cambie el comportamiento actualiza el manual o la ayuda en la misma entrega.
+- **Entrega:** un solo comentario en el Issue #2 con `docs\orquestador\post_issue_comment.ps1 -BodyFile <md>`. No se usa `audit/orchestrator_handoff.json` como canal.
+
+## 6. Bajo demanda (no en el arranque)
+
+- **Herramientas por entorno y máquina nueva:** [`ENVIRONMENT.md`](ENVIRONMENT.md).
+- **Accesos** (solo nombres): [`ACCESS_BOOTSTRAP.md`](ACCESS_BOOTSTRAP.md).
+- **Conocimiento técnico:** [`PROJECT_KNOWLEDGE.md`](PROJECT_KNOWLEDGE.md).
+- **Tarea actual en una página:** [`current_task.md`](current_task.md).
+- **Historia:** [`history/`](history/).
