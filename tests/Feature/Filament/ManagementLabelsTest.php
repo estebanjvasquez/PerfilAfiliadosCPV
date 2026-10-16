@@ -12,6 +12,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 /**
@@ -42,9 +45,18 @@ class ManagementLabelsTest extends TestCase
      *
      * @return array{0: Empresa, 1: User}
      */
-    private function empresaConUsuario(array $management = []): array
+    private function empresaConUsuario(array $management = [], bool $superAdmin = false): array
     {
         $user = User::factory()->create();
+        if ($superAdmin) {
+            $user->assignRole(Role::findOrCreate(config('filament-shield.super_admin.name'), 'web'));
+        } else {
+            // Afiliado: los permisos de Shield que ManagementPolicy exige para ver y editar la pestaña.
+            foreach (['view_any_management', 'view_management', 'create_management', 'update_management'] as $permission) {
+                $user->givePermissionTo(Permission::findOrCreate($permission, 'web'));
+            }
+        }
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->actingAs($user);
         $empresa = Empresa::create([
             'rif' => 'J'.random_int(10000000, 99999999).'-'.random_int(0, 9),
@@ -85,9 +97,9 @@ class ManagementLabelsTest extends TestCase
     }
 
     #[Test]
-    public function the_quality_form_labels_iso_9001_and_iso_17025_and_saves_them(): void
+    public function the_quality_form_labels_iso_9001_and_iso_17025_and_saves_them_as_admin(): void
     {
-        [$empresa, $user] = $this->empresaConUsuario();
+        [$empresa, $user] = $this->empresaConUsuario([], superAdmin: true);
 
         $this->manager($empresa, $user)
             ->mountTableAction('calidad')
@@ -109,7 +121,8 @@ class ManagementLabelsTest extends TestCase
     {
         [$empresa, $user] = $this->empresaConUsuario(['ovid' => true]);
 
-        $this->manager($empresa, $user)->assertSee('OVID')->assertDontSee('COVID');
+        // La tabla es diferida (deferLoading en todo el panel): se carga como lo haría el navegador.
+        $this->manager($empresa, $user)->call('loadTable')->assertSee('OVID')->assertDontSee('COVID');
 
         // Mismo campo en el PDF del perfil, la vista de administración y el export: sin «COVID».
         foreach (['resources/views/pdf.blade.php', 'resources/views/filament/pages/management-det-view.blade.php', 'app/Exports/ManagementDetExport.php'] as $file) {
