@@ -41,10 +41,13 @@ class HomeBrandingLayoutTest extends TestCase
             ->getContent();
     }
 
-    /** Posición del primer elemento con esa clase (no la del CSS de la página, que también la nombra). */
-    private function classOffset(string $html, string $class): int|false
+    /** El HTML después del bloque de estilos de Inicio, que también nombra estas clases. */
+    private function afterHomeStyles(string $html): string
     {
-        return preg_match('/class="[^"]*'.preg_quote($class, '/').'/', $html, $m, PREG_OFFSET_CAPTURE) ? $m[0][1] : false;
+        $styles = strpos($html, '.cpv-home-notice .fi-wi-stats-overview-stat-value');
+        $this->assertNotFalse($styles, 'Faltan los estilos de Inicio.');
+
+        return substr($html, strpos($html, '</style>', $styles));
     }
 
     private function superAdmin(): User
@@ -124,16 +127,16 @@ class HomeBrandingLayoutTest extends TestCase
     public function an_affiliate_and_an_admin_see_account_help_and_notices_in_that_order(): void
     {
         foreach (['afiliado' => User::factory()->create(), 'admin' => $this->superAdmin()] as $who => $user) {
-            $html = $this->homeHtml($user);
+            $html = $this->afterHomeStyles($this->homeHtml($user));
 
-            $account = $this->classOffset($html, 'fi-account-widget');
-            $help = $this->classOffset($html, 'cpv-profile-help-widget');
-            $notices = $this->classOffset($html, 'cpv-home-notice');
+            $account = strpos($html, 'fi-account-widget');
+            $help = strpos($html, 'cpv-profile-help-widget');
+            $notices = strpos($html, 'cpv-home-notice');
             $this->assertNotFalse($account, "{$who}: falta la tarjeta de la cuenta.");
             $this->assertNotFalse($help, "{$who}: falta la tarjeta de ayuda.");
             $this->assertNotFalse($notices, "{$who}: faltan los avisos.");
             $this->assertTrue($account < $help && $help < $notices, "{$who}: el orden debe ser cuenta, ayuda, avisos.");
-            $this->assertSame(2, preg_match_all('/class="[^"]*cpv-home-notice/', $html), "{$who}: deben estar los dos avisos.");
+            $this->assertSame(2, substr_count($html, 'cpv-home-notice'), "{$who}: deben estar los dos avisos.");
             $this->assertStringContainsString(Filament::getPanel('admin')->getLogoutUrl(), $html);
             $this->assertStringContainsString('md:grid-cols-2', $html, "{$who}: los avisos van en 2 columnas.");
         }
