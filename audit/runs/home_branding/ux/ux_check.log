@@ -1,0 +1,137 @@
+PASS  guest is sent to login from the home URL  :: http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/login
+PASS  [affiliate/light/desktop] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [affiliate/light/desktop] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [affiliate/light/desktop] logo keeps its aspect ratio at a restrained size  :: 140x72 ratio=1.944
+PASS  [affiliate/light/desktop] logo sits on a light surface  :: bg=[250,250,250]
+PASS  [affiliate/light/desktop] no visible «Escritorio»
+PASS  [affiliate/light/desktop] browser title says Inicio  :: Inicio - Laravel
+PASS  [affiliate/light/desktop] active sidebar item is «Inicio»  :: Inicio
+PASS  [affiliate/light/desktop] account and help side by side, account first  :: account 336px @352, help 696px @712
+PASS  [affiliate/light/desktop] notices below both cards, full width  :: notices 1056px
+PASS  [affiliate/light/desktop] notice text at reading size  :: 16px
+PASS  [affiliate/light/desktop] no page-level horizontal overflow  :: excess=0px
+PASS  [affiliate/light/desktop] keyboard order: Salir, Manual de usuario, Mapa de la taxonomía  :: Salir | Manual de usuario | Mapa de la taxonomía
+PASS  [affiliate/light/desktop] "Manual de usuario" opens the manual  :: http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/manual-de-usuario
+PASS  [affiliate/light/desktop] "Mapa de la taxonomía" opens the map  :: http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/mapa-de-la-taxonomia
+PASS  [affiliate/light/desktop] sidebar «Inicio» returns to /admin  :: http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin
+PASS  [affiliate/light/desktop] «Salir» logs out  :: http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/login
+PASS  [affiliate/dark/desktop] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [affiliate/dark/desktop] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [affiliate/dark/desktop] logo keeps its aspect ratio at a restrained size  :: 140x72 ratio=1.944
+PASS  [affiliate/dark/desktop] logo sits on a light surface  :: bg=[255,255,255]
+PASS  [affiliate/dark/desktop] no visible «Escritorio»
+PASS  [affiliate/dark/desktop] browser title says Inicio  :: Inicio - Laravel
+PASS  [affiliate/dark/desktop] active sidebar item is «Inicio»  :: Inicio
+PASS  [affiliate/dark/desktop] account and help side by side, account first  :: account 336px @352, help 696px @712
+PASS  [affiliate/dark/desktop] notices below both cards, full width  :: notices 1056px
+PASS  [affiliate/dark/desktop] notice text at reading size  :: 16px
+PASS  [affiliate/dark/desktop] no page-level horizontal overflow  :: excess=0px
+PASS  [affiliate/light/tablet] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [affiliate/light/tablet] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [affiliate/light/tablet] logo keeps its aspect ratio at a restrained size  :: 140x72 ratio=1.944
+PASS  [affiliate/light/tablet] logo sits on a light surface  :: bg=[250,250,250]
+PASS  [affiliate/light/tablet] no visible «Escritorio»
+PASS  [affiliate/light/tablet] browser title says Inicio  :: Inicio - Laravel
+PASS  [affiliate/light/tablet] account, help, notices stacked in order  :: y 208 < 324 < 512
+PASS  [affiliate/light/tablet] notices below both cards, full width  :: notices 772px
+PASS  [affiliate/light/tablet] notice text at reading size  :: 16px
+PASS  [affiliate/light/tablet] no page-level horizontal overflow  :: excess=0px
+PASS  [affiliate/dark/tablet] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [affiliate/dark/tablet] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [affiliate/dark/tablet] logo keeps its aspect ratio at a restrained size  :: 140x72 ratio=1.944
+PASS  [affiliate/dark/tablet] logo sits on a light surface  :: bg=[255,255,255]
+PASS  [affiliate/dark/tablet] no visible «Escritorio»
+PASS  [affiliate/dark/tablet] browser title says Inicio  :: Inicio - Laravel
+PASS  [affiliate/dark/tablet] account, help, notices stacked in order  :: y 224 < 340 < 528
+PASS  [affiliate/dark/tablet] notices below both cards, full width  :: notices 772px
+PASS  [affiliate/dark/tablet] notice text at reading size  :: 16px
+PASS  [affiliate/dark/tablet] no page-level horizontal overflow  :: excess=0px
+PASS  [affiliate/light/mobile] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [affiliate/light/mobile] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [affiliate/light/mobile] logo keeps its aspect ratio at a restrained size  :: 109x56 ratio=1.946
+PASS  [affiliate/light/mobile] logo sits on a light surface  :: bg=[250,250,250]
+PASS  [affiliate/light/mobile] no visible «Escritorio»
+PASS  [affiliate/light/mobile] browser title says Inicio  :: Inicio - Laravel
+PASS  [affiliate/light/mobile] account, help, notices stacked in order  :: y 208 < 324 < 616
+PASS  [affiliate/light/mobile] notices below both cards, full width  :: notices 358px
+PASS  [affiliate/light/mobile] notice text at reading size  :: 16px
+PASS  [affiliate/light/mobile] no page-level horizontal overflow  :: excess=0px
+PASS  [affiliate/dark/mobile] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [affiliate/dark/mobile] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [affiliate/dark/mobile] logo keeps its aspect ratio at a restrained size  :: 109x56 ratio=1.946
+PASS  [affiliate/dark/mobile] logo sits on a light surface  :: bg=[255,255,255]
+PASS  [affiliate/dark/mobile] no visible «Escritorio»
+PASS  [affiliate/dark/mobile] browser title says Inicio  :: Inicio - Laravel
+PASS  [affiliate/dark/mobile] account, help, notices stacked in order  :: y 224 < 340 < 632
+PASS  [affiliate/dark/mobile] notices below both cards, full width  :: notices 358px
+PASS  [affiliate/dark/mobile] notice text at reading size  :: 16px
+PASS  [affiliate/dark/mobile] no page-level horizontal overflow  :: excess=0px
+PASS  [admin/light/desktop] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [admin/light/desktop] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [admin/light/desktop] logo keeps its aspect ratio at a restrained size  :: 140x72 ratio=1.944
+PASS  [admin/light/desktop] logo sits on a light surface  :: bg=[250,250,250]
+PASS  [admin/light/desktop] no visible «Escritorio»
+PASS  [admin/light/desktop] browser title says Inicio  :: Inicio - Laravel
+PASS  [admin/light/desktop] active sidebar item is «Inicio»  :: Inicio
+PASS  [admin/light/desktop] account and help side by side, account first  :: account 336px @352, help 696px @712
+PASS  [admin/light/desktop] notices below both cards, full width  :: notices 1056px
+PASS  [admin/light/desktop] notice text at reading size  :: 16px
+PASS  [admin/light/desktop] no page-level horizontal overflow  :: excess=0px
+PASS  [admin/light/desktop] keyboard order: Salir, Manual de usuario, Mapa de la taxonomía  :: Salir | Manual de usuario | Mapa de la taxonomía
+PASS  [admin/light/desktop] "Manual de usuario" opens the manual  :: http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/manual-de-usuario
+PASS  [admin/light/desktop] "Mapa de la taxonomía" opens the map  :: http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/mapa-de-la-taxonomia
+PASS  [admin/light/desktop] sidebar «Inicio» returns to /admin  :: http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin
+PASS  [admin/light/desktop] «Salir» logs out  :: http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/login
+PASS  [admin/dark/desktop] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [admin/dark/desktop] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [admin/dark/desktop] logo keeps its aspect ratio at a restrained size  :: 140x72 ratio=1.944
+PASS  [admin/dark/desktop] logo sits on a light surface  :: bg=[255,255,255]
+PASS  [admin/dark/desktop] no visible «Escritorio»
+PASS  [admin/dark/desktop] browser title says Inicio  :: Inicio - Laravel
+PASS  [admin/dark/desktop] active sidebar item is «Inicio»  :: Inicio
+PASS  [admin/dark/desktop] account and help side by side, account first  :: account 336px @352, help 696px @712
+PASS  [admin/dark/desktop] notices below both cards, full width  :: notices 1056px
+PASS  [admin/dark/desktop] notice text at reading size  :: 16px
+PASS  [admin/dark/desktop] no page-level horizontal overflow  :: excess=0px
+PASS  [admin/light/tablet] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [admin/light/tablet] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [admin/light/tablet] logo keeps its aspect ratio at a restrained size  :: 140x72 ratio=1.944
+PASS  [admin/light/tablet] logo sits on a light surface  :: bg=[250,250,250]
+PASS  [admin/light/tablet] no visible «Escritorio»
+PASS  [admin/light/tablet] browser title says Inicio  :: Inicio - Laravel
+PASS  [admin/light/tablet] account, help, notices stacked in order  :: y 208 < 324 < 512
+PASS  [admin/light/tablet] notices below both cards, full width  :: notices 772px
+PASS  [admin/light/tablet] notice text at reading size  :: 16px
+PASS  [admin/light/tablet] no page-level horizontal overflow  :: excess=0px
+PASS  [admin/dark/tablet] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [admin/dark/tablet] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [admin/dark/tablet] logo keeps its aspect ratio at a restrained size  :: 140x72 ratio=1.944
+PASS  [admin/dark/tablet] logo sits on a light surface  :: bg=[255,255,255]
+PASS  [admin/dark/tablet] no visible «Escritorio»
+PASS  [admin/dark/tablet] browser title says Inicio  :: Inicio - Laravel
+PASS  [admin/dark/tablet] account, help, notices stacked in order  :: y 224 < 340 < 528
+PASS  [admin/dark/tablet] notices below both cards, full width  :: notices 772px
+PASS  [admin/dark/tablet] notice text at reading size  :: 16px
+PASS  [admin/dark/tablet] no page-level horizontal overflow  :: excess=0px
+PASS  [admin/light/mobile] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [admin/light/mobile] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [admin/light/mobile] logo keeps its aspect ratio at a restrained size  :: 109x56 ratio=1.946
+PASS  [admin/light/mobile] logo sits on a light surface  :: bg=[250,250,250]
+PASS  [admin/light/mobile] no visible «Escritorio»
+PASS  [admin/light/mobile] browser title says Inicio  :: Inicio - Laravel
+PASS  [admin/light/mobile] account, help, notices stacked in order  :: y 208 < 324 < 616
+PASS  [admin/light/mobile] notices below both cards, full width  :: notices 358px
+PASS  [admin/light/mobile] notice text at reading size  :: 16px
+PASS  [admin/light/mobile] no page-level horizontal overflow  :: excess=0px
+PASS  [admin/dark/mobile] h1 is the logo with alt «Perfil de Afiliados»  :: /images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1
+PASS  [admin/dark/mobile] logo loads at 400x206 from the existing asset  :: 400x206
+PASS  [admin/dark/mobile] logo keeps its aspect ratio at a restrained size  :: 109x56 ratio=1.946
+PASS  [admin/dark/mobile] logo sits on a light surface  :: bg=[255,255,255]
+PASS  [admin/dark/mobile] no visible «Escritorio»
+PASS  [admin/dark/mobile] browser title says Inicio  :: Inicio - Laravel
+PASS  [admin/dark/mobile] account, help, notices stacked in order  :: y 224 < 340 < 632
+PASS  [admin/dark/mobile] notices below both cards, full width  :: notices 358px
+PASS  [admin/dark/mobile] notice text at reading size  :: 16px
+PASS  [admin/dark/mobile] no page-level horizontal overflow  :: excess=0px
+
+135/135 checks passed

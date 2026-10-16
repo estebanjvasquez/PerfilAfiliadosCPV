@@ -1,0 +1,667 @@
+{
+  "results": [
+    {
+      "name": "guest is sent to login from the home URL",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/login"
+    },
+    {
+      "name": "[affiliate/light/desktop] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[affiliate/light/desktop] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[affiliate/light/desktop] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "140x72 ratio=1.944"
+    },
+    {
+      "name": "[affiliate/light/desktop] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[250,250,250]"
+    },
+    {
+      "name": "[affiliate/light/desktop] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[affiliate/light/desktop] active sidebar item is «Inicio»",
+      "pass": true,
+      "detail": "Inicio"
+    },
+    {
+      "name": "[affiliate/light/desktop] account and help side by side, account first",
+      "pass": true,
+      "detail": "account 336px @352, help 696px @712"
+    },
+    {
+      "name": "[affiliate/light/desktop] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 1056px"
+    },
+    {
+      "name": "[affiliate/light/desktop] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[affiliate/light/desktop] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/light/desktop] keyboard order: Salir, Manual de usuario, Mapa de la taxonomía",
+      "pass": true,
+      "detail": "Salir | Manual de usuario | Mapa de la taxonomía"
+    },
+    {
+      "name": "[affiliate/light/desktop] \"Manual de usuario\" opens the manual",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/manual-de-usuario"
+    },
+    {
+      "name": "[affiliate/light/desktop] \"Mapa de la taxonomía\" opens the map",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/mapa-de-la-taxonomia"
+    },
+    {
+      "name": "[affiliate/light/desktop] sidebar «Inicio» returns to /admin",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin"
+    },
+    {
+      "name": "[affiliate/light/desktop] «Salir» logs out",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/login"
+    },
+    {
+      "name": "[affiliate/dark/desktop] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[affiliate/dark/desktop] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[affiliate/dark/desktop] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "140x72 ratio=1.944"
+    },
+    {
+      "name": "[affiliate/dark/desktop] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[255,255,255]"
+    },
+    {
+      "name": "[affiliate/dark/desktop] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/desktop] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[affiliate/dark/desktop] active sidebar item is «Inicio»",
+      "pass": true,
+      "detail": "Inicio"
+    },
+    {
+      "name": "[affiliate/dark/desktop] account and help side by side, account first",
+      "pass": true,
+      "detail": "account 336px @352, help 696px @712"
+    },
+    {
+      "name": "[affiliate/dark/desktop] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 1056px"
+    },
+    {
+      "name": "[affiliate/dark/desktop] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[affiliate/dark/desktop] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/light/tablet] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[affiliate/light/tablet] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[affiliate/light/tablet] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "140x72 ratio=1.944"
+    },
+    {
+      "name": "[affiliate/light/tablet] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[250,250,250]"
+    },
+    {
+      "name": "[affiliate/light/tablet] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/tablet] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[affiliate/light/tablet] account, help, notices stacked in order",
+      "pass": true,
+      "detail": "y 208 < 324 < 512"
+    },
+    {
+      "name": "[affiliate/light/tablet] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 772px"
+    },
+    {
+      "name": "[affiliate/light/tablet] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[affiliate/light/tablet] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/dark/tablet] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[affiliate/dark/tablet] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[affiliate/dark/tablet] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "140x72 ratio=1.944"
+    },
+    {
+      "name": "[affiliate/dark/tablet] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[255,255,255]"
+    },
+    {
+      "name": "[affiliate/dark/tablet] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/tablet] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[affiliate/dark/tablet] account, help, notices stacked in order",
+      "pass": true,
+      "detail": "y 224 < 340 < 528"
+    },
+    {
+      "name": "[affiliate/dark/tablet] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 772px"
+    },
+    {
+      "name": "[affiliate/dark/tablet] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[affiliate/dark/tablet] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/light/mobile] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[affiliate/light/mobile] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[affiliate/light/mobile] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "109x56 ratio=1.946"
+    },
+    {
+      "name": "[affiliate/light/mobile] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[250,250,250]"
+    },
+    {
+      "name": "[affiliate/light/mobile] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/mobile] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[affiliate/light/mobile] account, help, notices stacked in order",
+      "pass": true,
+      "detail": "y 208 < 324 < 616"
+    },
+    {
+      "name": "[affiliate/light/mobile] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 358px"
+    },
+    {
+      "name": "[affiliate/light/mobile] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[affiliate/light/mobile] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/dark/mobile] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[affiliate/dark/mobile] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[affiliate/dark/mobile] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "109x56 ratio=1.946"
+    },
+    {
+      "name": "[affiliate/dark/mobile] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[255,255,255]"
+    },
+    {
+      "name": "[affiliate/dark/mobile] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/mobile] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[affiliate/dark/mobile] account, help, notices stacked in order",
+      "pass": true,
+      "detail": "y 224 < 340 < 632"
+    },
+    {
+      "name": "[affiliate/dark/mobile] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 358px"
+    },
+    {
+      "name": "[affiliate/dark/mobile] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[affiliate/dark/mobile] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/light/desktop] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[admin/light/desktop] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[admin/light/desktop] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "140x72 ratio=1.944"
+    },
+    {
+      "name": "[admin/light/desktop] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[250,250,250]"
+    },
+    {
+      "name": "[admin/light/desktop] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[admin/light/desktop] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[admin/light/desktop] active sidebar item is «Inicio»",
+      "pass": true,
+      "detail": "Inicio"
+    },
+    {
+      "name": "[admin/light/desktop] account and help side by side, account first",
+      "pass": true,
+      "detail": "account 336px @352, help 696px @712"
+    },
+    {
+      "name": "[admin/light/desktop] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 1056px"
+    },
+    {
+      "name": "[admin/light/desktop] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[admin/light/desktop] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/light/desktop] keyboard order: Salir, Manual de usuario, Mapa de la taxonomía",
+      "pass": true,
+      "detail": "Salir | Manual de usuario | Mapa de la taxonomía"
+    },
+    {
+      "name": "[admin/light/desktop] \"Manual de usuario\" opens the manual",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/manual-de-usuario"
+    },
+    {
+      "name": "[admin/light/desktop] \"Mapa de la taxonomía\" opens the map",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/mapa-de-la-taxonomia"
+    },
+    {
+      "name": "[admin/light/desktop] sidebar «Inicio» returns to /admin",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin"
+    },
+    {
+      "name": "[admin/light/desktop] «Salir» logs out",
+      "pass": true,
+      "detail": "http://cpvtest-uxserve-20261016t074624z-17e2b076f221:8000/admin/login"
+    },
+    {
+      "name": "[admin/dark/desktop] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[admin/dark/desktop] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[admin/dark/desktop] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "140x72 ratio=1.944"
+    },
+    {
+      "name": "[admin/dark/desktop] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[255,255,255]"
+    },
+    {
+      "name": "[admin/dark/desktop] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[admin/dark/desktop] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[admin/dark/desktop] active sidebar item is «Inicio»",
+      "pass": true,
+      "detail": "Inicio"
+    },
+    {
+      "name": "[admin/dark/desktop] account and help side by side, account first",
+      "pass": true,
+      "detail": "account 336px @352, help 696px @712"
+    },
+    {
+      "name": "[admin/dark/desktop] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 1056px"
+    },
+    {
+      "name": "[admin/dark/desktop] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[admin/dark/desktop] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/light/tablet] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[admin/light/tablet] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[admin/light/tablet] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "140x72 ratio=1.944"
+    },
+    {
+      "name": "[admin/light/tablet] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[250,250,250]"
+    },
+    {
+      "name": "[admin/light/tablet] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[admin/light/tablet] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[admin/light/tablet] account, help, notices stacked in order",
+      "pass": true,
+      "detail": "y 208 < 324 < 512"
+    },
+    {
+      "name": "[admin/light/tablet] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 772px"
+    },
+    {
+      "name": "[admin/light/tablet] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[admin/light/tablet] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/dark/tablet] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[admin/dark/tablet] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[admin/dark/tablet] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "140x72 ratio=1.944"
+    },
+    {
+      "name": "[admin/dark/tablet] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[255,255,255]"
+    },
+    {
+      "name": "[admin/dark/tablet] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[admin/dark/tablet] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[admin/dark/tablet] account, help, notices stacked in order",
+      "pass": true,
+      "detail": "y 224 < 340 < 528"
+    },
+    {
+      "name": "[admin/dark/tablet] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 772px"
+    },
+    {
+      "name": "[admin/dark/tablet] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[admin/dark/tablet] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/light/mobile] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[admin/light/mobile] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[admin/light/mobile] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "109x56 ratio=1.946"
+    },
+    {
+      "name": "[admin/light/mobile] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[250,250,250]"
+    },
+    {
+      "name": "[admin/light/mobile] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[admin/light/mobile] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[admin/light/mobile] account, help, notices stacked in order",
+      "pass": true,
+      "detail": "y 208 < 324 < 616"
+    },
+    {
+      "name": "[admin/light/mobile] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 358px"
+    },
+    {
+      "name": "[admin/light/mobile] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[admin/light/mobile] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[admin/dark/mobile] h1 is the logo with alt «Perfil de Afiliados»",
+      "pass": true,
+      "detail": "/images/Perfil-Afiliados.png alt=Perfil de Afiliados h1s=1"
+    },
+    {
+      "name": "[admin/dark/mobile] logo loads at 400x206 from the existing asset",
+      "pass": true,
+      "detail": "400x206"
+    },
+    {
+      "name": "[admin/dark/mobile] logo keeps its aspect ratio at a restrained size",
+      "pass": true,
+      "detail": "109x56 ratio=1.946"
+    },
+    {
+      "name": "[admin/dark/mobile] logo sits on a light surface",
+      "pass": true,
+      "detail": "bg=[255,255,255]"
+    },
+    {
+      "name": "[admin/dark/mobile] no visible «Escritorio»",
+      "pass": true
+    },
+    {
+      "name": "[admin/dark/mobile] browser title says Inicio",
+      "pass": true,
+      "detail": "Inicio - Laravel"
+    },
+    {
+      "name": "[admin/dark/mobile] account, help, notices stacked in order",
+      "pass": true,
+      "detail": "y 224 < 340 < 632"
+    },
+    {
+      "name": "[admin/dark/mobile] notices below both cards, full width",
+      "pass": true,
+      "detail": "notices 358px"
+    },
+    {
+      "name": "[admin/dark/mobile] notice text at reading size",
+      "pass": true,
+      "detail": "16px"
+    },
+    {
+      "name": "[admin/dark/mobile] no page-level horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    }
+  ]
+}

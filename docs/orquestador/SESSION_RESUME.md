@@ -1,6 +1,10 @@
 # CPV — Punto de reanudación maestro
 
-**Checkpoint:** 2026-10-15, ~15:45 UTC.
+**Checkpoint:** 2026-10-16, ~07:55 UTC.
+- **CPV-HOME-BRANDING-AND-LAYOUT** (`6210321522`, del propietario): la página de inicio se llama **Inicio**, su título visible es el logo de Perfil de Afiliados y las tarjetas van cuenta → ayuda → avisos.
+  - Rama `feature/home-branding-layout`, BASE `6e26302` (= `c02d4ec` desplegado más audit/docs), TESTED_HEAD `17e2b07`.
+  - 40 tests enfocados OK y navegador 135/135 (aislado). **READY_FOR_REVIEW — MANUAL, sin desplegar.**
+  - Informe: `audit/home_branding_layout_2026-10-16.md`; evidencia y capturas: `audit/runs/home_branding/`.
 - TASK-0010C está desplegada y el propietario informó su prueba manual como **OK**.
 - La ronda **CPV-MAIL-DOCS-AND-USER-MANUAL** fue aceptada (`6190018710`) y está **desplegada en staging** (`d23c0e6`, **MANUAL_SSH_DEPLOY** por la vía `6190372221`): **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**.
 - El propietario lo revisó y lo vio igual: el índice seguía centrado en la taxonomía. Se reorganizó por módulo del sistema en `4b7cab6` y está **desplegado** (`37e3b71`, run `38727131820`; el propietario lo autorizó por chat; informe §10).
@@ -28,6 +32,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 | TASK-0010A/B/C | Desplegadas. C fue aceptada (`6188413270`) y el propietario informó su prueba manual como **OK** (`6189493183`, `OWNER_REPORTED_UAT_PASS`; es un informe del propietario, no un test automático). |
 | Ronda manual + correo | **Aceptada** (`6190018710`) y **desplegada** (2026-10-15 11:05Z; informe §9), + **reorganización por módulo** `4b7cab66e4f580da5854a1f97afde3cac30822aa` (feedback del propietario, informe §10): verde aislado (45 tests, navegador 40/40), **desplegado** en `37e3b71`. Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo (con la secuencia correcta: recrear `app` y luego `config:cache`, para activar y para volver atrás) y regla de documentación. |
 | Mapa de la taxonomía | **Aceptado (`6194751263`) y desplegado (`9e7e379`).** Rama `feature/taxonomy-map`. Página de solo lectura `/admin/mapa-de-la-taxonomia`, con el mismo acceso que el manual y enlaces desde el manual y la pestaña «Categorías CPV». Árbol publicado según `is_active` y ancestros visibles; sin caché ni escrituras. Sobre staging, en solo lectura, las reglas darían 48/333/2.418, con 55 Familias y 1 Grupo vacíos. |
+| Inicio con logo y orden de tarjetas | **READY_FOR_REVIEW — MANUAL, sin desplegar** (2026-10-16). Rama `feature/home-branding-layout` @ TESTED_HEAD `17e2b076f221f36037a193b8fcab58a11d243009`, base `6e26302`. «Escritorio» → «Inicio» (misma URL y ruta), logo en el `<h1>` (superficie blanca en oscuro), 3 columnas en escritorio. Manual §`#escritorio` actualizado (ancla conservada). |
 | Inicio útil (Escritorio) | **Aceptado (`6195972738`) y desplegado (`c02d4ec`).** Rama `feature/home-useful-help` @ TESTED_HEAD `dc584e36cbea75852f0094e9053d9291b41e288e`, base `2e38c60` (= `9e7e379` más docs). 32 tests enfocados OK y navegador 47/47. |
 | Correo del sistema | **ACTIVACIÓN GLOBAL PENDIENTE: espera proveedor, configuración y credenciales del propietario.** Staging en modo sin envío (`MAIL_MAILER=log`, comprobado el 2026-10-15 con `docs/deploy/mail_status_readonly.php`). Sin destinatario configurado. No se ha enviado ningún correo real. |
 | Solicitud #1 | `failed`/`recipient_not_configured`, con una fila histórica. Sin reintento autorizado. |
@@ -36,6 +41,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 ## 2. SHAs y ramas
 
 - **Runtime desplegado:** `c02d4ec8f578b25f8101ac3109c7931e23298f2b`: el inicio útil (TESTED_HEAD `dc584e3`) sobre `9e7e379`, que es el mapa (TESTED_HEAD `0fb38e2`) sobre el manual por módulo (`37e3b71`).
+- **Inicio con logo y orden de tarjetas:** rama `feature/home-branding-layout`, BASE `6e26302`, **TESTED_HEAD `17e2b076f221f36037a193b8fcab58a11d243009`**; REVIEW_HEAD = el commit del informe. El chequeo de navegador es `ux_check_home_branding.mjs` en `infra/contabo-test-runner` @ `ac4fc4f`.
 - **Mapa de la taxonomía:** rama `feature/taxonomy-map`.
   - BASE `f4eb859`, que es `37e3b71` más solo docs/audit.
   - **TESTED_HEAD `0fb38e2050ce24792dde36132c90f666c71157cf`**. REVIEW_HEAD aceptado y desplegado **`9e7e379`**.
@@ -64,6 +70,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
   - autorización de despliegue de C: `6188477132`;
   - entrega del despliegue de C: `6188643243`;
   - mapa: propuesta `6191417709`, revisión con correcciones A–F `6191485610`, autorización de desarrollo `6191513374`, entrega `6194134316`, aceptación `6194751263`; despliegue autorizado por el propietario en el chat;
+  - inicio con logo: instrucción `6210321522`; informe `audit/home_branding_layout_2026-10-16.md`; evidencia `audit/runs/home_branding/`;
   - inicio útil: instrucción `6195707471`, entrega `6195905470`, aceptación `6195972738`, despliegue autorizado por el propietario en el chat (evidencia `audit/runs/home_help_deploy_2026-10-15/`); informe `audit/home_useful_help_2026-10-15.md`; evidencia `audit/runs/home_help/`;
   - evidencia del despliegue del mapa: `audit/runs/taxonomy_map_deploy_2026-10-15/` (informe §9).
 
@@ -76,6 +83,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
   - recorrer Grupos y Familias y probar el filtro, también en el teléfono;
   - comprobar el enlace desde la pestaña «Categorías CPV» de una empresa.
   - Ninguna de las dos cosas se verificó en vivo: la pestaña y el filtro en un navegador real.
+- **Propietario/orquestador:** revisar la entrega de CPV-HOME-BRANDING-AND-LAYOUT en el Issue #2 (capturas en `audit/runs/home_branding/ux/`). No está desplegada: el despliegue necesita autorización aparte.
 - **Agente:** **ninguna** hasta una nueva instrucción. No activar correo y no tocar secretos.
 - **Propietario, cuando lo tenga:** proveedor de correo, remitente y dominio (SPF/DKIM/DMARC), destinatario responsable, aprovisionamiento seguro en el `.env` del servidor y una prueba controlada (ver `CORREO_DEL_SISTEMA.md` §6). También: decidir si se reintenta la #1.
 

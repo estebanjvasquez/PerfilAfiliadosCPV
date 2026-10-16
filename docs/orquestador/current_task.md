@@ -12,6 +12,9 @@
 > - **15:40Z:**
 >   - el mapa está desplegado (`9e7e379`);
 >   - **CPV-HOME-USEFUL-HELP** (tarjeta «Ayuda para completar su perfil» en el Escritorio) está **READY_FOR_REVIEW — MANUAL** en `feature/home-useful-help`, sin desplegar.
+> - **2026-10-16:**
+>   - el inicio útil está desplegado (`c02d4ec`);
+>   - **CPV-HOME-BRANDING-AND-LAYOUT** («Inicio» con el logo y orden de tarjetas, `6210321522`) está **READY_FOR_REVIEW — MANUAL** en `feature/home-branding-layout`, sin desplegar.
 > - Siguiente acción y pendientes: `SESSION_RESUME.md` §4 y §5.
 >
 > Todo lo que sigue es la historia de TASK-0010 y se conserva sin cambios.
