@@ -1,0 +1,29 @@
+run_id=20261016T131022Z-3e684c569c03
+sha=3e684c569c035bc2944319f63996b45cbceab902
+phpunit_exit=0
+suites_run=Unit+Feature (full suite)
+findings=1
+-- isolation --
+isolation_passed=19
+isolation_failed=0
+-- schema preparation --
+schema_fix_applied=(none: already in the code under test)
+schema_fix_already_present=defer_four_fks.patch,align_permission_migration_to_v6.patch,portable_index_check.patch
+deferred_fks_restored_by=not needed (the replay itself created all four)
+pgsql_bootstrap_from=feature/supplhi-postgres-buscador@not needed at this SHA
+pgsql_bootstrap_migrations=8
+migration_ordering_violations=0
+migrate_ok=yes
+prep_passed=14
+prep_failed=0
+fixture_tables=79
+-- fixture load --
+fixture_loaded=yes
+fixture_source=docker/test/fixtures/synthetic_fixture.sql (synthetic, no copied data)
+preconditions_passed=8
+preconditions_failed=0
+-- tests --
+staging_before=200
+staging_after=200
+php_version=8.2.34
+extensions=pdo_pgsql,intl,zip,gd,bcmath

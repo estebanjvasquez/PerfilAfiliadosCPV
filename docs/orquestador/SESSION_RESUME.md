@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-16 ~12:00Z, en la rama `fix/first-save-postgres`. Sale de `fix/model-compatibility-labels` @ `0895258` (aceptada en `6212784682`), que a su vez sale de `docs/session-continuity` @ `28014c2`.
+**Checkpoint:** 2026-10-16 ~13:30Z, en la rama `fix/verification-completion`. Sale de `fix/first-save-postgres` @ `10616af` (aceptada en `6215360219`), que contiene `0895258` y `docs/session-continuity` @ `28014c2`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,8 +32,8 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** la de la tarea en curso, **`fix/first-save-postgres`**. Es el candidato integrado.
-  - Contiene `fix/model-compatibility-labels` @ `0895258` y `docs/session-continuity` @ `28014c2`.
+- **Rama canónica:** la de la tarea en curso, **`fix/verification-completion`**. Es el candidato integrado.
+  - Contiene `fix/first-save-postgres` @ `10616af`, que a su vez contiene `0895258` y `28014c2`.
   - Es el candidato de runtime que **lleva los archivos de arranque**: `CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo.
   - Esos archivos existen solo en estas ramas. Llegan a `feature/upgrade-filament-v3` únicamente si este candidato se despliega con una autorización.
   - Una sesión abierta en otra rama o en un checkout viejo no los carga sola.
@@ -44,26 +44,29 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `fix/first-save-postgres` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabajá en la rama `fix/verification-completion` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
 | Hecho | Valor | Fuente y fecha |
 |---|---|---|
-| HEAD remoto de `feature/upgrade-filament-v3` | `0f8bdad97590676c966048e18afa35f76110ff1f` | `git ls-remote`, 2026-10-16 ~10:02Z |
-| Código en staging (checkout del VPS) | `0f8bdad`, 0 modificaciones, imagen `sha256:37e023fd…` | SSH de solo lectura, 10:02:05Z |
+| HEAD remoto de `feature/upgrade-filament-v3` | `0f8bdad97590676c966048e18afa35f76110ff1f` | `git ls-remote`, 2026-10-16 12:27Z |
+| Código en staging (checkout del VPS) | `0f8bdad`, 0 modificaciones rastreadas (6 carpetas de assets publicados sin rastrear) | SSH de solo lectura, 12:27Z |
 | Workflow del último despliegue | run `38873194879`, success, 08:22Z | `6211360371` |
 | Imagen de recuperación | `perfilafiliados-app:pre-branding-c02d4ec` | creada ~08:11Z |
 
-### En curso: candidato integrado CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (READY_FOR_REVIEW — MANUAL, sin desplegar)
+### En curso: CPV-VERIFICATION-FLOW-AND-COMPLETION (READY_FOR_REVIEW — MANUAL, sin desplegar)
 
-- **Autorización:** `6212967641`; corrección de atomicidad `6214463281`. Prerrequisito aceptado: `0895258` (`6212784682`).
-- **Rama:** `fix/first-save-postgres`. BASE `0895258`.
-- **TESTED_HEAD:** `b9b41a0ee6dcef0323a52537cfe067dd2a187f8a`.
-- **Incluye:** `EmpresaPgsql` + etiquetas; actor en el INSERT (`creating`); transacciones en los helpers y `->databaseTransaction()` de Filament en Presencia/Sostenibilidad; clave string en Experiencia.
-- **Pruebas en `b9b41a0`:** fallas inyectadas tras el INSERT (5 primeros guardados + 4 edición/borrado) con rollback y reintento OK, en `pgsql` (8 en rojo antes, `19a67bb`); enfocadas 107 OK; suite completa **547 OK**; navegador 7/7.
-- **Informe:** `audit/first_save_postgres_2026-10-16.md` (matriz §3, atomicidad §12). **Evidencia:** `audit/runs/first_save/`.
-- **Bloqueante aparte:** el 500 del usuario sin verificar (§5). El alta completa de afiliados no está lista.
+- **Autorización:** `6215451160`. BASE `10616af` (candidato aceptado en `6215360219`).
+- **TESTED_HEAD:** `3e684c569c035bc2944319f63996b45cbceab902`. Navegador en `3f639b7` (después solo cambian el manual y los docs).
+- **Incluye:**
+  - `->emailVerification()` de Filament con una página propia: textos honestos sin envío de correo, «Cerrar sesión», reenvío limitado a 2 por minuto;
+  - enlace firmado del panel por `User::sendEmailVerificationNotification()`;
+  - `setStatus(false)` borra por modelo, así se recalcula el cache;
+  - `NoAplicaAction` en transacción.
+- **Pruebas:** enfocadas 139 OK y suite completa **568 OK** en `3e684c5`; navegador 30/30.
+- **Informe:** `audit/verification_completion_2026-10-16.md`. **Evidencia:** `audit/runs/verification_completion/`.
+- **Antes:** CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (`audit/first_save_postgres_2026-10-16.md`), incluida.
 
 ### Anteriores
 
@@ -85,13 +88,12 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 ## 4. Worktrees en uso (no tocar sin instrucción)
 
 - `..\wt-task-0010a` (`b43737e`) y `..\wt-task-0010b` (`964550d`) son históricos.
-- El runner aislado es `infra/contabo-test-runner` @ `5b6171c`.
-  - `457d445` le sube a phpunit el `memory_limit` a 512M. `5b6171c` agrega `ux_check_first_save_tx.mjs`.
+- El runner aislado es `infra/contabo-test-runner` @ `2b3471f`: phpunit con 512M; `ux_check_verification.mjs` + `ux_seed_verification.php`. El seed recibe `CPV_UX_BASE_URL`, y la app servida usa caché en archivo.
 
 ## 5. Pendientes conocidos (no arrancan solos)
 
-- **Bloqueante de release, tarea aparte:** un usuario **sin verificar** que abre el panel recibe **500** (`Route [verification.notice] not defined`). Falta `->emailVerification()` de Filament (informe §5). La próxima tarea es el flujo real registro → verificación → panel, con SMTP pendiente; la autoriza el propietario.
-- **`NoAplicaAction` al desmarcar:** no refresca el porcentaje cacheado (informe §12). Fuera de alcance.
+- **Seguridad, prioritario y sin autorizar:** `pdf/{empresa}` y `xls/{empresa}` no exigen sesión (informe de verificación §9).
+- **Correo:** pendiente del propietario. Sin envío, un afiliado nuevo **no** puede verificarse solo.
 - **Datos históricos (solo lectura, sin acción):**
   - 1 fila de `assets` con actor NULL;
   - 1 empresa con 2 filas de `assets` (informe §8).
@@ -99,7 +101,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
   - `paths-ignore` no despliega un cambio que solo toque `resources/manual/*.md`;
   - el agente no puede lanzar `workflow_dispatch` (403);
   - por SSH, nunca `bash -s` por stdin.
-- **Correo:** sin correo, un usuario nuevo no recibe la verificación. La reserva de avisos no garantiza un único envío.
+- **Avisos de solicitudes:** la reserva no garantiza un único envío.
 - **Backlog:**
   - `Empresa::users()` falla sin sesión;
   - `EditEmpresa::getSteps()` falla con `cities` vacía;

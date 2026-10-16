@@ -1,0 +1,147 @@
+{
+  "results": [
+    {
+      "name": "seed produced a verification link (not printed)",
+      "pass": true
+    },
+    {
+      "name": "[unverified/dark/mobile] lands on the verification page",
+      "pass": true,
+      "detail": "/admin/email-verification/prompt"
+    },
+    {
+      "name": "[unverified/dark/mobile] no horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[unverified/light/desktop] after login lands on the verification page (no 500)",
+      "pass": true,
+      "detail": "/admin/email-verification/prompt"
+    },
+    {
+      "name": "[unverified/light/desktop] heading «Verifique su correo electrónico»",
+      "pass": true
+    },
+    {
+      "name": "[unverified/light/desktop] honest wording: mail is not being sent, contact the Cámara",
+      "pass": true,
+      "detail": "Laravel Verifique su correo electrónico Su cuenta está creada, pero falta verificar su correo electrónico zzz-ux-unverified@example.test. Hasta entonces no puede abrir el perfil de su empresa, el manu"
+    },
+    {
+      "name": "[unverified/light/desktop] does not claim a mail was sent",
+      "pass": true
+    },
+    {
+      "name": "[unverified/light/desktop] /admin → verification page",
+      "pass": true,
+      "detail": "200 /admin/email-verification/prompt"
+    },
+    {
+      "name": "[unverified/light/desktop] /admin/empresas → verification page",
+      "pass": true,
+      "detail": "200 /admin/email-verification/prompt"
+    },
+    {
+      "name": "[unverified/light/desktop] /admin/manual-de-usuario → verification page",
+      "pass": true,
+      "detail": "200 /admin/email-verification/prompt"
+    },
+    {
+      "name": "[unverified/light/desktop] /admin/mapa-de-la-taxonomia → verification page",
+      "pass": true,
+      "detail": "200 /admin/email-verification/prompt"
+    },
+    {
+      "name": "[unverified/light/desktop] resend #1: «Pedido registrado», no delivery promised",
+      "pass": true,
+      "detail": "Pedido registrado El sistema todavía no envía correos, así que este mensaje no llegará a su buzón. Para activar su cuenta, comuníquese con la Cámara e indique e"
+    },
+    {
+      "name": "[unverified/light/desktop] resend #2: «Pedido registrado», no delivery promised",
+      "pass": true,
+      "detail": "Pedido registrado El sistema todavía no envía correos, así que este mensaje no llegará a su buzón. Para activar su cuenta, comuníquese con la Cámara e indique e"
+    },
+    {
+      "name": "[unverified/light/desktop] resend #3 is throttled",
+      "pass": true,
+      "detail": "Demasiados intentos de reenvío Por favor, inténtelo de nuevo en 57 segundos."
+    },
+    {
+      "name": "[unverified/light/desktop] «Cerrar sesión» goes to the login page",
+      "pass": true,
+      "detail": "/admin/login"
+    },
+    {
+      "name": "[unverified/light/desktop] the signed link verifies and opens the panel",
+      "pass": true,
+      "detail": "200 /admin"
+    },
+    {
+      "name": "[unverified/light/desktop] after verifying: Inicio opens (200), no verification page",
+      "pass": true,
+      "detail": "200 /admin"
+    },
+    {
+      "name": "[unverified/light/desktop] verifying gives no extra access: Empresas is 403 without the permission",
+      "pass": true,
+      "detail": "403 /admin/empresas"
+    },
+    {
+      "name": "[affiliate/light/desktop] starts with ISO 9001 saved and a partial badge",
+      "pass": true,
+      "detail": "badge=17%"
+    },
+    {
+      "name": "[affiliate/light/desktop] after «No Aplica» on and a reload: badge 100%",
+      "pass": true,
+      "detail": "badge=100%"
+    },
+    {
+      "name": "[affiliate/light/desktop] the saved ISO 9001 is still there",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] after «No Aplica» off and a reload: badge back to 17%",
+      "pass": true,
+      "detail": "badge=17%"
+    },
+    {
+      "name": "[affiliate/light/desktop] the saved ISO 9001 is still there after turning it off",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] no horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/dark/mobile] starts with ISO 9001 saved and a partial badge",
+      "pass": true,
+      "detail": "badge=17%"
+    },
+    {
+      "name": "[affiliate/dark/mobile] after «No Aplica» on and a reload: badge 100%",
+      "pass": true,
+      "detail": "badge=100%"
+    },
+    {
+      "name": "[affiliate/dark/mobile] the saved ISO 9001 is still there",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/mobile] after «No Aplica» off and a reload: badge back to 17%",
+      "pass": true,
+      "detail": "badge=17%"
+    },
+    {
+      "name": "[affiliate/dark/mobile] the saved ISO 9001 is still there after turning it off",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/mobile] no horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    }
+  ]
+}

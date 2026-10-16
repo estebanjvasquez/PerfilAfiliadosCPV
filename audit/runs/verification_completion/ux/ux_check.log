@@ -1,0 +1,32 @@
+PASS  seed produced a verification link (not printed)
+PASS  [unverified/dark/mobile] lands on the verification page  :: /admin/email-verification/prompt
+PASS  [unverified/dark/mobile] no horizontal overflow  :: excess=0px
+PASS  [unverified/light/desktop] after login lands on the verification page (no 500)  :: /admin/email-verification/prompt
+PASS  [unverified/light/desktop] heading «Verifique su correo electrónico»
+PASS  [unverified/light/desktop] honest wording: mail is not being sent, contact the Cámara  :: Laravel Verifique su correo electrónico Su cuenta está creada, pero falta verificar su correo electrónico zzz-ux-unverified@example.test. Hasta entonces no puede abrir el perfil de su empresa, el manu
+PASS  [unverified/light/desktop] does not claim a mail was sent
+PASS  [unverified/light/desktop] /admin → verification page  :: 200 /admin/email-verification/prompt
+PASS  [unverified/light/desktop] /admin/empresas → verification page  :: 200 /admin/email-verification/prompt
+PASS  [unverified/light/desktop] /admin/manual-de-usuario → verification page  :: 200 /admin/email-verification/prompt
+PASS  [unverified/light/desktop] /admin/mapa-de-la-taxonomia → verification page  :: 200 /admin/email-verification/prompt
+PASS  [unverified/light/desktop] resend #1: «Pedido registrado», no delivery promised  :: Pedido registrado El sistema todavía no envía correos, así que este mensaje no llegará a su buzón. Para activar su cuenta, comuníquese con la Cámara e indique e
+PASS  [unverified/light/desktop] resend #2: «Pedido registrado», no delivery promised  :: Pedido registrado El sistema todavía no envía correos, así que este mensaje no llegará a su buzón. Para activar su cuenta, comuníquese con la Cámara e indique e
+PASS  [unverified/light/desktop] resend #3 is throttled  :: Demasiados intentos de reenvío Por favor, inténtelo de nuevo en 57 segundos.
+PASS  [unverified/light/desktop] «Cerrar sesión» goes to the login page  :: /admin/login
+PASS  [unverified/light/desktop] the signed link verifies and opens the panel  :: 200 /admin
+PASS  [unverified/light/desktop] after verifying: Inicio opens (200), no verification page  :: 200 /admin
+PASS  [unverified/light/desktop] verifying gives no extra access: Empresas is 403 without the permission  :: 403 /admin/empresas
+PASS  [affiliate/light/desktop] starts with ISO 9001 saved and a partial badge  :: badge=17%
+PASS  [affiliate/light/desktop] after «No Aplica» on and a reload: badge 100%  :: badge=100%
+PASS  [affiliate/light/desktop] the saved ISO 9001 is still there
+PASS  [affiliate/light/desktop] after «No Aplica» off and a reload: badge back to 17%  :: badge=17%
+PASS  [affiliate/light/desktop] the saved ISO 9001 is still there after turning it off
+PASS  [affiliate/light/desktop] no horizontal overflow  :: excess=0px
+PASS  [affiliate/dark/mobile] starts with ISO 9001 saved and a partial badge  :: badge=17%
+PASS  [affiliate/dark/mobile] after «No Aplica» on and a reload: badge 100%  :: badge=100%
+PASS  [affiliate/dark/mobile] the saved ISO 9001 is still there
+PASS  [affiliate/dark/mobile] after «No Aplica» off and a reload: badge back to 17%  :: badge=17%
+PASS  [affiliate/dark/mobile] the saved ISO 9001 is still there after turning it off
+PASS  [affiliate/dark/mobile] no horizontal overflow  :: excess=0px
+
+30/30 checks passed

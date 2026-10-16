@@ -1,0 +1,328 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-phpunit-20261016T123731Z-d0e6947a85eb Creating 
+ Container cpvtest-phpunit-20261016T123731Z-d0e6947a85eb Created 
+PHPUnit 11.5.56 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.34
+Configuration: /app/phpunit.xml
+
+E.EEEEEEE.ATOMICITY management @ created | {"step":"created","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":1} | rolled back; retry OK
+.ATOMICITY management @ completion | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":13} | rolled back; retry OK
+.ATOMICITY assets @ created | {"step":"created","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":1} | rolled back; retry OK
+.ATOMICITY assets @ completion | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":13} | rolled back; retry OK
+.ATOMICITY experiences @ created | {"step":"created","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":1} | rolled back; retry OK
+.ATOMICITY experiences @ completion | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":25} | rolled back; retry OK
+.ATOMICITY presences @ created | {"step":"created","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":1} | rolled back; retry OK
+.ATOMICITY presences @ completion | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":25} | rolled back; retry OK
+.ATOMICITY sustainabilities @ created | {"step":"created","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":1} | rolled back; retry OK
+.ATOMICITY sustainabilities @ completion | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":25} | rolled back; retry OK
+.FFFFATOMICITY presences | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":25} | rolled back
+.ATOMICITY presences | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":0,"completion_inside":13} | rolled back
+.ATOMICITY sustainabilities | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":0,"completion_inside":13} | rolled back
+.ATOMICITY experiences | {"step":"completion","model_connection":"pgsql","default_connection":"pgsql","empresa_connection":"pgsql","status_connection":"pgsql","transaction_level":1,"rows_inside":1,"completion_inside":25} | rolled back
+.FFFFFF.E                              36 / 36 (100%)
+
+Time: 00:27.165, Memory: 107.00 MB
+
+There were 9 errors:
+
+1) Tests\Feature\Filament\EmailVerificationFlowTest::registration_to_verification_required_to_link_to_panel
+Symfony\Component\Routing\Exception\RouteNotFoundException: Route [filament.admin.auth.email-verification.verify] not defined.
+
+/app/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:536
+/app/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:375
+/app/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:415
+/app/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+/app/vendor/filament/filament/src/Panel/Concerns/HasAuth.php:307
+/app/vendor/filament/filament/src/FilamentManager.php:533
+/app/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+/app/vendor/filament/filament/src/Pages/Auth/Register.php:145
+/app/vendor/filament/filament/src/Pages/Auth/Register.php:97
+/app/app/Filament/Pages/Register.php:62
+/app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/app/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/app/vendor/livewire/livewire/src/Wrapped.php:23
+/app/vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:521
+/app/vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:124
+/app/vendor/livewire/livewire/src/LivewireManager.php:102
+/app/vendor/livewire/livewire/src/Mechanisms/HandleRequests/HandleRequests.php:144
+/app/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php:46
+/app/vendor/laravel/framework/src/Illuminate/Routing/Route.php:265
+/app/vendor/laravel/framework/src/Illuminate/Routing/Route.php:211
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:822
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:800
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:764
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:753
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:607
+/app/vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:36
+/app/vendor/livewire/livewire/src/Features/SupportTesting/RequestBroker.php:30
+/app/vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:35
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Render.php:24
+/app/vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:34
+/app/vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:16
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:252
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:219
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:94
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:124
+
+2) Tests\Feature\Filament\EmailVerificationFlowTest::registration_fires_the_registered_event_once
+Symfony\Component\Routing\Exception\RouteNotFoundException: Route [filament.admin.auth.email-verification.verify] not defined.
+
+/app/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:536
+/app/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:375
+/app/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:415
+/app/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+/app/vendor/filament/filament/src/Panel/Concerns/HasAuth.php:307
+/app/vendor/filament/filament/src/FilamentManager.php:533
+/app/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+/app/vendor/filament/filament/src/Pages/Auth/Register.php:145
+/app/vendor/filament/filament/src/Pages/Auth/Register.php:97
+/app/app/Filament/Pages/Register.php:62
+/app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/app/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/app/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/app/vendor/livewire/livewire/src/Wrapped.php:23
+/app/vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:521
+/app/vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:124
+/app/vendor/livewire/livewire/src/LivewireManager.php:102
+/app/vendor/livewire/livewire/src/Mechanisms/HandleRequests/HandleRequests.php:144
+/app/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php:46
+/app/vendor/laravel/framework/src/Illuminate/Routing/Route.php:265
+/app/vendor/laravel/framework/src/Illuminate/Routing/Route.php:211
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:822
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:800
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:764
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:753
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:607
+/app/vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:36
+/app/vendor/livewire/livewire/src/Features/SupportTesting/RequestBroker.php:30
+/app/vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:35
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Render.php:24
+/app/vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:34
+/app/vendor/livewire/livewire/src/Features/SupportTesting/SubsequentRender.php:16
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:252
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:219
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:94
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:181
+
+3) Tests\Feature\Filament\EmailVerificationFlowTest::an_unverified_user_can_log_out_and_the_prompt_does_not_loop
+TypeError: Tests\Feature\Filament\EmailVerificationFlowTest::prompt(): Return value must be of type string, null returned
+
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:99
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:191
+
+4) Tests\Feature\Filament\EmailVerificationFlowTest::an_unverified_user_with_a_company_still_cannot_open_it
+TypeError: Tests\Feature\Filament\EmailVerificationFlowTest::prompt(): Return value must be of type string, null returned
+
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:99
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:205
+
+5) Tests\Feature\Filament\EmailVerificationFlowTest::the_link_only_verifies_the_intended_authenticated_user
+Symfony\Component\Routing\Exception\RouteNotFoundException: Route [filament.admin.auth.email-verification.verify] not defined.
+
+/app/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:536
+/app/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:375
+/app/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:415
+/app/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+/app/vendor/filament/filament/src/Panel/Concerns/HasAuth.php:307
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:214
+
+6) Tests\Feature\Filament\EmailVerificationFlowTest::resend_is_throttled_and_does_not_claim_delivery_without_a_sending_transport
+Livewire\Exceptions\ComponentNotFoundException: Unable to find component: []
+
+/app/vendor/livewire/livewire/src/Mechanisms/ComponentRegistry.php:116
+/app/vendor/livewire/livewire/src/Mechanisms/ComponentRegistry.php:25
+/app/vendor/livewire/livewire/src/LivewireManager.php:58
+/app/vendor/livewire/livewire/src/Mechanisms/HandleComponents/HandleComponents.php:43
+/app/vendor/livewire/livewire/src/LivewireManager.php:73
+/app/storage/framework/views/c75715ce773c15e97b6661e9c36aaa60.php:11
+/app/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php:123
+/app/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php:124
+/app/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php:57
+/app/vendor/livewire/livewire/src/Mechanisms/ExtendBlade/ExtendedCompilerEngine.php:22
+/app/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php:76
+/app/vendor/livewire/livewire/src/Mechanisms/ExtendBlade/ExtendedCompilerEngine.php:10
+/app/vendor/laravel/framework/src/Illuminate/View/View.php:208
+/app/vendor/laravel/framework/src/Illuminate/View/View.php:191
+/app/vendor/laravel/framework/src/Illuminate/View/View.php:160
+/app/vendor/laravel/framework/src/Illuminate/View/Compilers/BladeCompiler.php:353
+/app/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+/app/vendor/livewire/livewire/src/Features/SupportTesting/InitialRender.php:25
+/app/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php:39
+/app/vendor/laravel/framework/src/Illuminate/Routing/Route.php:243
+/app/vendor/laravel/framework/src/Illuminate/Routing/Route.php:214
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:822
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:800
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:764
+/app/vendor/laravel/framework/src/Illuminate/Routing/Router.php:753
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+/app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:607
+/app/vendor/livewire/livewire/src/Features/SupportTesting/InitialRender.php:33
+/app/vendor/livewire/livewire/src/Features/SupportTesting/RequestBroker.php:30
+/app/vendor/livewire/livewire/src/Features/SupportTesting/InitialRender.php:32
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Render.php:24
+/app/vendor/livewire/livewire/src/Features/SupportTesting/InitialRender.php:31
+/app/vendor/livewire/livewire/src/Features/SupportTesting/InitialRender.php:17
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:44
+/app/vendor/livewire/livewire/src/LivewireManager.php:197
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:256
+
+7) Tests\Feature\Filament\EmailVerificationFlowTest::with_a_sending_transport_the_wording_says_the_message_was_sent
+TypeError: Tests\Feature\Filament\EmailVerificationFlowTest::prompt(): Return value must be of type string, null returned
+
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:99
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:271
+
+8) Tests\Feature\Filament\EmailVerificationFlowTest::a_guest_and_a_verified_user_keep_their_previous_access
+TypeError: Tests\Feature\Filament\EmailVerificationFlowTest::prompt(): Return value must be of type string, null returned
+
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:99
+/app/tests/Feature/Filament/EmailVerificationFlowTest.php:282
+
+9) Tests\Feature\Filament\NoAplicaCompletionTest::the_action_keeps_the_existing_authorization
+ErrorException: Attempt to read property "mountedTableActions" on null
+
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/app/vendor/filament/tables/src/Testing/TestsActions.php:50
+/app/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:407
+/app/tests/Feature/Filament/Concerns/ProfileModuleFixtures.php:55
+/app/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:407
+/app/tests/Feature/Filament/NoAplicaCompletionTest.php:173
+
+--
+
+There were 10 failures:
+
+1) Tests\Feature\Filament\FirstSaveAtomicityTest::a_failure_after_the_completion_refresh_rolls_back_the_no_aplica_toggle with data set "gestion on" ('App\Filament\Resources\Empres...anager', 'gestion', true)
+gestion on: committed state after the failure (transaction level measured inside: 0)
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     'injected' => true,
+-    'no_aplica' => false,
+-    'completion' => 1,
++    'no_aplica' => true,
++    'completion' => 25,
+ ]
+
+/app/tests/Feature/Filament/FirstSaveAtomicityTest.php:376
+
+2) Tests\Feature\Filament\FirstSaveAtomicityTest::a_failure_after_the_completion_refresh_rolls_back_the_no_aplica_toggle with data set "gestion off" ('App\Filament\Resources\Empres...anager', 'gestion', false)
+gestion off: committed state after the failure (transaction level measured inside: n/a: the completion step never ran)
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'injected' => true,
+-    'no_aplica' => true,
++    'injected' => false,
++    'no_aplica' => false,
+     'completion' => 1,
+ ]
+
+/app/tests/Feature/Filament/FirstSaveAtomicityTest.php:376
+
+3) Tests\Feature\Filament\FirstSaveAtomicityTest::a_failure_after_the_completion_refresh_rolls_back_the_no_aplica_toggle with data set "sostenibilidad on" ('App\Filament\Resources\Empres...anager', 'sostenibilidad', true)
+sostenibilidad on: committed state after the failure (transaction level measured inside: 0)
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     'injected' => true,
+-    'no_aplica' => false,
+-    'completion' => 1,
++    'no_aplica' => true,
++    'completion' => 25,
+ ]
+
+/app/tests/Feature/Filament/FirstSaveAtomicityTest.php:376
+
+4) Tests\Feature\Filament\FirstSaveAtomicityTest::a_failure_after_the_completion_refresh_rolls_back_the_no_aplica_toggle with data set "sostenibilidad off" ('App\Filament\Resources\Empres...anager', 'sostenibilidad', false)
+sostenibilidad off: committed state after the failure (transaction level measured inside: n/a: the completion step never ran)
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'injected' => true,
+-    'no_aplica' => true,
++    'injected' => false,
++    'no_aplica' => false,
+     'completion' => 1,
+ ]
+
+/app/tests/Feature/Filament/FirstSaveAtomicityTest.php:376
+
+5) Tests\Feature\Filament\NoAplicaCompletionTest::whole_module_toggle_on_and_off_keeps_the_cache_equal_to_a_fresh_computation with data set "gestion" ('App\Filament\Resources\Empres...anager', 'gestion')
+paso 2 (off): cache = cálculo fresco
+Failed asserting that 25 is identical to 13.
+
+/app/tests/Feature/Filament/NoAplicaCompletionTest.php:104
+
+6) Tests\Feature\Filament\NoAplicaCompletionTest::whole_module_toggle_on_and_off_keeps_the_cache_equal_to_a_fresh_computation with data set "recursos" ('App\Filament\Resources\Empres...anager', 'recursos')
+paso 2 (off): cache = cálculo fresco
+Failed asserting that 25 is identical to 13.
+
+/app/tests/Feature/Filament/NoAplicaCompletionTest.php:104
+
+7) Tests\Feature\Filament\NoAplicaCompletionTest::whole_module_toggle_on_and_off_keeps_the_cache_equal_to_a_fresh_computation with data set "experiencias" ('App\Filament\Resources\Empres...anager', 'experiencias')
+paso 2 (off): cache = cálculo fresco
+Failed asserting that 25 is identical to 13.
+
+/app/tests/Feature/Filament/NoAplicaCompletionTest.php:104
+
+8) Tests\Feature\Filament\NoAplicaCompletionTest::whole_module_toggle_on_and_off_keeps_the_cache_equal_to_a_fresh_computation with data set "presencia" ('App\Filament\Resources\Empres...anager', 'presencia')
+paso 2 (off): cache = cálculo fresco
+Failed asserting that 25 is identical to 13.
+
+/app/tests/Feature/Filament/NoAplicaCompletionTest.php:104
+
+9) Tests\Feature\Filament\NoAplicaCompletionTest::whole_module_toggle_on_and_off_keeps_the_cache_equal_to_a_fresh_computation with data set "sostenibilidad" ('App\Filament\Resources\Empres...anager', 'sostenibilidad')
+paso 2 (off): cache = cálculo fresco
+Failed asserting that 25 is identical to 13.
+
+/app/tests/Feature/Filament/NoAplicaCompletionTest.php:104
+
+10) Tests\Feature\Filament\NoAplicaCompletionTest::toggling_keeps_existing_data_and_sibling_sections
+gestion off
+Failed asserting that 41 is identical to 32.
+
+/app/tests/Feature/Filament/NoAplicaCompletionTest.php:135
+
+ERRORS!
+Tests: 36, Assertions: 612, Errors: 9, Failures: 10.
+
