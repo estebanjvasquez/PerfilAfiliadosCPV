@@ -28,11 +28,21 @@ Toda la aplicación envía con **el mailer por defecto de Laravel**. No hay un s
 
 | Flujo | Cómo envía | Usa el mailer por defecto | ¿Lo sobrescribe? |
 |---|---|---|---|
-| Verificación de correo al registrarse | evento `Registered` → `SendEmailVerificationNotification` (`EventServiceProvider`); el panel exige correo verificado (`EnsureEmailIsVerified` en `AdminPanelProvider`) | sí | no |
+| Verificación de correo al registrarse y «Pedir un nuevo enlace» | desde `6215451160`: `->emailVerification()` de Filament en `AdminPanelProvider`. Registro y reenvío → `User::sendEmailVerificationNotification()`: un aviso con el enlace firmado del panel (vence según `auth.verification.expire`, 60 min) | sí | no |
 | Aviso de solicitud de revisión de categoría | `TaxonomyCategoryRequestService` → `Mail::to(...)->send(TaxonomyCategoryRequestMail)` | sí | no |
 | Recuperar contraseña | **no está habilitado** en el panel (sin `->passwordReset()`) | — | — |
 
 No hay ninguna llamada a `Mail::mailer(...)` ni configuración que cambie el mailer en tiempo de ejecución. **No hay sobrescrituras.**
+
+### Verificación de cuentas mientras el correo no está activo (`6215451160`)
+
+- **Qué ve el usuario:** un usuario sin verificar ve **Verifique su correo electrónico**, sin el 500 de antes, y no puede abrir ninguna otra página del panel.
+  - Con el transporte `log` o `array`, la pantalla y el reenvío **no dicen que el correo se envió**. Dicen que el mensaje no llegará todavía y que se comunique con la Cámara.
+  - El criterio es el mismo de las solicitudes de categoría: `TaxonomyCategoryRequestService::transportSendsExternally()`.
+  - No se muestra el modo ni la configuración.
+- **Con `log`, el aviso queda escrito en el log del servidor**, con su enlace firmado. Esto vale para todo correo en ese modo. Ese log no se publica.
+- **Esta ronda no activa el envío.** Mientras no se configure el correo (la decisión del proveedor es aparte), una cuenta nueva no puede verificarse sola.
+  - La entrega no tiene aquí un procedimiento manual de verificación para la Cámara. No se verificó ninguna cuenta real.
 
 ### Dos cosas distintas que no hay que confundir
 

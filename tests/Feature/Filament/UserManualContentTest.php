@@ -86,7 +86,7 @@ class UserManualContentTest extends TestCase
             'ExperiencesRelationManager', 'PresenceRelationManager', 'SustainabilitiesRelationManager',
         ], $tabs, 'Cambiaron las pestañas de la empresa: actualice el orden de las secciones del manual.');
 
-        foreach (['agregar-categorias', 'principal-secundaria', 'beneficios', 'no-encuentro-categoria', 'grupo-familia-categoria', 'busqueda-libre', 'explorar-familia', 'limites', 'confirmar-reclasificar-quitar', 'solicitar-revision', 'no-aplica', 'completitud', 'mapa-del-sistema', 'botones-ventanas', 'mapa-taxonomia'] as $anchor) {
+        foreach (['agregar-categorias', 'principal-secundaria', 'beneficios', 'no-encuentro-categoria', 'grupo-familia-categoria', 'busqueda-libre', 'explorar-familia', 'limites', 'confirmar-reclasificar-quitar', 'solicitar-revision', 'no-aplica', 'completitud', 'mapa-del-sistema', 'botones-ventanas', 'mapa-taxonomia', 'verificar-correo'] as $anchor) {
             $this->assertStringContainsString('id="'.$anchor.'"', $manual['html'], "Falta el ancla estable #{$anchor}.");
         }
 

@@ -57,11 +57,21 @@ Cada persona de su empresa que vaya a trabajar en el sistema necesita **su propi
 2. Complete **Nombre**, **Correo electrónico**, **Contraseña** y **Confirmar contraseña**.
 3. Complete la verificación anti-bot y presione **Registrarse**.
 
-El sistema exige que su correo electrónico esté verificado para trabajar en el panel. Después de registrarse:
+El sistema exige que su correo electrónico esté verificado para trabajar en el panel.
 
-1. Busque en su correo el mensaje de verificación y abra el enlace que contiene.
-2. Si no lo ve después de un tiempo prudencial, revise la carpeta de correo no deseado («spam»).
-3. Si aun así no le llegó, **contacte a la Cámara** e indique el correo con el que se registró. Sin el correo verificado no podrá entrar al panel.
+### Verificar su correo electrónico {#verificar-correo}
+
+Después de registrarse, y cada vez que ingrese mientras su correo no esté verificado, verá la pantalla **Verifique su correo electrónico**. Hasta verificarlo no puede abrir su empresa, este manual ni el resto del panel: el sistema lo devuelve a esa pantalla.
+
+> **IMPORTANTE:** Por ahora **el sistema todavía no envía correos**. El mensaje de verificación no llegará a su buzón, y la pantalla se lo indica. Para activar su cuenta, **comuníquese con la Cámara** e indique el correo con el que se registró.
+
+Cuando el envío de correos esté activo:
+
+1. Abra el mensaje de verificación y presione su enlace en el mismo navegador donde inició sesión. Si no tiene la sesión iniciada, el sistema le pedirá entrar primero.
+2. El enlace vence a los 60 minutos y solo sirve para su propia cuenta.
+3. Si no lo encuentra, revise la carpeta de correo no deseado («spam»). En la pantalla de verificación puede pedir otro mensaje; el sistema admite como máximo 2 pedidos por minuto.
+
+Verificar el correo no le da acceso a ninguna empresa: la Cámara debe asociar su usuario (ver la nota de abajo). Para salir de la pantalla de verificación, presione **Cerrar sesión**.
 
 > **IMPORTANTE:** Crear una cuenta no le da acceso automático a los datos de su empresa. La Cámara debe asociar su usuario con la empresa correspondiente. Después de registrarse, avise a la Cámara.
 
@@ -448,6 +458,8 @@ Las pestañas **Recursos en Venezuela**, **Sistemas de gestión**, **Experiencia
 
 - Si activa **No Aplica**, la sección cuenta como completada aunque no tenga datos.
 - Si después carga datos en esa sección, la marca se elimina automáticamente.
+- Marcar o quitar **No Aplica** no borra ni cambia los datos que ya cargó. Si la quita, la sección vuelve a contar solo lo que tenga cargado.
+- El porcentaje se actualiza al guardar. Si la pantalla sigue mostrando el valor anterior, recargue la página.
 - En **Recursos en Venezuela** y **Sistemas de gestión** también puede marcar **No Aplica** por tipo, dentro de cada ventana.
 
 > **IMPORTANTE:** Use **No Aplica** solo cuando la sección realmente no corresponde a su empresa. Una sección vacía y sin marcar se interpreta como un dato pendiente de cargar.
@@ -480,7 +492,9 @@ Una sección cuenta como completa si tiene datos cargados o si está marcada **N
 | No estoy seguro de si se guardaron los cambios | En el formulario de datos generales debe presionar **Guardar cambios** en el último paso y ver el aviso **Guardado**. En las pestañas, cada acción se guarda al confirmarla. |
 | El RIF o el Sector principal están bloqueados | Es intencional: solo la Cámara los modifica. Contáctela si hay un error. |
 | La lista de Empresas está vacía | Su usuario todavía no está asociado a su empresa. Contacte a la Cámara. |
-| No me llegó el correo de verificación | Revise la carpeta de correo no deseado. Si no está, contacte a la Cámara e indique el correo con el que se registró. |
+| No me llegó el correo de verificación | Por ahora el sistema todavía no envía correos, así que no le llegará. Comuníquese con la Cámara e indique el correo con el que se registró (ver [Verificar su correo electrónico](#verificar-correo)). |
+| Al entrar siempre veo «Verifique su correo electrónico» | Su correo todavía no está verificado. Siga los pasos de [Verificar su correo electrónico](#verificar-correo). |
+| Quité «No Aplica» y el porcentaje bajó | Es lo esperado: la sección vuelve a contar solo los datos cargados. Sus datos no se borraron. |
 | Usé «Crear y crear otro» y la ventana no se cerró | Es lo esperado: lo cargado ya quedó guardado y la ventana queda vacía para el siguiente registro. Presione **Cancelar** cuando termine. |
 | No encuentro cómo traer un contacto de otra empresa que también atiendo | Esa opción ya no existe. Cree el contacto en cada empresa por separado. |
 | La ventana no se cierra al presionar **Crear** | Hay un campo obligatorio vacío o mal escrito, marcado en rojo. Corríjalo y vuelva a presionar **Crear**. |
@@ -489,7 +503,7 @@ Una sección cuenta como completa si tiene datos cargados o si está marcada **N
 ### Cuándo contactar a la Cámara {#contactar-camara}
 
 - Su usuario no está asociado a su empresa o necesita dar acceso a otra persona.
-- No le llegó el correo de verificación de su cuenta.
+- Necesita activar su cuenta (verificar su correo): por ahora el sistema no envía el mensaje.
 - Olvidó su contraseña.
 - El RIF, el nombre o el Sector principal de su empresa tienen un error.
 - Su empresa necesita más categorías que el límite configurado.
