@@ -7,7 +7,7 @@
   - `origin/feature/upgrade-filament-v3` is also at `c02d4ec`. Nothing unrelated is stacked.
 - **TESTED_HEAD:** `17e2b076f221f36037a193b8fcab58a11d243009`.
 - **REVIEW_HEAD:** the commit that adds this report (docs/audit only on top of TESTED_HEAD).
-- **Deployed:** **NO**.
+- **Deployed:** **YES**, on 2026-10-16 at 08:22Z, at REVIEW_HEAD `0f8bdad` (§9). It was accepted in `6211023097`.
 
 ## 1. Logo
 
@@ -120,3 +120,47 @@ All ran on the isolated Contabo runner (`infra/contabo-test-runner` @ `ac4fc4f`)
 - **Mobile «Salir»:** below 640 px, Filament's account card shows «Salir» as an icon button with an accessible label but no visible text. This is pre-existing Filament behaviour and was not changed (no account-card customization was authorized).
 - **Pre-existing, not fixed (out of scope):** `StatsOverview::getCards()` still computes two unused counts and would divide by zero if the `empresas` table were empty. That never happens on staging.
 - **Top-bar brand:** the top bar still shows `config('app.name')` as text. The disposable stack shows «Laravel»; staging shows whatever its `.env` sets. It was left unchanged, because the instruction is limited to the page heading.
+
+## 9. Staging deployment (2026-10-16)
+
+- **Acceptance:** `6211023097` (MANUAL REVIEW — PASS). It reserved deployment for the owner.
+- **Authorization:** the owner approved it **in chat** in the Claude Code session. The agent's push to the deploy branch was denied by the session's permission classifier. The owner then ran the fast-forward themselves.
+- **Preconditions** (read-only, captured before the push; `pre_state.txt`):
+  - staging and the deploy branch were both at `c02d4ec`, with 0 tracked modifications;
+  - `0f8bdad` is a fast-forward of `c02d4ec`, with no migrations and no `.github/` change in the diff;
+  - 0 pending migrations and 0 workflow runs in progress;
+  - the 0010C smoke was 18/18;
+  - recovery image `perfilafiliados-app:pre-branding-c02d4ec`.
+- **Route:** push fast-forward `c02d4ec..0f8bdad` (no force), then workflow run [`38873194879`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/38873194879) (push, **success**, 08:21:57–08:22:32Z).
+- **Post-state** (`post_state.txt`, 08:24:51Z):
+  - the checkout is at `0f8bdad`, 0 modifications;
+  - `app` was recreated at 08:22:28Z, new image `sha256:37e023fd…`;
+  - the `.env` hash is unchanged and maintenance is off;
+  - `/` and `/admin/login` return 200, and a guest on `/admin` is redirected (302 → `/admin/login`);
+  - `/images/Perfil-Afiliados.png` returns 200, `image/png`, 18,311 B (the same file);
+  - 0 pending migrations, and 0 `ERROR` lines in `laravel.log` since the deployment.
+- **Smoke `smoke_home_branding_readonly.php`** (in-memory users, READ ONLY + ROLLBACK, GET only, `Mail::fake`): **37/37**.
+  - **Registration:** one home page, the custom one, labelled «Inicio»; the logo file is 400×206; the home URL is still `/admin`.
+  - **For both the affiliate and the admin:**
+    - Inicio returns 200 and the `<title>` is «Inicio»;
+    - the `<h1>` is the logo with `alt="Perfil de Afiliados"`;
+    - no «Escritorio» on the page;
+    - the home styles are present;
+    - the order is account, help, notices;
+    - the help card links to the manual and the map, both 200;
+    - no Filament card;
+    - the account card and the logout URL are present.
+  - **SPA navigation:** from the manual, the sidebar «Inicio» links back to the home URL with `wire:navigate`.
+  - **Manual:** «Inicio y el menú» mentions the logo and the order, and has no «Escritorio».
+  - No mail was sent.
+- **Preserved:**
+  - **mail:** `log`, simulated (`mail_status_post.json`);
+  - **request #1:** the 0010C smoke is **18/18** after the deployment (`smoke_0010c_post.json`);
+  - **taxonomy:** the published aggregate (`map_rules_aggregate_post.json`) is identical to the 2026-10-15 post-deployment aggregate;
+  - **secrets:** untouched.
+- **Not verified live:**
+  - the in-browser card geometry;
+  - actually clicking «Salir»;
+  - an executed SPA round trip.
+  - These need a real authenticated browser session, and staging has no synthetic accounts; creating one would be a mutation. They were verified in isolation (135/135 at TESTED_HEAD). Visual acceptance stays with the owner's UAT.
+- Evidence: `audit/runs/home_branding_deploy_2026-10-16/`.

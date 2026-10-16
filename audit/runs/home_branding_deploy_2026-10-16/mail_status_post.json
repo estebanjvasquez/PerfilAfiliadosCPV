@@ -1,0 +1,6 @@
+mailer_por_defecto=log
+transporte=log
+envia_fuera_del_servidor=no (simulado)
+configuracion_cacheada=si
+remitente_direccion=configurado
+remitente_nombre=configurado

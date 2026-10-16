@@ -1,0 +1,191 @@
+{
+    "checks": [
+        {
+            "check": "transaccion READ ONLY",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "registro: sin FilamentInfoWidget",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "registro: cuenta, ayuda y widget de empresa",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "registro: una sola página de inicio, la propia",
+            "ok": true,
+            "detail": "[\"App\\\\Filament\\\\Pages\\\\Dashboard\"]"
+        },
+        {
+            "check": "registro: etiqueta «Inicio»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "logo: archivo de 400x206 en la imagen",
+            "ok": true,
+            "detail": "400x206"
+        },
+        {
+            "check": "URL de inicio sin cambios",
+            "ok": true,
+            "detail": "\/admin"
+        },
+        {
+            "check": "afiliado: Inicio 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "afiliado: título Inicio",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: el h1 es el logo con alt",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: sin «Escritorio»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: estilos de Inicio",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: orden cuenta, ayuda, avisos",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: tarjeta «Ayuda para completar su perfil»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: enlace al manual y al mapa",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: sin la tarjeta de Filament",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: tarjeta de cuenta con «Salir»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: widget de empresa presente (diferido)",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: destino manual 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "afiliado: desde el manual, «Inicio» vuelve por SPA (wire:navigate)",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "afiliado: destino mapa 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: Inicio 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: título Inicio",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: el h1 es el logo con alt",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: sin «Escritorio»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: estilos de Inicio",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: orden cuenta, ayuda, avisos",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: tarjeta «Ayuda para completar su perfil»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: enlace al manual y al mapa",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: sin la tarjeta de Filament",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: tarjeta de cuenta con «Salir»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: widget de empresa presente (diferido)",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: destino manual 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "admin: desde el manual, «Inicio» vuelve por SPA (wire:navigate)",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "admin: destino mapa 200",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "manual: «Inicio y el menú» con logo y orden",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "ningún correo",
+            "ok": true,
+            "detail": "salientes=0"
+        }
+    ],
+    "passed": 37,
+    "failed": 0
+}

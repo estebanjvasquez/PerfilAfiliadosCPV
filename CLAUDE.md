@@ -8,7 +8,11 @@ Al empezar:
 
 1. Leer `docs/orquestador/SESSION_RESUME.md` completo (§0 es el procedimiento de arranque).
 2. Ver `git status -sb` y la rama y el HEAD actuales. No cambiar de rama, no hacer pull y no descartar cambios.
-3. Leer completo **solo** el comentario del Issue #2 que asigne el usuario (repo `estebanjvasquez/PerfilAfiliadosCPV`).
+3. Leer completo, una vez, **solo** el comentario del Issue #2 que asigne el usuario (repo `estebanjvasquez/PerfilAfiliadosCPV`).
+   De lo que cite, abrir solo las referencias directas que la tarea necesite. No recorrer comentarios en cadena.
+
+Estos archivos de arranque viven en la rama `docs/session-continuity` hasta que se integren con una entrega autorizada
+(`SESSION_RESUME.md` §1).
 
 **No:**
 - onboarding recursivo;

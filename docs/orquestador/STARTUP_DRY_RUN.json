@@ -1,23 +1,32 @@
 {
   "manifest": "STARTUP_DRY_RUN",
-  "task": "CPV-SESSION-CONTINUITY",
-  "authorization": "Issue #2 comment 6210552318",
-  "measured_utc": "2026-10-16T08:40:00Z",
-  "measured_at_branch": "docs/session-continuity",
-  "method": "deterministic: byte sizes of the files as committed on this branch; no AI session or subagent was launched to prove it",
+  "task": "CPV-SESSION-CONTINUITY (final closure, Issue #2 6211767961)",
+  "measured_utc": "2026-10-16T08:55:00Z",
+  "measured_at_branch": "docs/session-continuity (canonical startup branch; see SESSION_RESUME.md section 1)",
+  "method": "deterministic: byte sizes of the files as committed on this branch; no AI session, subagent or test run was launched to prove it",
+  "caveat": "file sizes are an input budget, not a guarantee of actual session context or token cost; the tool's own system prompt and tool outputs are not counted here",
   "budget": { "minutes_target": 5, "project_docs_bytes_target": 10240 },
-  "auto_loaded_by_tool": [
-    { "tool": "Claude Code", "file": "CLAUDE.md", "range": "all", "bytes": 1044, "note": "repo root; there is no CLAUDE.md in ancestor directories or in the user profile (checked 2026-10-16)" },
-    { "tool": "Claude Code", "file": "<executor private memory>/MEMORY.md", "range": "all", "bytes": 1097, "note": "local, private, outside git; index only" },
-    { "tool": "Claude Code", "file": ".claude/settings.json", "range": "permissions only", "bytes": null, "note": "permission rules, not instructions; its Python, xampp and OneDrive paths come from another machine and account and prove nothing about tools today" },
-    { "tool": "Codex/other agents", "file": "AGENTS.md", "range": "all", "bytes": 697, "note": "same rules as CLAUDE.md, single source in SESSION_RESUME.md" }
-  ],
   "startup_reads": [
-    { "step": 1, "file": "docs/orquestador/SESSION_RESUME.md", "range": "all (116 lines)", "bytes": 7292 },
-    { "step": 3, "file": "Issue #2 assigned comment (example: 6210552318)", "range": "body only", "bytes": 8922, "note": "task input, not project documentation; size varies per task" }
+    { "step": 0, "file": "CLAUDE.md", "range": "all (23 lines)", "bytes": 1337, "class": "project_doc", "loaded_by": "Claude Code auto-load (repo root)" },
+    { "step": 1, "file": "docs/orquestador/SESSION_RESUME.md", "range": "all (115 lines)", "bytes": 8468, "class": "project_doc" },
+    { "step": 3, "file": "Issue #2 assigned comment body", "range": "body only, once", "bytes": 5299, "class": "assigned_input", "example": "6211767961; earlier rounds: 6210552318 = 8922 B", "note": "size varies per task; cited references are opened only if directly needed, never transitively" }
   ],
-  "project_docs_bytes_total": 8336,
-  "project_docs_bytes_breakdown": "CLAUDE.md 1044 + SESSION_RESUME.md 7292",
+  "tool_provided_inputs": [
+    { "file": "<executor private memory>/MEMORY.md", "bytes": 1413, "class": "private_memory", "note": "local, outside git; index only; per machine" },
+    { "file": ".claude/settings.json", "bytes": 11939, "class": "permissions", "note": "permission rules, not instructions; historical Python, xampp and OneDrive paths from another machine and account prove nothing about tools today" }
+  ],
+  "other_agents": [
+    { "file": "AGENTS.md", "bytes": 916, "note": "read instead of CLAUDE.md by other agents; same rules, single source in SESSION_RESUME.md" }
+  ],
+  "totals": {
+    "project_docs_bytes": 9805,
+    "project_docs_breakdown": "CLAUDE.md 1337 + SESSION_RESUME.md 8468",
+    "project_docs_within_target": true,
+    "assigned_input_bytes": 5299,
+    "private_memory_bytes": 1413,
+    "total_initial_text_inputs_bytes": 16517,
+    "total_initial_text_inputs_breakdown": "project docs 9805 + assigned comment 5299 + private memory 1413 (settings.json permissions not counted as reading)"
+  },
   "commands": [
     { "step": 2, "shell": "PowerShell", "command": "git status -sb; git branch --show-current; git rev-parse HEAD", "network": false },
     { "step": 3, "shell": "PowerShell", "command": "curl.exe -s -H \"Accept: application/vnd.github+json\" https://api.github.com/repos/estebanjvasquez/PerfilAfiliadosCPV/issues/comments/<id> -o <scratch>\\c.json; then ConvertFrom-Json and save .body with -Encoding utf8", "network": true, "auth": "none (public repo)" },
@@ -26,10 +35,10 @@
   ],
   "not_read_at_startup": [
     "docs/orquestador/history/** (26889 + 114367 bytes)",
-    "docs/orquestador/current_task.md (2051 bytes; on demand)",
-    "docs/orquestador/ENVIRONMENT.md, ACCESS_BOOTSTRAP.md, PROJECT_KNOWLEDGE.md, AUTONOMOUS_DEV_LOOP.md (on demand)",
+    "docs/orquestador/current_task.md (1883 bytes; on demand)",
+    "docs/orquestador/ENVIRONMENT.md (7.3 KB), ACCESS_BOOTSTRAP.md, PROJECT_KNOWLEDGE.md, AUTONOMOUS_DEV_LOOP.md (on demand)",
     "audit/orchestrator_handoff.json (515767 bytes; selected fields only, never whole)",
-    "audit/**, the full Issue #2 thread, test suites, server logs"
+    "audit/**, the full Issue #2 thread, comments cited by cited comments, test suites, server logs"
   ],
-  "next_authorized_action": "owner: fast-forward feature/upgrade-filament-v3 to 0f8bdad97590676c966048e18afa35f76110ff1f (deploy of CPV-HOME-BRANDING-AND-LAYOUT approved in chat 2026-10-16; the agent's push was denied by the permission classifier); orchestrator/owner: review deliveries 6210758420 and the CPV-SESSION-CONTINUITY comment; agent: nothing else without a new Issue #2 instruction"
+  "next_authorized_action": "owner: product UAT of Inicio on staging (deployed 0f8bdad, run 38873194879, record 6211360371; no repeat push or deployment); orchestrator/owner: accept or correct the CPV-SESSION-CONTINUITY closure; agent: nothing without a new Issue #2 instruction"
 }

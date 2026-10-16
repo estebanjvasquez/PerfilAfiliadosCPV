@@ -32,7 +32,7 @@ Esta página se consulta bajo demanda, no en el arranque. Se creó el 2026-10-16
 | PHPUnit | sí, para tests | no se usa: la base compartida es remota y no hay intl | no hay (`--no-dev`) | **TEST**: `run_tests.sh <sha> --filter …` |
 | docker | opcional en WIN | AVAILABLE 29.8.1 (cliente; daemon NOT_CHECKED) | AVAILABLE 29.7.2 | — |
 | gh | **no** | NOT_ON_PATH (también lo vio el propietario el 2026-10-15) | NOT_ON_PATH | lectura: API REST anónima; escritura: `post_issue_comment.ps1` |
-| python / python3 | **no** | **STORE_ALIAS**: `python --version` responde «Python was not found… Microsoft Store» | AVAILABLE `python3` 3.12.14 | PowerShell, node, o un contenedor DOC/TEST |
+| python / python3 | **no** | **STORE_ALIAS**, código de salida nativo **9009**: `python --version` responde «Python was not found… Microsoft Store» (medido de nuevo 2026-10-16 ~08:55Z) | AVAILABLE `python3` 3.12.14 | PowerShell, node, o un contenedor DOC/TEST |
 | py (lanzador) | no | NOT_ON_PATH | n/a | — |
 
 Para comprobarlo de nuevo en WIN, sin instalar nada: `docs\orquestador\check_tools.ps1 -Name <tool> -Version`.
@@ -41,8 +41,9 @@ Para comprobarlo de nuevo en WIN, sin instalar nada: `docs\orquestador\check_too
 
 - **WIN:** es un alias de la Store, no un intérprete. Hay tres pruebas:
   - `audit/chat_memory_intent_audit_2026-09-28.md` §1 lo registra: «solo un stub de Microsoft Store»;
-  - en esta sesión, una llamada a `python` terminó con el mensaje de la Store (exit 49);
-  - `check_tools.ps1` lo confirma.
+  - en esta sesión, una llamada a `python` terminó con el mensaje de la Store: exit 49 en Git Bash, que es 9009 mod 256;
+  - `check_tools.ps1` lo confirma con exit 9009.
+  - El estado no se deduce de la ruta: un Python instalado desde la Store también vive en `WindowsApps`. `check_tools.ps1` solo marca **AVAILABLE** cuando el comando sale con 0 y da la versión esperada, y marca **STORE_ALIAS** cuando responde con el mensaje del alias.
 - **Por qué `.claude/settings.json` permite comandos `python …`:** esos permisos son **históricos** y vienen de otra máquina y otra cuenta (rutas `C:/Users/EstebanVasquez/…/OneDrive…`, `C:\xampp\php`).
   - Permitir un comando no prueba que esté instalado ni que funcione hoy.
   - Si Python funcionaba en esa máquina: **UNKNOWN**, no hay evidencia.

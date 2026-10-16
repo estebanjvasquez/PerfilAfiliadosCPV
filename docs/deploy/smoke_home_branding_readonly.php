@@ -100,6 +100,11 @@ try {
         foreach (['manual' => $manual, 'mapa' => $map] as $destino => $url) {
             $r = $get(parse_url($url, PHP_URL_PATH), $as);
             $check("{$quien}: destino {$destino} 200", $r->getStatusCode() === 200, 'status='.$r->getStatusCode());
+            // Vuelta a Inicio por SPA: desde el destino, el ítem «Inicio» del menú enlaza a la misma URL con wire:navigate.
+            if ($destino === 'manual') {
+                $back = (bool) preg_match('#<a\s[^>]*href="'.preg_quote(App\Filament\Pages\Dashboard::getUrl(), '#').'"[^>]*wire:navigate[^>]*>.*?Inicio#s', (string) $r->getContent());
+                $check("{$quien}: desde el manual, «Inicio» vuelve por SPA (wire:navigate)", $back);
+            }
         }
     }
 

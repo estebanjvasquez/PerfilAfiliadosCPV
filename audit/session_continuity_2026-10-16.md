@@ -116,3 +116,48 @@ Se validó con `ConvertFrom-Json`. Los enlaces relativos de los archivos nuevos 
 
 - No se puede probar la causa exacta del ~20%: no se importaron logs de sesión, como pide la instrucción.
 - El daemon de Docker en WIN y node en el VPS quedaron como NOT_CHECKED.
+
+## 11. Final closure (Issue #2 `6211767961`)
+
+The review accepted the structure and asked for 9 bounded corrections. Status of each:
+
+1. **Product state refreshed** from record `6211360371`. Inicio is **deployed at `0f8bdad`**, run `38873194879` success, with product checkpoint `68168129`. The obsolete "owner must push `0f8bdad`" instruction and the "blocked" claim are removed. The recorded timestamps are reused, and staging was not rechecked for this.
+2. **Reconciliation:**
+   - `feature/home-branding-layout` (`68168129`) was merged into this branch with `-X no-renames`, so its edits could not land on the archived files.
+   - `SESSION_RESUME.md` and `current_task.md` keep the short form and were rewritten with the new state.
+   - The smoke script takes the product version, which has the SPA check.
+   - The deployment evidence and report §9 come in with the merge.
+   - `history/**` is byte-identical to `235949b` (`git diff` is empty).
+   - The product branch's long checkpoint stays in its own history at `68168129`.
+   - `SESSION_RESUME.md`, `current_task.md` and `STARTUP_DRY_RUN.json` all state the same next action: product UAT and continuity acceptance.
+3. **No recursive reading:** `SESSION_RESUME.md` §0.3, `CLAUDE.md` and `AGENTS.md` now say: read the assigned comment once; open only the direct references the task needs, once each, and extract only the relevant requirements; never follow comments transitively. §0 also separates "no broad audit at onboarding" from the normal, targeted source reads that implementation requires.
+4. **Honest budget** in `STARTUP_DRY_RUN.json`:
+   - project docs: **9,805 B** (`CLAUDE.md` 1,337 + `SESSION_RESUME.md` 8,468, 115 lines);
+   - assigned input reported separately: **5,299 B** for `6211767961`;
+   - private memory: 1,413 B;
+   - total initial text inputs: **16,517 B**;
+   - an explicit caveat that file size does not guarantee context or token cost.
+5. **`check_tools.ps1`:**
+   - **AVAILABLE** requires native exit code 0 **and** a version pattern specific to the tool;
+   - **STORE_ALIAS** requires the alias *message*, not just a `WindowsApps` path;
+   - non-zero exit, timeout or policy denial → **BLOCKED**;
+   - exit 0 with an unexpected shape → **UNKNOWN**;
+   - **FOUND** without `-Version`;
+   - stdout and stderr are captured through `cmd /c`, which keeps `$LASTEXITCODE`.
+   - Re-measured on 2026-10-16 ~08:55Z: `python`/`python3` STORE_ALIAS with exit **9009** (the earlier Git Bash exit 49 is 9009 mod 256); git, ssh, node, php and docker AVAILABLE with exit 0; `gh` and `py` NOT_ON_PATH. The parser reports 0 errors.
+6. **Distribution:** `SESSION_RESUME.md` §1 names the canonical branch `docs/session-continuity`. It explains how to switch safely (clean tree → fetch/switch/`pull --ff-only`, or a separate `git worktree`; never discard changes) and that another computer needs its own provisioning. It also gives the exact one-line restart prompt.
+7. **Not integrated into the deploy line.** The required carry-forward is recorded in `SESSION_RESUME.md` §1 and `current_task.md`: integrate the startup files in the next explicitly authorized runtime delivery. No push to `feature/upgrade-filament-v3`.
+8. **Validation:**
+   - the archives are unchanged;
+   - credentials stay external;
+   - verification is per capability;
+   - the JSON parses;
+   - relative links in the active startup files are checked;
+   - the script behaviour is checked;
+   - the manifest is regenerated.
+9. **How it ran:** one foreground session. No agents, no AI reviewers, no polling, no tests, no reinstalls, no live mutation and no deployment.
+
+**Tools by environment:**
+- **Windows:** Python is a Store alias (exit 9009); `gh` is absent.
+- **VPS:** `python3` 3.12.14 (observed 2026-10-16 08:14Z).
+- **UNKNOWN:** the DOC container image, and whether Python worked on the previous machine.

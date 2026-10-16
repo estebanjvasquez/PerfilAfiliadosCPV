@@ -1,0 +1,14 @@
+method=GitHub Actions workflow, push fast-forward c02d4ec..0f8bdad by owner, run 38873194879 success
+captured_utc=2026-10-16T08:24:51Z
+staging_head=0f8bdad97590676c966048e18afa35f76110ff1f
+tracked_modifications=0
+app_started=2026-10-16T08:22:28.725542581Z
+app_image=sha256:37e023fd6830662397b66f73b319a3700ae6726d7f02da92676e594175f85917
+env_sha256=085c617c22a2e1f4
+maintenance=off
+http_root=200
+http_login=200
+guest_admin=302 -> https://pruebas.camarapetrolera.app/admin/login
+logo=200 image/png 18311B
+pending_migrations=0
+errors_since_deploy=0 (ERROR lines in storage/logs/laravel.log stamped 2026-10-16 08:22Z or later; rechecked 08:3xZ)
