@@ -41,6 +41,12 @@ class HomeBrandingLayoutTest extends TestCase
             ->getContent();
     }
 
+    /** Posición del primer elemento con esa clase (no la del CSS de la página, que también la nombra). */
+    private function classOffset(string $html, string $class): int|false
+    {
+        return preg_match('/class="[^"]*'.preg_quote($class, '/').'/', $html, $m, PREG_OFFSET_CAPTURE) ? $m[0][1] : false;
+    }
+
     private function superAdmin(): User
     {
         $user = User::factory()->create();
@@ -56,7 +62,8 @@ class HomeBrandingLayoutTest extends TestCase
         $homes = array_values(array_filter($pages, fn ($p) => is_a($p, FilamentDashboard::class, true)));
 
         $this->assertSame([Dashboard::class], $homes, 'Debe haber una sola página de inicio: la propia.');
-        $this->assertSame(Filament::getPanel('admin')->getUrl(), Dashboard::getUrl());
+        // Misma URL de siempre: la raíz del panel (Panel::getUrl() resolvería al login sin sesión).
+        $this->assertSame(url(Filament::getPanel('admin')->getPath()), Dashboard::getUrl());
         $this->assertSame('filament.admin.pages.dashboard', Dashboard::getRouteName());
         $this->assertSame('Inicio', Dashboard::getNavigationLabel());
     }
@@ -72,7 +79,7 @@ class HomeBrandingLayoutTest extends TestCase
             $html,
             'El <h1> de la página debe ser el logo, con «Perfil de Afiliados» como texto alternativo.'
         );
-        $this->assertSame(1, substr_count($html, 'cpv-home-logo-img'), 'Un solo logo en la página.');
+        $this->assertSame(1, substr_count($html, 'class="cpv-home-logo-img"'), 'Un solo logo en la página.');
         $this->assertStringNotContainsString('Escritorio', $html);
         // El menú lateral muestra «Inicio» enlazando a la misma URL.
         $this->assertMatchesRegularExpression('#href="'.preg_quote(Dashboard::getUrl(), '#').'"[^>]*>.*?Inicio#s', $html);
@@ -119,14 +126,14 @@ class HomeBrandingLayoutTest extends TestCase
         foreach (['afiliado' => User::factory()->create(), 'admin' => $this->superAdmin()] as $who => $user) {
             $html = $this->homeHtml($user);
 
-            $account = strpos($html, 'fi-account-widget');
-            $help = strpos($html, 'cpv-profile-help-widget');
-            $notices = strpos($html, 'cpv-home-notice');
+            $account = $this->classOffset($html, 'fi-account-widget');
+            $help = $this->classOffset($html, 'cpv-profile-help-widget');
+            $notices = $this->classOffset($html, 'cpv-home-notice');
             $this->assertNotFalse($account, "{$who}: falta la tarjeta de la cuenta.");
             $this->assertNotFalse($help, "{$who}: falta la tarjeta de ayuda.");
             $this->assertNotFalse($notices, "{$who}: faltan los avisos.");
             $this->assertTrue($account < $help && $help < $notices, "{$who}: el orden debe ser cuenta, ayuda, avisos.");
-            $this->assertSame(2, substr_count($html, 'cpv-home-notice'), "{$who}: deben estar los dos avisos.");
+            $this->assertSame(2, preg_match_all('/class="[^"]*cpv-home-notice/', $html), "{$who}: deben estar los dos avisos.");
             $this->assertStringContainsString(Filament::getPanel('admin')->getLogoutUrl(), $html);
             $this->assertStringContainsString('md:grid-cols-2', $html, "{$who}: los avisos van en 2 columnas.");
         }
