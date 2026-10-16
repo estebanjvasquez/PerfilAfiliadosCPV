@@ -1,6 +1,8 @@
 # CPV — Punto de reanudación maestro
 
-**Checkpoint:** 2026-10-16, ~07:55 UTC.
+**Checkpoint:** 2026-10-16, ~08:35 UTC.
+- **CPV-HOME-BRANDING-AND-LAYOUT** está aceptada (`6211023097`) y **desplegada en staging** (`0f8bdad`, run `38873194879`; push del propietario). Estado: **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**. Smoke 37/37 y 0010C 18/18. Informe §9; evidencia en `audit/runs/home_branding_deploy_2026-10-16/`.
+- **CPV-SESSION-CONTINUITY** (`6210552318`) es otra línea de trabajo: rama `docs/session-continuity` @ `235949b`, entrega `6211267473`, **pendiente de revisión**. Esta rama no la incluye.
 - **CPV-HOME-BRANDING-AND-LAYOUT** (`6210321522`, del propietario): la página de inicio se llama **Inicio**, su título visible es el logo de Perfil de Afiliados y las tarjetas van cuenta → ayuda → avisos.
   - Rama `feature/home-branding-layout`, BASE `6e26302` (= `c02d4ec` desplegado más audit/docs), TESTED_HEAD `17e2b07`.
   - 40 tests enfocados OK y navegador 135/135 (aislado). **READY_FOR_REVIEW — MANUAL, sin desplegar.**
@@ -28,11 +30,11 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 
 | Tema | Estado |
 |---|---|
-| Runtime de staging | **`c02d4ec8f578b25f8101ac3109c7931e23298f2b`** (Escritorio con «Ayuda para completar su perfil», sobre el mapa `9e7e379`). Desplegado el 2026-10-15 a las 15:40Z por el workflow normal, run `38762292519` success. Smoke del Escritorio 21/21 y de C 18/18; la taxonomía no cambió. |
+| Runtime de staging | **`0f8bdad97590676c966048e18afa35f76110ff1f`** (Inicio con logo, sobre el inicio útil `c02d4ec`). Desplegado el 2026-10-16 a las 08:22Z por el workflow normal, run `38873194879` success, con imagen `sha256:37e023fd…`. Smoke de Inicio 37/37 y de C 18/18; la taxonomía no cambió; el correo sigue en `log`. Observado 08:24Z. |
 | TASK-0010A/B/C | Desplegadas. C fue aceptada (`6188413270`) y el propietario informó su prueba manual como **OK** (`6189493183`, `OWNER_REPORTED_UAT_PASS`; es un informe del propietario, no un test automático). |
 | Ronda manual + correo | **Aceptada** (`6190018710`) y **desplegada** (2026-10-15 11:05Z; informe §9), + **reorganización por módulo** `4b7cab66e4f580da5854a1f97afde3cac30822aa` (feedback del propietario, informe §10): verde aislado (45 tests, navegador 40/40), **desplegado** en `37e3b71`. Rama `feature/mail-docs-and-user-manual`. Manual en línea completado contra el PDF de 2022, documentación del correo (con la secuencia correcta: recrear `app` y luego `config:cache`, para activar y para volver atrás) y regla de documentación. |
 | Mapa de la taxonomía | **Aceptado (`6194751263`) y desplegado (`9e7e379`).** Rama `feature/taxonomy-map`. Página de solo lectura `/admin/mapa-de-la-taxonomia`, con el mismo acceso que el manual y enlaces desde el manual y la pestaña «Categorías CPV». Árbol publicado según `is_active` y ancestros visibles; sin caché ni escrituras. Sobre staging, en solo lectura, las reglas darían 48/333/2.418, con 55 Familias y 1 Grupo vacíos. |
-| Inicio con logo y orden de tarjetas | **READY_FOR_REVIEW — MANUAL, sin desplegar** (2026-10-16). Rama `feature/home-branding-layout` @ TESTED_HEAD `17e2b076f221f36037a193b8fcab58a11d243009`, base `6e26302`. «Escritorio» → «Inicio» (misma URL y ruta), logo en el `<h1>` (superficie blanca en oscuro), 3 columnas en escritorio. Manual §`#escritorio` actualizado (ancla conservada). |
+| Inicio con logo y orden de tarjetas | **Aceptado (`6211023097`) y desplegado (`0f8bdad`, run `38873194879`, 2026-10-16 08:22Z)**: DEPLOYED_FOR_OWNER_REVIEW — MANUAL. Rama `feature/home-branding-layout` @ TESTED_HEAD `17e2b076f221f36037a193b8fcab58a11d243009`, base `6e26302`. «Escritorio» → «Inicio» (misma URL y ruta), logo en el `<h1>` (superficie blanca en oscuro), 3 columnas en escritorio. Manual §`#escritorio` actualizado (ancla conservada). |
 | Inicio útil (Escritorio) | **Aceptado (`6195972738`) y desplegado (`c02d4ec`).** Rama `feature/home-useful-help` @ TESTED_HEAD `dc584e36cbea75852f0094e9053d9291b41e288e`, base `2e38c60` (= `9e7e379` más docs). 32 tests enfocados OK y navegador 47/47. |
 | Correo del sistema | **ACTIVACIÓN GLOBAL PENDIENTE: espera proveedor, configuración y credenciales del propietario.** Staging en modo sin envío (`MAIL_MAILER=log`, comprobado el 2026-10-15 con `docs/deploy/mail_status_readonly.php`). Sin destinatario configurado. No se ha enviado ningún correo real. |
 | Solicitud #1 | `failed`/`recipient_not_configured`, con una fila histórica. Sin reintento autorizado. |
@@ -40,7 +42,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
 
 ## 2. SHAs y ramas
 
-- **Runtime desplegado:** `c02d4ec8f578b25f8101ac3109c7931e23298f2b`: el inicio útil (TESTED_HEAD `dc584e3`) sobre `9e7e379`, que es el mapa (TESTED_HEAD `0fb38e2`) sobre el manual por módulo (`37e3b71`).
+- **Runtime desplegado:** `0f8bdad97590676c966048e18afa35f76110ff1f` (Inicio con logo, TESTED_HEAD `17e2b07`) sobre `c02d4ec`, que es el inicio útil (TESTED_HEAD `dc584e3`) sobre `9e7e379`, que es el mapa (TESTED_HEAD `0fb38e2`) sobre el manual por módulo (`37e3b71`).
 - **Inicio con logo y orden de tarjetas:** rama `feature/home-branding-layout`, BASE `6e26302`, **TESTED_HEAD `17e2b076f221f36037a193b8fcab58a11d243009`**; REVIEW_HEAD = el commit del informe. El chequeo de navegador es `ux_check_home_branding.mjs` en `infra/contabo-test-runner` @ `ac4fc4f`.
 - **Mapa de la taxonomía:** rama `feature/taxonomy-map`.
   - BASE `f4eb859`, que es `37e3b71` más solo docs/audit.
@@ -52,7 +54,7 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
   - Corrección: solo `docs/deploy/CORREO_DEL_SISTEMA.md` y el informe.
 - **Rama de C:** `feature/task-0010c-request-operations` @ `0becd37` (checkpoint).
 - **Arnés aislado:** `infra/contabo-test-runner` @ `8b707d1`. Agrega `ux_check_home_help.mjs`; antes, `3dff19a` agregó la semilla y el chequeo del mapa. Agrega `--ux-seed`, la semilla sintética y el chequeo de navegador del mapa; el chequeo de fugas excluye las filas `ux-synthetic-*`.
-- **Imágenes de recuperación en el VPS:** `perfilafiliados-app:pre-home-9e7e379` (imagen anterior al inicio útil), `perfilafiliados-app:pre-taxmap-37e3b71` (imagen anterior al mapa), `perfilafiliados-app:pre-manual-a577234` (imagen anterior al manual, `fd4441da…`), `perfilafiliados-app:pre-0010c-9b447eb`, `perfilafiliados-app:pre-0010-004d24e`.
+- **Imágenes de recuperación en el VPS:** `perfilafiliados-app:pre-branding-c02d4ec` (imagen anterior a Inicio con logo), `perfilafiliados-app:pre-home-9e7e379` (imagen anterior al inicio útil), `perfilafiliados-app:pre-taxmap-37e3b71` (imagen anterior al mapa), `perfilafiliados-app:pre-manual-a577234` (imagen anterior al manual, `fd4441da…`), `perfilafiliados-app:pre-0010c-9b447eb`, `perfilafiliados-app:pre-0010-004d24e`.
 
 ## 3. Evidencia (enlazar, no copiar)
 
@@ -83,7 +85,8 @@ Las §0 a §6 son la primera lectura. Lo que está después de la línea «Histo
   - recorrer Grupos y Familias y probar el filtro, también en el teléfono;
   - comprobar el enlace desde la pestaña «Categorías CPV» de una empresa.
   - Ninguna de las dos cosas se verificó en vivo: la pestaña y el filtro en un navegador real.
-- **Propietario/orquestador:** revisar la entrega de CPV-HOME-BRANDING-AND-LAYOUT en el Issue #2 (capturas en `audit/runs/home_branding/ux/`). No está desplegada: el despliegue necesita autorización aparte.
+- **Propietario, prueba de Inicio (UAT):** revisar el logo, la etiqueta «Inicio», el orden de las tarjetas en la computadora y en el teléfono, los botones de ayuda, «Salir» y la vuelta a Inicio desde el menú. La geometría en un navegador real no se verificó en vivo.
+- **Orquestador/propietario:** revisar CPV-SESSION-CONTINUITY (`6211267473`), que es una línea de trabajo aparte.
 - **Agente:** **ninguna** hasta una nueva instrucción. No activar correo y no tocar secretos.
 - **Propietario, cuando lo tenga:** proveedor de correo, remitente y dominio (SPF/DKIM/DMARC), destinatario responsable, aprovisionamiento seguro en el `.env` del servidor y una prueba controlada (ver `CORREO_DEL_SISTEMA.md` §6). También: decidir si se reintenta la #1.
 

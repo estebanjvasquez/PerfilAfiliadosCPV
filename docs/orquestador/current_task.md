@@ -14,7 +14,8 @@
 >   - **CPV-HOME-USEFUL-HELP** (tarjeta «Ayuda para completar su perfil» en el Escritorio) está **READY_FOR_REVIEW — MANUAL** en `feature/home-useful-help`, sin desplegar.
 > - **2026-10-16:**
 >   - el inicio útil está desplegado (`c02d4ec`);
->   - **CPV-HOME-BRANDING-AND-LAYOUT** («Inicio» con el logo y orden de tarjetas, `6210321522`) está **READY_FOR_REVIEW — MANUAL** en `feature/home-branding-layout`, sin desplegar.
+>   - **CPV-HOME-BRANDING-AND-LAYOUT** («Inicio» con el logo y orden de tarjetas, `6210321522`) fue aceptada (`6211023097`) y está **desplegada** (`0f8bdad`, run `38873194879`): **DEPLOYED_FOR_OWNER_REVIEW — MANUAL**.
+>   - **CPV-SESSION-CONTINUITY** (`6210552318`) va aparte, en `docs/session-continuity` @ `235949b`, pendiente de revisión.
 > - Siguiente acción y pendientes: `SESSION_RESUME.md` §4 y §5.
 >
 > Todo lo que sigue es la historia de TASK-0010 y se conserva sin cambios.
