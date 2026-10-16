@@ -22,7 +22,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 $cfg = config('database.connections.pgsql');
 if (app()->environment() !== 'testing' || ($cfg['host'] ?? null) !== 'testdb' || ($cfg['database'] ?? null) !== 'cpv_test') {
-    fwrite(STDERR, "REFUSING: not the disposable test database\n");
+    fwrite(fopen('php://stderr', 'w'), "REFUSING: not the disposable test database\n");
     exit(3);
 }
 
@@ -30,7 +30,7 @@ $affiliate = App\Models\User::where('email', 'zzz-ux-affiliate@example.test')->f
 $admin = App\Models\User::where('email', 'zzz-ux-admin@example.test')->first();
 $empresa = App\Models\Empresa::where('rif', 'J-00000000-9')->first();
 if (! $affiliate || ! $admin || ! $empresa) {
-    fwrite(STDERR, "synthetic affiliate, admin or company missing\n");
+    fwrite(fopen('php://stderr', 'w'), "synthetic affiliate, admin or company missing\n");
     exit(4);
 }
 
