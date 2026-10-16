@@ -45,6 +45,19 @@ foreach ($permissions as $permission) {
 }
 app(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
+// Minimal catalogs the company edit page needs (as in ux_seed_first_save.php): with `cities` empty,
+// EditEmpresa fails (known backlog item, SESSION_RESUME §5), which is not what this check is about.
+$db = Illuminate\Support\Facades\DB::connection();
+$now = now();
+if ($db->table('cities')->count() === 0) {
+    $countryId = $db->table('countries')->insertGetId(['country_name' => 'ZZZ País sintético', 'created_at' => $now, 'updated_at' => $now]);
+    $stateId = $db->table('states')->insertGetId(['country_id' => $countryId, 'state_name' => 'ZZZ Estado sintético', 'created_at' => $now, 'updated_at' => $now]);
+    $db->table('cities')->insert(['country_id' => $countryId, 'states_id' => $stateId, 'city_name' => 'ZZZ Ciudad sintética', 'created_at' => $now, 'updated_at' => $now]);
+}
+if ($db->table('sectors')->count() === 0) {
+    $db->table('sectors')->insert(['name' => 'ZZZ Sector sintético', 'created_at' => $now, 'updated_at' => $now]);
+}
+
 $unverified = App\Models\User::firstOrNew(['email' => 'zzz-ux-unverified@example.test']);
 $unverified->forceFill(['name' => 'ZZZ UX Sin Verificar', 'password' => $affiliate->password, 'email_verified_at' => null])->save();
 

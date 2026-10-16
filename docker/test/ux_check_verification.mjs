@@ -118,10 +118,12 @@ try {
       const vr = await page.goto(LINK, { waitUntil: 'networkidle' });
       const landed = path(page);
       record(`${tag} the signed link verifies and opens the panel`, !landed.includes('/email-verification/') && landed.startsWith('/admin') && landed !== '/admin/login', `${vr.status()} ${landed.includes('/email-verification/verify/') ? '(still on the verify URL)' : landed}`);
+      // Verifying unblocks the panel but adds no access: this synthetic user has no role and no
+      // permission, so Inicio opens and Empresas answers 403 exactly as for any such verified user.
+      const home = await page.goto(BASE + '/admin', { waitUntil: 'networkidle' });
+      record(`${tag} after verifying: Inicio opens (200), no verification page`, home.status() === 200 && path(page) === '/admin', `${home.status()} ${path(page)}`);
       const resp = await page.goto(BASE + '/admin/empresas', { waitUntil: 'networkidle' });
-      const text = (await page.locator('main').first().innerText().catch(() => '')).replace(/\s+/g, ' ');
-      record(`${tag} after verifying: Empresas opens (200)`, resp.status() === 200 && path(page) === '/admin/empresas', `${resp.status()} ${path(page)}`);
-      record(`${tag} verifying gives no extra access: no company listed`, !/ZZZ UX EMPRESA/i.test(text), text.slice(0, 160));
+      record(`${tag} verifying gives no extra access: Empresas is 403 without the permission`, resp.status() === 403 && path(page) === '/admin/empresas', `${resp.status()} ${path(page)}`);
       await page.screenshot({ path: `${OUT}/ver-after-link.png` });
     });
     await ctx.close();
