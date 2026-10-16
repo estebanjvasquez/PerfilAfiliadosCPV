@@ -68,6 +68,8 @@ try {
         const page = await login(ctx, email);
         await page.goto(BASE + HOME, { waitUntil: 'networkidle' });
         await page.evaluate((dark) => document.documentElement.classList.toggle('dark', dark), scheme === 'dark');
+        // Below lg the sidebar is an overlay; close it so the screenshot shows the page.
+        if (label !== 'desktop') await page.evaluate(() => window.Alpine?.store('sidebar')?.close?.());
         await page.waitForTimeout(400);
 
         // Logo as the page heading.
