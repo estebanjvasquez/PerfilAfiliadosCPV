@@ -76,7 +76,8 @@ class NewAffiliateOnboardingTest extends TestCase
 
             return true;
         });
-        $this->actingAs($user)->get($link)->assertRedirect(Filament::getPanel('admin')->getUrl());
+        // redirect()->intended(): vuelve a la página que quiso abrir (Empresas).
+        $this->actingAs($user)->get($link)->assertRedirect(EmpresaResource::getUrl('index'));
         $this->assertNotNull($user->fresh()->email_verified_at);
         $user->refresh();
         $this->actingAs($user)->get(EmpresaResource::getUrl('index'))->assertOk();

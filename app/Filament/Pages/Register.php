@@ -63,13 +63,18 @@ class Register extends \Filament\Pages\Auth\Register
     }
 
     /**
-     * CPV-VERIFICATION-FLOW-AND-COMPLETION (`6215451160`): no se manda un segundo aviso. El evento Registered,
-     * que el registro de Filament dispara justo antes, ya lo manda por su listener
-     * (SendEmailVerificationNotification → User::sendEmailVerificationNotification()).
+     * CPV-VERIFICATION-FLOW-AND-COMPLETION (`6215451160`): el aviso sale por la misma vía que el reenvío,
+     * User::sendEmailVerificationNotification(). El registro de Filament dispara su propio evento
+     * (Filament\Events\Auth\Registered), no el de Laravel, así que el listener SendEmailVerificationNotification
+     * no corre aquí y sale un solo mensaje.
      */
     protected function sendEmailVerificationNotification(\Illuminate\Database\Eloquent\Model $user): void
     {
-        //
+        if (! $user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail || $user->hasVerifiedEmail()) {
+            return;
+        }
+
+        $user->sendEmailVerificationNotification();
     }
 
     /**

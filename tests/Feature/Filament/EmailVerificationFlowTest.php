@@ -94,6 +94,19 @@ class EmailVerificationFlowTest extends TestCase
             ->call('register');
     }
 
+    /**
+     * Después de verificar, Filament usa redirect()->intended(): vuelve a la página que el usuario quiso abrir
+     * (o al Inicio). Lo que importa es que sale de la verificación y no va al login.
+     */
+    private function assertLeavesVerification(\Illuminate\Testing\TestResponse $response): void
+    {
+        $response->assertRedirect();
+        $location = (string) $response->headers->get('Location');
+        $this->assertStringNotContainsString('/email-verification/', $location);
+        $this->assertNotSame(Filament::getPanel('admin')->getLoginUrl(), $location);
+        $this->assertStringStartsWith(Filament::getPanel('admin')->getUrl(), $location);
+    }
+
     private function prompt(): string
     {
         return Filament::getPanel('admin')->getEmailVerificationPromptUrl();
@@ -149,11 +162,11 @@ class EmailVerificationFlowTest extends TestCase
             ->assertDontSee('MAIL_');
 
         // El enlace del mensaje verifica a este usuario y abre el panel.
-        $this->actingAs($user)->get($link)->assertRedirect(Filament::getPanel('admin')->getUrl());
+        $this->assertLeavesVerification($this->actingAs($user)->get($link));
         $user->refresh();
         $this->assertNotNull($user->email_verified_at);
         $this->actingAs($user)->get(Filament::getPanel('admin')->getUrl())->assertOk();
-        $this->actingAs($user)->get($this->prompt())->assertRedirect(Filament::getPanel('admin')->getUrl());
+        $this->assertLeavesVerification($this->actingAs($user)->get($this->prompt()));
 
         // Verificar no da más acceso que el que ya tenía: ni roles ni empresas.
         $this->assertSame([], $user->getRoleNames()->all());
@@ -173,14 +186,17 @@ class EmailVerificationFlowTest extends TestCase
     }
 
     #[Test]
-    public function registration_fires_the_registered_event_once(): void
+    public function registration_fires_filaments_event_once_and_not_laravels(): void
     {
+        // El registro de Filament dispara su propio evento, no el de Laravel. Por eso el listener
+        // SendEmailVerificationNotification de Laravel no manda un segundo aviso.
         $this->captcha(true);
-        Event::fake([Registered::class]);
+        Event::fake([Registered::class, \Filament\Events\Auth\Registered::class]);
 
         $this->register('zzz-evento-'.uniqid().'@example.test')->assertHasNoErrors();
 
-        Event::assertDispatchedTimes(Registered::class, 1);
+        Event::assertDispatchedTimes(\Filament\Events\Auth\Registered::class, 1);
+        Event::assertNotDispatched(Registered::class);
     }
 
     #[Test]
@@ -238,10 +254,10 @@ class EmailVerificationFlowTest extends TestCase
 
         // Un enlace vigente y propio verifica; repetirlo no cambia nada.
         $fresh = $panel->getVerifyEmailUrl($b);
-        $this->actingAs($b)->get($fresh)->assertRedirect($panel->getUrl());
+        $this->assertLeavesVerification($this->actingAs($b)->get($fresh));
         $verifiedAt = $b->fresh()->email_verified_at;
         $this->assertNotNull($verifiedAt);
-        $this->actingAs($b->fresh())->get($fresh)->assertRedirect($panel->getUrl());
+        $this->assertLeavesVerification($this->actingAs($b->fresh())->get($fresh));
         $this->assertEquals($verifiedAt, $b->fresh()->email_verified_at);
         $this->assertNull($a->fresh()->email_verified_at);
     }
@@ -279,7 +295,7 @@ class EmailVerificationFlowTest extends TestCase
     {
         $this->get(EmpresaResource::getUrl('index'))->assertRedirect(Filament::getPanel('admin')->getLoginUrl());
         $verified = User::factory()->create();
-        $this->actingAs($verified)->get($this->prompt())->assertRedirect(Filament::getPanel('admin')->getUrl());
+        $this->assertLeavesVerification($this->actingAs($verified)->get($this->prompt()));
         $this->actingAs($verified)->get(UserManual::getUrl())->assertOk();
     }
 }

@@ -73,9 +73,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
      * firmado del PANEL (`filament.admin.auth.email-verification.verify`, con vencimiento
      * `auth.verification.expire`), no la ruta `verification.verify` de Laravel, que esta app no tiene.
      *
-     * Es la única vía de envío. La usan el listener SendEmailVerificationNotification del evento Registered
-     * y el «Pedir un nuevo enlace» de la página de verificación. El registro no manda uno propio (ver
-     * App\Filament\Pages\Register), así que sale un solo mensaje por registro.
+     * Es la única vía de envío. La usan el registro (App\Filament\Pages\Register), el «Pedir un nuevo enlace»
+     * de la página de verificación y, si algo dispara el evento Registered de Laravel, su listener
+     * SendEmailVerificationNotification.
      *
      * Sale por el transporte configurado. Con `log`, como hoy en staging, no llega a ningún buzón.
      */
