@@ -251,6 +251,12 @@ class ExperiencesRelationManager extends RelationManager
 
     protected static function deleteEntry(RelationManager $livewire, string $key): void
     {
+        // El UPDATE de las entradas y el porcentaje cacheado (`saved`) van juntos.
+        DB::transaction(fn () => static::deleteEntryInTransaction($livewire, $key));
+    }
+
+    private static function deleteEntryInTransaction(RelationManager $livewire, string $key): void
+    {
         $experience = $livewire->ownerRecord->experiences()->first();
 
         if (! $experience) {

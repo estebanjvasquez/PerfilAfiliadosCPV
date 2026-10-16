@@ -111,15 +111,20 @@ class PresenceRelationManager extends RelationManager
                 Tables\Columns\BooleanColumn::make('has_experience')->label('Tiene experiencia internacional'),
             ])
             ->headerActions([
+                // CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (`6214463281`): el INSERT, el hook `created` (marca del
+                // módulo) y el `saved` (porcentaje cacheado) van en una sola transacción de la conexión por defecto,
+                // la misma de los modelos. Es el mecanismo de Filament (`MountableAction::databaseTransaction()`).
                 Tables\Actions\CreateAction::make()
+                    ->databaseTransaction()
                     ->modalWidth('7xl')
                     ->visible(fn (RelationManager $livewire) => ! $livewire->ownerRecord->presence()->exists()),
                 CompletionBadge::make(EmpresaModuleStatus::MODULE_PRESENCIA),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_PRESENCIA),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->modalWidth('7xl'),
-                Tables\Actions\DeleteAction::make(),
+                // Editar y Eliminar también escriben el porcentaje cacheado después de la fila: misma transacción.
+                Tables\Actions\EditAction::make()->databaseTransaction()->modalWidth('7xl'),
+                Tables\Actions\DeleteAction::make()->databaseTransaction(),
             ])
             ->bulkActions([
                 FilamentExportBulkAction::make('export')

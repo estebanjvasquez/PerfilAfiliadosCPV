@@ -95,12 +95,16 @@ class SustainabilitiesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                // CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (`6214463281`): el INSERT, el hook `created` (marca del
+                // módulo) y el `saved` (porcentaje cacheado) van en una sola transacción de la conexión por defecto,
+                // la misma de los modelos. Es el mecanismo de Filament (`MountableAction::databaseTransaction()`).
+                Tables\Actions\CreateAction::make()->databaseTransaction(),
                 CompletionBadge::make(EmpresaModuleStatus::MODULE_SOSTENIBILIDAD),
                 NoAplicaAction::make(EmpresaModuleStatus::MODULE_SOSTENIBILIDAD),
             ])
             ->actions([
-                Tables\Actions\DeleteAction::make(),
+                // Eliminar también escribe el porcentaje cacheado después de borrar la fila: misma transacción.
+                Tables\Actions\DeleteAction::make()->databaseTransaction(),
             ])
             ->bulkActions([
                 //Tables\Actions\DeleteBulkAction::make(),
