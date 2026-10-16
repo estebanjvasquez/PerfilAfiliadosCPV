@@ -140,4 +140,239 @@ class FirstSaveAtomicityTest extends TestCase
 
         $this->assertSame([], $failures, "First-save failures on PostgreSQL:\n".implode("\n", $failures));
     }
+
+    // -----------------------------------------------------------------------------------------------
+    // `6214463281`: prueba del camino de FALLA. Un guardado exitoso no prueba el rollback, así que aquí se
+    // inyecta una excepción DESPUÉS del INSERT, en un paso identificado, con los eventos reales activos y
+    // sin transacción externa del test. La inyección es solo del test: un listener temporal o un doble
+    // del observer en el contenedor. El código de producción no se toca ni se saltan eventos.
+    // -----------------------------------------------------------------------------------------------
+
+    private const MODEL_OF = [
+        'management' => \App\Models\Management::class,
+        'assets' => \App\Models\Asset::class,
+        'experiences' => \App\Models\Experience::class,
+        'presences' => \App\Models\Presence::class,
+        'sustainabilities' => \App\Models\Sustainability::class,
+    ];
+
+    /** Valor centinela del porcentaje cacheado: si el refresco de adentro se confirmara, dejaría de verse. */
+    private const SENTINEL = 1;
+
+    /** Activo mientras se quiere la falla; el reintento lo apaga. */
+    private bool $armed = false;
+
+    /** Lo que se midió dentro del paso donde se inyecta la falla (conexión, nivel de transacción, estado). */
+    private array $probe = [];
+
+    /**
+     * Cinco caminos de primer guardado × dos pasos posteriores al INSERT:
+     *  - `created`: después del hook `created` del modelo, que ya borró la marca «No aplica» del módulo;
+     *  - `completion`: después de que EmpresaCompletionObserver::saved() escribió empresas.completion_percentage.
+     */
+    public static function failureCases(): array
+    {
+        $cases = [];
+        foreach (array_keys(self::modules()) as $name) {
+            foreach (['created', 'completion'] as $step) {
+                $cases["{$name} @ {$step}"] = [$name, $step];
+            }
+        }
+
+        return $cases;
+    }
+
+    private function inject(string $modelClass, string $step, array $events = ['saved']): void
+    {
+        new $modelClass; // el modelo ya está booteado: su `created` corre antes que este listener
+        $this->armed = true;
+        $this->probe = [];
+        $test = $this;
+
+        if ($step === 'created') {
+            \Illuminate\Support\Facades\Event::listen("eloquent.created: {$modelClass}", function ($model) use ($test) {
+                $test->failHere($model, 'created');
+            });
+
+            return;
+        }
+
+        // Doble del observer real: hace su trabajo (el refresco del porcentaje) y recién después falla.
+        $this->app->instance(\App\Observers\EmpresaCompletionObserver::class, new class($test, $modelClass, $events) extends \App\Observers\EmpresaCompletionObserver
+        {
+            public function __construct(private $test, private string $target, private array $events) {}
+
+            public function saved(\Illuminate\Database\Eloquent\Model $model): void
+            {
+                parent::saved($model);
+                if ($model instanceof $this->target && in_array('saved', $this->events, true)) {
+                    $this->test->failHere($model, 'completion');
+                }
+            }
+
+            public function deleted(\Illuminate\Database\Eloquent\Model $model): void
+            {
+                parent::deleted($model);
+                if ($model instanceof $this->target && in_array('deleted', $this->events, true)) {
+                    $this->test->failHere($model, 'completion');
+                }
+            }
+        });
+    }
+
+    /** @internal lo llama la inyección: mide adentro y lanza. */
+    public function failHere(\Illuminate\Database\Eloquent\Model $model, string $step): void
+    {
+        if (! $this->armed) {
+            return;
+        }
+        $this->armed = false;
+        $conn = $model->getConnection();
+        $this->probe = [
+            'step' => $step,
+            'model_connection' => $conn->getName(),
+            'default_connection' => DB::connection()->getName(),
+            'empresa_connection' => (new Empresa)->getConnection()->getName(),
+            'status_connection' => (new EmpresaModuleStatus)->getConnection()->getName(),
+            'transaction_level' => $conn->transactionLevel(),
+            'rows_inside' => $conn->table($model->getTable())->where('empresa_id', $model->empresa_id)->count(),
+            'completion_inside' => (int) $conn->table('empresas')->where('id', $model->empresa_id)->value('completion_percentage'),
+        ];
+
+        throw new \RuntimeException("injected failure after {$step}");
+    }
+
+    /** Foto de todo lo que una empresa tiene en los cinco módulos, su marca y su porcentaje cacheado. */
+    private function snapshot(Empresa $empresa): array
+    {
+        $db = DB::connection();
+        $out = [];
+        foreach (array_keys(self::MODEL_OF) as $table) {
+            $out[$table] = $db->table($table)->where('empresa_id', $empresa->id)->orderBy('id')->get()->map(fn ($r) => (array) $r)->all();
+        }
+        $out['status'] = $db->table('empresa_module_status')->where('empresa_id', $empresa->id)->orderBy('id')->get()->map(fn ($r) => (array) $r)->all();
+        $out['completion'] = $db->table('empresas')->where('id', $empresa->id)->value('completion_percentage');
+
+        return $out;
+    }
+
+    /** Empresa con la marca «No aplica» del módulo y el porcentaje cacheado en el centinela. */
+    private function preparedCompany(string $module): array
+    {
+        [$empresa, $user] = $this->freshCompany();
+        EmpresaModuleStatus::setStatus($empresa->id, $module, true);
+        DB::connection()->table('empresas')->where('id', $empresa->id)->update(['completion_percentage' => self::SENTINEL]);
+
+        return [$empresa, $user];
+    }
+
+    private function report(string $case, string $result): void
+    {
+        fwrite(STDERR, sprintf("ATOMICITY %s | %s | %s\n", $case, json_encode($this->probe), $result));
+    }
+
+    #[Test]
+    #[\PHPUnit\Framework\Attributes\DataProvider('failureCases')]
+    public function a_failure_after_the_insert_rolls_back_the_whole_first_save_and_a_retry_succeeds(string $name, string $step): void
+    {
+        [$table, $manager, $action, $data, $module] = self::modules()[$name];
+        if (($data['areas_id'] ?? null) === 'area1') {
+            $data['areas_id'] = $this->catalog['area1'];
+        }
+        $modelClass = self::MODEL_OF[$name];
+
+        // Otra empresa, con su propia fila y su marca: no debe cambiar.
+        [$other, $otherUser] = $this->preparedCompany($module);
+        $this->assertNull($this->firstSave($manager, $action, $data, $other, $otherUser), "{$name}: setup of the other company");
+        EmpresaModuleStatus::setStatus($other->id, $module, true);
+        $otherBefore = $this->snapshot($other);
+
+        [$empresa, $user] = $this->preparedCompany($module);
+        $before = $this->snapshot($empresa);
+        $this->assertSame([], $before[$table], "{$name}: the company starts with no row");
+        $this->assertTrue(EmpresaModuleStatus::isNoAplica($empresa->id, $module));
+
+        $this->inject($modelClass, $step);
+        $error = $this->firstSave($manager, $action, $data, $empresa, $user);
+
+        $this->assertInstanceOf(\RuntimeException::class, $error, "{$name}: the injected failure surfaced");
+        $this->assertSame("injected failure after {$step}", $error->getMessage());
+        // Medido adentro: el INSERT ya estaba hecho, en la conexión de los modelos, dentro de una transacción.
+        $this->assertSame(1, $this->probe['rows_inside'], "{$name}: the INSERT ran before the failure");
+        $this->assertSame($this->probe['default_connection'], $this->probe['model_connection'], "{$name}: model on the default connection");
+        $this->assertSame($this->probe['model_connection'], $this->probe['empresa_connection'], "{$name}: completion written on the same connection");
+        $this->assertSame($this->probe['model_connection'], $this->probe['status_connection'], "{$name}: status written on the same connection");
+        $this->assertGreaterThanOrEqual(1, $this->probe['transaction_level'], "{$name}: the post-INSERT step runs inside an application transaction");
+        if ($step === 'completion') {
+            $this->assertNotSame(self::SENTINEL, $this->probe['completion_inside'], "{$name}: the completion refresh had been written inside");
+        }
+
+        // Después del rollback: nada confirmado, la marca y el porcentaje como antes, la otra empresa intacta.
+        $this->assertSame($before, $this->snapshot($empresa), "{$name} @ {$step}: nothing committed");
+        $this->assertTrue(EmpresaModuleStatus::isNoAplica($empresa->id, $module), "{$name}: pre-existing «No aplica» kept");
+        $this->assertSame(self::SENTINEL, (int) $this->snapshot($empresa)['completion'], "{$name}: cached completion unchanged");
+        $this->assertSame($otherBefore, $this->snapshot($other), "{$name}: other company unchanged");
+
+        // Sin la falla, el reintento guarda bien.
+        $this->armed = false;
+        $this->assertNull($this->firstSave($manager, $action, $data, $empresa, $user), "{$name}: retry after the failure");
+        $rows = $this->rows($table, $empresa);
+        $this->assertCount(1, $rows, "{$name}: one row after the retry");
+        $this->assertSame($user->id, (int) $rows[0]->user_id, "{$name}: actor on the retried row");
+        $this->assertFalse(EmpresaModuleStatus::isNoAplica($empresa->id, $module), "{$name}: «No aplica» cleared by the retry");
+        $cached = (int) DB::connection()->table('empresas')->where('id', $empresa->id)->value('completion_percentage');
+        $this->assertSame(Empresa::query()->withCompletionData()->findOrFail($empresa->id)->completionPercentage(), $cached, "{$name}: cached completion refreshed by the retry");
+        $this->assertSame($otherBefore, $this->snapshot($other), "{$name}: other company still unchanged");
+
+        $this->report("{$name} @ {$step}", 'rolled back; retry OK');
+    }
+
+    /**
+     * Caminos de actualización y borrado que escriben la fila y DESPUÉS el porcentaje cacheado.
+     * (Gestión, Recursos y la edición de Experiencia pasan por los helpers ya cubiertos arriba.)
+     */
+    public static function updateFailureCases(): array
+    {
+        return [
+            'presences edit' => ['presences', 'edit', ['saved']],
+            'presences delete' => ['presences', 'delete', ['deleted']],
+            'sustainabilities delete' => ['sustainabilities', 'delete', ['deleted']],
+            'experiences eliminar' => ['experiences', 'eliminar', ['saved']],
+        ];
+    }
+
+    #[Test]
+    #[\PHPUnit\Framework\Attributes\DataProvider('updateFailureCases')]
+    public function a_failure_after_an_update_or_delete_rolls_it_back(string $name, string $action, array $events): void
+    {
+        [$table, $manager, $createAction, $data, $module] = self::modules()[$name];
+        if (($data['areas_id'] ?? null) === 'area1') {
+            $data['areas_id'] = $this->catalog['area1'];
+        }
+        [$empresa, $user] = $this->freshCompany();
+        $this->assertNull($this->firstSave($manager, $createAction, $data, $empresa, $user), "{$name}: setup");
+        DB::connection()->table('empresas')->where('id', $empresa->id)->update(['completion_percentage' => self::SENTINEL]);
+        $before = $this->snapshot($empresa);
+
+        $rm = $this->manager($manager, $empresa, $user);
+        $record = $rm->instance()->getTableRecords()->first();
+        $this->assertNotNull($record, "{$name}: a table row to act on");
+        $payload = $action === 'edit' ? ['has_offices' => false, 'has_experience' => true, 'experience_data' => ['b' => ['expcountry_id' => $this->catalog['country'], 'projects_q' => 5, 'role' => '3', 'executed_q' => '4']]] : [];
+
+        $this->inject(self::MODEL_OF[$name], 'completion', $events);
+        try {
+            $this->withoutExceptionHandling();
+            $rm->actWith($action, $record, data: $payload);
+            $error = null;
+        } catch (Throwable $e) {
+            $error = $e;
+        }
+
+        $this->assertInstanceOf(\RuntimeException::class, $error, "{$name}: the injected failure surfaced");
+        $this->assertGreaterThanOrEqual(1, $this->probe['transaction_level'], "{$name}: inside an application transaction");
+        $this->assertSame($this->probe['model_connection'], $this->probe['empresa_connection'], "{$name}: same connection");
+        $this->assertSame($before, $this->snapshot($empresa), "{$name}: row and cached completion unchanged after the failure");
+
+        $this->report($name, 'rolled back');
+    }
 }
