@@ -22,16 +22,15 @@ class Sustainability extends Model
     {
         parent::boot();
 
-        static::created(function ($item) {
-            $user = Auth::id();
-            $empresa = $item->empresa_id;
+        // CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (`6212967641`): el actor va en el INSERT, solo en la fila
+        // creada. Este módulo admite varias filas por empresa, y antes el WHERE empresa_id le reescribía
+        // el actor a todas. Ver el comentario en Management::boot().
+        static::creating(function ($item) {
+            $item->user_id = Auth::id();
+        });
 
-            DB::update(
-                'update sustainabilities
-                set sustainabilities.user_id = ?
-                where empresa_id = ?',
-                [$user, $empresa]
-            );
+        static::created(function ($item) {
+            $empresa = $item->empresa_id;
 
             EmpresaModuleStatus::setStatus($empresa, EmpresaModuleStatus::MODULE_SOSTENIBILIDAD, false);
             /* $user = strval(Auth::User()->id);

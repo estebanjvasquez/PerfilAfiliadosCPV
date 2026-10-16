@@ -40,8 +40,30 @@ trait ProfileModuleFixtures
     /** @var array{country: int, city: int, sector: int, infrasector: int, area1: int, area2: int} */
     protected array $catalog = [];
 
+    /**
+     * `actWith()` es como `callTableAction()`, pero REEMPLAZA cada campo de primer nivel del formulario
+     * montado. `callTableAction(data:)` aplana con Arr::dot y deja el ítem vacío que un repeater trae por
+     * defecto, que después falla la validación sin que el test lo haya pedido.
+     */
+    protected function registerActWith(): void
+    {
+        if (Testable::hasMacro('actWith')) {
+            return;
+        }
+        Testable::macro('actWith', function (string $name, $record = null, array $data = []) {
+            /** @var Testable $this */
+            $this->mountTableAction($name, $record);
+            foreach ($data as $key => $value) {
+                $this->set("mountedTableActionsData.0.{$key}", $value);
+            }
+
+            return $this->callMountedTableAction();
+        });
+    }
+
     protected function seedCatalogs(): void
     {
+        $this->registerActWith();
         $now = now();
         $db = DB::connection();
         $countryId = $db->table('countries')->insertGetId(['country_name' => 'ZZZ País sintético', 'created_at' => $now, 'updated_at' => $now]);

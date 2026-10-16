@@ -31,9 +31,14 @@ class Asset extends Model
     {
         parent::boot();
 
+        // CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (`6212967641`): el actor va en el INSERT, solo en la fila
+        // creada. Ver el comentario en Management::boot().
+        static::creating(function ($item) {
+            $item->user_id = Auth::id();
+        });
+
         static::created(function ($item) {
             //$user = strval(Auth::User()->id);
-            $user = Auth::id();
             $empresa = $item->empresa_id;
 
             //dd($empresa);
@@ -47,13 +52,6 @@ class Asset extends Model
                 //[$user, $user]
                 [Auth::id(), Auth::id()]
             );  */
-
-            DB::update(
-                'update assets
-                set assets.user_id = ?
-                where empresa_id = ?',
-                [$user, $empresa]
-            );
 
             EmpresaModuleStatus::setStatus($empresa, EmpresaModuleStatus::MODULE_RECURSOS, false);
 

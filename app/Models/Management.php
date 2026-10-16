@@ -79,16 +79,17 @@ class Management extends Model
     {
         parent::boot();
 
-        static::created(function ($item) {
-            $user = Auth::id();
-            $empresa = $item->empresa_id;
+        // CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (Issue #2 `6212967641`): el actor se escribe en el mismo
+        // INSERT y solo en la fila creada. Antes era un segundo statement después del insert,
+        // `update management set management.user_id = ? where empresa_id = ?`. PostgreSQL rechaza un SET
+        // calificado con la tabla (SQLSTATE 42703), así que el primer guardado fallaba después de dejar una
+        // fila parcial. Además, el WHERE reescribía el actor de todas las filas de la empresa.
+        static::creating(function ($item) {
+            $item->user_id = Auth::id();
+        });
 
-            DB::update(
-                'update management
-                set management.user_id = ?
-                where empresa_id = ?',
-                [$user, $empresa]
-            );
+        static::created(function ($item) {
+            $empresa = $item->empresa_id;
 
             EmpresaModuleStatus::setStatus($empresa, EmpresaModuleStatus::MODULE_GESTION, false);
             /* $user = strval(Auth::User()->id);

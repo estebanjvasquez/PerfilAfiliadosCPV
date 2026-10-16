@@ -16,6 +16,7 @@ use Filament\Support\RawJs;
 use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 
 class AssetsRelationManager extends RelationManager
@@ -87,6 +88,12 @@ class AssetsRelationManager extends RelationManager
     }
 
     protected static function saveFieldWithNoAplica(RelationManager $livewire, string $field, string $subType, array $data): void
+    {
+        // CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY: marca, primer INSERT (con su hook) y actualización van juntos.
+        DB::transaction(fn () => static::saveFieldWithNoAplicaInTransaction($livewire, $field, $subType, $data));
+    }
+
+    private static function saveFieldWithNoAplicaInTransaction(RelationManager $livewire, string $field, string $subType, array $data): void
     {
         EmpresaModuleStatus::setStatus(
             (int) $livewire->ownerRecord->id,

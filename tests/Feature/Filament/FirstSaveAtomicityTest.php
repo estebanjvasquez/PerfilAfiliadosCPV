@@ -80,7 +80,7 @@ class FirstSaveAtomicityTest extends TestCase
     {
         try {
             $this->withoutExceptionHandling();
-            $this->manager($manager, $empresa, $user)->callTableAction($action, data: $data)->assertHasNoTableActionErrors();
+            $this->manager($manager, $empresa, $user)->actWith($action, data: $data)->assertHasNoTableActionErrors();
 
             return null;
         } catch (Throwable $e) {

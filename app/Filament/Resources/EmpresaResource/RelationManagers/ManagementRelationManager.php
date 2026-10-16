@@ -17,6 +17,7 @@ use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 
 class ManagementRelationManager extends RelationManager
@@ -75,14 +76,18 @@ class ManagementRelationManager extends RelationManager
 
     protected static function saveFieldsWithNoAplica(RelationManager $livewire, string $subType, array $data): void
     {
-        EmpresaModuleStatus::setStatus(
-            (int) $livewire->ownerRecord->id,
-            EmpresaModuleStatus::MODULE_GESTION,
-            (bool) ($data['no_aplica'] ?? false),
-            $subType
-        );
+        // CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY: la marca de la sección, el primer INSERT (con su hook)
+        // y la actualización van juntos. Si algo falla, no queda una fila a medias ni una marca suelta.
+        DB::transaction(function () use ($livewire, $subType, $data) {
+            EmpresaModuleStatus::setStatus(
+                (int) $livewire->ownerRecord->id,
+                EmpresaModuleStatus::MODULE_GESTION,
+                (bool) ($data['no_aplica'] ?? false),
+                $subType
+            );
 
-        static::saveFields($livewire, Arr::except($data, ['no_aplica']));
+            static::saveFields($livewire, Arr::except($data, ['no_aplica']));
+        });
     }
 
     protected static function summaryColumn(string $name, string $subType, string $label, array $checks, string $otrosField): Tables\Columns\TextColumn

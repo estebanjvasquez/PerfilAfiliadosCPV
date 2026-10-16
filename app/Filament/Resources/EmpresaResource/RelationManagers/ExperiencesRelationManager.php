@@ -24,6 +24,7 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ExperiencesRelationManager extends RelationManager
@@ -218,6 +219,13 @@ class ExperiencesRelationManager extends RelationManager
     }
 
     protected static function saveEntry(RelationManager $livewire, array $data, ?string $key): void
+    {
+        // CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY: el primer INSERT (con su hook) y la escritura de la entrada
+        // van juntos, así no queda una fila vacía si algo falla en medio.
+        DB::transaction(fn () => static::saveEntryInTransaction($livewire, $data, $key));
+    }
+
+    private static function saveEntryInTransaction(RelationManager $livewire, array $data, ?string $key): void
     {
         $experience = $livewire->ownerRecord->experiences()->first();
 

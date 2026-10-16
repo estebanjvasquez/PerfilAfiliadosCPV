@@ -31,16 +31,14 @@ class Presence extends Model
     {
         parent::boot();
 
-        static::created(function ($item) {
-            $user = Auth::id();
-            $empresa = $item->empresa_id;
+        // CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (`6212967641`): el actor va en el INSERT, solo en la fila
+        // creada. Ver el comentario en Management::boot().
+        static::creating(function ($item) {
+            $item->user_id = Auth::id();
+        });
 
-            DB::update(
-                'update presences
-                set presences.user_id = ?
-                where empresa_id = ?',
-                [$user, $empresa]
-            );
+        static::created(function ($item) {
+            $empresa = $item->empresa_id;
 
             EmpresaModuleStatus::setStatus($empresa, EmpresaModuleStatus::MODULE_PRESENCIA, false);
             /* $user = strval(Auth::User()->id);
