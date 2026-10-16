@@ -1,8 +1,8 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-16 ~09:00Z, en la rama `docs/session-continuity`. Las versiones largas anteriores, completas y sin
-cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md). El
-checkpoint largo de producto sigue en `68168129:docs/orquestador/SESSION_RESUME.md` (rama `feature/home-branding-layout`).
+**Checkpoint:** 2026-10-16 ~09:45Z, en la rama `fix/model-compatibility-labels`. Sale de `docs/session-continuity` @ `28014c2`, aceptada en `6211970495`.
+Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
+El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
 > **Prioridad:** las instrucciones del usuario y del comentario del Issue #2 asignado prevalecen sobre este archivo.
 > Si algo de aquí contradice GitHub o el servidor, prevalece la evidencia viva: se registra la discrepancia y se sigue
@@ -32,83 +32,94 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** `docs/session-continuity`. Su punta tiene este checkpoint; el SHA está en la entrega final de CPV-SESSION-CONTINUITY en el Issue #2.
-  - `CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo corto existen **solo en esta rama**.
-  - Una sesión abierta en otra rama o en un checkout viejo **no** los carga sola.
+- **Rama canónica:** la de la tarea en curso, **`fix/model-compatibility-labels`**.
+  - Contiene `docs/session-continuity` @ `28014c2` completa.
+  - Es el candidato de runtime que **lleva los archivos de arranque**: `CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo.
+  - Esos archivos existen solo en estas dos ramas. Llegan a `feature/upgrade-filament-v3` únicamente si este candidato se despliega con una autorización.
+  - Una sesión abierta en otra rama o en un checkout viejo no los carga sola.
 - **Cómo situarse sin perder trabajo:**
   1. `git status -sb`. Si hay cambios, **no** se descartan: se commitean en su rama o se usa un worktree aparte.
-  2. Con el árbol limpio: `git fetch origin docs/session-continuity` y `git switch docs/session-continuity`, y después `git pull --ff-only`.
-  3. Alternativa sin tocar el árbol actual: `git worktree add ..\cpv-continuity origin/docs/session-continuity`.
+  2. Con el árbol limpio: `git fetch origin <rama>`, `git switch <rama>` y `git pull --ff-only`.
+  3. Alternativa sin tocar el árbol actual: `git worktree add ..\cpv-<rama> origin/<rama>`.
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
-- **Pendiente obligatorio:** integrar estos archivos de arranque a `feature/upgrade-filament-v3` en la **próxima entrega de runtime autorizada explícitamente**.
-  - No se integran solos, porque `CLAUDE.md`, `AGENTS.md` y `check_tools.ps1` no están todos cubiertos por `paths-ignore` y podrían disparar un despliegue.
-  - Hasta entonces **no** están en todas las ramas ni en todas las computadoras.
-- **Mensaje exacto para reiniciar** (el propietario lo pega en una sesión nueva):
+- **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `docs/session-continuity` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabajá en la rama `fix/model-compatibility-labels` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
 | Hecho | Valor | Fuente y fecha |
 |---|---|---|
-| HEAD remoto de `feature/upgrade-filament-v3` | `0f8bdad97590676c966048e18afa35f76110ff1f` | 2026-10-16 08:24Z, registro `6211360371` |
-| Workflow de ese push | run `38873194879`, success, 08:21:57–08:22:32Z | `6211360371` |
-| Código en staging (checkout del VPS) | `0f8bdad`, 0 modificaciones | post-state 08:24:51Z |
-| Imagen `app` en staging | `sha256:37e023fd…`, recreada 08:22:28Z | post-state |
+| HEAD remoto de `feature/upgrade-filament-v3` | `0f8bdad97590676c966048e18afa35f76110ff1f` | `git ls-remote`, 2026-10-16 ~09:04Z |
+| Código en staging (checkout del VPS) | `0f8bdad`, 0 modificaciones, imagen `sha256:37e023fd…` | SSH de solo lectura, 09:05:16Z |
+| Workflow del último despliegue | run `38873194879`, success, 08:22Z | `6211360371` |
 | Imagen de recuperación | `perfilafiliados-app:pre-branding-c02d4ec` | creada ~08:11Z |
 
-Una rama remota no prueba un despliegue: el estado de staging sale del VPS. Estas filas no se volvieron a comprobar en este checkpoint.
+### En curso: CPV-MODEL-COMPATIBILITY-AND-LABELS (READY_FOR_REVIEW — MANUAL, sin desplegar)
 
-### Producto: CPV-HOME-BRANDING-AND-LAYOUT, DESPLEGADO
+- **Autorización:** `6211997650`. Referencia directa: `6190871814`.
+- **Rama:** `fix/model-compatibility-labels`. BASE `28014c2`.
+- **TESTED_HEAD:** `2f1e6fdd9a363bfa57c1a8e523375e6e963bcbd1`. Los commits posteriores son solo docs y audit.
+- **Cambios:**
+  - `EmpresaPgsql` hereda `taxonomyCategories(): HasMany` del padre, porque el override incompatible daba un error fatal al cargar;
+  - las etiquetas pasan a OVID, ISO 9001 e ISO 17025;
+  - el manual dice «ISO 45001 u OVID».
+- **Pruebas en aislamiento:**
+  - enfocadas 61 OK;
+  - suite completa **515 OK**;
+  - navegador 51/51.
+- **Informe:** `audit/model_compat_labels_2026-10-16.md`. **Evidencia:** `audit/runs/model_compat_labels/`.
 
-- **Recorrido:**
-  - instrucción `6210321522`;
-  - entrega `6210758420`;
-  - aceptación `6211023097`;
-  - despliegue **`0f8bdad`** (lo empujó el propietario), registrado en `6211360371`: DEPLOYED_FOR_OWNER_REVIEW — MANUAL.
-- **Rama** `feature/home-branding-layout`:
-  - TESTED_HEAD `17e2b07`;
-  - checkpoint de producto `68168129a00e90004a7547ee5a1f9d270e7f15a5`;
-  - el merge de esa rama en esta trae su evidencia: `audit/home_branding_layout_2026-10-16.md` §9 y `audit/runs/home_branding_deploy_2026-10-16/`.
-- **Resultados:** smoke 37/37 y 0010C 18/18; el correo sigue en `log`; la taxonomía no cambió.
-- **No verificado en vivo:** la geometría en un navegador real, «Salir» con clic y el recorrido SPA. Eso queda para la UAT del propietario.
+### Anteriores
 
-### Continuidad: CPV-SESSION-CONTINUITY
-
-- **Recorrido:** instrucción `6210552318`, entrega `6211267473`, revisión y cierre `6211767961`; entrega final en esta rama. Solo documentación; **sin** despliegue de runtime.
-- **Informe:** `audit/session_continuity_2026-10-16.md`.
-
-### Ya desplegado antes (registrado)
-
-Inicio útil `c02d4ec`, mapa de la taxonomía `9e7e379`, manual por módulo `37e3b71` y TASK-0010A/B/C (C con OK del propietario, `6189493183`). El correo sigue en `log` y su activación está pendiente del propietario (`docs/deploy/CORREO_DEL_SISTEMA.md`). El ejecutor autónomo del VPS está suspendido.
+- **CPV-HOME-BRANDING-AND-LAYOUT:** desplegado en `0f8bdad` (`6211360371`). Queda la UAT del propietario.
+- **CPV-SESSION-CONTINUITY:** cerrado y aceptado en `6211970495`. Informe: `audit/session_continuity_2026-10-16.md`.
+- **Despliegues previos:** Inicio útil `c02d4ec`, mapa `9e7e379`, manual `37e3b71` y TASK-0010A/B/C.
+- **Correo:** sigue en `log`; la activación está pendiente del propietario (`docs/deploy/CORREO_DEL_SISTEMA.md`).
+- **Ejecutor autónomo:** suspendido.
 
 ## 3. Siguiente acción
 
-- **Propietario:** UAT de Inicio en staging. Comprobar el logo, «Inicio», el orden de las tarjetas en la computadora y en el teléfono, los botones de ayuda, «Salir» y la vuelta a Inicio desde el menú. **No** hay que repetir ningún push ni despliegue.
-- **Orquestador/propietario:** aceptar o corregir el cierre de CPV-SESSION-CONTINUITY.
+- **Orquestador/propietario:** revisar la entrega de CPV-MODEL-COMPATIBILITY-AND-LABELS. Desplegarla requiere una autorización aparte del propietario. El push a la rama de despliegue puede tener que hacerlo el propietario.
+- **Propietario:**
+  - UAT de Inicio en staging;
+  - el correo (proveedor, credenciales, prueba controlada);
+  - decidir si se reintenta la solicitud #1.
 - **Agente:** nada sin una instrucción nueva del Issue #2.
 
 ## 4. Worktrees en uso (no tocar sin instrucción)
 
-`..\wt-task-0010a` (`b43737e`) y `..\wt-task-0010b` (`964550d`) son históricos. El runner aislado es `infra/contabo-test-runner` @ `ac4fc4f`.
+- `..\wt-task-0010a` (`b43737e`) y `..\wt-task-0010b` (`964550d`) son históricos.
+- El runner aislado es `infra/contabo-test-runner` @ `fc1100b`. Tiene `ux_check_management.mjs` y `ux_seed_management.php`.
 
 ## 5. Pendientes conocidos (no arrancan solos)
 
-- **Despliegue:** `paths-ignore` no despliega un cambio que solo toque `resources/manual/*.md`, y el agente no puede lanzar `workflow_dispatch` (403). Por SSH, nunca `bash -s` por stdin.
+- **Nuevo, con prioridad:** los hooks `created` de `Management`, `Asset`, `Experience`, `Presence` y `Sustainability` hacen `update <tabla> set <tabla>.user_id`. PostgreSQL lo rechaza (42703).
+  - Staging usa pgsql, así que el **primer guardado** de esos módulos probablemente falla allí. No se verificó en vivo.
+  - Necesita su propia ronda autorizada (informe §6).
+- **Despliegue:**
+  - `paths-ignore` no despliega un cambio que solo toque `resources/manual/*.md`;
+  - el agente no puede lanzar `workflow_dispatch` (403);
+  - por SSH, nunca `bash -s` por stdin.
 - **Correo:** sin correo, un usuario nuevo no recibe la verificación. La reserva de avisos no garantiza un único envío.
-- **Defectos:** `EmpresaPgsql` no compila; la casilla `ovid` dice «COVID.»; ISO 9001/17025 sin etiqueta; `app/images/user.pdf` es ajeno.
-- **Fallas latentes:** `Empresa::users()` sin sesión, `EditEmpresa::getSteps()` con `cities` vacía, `StatsOverview` con `empresas` vacía.
+- **Backlog:**
+  - `Empresa::users()` falla sin sesión;
+  - `EditEmpresa::getSteps()` falla con `cities` vacía;
+  - `StatsOverview` falla con `empresas` vacía;
+  - el estado de los ancestros en el buscador;
+  - `app/images/user.pdf` es un PDF ajeno;
+  - la dependencia mysql del crawler.
 
 ## 6. Reglas vigentes (el detalle está en `PROJECT_KNOWLEDGE.md` §8)
 
 - **Secretos:** ninguno en git, chat, Issue ni logs. No crear, rotar ni ampliar permisos sin una instrucción explícita.
-- **Permisos:** un rechazo de permisos se **reporta, no se rodea**. El push a `feature/upgrade-filament-v3` puede tener que ejecutarlo el propietario.
+- **Permisos:** un rechazo de permisos se **reporta, no se rodea**.
 - **Documentación:** toda ronda que cambie el comportamiento actualiza el manual o la ayuda en la misma entrega.
 - **Entrega:** un comentario con `docs\orquestador\post_issue_comment.ps1 -BodyFile <md>`. El handoff JSON no es canal de entrega.
 
 ## 7. Bajo demanda
 
-- **Herramientas por entorno y máquina nueva:** [`ENVIRONMENT.md`](ENVIRONMENT.md).
+- **Herramientas y máquina nueva:** [`ENVIRONMENT.md`](ENVIRONMENT.md).
 - **Accesos:** [`ACCESS_BOOTSTRAP.md`](ACCESS_BOOTSTRAP.md).
 - **Conocimiento técnico:** [`PROJECT_KNOWLEDGE.md`](PROJECT_KNOWLEDGE.md).
 - **Tarea actual:** [`current_task.md`](current_task.md).

@@ -1,0 +1,86 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-phpunit-20261016T090943Z-9177f9661a72 Creating 
+ Container cpvtest-phpunit-20261016T090943Z-9177f9661a72 Created 
+PHPUnit 11.5.56 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.34
+Configuration: /app/phpunit.xml
+
+........EEE..................................................     61 / 61 (100%)
+
+Time: 00:13.019, Memory: 95.00 MB
+
+There were 3 errors:
+
+1) Tests\Feature\Filament\ManagementLabelsTest::the_security_form_labels_ovid_as_ovid_and_saves_the_same_field
+ErrorException: Attempt to read property "mountedTableActions" on null
+
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/app/vendor/filament/tables/src/Testing/TestsActions.php:50
+/app/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:407
+/app/tests/Feature/Filament/ManagementLabelsTest.php:63
+
+2) Tests\Feature\Filament\ManagementLabelsTest::the_quality_form_labels_iso_9001_and_iso_17025_and_saves_them
+ErrorException: Attempt to read property "mountedTableActions" on null
+
+/app/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:262
+/app/vendor/filament/tables/src/Testing/TestsActions.php:50
+/app/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/app/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:407
+/app/tests/Feature/Filament/ManagementLabelsTest.php:82
+
+3) Tests\Feature\Filament\ManagementLabelsTest::the_summary_column_and_the_other_outputs_say_ovid
+Illuminate\Database\QueryException: SQLSTATE[42703]: Undefined column: 7 ERROR:  column "management" of relation "management" does not exist
+LINE 2:                 set management.user_id = $1
+                            ^ (Connection: pgsql, Host: testdb, Port: 5432, Database: cpv_test, SQL: update management
+                set management.user_id = 5
+                where empresa_id = 8)
+
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:597
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:549
+/app/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:491
+/app/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+/app/app/Models/Management.php:86
+/app/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:492
+/app/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:319
+/app/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:299
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasEvents.php:224
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1422
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1240
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/HasOneOrMany.php:391
+/app/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/HasOneOrMany.php:388
+/app/tests/Feature/Filament/ManagementLabelsTest.php:100
+
+Caused by
+PDOException: SQLSTATE[42703]: Undefined column: 7 ERROR:  column "management" of relation "management" does not exist
+LINE 2:                 set management.user_id = $1
+                            ^
+
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:609
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:827
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:794
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:597
+/app/vendor/laravel/framework/src/Illuminate/Database/Connection.php:549
+/app/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:491
+/app/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+/app/app/Models/Management.php:86
+/app/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:492
+/app/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:319
+/app/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:299
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasEvents.php:224
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1422
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1240
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/HasOneOrMany.php:391
+/app/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/app/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/HasOneOrMany.php:388
+/app/tests/Feature/Filament/ManagementLabelsTest.php:100
+
+ERRORS!
+Tests: 61, Assertions: 646, Errors: 3.
+

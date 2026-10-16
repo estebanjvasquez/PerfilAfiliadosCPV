@@ -1,28 +1,26 @@
-# Tarea actual (checkpoint 2026-10-16 ~09:00Z, rama `docs/session-continuity`)
+# Tarea actual (checkpoint 2026-10-16 ~09:45Z, rama `fix/model-compatibility-labels`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## Producto: CPV-HOME-BRANDING-AND-LAYOUT — DESPLEGADO
+## CPV-MODEL-COMPATIBILITY-AND-LABELS — READY_FOR_REVIEW — MANUAL
 
 | Campo | Valor |
 |---|---|
-| Autorización / entrega / aceptación | `6210321522` / `6210758420` / `6211023097` |
-| Rama | `feature/home-branding-layout`; checkpoint `68168129a00e90004a7547ee5a1f9d270e7f15a5` |
-| TESTED_HEAD / desplegado | `17e2b076f221f36037a193b8fcab58a11d243009` / **`0f8bdad97590676c966048e18afa35f76110ff1f`** |
-| Despliegue | push del propietario; run `38873194879` success (2026-10-16 08:22Z); registro `6211360371`: DEPLOYED_FOR_OWNER_REVIEW — MANUAL |
-| Evidencia | `audit/home_branding_layout_2026-10-16.md` §9; `audit/runs/home_branding_deploy_2026-10-16/` |
-| Siguiente acción | **UAT del propietario** en staging. No se repite ningún push ni despliegue |
+| Autorización | `6211997650` (propietario, 2026-10-16 09:03Z): implementación y validación aislada; **no** despliegue |
+| Referencia directa | `6190871814` (investigación de solo lectura) |
+| Rama / BASE | `fix/model-compatibility-labels` / `28014c2cb56ef5f75bb9339545a045635ee81854` (continuidad aceptada, `6211970495`) |
+| Runtime verificado antes de la rama | staging `0f8bdad`, 0 modificaciones, 2026-10-16 09:05Z |
+| TESTED_HEAD | `2f1e6fdd9a363bfa57c1a8e523375e6e963bcbd1` |
+| Resultados | enfocados 61 OK; suite completa 515 OK; navegador 51/51 (aislado) |
+| Informe | `audit/model_compat_labels_2026-10-16.md`; evidencia `audit/runs/model_compat_labels/` |
+| Siguiente acción | revisión manual. Desplegar requiere una autorización del propietario |
+| Arrastre de continuidad | esta rama lleva los archivos de arranque aceptados hacia la próxima entrega de runtime |
 
-## Continuidad: CPV-SESSION-CONTINUITY — cierre final
+## Hallazgo para una ronda aparte (no autorizado aquí)
 
-| Campo | Valor |
-|---|---|
-| Instrucción / entrega / cierre | `6210552318` / `6211267473` / `6211767961` |
-| Rama | `docs/session-continuity` (rama canónica del arranque; ver `SESSION_RESUME.md` §1) |
-| Informe | `audit/session_continuity_2026-10-16.md` |
-| Siguiente acción | aceptación del orquestador o del propietario |
-| Pendiente obligatorio | integrar `CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y el checkpoint corto a `feature/upgrade-filament-v3` en la próxima entrega de runtime autorizada. No se hace antes, porque podría disparar un despliegue |
+Los hooks `created` de `Management`, `Asset`, `Experience`, `Presence` y `Sustainability` usan
+`set <tabla>.user_id`, que PostgreSQL rechaza. Detalle en el informe §6.
 
 ## Fuera de alcance hasta una instrucción nueva
 
@@ -30,4 +28,5 @@ hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_
 - reintentar la solicitud #1;
 - reactivar el ejecutor;
 - hacer merge a `main`;
-- cualquier mutación de la taxonomía.
+- mutar la taxonomía;
+- el backlog listado en `SESSION_RESUME.md` §5.

@@ -9,7 +9,7 @@ del usuario y del comentario del Issue #2 asignado.
 3. Leer completo, una vez, solo el comentario del Issue #2 asignado. De lo que cite, abrir solo las referencias
    directas necesarias. No recorrer comentarios en cadena.
 
-Rama canónica de estos archivos: `docs/session-continuity` (`SESSION_RESUME.md` §1).
+Rama canónica de estos archivos: la de la tarea en curso (`SESSION_RESUME.md` §1).
 
 **No:**
 - onboarding recursivo;

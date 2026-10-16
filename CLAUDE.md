@@ -11,7 +11,7 @@ Al empezar:
 3. Leer completo, una vez, **solo** el comentario del Issue #2 que asigne el usuario (repo `estebanjvasquez/PerfilAfiliadosCPV`).
    De lo que cite, abrir solo las referencias directas que la tarea necesite. No recorrer comentarios en cadena.
 
-Estos archivos de arranque viven en la rama `docs/session-continuity` hasta que se integren con una entrega autorizada
+Estos archivos de arranque viven en la rama de la tarea en curso (y en `docs/session-continuity`) hasta que se integren con una entrega autorizada
 (`SESSION_RESUME.md` §1).
 
 **No:**

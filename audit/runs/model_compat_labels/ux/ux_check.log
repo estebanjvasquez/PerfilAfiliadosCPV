@@ -1,0 +1,53 @@
+PASS  [affiliate/light/desktop] the «Sistemas de gestión» tab and its actions are reachable
+PASS  [affiliate/light/desktop] summary table shows OVID and no COVID  :: Sistemas de gestión Completado: 0% No Aplica Calidad Ambiente Credibilidad y transparencia Seguridad Gestión de proyecto
+PASS  [affiliate/light/desktop] «Seguridad»: checkbox labelled «OVID», no «COVID»  :: Cerrar Agregar / editar: seguridad No Aplica Si lo activa, "Seguridad" contará como completado en el perfil aunque no cargue datos. Si guard
+PASS  [affiliate/light/desktop] no page-level horizontal overflow with the modal open  :: excess=0px
+PASS  [affiliate/light/desktop] saving OVID persists (re-opened modal shows it checked)
+PASS  [affiliate/light/desktop] «Calidad»: checkboxes labelled «ISO 9001» and «ISO 17025»  :: Cerrar Agregar / editar: calidad No Aplica Si lo activa, "Calidad" contará como completado en el perfil aunque no cargue datos. Si guarda da
+PASS  [affiliate/light/desktop] no page-level horizontal overflow (Calidad)  :: excess=0px
+PASS  [affiliate/dark/desktop] the «Sistemas de gestión» tab and its actions are reachable
+PASS  [affiliate/dark/desktop] summary table shows OVID and no COVID  :: Sistemas de gestión Completado: 17% No Aplica Calidad Ambiente Credibilidad y transparencia Seguridad Gestión de proyect
+PASS  [affiliate/dark/desktop] «Seguridad»: checkbox labelled «OVID», no «COVID»  :: Cerrar Agregar / editar: seguridad No Aplica Si lo activa, "Seguridad" contará como completado en el perfil aunque no cargue datos. Si guard
+PASS  [affiliate/dark/desktop] no page-level horizontal overflow with the modal open  :: excess=0px
+PASS  [affiliate/dark/desktop] «Calidad»: checkboxes labelled «ISO 9001» and «ISO 17025»  :: Cerrar Agregar / editar: calidad No Aplica Si lo activa, "Calidad" contará como completado en el perfil aunque no cargue datos. Si guarda da
+PASS  [affiliate/dark/desktop] no page-level horizontal overflow (Calidad)  :: excess=0px
+PASS  [affiliate/light/mobile] the «Sistemas de gestión» tab and its actions are reachable
+PASS  [affiliate/light/mobile] summary table shows OVID and no COVID  :: Sistemas de gestión Completado: 17% No Aplica Calidad Ambiente Credibilidad y transparencia Seguridad Gestión de proyect
+PASS  [affiliate/light/mobile] «Seguridad»: checkbox labelled «OVID», no «COVID»  :: Cerrar Agregar / editar: seguridad No Aplica Si lo activa, "Seguridad" contará como completado en el perfil aunque no cargue datos. Si guard
+PASS  [affiliate/light/mobile] no page-level horizontal overflow with the modal open  :: excess=0px
+PASS  [affiliate/light/mobile] «Calidad»: checkboxes labelled «ISO 9001» and «ISO 17025»  :: Cerrar Agregar / editar: calidad No Aplica Si lo activa, "Calidad" contará como completado en el perfil aunque no cargue datos. Si guarda da
+PASS  [affiliate/light/mobile] no page-level horizontal overflow (Calidad)  :: excess=0px
+PASS  [affiliate/dark/mobile] the «Sistemas de gestión» tab and its actions are reachable
+PASS  [affiliate/dark/mobile] summary table shows OVID and no COVID  :: Sistemas de gestión Completado: 17% No Aplica Calidad Ambiente Credibilidad y transparencia Seguridad Gestión de proyect
+PASS  [affiliate/dark/mobile] «Seguridad»: checkbox labelled «OVID», no «COVID»  :: Cerrar Agregar / editar: seguridad No Aplica Si lo activa, "Seguridad" contará como completado en el perfil aunque no cargue datos. Si guard
+PASS  [affiliate/dark/mobile] no page-level horizontal overflow with the modal open  :: excess=0px
+PASS  [affiliate/dark/mobile] «Calidad»: checkboxes labelled «ISO 9001» and «ISO 17025»  :: Cerrar Agregar / editar: calidad No Aplica Si lo activa, "Calidad" contará como completado en el perfil aunque no cargue datos. Si guarda da
+PASS  [affiliate/dark/mobile] no page-level horizontal overflow (Calidad)  :: excess=0px
+PASS  [admin/light/desktop] the «Sistemas de gestión» tab and its actions are reachable
+PASS  [admin/light/desktop] summary table shows OVID and no COVID  :: Sistemas de gestión Completado: 17% No Aplica Calidad Ambiente Credibilidad y transparencia Seguridad Gestión de proyect
+PASS  [admin/light/desktop] «Seguridad»: checkbox labelled «OVID», no «COVID»  :: Cerrar Agregar / editar: seguridad No Aplica Si lo activa, "Seguridad" contará como completado en el perfil aunque no cargue datos. Si guard
+PASS  [admin/light/desktop] no page-level horizontal overflow with the modal open  :: excess=0px
+PASS  [admin/light/desktop] «Calidad»: checkboxes labelled «ISO 9001» and «ISO 17025»  :: Cerrar Agregar / editar: calidad No Aplica Si lo activa, "Calidad" contará como completado en el perfil aunque no cargue datos. Si guarda da
+PASS  [admin/light/desktop] no page-level horizontal overflow (Calidad)  :: excess=0px
+PASS  [admin/light/desktop] saving ISO 9001 persists (re-opened modal shows it checked)
+PASS  [admin/light/desktop] the affiliate's OVID save is visible to the admin
+PASS  [admin/dark/desktop] the «Sistemas de gestión» tab and its actions are reachable
+PASS  [admin/dark/desktop] summary table shows OVID and no COVID  :: Sistemas de gestión Completado: 33% No Aplica Calidad Ambiente Credibilidad y transparencia Seguridad Gestión de proyect
+PASS  [admin/dark/desktop] «Seguridad»: checkbox labelled «OVID», no «COVID»  :: Cerrar Agregar / editar: seguridad No Aplica Si lo activa, "Seguridad" contará como completado en el perfil aunque no cargue datos. Si guard
+PASS  [admin/dark/desktop] no page-level horizontal overflow with the modal open  :: excess=0px
+PASS  [admin/dark/desktop] «Calidad»: checkboxes labelled «ISO 9001» and «ISO 17025»  :: Cerrar Agregar / editar: calidad No Aplica Si lo activa, "Calidad" contará como completado en el perfil aunque no cargue datos. Si guarda da
+PASS  [admin/dark/desktop] no page-level horizontal overflow (Calidad)  :: excess=0px
+PASS  [admin/light/mobile] the «Sistemas de gestión» tab and its actions are reachable
+PASS  [admin/light/mobile] summary table shows OVID and no COVID  :: Sistemas de gestión Completado: 33% No Aplica Calidad Ambiente Credibilidad y transparencia Seguridad Gestión de proyect
+PASS  [admin/light/mobile] «Seguridad»: checkbox labelled «OVID», no «COVID»  :: Cerrar Agregar / editar: seguridad No Aplica Si lo activa, "Seguridad" contará como completado en el perfil aunque no cargue datos. Si guard
+PASS  [admin/light/mobile] no page-level horizontal overflow with the modal open  :: excess=0px
+PASS  [admin/light/mobile] «Calidad»: checkboxes labelled «ISO 9001» and «ISO 17025»  :: Cerrar Agregar / editar: calidad No Aplica Si lo activa, "Calidad" contará como completado en el perfil aunque no cargue datos. Si guarda da
+PASS  [admin/light/mobile] no page-level horizontal overflow (Calidad)  :: excess=0px
+PASS  [admin/dark/mobile] the «Sistemas de gestión» tab and its actions are reachable
+PASS  [admin/dark/mobile] summary table shows OVID and no COVID  :: Sistemas de gestión Completado: 33% No Aplica Calidad Ambiente Credibilidad y transparencia Seguridad Gestión de proyect
+PASS  [admin/dark/mobile] «Seguridad»: checkbox labelled «OVID», no «COVID»  :: Cerrar Agregar / editar: seguridad No Aplica Si lo activa, "Seguridad" contará como completado en el perfil aunque no cargue datos. Si guard
+PASS  [admin/dark/mobile] no page-level horizontal overflow with the modal open  :: excess=0px
+PASS  [admin/dark/mobile] «Calidad»: checkboxes labelled «ISO 9001» and «ISO 17025»  :: Cerrar Agregar / editar: calidad No Aplica Si lo activa, "Calidad" contará como completado en el perfil aunque no cargue datos. Si guarda da
+PASS  [admin/dark/mobile] no page-level horizontal overflow (Calidad)  :: excess=0px
+
+51/51 checks passed
