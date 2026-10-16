@@ -78,6 +78,9 @@ async function submit(page, modal, label = /^(Enviar|Crear|Guardar cambios|Guard
   await page.waitForTimeout(2000);
 }
 
+// Empty repeaters start with no items: add one before filling its fields.
+const addItem = async (page, modal) => { await modal.getByRole('button', { name: /^(Agregar|Añadir)/ }).last().click(); await page.waitForTimeout(700); };
+
 const closed = async (modal) => !(await modal.isVisible().catch(() => false));
 const overflow = (page) => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
 
@@ -96,6 +99,7 @@ try {
       await modal.getByLabel('ISO 9001', { exact: true }).check();
       await modal.getByRole('switch', { name: /Otros/ }).click();
       await page.waitForTimeout(500);
+      await addItem(page, modal);
       await submit(page, modal);
       const err = await modal.locator('.fi-fo-field-wrp-error-message').first().innerText().catch(() => '');
       record(`${tag} Gestión: «Otros» without a name shows a validation error and keeps the modal`, !(await closed(modal)) && err.length > 0, err);
@@ -131,10 +135,12 @@ try {
       await openCompany(page);
       await openTab(page, /Recursos en Venezuela/);
       const modal = await header(page, 'Recursos humanos');
+      await addItem(page, modal);
       await modal.locator('select').first().selectOption({ index: 1 });
       await submit(page, modal);
       record(`${tag} Recursos: first save (Recursos humanos) closes the modal`, await closed(modal));
       const m2 = await header(page, 'Inventario');
+      await addItem(page, m2);
       await m2.locator('select').nth(0).selectOption({ index: 1 });
       await m2.locator('select').nth(1).selectOption({ index: 1 });
       await m2.getByLabel('Unidad').first().fill('KG');
@@ -197,6 +203,7 @@ try {
       await page.waitForTimeout(400);
       await edit.getByRole('switch', { name: /Tiene experiencia/ }).click();
       await page.waitForTimeout(600);
+      if (!(await edit.locator('select').filter({ has: page.locator('option', { hasText: 'Subcontratista' }) }).count())) await addItem(page, edit);
       const selects = edit.locator('select');
       await selects.nth(0).selectOption({ label: 'ZZZ País sintético' }).catch(() => {});
       await edit.locator('select').filter({ has: page.locator('option', { hasText: 'Subcontratista' }) }).first().selectOption({ label: 'Ambos' });
