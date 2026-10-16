@@ -143,7 +143,10 @@ try {
       const editUrl = new URL(await edit.getAttribute('href'), BASE).href;
       const openTab = async () => {
         await page.goto(editUrl, { waitUntil: 'networkidle' });
-        const tab = page.getByRole('tab', { name: /Sistemas de gestión/ }).first();
+        // On a phone the sidebar opens over the page; close it, as ux_check_first_save.mjs does.
+        if (page.viewportSize().width < 1024) await page.evaluate(() => window.Alpine?.store('sidebar')?.close?.());
+        await page.waitForTimeout(400);
+        const tab =page.getByRole('tab', { name: /Sistemas de gestión/ }).first();
         for (let i = 0; i < 6 && !(await tab.isVisible().catch(() => false)); i++) { await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.waitForTimeout(500); }
         await tab.click();
         await page.waitForTimeout(1500);
