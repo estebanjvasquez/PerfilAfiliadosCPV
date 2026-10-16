@@ -124,6 +124,10 @@ class FirstSaveAtomicityTest extends TestCase
             $this->assertCount(1, $rows, "{$name}: exactly one committed row");
             $this->assertSame($user->id, (int) $rows[0]->user_id, "{$name}: actor on the created row");
             $this->assertFalse(EmpresaModuleStatus::isNoAplica($empresa->id, $module), "{$name}: module «No aplica» cleared by the first save");
+            // EmpresaCompletionObserver (saved) recomputes the cached percentage. Before the fix, the
+            // exception in created() meant saved() never ran, so the cache went stale.
+            $cached = (int) DB::connection()->table('empresas')->where('id', $empresa->id)->value('completion_percentage');
+            $this->assertSame(Empresa::query()->withCompletionData()->findOrFail($empresa->id)->completionPercentage(), $cached, "{$name}: cached completion percentage refreshed");
 
             // Reintento (doble click o segundo intento). Los módulos de una fila no duplican; en
             // Sostenibilidad, un segundo «Crear» es un enfoque más, que es legítimo.
