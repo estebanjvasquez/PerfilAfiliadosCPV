@@ -927,10 +927,14 @@ if (class_exists(App\Models\TaxonomyCategoryRequestDeliveryAttempt::class)) {
   # Optional synthetic data for this browser check (--ux-seed). Runs as the app,
   # inside the disposable stack, reading the file on stdin: nothing from a live
   # database, nothing persisted outside this run.
+  # The served host is fixed before the seed, so a seed can sign a URL for it (the
+  # verification link of CPV-VERIFICATION-FLOW-AND-COMPLETION). The APP_KEY is
+  # ephemeral: such a link is worthless once this run ends.
+  UX_SERVER="${PROJECT}-uxserve-${RUN_ID}"
   if [ -n "$UX_SEED" ]; then
     if [ ! -f "$COMPOSE_DIR/$UX_SEED" ]; then
       uxbad "ux seed not found: $UX_SEED"
-    elif compose run --rm -T testapp php <"$COMPOSE_DIR/$UX_SEED" >"$ARTIFACTS/ux/ux_seed.log" 2>&1; then
+    elif compose run --rm -T -e CPV_UX_BASE_URL="http://${UX_SERVER}:8000" testapp php <"$COMPOSE_DIR/$UX_SEED" >"$ARTIFACTS/ux/ux_seed.log" 2>&1; then
       uxok "synthetic ux seed applied: $UX_SEED"
       tail -3 "$ARTIFACTS/ux/ux_seed.log" | sed 's/^/           /'
     else
