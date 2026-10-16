@@ -252,7 +252,9 @@ class EmailVerificationFlowTest extends TestCase
         $this->assertNull($b->fresh()->email_verified_at);
         $this->travelBack();
 
-        // Un enlace vigente y propio verifica; repetirlo no cambia nada.
+        // Un enlace vigente y propio verifica; repetirlo no cambia nada. (La visita sin sesión de arriba dejó
+        // ese enlace viejo como «intended»; se limpia para mirar solo este paso.)
+        session()->forget('url.intended');
         $fresh = $panel->getVerifyEmailUrl($b);
         $this->assertLeavesVerification($this->actingAs($b)->get($fresh));
         $verifiedAt = $b->fresh()->email_verified_at;
