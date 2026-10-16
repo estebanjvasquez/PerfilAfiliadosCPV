@@ -13,7 +13,7 @@ use Filament\Pages\Page;
  *
  * ACCESO. Es exactamente el del manual de usuario (revisión `6191485610`, punto C): `canAccess()`
  * delega en `UserManual::canAccess()`, y la página vive en el mismo panel, con los mismos
- * `authMiddleware` (Authenticate + EnsureEmailIsVerified). Si el acceso al manual cambia, este cambia
+ * middleware: Authenticate y la verificación de correo del panel. Si el acceso al manual cambia, este cambia
  * con él. La taxonomía publicada es global: no depende de la empresa del usuario, así que no se lee
  * ningún dato de empresas.
  *

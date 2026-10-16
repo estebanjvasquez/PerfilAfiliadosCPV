@@ -86,7 +86,11 @@ class EmpresaModuleStatus extends Model
                 ['no_aplica' => true]
             );
         } else {
-            static::where('empresa_id', $empresaId)->where('module', $module)->where('sub_type', $subType)->delete();
+            // CPV-VERIFICATION-FLOW-AND-COMPLETION (`6215451160`): se borra modelo por modelo, no con el
+            // query builder, para que dispare `deleted` y EmpresaCompletionObserver recalcule el porcentaje
+            // cacheado. Antes, desmarcar «No Aplica» lo dejaba viejo. Es como mucho una fila (unique
+            // empresa_id + module + sub_type).
+            static::where('empresa_id', $empresaId)->where('module', $module)->where('sub_type', $subType)->get()->each->delete();
         }
     }
 

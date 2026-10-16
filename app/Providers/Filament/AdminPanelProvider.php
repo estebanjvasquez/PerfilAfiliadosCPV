@@ -22,7 +22,7 @@ use Filament\PanelProvider;
 use Filament\Tables\Table;
 use Filament\Widgets;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
-use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
+use App\Filament\Pages\Auth\EmailVerificationPrompt;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -37,8 +37,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
  * paths de discovery de Resources/Pages/Widgets, el widget de completitud
  * de EmpresaResource (no cubierto por discoverWidgets porque vive anidado
  * dentro de la carpeta del Resource, no en Filament/Widgets), dark mode,
- * favicon, fuente de Google, y el middleware de EnsureEmailIsVerified
- * (User implementa MustVerifyEmail).
+ * favicon, fuente de Google, y la verificación de correo (User implementa
+ * MustVerifyEmail; desde `6215451160`, con ->emailVerification() de Filament).
  */
 class AdminPanelProvider extends PanelProvider
 {
@@ -105,6 +105,12 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard(env('FILAMENT_AUTH_GUARD', 'web'))
             ->login(Login::class)
             ->registration(Register::class)
+            // CPV-VERIFICATION-FLOW-AND-COMPLETION (`6215451160`): verificación de correo de Filament. Registra la
+            // página «Verifique su correo electrónico» y el enlace firmado (`signed`, `throttle:6,1`). Cada
+            // página y recurso del panel recibe el middleware `verified:<ruta de esa página>`. La página de
+            // verificación y el cierre de sesión quedan fuera, así que no hay bucle. Antes, el middleware de
+            // Laravel apuntaba a `verification.notice`, que no existe, y un usuario sin verificar recibía 500.
+            ->emailVerification(EmailVerificationPrompt::class)
             ->homeUrl('/')
             ->brandName(config('app.name'))
             ->favicon(asset('images/capet.jpg'))
@@ -150,9 +156,9 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 FilamentShieldPlugin::make(),
             ])
+            // Sin EnsureEmailIsVerified aquí: lo aplica ->emailVerification() página por página (ver arriba).
             ->authMiddleware([
                 Authenticate::class,
-                EnsureEmailIsVerified::class,
             ])
             ->plugin(
                 // Breezy v2 dejo de manejar login/registro (ahora es 100% nativo

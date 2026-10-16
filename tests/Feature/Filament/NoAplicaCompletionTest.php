@@ -169,6 +169,7 @@ class NoAplicaCompletionTest extends TestCase
         // Sin el permiso del módulo, el gestor de la pestaña no se monta.
         $noPerms = $this->affiliate(withPermissions: false);
         $empresa->users()->attach($noPerms->id);
+        $this->withoutExceptionHandling();
         try {
             $this->manager(ManagementRelationManager::class, $empresa, $noPerms)->actWith('no_aplica', data: ['no_aplica' => true]);
             $this->fail('Sin permiso no debería poder usar la acción.');
@@ -178,6 +179,7 @@ class NoAplicaCompletionTest extends TestCase
         $this->assertFalse(EmpresaModuleStatus::isNoAplica($empresa->id, EmpresaModuleStatus::MODULE_GESTION));
 
         // Otra empresa: su página de edición no se abre.
+        $this->withExceptionHandling();
         $stranger = $this->affiliate();
         $this->companyOf($stranger);
         $this->actingAs($stranger)->get(EmpresaResource::getUrl('edit', ['record' => $empresa]))->assertNotFound();

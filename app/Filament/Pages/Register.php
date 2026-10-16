@@ -63,6 +63,16 @@ class Register extends \Filament\Pages\Auth\Register
     }
 
     /**
+     * CPV-VERIFICATION-FLOW-AND-COMPLETION (`6215451160`): no se manda un segundo aviso. El evento Registered,
+     * que el registro de Filament dispara justo antes, ya lo manda por su listener
+     * (SendEmailVerificationNotification → User::sendEmailVerificationNotification()).
+     */
+    protected function sendEmailVerificationNotification(\Illuminate\Database\Eloquent\Model $user): void
+    {
+        //
+    }
+
+    /**
      * @return array<int|string, Form>
      */
     protected function getForms(): array

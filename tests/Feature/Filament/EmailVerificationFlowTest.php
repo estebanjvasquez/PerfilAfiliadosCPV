@@ -145,7 +145,7 @@ class EmailVerificationFlowTest extends TestCase
             ->assertSee('todavía no envía correos')
             ->assertSee('Cámara')
             ->assertDontSee('Hemos enviado')
-            ->assertDontSee('array')
+            ->assertDontSee('Simulado')
             ->assertDontSee('MAIL_');
 
         // El enlace del mensaje verifica a este usuario y abre el panel.

@@ -15,6 +15,7 @@ use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\PermissionRegistrar;
@@ -28,8 +29,10 @@ use Tests\TestCase;
  * Supuestos declarados:
  * - **Usuario:** se crea como lo deja el registro (sin verificar); no se ejercita el formulario de
  *   registro, que tiene captcha.
- * - **Verificación de correo:** SIMULADA con markEmailAsVerified(). El correo de staging no está
- *   configurado y aquí no se envía nada (Mail::fake).
+ * - **Verificación de correo:** desde `6215451160`, por el ENLACE real del panel. El aviso se genera con
+ *   User::sendEmailVerificationNotification() y se captura con Notification::fake(): no sale ningún
+ *   correo. El correo de staging no está configurado. El registro con captcha está en
+ *   EmailVerificationFlowTest.
  * - **Permisos:** los de las policies se otorgan como lo haría su rol en producción (ver
  *   ProfileModuleFixtures).
  *
@@ -52,7 +55,7 @@ class NewAffiliateOnboardingTest extends TestCase
     }
 
     #[Test]
-    public function a_new_affiliate_verifies_creates_their_company_and_saves_each_module_for_the_first_time(): void
+    public function a_new_affiliate_verifies_by_the_link_creates_their_company_and_saves_each_module_for_the_first_time(): void
     {
         // Otra empresa, de otro usuario, que el afiliado nuevo no debe ver.
         $other = $this->affiliate();
@@ -63,11 +66,19 @@ class NewAffiliateOnboardingTest extends TestCase
         $user->givePermissionTo($this->permissions());
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        // Sin verificar, el panel no deja entrar (EnsureEmailIsVerified). HALLAZGO PREVIO, fuera de esta
-        // ronda: hoy responde 500 (`Route [verification.notice] not defined`). El panel usa el middleware de
-        // Laravel sin la verificación de Filament. Aquí solo se afirma que no entra; el 500 se reporta aparte.
-        $this->assertNotSame(200, $this->actingAs($user)->get(EmpresaResource::getUrl('index'))->getStatusCode());
-        $user->markEmailAsVerified();
+        // Sin verificar, el panel lleva a la página de verificación (antes, 500: `verification.notice`).
+        $this->actingAs($user)->get(EmpresaResource::getUrl('index'))->assertRedirect(Filament::getPanel('admin')->getEmailVerificationPromptUrl());
+        Notification::fake();
+        $user->sendEmailVerificationNotification();
+        $link = null;
+        Notification::assertSentTo($user, \Filament\Notifications\Auth\VerifyEmail::class, function ($n) use (&$link) {
+            $link = $n->url;
+
+            return true;
+        });
+        $this->actingAs($user)->get($link)->assertRedirect(Filament::getPanel('admin')->getUrl());
+        $this->assertNotNull($user->fresh()->email_verified_at);
+        $user->refresh();
         $this->actingAs($user)->get(EmpresaResource::getUrl('index'))->assertOk();
 
         // Alta de su empresa por la página real: Empresa::created() lo vincula.

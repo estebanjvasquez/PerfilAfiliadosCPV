@@ -69,6 +69,25 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     }
 
     /**
+     * CPV-VERIFICATION-FLOW-AND-COMPLETION (Issue #2 `6215451160`): el aviso de verificación lleva el enlace
+     * firmado del PANEL (`filament.admin.auth.email-verification.verify`, con vencimiento
+     * `auth.verification.expire`), no la ruta `verification.verify` de Laravel, que esta app no tiene.
+     *
+     * Es la única vía de envío. La usan el listener SendEmailVerificationNotification del evento Registered
+     * y el «Pedir un nuevo enlace» de la página de verificación. El registro no manda uno propio (ver
+     * App\Filament\Pages\Register), así que sale un solo mensaje por registro.
+     *
+     * Sale por el transporte configurado. Con `log`, como hoy en staging, no llega a ningún buzón.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $notification = app(\Filament\Notifications\Auth\VerifyEmail::class);
+        $notification->url = \Filament\Facades\Filament::getPanel('admin')->getVerifyEmailUrl($this);
+
+        $this->notify($notification);
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>

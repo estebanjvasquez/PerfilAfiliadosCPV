@@ -27,6 +27,10 @@ class NoAplicaAction
             ->color('warning')
             ->modalHeading("No Aplica — {$label}")
             ->modalButton('Guardar')
+            // CPV-VERIFICATION-FLOW-AND-COMPLETION (`6215451160`): la marca y el porcentaje cacheado (que
+            // recalcula EmpresaCompletionObserver al guardar o borrar la marca) se confirman juntos, en la
+            // conexión por defecto, que es la de ambos modelos.
+            ->databaseTransaction()
             ->form([
                 Toggle::make('no_aplica')
                     ->label("\"{$label}\" No Aplica para esta empresa")
