@@ -302,13 +302,19 @@ class FirstSaveAtomicityTest extends TestCase
         $this->assertSame($this->probe['default_connection'], $this->probe['model_connection'], "{$name}: model on the default connection");
         $this->assertSame($this->probe['model_connection'], $this->probe['empresa_connection'], "{$name}: completion written on the same connection");
         $this->assertSame($this->probe['model_connection'], $this->probe['status_connection'], "{$name}: status written on the same connection");
-        $this->assertGreaterThanOrEqual(1, $this->probe['transaction_level'], "{$name}: the post-INSERT step runs inside an application transaction");
         if ($step === 'completion') {
             $this->assertNotSame(self::SENTINEL, $this->probe['completion_inside'], "{$name}: the completion refresh had been written inside");
         }
 
         // Después del rollback: nada confirmado, la marca y el porcentaje como antes, la otra empresa intacta.
-        $this->assertSame($before, $this->snapshot($empresa), "{$name} @ {$step}: nothing committed");
+        $after = $this->snapshot($empresa);
+        $this->assertSame(
+            ['rows' => 0, 'no_aplica' => true, 'completion' => self::SENTINEL],
+            ['rows' => count($after[$table]), 'no_aplica' => EmpresaModuleStatus::isNoAplica($empresa->id, $module), 'completion' => (int) $after['completion']],
+            "{$name} @ {$step}: committed state after the failure (transaction level measured inside: {$this->probe['transaction_level']})"
+        );
+        $this->assertGreaterThanOrEqual(1, $this->probe['transaction_level'], "{$name}: the post-INSERT step runs inside an application transaction");
+        $this->assertSame($before, $after, "{$name} @ {$step}: nothing committed");
         $this->assertTrue(EmpresaModuleStatus::isNoAplica($empresa->id, $module), "{$name}: pre-existing «No aplica» kept");
         $this->assertSame(self::SENTINEL, (int) $this->snapshot($empresa)['completion'], "{$name}: cached completion unchanged");
         $this->assertSame($otherBefore, $this->snapshot($other), "{$name}: other company unchanged");
@@ -369,9 +375,15 @@ class FirstSaveAtomicityTest extends TestCase
         }
 
         $this->assertInstanceOf(\RuntimeException::class, $error, "{$name}: the injected failure surfaced");
+        $after = $this->snapshot($empresa);
+        $this->assertSame(
+            ['rows' => count($before[$table]), 'row_unchanged' => true, 'completion' => self::SENTINEL],
+            ['rows' => count($after[$table]), 'row_unchanged' => $before[$table] === $after[$table], 'completion' => (int) $after['completion']],
+            "{$name}: committed state after the failure (transaction level measured inside: {$this->probe['transaction_level']})"
+        );
         $this->assertGreaterThanOrEqual(1, $this->probe['transaction_level'], "{$name}: inside an application transaction");
         $this->assertSame($this->probe['model_connection'], $this->probe['empresa_connection'], "{$name}: same connection");
-        $this->assertSame($before, $this->snapshot($empresa), "{$name}: row and cached completion unchanged after the failure");
+        $this->assertSame($before, $after, "{$name}: row and cached completion unchanged after the failure");
 
         $this->report($name, 'rolled back');
     }
