@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-19 ~11:00Z, en la rama `fix/export-access`. Sale de `review/export-access` @ `dc79728`, que solo agrega tests e informe sobre `fix/verification-completion` @ `edf20ed` (aceptada en `6262657488`).
+**Checkpoint:** 2026-10-19 ~12:25Z, en la rama `fix/export-access` (solo docs sobre `ce70b7f`, desplegado en staging).
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,11 +32,10 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`fix/export-access`**, el candidato integrado en curso. Sobre `edf20ed` agrega la reparación de las descargas y las páginas 404.
-  - Contiene `fix/first-save-postgres` @ `10616af`, que a su vez contiene `0895258` y `28014c2`.
-  - Es el candidato de runtime que **lleva los archivos de arranque**: `CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo.
-  - Esos archivos existen solo en estas ramas. Llegan a `feature/upgrade-filament-v3` únicamente si este candidato se despliega con una autorización.
-  - Una sesión abierta en otra rama o en un checkout viejo no los carga sola.
+- **Rama canónica:** **`fix/export-access`**. Su runtime `ce70b7f` es el que corre en staging; encima solo hay commits de checkpoint (docs).
+  - Contiene `edf20ed`, `10616af`, `0895258` y `28014c2`.
+  - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `ce70b7f`; el checkpoint vigente es el de esta rama.
+  - Una sesión abierta en un checkout viejo no los carga sola.
 - **Cómo situarse sin perder trabajo:**
   1. `git status -sb`. Si hay cambios, **no** se descartan: se commitean en su rama o se usa un worktree aparte.
   2. Con el árbol limpio: `git fetch origin <rama>`, `git switch <rama>` y `git pull --ff-only`.
@@ -50,26 +49,28 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 | Hecho | Valor | Fuente y fecha |
 |---|---|---|
-| HEAD remoto de `feature/upgrade-filament-v3` | `0f8bdad97590676c966048e18afa35f76110ff1f` | `git ls-remote`, 2026-10-16 12:27Z |
-| Código en staging (checkout del VPS) | `0f8bdad`, 0 modificaciones rastreadas (6 carpetas de assets publicados sin rastrear) | SSH de solo lectura, 12:27Z |
-| Workflow del último despliegue | run `38873194879`, success, 08:22Z | `6211360371` |
-| Imagen de recuperación | `perfilafiliados-app:pre-branding-c02d4ec` | creada ~08:11Z |
+| HEAD remoto de `feature/upgrade-filament-v3` | `ce70b7f3345f5d196e2e0190356ed8a6e2e091b4` | `git ls-remote`, 2026-10-19 ~12:20Z |
+| Código en staging (checkout del VPS) | `ce70b7f`, 0 modificaciones rastreadas; `app` y `nginx` arriba; mantenimiento apagado; sin migraciones pendientes | SSH de solo lectura, ~12:20Z |
+| Workflow del último despliegue | run `39249485948`, success, 12:06Z | API pública |
+| Imagen de recuperación | `perfilafiliados-app:pre-exportaccess-0f8bdad` (`37e023fd6830`, la imagen de `0f8bdad`) | creada ~11:05Z |
 
-### Despliegue bloqueado: CPV-INTEGRATED-EXPORT-ACCESS-DEPLOY (`6265502896`, 2026-10-19 ~11:10Z)
+### Desplegado: CPV-INTEGRATED-EXPORT-ACCESS-DEPLOY (`6265502896`) — DEPLOYED_FOR_OWNER_REVIEW — MANUAL
 
-- Prechequeo OK (staging `0f8bdad` limpio, sin migraciones pendientes, fast-forward). Imagen de recuperación: `pre-exportaccess-0f8bdad`.
-- El push a la rama de despliegue fue **rechazado por el clasificador** (`Production Deploy`). Lo ejecuta el propietario: `git push origin ce70b7f3345f5d196e2e0190356ed8a6e2e091b4:refs/heads/feature/upgrade-filament-v3`.
+- **Promoción:** el push del agente fue rechazado por el **clasificador de permisos** (`Production Deploy`). No fue una pérdida de acceso, y no se rodeó. El **propietario** hizo el fast-forward a `ce70b7f`.
+- **Smoke de solo lectura** (en memoria, READ ONLY, ids falsos): `docs/deploy/smoke_export_access_readonly.php` 25/25 y `smoke_task_0010c_readonly.php` 18/18. HTTP público: login 200, 404 «Página no encontrada», `/pdf` y `/xls` → 302 a la ruta protegida, que lleva al login.
+- **Correo:** `log`. `app.debug=false`.
+- **CDN:** no se inspeccionaron las reglas de Cloudflare ni se purgó nada (acción del propietario, `docs/deploy/DESCARGAS_PERFIL.md`).
 
 ### Aceptado (`6265458863`): CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES
 
 - **Autorización:** `6264837159`. BASE `dc79728`. **TESTED_HEAD:** `8e01cacf0a9be978244bd32daf08f7355a70caaf`.
 - **Descargas** (`/admin/descargas/empresas/{id}/pdf` y `…/xlsx`): login del panel, verificación de correo y `EmpresaPolicy::export` (vínculo + `view_empresa`), antes de consultar o generar nada. `/pdf` y `/xls` solo redirigen. Lo demás da el mismo 404 «Archivo no disponible»; hay una 404 general en español. `JoinViewExport` recibe un id explícito. Cabeceras privadas.
 - **Pruebas en `8e01cac`:** enfocadas 147 OK, suite completa **576 OK**, navegador 42/42. Informe: `audit/export_access_repair_2026-10-19.md`.
-- **Pendiente del propietario:** desplegar; purgar Cloudflare si alguna regla guardaba `/xls` o `/pdf`; configurar el correo.
+- **Pendiente del propietario:** revisar Cloudflare y purgar si alguna regla guardaba `/xls` o `/pdf`; configurar el correo.
 
 ### Anteriores
 
-- **CPV-HOME-BRANDING-AND-LAYOUT:** desplegado en `0f8bdad` (`6211360371`). Queda la UAT del propietario.
+- **CPV-HOME-BRANDING-AND-LAYOUT:** desplegado en `0f8bdad` (`6211360371`). Queda la UAT del propietario. Imagen previa: `pre-branding-c02d4ec`.
 - **CPV-SESSION-CONTINUITY:** cerrado y aceptado en `6211970495`. Informe: `audit/session_continuity_2026-10-16.md`.
 - **Despliegues previos:** Inicio útil `c02d4ec`, mapa `9e7e379`, manual `37e3b71` y TASK-0010A/B/C.
 - **Correo:** sigue en `log`; la activación está pendiente del propietario (`docs/deploy/CORREO_DEL_SISTEMA.md`).
@@ -77,9 +78,9 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Propietario:** ejecutar el push de `ce70b7f` a `feature/upgrade-filament-v3` (arriba); luego asignar la verificación posdespliegue de solo lectura.
 - **Propietario:**
-  - UAT de Inicio en staging;
+  - UAT de las descargas (`current_task.md`) y de Inicio en staging;
+  - reglas de caché de Cloudflare para `/pdf/*` y `/xls/*`;
   - el correo (proveedor, credenciales, prueba controlada);
   - decidir si se reintenta la solicitud #1.
 - **Agente:** nada sin una instrucción nueva del Issue #2.

@@ -1,19 +1,37 @@
-# Tarea actual (checkpoint 2026-10-19 ~11:10Z, rama `fix/export-access`)
+# Tarea actual (checkpoint 2026-10-19 ~12:25Z, rama `fix/export-access`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-INTEGRATED-EXPORT-ACCESS-DEPLOY — BLOCKED — MANUAL (`6265502896`)
+## CPV-INTEGRATED-EXPORT-ACCESS-DEPLOY — DEPLOYED_FOR_OWNER_REVIEW — MANUAL (`6265502896`)
+
+| Campo | Valor |
+|---|---|
+| Promoción | el **propietario** hizo el fast-forward de `feature/upgrade-filament-v3` a `ce70b7f` |
+| Por qué no el agente | su push fue **rechazado por el clasificador de permisos** (`Production Deploy`). No hubo pérdida de acceso y no se rodeó (sin SSH, dispatch ni otra vía); credenciales y permisos sin cambios |
+| Workflow | run `39249485948`, `success`, head `ce70b7f`, 12:06Z |
+| Estado vivo (~12:20Z, solo lectura) | checkout `ce70b7f` limpio; `app` (imagen `aa44b1884b93`) y `nginx` arriba; mantenimiento apagado; sin migraciones pendientes; `app.debug=false`; `mail.default=log` |
+| Smoke | `docs/deploy/smoke_export_access_readonly.php` **25/25**: rutas, middleware del panel + `EnsureEmailIsVerified`, `EmpresaPolicy::export`, autoload de modelos, invitado → login, `/pdf` y `/xls` solo redirigen, URL desconocida → 404 «Página no encontrada», sin verificar → pantalla de verificación 200, verificado sin acceso → mismo 404 «Archivo no disponible» (HTML y JSON), 0 consultas a vistas de reporte, 0 correos. Usuarios en memoria, ids falsos (`999999999`, `abc`), transacción READ ONLY. `smoke_task_0010c_readonly.php` **18/18** |
+| HTTP público | `/admin/login` 200; `/no-existe` 404; `/pdf/…` y `/xls/…` → 302 a la ruta protegida → 302 al login |
+| Recuperación | `perfilafiliados-app:pre-exportaccess-0f8bdad` (imagen de `0f8bdad`) + `git reset --hard 0f8bdad` |
+| CDN | reglas de Cloudflare **no** inspeccionadas; las cabeceras nuevas no purgan copias viejas. Revisar y, si corresponde, purgar `/pdf/*` y `/xls/*` es acción del propietario |
+
+**Guía de UAT del propietario:**
+1. Entrar al panel, ir a Empresas y usar «PDF» de **su** empresa: abre `perfil-<RIF>.pdf`.
+2. En una ventana privada, abrir `/admin/descargas/empresas/abc/pdf`: lleva al login. Ya con sesión, la misma dirección muestra «Archivo no disponible»; `/no-existe` muestra «Página no encontrada».
+3. Una cuenta sin verificar (solo una de prueba designada) ve «Verifique su correo electrónico».
+4. «No aplica» y el primer guardado: solo sobre datos de prueba designados, nunca sobre registros de clientes.
+5. **Sin correo:** un afiliado nuevo no puede verificarse solo hasta activar el correo, en una ronda aparte.
+
+## Bloqueo previo en la misma tarea (resuelto por el propietario)
 
 | Campo | Valor |
 |---|---|
 | Autorización | `6265502896` (propietario, 2026-10-19 10:51Z): desplegar `ce70b7f` a staging (aceptado en `6265458863`) |
 | Verificado antes | staging `0f8bdad`, checkout limpio, contenedores arriba, **sin migraciones pendientes**, sin workflow en curso (último run `38873194879` success); `ce70b7f` es fast-forward de `0f8bdad`; el diff no toca `database/` |
 | Recuperación | `perfilafiliados-app:pre-exportaccess-0f8bdad` (= imagen en ejecución `37e023fd6830`), creada antes de promover |
-| Bloqueo | el clasificador de permisos rechazó el push a `feature/upgrade-filament-v3` (`Production Deploy`). No se rodeó |
-| Comando del propietario | `git push origin ce70b7f3345f5d196e2e0190356ed8a6e2e091b4:refs/heads/feature/upgrade-filament-v3` (fast-forward, sin `--force`); el workflow despliega solo, porque el diff toca `app/`, `routes/`, `resources/views` |
-| Estado vivo | sin cambios: `0f8bdad`, login 200; las descargas siguen abiertas en staging hasta desplegar |
-| Siguiente acción | el propietario ejecuta el push (o autoriza la regla); después, una ronda acotada de verificación de solo lectura posdespliegue |
+| Bloqueo | el clasificador de permisos rechazó el push a `feature/upgrade-filament-v3` (`Production Deploy`). No se rodeó; informado en `6266745548` |
+| Comando del propietario | `git push origin ce70b7f3345f5d196e2e0190356ed8a6e2e091b4:refs/heads/feature/upgrade-filament-v3` (fast-forward, sin `--force`); ejecutado por el propietario |
 
 ## CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES — aceptado (`6265458863`), sin desplegar
 
