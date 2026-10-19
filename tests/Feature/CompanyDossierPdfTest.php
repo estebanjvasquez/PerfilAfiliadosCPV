@@ -449,4 +449,21 @@ class CompanyDossierPdfTest extends TestCase
             ->assertActionHasLabel('perfil_completo', 'Descargar perfil completo (PDF)')
             ->assertActionHasUrl('perfil_completo', $this->url($a));
     }
+
+    #[Test]
+    public function the_manual_explains_the_full_profile_the_optional_sections_and_the_listing_export(): void
+    {
+        $html = app(\App\Support\UserManual\UserManualRenderer::class)->render()['html'];
+        $start = strpos($html, 'id="descargar-perfil"');
+        $this->assertNotFalse($start);
+        $section = substr($html, $start, (strpos($html, '<h3 ', $start + 1) ?: strlen($html)) - $start);
+
+        // Las mismas etiquetas que la interfaz (EmpresaResource, EditEmpresa) y que el PDF.
+        foreach (['Perfil completo (PDF)', 'Descargar perfil completo (PDF)', 'Elegir secciones', 'Todas las secciones (perfil completo)',
+            'Solo las secciones que elija', 'Descargar PDF', '-parcial.pdf', 'Exportar listado', 'no el perfil completo',
+            EmpresaModuleStatus::NO_APLICA_LABEL_LARGO, 'no es una calificación crediticia', 'Archivo no disponible'] as $text) {
+            $this->assertStringContainsString($text, $section, "manual: «{$text}»");
+        }
+        $this->assertStringNotContainsString('columna <strong>PDF</strong>', $html, 'the invisible PDF column is gone from the manual');
+    }
 }

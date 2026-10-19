@@ -6,7 +6,7 @@ Nota para la Cámara y los operadores. Se agregó con CPV-EXPORT-ACCESS-REPAIR-A
 
 | Ruta | Qué hace |
 |---|---|
-| `/admin/descargas/empresas/{id}/pdf` (`filament.admin.export.pdf`) | perfil completo de la empresa en PDF (`perfil-<rif>.pdf`, inline) |
+| `/admin/descargas/empresas/{id}/pdf` (`filament.admin.export.pdf`) | perfil completo de la empresa en PDF, como descarga (`perfil-<rif>.pdf`). Con `?secciones=a,b` (opcional), solo esas secciones (`perfil-<rif>-parcial.pdf`; ver abajo) |
 | `/admin/descargas/empresas/{id}/xlsx` (`filament.admin.export.xls`) | la fila de la empresa en Excel (`perfil-<rif>.xlsx`); no tiene botón en la interfaz |
 | `/pdf/{id}`, `/xls/{id}` (antes) | **solo redirigen** a las rutas de arriba, sin consultar la base. Los enlaces viejos siguen sirviendo, con las mismas reglas |
 
@@ -25,6 +25,16 @@ Nota para la Cámara y los operadores. Se agregó con CPV-EXPORT-ACCESS-REPAIR-A
   - Se responde **antes** de consultar las vistas de reporte o de generar el archivo.
 
 Para dar acceso a una persona: vincular su usuario a la empresa (pestaña Usuarios, o como se hace hoy) y que su rol tenga `view_empresa`. No hay nada que configurar en las descargas.
+
+## Perfil completo y secciones (CPV-COMPLETE-COMPANY-PDF, `6270558322`)
+
+- **Dónde:** en **Empresas**, cada fila tiene **Perfil completo (PDF)** y **Elegir secciones**; la ficha de la empresa tiene **Descargar perfil completo (PDF)**. **Exportar listado** (acción masiva) es otra cosa: exporta solo las columnas de la tabla.
+- **Por defecto, todo:** sin `secciones`, el PDF trae las 10 secciones (`App\Support\CompanyDossier::SECTIONS`).
+- **`secciones`:** lista blanca de claves: `generales`, `clientes`, `camaras`, `sectores`, `categorias`, `sostenibilidad`, `recursos`, `experiencia`, `presencia`, `gestion`.
+  - Acepta `secciones=a,b` o `secciones[]=a`.
+  - Las claves desconocidas se ignoran. Si no queda ninguna válida, o el valor pasa de 300 caracteres, sale el perfil completo.
+  - Solo elige secciones: se lee **después** de autorizar, y no cambia la empresa ni el acceso.
+- **El PDF dice lo que contiene:** al inicio, qué secciones incluye y cuáles se omitieron. Cada sección distingue datos, «Marcado no aplica por el afiliado» y «No hay información registrada».
 
 ## Páginas de error
 

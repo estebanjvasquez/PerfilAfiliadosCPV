@@ -25,7 +25,7 @@ Cada persona de su empresa que vaya a trabajar en el sistema necesita **su propi
 | Entrar, registrarse y cambiar su nombre, correo o contraseña | Pantalla de acceso y **Mi perfil** | [Ingreso y cuenta](#ingreso-y-cuenta) |
 | Ubicarse en el sistema | **Inicio** y menú lateral | [Inicio y el menú](#escritorio) |
 | Registrar RIF, dirección, contacto web, operaciones y clientes | **Empresas** > su empresa, formulario por pasos | [Datos generales de la empresa](#datos-generales) |
-| Descargar el perfil de su empresa en PDF | **Empresas**, columna **PDF** | [Descargar el perfil](#descargar-perfil) |
+| Descargar el perfil completo de su empresa en PDF | **Empresas**, botón **Perfil completo (PDF)** | [Descargar el perfil](#descargar-perfil) |
 | Indicar en qué cámaras participa su empresa | Pestaña **Cámaras** | [Cámaras](#camaras) |
 | Registrar las personas de contacto | Pestaña **Contactos** | [Contactos](#contactos) |
 | Ver quién tiene acceso a su empresa | Pestaña **Usuarios** | [Usuarios](#usuarios) |
@@ -114,12 +114,35 @@ En el menú **Empresas** solo aparecen las empresas asociadas a su usuario. Si l
 1. En el menú lateral, entre a **Empresas**.
 2. Haga clic sobre la fila de su empresa para abrir la edición.
 
-La lista muestra el nombre de la empresa, si está **Activo**, el año de fundación, la ciudad, el país y el sector principal. El ícono de la columna **PDF** descarga el perfil de la empresa en PDF.
+La lista muestra el nombre de la empresa, si está **Activo**, el año de fundación, la ciudad, el país y el sector principal. Al final de cada fila están los botones **Perfil completo (PDF)** y **Elegir secciones** (ver [Descargar el perfil](#descargar-perfil)).
 
 ### Descargar el perfil {#descargar-perfil}
 
-- Solo puede descargar el perfil de las empresas **asociadas a su usuario**, y con la sesión iniciada y el correo verificado. Use siempre el ícono de la columna **PDF** de la lista **Empresas**.
-- El archivo se llama `perfil-<RIF>.pdf`. Es información de su empresa: guárdelo en un equipo de confianza y no lo publique.
+El **perfil completo** es un PDF con todo lo que su empresa registró en el sistema:
+- datos generales y contactos (dirección, ciudad, web, redes, teléfono, capital, origen, sectores, facturación, empleados, estatus);
+- clientes, cámaras, sectores y servicios, y categorías CPV;
+- enfoque de sostenibilidad;
+- recursos en Venezuela (recursos humanos, maquinaria y equipos, instalaciones e inventario);
+- experiencia relevante, presencia internacional y sistemas de gestión.
+
+Cada sección dice si tiene datos, si su empresa la marcó **No aplica** («Marcado no aplica por el afiliado») o si todavía no hay información registrada. El documento muestra lo que la empresa declaró: no es una calificación crediticia, una certificación ni un aval de la Cámara.
+
+**Descargar el perfil completo:**
+1. En el menú lateral, entre a **Empresas**.
+2. En la fila de su empresa, haga clic en **Perfil completo (PDF)**. El archivo se descarga con el nombre `perfil-<RIF>.pdf`.
+
+También puede descargarlo desde la ficha de la empresa, con el botón **Descargar perfil completo (PDF)** de arriba a la derecha.
+
+**Descargar solo algunas secciones (opcional):**
+1. En la fila de su empresa, haga clic en **Elegir secciones**.
+2. Por defecto está marcada **Todas las secciones (perfil completo)**. Para elegir, marque **Solo las secciones que elija** y desmarque las que no quiera.
+3. Haga clic en **Descargar PDF**. El archivo se llama `perfil-<RIF>-parcial.pdf`. Al inicio del documento dice qué secciones incluye y cuáles se omitieron, y aclara que no es el perfil completo.
+
+**Exportar listado no es el perfil:** en **Empresas**, si marca una o más filas, el menú de acciones ofrece **Exportar listado**. Ese botón exporta solo las columnas de la tabla (nombre, año de fundación, ciudad, país, sector…), no el perfil completo de la empresa.
+
+**Acceso y seguridad:**
+- Solo puede descargar el perfil de las empresas **asociadas a su usuario**, y con la sesión iniciada y el correo verificado. Use siempre los botones de la lista **Empresas** o de la ficha de la empresa.
+- El archivo es información de su empresa: guárdelo en un equipo de confianza y no lo publique.
 - Si abre un enlace de descarga sin haber iniciado sesión, el sistema le pide entrar primero. Si su correo no está verificado, verá **Verifique su correo electrónico** (ver [Verificar su correo electrónico](#verificar-correo)).
 - Si aparece **Archivo no disponible**, el enlace está incompleto o desactualizado, o su cuenta no tiene acceso a esa descarga. Por seguridad, el mensaje es el mismo en todos los casos. Vuelva a **Empresas** y descargue desde la empresa que le corresponde. Si el problema continúa, comuníquese con la Cámara.
 
@@ -500,7 +523,8 @@ Una sección cuenta como completa si tiene datos cargados o si está marcada **N
 | El RIF o el Sector principal están bloqueados | Es intencional: solo la Cámara los modifica. Contáctela si hay un error. |
 | La lista de Empresas está vacía | Su usuario todavía no está asociado a su empresa. Contacte a la Cámara. |
 | No me llegó el correo de verificación | Por ahora el sistema todavía no envía correos, así que no le llegará. Comuníquese con la Cámara e indique el correo con el que se registró (ver [Verificar su correo electrónico](#verificar-correo)). |
-| Al descargar un PDF aparece «Archivo no disponible» | El enlace está incompleto o desactualizado, o su cuenta no tiene acceso a esa empresa. Descargue desde la columna **PDF** de **Empresas** (ver [Descargar el perfil](#descargar-perfil)). |
+| Al descargar un PDF aparece «Archivo no disponible» | El enlace está incompleto o desactualizado, o su cuenta no tiene acceso a esa empresa. Descargue con el botón **Perfil completo (PDF)** de **Empresas** (ver [Descargar el perfil](#descargar-perfil)). |
+| El PDF que descargué solo tiene la tabla de empresas | Usó **Exportar listado**, que exporta las columnas de la lista. El perfil completo se descarga con **Perfil completo (PDF)** (ver [Descargar el perfil](#descargar-perfil)). |
 | Aparece «Página no encontrada» | La dirección no existe o su cuenta no tiene acceso. Use **Ir al Inicio** o el menú. |
 | Al entrar siempre veo «Verifique su correo electrónico» | Su correo todavía no está verificado. Siga los pasos de [Verificar su correo electrónico](#verificar-correo). |
 | Quité «No Aplica» y el porcentaje bajó | Es lo esperado: la sección vuelve a contar solo los datos cargados. Sus datos no se borraron. |
