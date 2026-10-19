@@ -114,7 +114,7 @@ En el menú **Empresas** solo aparecen las empresas asociadas a su usuario. Si l
 1. En el menú lateral, entre a **Empresas**.
 2. Haga clic sobre la fila de su empresa para abrir la edición.
 
-La lista muestra el nombre de la empresa, si está **Activo**, el año de fundación, la ciudad, el país y el sector principal. Al final de cada fila están los botones **Perfil completo (PDF)** y **Elegir secciones** (ver [Descargar el perfil](#descargar-perfil)).
+La lista muestra el nombre de la empresa, si está **Activo**, el año de fundación, la ciudad, el país y el sector principal. Al inicio de cada fila está el botón **Perfil completo (PDF)** y, a su lado, el botón de ajustes **Elegir secciones** (ícono de controles deslizantes; al pasar el cursor muestra su nombre). Ver [Descargar el perfil](#descargar-perfil).
 
 ### Descargar el perfil {#descargar-perfil}
 
@@ -134,11 +134,11 @@ Cada sección dice si tiene datos, si su empresa la marcó **No aplica** («Marc
 También puede descargarlo desde la ficha de la empresa, con el botón **Descargar perfil completo (PDF)** de arriba a la derecha.
 
 **Descargar solo algunas secciones (opcional):**
-1. En la fila de su empresa, haga clic en **Elegir secciones**.
+1. En la fila de su empresa, haga clic en el botón de ajustes **Elegir secciones**, junto a **Perfil completo (PDF)**.
 2. Por defecto está marcada **Todas las secciones (perfil completo)**. Para elegir, marque **Solo las secciones que elija** y desmarque las que no quiera.
 3. Haga clic en **Descargar PDF**. El archivo se llama `perfil-<RIF>-parcial.pdf`. Al inicio del documento dice qué secciones incluye y cuáles se omitieron, y aclara que no es el perfil completo.
 
-**Exportar listado no es el perfil:** en **Empresas**, si marca una o más filas, el menú de acciones ofrece **Exportar listado**. Ese botón exporta solo las columnas de la tabla (nombre, año de fundación, ciudad, país, sector…), no el perfil completo de la empresa.
+**Exportar listado no es el perfil:** en **Empresas**, si marca una o más filas, arriba de la tabla aparece **Exportar listado**. Ese botón exporta solo las columnas de la tabla (nombre, año de fundación, ciudad, país, sector…), no el perfil completo de la empresa.
 
 **Acceso y seguridad:**
 - Solo puede descargar el perfil de las empresas **asociadas a su usuario**, y con la sesión iniciada y el correo verificado. Use siempre los botones de la lista **Empresas** o de la ficha de la empresa.

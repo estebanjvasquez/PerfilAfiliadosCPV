@@ -124,6 +124,9 @@ class AdminPanelProvider extends PanelProvider
             // completarse la navegacion. El widget de Turnstile (wire:ignore) y el link de
             // descarga de PDF (target=_blank, ver generate_href_html()) no se ven afectados.
             ->spa()
+            // CPV-COMPLETE-COMPANY-PDF (`6270558322`): las descargas son archivos, no páginas. Con wire:navigate, el
+            // navegador pedía el PDF por fetch y nunca lo descargaba: el botón «Perfil completo (PDF)» no hacía nada.
+            ->spaUrlExceptions(['*/descargas/empresas/*'])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             // CPV-HOME-BRANDING-AND-LAYOUT: la página de inicio es App\Filament\Pages\Dashboard («Inicio» con

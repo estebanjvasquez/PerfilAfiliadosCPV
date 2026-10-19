@@ -216,10 +216,12 @@ class EmpresaResource extends Resource
                 // el origen del N+1.
 
             ])
+            // Antes de las columnas, donde estaba la columna «PDF»: el perfil completo es lo primero de la fila, también en
+            // un teléfono, sin desplazar la tabla.
             ->actions([
                 static::fullProfileAction(),
                 static::profileSectionsAction(),
-            ])
+            ], position: Tables\Enums\ActionsPosition::BeforeColumns)
 
             ->bulkActions([
                 BulkAction::make('editar')
@@ -377,8 +379,9 @@ class EmpresaResource extends Resource
         return Action::make('perfil_secciones')
             ->label('Elegir secciones')
             ->icon('heroicon-o-adjustments-horizontal')
+            ->iconButton()
             ->color('gray')
-            ->tooltip('Descargar el perfil en PDF solo con las secciones que elija')
+            ->tooltip('Elegir secciones: descargar el perfil en PDF solo con las secciones que elija')
             ->visible(fn (): bool => Auth::user()?->can('view_empresa') ?? false)
             ->modalHeading('Descargar el perfil en PDF')
             ->modalDescription('Por defecto se descarga el perfil completo, con todas sus secciones.')
