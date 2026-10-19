@@ -101,7 +101,14 @@ final class CompanyDossier
         $datos = $want('generales') || $want('clientes') ? JoinViews::index($id)->data : collect();
         $g = (object) array_merge(array_fill_keys(self::GENERAL_FIELDS, null), (array) ($datos->first()?->getAttributes() ?? []));
 
-        $recursos = $want('recursos') ? JoinViews::index_recursos($id) : null;
+        // JoinViews devuelve objetos View. Se sacan sus datos: un View dentro de los datos de otra vista se RENDERIZA al
+        // armarla (View::gatherData), y join-views.blade.php no se puede renderizar fuera de su página.
+        $recursos = null;
+        if ($want('recursos')) {
+            $view = JoinViews::index_recursos($id);
+            $recursos = (object) collect(['value_emp', 'value_maq', 'value_fac', 'value_inv', 'data_rec', 'data_maq', 'data_ins', 'data_inv'])
+                ->mapWithKeys(fn (string $key) => [$key => $view->getData()[$key] ?? []])->all();
+        }
         $statuses = EmpresaModuleStatus::where('empresa_id', $id)->get();
 
         return [

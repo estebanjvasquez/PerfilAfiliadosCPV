@@ -138,7 +138,7 @@ class CompanyDossierPdfTest extends TestCase
         $c = $this->cat;
         $empresa = $this->company($owner, [
             'name' => "ZZZ{$p}NOMBRE", 'phone' => "+58-212-{$p}5550101", 'website' => "https://zzz{$p}.test", 'street' => "ZZZ{$p}CALLE 123",
-            'city_id' => $c['city'], 'ano_fund' => 1987, 'linkedin_profile' => "linkedin.com/company/zzz{$p}", 'billing_id' => 3, 'employees_id' => 2,
+            'city_id' => $c['city'], 'ano_fund' => 1987, 'linkedin_profile' => "in/zzz{$p}linkedin", 'billing_id' => 3, 'employees_id' => 2,
             'status_id' => 1, 'property_id' => 1, 'origin_id' => 0, 'sector_principal_id' => $c['sector1'], 'sector_secundario_id' => $c['sector2'],
             'customers_country' => [['customer_name' => "ZZZ{$p}CLIENTE", 'country_id' => (string) $c['country']]],
         ]);
@@ -280,7 +280,7 @@ class CompanyDossierPdfTest extends TestCase
 
         $expected = [
             // Datos generales, contactos, operación
-            'ZZZANOMBRE', 'ZZZACALLE 123', 'ZZZCIUDADCENTINELA, ZZZPAISCENTINELA', 'https://zzzA.test', 'linkedin.com/company/zzzA', '1987',
+            'ZZZANOMBRE', 'ZZZACALLE 123', 'ZZZCIUDADCENTINELA, ZZZPAISCENTINELA', 'https://zzzA.test', 'LinkedIn: in/zzzAlinkedin', '1987',
             'Privado / Internacional', 'ZZZSECTORPRINCIPAL', 'ZZZSECTORSECUNDARIO', '1.000.001 - 10.000.000 USD', '51 - 100', 'Activa',
             'ZZZACONTACTOUNO', '(contacto principal)', 'ZZZACONTACTODOS', 'ZZZACARGO', 'zzzacontactouno@zzz.test',
             // Clientes, cámaras, sectores y servicios, categorías
