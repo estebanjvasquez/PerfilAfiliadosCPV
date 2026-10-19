@@ -192,6 +192,18 @@ class ExportAccessCharacterizationTest extends TestCase
         }
     }
 
+    /**
+     * Para la propuesta de reparación: el alias genérico `auth` (App\Http\Middleware\Authenticate) manda a un
+     * invitado a route('login'), que esta app no define (el login es el del panel). Usarlo tal cual daría 500.
+     */
+    #[Test]
+    public function the_generic_auth_alias_would_redirect_guests_to_a_missing_route(): void
+    {
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('login'));
+        $this->assertTrue(\Illuminate\Support\Facades\Route::has('filament.admin.auth.login'));
+        $this->assertTrue(\Illuminate\Support\Facades\Route::has('filament.admin.auth.email-verification.prompt'));
+    }
+
     #[Test]
     public function current_behaviour_of_both_exports_for_every_actor(): void
     {
