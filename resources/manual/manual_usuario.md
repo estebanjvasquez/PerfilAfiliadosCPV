@@ -25,7 +25,7 @@ Cada persona de su empresa que vaya a trabajar en el sistema necesita **su propi
 | Entrar, registrarse y cambiar su nombre, correo o contraseña | Pantalla de acceso y **Mi perfil** | [Ingreso y cuenta](#ingreso-y-cuenta) |
 | Ubicarse en el sistema | **Inicio** y menú lateral | [Inicio y el menú](#escritorio) |
 | Registrar RIF, dirección, contacto web, operaciones y clientes | **Empresas** > su empresa, formulario por pasos | [Datos generales de la empresa](#datos-generales) |
-| Descargar el perfil de su empresa en PDF | **Empresas**, columna **PDF** | [Abrir su empresa](#abrir-empresa) |
+| Descargar el perfil de su empresa en PDF | **Empresas**, columna **PDF** | [Descargar el perfil](#descargar-perfil) |
 | Indicar en qué cámaras participa su empresa | Pestaña **Cámaras** | [Cámaras](#camaras) |
 | Registrar las personas de contacto | Pestaña **Contactos** | [Contactos](#contactos) |
 | Ver quién tiene acceso a su empresa | Pestaña **Usuarios** | [Usuarios](#usuarios) |
@@ -115,6 +115,13 @@ En el menú **Empresas** solo aparecen las empresas asociadas a su usuario. Si l
 2. Haga clic sobre la fila de su empresa para abrir la edición.
 
 La lista muestra el nombre de la empresa, si está **Activo**, el año de fundación, la ciudad, el país y el sector principal. El ícono de la columna **PDF** descarga el perfil de la empresa en PDF.
+
+### Descargar el perfil {#descargar-perfil}
+
+- Solo puede descargar el perfil de las empresas **asociadas a su usuario**, y con la sesión iniciada y el correo verificado. Use siempre el ícono de la columna **PDF** de la lista **Empresas**.
+- El archivo se llama `perfil-<RIF>.pdf`. Es información de su empresa: guárdelo en un equipo de confianza y no lo publique.
+- Si abre un enlace de descarga sin haber iniciado sesión, el sistema le pide entrar primero. Si su correo no está verificado, verá **Verifique su correo electrónico** (ver [Verificar su correo electrónico](#verificar-correo)).
+- Si aparece **Archivo no disponible**, el enlace está incompleto o desactualizado, o su cuenta no tiene acceso a esa descarga. Por seguridad, el mensaje es el mismo en todos los casos. Vuelva a **Empresas** y descargue desde la empresa que le corresponde. Si el problema continúa, comuníquese con la Cámara.
 
 ### Formulario por pasos {#formulario-por-pasos}
 
@@ -493,6 +500,8 @@ Una sección cuenta como completa si tiene datos cargados o si está marcada **N
 | El RIF o el Sector principal están bloqueados | Es intencional: solo la Cámara los modifica. Contáctela si hay un error. |
 | La lista de Empresas está vacía | Su usuario todavía no está asociado a su empresa. Contacte a la Cámara. |
 | No me llegó el correo de verificación | Por ahora el sistema todavía no envía correos, así que no le llegará. Comuníquese con la Cámara e indique el correo con el que se registró (ver [Verificar su correo electrónico](#verificar-correo)). |
+| Al descargar un PDF aparece «Archivo no disponible» | El enlace está incompleto o desactualizado, o su cuenta no tiene acceso a esa empresa. Descargue desde la columna **PDF** de **Empresas** (ver [Descargar el perfil](#descargar-perfil)). |
+| Aparece «Página no encontrada» | La dirección no existe o su cuenta no tiene acceso. Use **Ir al Inicio** o el menú. |
 | Al entrar siempre veo «Verifique su correo electrónico» | Su correo todavía no está verificado. Siga los pasos de [Verificar su correo electrónico](#verificar-correo). |
 | Quité «No Aplica» y el porcentaje bajó | Es lo esperado: la sección vuelve a contar solo los datos cargados. Sus datos no se borraron. |
 | Usé «Crear y crear otro» y la ventana no se cerró | Es lo esperado: lo cargado ya quedó guardado y la ventana queda vacía para el siguiente registro. Presione **Cancelar** cuando termine. |

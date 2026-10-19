@@ -159,14 +159,16 @@ class AdminPanelProvider extends PanelProvider
             // CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES (`6264837159`): descargas del perfil de una empresa. Están
             // detrás del Authenticate del panel (un invitado va al login del panel) y de la verificación de correo
             // del panel. La autorización por empresa está en EmpresaExportController (EmpresaPolicy::export).
-            // Las rutas viejas /pdf/{id} y /xls/{id} (routes/web.php) solo redirigen aquí.
+            // Las rutas viejas /pdf/{id} y /xls/{id} (routes/web.php) solo redirigen aquí. Las rutas nuevas no
+            // terminan en .pdf/.xlsx: algunos CDN guardan en caché por extensión de archivo, y así no dependemos
+            // solo de las cabeceras privadas.
             ->authenticatedRoutes(function (Panel $panel): void {
                 \Illuminate\Support\Facades\Route::middleware('verified:'.$panel->getEmailVerificationPromptRouteName())
                     ->prefix('descargas/empresas/{empresa}')
                     ->name('export.')
                     ->group(function (): void {
-                        \Illuminate\Support\Facades\Route::get('perfil.pdf', [\App\Http\Controllers\EmpresaExportController::class, 'pdf'])->name('pdf');
-                        \Illuminate\Support\Facades\Route::get('perfil.xlsx', [\App\Http\Controllers\EmpresaExportController::class, 'xls'])->name('xls');
+                        \Illuminate\Support\Facades\Route::get('pdf', [\App\Http\Controllers\EmpresaExportController::class, 'pdf'])->name('pdf');
+                        \Illuminate\Support\Facades\Route::get('xlsx', [\App\Http\Controllers\EmpresaExportController::class, 'xls'])->name('xls');
                     });
             })
             // Sin EnsureEmailIsVerified aquí: lo aplica ->emailVerification() página por página (ver arriba).
