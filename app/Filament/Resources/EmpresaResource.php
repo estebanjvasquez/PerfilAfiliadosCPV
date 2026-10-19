@@ -196,7 +196,7 @@ class EmpresaResource extends Resource
                     ->label('PDF')
                     //->color('success')
                     //->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Empresa $record) => route('pdf', $record))
+                    ->url(fn (Empresa $record) => route('filament.admin.export.pdf', ['empresa' => $record->getKey()]))
                     ->openUrlInNewTab(),
                 //->url(fn (Empresa $record): string => route('filament.pages.join-views', $record)), RUTA PARA REPORTE HTML........
 

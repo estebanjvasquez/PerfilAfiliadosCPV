@@ -4,7 +4,6 @@ use App\Models\User;
 use App\Models\Empresa;
 use App\Http\Livewire\Form;
 use App\Exports\UsersExport;
-use App\Exports\JoinViewExport;
 use App\Filament\Pages\JoinViews;
 use App\Filament\Pages\GenCatalog;
 use App\Filament\Pages\JoinedViews;
@@ -13,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 //ADDED.....
 use App\Filament\Pages\UsrGenCatalog;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PdfController;
 use App\Http\Controllers\XlsController;
 use App\Http\Controllers\JointableController;
 use App\Http\Controllers\JoinedViewsController;
@@ -37,11 +35,12 @@ Route::get('/', function () {
 })->name('home');
 
 \Illuminate\Support\Facades\Route::get('form', Form::class);
-Route::get('pdf/{empresa}', PdfController::class)->name('pdf');
-
-Route::get('xls/{empresa}', function () {
-    return Excel::download(new JoinViewExport, 'join-views.xlsx');
-})->name('xls');
+// CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES (Issue #2 `6264837159`): las rutas viejas de descarga ya no generan
+// nada. Solo redirigen a las del panel (filament.admin.export.*), que exigen sesión, correo verificado y
+// acceso a la empresa. Así los enlaces y marcadores viejos siguen funcionando. El parámetro se pasa como texto
+// y no se consulta la base aquí: la respuesta no dice si la empresa existe.
+Route::get('pdf/{empresa}', fn (string $empresa) => redirect()->route('filament.admin.export.pdf', ['empresa' => $empresa]))->name('pdf');
+Route::get('xls/{empresa}', fn (string $empresa) => redirect()->route('filament.admin.export.xls', ['empresa' => $empresa]))->name('xls');
 
 
 /* Route::get('/gen-catalog/exportxls', [GenCatalog::class, 'exportAllCatalogXls'])->name('gen-catalog.exportxls');

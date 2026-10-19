@@ -75,4 +75,20 @@ class EmpresaPolicy
         return $user->can('delete_any_empresa');
     }
 
+    /**
+     * CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES (Issue #2 `6264837159`): descargar el perfil de UNA empresa
+     * (PDF o XLS). Es la misma regla con la que la lista de Empresas muestra una empresa:
+     * - el permiso `view_empresa`;
+     * - el vínculo del usuario con esa empresa en `empresa_user`;
+     * - el correo verificado.
+     * No hay excepción para administradores (decisión del propietario). El personal de la Cámara sigue con
+     * sus vínculos y con los reportes generales de Shield.
+     */
+    public function export(User $user, \App\Models\Empresa $empresa): bool
+    {
+        return $user->hasVerifiedEmail()
+            && $user->can('view_empresa')
+            && $empresa->users()->whereKey($user->getKey())->exists();
+    }
+
 }

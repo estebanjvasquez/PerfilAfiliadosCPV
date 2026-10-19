@@ -1,5 +1,6 @@
 <?php
-$record = explode("?", explode("?", $_SERVER['REQUEST_URI'])[1]);
+// CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES: la empresa la valida la página al montarse (JoinViews::$empresaId), ya no se lee de REQUEST_URI.
+$record = [$this->empresaId ?? 0];
 $datos = App\Filament\Pages\JoinViews::index($record[0])->data;
 $datos_exp = App\Filament\Pages\JoinViews::index_exp($record[0])->data_exp;
 $datos_pres = App\Filament\Pages\JoinViews::index_pres($record[0])->data_pres;

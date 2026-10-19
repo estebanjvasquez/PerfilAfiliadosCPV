@@ -130,9 +130,18 @@ class JoinViewExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
         ];
     }
 
+    /**
+     * CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES (`6264837159`): la empresa llega explícita, ya validada y
+     * autorizada por quien llama (EmpresaExportController, o la página JoinViews de la Cámara). Antes salía de
+     * `$_SERVER['REQUEST_URI']`: dependía de la ruta del servidor, y con un query string terminaba en 500.
+     */
+    public function __construct(private int $empresaId)
+    {
+    }
+
     public function collection()
     {
-        $record = explode("/", explode("/", $_SERVER['REQUEST_URI'])[2]);
+        $record = $this->empresaId;
 
         $data = JoinViewsModel::leftjoin('catalogoView', 'catalogoView.id', '=', 'capacityView.id')
             ->leftjoin('ClientsView', 'ClientsView.id', '=', 'capacityView.id')
@@ -155,7 +164,7 @@ class JoinViewExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
 
             ]);
 
-        $empresaId = is_array($record) ? ($record[0] ?? null) : $record;
+        $empresaId = $record;
 
         if ($empresaId !== null && $data->isNotEmpty()) {
             $isWholeModuleNA = \App\Models\EmpresaModuleStatus::isNoAplica($empresaId, \App\Models\EmpresaModuleStatus::MODULE_GESTION);

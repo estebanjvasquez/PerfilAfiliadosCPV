@@ -51,9 +51,30 @@ class JoinViews extends Page
         ];
     }
 
+    /**
+     * CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES (`6264837159`): el reporte de la Cámara (Shield, sin cambio de
+     * acceso) muestra la empresa que llega en la dirección (`/admin/join-views?<id>`). El id se toma UNA vez, al
+     * montar la página, y solo si es numérico. Antes, la vista y el export lo leían de `REQUEST_URI` en cada
+     * pedido. En un pedido de Livewire esa dirección es `/livewire/update`, y el botón Excel fallaba.
+     */
+    #[\Livewire\Attributes\Locked]
+    public ?int $empresaId = null;
+
+    public function mount(): void
+    {
+        $query = (string) request()->getQueryString();
+        $this->empresaId = ctype_digit($query) && strlen($query) <= 18 ? (int) $query : null;
+    }
+
     public function exportAllJoinViewsXls()
     {
-        return Excel::download(new JoinViewExport, 'join-views.xlsx');
+        if ($this->empresaId === null) {
+            \Filament\Notifications\Notification::make()->warning()->title('Abra este reporte desde una empresa para exportarlo.')->send();
+
+            return null;
+        }
+
+        return Excel::download(new JoinViewExport($this->empresaId), 'join-views.xlsx');
     }
 
     //CONSULTA PARA TODOS LOS DATOS EXCEPTO LOS RELACIONADOS A LAS CONSULTAS MÁS ABAJO......................
