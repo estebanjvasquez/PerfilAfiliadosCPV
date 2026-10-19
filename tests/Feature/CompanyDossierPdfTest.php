@@ -432,6 +432,9 @@ class CompanyDossierPdfTest extends TestCase
             ->assertTableBulkActionExists('export')
             ->assertTableBulkActionHasLabel('export', 'Exportar listado')
             ->assertSee('Perfil completo (PDF)');
+        // El panel usa ->spa(): sin la excepción, el enlace se abría con wire:navigate y el archivo nunca se descargaba.
+        $this->assertFalse(\Filament\Support\Facades\FilamentView::hasSpaMode($this->url($a)), 'the download link bypasses SPA navigation');
+        $this->assertTrue(\Filament\Support\Facades\FilamentView::hasSpaMode(route('filament.admin.resources.empresas.index')), 'the rest of the panel keeps SPA mode');
 
         // «Elegir secciones»: «Todas» lleva al perfil completo; un subconjunto, a ?secciones= con la lista blanca.
         $list->callTableAction('perfil_secciones', $a, data: ['alcance' => 'todas'])->assertRedirect($this->url($a));
