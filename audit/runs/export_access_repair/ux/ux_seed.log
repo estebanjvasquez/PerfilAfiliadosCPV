@@ -1,0 +1,9 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-testapp-run-5bf1ea883a0f Creating 
+ Container cpvtest-testapp-run-5bf1ea883a0f Created 
+A_ID=4
+B_ID=5
+report views=13 affiliate linked to A=1
+seed done

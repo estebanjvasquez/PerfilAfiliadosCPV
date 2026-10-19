@@ -1,8 +1,8 @@
 {
     "manifest": "STARTUP_DRY_RUN",
-    "task": "CPV-EXPORT-ACCESS-REVIEW checkpoint (startup rules from CPV-SESSION-CONTINUITY, accepted 6211970495)",
-    "measured_utc": "2026-10-19T10:30:00Z",
-    "measured_at_branch": "review/export-access (review-only, on fix/verification-completion @ edf20ed)",
+    "task": "CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES checkpoint (startup rules from CPV-SESSION-CONTINUITY, accepted 6211970495)",
+    "measured_utc": "2026-10-19T11:00:00Z",
+    "measured_at_branch": "fix/export-access (on review/export-access @ dc79728, runtime base edf20ed)",
     "method": "deterministic: byte sizes of the files as committed on this branch; no AI session, subagent or test run was launched to prove it",
     "caveat": "file sizes are an input budget, not a guarantee of actual session context or token cost; the tool's own system prompt and tool outputs are not counted here",
     "budget": {
@@ -21,17 +21,17 @@
         {
             "step": 1,
             "file": "docs/orquestador/SESSION_RESUME.md",
-            "range": "all (121 lines)",
-            "bytes": 8859,
+            "range": "all (120 lines)",
+            "bytes": 8540,
             "class": "project_doc"
         },
         {
             "step": 3,
             "file": "Issue #2 assigned comment body",
             "range": "body only, once",
-            "bytes": 5614,
+            "bytes": 7969,
             "class": "assigned_input",
-            "example": "6262799754; earlier rounds: 6215451160 = 6974 B, 6214463281 = 5000 B",
+            "example": "6264837159; earlier rounds: 6262799754 = 5614 B, 6215451160 = 6974 B",
             "note": "size varies per task; cited references are opened only if directly needed, never transitively"
         }
     ],
@@ -57,13 +57,13 @@
         }
     ],
     "totals": {
-        "project_docs_bytes": 10201,
-        "project_docs_breakdown": "CLAUDE.md 1342 + SESSION_RESUME.md 8859",
+        "project_docs_bytes": 9882,
+        "project_docs_breakdown": "CLAUDE.md 1342 + SESSION_RESUME.md 8540",
         "project_docs_within_target": true,
-        "assigned_input_bytes": 5614,
+        "assigned_input_bytes": 7969,
         "private_memory_bytes": 1413,
-        "total_initial_text_inputs_bytes": 17228,
-        "total_initial_text_inputs_breakdown": "project docs 10201 + assigned comment 5614 + private memory 1413 (settings.json permissions not counted as reading)"
+        "total_initial_text_inputs_bytes": 19264,
+        "total_initial_text_inputs_breakdown": "project docs 9882 + assigned comment 7969 + private memory 1413 (settings.json permissions not counted as reading)"
     },
     "commands": [
         {
@@ -101,5 +101,5 @@
         "audit/orchestrator_handoff.json (515767 bytes; selected fields only, never whole)",
         "audit/**, the full Issue #2 thread, comments cited by cited comments, test suites, server logs"
     ],
-    "next_authorized_action": "owner: review the export-access repair proposal and decide D1/D2/D3; agent: nothing without a new Issue #2 instruction"
+    "next_authorized_action": "owner: manual review of fix/export-access; deployment, a possible Cloudflare purge and SMTP each need explicit owner action; agent: nothing without a new Issue #2 instruction"
 }

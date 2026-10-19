@@ -1,0 +1,44 @@
+PASS  seed gave two synthetic company ids  :: A=4 B=5
+PASS  [affiliate] the «PDF» column links to the protected route of its own company
+PASS  [affiliate] own PDF downloads (200, application/pdf, %PDF)  :: 200 application/pdf
+PASS  [affiliate] own PDF headers: private, no-store, nosniff, named file  :: max-age=0, no-store, private | inline; filename=perfil-j000000009.pdf
+PASS  [affiliate] own XLS downloads (200, attachment, private)  :: 200 attachment; filename=perfil-j000000009.xlsx
+PASS  [affiliate/light/desktop] other company PDF: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/light/desktop] other company XLS: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/light/desktop] missing id PDF: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/light/desktop] invalid id: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/light/desktop] the four denials show the same text
+PASS  [affiliate/light/desktop] useful links (Empresas, Inicio)  :: Ir a Empresas, Ir al Inicio
+PASS  [affiliate/light/desktop] no horizontal overflow  :: excess=0px
+PASS  [affiliate/light/desktop] «Ir a Empresas» opens the list  :: /admin/empresas
+PASS  [affiliate/dark/desktop] other company PDF: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/dark/desktop] other company XLS: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/dark/desktop] missing id PDF: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/dark/desktop] invalid id: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/dark/desktop] the four denials show the same text
+PASS  [affiliate/dark/desktop] useful links (Empresas, Inicio)  :: Ir a Empresas, Ir al Inicio
+PASS  [affiliate/dark/desktop] no horizontal overflow  :: excess=0px
+PASS  [affiliate/dark/desktop] «Ir a Empresas» opens the list  :: /admin/empresas
+PASS  [affiliate/light/mobile] other company PDF: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/light/mobile] other company XLS: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/light/mobile] missing id PDF: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/light/mobile] invalid id: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/light/mobile] the four denials show the same text
+PASS  [affiliate/light/mobile] useful links (Empresas, Inicio)  :: Ir a Empresas, Ir al Inicio
+PASS  [affiliate/light/mobile] no horizontal overflow  :: excess=0px
+PASS  [affiliate/light/mobile] «Ir a Empresas» opens the list  :: /admin/empresas
+PASS  [affiliate/dark/mobile] other company PDF: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/dark/mobile] other company XLS: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/dark/mobile] missing id PDF: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/dark/mobile] invalid id: 404 «Archivo no disponible», no other-company data  :: 404
+PASS  [affiliate/dark/mobile] the four denials show the same text
+PASS  [affiliate/dark/mobile] useful links (Empresas, Inicio)  :: Ir a Empresas, Ir al Inicio
+PASS  [affiliate/dark/mobile] no horizontal overflow  :: excess=0px
+PASS  [affiliate/dark/mobile] «Ir a Empresas» opens the list  :: /admin/empresas
+PASS  [guest] unknown URL: 404 «Página no encontrada», no URL echoed
+PASS  [guest] export URL → panel login  :: /admin/login
+PASS  [guest] old /pdf/{id} only redirects to the protected route  :: 302 <UX_HOST>/admin/descargas/empresas/4/pdf
+PASS  [unverified] own company export URL → «Verifique su correo electrónico» (no 500)  :: 200 /admin/email-verification/prompt
+PASS  [unverified] «Cerrar sesión» goes to the login  :: /admin/login
+
+42/42 checks passed

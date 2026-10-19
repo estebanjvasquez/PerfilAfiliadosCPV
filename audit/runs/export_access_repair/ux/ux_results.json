@@ -1,0 +1,208 @@
+{
+  "results": [
+    {
+      "name": "seed gave two synthetic company ids",
+      "pass": true,
+      "detail": "A=4 B=5"
+    },
+    {
+      "name": "[affiliate] the «PDF» column links to the protected route of its own company",
+      "pass": true
+    },
+    {
+      "name": "[affiliate] own PDF downloads (200, application/pdf, %PDF)",
+      "pass": true,
+      "detail": "200 application/pdf"
+    },
+    {
+      "name": "[affiliate] own PDF headers: private, no-store, nosniff, named file",
+      "pass": true,
+      "detail": "max-age=0, no-store, private | inline; filename=perfil-j000000009.pdf"
+    },
+    {
+      "name": "[affiliate] own XLS downloads (200, attachment, private)",
+      "pass": true,
+      "detail": "200 attachment; filename=perfil-j000000009.xlsx"
+    },
+    {
+      "name": "[affiliate/light/desktop] other company PDF: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/light/desktop] other company XLS: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/light/desktop] missing id PDF: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/light/desktop] invalid id: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/light/desktop] the four denials show the same text",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/desktop] useful links (Empresas, Inicio)",
+      "pass": true,
+      "detail": "Ir a Empresas, Ir al Inicio"
+    },
+    {
+      "name": "[affiliate/light/desktop] no horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/light/desktop] «Ir a Empresas» opens the list",
+      "pass": true,
+      "detail": "/admin/empresas"
+    },
+    {
+      "name": "[affiliate/dark/desktop] other company PDF: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/dark/desktop] other company XLS: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/dark/desktop] missing id PDF: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/dark/desktop] invalid id: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/dark/desktop] the four denials show the same text",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/desktop] useful links (Empresas, Inicio)",
+      "pass": true,
+      "detail": "Ir a Empresas, Ir al Inicio"
+    },
+    {
+      "name": "[affiliate/dark/desktop] no horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/dark/desktop] «Ir a Empresas» opens the list",
+      "pass": true,
+      "detail": "/admin/empresas"
+    },
+    {
+      "name": "[affiliate/light/mobile] other company PDF: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/light/mobile] other company XLS: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/light/mobile] missing id PDF: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/light/mobile] invalid id: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/light/mobile] the four denials show the same text",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/light/mobile] useful links (Empresas, Inicio)",
+      "pass": true,
+      "detail": "Ir a Empresas, Ir al Inicio"
+    },
+    {
+      "name": "[affiliate/light/mobile] no horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/light/mobile] «Ir a Empresas» opens the list",
+      "pass": true,
+      "detail": "/admin/empresas"
+    },
+    {
+      "name": "[affiliate/dark/mobile] other company PDF: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/dark/mobile] other company XLS: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/dark/mobile] missing id PDF: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/dark/mobile] invalid id: 404 «Archivo no disponible», no other-company data",
+      "pass": true,
+      "detail": "404"
+    },
+    {
+      "name": "[affiliate/dark/mobile] the four denials show the same text",
+      "pass": true
+    },
+    {
+      "name": "[affiliate/dark/mobile] useful links (Empresas, Inicio)",
+      "pass": true,
+      "detail": "Ir a Empresas, Ir al Inicio"
+    },
+    {
+      "name": "[affiliate/dark/mobile] no horizontal overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/dark/mobile] «Ir a Empresas» opens the list",
+      "pass": true,
+      "detail": "/admin/empresas"
+    },
+    {
+      "name": "[guest] unknown URL: 404 «Página no encontrada», no URL echoed",
+      "pass": true
+    },
+    {
+      "name": "[guest] export URL → panel login",
+      "pass": true,
+      "detail": "/admin/login"
+    },
+    {
+      "name": "[guest] old /pdf/{id} only redirects to the protected route",
+      "pass": true,
+      "detail": "302 <UX_HOST>/admin/descargas/empresas/4/pdf"
+    },
+    {
+      "name": "[unverified] own company export URL → «Verifique su correo electrónico» (no 500)",
+      "pass": true,
+      "detail": "200 /admin/email-verification/prompt"
+    },
+    {
+      "name": "[unverified] «Cerrar sesión» goes to the login",
+      "pass": true,
+      "detail": "/admin/login"
+    }
+  ]
+}
