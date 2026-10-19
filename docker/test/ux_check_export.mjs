@@ -27,6 +27,7 @@ const record = (name, pass, detail) => {
   console.log(`${pass ? 'PASS' : 'FAIL'}  ${name}${detail !== undefined ? '  :: ' + detail : ''}`);
 };
 let current = null;
+let affiliateState = undefined;
 const step = async (name, fn) => {
   try { await fn(); } catch (e) {
     record(`${name} (crashed)`, false, String(e && e.message || e).split(/\r?\n/)[0]);
@@ -69,14 +70,16 @@ try {
       record('[affiliate] own XLS downloads (200, attachment, private)', xls.status() === 200 && /attachment/.test(hx['content-disposition'] || '') && /no-store/.test(hx['cache-control'] || ''), `${xls.status()} ${hx['content-disposition']}`);
       await page.screenshot({ path: `${OUT}/exp-empresas-pdf-column.png` });
     });
+    // One login only: the panel limits logins to 5 per minute, so the other schemes reuse this session.
+    affiliateState = await ctx.storageState();
     await ctx.close();
   }
 
   // ---------------------------------------------------------------- affiliate: the 404s, 4 schemes/widths
   for (const [label, viewport, scheme] of [['desktop', { width: 1440, height: 900 }, 'light'], ['desktop', { width: 1440, height: 900 }, 'dark'], ['mobile', { width: 390, height: 844 }, 'light'], ['mobile', { width: 390, height: 844 }, 'dark']]) {
     const tag = `[affiliate/${scheme}/${label}]`;
-    const ctx = await browser.newContext({ viewport, colorScheme: scheme });
-    const page = await login(ctx, AFFILIATE);
+    const ctx = await browser.newContext({ viewport, colorScheme: scheme, storageState: affiliateState });
+    const page = await ctx.newPage();
     current = page;
     await step(`${tag} 404`, async () => {
       const texts = [];
