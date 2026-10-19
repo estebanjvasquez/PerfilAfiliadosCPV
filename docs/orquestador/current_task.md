@@ -1,9 +1,21 @@
-# Tarea actual (checkpoint 2026-10-19 ~11:00Z, rama `fix/export-access`)
+# Tarea actual (checkpoint 2026-10-19 ~11:10Z, rama `fix/export-access`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES — READY_FOR_REVIEW — MANUAL
+## CPV-INTEGRATED-EXPORT-ACCESS-DEPLOY — BLOCKED — MANUAL (`6265502896`)
+
+| Campo | Valor |
+|---|---|
+| Autorización | `6265502896` (propietario, 2026-10-19 10:51Z): desplegar `ce70b7f` a staging (aceptado en `6265458863`) |
+| Verificado antes | staging `0f8bdad`, checkout limpio, contenedores arriba, **sin migraciones pendientes**, sin workflow en curso (último run `38873194879` success); `ce70b7f` es fast-forward de `0f8bdad`; el diff no toca `database/` |
+| Recuperación | `perfilafiliados-app:pre-exportaccess-0f8bdad` (= imagen en ejecución `37e023fd6830`), creada antes de promover |
+| Bloqueo | el clasificador de permisos rechazó el push a `feature/upgrade-filament-v3` (`Production Deploy`). No se rodeó |
+| Comando del propietario | `git push origin ce70b7f3345f5d196e2e0190356ed8a6e2e091b4:refs/heads/feature/upgrade-filament-v3` (fast-forward, sin `--force`); el workflow despliega solo, porque el diff toca `app/`, `routes/`, `resources/views` |
+| Estado vivo | sin cambios: `0f8bdad`, login 200; las descargas siguen abiertas en staging hasta desplegar |
+| Siguiente acción | el propietario ejecuta el push (o autoriza la regla); después, una ronda acotada de verificación de solo lectura posdespliegue |
+
+## CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES — aceptado (`6265458863`), sin desplegar
 
 | Campo | Valor |
 |---|---|

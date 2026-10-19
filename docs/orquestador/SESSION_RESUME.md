@@ -55,7 +55,12 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 | Workflow del último despliegue | run `38873194879`, success, 08:22Z | `6211360371` |
 | Imagen de recuperación | `perfilafiliados-app:pre-branding-c02d4ec` | creada ~08:11Z |
 
-### En curso: CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES (READY_FOR_REVIEW — MANUAL, sin desplegar)
+### Despliegue bloqueado: CPV-INTEGRATED-EXPORT-ACCESS-DEPLOY (`6265502896`, 2026-10-19 ~11:10Z)
+
+- Prechequeo OK (staging `0f8bdad` limpio, sin migraciones pendientes, fast-forward). Imagen de recuperación: `pre-exportaccess-0f8bdad`.
+- El push a la rama de despliegue fue **rechazado por el clasificador** (`Production Deploy`). Lo ejecuta el propietario: `git push origin ce70b7f3345f5d196e2e0190356ed8a6e2e091b4:refs/heads/feature/upgrade-filament-v3`.
+
+### Aceptado (`6265458863`): CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES
 
 - **Autorización:** `6264837159`. BASE `dc79728`. **TESTED_HEAD:** `8e01cacf0a9be978244bd32daf08f7355a70caaf`.
 - **Descargas** (`/admin/descargas/empresas/{id}/pdf` y `…/xlsx`): login del panel, verificación de correo y `EmpresaPolicy::export` (vínculo + `view_empresa`), antes de consultar o generar nada. `/pdf` y `/xls` solo redirigen. Lo demás da el mismo 404 «Archivo no disponible»; hay una 404 general en español. `JoinViewExport` recibe un id explícito. Cabeceras privadas.
@@ -72,7 +77,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Orquestador/propietario:** revisión manual del candidato integrado. Desplegarlo requiere una autorización aparte del propietario. El push a la rama de despliegue puede tener que hacerlo el propietario.
+- **Propietario:** ejecutar el push de `ce70b7f` a `feature/upgrade-filament-v3` (arriba); luego asignar la verificación posdespliegue de solo lectura.
 - **Propietario:**
   - UAT de Inicio en staging;
   - el correo (proveedor, credenciales, prueba controlada);
