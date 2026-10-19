@@ -41,7 +41,7 @@ try {
     }
 
     foreach ([$affiliate, $admin] as $user) {
-        foreach (['view_any_empresa', 'view_empresa'] as $permission) {
+        foreach (['view_any_empresa', 'view_empresa', 'update_empresa'] as $permission) {
             $user->givePermissionTo(Spatie\Permission\Models\Permission::findOrCreate($permission, 'web'));
         }
     }

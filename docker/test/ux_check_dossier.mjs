@@ -108,15 +108,11 @@ try {
 
     await step('[affiliate/light/desktop] listing export is separate', async () => {
       await openList(page);
-      await page.locator('.fi-ta-record-checkbox, input.fi-checkbox-input[type="checkbox"]').nth(1).check().catch(async () => {
-        await page.locator('tbody input[type="checkbox"]').first().check();
-      });
-      await page.waitForTimeout(500);
-      const trigger = page.locator('.fi-ta-bulk-actions button, button:has-text("Acciones")').first();
-      await trigger.click();
-      await page.waitForTimeout(500);
-      const item = page.getByRole('button', { name: 'Exportar listado' }).or(page.getByText('Exportar listado', { exact: true })).first();
-      record('[affiliate] the listing exporter is the bulk action «Exportar listado», not on the row', await item.isVisible());
+      await page.locator('tbody input[type="checkbox"]').first().check();
+      await page.waitForTimeout(600);
+      const item = page.getByRole('button', { name: 'Exportar listado' }).first();
+      const inRow = await page.locator('tbody').getByText('Exportar listado').count();
+      record('[affiliate] the listing exporter is the toolbar action «Exportar listado» for selected rows, not on the row', await item.isVisible() && inRow === 0, `in rows: ${inRow}`);
       await page.screenshot({ path: `${OUT}/dos-bulk-export-listado.png` });
       await item.click();
       await page.waitForTimeout(1200);
@@ -145,8 +141,8 @@ try {
     current = page;
     await step('[affiliate/dark/mobile] full profile', async () => {
       const button = await openList(page);
-      await button.scrollIntoViewIfNeeded();
-      record('[affiliate/mobile] «Perfil completo (PDF)» is visible', await button.isVisible());
+      const mb = await button.boundingBox();
+      record('[affiliate/mobile] «Perfil completo (PDF)» is visible without scrolling the table', await button.isVisible() && mb && mb.x >= 0 && mb.x + mb.width <= 390, mb && `x=${Math.round(mb.x)} w=${Math.round(mb.width)}`);
       const ov = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       record('[affiliate/mobile] no horizontal page overflow', ov <= 1, `excess=${ov}px`);
       await page.screenshot({ path: `${OUT}/dos-list-mobile-dark.png`, fullPage: true });
