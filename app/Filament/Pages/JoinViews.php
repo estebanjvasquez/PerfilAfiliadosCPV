@@ -62,7 +62,8 @@ class JoinViews extends Page
 
     public function mount(): void
     {
-        $query = (string) request()->getQueryString();
+        // El QUERY_STRING crudo (`22`). getQueryString() lo normaliza a `22=`.
+        $query = rtrim((string) request()->server('QUERY_STRING', ''), '=');
         $this->empresaId = ctype_digit($query) && strlen($query) <= 18 ? (int) $query : null;
     }
 
