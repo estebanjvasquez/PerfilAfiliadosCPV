@@ -1157,13 +1157,16 @@ foreach (["taxonomy_categories","taxonomy_category_translations","taxonomy_term_
         $q = DB::table($t);
         if ($t === "taxonomy_categories") { $q->where(fn ($w) => $w->whereNull("source_version")->orWhere("source_version", "not like", "ux-synthetic-%")); }
         if ($t === "taxonomy_category_translations") { $q->whereNotIn("category_id", $seed()); }
+        // A --ux-seed company linked to its own ux-synthetic category (ux_seed_dossier.php) is seed data too.
+        if ($t === "empresa_taxonomy_category") { $q->whereNotIn("category_id", $seed()); }
         printf("%-34s %d\n", $t, $q->count());
     }
     catch (Throwable $e) { printf("%-34s (unreadable)\n", $t); }
 }
 try {
-    fprintf(STDERR, "ux_seed_taxonomy_categories %d\nux_seed_translations %d\n",
-        $seed()->count(), DB::table("taxonomy_category_translations")->whereIn("category_id", $seed())->count());
+    fprintf(STDERR, "ux_seed_taxonomy_categories %d\nux_seed_translations %d\nux_seed_company_links %d\n",
+        $seed()->count(), DB::table("taxonomy_category_translations")->whereIn("category_id", $seed())->count(),
+        DB::table("empresa_taxonomy_category")->whereIn("category_id", $seed())->count());
 } catch (Throwable $e) {}
 ' 2>"$ARTIFACTS/taxonomy_seed_rows.txt" | tr -d '\r' > "$ARTIFACTS/taxonomy_after_suite.txt"
   sed 's/^/           /' "$ARTIFACTS/taxonomy_after_suite.txt"
