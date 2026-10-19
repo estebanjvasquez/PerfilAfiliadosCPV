@@ -1,8 +1,8 @@
 {
     "manifest": "STARTUP_DRY_RUN",
-    "task": "CPV-VERIFICATION-FLOW-AND-COMPLETION checkpoint (startup rules from CPV-SESSION-CONTINUITY, accepted 6211970495)",
-    "measured_utc": "2026-10-16T13:30:00Z",
-    "measured_at_branch": "fix/verification-completion (contains fix/first-save-postgres @ 10616af, fix/model-compatibility-labels @ 0895258 and docs/session-continuity @ 28014c2)",
+    "task": "CPV-EXPORT-ACCESS-REVIEW checkpoint (startup rules from CPV-SESSION-CONTINUITY, accepted 6211970495)",
+    "measured_utc": "2026-10-19T10:30:00Z",
+    "measured_at_branch": "review/export-access (review-only, on fix/verification-completion @ edf20ed)",
     "method": "deterministic: byte sizes of the files as committed on this branch; no AI session, subagent or test run was launched to prove it",
     "caveat": "file sizes are an input budget, not a guarantee of actual session context or token cost; the tool's own system prompt and tool outputs are not counted here",
     "budget": {
@@ -21,17 +21,17 @@
         {
             "step": 1,
             "file": "docs/orquestador/SESSION_RESUME.md",
-            "range": "all (126 lines)",
-            "bytes": 8593,
+            "range": "all (121 lines)",
+            "bytes": 8859,
             "class": "project_doc"
         },
         {
             "step": 3,
             "file": "Issue #2 assigned comment body",
             "range": "body only, once",
-            "bytes": 6974,
+            "bytes": 5614,
             "class": "assigned_input",
-            "example": "6215451160; earlier rounds: 6214463281 = 5000 B, 6212967641 = 8211 B",
+            "example": "6262799754; earlier rounds: 6215451160 = 6974 B, 6214463281 = 5000 B",
             "note": "size varies per task; cited references are opened only if directly needed, never transitively"
         }
     ],
@@ -57,13 +57,13 @@
         }
     ],
     "totals": {
-        "project_docs_bytes": 9935,
-        "project_docs_breakdown": "CLAUDE.md 1342 + SESSION_RESUME.md 8593",
+        "project_docs_bytes": 10201,
+        "project_docs_breakdown": "CLAUDE.md 1342 + SESSION_RESUME.md 8859",
         "project_docs_within_target": true,
-        "assigned_input_bytes": 6974,
+        "assigned_input_bytes": 5614,
         "private_memory_bytes": 1413,
-        "total_initial_text_inputs_bytes": 18322,
-        "total_initial_text_inputs_breakdown": "project docs 9935 + assigned comment 6974 + private memory 1413 (settings.json permissions not counted as reading)"
+        "total_initial_text_inputs_bytes": 17228,
+        "total_initial_text_inputs_breakdown": "project docs 10201 + assigned comment 5614 + private memory 1413 (settings.json permissions not counted as reading)"
     },
     "commands": [
         {
@@ -101,5 +101,5 @@
         "audit/orchestrator_handoff.json (515767 bytes; selected fields only, never whole)",
         "audit/**, the full Issue #2 thread, comments cited by cited comments, test suites, server logs"
     ],
-    "next_authorized_action": "orchestrator/owner: manual review of fix/verification-completion (not deployed; deployment and SMTP activation each need explicit owner authorization); agent: nothing without a new Issue #2 instruction"
+    "next_authorized_action": "owner: review the export-access repair proposal and decide D1/D2/D3; agent: nothing without a new Issue #2 instruction"
 }

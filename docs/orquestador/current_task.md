@@ -1,31 +1,23 @@
-# Tarea actual (checkpoint 2026-10-16 ~13:30Z, rama `fix/verification-completion`)
+# Tarea actual (checkpoint 2026-10-19 ~10:30Z, rama `review/export-access`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-VERIFICATION-FLOW-AND-COMPLETION — READY_FOR_REVIEW — MANUAL
+## CPV-EXPORT-ACCESS-REVIEW — READY_FOR_REVIEW — MANUAL (solo revisión)
 
 | Campo | Valor |
 |---|---|
-| Autorización | `6215451160` (propietario, 2026-10-16 12:25Z): implementación y pruebas aisladas; **no** despliegue; correo/SMTP en otra ronda |
-| Rama / BASE | `fix/verification-completion` / `10616afcf0b6f75248bd54a0903d93b3a9b51d85` (candidato `fix/first-save-postgres`, aceptado en `6215360219`) |
-| Runtime verificado antes de la rama | remoto `10616af`; despliegue `0f8bdad`; staging `0f8bdad`, 0 modificaciones rastreadas (12:27Z) |
-| TESTED_HEAD | `3e684c569c035bc2944319f63996b45cbceab902` (navegador en `3f639b7`; después solo cambian el manual y los docs) |
-| A. Verificación | `->emailVerification()` de Filament: sin 500; páginas protegidas → «Verifique su correo electrónico»; enlace firmado propio (403 para otro usuario, firma alterada, hash ajeno o vencido); reenvío limitado a 2 por minuto, que no promete entrega si no hay envío |
-| B. Completitud | `setStatus(false)` borra por modelo y se recalcula el cache; `NoAplicaAction` en transacción; datos y `updated_at` intactos |
-| Pruebas | antes en rojo (`d0e6947`); enfocadas 139 OK; suite completa 568 OK en `3e684c5`; navegador 30/30 |
-| Informe | `audit/verification_completion_2026-10-16.md`; evidencia `audit/runs/verification_completion/` |
-| Manual | `#verificar-correo` (nuevo), «No Aplica», errores frecuentes, contactar a la Cámara; `docs/deploy/CORREO_DEL_SISTEMA.md` |
-| Siguiente acción | revisión manual. Desplegar y activar el correo requieren autorizaciones aparte del propietario |
-
-## Hallazgos para una ronda aparte (no autorizados aquí)
-
-- **Seguridad:** `pdf/{empresa}` y `xls/{empresa}` no exigen sesión (informe §9). Se recomienda priorizarlo.
-- **Correo:** mientras no se active, un afiliado nuevo no puede verificarse solo.
-- **Datos históricos de `assets`:** solo propuesta (`audit/first_save_postgres_2026-10-16.md` §8).
+| Instrucción | `6262799754` (propietario, 2026-10-19): revisión, prueba aislada y propuesta; **sin** cambio de runtime ni despliegue |
+| Rama / BASE | `review/export-access` / `edf20ed4a1fbd8b2d6b8cee3d62af2a58bfa6d7a` (`fix/verification-completion`, aceptada en `6262657488`) |
+| Runtime observado | staging `0f8bdad`: middleware efectivo de las dos rutas y existencia de las vistas, leídos de solo lectura |
+| Prueba | `ExportAccessCharacterizationTest` (3 OK): 6 actores × PDF/XLS × empresas A/B/C, más ids inexistentes y manipulados |
+| Hallazgos | F1/F2: el PDF y el XLS se sirven a cualquiera, incluso a un invitado (IDOR). F3: el XLS toma el id de `REQUEST_URI`, filtra a una sola empresa y responde 500 con `?x`/`abc`. F4: XLS `Cache-Control: public`. F7: el alias `auth` lleva a una ruta `login` que no existe |
+| Propuesta | informe §5 (matriz) y §6 (reparación mínima); decisiones D1, D2 y D3 en §7 |
+| Siguiente acción | revisión y autorización de la reparación. El correo y el resto siguen diferidos |
 
 ## Fuera de alcance hasta una instrucción nueva
 
+- implementar la reparación de las descargas;
 - activar el correo;
 - reintentar la solicitud #1;
 - reactivar el ejecutor;

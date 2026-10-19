@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-16 ~13:30Z, en la rama `fix/verification-completion`. Sale de `fix/first-save-postgres` @ `10616af` (aceptada en `6215360219`), que contiene `0895258` y `docs/session-continuity` @ `28014c2`.
+**Checkpoint:** 2026-10-19 ~10:30Z, en la rama `review/export-access` (solo revisión). Sale de `fix/verification-completion` @ `edf20ed` (aceptada en `6262657488`), que contiene `10616af`, `0895258` y `docs/session-continuity` @ `28014c2`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,7 +32,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** la de la tarea en curso, **`fix/verification-completion`**. Es el candidato integrado.
+- **Rama canónica de runtime:** **`fix/verification-completion`** @ `edf20ed`, el candidato integrado aceptado. La revisión en curso vive en `review/export-access`, que solo agrega tests, fixtures e informe.
   - Contiene `fix/first-save-postgres` @ `10616af`, que a su vez contiene `0895258` y `28014c2`.
   - Es el candidato de runtime que **lleva los archivos de arranque**: `CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo.
   - Esos archivos existen solo en estas ramas. Llegan a `feature/upgrade-filament-v3` únicamente si este candidato se despliega con una autorización.
@@ -44,7 +44,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `fix/verification-completion` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabajá en la rama `review/export-access` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
@@ -55,18 +55,13 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 | Workflow del último despliegue | run `38873194879`, success, 08:22Z | `6211360371` |
 | Imagen de recuperación | `perfilafiliados-app:pre-branding-c02d4ec` | creada ~08:11Z |
 
-### En curso: CPV-VERIFICATION-FLOW-AND-COMPLETION (READY_FOR_REVIEW — MANUAL, sin desplegar)
+### En curso: CPV-EXPORT-ACCESS-REVIEW (READY_FOR_REVIEW — MANUAL; solo revisión, sin cambios de runtime)
 
-- **Autorización:** `6215451160`. BASE `10616af` (candidato aceptado en `6215360219`).
-- **TESTED_HEAD:** `3e684c569c035bc2944319f63996b45cbceab902`. Navegador en `3f639b7` (después solo cambian el manual y los docs).
-- **Incluye:**
-  - `->emailVerification()` de Filament con una página propia: textos honestos sin envío de correo, «Cerrar sesión», reenvío limitado a 2 por minuto;
-  - enlace firmado del panel por `User::sendEmailVerificationNotification()`;
-  - `setStatus(false)` borra por modelo, así se recalcula el cache;
-  - `NoAplicaAction` en transacción.
-- **Pruebas:** enfocadas 139 OK y suite completa **568 OK** en `3e684c5`; navegador 30/30.
-- **Informe:** `audit/verification_completion_2026-10-16.md`. **Evidencia:** `audit/runs/verification_completion/`.
-- **Antes:** CPV-FIRST-SAVE-POSTGRES-COMPATIBILITY (`audit/first_save_postgres_2026-10-16.md`), incluida.
+- **Instrucción:** `6262799754`. BASE `edf20ed`. Informe: `audit/export_access_review_2026-10-19.md`; evidencia `audit/runs/export_access/`.
+- **Confirmado:** `pdf/{empresa}` y `xls/{empresa}` solo pasan por el grupo `web` (sin sesión obligatoria ni autorización). Cualquiera, incluso un invitado, obtiene el perfil o la fila de cualquier empresa. El XLS filtra a la empresa del id, no a todas, pero toma el id de `REQUEST_URI` y responde 500 con `?x` o `abc`; su `Cache-Control` es `public`.
+- **Propuesta:** middleware del panel con verificación, `EmpresaPolicy::export` (vínculo + `view_empresa`, o permiso `export_any_empresa`), 404 antes de consultar, XLS con binding tipado y sin `REQUEST_URI`, cabeceras `private, no-store`.
+- **Decisiones del propietario:** D1 (¿personal de la Cámara exporta cualquier empresa?), D2 (¿qué hacer con el XLS por empresa?), D3 (¿403 o 404?).
+- **Antes:** CPV-VERIFICATION-FLOW-AND-COMPLETION, aceptada (`6262657488`): suite completa 568 OK en `3e684c5`.
 
 ### Anteriores
 
@@ -92,7 +87,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 5. Pendientes conocidos (no arrancan solos)
 
-- **Seguridad, prioritario y sin autorizar:** `pdf/{empresa}` y `xls/{empresa}` no exigen sesión (informe de verificación §9).
+- **Seguridad, prioritario:** la reparación de las descargas espera revisión y decisiones D1, D2 y D3 (`audit/export_access_review_2026-10-19.md`).
 - **Correo:** pendiente del propietario. Sin envío, un afiliado nuevo **no** puede verificarse solo.
 - **Datos históricos (solo lectura, sin acción):**
   - 1 fila de `assets` con actor NULL;

@@ -1,0 +1,55 @@
+ Container cpvtest-testdb-1 Running 
+ Container cpvtest-testdb-1 Waiting 
+ Container cpvtest-testdb-1 Healthy 
+ Container cpvtest-phpunit-20261019T100348Z-af23c3f0904b Creating 
+ Container cpvtest-phpunit-20261019T100348Z-af23c3f0904b Created 
+PHPUnit 11.5.56 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.34
+Configuration: /app/phpunit.xml
+
+..EXPORT | guest                        | pdf A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | guest                        | pdf B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | guest                        | pdf C (no users)       | 200 | owner=ZZZ MARCA GAMMA | queried=ZZZ MARCA GAMMA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | guest                        | xls A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | guest                        | xls B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | guest                        | xls C (no users)       | 200 | owner=no data rows | queried=ZZZ MARCA GAMMA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | unverified, linked to A      | pdf A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | unverified, linked to A      | pdf B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | unverified, linked to A      | pdf C (no users)       | 200 | owner=ZZZ MARCA GAMMA | queried=ZZZ MARCA GAMMA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | unverified, linked to A      | xls A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | unverified, linked to A      | xls B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | unverified, linked to A      | xls C (no users)       | 200 | owner=no data rows | queried=ZZZ MARCA GAMMA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | owner of A                   | pdf A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | owner of A                   | pdf B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | owner of A                   | pdf C (no users)       | 200 | owner=ZZZ MARCA GAMMA | queried=ZZZ MARCA GAMMA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | owner of A                   | xls A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | owner of A                   | xls B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | owner of A                   | xls C (no users)       | 200 | owner=no data rows | queried=ZZZ MARCA GAMMA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | user with no company         | pdf A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | user with no company         | pdf B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | user with no company         | pdf C (no users)       | 200 | owner=ZZZ MARCA GAMMA | queried=ZZZ MARCA GAMMA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | user with no company         | xls A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | user with no company         | xls B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | user with no company         | xls C (no users)       | 200 | owner=no data rows | queried=ZZZ MARCA GAMMA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | linked to A, no permission   | pdf A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | linked to A, no permission   | pdf B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | linked to A, no permission   | pdf C (no users)       | 200 | owner=ZZZ MARCA GAMMA | queried=ZZZ MARCA GAMMA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | linked to A, no permission   | xls A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | linked to A, no permission   | xls B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | linked to A, no permission   | xls C (no users)       | 200 | owner=no data rows | queried=ZZZ MARCA GAMMA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | super_admin, not linked      | pdf A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | super_admin, not linked      | pdf B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | super_admin, not linked      | pdf C (no users)       | 200 | owner=ZZZ MARCA GAMMA | queried=ZZZ MARCA GAMMA | cache=no-cache, private | disposition=inline; filename=.pdf
+EXPORT | super_admin, not linked      | xls A                  | 200 | owner=ZZZ MARCA ALFA | queried=ZZZ MARCA ALFA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | super_admin, not linked      | xls B                  | 200 | owner=ZZZ MARCA BETA | queried=ZZZ MARCA BETA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | super_admin, not linked      | xls C (no users)       | 200 | owner=no data rows | queried=ZZZ MARCA GAMMA | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | guest                        | pdf missing id         | 404 | owner=- | queried=- | cache=no-cache, private | disposition=-
+EXPORT | guest                        | xls missing id         | 200 | owner=no data rows | queried=- | cache=public | disposition=attachment; filename=join-views.xlsx
+EXPORT | guest                        | xls A?x=1              | 500 | owner=- | queried=- | cache=no-cache, private | disposition=-
+EXPORT | guest                        | xls abc                | 500 | owner=- | queried=- | cache=no-cache, private | disposition=-
+.                                                                 3 / 3 (100%)
+
+Time: 00:13.123, Memory: 119.00 MB
+
+OK (3 tests, 53 assertions)

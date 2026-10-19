@@ -1,0 +1,9 @@
+default_connection=pgsql driver=pgsql
+object public.ClientsView VIEW
+object public.FinanceView VIEW
+object public.ManagementDetView VIEW
+object public.capacityView VIEW
+object public.catalogoView VIEW
+route pdf uri=pdf/{empresa} methods=GET|HEAD middleware=["App\\Http\\Middleware\\EncryptCookies","Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse","Illuminate\\Session\\Middleware\\StartSession","Illuminate\\View\\Middleware\\ShareErrorsFromSession","App\\Http\\Middleware\\VerifyCsrfToken","Illuminate\\Routing\\Middleware\\SubstituteBindings"]
+route xls uri=xls/{empresa} methods=GET|HEAD middleware=["App\\Http\\Middleware\\EncryptCookies","Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse","Illuminate\\Session\\Middleware\\StartSession","Illuminate\\View\\Middleware\\ShareErrorsFromSession","App\\Http\\Middleware\\VerifyCsrfToken","Illuminate\\Routing\\Middleware\\SubstituteBindings"]
+global=["TrustProxies","HandleCors","PreventRequestsDuringMaintenance","ValidatePostSize","TrimStrings","ConvertEmptyStringsToNull","DisableBackButtonCacheMiddleware"]
