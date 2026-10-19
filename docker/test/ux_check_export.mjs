@@ -19,7 +19,7 @@ mkdirSync(OUT, { recursive: true });
 const seed = readFileSync(`${OUT}/ux_seed.log`, 'utf8');
 const A = (seed.match(/^A_ID=(\d+)$/m) || [])[1];
 const B = (seed.match(/^B_ID=(\d+)$/m) || [])[1];
-const exportUrl = (id, kind) => `${BASE}/admin/descargas/empresas/${id}/perfil.${kind}`;
+const exportUrl = (id, kind) => `${BASE}/admin/descargas/empresas/${id}/${kind}`;
 
 const results = [];
 const record = (name, pass, detail) => {
@@ -57,7 +57,7 @@ try {
     current = page;
     await step('[affiliate/light/desktop] own downloads', async () => {
       await page.goto(BASE + '/admin/empresas', { waitUntil: 'networkidle' });
-      const link = page.locator(`a[href*="/admin/descargas/empresas/${A}/perfil.pdf"]`).first();
+      const link = page.locator(`a[href*="/admin/descargas/empresas/${A}/pdf"]`).first();
       await link.waitFor({ timeout: 20000 });
       record('[affiliate] the «PDF» column links to the protected route of its own company', await link.count() === 1);
       const pdf = await page.request.get(await link.getAttribute('href'));
@@ -116,7 +116,7 @@ try {
       await page.goto(exportUrl(A, 'pdf'), { waitUntil: 'domcontentloaded' });
       record('[guest] export URL → panel login', path(page) === '/admin/login', path(page));
       const old = await page.request.get(`${BASE}/pdf/${A}`, { maxRedirects: 0 });
-      record('[guest] old /pdf/{id} only redirects to the protected route', old.status() === 302 && (old.headers().location || '').endsWith(`/admin/descargas/empresas/${A}/perfil.pdf`), `${old.status()} ${old.headers().location}`);
+      record('[guest] old /pdf/{id} only redirects to the protected route', old.status() === 302 && (old.headers().location || '').endsWith(`/admin/descargas/empresas/${A}/pdf`), `${old.status()} ${old.headers().location}`);
     });
     await ctx.close();
   }
