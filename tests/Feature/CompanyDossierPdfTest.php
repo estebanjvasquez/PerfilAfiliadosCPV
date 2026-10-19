@@ -433,6 +433,11 @@ class CompanyDossierPdfTest extends TestCase
             ->assertTableBulkActionHasLabel('export', 'Exportar listado')
             ->assertSee('Perfil completo (PDF)');
         // El panel usa ->spa(): sin la excepción, el enlace se abría con wire:navigate y el archivo nunca se descargaba.
+        // Panel::boot() pasa estos dos ajustes a FilamentView en cada petición; aquí se aplican igual, sin el resto del boot.
+        $panel = Filament::getPanel('admin');
+        $this->assertTrue($panel->hasSpaMode());
+        \Filament\Support\Facades\FilamentView::spa($panel->hasSpaMode());
+        \Filament\Support\Facades\FilamentView::spaUrlExceptions($panel->getSpaUrlExceptions());
         $this->assertFalse(\Filament\Support\Facades\FilamentView::hasSpaMode($this->url($a)), 'the download link bypasses SPA navigation');
         $this->assertTrue(\Filament\Support\Facades\FilamentView::hasSpaMode(route('filament.admin.resources.empresas.index')), 'the rest of the panel keeps SPA mode');
 
