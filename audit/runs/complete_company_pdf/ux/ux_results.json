@@ -1,0 +1,81 @@
+{
+  "results": [
+    {
+      "name": "seed gave the synthetic company id and RIF",
+      "pass": true,
+      "detail": "A=4 rif=j000000009"
+    },
+    {
+      "name": "[affiliate] «Perfil completo (PDF)» is a visible button on its row",
+      "pass": true,
+      "detail": "182x32"
+    },
+    {
+      "name": "[affiliate] the button has a tooltip that says it is the full profile",
+      "pass": true,
+      "detail": "Descarga el perfil completo de la empresa en PDF, con todas sus secciones | Descarga el perfil completo de la empresa en"
+    },
+    {
+      "name": "[affiliate] clicking it downloads perfil-<rif>.pdf (a real PDF)",
+      "pass": true,
+      "detail": "perfil-j000000009.pdf %PDF"
+    },
+    {
+      "name": "[affiliate] the modal opens with «Todas las secciones (perfil completo)» selected",
+      "pass": true
+    },
+    {
+      "name": "[affiliate] choosing «Solo las secciones que elija» shows the 10 sections, all checked by default",
+      "pass": true,
+      "detail": "10/10"
+    },
+    {
+      "name": "[affiliate] «Descargar PDF» with two sections downloads perfil-<rif>-parcial.pdf",
+      "pass": true,
+      "detail": "perfil-j000000009-parcial.pdf %PDF"
+    },
+    {
+      "name": "[affiliate] the listing exporter is the toolbar action «Exportar listado» for selected rows, not on the row",
+      "pass": true,
+      "detail": "in rows: 0"
+    },
+    {
+      "name": "[affiliate] its modal says it is a listing and not the full profile",
+      "pass": true,
+      "detail": "Cerrar Exportar listado de empresas Exporta solo las columnas de esta tabla. No es el perfil completo de la empresa: para eso use «Perfil completo (PDF)» en la "
+    },
+    {
+      "name": "[affiliate] the company page header offers «Descargar perfil completo (PDF)»",
+      "pass": true
+    },
+    {
+      "name": "[affiliate] the header button downloads perfil-<rif>.pdf",
+      "pass": true,
+      "detail": "perfil-j000000009.pdf %PDF"
+    },
+    {
+      "name": "[affiliate/mobile] «Perfil completo (PDF)» is visible without scrolling the table",
+      "pass": true,
+      "detail": "x=72 w=182"
+    },
+    {
+      "name": "[affiliate/mobile] no horizontal page overflow",
+      "pass": true,
+      "detail": "excess=0px"
+    },
+    {
+      "name": "[affiliate/mobile] it downloads perfil-<rif>.pdf",
+      "pass": true,
+      "detail": "perfil-j000000009.pdf %PDF"
+    },
+    {
+      "name": "[staff] sees «Perfil completo (PDF)» for the linked company",
+      "pass": true
+    },
+    {
+      "name": "[staff] it downloads perfil-<rif>.pdf",
+      "pass": true,
+      "detail": "perfil-j000000009.pdf %PDF"
+    }
+  ]
+}

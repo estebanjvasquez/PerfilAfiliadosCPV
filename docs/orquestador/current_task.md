@@ -1,7 +1,19 @@
-# Tarea actual (checkpoint 2026-10-19 ~12:25Z, rama `fix/export-access`)
+# Tarea actual (checkpoint 2026-10-19 ~16:20Z, rama `fix/complete-company-pdf`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
+
+## CPV-COMPLETE-COMPANY-PDF — READY_FOR_REVIEW — MANUAL (`6270558322`)
+
+| Campo | Valor |
+|---|---|
+| Autorización | `6270558322` (propietario, 2026-10-19 15:11Z): perfil completo visible y por defecto, secciones opcionales; **no** despliegue |
+| Rama / BASE | `fix/complete-company-pdf` / `37503c8` (checkpoint sobre el runtime desplegado `ce70b7f`) |
+| Causa | la columna «PDF» era `IconColumn::make('')`: estado null, **ningún ícono visible**. Lo único visible era el exportador de la tabla (listado). Además, `->spa()` convertía el enlace directo en `wire:navigate` y no descargaba |
+| Arreglo | acciones de fila «Perfil completo (PDF)» y «Elegir secciones» (antes de las columnas), «Descargar perfil completo (PDF)» en la ficha, «Exportar listado» rotulado aparte; `pdf.blade.php` reparado (mismo diseño, sin consultas, «Sí/No», No aplica por sub-tipo, Categorías CPV, contactos, experiencia y presencia leídas de los modelos); `?secciones=` con lista blanca |
+| TESTED_HEAD | `88713a70171ca80903fedac74cd4507498ad8718`: suite completa **582 OK**, enfocadas 109 OK, navegador 16/16 |
+| Informe | `audit/complete_company_pdf_2026-10-19.md`; evidencia `audit/runs/complete_company_pdf/` (PDF sintéticos, texto, páginas PNG) |
+| Siguiente acción | revisión manual; desplegar requiere autorización |
 
 ## CPV-INTEGRATED-EXPORT-ACCESS-DEPLOY — DEPLOYED_FOR_OWNER_REVIEW — MANUAL (`6265502896`)
 

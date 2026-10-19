@@ -1,0 +1,18 @@
+PASS  seed gave the synthetic company id and RIF  :: A=4 rif=j000000009
+PASS  [affiliate] «Perfil completo (PDF)» is a visible button on its row  :: 182x32
+PASS  [affiliate] the button has a tooltip that says it is the full profile  :: Descarga el perfil completo de la empresa en PDF, con todas sus secciones | Descarga el perfil completo de la empresa en
+PASS  [affiliate] clicking it downloads perfil-<rif>.pdf (a real PDF)  :: perfil-j000000009.pdf %PDF
+PASS  [affiliate] the modal opens with «Todas las secciones (perfil completo)» selected
+PASS  [affiliate] choosing «Solo las secciones que elija» shows the 10 sections, all checked by default  :: 10/10
+PASS  [affiliate] «Descargar PDF» with two sections downloads perfil-<rif>-parcial.pdf  :: perfil-j000000009-parcial.pdf %PDF
+PASS  [affiliate] the listing exporter is the toolbar action «Exportar listado» for selected rows, not on the row  :: in rows: 0
+PASS  [affiliate] its modal says it is a listing and not the full profile  :: Cerrar Exportar listado de empresas Exporta solo las columnas de esta tabla. No es el perfil completo de la empresa: para eso use «Perfil completo (PDF)» en la 
+PASS  [affiliate] the company page header offers «Descargar perfil completo (PDF)»
+PASS  [affiliate] the header button downloads perfil-<rif>.pdf  :: perfil-j000000009.pdf %PDF
+PASS  [affiliate/mobile] «Perfil completo (PDF)» is visible without scrolling the table  :: x=72 w=182
+PASS  [affiliate/mobile] no horizontal page overflow  :: excess=0px
+PASS  [affiliate/mobile] it downloads perfil-<rif>.pdf  :: perfil-j000000009.pdf %PDF
+PASS  [staff] sees «Perfil completo (PDF)» for the linked company
+PASS  [staff] it downloads perfil-<rif>.pdf  :: perfil-j000000009.pdf %PDF
+
+16/16 checks passed
