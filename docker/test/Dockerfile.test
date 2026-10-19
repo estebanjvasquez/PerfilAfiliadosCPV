@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         unzip \
         postgresql-client \
+        poppler-utils \
     && docker-php-ext-install -j"$(nproc)" \
         pdo_pgsql \
         intl \

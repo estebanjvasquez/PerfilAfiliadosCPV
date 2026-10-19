@@ -107,6 +107,15 @@ STAGING_URL=https://pruebas.camarapetrolera.app/
 
 say()  { printf '  %s\n' "$*"; }
 step() { printf '\n== %s\n' "$*"; }
+# Renders every page of every PDF in an ARTIFACTS directory as a PNG (poppler's pdftoppm, from the test image). Only
+# that directory is mounted, with no network: the files are synthetic evidence of this run.
+render_pdf_pages() {
+  local dir="$1"
+  docker run --rm --network none -v "$dir:/d" -w /d cpvtest-php:8.2 \
+    sh -c 'for f in *.pdf; do pdftoppm -r 70 -png "$f" "${f%.pdf}-page" || echo "render failed: $f"; done' \
+    >"$dir/render.log" 2>&1 || true
+  say "PDF pages rendered in $(basename "$dir")/: $(ls "$dir"/*.pdf 2>/dev/null | wc -l) PDF(s), $(ls "$dir"/*-page-*.png 2>/dev/null | wc -l) page image(s)"
+}
 note() { printf '         %s\n' "$*"; }
 die()  { printf '\nFAILED: %s\n' "$*" >&2; teardown; exit 1; }
 
@@ -841,6 +850,13 @@ if [ "$PHPUNIT_EXIT" = "0" ]; then
 else
   say "[SUITE RED] phpunit exited $PHPUNIT_EXIT (recorded, not hidden)"
 fi
+# PDF evidence (CPV-COMPLETE-COMPANY-PDF): tests that read a generated PDF with pdftotext leave it, and its text, in
+# storage/app/pdf_evidence of the disposable workspace. Kept with the artifacts, each page rendered as a PNG.
+if [ -d "$WORKSPACE/storage/app/pdf_evidence" ]; then
+  mkdir -p "$ARTIFACTS/pdf"
+  cp -r "$WORKSPACE/storage/app/pdf_evidence/." "$ARTIFACTS/pdf/"
+  render_pdf_pages "$ARTIFACTS/pdf"
+fi
 fi
 
 # --- 8-ter. UX / BROWSER CHECK (its own group) -------------------------------
@@ -1037,6 +1053,10 @@ if (class_exists(App\Models\TaxonomyCategoryRequestDeliveryAttempt::class)) {
       uxbad "browser checks reported failures (exit $UX_EXIT) - see ux/ux_results.json"
     fi
     ls -1 "$ARTIFACTS/ux" | sed 's/^/           /'
+    # Files the browser downloaded (CPV-COMPLETE-COMPANY-PDF): every page rendered for review.
+    if ls "$ARTIFACTS/ux"/*.pdf >/dev/null 2>&1; then
+      render_pdf_pages "$ARTIFACTS/ux"
+    fi
   fi
 
   docker rm -f "$UX_SERVER" >/dev/null 2>&1 || true
