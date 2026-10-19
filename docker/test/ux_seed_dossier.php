@@ -60,7 +60,7 @@ try {
 
     $a->forceFill([
         'street' => 'ZZZUXCALLE 1', 'city_id' => $city, 'website' => 'https://zzzux.test', 'ano_fund' => 1990, 'billing_id' => 2, 'employees_id' => 1,
-        'status_id' => 1, 'property_id' => 1, 'origin_id' => 1, 'sector_principal_id' => $sector, 'linkedin_profile' => 'linkedin.com/company/zzzux',
+        'status_id' => 1, 'property_id' => 1, 'origin_id' => 1, 'sector_principal_id' => $sector, 'linkedin_profile' => 'in/zzzux',
         'customers_country' => [['customer_name' => 'ZZZUXCLIENTE', 'country_id' => (string) $country]],
     ])->save();
 
