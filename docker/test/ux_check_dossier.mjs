@@ -116,7 +116,9 @@ try {
       await page.screenshot({ path: `${OUT}/dos-bulk-export-listado.png` });
       await item.click();
       await page.waitForTimeout(1200);
-      const modalText = (await page.locator('.fi-modal-window').last().innerText().catch(() => '')).replace(/\s+/g, ' ');
+      const listModal = page.locator('.fi-modal-window').filter({ hasText: 'Exportar listado de empresas' }).first();
+      await listModal.waitFor({ timeout: 15000 });
+      const modalText = (await listModal.innerText()).replace(/\s+/g, ' ');
       record('[affiliate] its modal says it is a listing and not the full profile', /Exportar listado de empresas/.test(modalText) && /No es el perfil completo/.test(modalText), modalText.slice(0, 160));
       await page.screenshot({ path: `${OUT}/dos-export-listado-modal.png` });
     });
