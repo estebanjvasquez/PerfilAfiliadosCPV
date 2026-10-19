@@ -73,10 +73,13 @@
 
         .card p.card-titulo { margin: 0 0 4px 0; font-weight: bold; }
 
-        /* Un encabezado de sección no queda solo al pie de una página, separado de su contenido. */
-        h2.titulo2, h4.subtitulo { page-break-after: avoid; }
-
         tr { page-break-inside: avoid; }
+
+        /* Un título con su tabla: no queda un encabezado solo al pie de una página. Si el bloque no cabe en una página,
+           dompdf lo corta igual, y el <thead> de la tabla se repite en la página siguiente. */
+        .bloque { page-break-inside: avoid; }
+
+        h2.titulo2, h4.subtitulo { page-break-after: avoid; }
     </style>
 </head>
 <body>
@@ -134,119 +137,133 @@
             <tr class="noBorder"><td class="etiqueta">Sector secundario:</td><td>{{ $sectorSecundario ?? 'No declarado' }}</td></tr>
         </table>
 
-        <h4 class="subtitulo gris-oscuro">Operación en Venezuela</h4>
-        <table>
-            <tr class="noBorder"><td class="etiqueta">Facturación anual:</td><td>{{ $has($g->facturacion_anual) ? $g->facturacion_anual : $vacio }}</td></tr>
-            <tr class="noBorder"><td class="etiqueta">Empleados (rango declarado):</td><td>{{ $empleadosRango ?? $vacio }}</td></tr>
-            <tr class="noBorder"><td class="etiqueta">Empleados (total en Recursos humanos):</td><td>{{ $has($g->empleados) ? $g->empleados : $vacio }}</td></tr>
-            <tr class="noBorder"><td class="etiqueta">Estatus actual:</td><td>{{ $has($g->estado_actual) ? $g->estado_actual : $vacio }}</td></tr>
-        </table>
+        <div class="bloque">
+            <h4 class="subtitulo gris-oscuro">Operación en Venezuela</h4>
+            <table>
+                <tr class="noBorder"><td class="etiqueta">Facturación anual:</td><td>{{ $has($g->facturacion_anual) ? $g->facturacion_anual : $vacio }}</td></tr>
+                <tr class="noBorder"><td class="etiqueta">Empleados (rango declarado):</td><td>{{ $empleadosRango ?? $vacio }}</td></tr>
+                <tr class="noBorder"><td class="etiqueta">Empleados (total en Recursos humanos):</td><td>{{ $has($g->empleados) ? $g->empleados : $vacio }}</td></tr>
+                <tr class="noBorder"><td class="etiqueta">Estatus actual:</td><td>{{ $has($g->estado_actual) ? $g->estado_actual : $vacio }}</td></tr>
+            </table>
+        </div>
 
-        <h4 class="subtitulo gris-oscuro">Contactos</h4>
-        <table>
-            @forelse ($contactos as $contacto)
-                <tr class="noBorder">
-                    <td class="etiqueta"><b>{{ $contacto->name }}</b>@if ($contacto->pivot?->is_principal)<br>(contacto principal)@endif</td>
-                    <td>
-                        @if ($has($contacto->position)) Cargo: {{ $contacto->position }}<br>@endif
-                        @if ($has($contacto->phone)) Teléfono: {{ $contacto->phone }}<br>@endif
-                        @if ($has($contacto->email)) Correo: {{ $contacto->email }}@endif
-                    </td>
-                </tr>
-            @empty
-                <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
-            @endforelse
-        </table>
+        <div class="bloque">
+            <h4 class="subtitulo gris-oscuro">Contactos</h4>
+            <table>
+                @forelse ($contactos as $contacto)
+                    <tr class="noBorder">
+                        <td class="etiqueta"><b>{{ $contacto->name }}</b>@if ($contacto->pivot?->is_principal)<br>(contacto principal)@endif</td>
+                        <td>
+                            @if ($has($contacto->position)) Cargo: {{ $contacto->position }}<br>@endif
+                            @if ($has($contacto->phone)) Teléfono: {{ $contacto->phone }}<br>@endif
+                            @if ($has($contacto->email)) Correo: {{ $contacto->email }}@endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
+                @endforelse
+            </table>
+        </div>
     @endif
 
     {{-- CLIENTES ................................................................................. --}}
     @if ($want('clientes'))
-        <h2 class="titulo2 gris-oscuro">Clientes</h2>
-        <table>
-            @if ($clientes->isNotEmpty())
-                <tr><th>Nombre</th><th>País</th></tr>
-                @foreach ($clientes as $cliente)
-                    <tr><td>{{ $cliente['nombre'] }}</td><td>{{ $cliente['pais'] }}</td></tr>
-                @endforeach
-            @else
-                <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
-            @endif
-        </table>
+        <div class="bloque">
+            <h2 class="titulo2 gris-oscuro">Clientes</h2>
+            <table>
+                @if ($clientes->isNotEmpty())
+                    <thead><tr><th>Nombre</th><th>País</th></tr></thead>
+                    @foreach ($clientes as $cliente)
+                        <tr><td>{{ $cliente['nombre'] }}</td><td>{{ $cliente['pais'] }}</td></tr>
+                    @endforeach
+                @else
+                    <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
+                @endif
+            </table>
+        </div>
     @endif
 
     {{-- CÁMARAS .................................................................................. --}}
     @if ($want('camaras'))
-        <h2 class="titulo2 gris-oscuro">Cámaras</h2>
-        <table>
-            @if (count($camaras) > 0)
-                <tr><th>Nombre</th></tr>
-                @foreach ($camaras as $camara)
-                    <tr><td>{{ $camara->name }}</td></tr>
-                @endforeach
-            @else
-                <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
-            @endif
-        </table>
+        <div class="bloque">
+            <h2 class="titulo2 gris-oscuro">Cámaras</h2>
+            <table>
+                @if (count($camaras) > 0)
+                    <thead><tr><th>Nombre</th></tr></thead>
+                    @foreach ($camaras as $camara)
+                        <tr><td>{{ $camara->name }}</td></tr>
+                    @endforeach
+                @else
+                    <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
+                @endif
+            </table>
+        </div>
     @endif
 
     {{-- SECTORES Y SERVICIOS ..................................................................... --}}
     @if ($want('sectores'))
-        <h2 class="titulo2 gris-oscuro">Sectores de actividad económica y servicios</h2>
-        <table>
-            @if (count($secSer) > 0)
-                <tr><th style="width: 35%;">Sector</th><th>Servicios</th></tr>
-                @php $anterior = null; @endphp
-                @foreach ($secSer as $fila)
-                    <tr>
-                        <td>{{ $fila->sector === $anterior ? '' : $fila->sector }}</td>
-                        <td>{{ $fila->servicio }}</td>
-                    </tr>
-                    @php $anterior = $fila->sector; @endphp
-                @endforeach
-            @else
-                <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
-            @endif
-        </table>
+        <div class="bloque">
+            <h2 class="titulo2 gris-oscuro">Sectores de actividad económica y servicios</h2>
+            <table>
+                @if (count($secSer) > 0)
+                    <thead><tr><th style="width: 35%;">Sector</th><th>Servicios</th></tr></thead>
+                    @php $anterior = null; @endphp
+                    @foreach ($secSer as $fila)
+                        <tr>
+                            <td>{{ $fila->sector === $anterior ? '' : $fila->sector }}</td>
+                            <td>{{ $fila->servicio }}</td>
+                        </tr>
+                        @php $anterior = $fila->sector; @endphp
+                    @endforeach
+                @else
+                    <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
+                @endif
+            </table>
+        </div>
     @endif
 
     {{-- CATEGORÍAS CPV ............................................................................ --}}
     @if ($want('categorias'))
-        <h2 class="titulo2 gris-oscuro">Categorías CPV</h2>
-        <table>
-            @if ($categorias->isNotEmpty())
-                <tr><th style="width: 60%;">Categoría (Grupo › Familia › Categoría)</th><th>Principal</th><th>Origen</th></tr>
-                @foreach ($categorias as $categoria)
-                    <tr>
-                        <td>{{ $categoria['nombre'] }}</td>
-                        <td>{{ $categoria['principal'] ? 'Sí' : 'No' }}</td>
-                        <td>{{ $categoria['origen'] }}</td>
-                    </tr>
-                @endforeach
-            @else
-                <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
-            @endif
-        </table>
-        <p class="nota">Solo categorías declaradas por la empresa o confirmadas. Las sugerencias sin confirmar no se incluyen.</p>
+        <div class="bloque">
+            <h2 class="titulo2 gris-oscuro">Categorías CPV</h2>
+            <table>
+                @if ($categorias->isNotEmpty())
+                    <thead><tr><th style="width: 60%;">Categoría (Grupo › Familia › Categoría)</th><th>Principal</th><th>Origen</th></tr></thead>
+                    @foreach ($categorias as $categoria)
+                        <tr>
+                            <td>{{ $categoria['nombre'] }}</td>
+                            <td>{{ $categoria['principal'] ? 'Sí' : 'No' }}</td>
+                            <td>{{ $categoria['origen'] }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
+                @endif
+            </table>
+            <p class="nota">Solo categorías declaradas por la empresa o confirmadas. Las sugerencias sin confirmar no se incluyen.</p>
+        </div>
     @endif
 
     {{-- ENFOQUE DE SOSTENIBILIDAD ................................................................. --}}
     @if ($want('sostenibilidad'))
-        <h2 class="titulo2 gris-oscuro">Enfoque de sostenibilidad</h2>
-        <table>
-            @if (count($sust) > 0)
-                <tr><th style="width: 40%;">Áreas</th><th>Sí: Activo</th><th>Sí: Inactivo</th><th>No</th></tr>
-                @foreach ($sust as $fila)
-                    <tr>
-                        <td>{{ $fila->sust_title }}</td>
-                        <td>{{ (string) $fila->sust_status === '2' ? 'Sí' : '' }}</td>
-                        <td>{{ (string) $fila->sust_status === '1' ? 'Sí' : '' }}</td>
-                        <td>{{ (string) $fila->sust_status === '0' ? 'No' : '' }}</td>
-                    </tr>
-                @endforeach
-            @else
-                <tr><td><p class="vacio">{{ $na['sostenibilidad'] ? $naLabel : $vacio }}</p></td></tr>
-            @endif
-        </table>
+        <div class="bloque">
+            <h2 class="titulo2 gris-oscuro">Enfoque de sostenibilidad</h2>
+            <table>
+                @if (count($sust) > 0)
+                    <thead><tr><th style="width: 40%;">Áreas</th><th>Sí: Activo</th><th>Sí: Inactivo</th><th>No</th></tr></thead>
+                    @foreach ($sust as $fila)
+                        <tr>
+                            <td>{{ $fila->sust_title }}</td>
+                            <td>{{ (string) $fila->sust_status === '2' ? 'Sí' : '' }}</td>
+                            <td>{{ (string) $fila->sust_status === '1' ? 'Sí' : '' }}</td>
+                            <td>{{ (string) $fila->sust_status === '0' ? 'No' : '' }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr><td><p class="vacio">{{ $na['sostenibilidad'] ? $naLabel : $vacio }}</p></td></tr>
+                @endif
+            </table>
+        </div>
     @endif
 
     {{-- RECURSOS EN VENEZUELA ..................................................................... --}}
@@ -262,157 +279,172 @@
             $tiposMaquinaria = ['Equip_med_lev', 'Equip_mar_flu', 'Mov_terr_cons', 'Equip_men_cons', 'Fab_metal_elec', 'Mont_elec_meca', 'Maq_herr_meca', 'Almac_trans', 'Serv_poz_inst'];
             $tiposInstalacion = ['Oficinas', 'Talleres', 'Manufactura', 'Almacenes', 'Laboratorios', 'Marinas', 'Otros'];
             $tiposInventario = ['Materia', 'Producto'];
+            $nivel = fn (string $level) => $personal ? collect($tiposPersonal)->sum(fn ($tipo) => $num($personal->{$tipo.'_'.$level})) : 0;
         @endphp
-        <h2 class="titulo2 gris-oscuro">Recursos en Venezuela</h2>
-
-        <h4 class="subtitulo gris-oscuro">Recursos humanos</h4>
-        <table>
-            @if ($personal)
-                <tr><th style="width: 32%;">Tipo de recurso</th><th>Junior</th><th>Medium</th><th>Senior</th><th>Total</th></tr>
-                @foreach ($tiposPersonal as $i => $tipo)
-                    <tr>
-                        <td>{{ $rec->value_emp[0][$i] ?? $tipo }}</td>
-                        <td>{{ $num($personal->{$tipo.'_Junior'}) }}</td>
-                        <td>{{ $num($personal->{$tipo.'_Medium'}) }}</td>
-                        <td>{{ $num($personal->{$tipo.'_Senior'}) }}</td>
-                        <td><b>{{ $num($personal->{$tipo.'_Junior'}) + $num($personal->{$tipo.'_Medium'}) + $num($personal->{$tipo.'_Senior'}) }}</b></td>
-                    </tr>
-                @endforeach
-                <tr>
-                    <td><b>Total</b></td>
-                    @foreach (['Junior', 'Medium', 'Senior'] as $nivel)
-                        <td><b>{{ collect($tiposPersonal)->sum(fn ($tipo) => $num($personal->{$tipo.'_'.$nivel})) }}</b></td>
+        <div class="bloque">
+            <h2 class="titulo2 gris-oscuro">Recursos en Venezuela</h2>
+            <h4 class="subtitulo gris-oscuro">Recursos humanos</h4>
+            <table>
+                @if ($personal)
+                    <thead><tr><th style="width: 32%;">Tipo de recurso</th><th>Junior</th><th>Medium</th><th>Senior</th><th>Total</th></tr></thead>
+                    @foreach ($tiposPersonal as $i => $tipo)
+                        <tr>
+                            <td>{{ $rec->value_emp[0][$i] ?? $tipo }}</td>
+                            <td>{{ $num($personal->{$tipo.'_Junior'}) }}</td>
+                            <td>{{ $num($personal->{$tipo.'_Medium'}) }}</td>
+                            <td>{{ $num($personal->{$tipo.'_Senior'}) }}</td>
+                            <td><b>{{ $num($personal->{$tipo.'_Junior'}) + $num($personal->{$tipo.'_Medium'}) + $num($personal->{$tipo.'_Senior'}) }}</b></td>
+                        </tr>
                     @endforeach
-                    <td><b>{{ $num($personal->Total) }}</b></td>
-                </tr>
-            @else
-                <tr><td><p class="vacio">{{ $sinDatos('employee') }}</p></td></tr>
-            @endif
-        </table>
-
-        <h4 class="subtitulo gris-oscuro">Maquinarias y equipos</h4>
-        <table>
-            @php $filas = $maquinaria ? collect($tiposMaquinaria)->filter(fn ($t) => $has($maquinaria->{$t.'_qua'}) || $has($maquinaria->{$t.'_est'})) : collect(); @endphp
-            @if ($filas->isNotEmpty())
-                <tr><th style="width: 50%;">Equipos</th><th>Cantidad (n)</th><th>Valor estimado USD</th></tr>
-                @foreach ($filas as $i => $tipo)
                     <tr>
-                        <td>{{ $rec->value_maq[0][$i] ?? $tipo }}</td>
-                        <td>{{ $maquinaria->{$tipo.'_qua'} }}</td>
-                        <td>{{ $maquinaria->{$tipo.'_est'} }}</td>
+                        <td><b>Total</b></td>
+                        <td><b>{{ $nivel('Junior') }}</b></td>
+                        <td><b>{{ $nivel('Medium') }}</b></td>
+                        <td><b>{{ $nivel('Senior') }}</b></td>
+                        <td><b>{{ $nivel('Junior') + $nivel('Medium') + $nivel('Senior') }}</b></td>
                     </tr>
-                @endforeach
-            @else
-                <tr><td><p class="vacio">{{ $sinDatos('machinery') }}</p></td></tr>
-            @endif
-        </table>
+                @else
+                    <tr><td><p class="vacio">{{ $sinDatos('employee') }}</p></td></tr>
+                @endif
+            </table>
+        </div>
 
-        <h4 class="subtitulo gris-oscuro">Instalaciones</h4>
-        <table>
-            @php $filas = $instalaciones ? collect($tiposInstalacion)->filter(fn ($t) => $has($instalaciones->{$t.'_q'}) || $has($instalaciones->{$t.'_surf'}) || $has($instalaciones->{$t.'_own'})) : collect(); @endphp
-            @if ($filas->isNotEmpty())
-                <tr><th style="width: 40%;">Tipo de instalación</th><th>Cantidad</th><th>Sup. (m²)</th><th>Tipo de propiedad</th></tr>
-                @foreach ($filas as $i => $tipo)
-                    <tr>
-                        <td>{{ $rec->value_fac[0][$i] ?? $tipo }}</td>
-                        <td>{{ $instalaciones->{$tipo.'_q'} }}</td>
-                        <td>{{ $instalaciones->{$tipo.'_surf'} }}</td>
-                        <td>{{ $instalaciones->{$tipo.'_own'} }}</td>
-                    </tr>
-                @endforeach
-                <tr>
-                    <td><b>Total</b></td>
-                    <td><b>{{ $filas->sum(fn ($t) => $num($instalaciones->{$t.'_q'})) }}</b></td>
-                    <td><b>{{ $filas->sum(fn ($t) => $num($instalaciones->{$t.'_surf'})) }}</b></td>
-                    <td></td>
-                </tr>
-            @else
-                <tr><td><p class="vacio">{{ $sinDatos('facility') }}</p></td></tr>
-            @endif
-        </table>
+        <div class="bloque">
+            <h4 class="subtitulo gris-oscuro">Maquinarias y equipos</h4>
+            <table>
+                @php $filas = $maquinaria ? collect($tiposMaquinaria)->filter(fn ($t) => $has($maquinaria->{$t.'_qua'}) || $has($maquinaria->{$t.'_est'})) : collect(); @endphp
+                @if ($filas->isNotEmpty())
+                    <thead><tr><th style="width: 50%;">Equipos</th><th>Cantidad (n)</th><th>Valor estimado USD</th></tr></thead>
+                    @foreach ($filas as $i => $tipo)
+                        <tr>
+                            <td>{{ $rec->value_maq[0][$i] ?? $tipo }}</td>
+                            <td>{{ $maquinaria->{$tipo.'_qua'} }}</td>
+                            <td>{{ $maquinaria->{$tipo.'_est'} }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr><td><p class="vacio">{{ $sinDatos('machinery') }}</p></td></tr>
+                @endif
+            </table>
+        </div>
 
-        <h4 class="subtitulo gris-oscuro">Inventario</h4>
-        <table>
-            @php $filas = $inventario ? collect($tiposInventario)->filter(fn ($t) => $has($inventario->{$t.'_q'}) || $has($inventario->{$t.'_unit'}) || $has($inventario->{$t.'_est'})) : collect(); @endphp
-            @if ($filas->isNotEmpty())
-                <tr><th style="width: 34%;">Tipo de inventario</th><th>Cantidad (n)</th><th>Unidad</th><th>Valor actual estimado</th></tr>
-                @foreach ($filas as $i => $tipo)
+        <div class="bloque">
+            <h4 class="subtitulo gris-oscuro">Instalaciones</h4>
+            <table>
+                @php $filas = $instalaciones ? collect($tiposInstalacion)->filter(fn ($t) => $has($instalaciones->{$t.'_q'}) || $has($instalaciones->{$t.'_surf'}) || $has($instalaciones->{$t.'_own'})) : collect(); @endphp
+                @if ($filas->isNotEmpty())
+                    <thead><tr><th style="width: 40%;">Tipo de instalación</th><th>Cantidad</th><th>Sup. (m²)</th><th>Tipo de propiedad</th></tr></thead>
+                    @foreach ($filas as $i => $tipo)
+                        <tr>
+                            <td>{{ $rec->value_fac[0][$i] ?? $tipo }}</td>
+                            <td>{{ $instalaciones->{$tipo.'_q'} }}</td>
+                            <td>{{ $instalaciones->{$tipo.'_surf'} }}</td>
+                            <td>{{ $instalaciones->{$tipo.'_own'} }}</td>
+                        </tr>
+                    @endforeach
                     <tr>
-                        <td>{{ $rec->value_inv[0][$i] ?? $tipo }}</td>
-                        <td>{{ $inventario->{$tipo.'_q'} }}</td>
-                        <td>{{ $inventario->{$tipo.'_unit'} }}</td>
-                        <td>{{ $inventario->{$tipo.'_est'} }}</td>
+                        <td><b>Total</b></td>
+                        <td><b>{{ $filas->sum(fn ($t) => $num($instalaciones->{$t.'_q'})) }}</b></td>
+                        <td><b>{{ $filas->sum(fn ($t) => $num($instalaciones->{$t.'_surf'})) }}</b></td>
+                        <td></td>
                     </tr>
-                @endforeach
-            @else
-                <tr><td><p class="vacio">{{ $sinDatos('inventory') }}</p></td></tr>
-            @endif
-        </table>
+                @else
+                    <tr><td><p class="vacio">{{ $sinDatos('facility') }}</p></td></tr>
+                @endif
+            </table>
+        </div>
+
+        <div class="bloque">
+            <h4 class="subtitulo gris-oscuro">Inventario</h4>
+            <table>
+                @php $filas = $inventario ? collect($tiposInventario)->filter(fn ($t) => $has($inventario->{$t.'_q'}) || $has($inventario->{$t.'_unit'}) || $has($inventario->{$t.'_est'})) : collect(); @endphp
+                @if ($filas->isNotEmpty())
+                    <thead><tr><th style="width: 34%;">Tipo de inventario</th><th>Cantidad (n)</th><th>Unidad</th><th>Valor actual estimado</th></tr></thead>
+                    @foreach ($filas as $i => $tipo)
+                        <tr>
+                            <td>{{ $rec->value_inv[0][$i] ?? $tipo }}</td>
+                            <td>{{ $inventario->{$tipo.'_q'} }}</td>
+                            <td>{{ $inventario->{$tipo.'_unit'} }}</td>
+                            <td>{{ $inventario->{$tipo.'_est'} }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr><td><p class="vacio">{{ $sinDatos('inventory') }}</p></td></tr>
+                @endif
+            </table>
+        </div>
     @endif
 
     {{-- EXPERIENCIA RELEVANTE ..................................................................... --}}
     @if ($want('experiencia'))
-        <h2 class="titulo2 gris-oscuro">Experiencia relevante</h2>
         @forelse ($exp as $fila)
-            <div class="experiencia-card">
-                <div class="gris-oscuro" style="font-size: 13px; padding: 3px;"><b>{{ $fila->ano }}</b></div>
-                @foreach ([
-                    'Sector' => $fila->sectorind,
-                    'Tipo' => $fila->tipoind,
-                    'Sistema' => $fila->systemind,
-                    'Región' => $fila->regionind,
-                    'Instalación' => $fila->facilityind,
-                    'Orden de magnitud del contrato' => $fila->magnitud,
-                    'Esfuerzo H-H — Profesionales y técnicos' => $fila->prof_tech,
-                    'Esfuerzo H-H — Mano de obra directa' => $fila->manpower,
-                    'Clasificación del trabajo — Sector' => $fila->exp_sector,
-                    'Clasificación del trabajo — Servicios' => $fila->exp_service,
-                ] as $etiqueta => $valor)
-                    @if ($has($valor))
-                        <div class="exp-grupo"><strong>{{ $etiqueta }}:</strong> {{ $valor }}</div>
-                    @endif
-                @endforeach
-                @if ($has(str_replace('null', '', (string) $fila->descripcion)))
-                    <div class="exp-grupo"><strong>Breve descripción del trabajo realizado:</strong><br>{{ str_replace('null', ' ', $fila->descripcion) }}</div>
+            {{-- El título va dentro del bloque de la primera experiencia, para no quedar solo al pie de una página. --}}
+            <div class="{{ $loop->first ? 'bloque' : '' }}">
+                @if ($loop->first)
+                    <h2 class="titulo2 gris-oscuro">Experiencia relevante</h2>
                 @endif
+                <div class="experiencia-card">
+                    <div class="gris-oscuro" style="font-size: 13px; padding: 3px;"><b>{{ $has($fila->ano) ? $fila->ano : 'Año no indicado' }}</b></div>
+                    @foreach ([
+                        'Sector' => $fila->sectorind,
+                        'Tipo' => $fila->tipoind,
+                        'Sistema' => $fila->systemind,
+                        'Región' => $fila->regionind,
+                        'Instalación' => $fila->facilityind,
+                        'Orden de magnitud del contrato' => $fila->magnitud,
+                        'Esfuerzo H-H — Profesionales y técnicos' => $fila->prof_tech,
+                        'Esfuerzo H-H — Mano de obra directa' => $fila->manpower,
+                        'Clasificación del trabajo — Sector' => $fila->exp_sector,
+                        'Clasificación del trabajo — Servicios' => $fila->exp_service,
+                    ] as $etiqueta => $valor)
+                        @if ($has($valor))
+                            <div class="exp-grupo"><strong>{{ $etiqueta }}:</strong> {{ $valor }}</div>
+                        @endif
+                    @endforeach
+                    @if ($has($fila->descripcion))
+                        <div class="exp-grupo"><strong>Breve descripción del trabajo realizado:</strong><br>{{ $fila->descripcion }}</div>
+                    @endif
+                </div>
             </div>
         @empty
-            <table><tr><td><p class="vacio">{{ $na['experiencias'] ? $naLabel : $vacio }}</p></td></tr></table>
+            <div class="bloque">
+                <h2 class="titulo2 gris-oscuro">Experiencia relevante</h2>
+                <table><tr><td><p class="vacio">{{ $na['experiencias'] ? $naLabel : $vacio }}</p></td></tr></table>
+            </div>
         @endforelse
     @endif
 
     {{-- PRESENCIA INTERNACIONAL ................................................................... --}}
     @if ($want('presencia'))
-        <h2 class="titulo2 gris-oscuro">Presencia internacional</h2>
-        @if (! $presencia['registrada'])
-            <table><tr><td><p class="vacio">{{ $na['presencia'] ? $naLabel : $vacio }}</p></td></tr></table>
-        @else
-            <h4 class="subtitulo gris-oscuro">¿Tiene presencia formal en otros países? {{ $presencia['has_offices'] ? 'Sí' : 'No' }}</h4>
-            @if (count($presencia['oficinas']) > 0)
-                <table>
-                    <tr><th>País</th><th>Oficinas (m²)</th><th>Empleados (n)</th><th>¿Activa?</th></tr>
-                    @foreach ($presencia['oficinas'] as $oficina)
-                        <tr><td>{{ $oficina['pais'] }}</td><td>{{ $oficina['mts'] }}</td><td>{{ $oficina['empleados'] }}</td><td>{{ $oficina['activa'] }}</td></tr>
-                    @endforeach
-                </table>
+        <div class="bloque">
+            <h2 class="titulo2 gris-oscuro">Presencia internacional</h2>
+            @if (! $presencia['registrada'])
+                <table><tr><td><p class="vacio">{{ $na['presencia'] ? $naLabel : $vacio }}</p></td></tr></table>
+            @else
+                <h4 class="subtitulo gris-oscuro">¿Tiene presencia formal en otros países? {{ $presencia['has_offices'] ? 'Sí' : 'No' }}</h4>
+                @if (count($presencia['oficinas']) > 0)
+                    <table>
+                        <thead><tr><th>País</th><th>Oficinas (m²)</th><th>Empleados (n)</th><th>¿Activa?</th></tr></thead>
+                        @foreach ($presencia['oficinas'] as $oficina)
+                            <tr><td>{{ $oficina['pais'] }}</td><td>{{ $oficina['mts'] }}</td><td>{{ $oficina['empleados'] }}</td><td>{{ $oficina['activa'] }}</td></tr>
+                        @endforeach
+                    </table>
+                @endif
             @endif
+        </div>
 
-            <h4 class="subtitulo gris-oscuro">¿Tiene experiencia desarrollando proyectos en otros países? {{ $presencia['has_experience'] ? 'Sí' : 'No' }}</h4>
-            @if (count($presencia['experiencias']) > 0)
-                <table>
-                    <tr><th>País</th><th>Nro. de proyectos</th><th>Rol</th><th>Monto total ejecutado</th><th>Empleados (n)</th><th>Principales clientes</th></tr>
-                    @foreach ($presencia['experiencias'] as $experiencia)
-                        <tr>
-                            <td>{{ $experiencia['pais'] }}</td>
-                            <td>{{ $experiencia['proyectos'] }}</td>
-                            <td>{{ $experiencia['rol'] }}</td>
-                            <td>{{ $experiencia['monto'] }}</td>
-                            <td>{{ $experiencia['empleados'] }}</td>
-                            <td>{{ $experiencia['clientes'] }}</td>
-                        </tr>
-                    @endforeach
-                </table>
-            @endif
+        @if ($presencia['registrada'])
+            <div class="bloque">
+                <h4 class="subtitulo gris-oscuro">¿Tiene experiencia desarrollando proyectos en otros países? {{ $presencia['has_experience'] ? 'Sí' : 'No' }}</h4>
+                @foreach ($presencia['experiencias'] as $experiencia)
+                    <table style="margin-bottom: 4px;">
+                        <tr><th>País</th><th>Nro. de proyectos</th><th>Rol</th></tr>
+                        <tr class="noBorder"><td>{{ $experiencia['pais'] }}</td><td>{{ $experiencia['proyectos'] }}</td><td>{{ $experiencia['rol'] }}</td></tr>
+                        <tr><th>Monto total ejecutado</th><th>Empleados (n)</th><th>Principales clientes</th></tr>
+                        <tr><td>{{ $experiencia['monto'] }}</td><td>{{ $experiencia['empleados'] }}</td><td>{{ $experiencia['clientes'] }}</td></tr>
+                    </table>
+                @endforeach
+            </div>
         @endif
     @endif
 
@@ -428,38 +460,40 @@
                 'seguridad_info' => ['Seguridad de la información', ['iso27001' => 'ISO 27001 Sistemas de Gestión de la Seguridad de la Información']],
             ];
         @endphp
-        <h2 class="titulo2 gris-oscuro">Sistemas de gestión</h2>
-        @if ($na['gestion'])
-            <table><tr><td><p class="vacio">{{ $naLabel }}</p></td></tr></table>
-        @elseif (! $gestion && ! in_array(true, $naGestion, true))
-            <table><tr><td><p class="vacio">{{ $vacio }}</p></td></tr></table>
-        @else
-            <table style="border: none;">
-                @foreach (array_chunk($tarjetas, 2, true) as $par)
-                    <tr>
-                        @foreach ($par as $clave => [$titulo, $items])
-                            <td style="width: 50%; padding: 3px;">
-                                <div class="card">
-                                    <p class="card-titulo">{{ $titulo }}</p>
-                                    @if ($naGestion[$clave] && ! ($gestion && (in_array(true, array_intersect_key($gestion['flags'], $items), true) || $gestion['otros'][$clave])))
-                                        {{ $naLabel }}
-                                    @elseif (! $gestion)
-                                        {{ $vacio }}
-                                    @else
-                                        @foreach ($items as $campo => $etiqueta)
-                                            {{ $etiqueta }}: <b>{{ $gestion['flags'][$campo] ? 'Sí' : 'No' }}</b><br>
-                                        @endforeach
-                                        @foreach ($gestion['otros'][$clave] as $otro)
-                                            Otros: <b>{{ $otro }}</b><br>
-                                        @endforeach
-                                    @endif
-                                </div>
-                            </td>
-                        @endforeach
-                    </tr>
-                @endforeach
-            </table>
-        @endif
+        <div class="bloque">
+            <h2 class="titulo2 gris-oscuro">Sistemas de gestión</h2>
+            @if ($na['gestion'])
+                <table><tr><td><p class="vacio">{{ $naLabel }}</p></td></tr></table>
+            @elseif (! $gestion && ! in_array(true, $naGestion, true))
+                <table><tr><td><p class="vacio">{{ $vacio }}</p></td></tr></table>
+            @else
+                <table style="border: none;">
+                    @foreach (array_chunk($tarjetas, 2, true) as $par)
+                        <tr>
+                            @foreach ($par as $clave => [$titulo, $items])
+                                <td style="width: 50%; padding: 3px;">
+                                    <div class="card">
+                                        <p class="card-titulo">{{ $titulo }}</p>
+                                        @if ($naGestion[$clave] && ! ($gestion && (in_array(true, array_intersect_key($gestion['flags'], $items), true) || $gestion['otros'][$clave])))
+                                            {{ $naLabel }}
+                                        @elseif (! $gestion)
+                                            {{ $vacio }}
+                                        @else
+                                            @foreach ($items as $campo => $etiqueta)
+                                                {{ $etiqueta }}: <b>{{ $gestion['flags'][$campo] ? 'Sí' : 'No' }}</b><br>
+                                            @endforeach
+                                            @foreach ($gestion['otros'][$clave] as $otro)
+                                                Otros: <b>{{ $otro }}</b><br>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                                </td>
+                            @endforeach
+                        </tr>
+                    @endforeach
+                </table>
+            @endif
+        </div>
     @endif
 
 </body>

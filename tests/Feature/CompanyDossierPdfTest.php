@@ -435,10 +435,13 @@ class CompanyDossierPdfTest extends TestCase
 
         // «Elegir secciones»: «Todas» lleva al perfil completo; un subconjunto, a ?secciones= con la lista blanca.
         $list->callTableAction('perfil_secciones', $a, data: ['alcance' => 'todas'])->assertRedirect($this->url($a));
-        $list->callTableAction('perfil_secciones', $a, data: ['alcance' => 'elegir', 'secciones' => ['gestion', 'generales']])
-            ->assertRedirect($this->url($a, ['secciones' => 'generales,gestion']));
-        $list->callTableAction('perfil_secciones', $a, data: ['alcance' => 'elegir', 'secciones' => []])
-            ->assertHasTableActionErrors(['secciones']);
+        // La lista se REEMPLAZA (callTableAction(data:) la mezclaría con las 10 marcadas por defecto).
+        $choose = fn (array $sections) => $list->mountTableAction('perfil_secciones', $a)
+            ->set('mountedTableActionsData.0.alcance', 'elegir')
+            ->set('mountedTableActionsData.0.secciones', $sections)
+            ->callMountedTableAction();
+        $choose(['gestion', 'generales'])->assertRedirect($this->url($a, ['secciones' => 'generales,gestion']));
+        $choose([])->assertHasTableActionErrors(['secciones']);
 
         // También desde la ficha de la empresa.
         Livewire::actingAs($owner)->test(EditEmpresa::class, ['record' => $a->getRouteKey()])
