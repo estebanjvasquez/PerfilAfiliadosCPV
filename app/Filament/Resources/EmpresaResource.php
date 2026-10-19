@@ -49,6 +49,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use App\Filament\Resources\EmpresaResource\RelationManagers;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use App\Filament\Resources\EmpresaResource\Widgets\StatsOverview;
+use App\Support\CompanyDossier;
 
 class EmpresaResource extends Resource
 {
@@ -187,20 +188,9 @@ class EmpresaResource extends Resource
 
         return $table
             ->columns([
-
-                Tables\Columns\IconColumn::make('')
-                    ->options([
-                        //'heroicon-o-printer',
-                        'heroicon-o-arrow-down-tray',
-                    ])
-                    ->label('PDF')
-                    //->color('success')
-                    //->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Empresa $record) => route('filament.admin.export.pdf', ['empresa' => $record->getKey()]))
-                    ->openUrlInNewTab(),
-                //->url(fn (Empresa $record): string => route('filament.pages.join-views', $record)), RUTA PARA REPORTE HTML........
-
-
+                // CPV-COMPLETE-COMPANY-PDF (`6270558322`): aquí había un IconColumn::make('') con el enlace al PDF. Sin
+                // nombre de campo su estado es null, así que Filament no dibujaba ningún ícono: el perfil completo no
+                // tenía control visible. Ahora son acciones de fila reales (->actions(), abajo).
                 Tables\Columns\TextColumn::make('name')->label('Nombre de la empresa'),
                 Tables\Columns\IconColumn::make('status_id')
                     ->label('Activo')
@@ -227,23 +217,8 @@ class EmpresaResource extends Resource
 
             ])
             ->actions([
-                //CUANDO EL REPORTE ESTABA DEL LADO DERECHO..................................
-                /*Tables\Actions\Action::make('pdf')
-                    ->label('PDF')
-                    ->color('success')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Empresa $record) => route('pdf', $record))
-                    ->openUrlInNewTab(),*/
-
-                //EN CASO DE QUERER AÑADIR REPORTE EN XLS........................................
-                /* Tables\Actions\Action::make('xls')
-                    ->label('XLS')
-                    ->color('success')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Empresa $record) => route('xls', $record))
-                    ->openUrlInNewTab(), */
-
-
+                static::fullProfileAction(),
+                static::profileSectionsAction(),
             ])
 
             ->bulkActions([
@@ -328,7 +303,12 @@ class EmpresaResource extends Resource
                     })
                     ->deselectRecordsAfterCompletion(),
 
-                FilamentExportBulkAction::make('export'),
+                // Exportador GENÉRICO de las columnas de esta tabla (nombre, ciudad, país, sector…). No es el perfil completo.
+                FilamentExportBulkAction::make('export')
+                    ->label('Exportar listado')
+                    ->icon('heroicon-o-table-cells')
+                    ->modalHeading('Exportar listado de empresas')
+                    ->modalDescription('Exporta solo las columnas de esta tabla. No es el perfil completo de la empresa: para eso use «Perfil completo (PDF)» en la fila de la empresa.'),
             ])
 
             // Los filtros (Activo/País/Ciudad/Sector) solo tienen sentido para quien administra
@@ -371,6 +351,69 @@ class EmpresaResource extends Resource
             );
     }
 
+
+    /**
+     * CPV-COMPLETE-COMPANY-PDF (`6270558322`): «Perfil completo (PDF)», el control principal de cada fila. Lleva a la descarga
+     * protegida (EmpresaExportController::pdf), no al exportador de la tabla. La lista ya muestra solo las empresas
+     * vinculadas al usuario, y el permiso se mira una vez (sin consulta por fila). El controlador vuelve a autorizar todo.
+     */
+    public static function fullProfileAction(): Action
+    {
+        return Action::make('perfil_completo')
+            ->label('Perfil completo (PDF)')
+            ->icon('heroicon-o-document-arrow-down')
+            ->button()
+            ->tooltip('Descarga el perfil completo de la empresa en PDF, con todas sus secciones')
+            ->url(fn (Empresa $record): string => route('filament.admin.export.pdf', ['empresa' => $record->getKey()]))
+            ->visible(fn (): bool => Auth::user()?->can('view_empresa') ?? false);
+    }
+
+    /**
+     * «Elegir secciones»: el mismo PDF, con «Todas las secciones» marcado por defecto. Solo arma la URL con `?secciones=`.
+     * El servidor valida esa lista contra CompanyDossier::SECTIONS y autoriza como siempre.
+     */
+    public static function profileSectionsAction(): Action
+    {
+        return Action::make('perfil_secciones')
+            ->label('Elegir secciones')
+            ->icon('heroicon-o-adjustments-horizontal')
+            ->color('gray')
+            ->tooltip('Descargar el perfil en PDF solo con las secciones que elija')
+            ->visible(fn (): bool => Auth::user()?->can('view_empresa') ?? false)
+            ->modalHeading('Descargar el perfil en PDF')
+            ->modalDescription('Por defecto se descarga el perfil completo, con todas sus secciones.')
+            ->modalSubmitActionLabel('Descargar PDF')
+            ->form([
+                Forms\Components\Radio::make('alcance')
+                    ->label('Contenido')
+                    ->options([
+                        'todas' => 'Todas las secciones (perfil completo)',
+                        'elegir' => 'Solo las secciones que elija',
+                    ])
+                    ->default('todas')
+                    ->required()
+                    ->live(),
+                Forms\Components\CheckboxList::make('secciones')
+                    ->label('Secciones')
+                    ->options(CompanyDossier::SECTIONS)
+                    ->default(array_keys(CompanyDossier::SECTIONS))
+                    ->columns(2)
+                    ->bulkToggleable()
+                    ->helperText('Las secciones que desmarque no aparecerán, y el PDF dirá cuáles se omitieron.')
+                    ->visible(fn (Forms\Get $get): bool => $get('alcance') === 'elegir')
+                    ->required(fn (Forms\Get $get): bool => $get('alcance') === 'elegir'),
+            ])
+            ->action(function (Empresa $record, array $data, $livewire): void {
+                $sections = ($data['alcance'] ?? 'todas') === 'elegir'
+                    ? CompanyDossier::sectionsFrom(array_values((array) ($data['secciones'] ?? [])))
+                    : array_keys(CompanyDossier::SECTIONS);
+                $params = ['empresa' => $record->getKey()];
+                if (! CompanyDossier::isComplete($sections)) {
+                    $params['secciones'] = implode(',', $sections);
+                }
+                $livewire->redirect(route('filament.admin.export.pdf', $params));
+            });
+    }
 
     public static function getRelations(): array
     {

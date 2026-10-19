@@ -237,7 +237,8 @@ class ExportAccessTest extends TestCase
         $this->assertStringStartsWith('%PDF', $pdf->getContent());
         $this->assertSame(1, $this->pdfRenders);
         $this->assertSame('application/pdf', $pdf->headers->get('Content-Type'));
-        $this->assertStringStartsWith('inline', (string) $pdf->headers->get('Content-Disposition'));
+        // CPV-COMPLETE-COMPANY-PDF (`6270558322`): «Perfil completo (PDF)» es una descarga real, con su nombre de archivo.
+        $this->assertStringStartsWith('attachment', (string) $pdf->headers->get('Content-Disposition'));
         $this->assertStringContainsString('perfil-'.strtolower($a->rif).'.pdf', (string) $pdf->headers->get('Content-Disposition'));
         $this->assertPrivate($pdf, 'owner pdf');
 
@@ -264,7 +265,7 @@ class ExportAccessTest extends TestCase
             $this->assertPrivate($head, "owner HEAD {$kind}");
         }
 
-        // El enlace de la columna «PDF» de la lista de Empresas apunta a la ruta protegida.
+        // La acción «Perfil completo (PDF)» de la lista de Empresas apunta a la ruta protegida (CompanyDossierPdfTest).
         $this->assertSame($this->url('pdf', (string) $a->id), route('filament.admin.export.pdf', ['empresa' => $a->getKey()]));
         $this->actingAs($ownerA)->get(EmpresaResource::getUrl('index'))->assertOk();
     }

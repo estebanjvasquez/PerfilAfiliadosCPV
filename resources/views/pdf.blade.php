@@ -1,1145 +1,466 @@
-    <?php
+{{--
+    Perfil completo de UNA empresa (CPV-COMPLETE-COMPANY-PDF, Issue #2 `6270558322`). Es el reporte de siempre, reparado:
+    mismas secciones, encabezado amarillo con los logos y títulos grises. Los datos llegan ya reunidos, con valores vacíos
+    seguros, desde App\Support\CompanyDossier::data(): este archivo no consulta la base. Lo genera solo
+    EmpresaExportController::pdf(), DESPUÉS de autorizar.
 
-    use function PHPUnit\Framework\isEmpty;
+    Cada sección distingue tres casos:
+    - hay datos: se muestran;
+    - la empresa la marcó «No aplica»: se muestra `$naLabel`;
+    - no hay nada registrado: «No hay información registrada».
+    Nunca se rellena con supuestos.
+--}}
+@php
+    $want = fn (string $section) => in_array($section, $sections, true);
+    $vacio = 'No hay información registrada.';
+    $has = fn ($value) => filled($value) && trim((string) $value) !== '';
+@endphp
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Perfil de {{ $record->name }}</title>
+    <style>
+        * { box-sizing: border-box; }
 
-    $datos = App\Filament\Pages\JoinViews::index($record->id)->data;
-    $datos_exp = App\Filament\Pages\JoinViews::index_exp($record->id)->data_exp;
-    $datos_pres = App\Filament\Pages\JoinViews::index_pres($record->id)->data_pres;
-    $datos_sust = App\Filament\Pages\JoinViews::index_sust($record->id)->data_sust;
-    $datos_rec = App\Filament\Pages\JoinViews::index_recursos($record->id)->value_emp; //TITULOS DE RRHH.....
-    $datos_recursos = App\Filament\Pages\JoinViews::index_recursos($record->id)->data_rec;
-    $datos_maq = App\Filament\Pages\JoinViews::index_recursos($record->id)->value_maq; // TITULOS DE MAQUINARIAS....
-    $datos_maquinaria = App\Filament\Pages\JoinViews::index_recursos($record->id)->data_maq;
-    $datos_ins = App\Filament\Pages\JoinViews::index_recursos($record->id)->value_fac; //TITULOS DE <INSTALACIONES class=""></INSTALACIONES>
-    $datos_instalaciones = App\Filament\Pages\JoinViews::index_recursos($record->id)->data_ins;
-    $datos_inv = App\Filament\Pages\JoinViews::index_recursos($record->id)->value_inv; //TITULOS DE INVENTARIOS.....
-    $datos_inventario = App\Filament\Pages\JoinViews::index_recursos($record->id)->data_inv;
-    $datos_chambers = App\Filament\Pages\JoinViews::index_chambers($record->id)->data_chambers;
-    $datos_sec_ser = App\Filament\Pages\JoinViews::index_sec_ser($record->id)->data_sec_ser;
+        @page { margin: 150px 50px 60px 50px; }
 
-    // Flags de módulos declarados "No Aplica" por la empresa
-    $na_flags = App\Models\EmpresaModuleStatus::flagsFor($record->id);
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #111; }
 
-    ?>
+        .page-header { position: fixed; left: 0; right: 0; top: -140px; height: 115px; }
 
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-            * {
-                box-sizing: border-box;
-            }
+        .row:after { content: ""; display: table; clear: both; }
 
-            .column1 {
-                float: left;
-                width: 48%;
-                padding: 5px;
-                height: 100px;
-                vertical-align: top;
-                /*border: solid;*/
-            }
+        .column1 { float: left; width: 48%; padding: 5px; height: 70px; }
 
-            .column2 {
-                float: right;
-                width: 48%;
-                padding: 5px;
-                height: 100px;
-                vertical-align: middle;
-                /*border: solid;*/
-            }
+        .column2 { float: right; width: 48%; padding: 5px; height: 70px; text-align: right; }
 
-            .right {
-                float: right;
-                width: 300px;
-                padding: 10px;
-            }
+        .amarillo { background-color: #FBB805; }
 
-            .row:after {
-                content: "";
-                display: table;
-                clear: both;
-                font-size: 15px;
-            }
+        .gris-oscuro { background-color: #D3D3D3; }
 
-            @media screen and (max-width: 600px) {
-                .column {
-                    width: 100%;
-                }
-            }
+        .page-header h3 { margin: 0; padding: 3px 6px 0 6px; text-align: center; font-size: 13px; }
 
-            .titulo {
-                text-align: center;
-                font-size: 20px;
-                color: black;
-            }
+        .page-header .empresa { margin: 0; padding: 0 6px 4px 6px; text-align: center; font-size: 11px; }
 
-            .titulo2 {
-                text-align: left;
-                font-size: 2vw;
-                color: black;
-                padding: 5px;
-            }
+        h2.titulo2 { font-size: 15px; text-align: left; color: #000; padding: 5px; margin: 14px 0 0 0; }
 
-            .titulo3 {
-                text-align: left;
-                font-size: 1.5vw;
-                color: black;
-                padding-bottom: 5pxM;
-            }
+        h4.subtitulo { font-size: 12.5px; padding: 4px 5px; margin: 6px 0 0 0; }
 
-            .gris-claro {
-                background-color: #C0DEDE;
-            }
+        table { border: 2px solid #D3D3D3; border-collapse: collapse; margin: 0; padding: 0; width: 100%; table-layout: fixed; }
 
-            .amarillo {
-                background-color: #FBB805;
-            }
+        th, td { padding: 6px 10px; text-align: left; vertical-align: top; border: none; word-wrap: break-word; }
 
-            .gris-oscuro {
-                background-color: #D3D3D3
-            }
+        th { font-size: 11.5px; border-bottom: 1px solid #CCC; border-top: 1px solid #808080; }
 
-            table {
-                border: 2px solid #D3D3D3;
-                border-collapse: collapse;
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                table-layout: fixed;
-            }
+        tr.noBorder td { border-bottom: 1px solid #E2E2E2; }
 
-            th,
-            td {
+        td.etiqueta { width: 32%; color: #333; }
 
-                padding-top: 10px;
-                padding-bottom: 10px;
-                padding-left: 25px;
-                padding-right: 25px;
-                text-align: left;
-                border: none;
-            }
+        .vacio { margin: 0; padding: 8px 10px; font-weight: bold; }
 
-            th,
-            tr.noBorder td {
+        .nota { font-size: 10.5px; color: #444; margin: 4px 0; }
 
-                border-bottom: 1px solid #CCC;
-                border-top: 1px solid #808080;
-                border-right: 0;
-                border-left: 0;
-            }
+        .contenido { border: 1px solid #CCC; padding: 6px 10px; margin-bottom: 4px; }
 
-            fieldset {
-                border: 1px solid #ddd;
-                margin-top: 1px;
-                width: 100%;
-                border-radius: 8px;
-                padding: 1px;
-            }
+        .contenido p { margin: 2px 0; }
 
-            input[type="checkbox"] {
-                display: inline-block;
-                vertical-align: top;
-            }
+        .experiencia-card { width: 100%; margin: 6px 0 0 0; border: 1px solid #ccc; padding: 6px; page-break-inside: avoid; }
 
-            h3 {
-                margin-top: 0px;
-                margin-bottom: 3px;
-                padding: 1px;
-                text-align: center;
-            }
+        .exp-grupo { margin-bottom: 3px; }
 
-            h2 {
-                margin-top: 0px;
-                margin-bottom: 0px;
-                padding: 2px;
-            }
+        .card { border: 1px solid #bbbbbb; padding: 6px; }
 
-            th {
-                font-size: 12.5px;
-            }
+        .card p.card-titulo { margin: 0 0 4px 0; font-weight: bold; }
 
-            .card {
-                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-                transition: 0.3s;
-                width: 33%;
-                height: 200px;
-                border-radius: 5px;
-            }
+        /* Un encabezado de sección no queda solo al pie de una página, separado de su contenido. */
+        h2.titulo2, h4.subtitulo { page-break-after: avoid; }
 
-            .card-sisges {
-                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-                transition: 0.3s;
-                width: 100%;
-                height: 290px;
-                border-radius: 5px;
-            }
+        tr { page-break-inside: avoid; }
+    </style>
+</head>
+<body>
 
-            .card:hover {
-                box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-            }
-
-            .input-container {
-                flex: auto;
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                justify-content: space-between;
-
-            }
-
-            .cajacheckbox {
-                flex: auto;
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-            .fill-height-or-more {
-                display: -webkit-box;
-                display: -webkit-flex;
-                display: -moz-box;
-                display: -ms-flexbox;
-                display: flex;
-                -webkit-box-orient: vertical;
-                -webkit-box-direction: normal;
-                -webkit-flex-direction: column;
-                -moz-box-orient: vertical;
-                -moz-box-direction: normal;
-                -ms-flex-direction: column;
-                flex-direction: column;
-                margin-top: 0px;
-                display: inline-block;
-            }
-
-            .fill-height-or-more>div {
-                -webkit-box-flex: 1;
-                -webkit-flex: 1;
-                -moz-box-flex: 1;
-                -ms-flex: 1;
-                flex: 1;
-                display: -webkit-box;
-                display: -webkit-flex;
-                display: -moz-box;
-                display: -ms-flexbox;
-                display: flex;
-                -webkit-box-pack: center;
-                -webkit-justify-content: center;
-                -moz-box-pack: center;
-                -ms-flex-pack: center;
-                justify-content: center;
-                -webkit-box-orient: vertical;
-                -webkit-box-direction: normal;
-                -webkit-flex-direction: column;
-                -moz-box-orient: vertical;
-                -moz-box-direction: normal;
-                -ms-flex-direction: column;
-                flex-direction: column;
-                padding-bottom: 10px;
-            }
-
-
-            @page {
-                margin: 150px 50px 50px 50px;
-            }
-
-            .page-header {
-                position: fixed;
-                left: 0px;
-                right: 0px;
-                top: -140px;
-                height: 110px;
-            }
-
-            @font-face {
-                font-family: Lato;
-                font-style: normal;
-                font-weight: 300;
-                src: url("https://mdn.github.io/web-fonts/LatoReg.ttf");
-            }
-
-            body {
-                font-family: Lato, sans-serif;
-            }
-
-            .page-break {
-                page-break-after: always;
-            }
-
-            .experiencias-grid {
-                margin-top: 5px;
-            }
-
-            .experiencia-card {
-                width: 100%;
-                margin: 0 0 10px 0;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                padding: 6px;
-                font-size: 12px;
-                page-break-inside: avoid;
-            }
-
-            .exp-grupo {
-                margin-bottom: 4px;
-            }
-
-            /* Evita que un encabezado de sección quede huérfano al final de una página,
-               separado del contenido que le sigue (dompdf no reubica el bloque completo,
-               solo respeta que no se corte justo después del encabezado). */
-            .amarillo,
-            h2.titulo2,
-            .gris-oscuro {
-                page-break-after: avoid;
-            }
-        </style>
-
-    </head>
-
-    <body>
-
-        <div class="page-header">
-            <div class="row amarillo">
-                <div class="column1">
-                    <img src="{{ $app_path = public_path('images'); }}/Campet-Logo.png" style="width:20%"></img>
-                </div>
-                <div class="column2">
-                    <img class="right" src="{{ $app_path = public_path('images'); }}/Perfil-Logo.png" style="width:60%;"></img>
-                </div>
-                <div style="width:100%">
-                    <h3>REPORTE POR EMPRESA DE LOS DATOS REGISTRADOS</h3>
-                </div>
+    <div class="page-header">
+        <div class="row amarillo">
+            <div class="column1">
+                <img src="{{ public_path('images/Campet-Logo.png') }}" style="height: 60px;">
+            </div>
+            <div class="column2">
+                <img src="{{ public_path('images/Perfil-Logo.png') }}" style="height: 55px;">
+            </div>
+            <div style="width: 100%; clear: both;">
+                <h3>{{ $complete ? 'PERFIL COMPLETO DE LA EMPRESA' : 'PERFIL DE LA EMPRESA — SECCIONES SELECCIONADAS' }}</h3>
+                <p class="empresa">{{ $record->name }} · RIF {{ $record->rif }}</p>
             </div>
         </div>
-        <h2 class="titulo2 gris-oscuro">Datos Generales</h2>
-        <div style="overflow-x:auto; font-size: 13px; margin: 0px;">
-            <table>
-                <tr class="noBorder">
-                    <td style="width: 35%;">Nombre de la Empresa:</td>
-                    <td colspan="2">{{ $datos[0]->nombre }}</td>
-                </tr>
+    </div>
 
-                <tr class="noBorder" style="background-color: none">
-                    <td>Nro. de RIF:</td>
-                    <td colspan="2">{{ $datos[0]->rif }}</td>
-                </tr>
-                <tr class="noBorder" style="background-color: none">
-                    <td>Dirección:</td>
-                    <td colspan="2">{{ $datos[0]->direccion }}</td>
-                </tr>
-                <tr class="noBorder" style="background-color: none">
-                    <td>Ciudad / País:</td>
-                    <td colspan="2">{{ $datos[0]->ciudad }}</td>
-                </tr>
+    {{-- CONTENIDO ................................................................................ --}}
+    <div class="contenido">
+        <p><b>Generado:</b> {{ $generatedAt->format('d/m/Y H:i') }} (hora de Venezuela)</p>
+        @if ($complete)
+            <p><b>Contenido:</b> todas las secciones del perfil ({{ implode(', ', \App\Support\CompanyDossier::SECTIONS) }}).</p>
+        @else
+            <p><b>Secciones incluidas:</b> {{ implode(', ', array_map(fn ($s) => \App\Support\CompanyDossier::SECTIONS[$s], $sections)) }}.</p>
+            <p><b>Secciones omitidas por elección del usuario:</b> {{ implode(', ', $omitted) }}. Este documento no es el perfil completo.</p>
+        @endif
+        <p class="nota">Información declarada por la empresa en el sistema Perfil de Afiliados de la Cámara Petrolera de Venezuela. No es una calificación crediticia, una certificación ni un aval de la Cámara.</p>
+    </div>
 
-                <tr class="noBorder">
-                    <td>Página Web:</td>
-                    <td colspan="2">{{ $datos[0]->website }}</td>
-                </tr>
-                <tr class="noBorder">
-                    <td>Teléfono:</td>
-                    <td colspan="2">{{ $datos[0]->telefono }} </td>
-
-                </tr>
-
-                <tr class="noBorder" style="vertical-align: top;">
-                    <td>Contactos:</td>
-                    <td colspan="2">
-                        <?php
-                        $arr = explode(";", $datos[0]->contactos);
-                        if (sizeof($arr) > 1) {
-
-                            foreach ($arr as $value) {
-                                $arr_name = explode("(", $value, 2);
-                                $nombre = $arr_name[0];
-                                echo $nombre;
-                                echo "<br>";
-                                preg_match('#\((.*?)\)#', $value, $match);
-                                $arr_datos = explode(",", $match[1], 3);
-                                if (array_key_exists(0, $arr_datos)) echo $arr_datos[0] . "<br>";
-                                if (array_key_exists(1, $arr_datos)) echo $arr_datos[1] . "<br>";
-                                if (array_key_exists(2, $arr_datos)) echo $arr_datos[2] . "<br>";
-                                echo "<hr>";
-                        ?> <br>
-                        <?php
-                            }
-                        }
-                        ?>
-                    </td>
-                </tr>
-                <tr class="noBorder">
-                    <td>Año de Fundación:</td>
-                    <td colspan="2">{{ $datos[0]->fundacion }}</td>
-                </tr>
-                <tr class="noBorder">
-                    <td>Capital de la Empresa:</td>
-                    <td colspan="2">{{ $datos[0]->capital }} / {{ $datos[0]->origen }}</td>
-                </tr>
-                <tr class="noBorder">
-                    <td style="padding-top: 0px; padding-bottom: 0px; border: 0">Operación en Venezuela</td>
-                    <td style="padding-top: 0px; padding-bottom: 0px; border: 0">Facturación Anual:</td>
-                    <td style="padding-top: 0px; padding-bottom: 0px;  padding-left: 0px; border: 0">{{ $datos[0]->facturacion_anual }}</td>
-                </tr>
-
-                <tr class="noBorder">
-                    <td style="padding-top: 0px; padding-bottom: 0px; border: 0"></td>
-                    <td style="padding-top: 0px; padding-bottom: 0px; border: 0">Empleados:</td>
-                    <td style="padding-top: 0px; padding-bottom: 0px; padding-left: 0px; border: 0">{{ $datos[0]->empleados }}</td>
-                </tr>
-
-                <tr class="noBorder">
-                    <td style="padding-top: 0px; padding-bottom: 0px; border: 0"></td>
-                    <td style="padding-top: 0px; padding-bottom: 0px; border: 0">Estatus Actual:</td>
-                    <td style="padding-top: 0px; padding-bottom: 0px; padding-left: 0px; border: 0">{{ $datos[0]->estado_actual }}</td>
-                </tr>
-            </table>
-        </div>
-
-        <!-- CLIENTES............................................................. -->
-        <h2 class="titulo2 gris-oscuro">Clientes</h2>
-        <div style="overflow-x:auto; font-size: 13px; margin: 0px;">
-            <table>
-                <tr class="noBorder">
-                    <th>Nombre</th>
-                    <th>País</th>
-                </tr>
-                @if (strlen($datos[0]->clientes) > 0)
-                @for ($i = 0; $i < count($datos); $i++) <tr>
-                    <td style="border: none">
-                        {{ $cli = $datos[$i]->clientes }}
-                    </td>
-                    <td style="border: none">
-                        {{ $cli_pais = $datos[$i]->cli_pais }}
-                    </td>
-                    </tr>
-                    @endfor
-                    @else
-                    <tr>
-                        <td colspan="4">
-                            <p><b>No existe información</b></p>
-                        </td>
-                    </tr>
-                    @endif
-
-            </table>
-        </div>
-        <!-- FIN DE CLIENTES.......................................................... -->
-
-        <!-- CAMARAS............................................................. -->
-        <h2 class="titulo2 gris-oscuro">Cámaras</h2>
-        <div style="overflow-x:auto; font-size: 13px; margin: 0px;">
-            <table>
-                <tr class="noBorder">
-                    <th>Nombre</th>
-                </tr>
-                @if (count($datos_chambers) > 0)
-                @for ($i = 0; $i < count($datos_chambers); $i++) <tr>
-                    <td style="border: none">
-                        {{ $datos_chambers[$i]->name }}
-                    </td>
-                    </tr>
-                    @endfor
-                    @else
-                    <tr>
-                        <td colspan="4">
-                            <p><b>No existe información</b></p>
-                        </td>
-                    </tr>
-                    @endif
-            </table>
-        </div>
-        <!-- FIN DE CAMARAS.......................................................... -->
-
-        <!-- SECTORES Y SERVICIOS.................................................... -->
-        <div style="font-size: 13px;">
-            <table>
-                <tr>
-                    <td colspan="4" style="padding: 0px; border: none">
-                        <h2 class="titulo2 gris-oscuro">Sectores de Actividad Económica y Servicios</h2>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td style="border: none; width: 35%"><b>Sector</b></td>
-                    <td colspan="3" style="border: none"><b>Servicios</b></td>
-                </tr>
-                @if (count($datos_sec_ser) > 0)
-                @php $vari = null; @endphp
-                @for ($i = 0; $i < count($datos_sec_ser); $i++) <tr>
-
-                    <td style="border: none">
-                        @if ($datos_sec_ser[$i]->sector == $vari)
-
-                        @else
-
-                        {{ $datos_sec_ser[$i]->sector }}
-                        @endif
-
-                        @php $vari = $datos_sec_ser[$i]->sector; @endphp
-                    </td>
-                    <td colspan="3" style="border: none">
-                        {{ $datos_sec_ser[$i]->servicio }}
-                    </td>
-                    </tr>
-
-                    @endfor
-                    @else
-                    <tr>
-                        <td colspan="4">
-                            <p><b>No existe información</b></p>
-                        </td>
-                    </tr>
-                    @endif
-
-            </table>
-        </div>
-        </div>
-        <!-- FIN DE SECTORES Y SERVICIOS ..............................................................-->
-
-        <!-- ENFOQUE A SOSTENIBILIDAD......................................................................-->
-        <div style="font-size: 13px;">
-            <table>
-                <tr>
-                    <td colspan="4" style="padding: 0px; border: none">
-                        <h2 class="titulo2 gris-oscuro">Enfoque de Sostenibilidad</h2>
-                    </td>
-                </tr>
-                @if (sizeof($datos_sust) > 0)
-                <!--
-            <tr>
-                <td colspan="4" style="padding: 0px; border: none">
-                    <p class="amarillo titulo" style="text-align: center; font-size: 1vw">Su empresa ha implementado programas formales de Desarrollo Sostenible dirigidos a alguna de las siguientes tareas?</p>
-                </td>
-            </tr>
-                    -->
-                <!-- CODES FOR SUSTAINABILITIES.....................................................               
-                '0' => 'No',
-                '1' => 'Sí: Inactivo',
-                '2' => 'Sí: Activo',
-            .................................................................................-->
-                <tr>
-                    <th style="width:40%;">Áreas</th>
-                    <th style="width:20%;">Sí: Activo</th>
-                    <th style="width:20%;">Sí: Inactivo</th>
-                    <th style="width:20%;">No</th>
-                </tr>
-                @foreach ($datos_sust as $key=>$row)
-                <tr>
-                    <!--<td style="width:10%; font-size: 14px">{{ $key+1}}</td>-->
-                    <td style="width:30%; font-size: 14px">{{$row->sust_title}}</td>
-
-                    @switch($row->sust_status)
-                    @case('2')
-                    <td style="width:20%; font-size: 14px;">Sí</td>
-                    <td></td>
-                    <td></td>
-                    @break
-                    @case('1')
-                    <td></td>
-                    <td style="width:20%; font-size: 14px;">Sí</td>
-                    <td></td>
-                    @break
-                    @case('0')
-                    <td></td>
-                    <td></td>
-                    <td style="width:20%; font-size: 14px;">No</td>
-                    @break
-
-                    @endswitch
-
-                </tr>
-                @endforeach
-                @else
-                <tr>
-                    <td colspan="4">
-                        @if ($na_flags['sostenibilidad'])
-                        <p><b>NO APLICA — Declarado por la empresa</b></p>
-                        @else
-                        <p><b>No existe información</b></p>
-                        @endif
-                    </td>
-                </tr>
-                @endif
-            </table>
-        </div>
-
-        <!-- FIN DE ENFOQUE A SOSTENIBILIDAD............................................. -->
-
-        <!-- RECURSOS EN VENEZUELA..............................................................-->
-        <div style="font-size: 13px; border: none;">
-            <table>
-                <tr>
-                    <td colspan="5" style="padding: 0px; border: none">
-                        <h2 class="titulo2 gris-oscuro">Recursos en Venezuela</h2>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="5" style="padding: 5px; border: none; font-size: 13px;" class="gris-oscuro">
-                        <strong>Recursos Humanos</strong>
-                    </td>
-                </tr>
-
-                @if (sizeof($datos_recursos) > 0)
-                <tr>
-                    <th style="width: 30%;">Tipo de Recurso</th>
-                    <th style="width: 17.5%;">Junior</th>
-                    <th style="width: 17.5%;">Medium</th>
-                    <th style="width: 17.5%;">Senior</th>
-                    <th style="width: 17.5%;">Total</th>
-                </tr>
-
-                @foreach ($datos_rec[0] as $key=>$row)
-                <tr>
-                    <td>{{ $datos_rec[0][$key] }}</td>
-                    @if ($key == 0)
-                    <td>{{ $datos_recursos[0]->Bachilleres_Junior }}</td>
-                    <td>{{ $datos_recursos[0]->Bachilleres_Medium }}</td>
-                    <td>{{ $datos_recursos[0]->Bachilleres_Senior }}</td>
-                    <td><b>{{ $datos_recursos[0]->Bachilleres_Junior + $datos_recursos[0]->Bachilleres_Medium + $datos_recursos[0]->Bachilleres_Senior}}</b></td>
-                    @endif
-                    @if ($key == 1)
-                    <td>{{ $datos_recursos[0]->Tecnicos_Junior }}</td>
-                    <td>{{ $datos_recursos[0]->Tecnicos_Medium }}</td>
-                    <td>{{ $datos_recursos[0]->Tecnicos_Senior }}</td>
-                    <td><b>{{ $datos_recursos[0]->Tecnicos_Junior + $datos_recursos[0]->Tecnicos_Medium + $datos_recursos[0]->Tecnicos_Senior}}</b></td>
-                    @endif
-                    @if ($key == 2)
-                    <td>{{ $datos_recursos[0]->Ingenieros_Junior }}</td>
-                    <td>{{ $datos_recursos[0]->Ingenieros_Medium }}</td>
-                    <td>{{ $datos_recursos[0]->Ingenieros_Senior }}</td>
-                    <td><b>{{ $datos_recursos[0]->Ingenieros_Junior + $datos_recursos[0]->Ingenieros_Medium + $datos_recursos[0]->Ingenieros_Senior}}</b></td>
-                    @endif
-                    @if ($key == 3)
-                    <td>{{ $datos_recursos[0]->Administrativos_Junior }}</td>
-                    <td>{{ $datos_recursos[0]->Administrativos_Medium }}</td>
-                    <td>{{ $datos_recursos[0]->Administrativos_Senior }}</td>
-                    <td><b>{{ $datos_recursos[0]->Administrativos_Junior + $datos_recursos[0]->Administrativos_Medium + $datos_recursos[0]->Administrativos_Senior}}</b></td>
-                    @endif
-                    @if ($key == 4)
-                    <td>{{ $datos_recursos[0]->Gerentes_Junior }}</td>
-                    <td>{{ $datos_recursos[0]->Gerentes_Medium }}</td>
-                    <td>{{ $datos_recursos[0]->Gerentes_Senior }}</td>
-                    <td><b>{{ $datos_recursos[0]->Gerentes_Junior + $datos_recursos[0]->Gerentes_Medium + $datos_recursos[0]->Gerentes_Senior}}</b></td>
-
-                    @endif
-                    @if ($key == 5)
-                    <td>{{ $datos_recursos[0]->Directivos_Junior }}</td>
-                    <td>{{ $datos_recursos[0]->Directivos_Medium }}</td>
-                    <td>{{ $datos_recursos[0]->Directivos_Senior }}</td>
-                    <td><b>{{ $datos_recursos[0]->Directivos_Junior + $datos_recursos[0]->Directivos_Medium + $datos_recursos[0]->Directivos_Senior}}</b></td>
-                    @endif
-                    @endforeach
-                </tr>
-                <tr>
-                    <td><b>Total</b></td>
-                    <td><b>{{ $datos_recursos[0]->Bachilleres_Junior + $datos_recursos[0]->Tecnicos_Junior + $datos_recursos[0]->Ingenieros_Junior + $datos_recursos[0]->Administrativos_Junior + $datos_recursos[0]->Gerentes_Junior + $datos_recursos[0]->Directivos_Junior}}</b></td>
-                    <td><b>{{ $datos_recursos[0]->Bachilleres_Medium + $datos_recursos[0]->Tecnicos_Medium + $datos_recursos[0]->Ingenieros_Medium + $datos_recursos[0]->Administrativos_Medium + $datos_recursos[0]->Gerentes_Medium + $datos_recursos[0]->Directivos_Medium}}</b></td>
-                    <td><b>{{ $datos_recursos[0]->Bachilleres_Senior + $datos_recursos[0]->Tecnicos_Senior + $datos_recursos[0]->Ingenieros_Senior + $datos_recursos[0]->Administrativos_Senior + $datos_recursos[0]->Gerentes_Senior + $datos_recursos[0]->Directivos_Senior}}</b></td>
-                    <td><b>{{ $datos_recursos[0]->Total }}</b></td>
-                </tr>
-
-                @else
-                <tr>
-                    <td colspan="4">
-                        @if ($na_flags['recursos'])
-                        <p><b>NO APLICA — Declarado por la empresa</b></p>
-                        @else
-                        <p><b>No existe información</b></p>
-                        @endif
-                    </td>
-                </tr>
-                @endif
-            </table>
-
-            <table>
-                <tr>
-                    <td colspan="5" style="padding: 5px; border: none; font-size: 13px;" class="gris-oscuro">
-                        <strong>Maquinarias y Equipos</strong>
-                    </td>
-                </tr>
-
-                @if (sizeof($datos_maquinaria) > 0)
-                <tr>
-                    <th colspan="3" style="width: 17.5%;">Equipos</th>
-                    <th>Cantidad (n)</th>
-                    <th>Valor estimado USD</th>
-                </tr>
-
-                @foreach ($datos_maq[0] as $key=>$row)
-                <tr>
-                    <td style="border: none; width:auto;" colspan="3">{{ $datos_maq[0][$key]}}</td>
-                    @if ($key == 0)
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Equip_med_lev_qua }}</td>
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Equip_med_lev_est }}</td>
-                    @endif
-                    @if ($key == 1)
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Equip_mar_flu_qua }}</td>
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Equip_mar_flu_est }}</td>
-                    @endif
-                    @if ($key == 2)
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Mov_terr_cons_qua }}</td>
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Mov_terr_cons_est }}</td>
-                    @endif
-                    @if ($key == 3)
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Equip_men_cons_qua }}</td>
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Equip_men_cons_est }}</td>
-                    @endif
-                    @if ($key == 4)
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Fab_metal_elec_qua }}</td>
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Fab_metal_elec_est }}</td>
-                    @endif
-                    @if ($key == 5)
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Mont_elec_meca_qua }}</td>
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Mont_elec_meca_est }}</td>
-                    @endif
-                    @if ($key == 6)
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Maq_herr_meca_qua }}</td>
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Maq_herr_meca_est }}</td>
-                    @endif
-                    @if ($key == 7)
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Almac_trans_qua }}</td>
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Almac_trans_est }}</td>
-                    @endif
-                    @if ($key == 8)
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Serv_poz_inst_qua }}</td>
-                    <td style="border: none; width:auto;">{{ $datos_maquinaria[0]->Serv_poz_inst_qua }}</td>
-                    @endif
-                </tr>
-
-                @endforeach
-
-                @else
-                <tr>
-                    <td colspan="4">
-                        @if ($na_flags['recursos'])
-                        <p><b>NO APLICA — Declarado por la empresa</b></p>
-                        @else
-                        <p><b>No existe información</b></p>
-                        @endif
-                    </td>
-                </tr>
-                @endif
-            </table>
-
-            <!-- INSTALACIONES ...........-->
-            <table>
-                <tr>
-                    <td colspan="5" style="padding: 0px; border: none">
-                        <h2 class="titulo2 gris-oscuro">Recursos en Venezuela</h2>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="5" style="padding: 5px; border: none; font-size: 13px;" class="gris-oscuro">
-                        <strong>Instalaciones</strong>
-                    </td>
-                </tr>
-                @if (sizeof($datos_instalaciones) > 0)
-                <tr>
-                    <th colspan="2">Tipo de Instalación</th>
-                    <th>Cantidad</th>
-                    <th>Sup. (mt2)</th>
-                    <th>Tipo de Propiedad</th>
-                </tr>
-
-                @foreach ($datos_ins[0] as $key=>$row)
-                <tr>
-                    <td colspan="2">{{ $datos_ins[0][$key]}}</td>
-                    @if ($key == 0)
-                    <td>{{ $datos_instalaciones[0]->Oficinas_q }}</td>
-                    <td>{{ $datos_instalaciones[0]->Oficinas_surf }}</td>
-                    <td>{{ $datos_instalaciones[0]->Oficinas_own }}</td>
-
-                    @endif
-                    @if ($key == 1)
-                    <td>{{ $datos_instalaciones[0]->Talleres_q }}</td>
-                    <td>{{ $datos_instalaciones[0]->Talleres_surf }}</td>
-                    <td>{{ $datos_instalaciones[0]->Talleres_own }}</td>
-                    @endif
-                    @if ($key == 2)
-                    <td>{{ $datos_instalaciones[0]->Manufactura_q }}</td>
-                    <td>{{ $datos_instalaciones[0]->Manufactura_surf }}</td>
-                    <td>{{ $datos_instalaciones[0]->Manufactura_own }}</td>
-                    @endif
-                    @if ($key == 3)
-                    <td>{{ $datos_instalaciones[0]->Almacenes_q }}</td>
-                    <td>{{ $datos_instalaciones[0]->Almacenes_surf }}</td>
-                    <td>{{ $datos_instalaciones[0]->Almacenes_own }}</td>
-                    @endif
-                    @if ($key == 4)
-                    <td>{{ $datos_instalaciones[0]->Laboratorios_q }}</td>
-                    <td>{{ $datos_instalaciones[0]->Laboratorios_surf }}</td>
-                    <td>{{ $datos_instalaciones[0]->Laboratorios_own }}</td>
-                    @endif
-                    @if ($key == 5)
-                    <td>{{ $datos_instalaciones[0]->Marinas_q }}</td>
-                    <td>{{ $datos_instalaciones[0]->Marinas_surf }}</td>
-                    <td>{{ $datos_instalaciones[0]->Marinas_own }}</td>
-                    @endif
-                    @if ($key == 6)
-                    <td>{{ $datos_instalaciones[0]->Otros_q }}</td>
-                    <td>{{ $datos_instalaciones[0]->Otros_surf }}</td>
-                    <td>{{ $datos_instalaciones[0]->Otros_own }}</td>
-                    @endif
-                </tr>
-                @endforeach
-
-                <tr>
-                    <td colspan="2"><b>Total</b></td>
-                    <td><b>{{ (int) str_replace(' ', 0, $datos_instalaciones[0]->Oficinas_q) + (int) str_replace(' ', 0, $datos_instalaciones[0]->Talleres_q) + (int) str_replace(' ', 0, $datos_instalaciones[0]->Manufactura_q) + (int) str_replace(' ', 0, $datos_instalaciones[0]->Almacenes_q) + (int) str_replace(' ', 0, $datos_instalaciones[0]->Laboratorios_q) + (int) str_replace(' ', 0, $datos_instalaciones[0]->Marinas_q) + (int) str_replace(' ', 0, $datos_instalaciones[0]->Otros_q)}}</b></td>
-                    <td><b>{{ (int) str_replace(' ', 0, $datos_instalaciones[0]->Oficinas_surf) + (int) str_replace(' ', 0, $datos_instalaciones[0]->Talleres_surf) + (int)str_replace(' ', 0, $datos_instalaciones[0]->Manufactura_surf) + (int) str_replace(' ', 0, $datos_instalaciones[0]->Almacenes_surf) + (int)str_replace(' ', 0, $datos_instalaciones[0]->Laboratorios_surf) + (int) str_replace(' ', 0, $datos_instalaciones[0]->Marinas_surf) + (int) str_replace(' ', 0, $datos_instalaciones[0]->Otros_surf)}}</b></td>
-                    <td></td>
-                </tr>
-                @else
-                <tr>
-                    <td colspan="4">
-                        @if ($na_flags['recursos'])
-                        <p><b>NO APLICA — Declarado por la empresa</b></p>
-                        @else
-                        <p><b>No existe información</b></p>
-                        @endif
-                    </td>
-                </tr>
-                @endif
-            </table>
-
-            <!-- INVENTARIO........-->
-            <table>
-                <tr>
-                    <td colspan="6" style="padding: 5px; border: none; font-size: 13px;" class="gris-oscuro">
-                        <strong>Inventario</strong>
-                    </td>
-                </tr>
-                @if (sizeof($datos_inventario) > 0)
-                <tr>
-                    <th colspan="3" style="text-align: left; width: 10%;">Tipo de Inventario</th>
-                    <th style="white-space: nowrap;">Cantidad (n)</th>
-                    <th>Unidad</th>
-                    <th>Valor actual Est.</th>
-                </tr>
-
-                @foreach ($datos_inv[0] as $key=>$row)
-                <tr>
-                    <td style="text-align: left; " colspan="3">{{ $datos_inv[0][$key]}}</td>
-                    @if ($key == 0)
-                    <td>{{ $datos_inventario[0]->Materia_q }}</td>
-                    <td>{{ $datos_inventario[0]->Materia_unit }}</td>
-                    <td>{{ $datos_inventario[0]->Materia_est }}</td>
-                    @endif
-                    @if ($key == 1)
-                    <td>{{ $datos_inventario[0]->Producto_q }}</td>
-                    <td>{{ $datos_inventario[0]->Producto_unit }}</td>
-                    <td>{{ $datos_inventario[0]->Producto_est }}</td>
-                    @endif
-                </tr>
-
-                @endforeach
-                @else
-                <tr>
-                    <td colspan="6">
-                        @if ($na_flags['recursos'])
-                        <p><b>NO APLICA — Declarado por la empresa</b></p>
-                        @else
-                        <p><b>No existe información</b></p>
-                        @endif
-                    </td>
-                </tr>
-                @endif
-            </table>
-
-
-            <!-- FIN DE RECURSOS EN VENEZUELA..............................................................-->
-
-            <!-- EXPERIENCIA RELEVANTE.....................................................................-->
-            <h2 class="titulo2 gris-oscuro">Experiencia Relevante</h2>
-
-            @if (sizeof($datos_exp) > 0)
-            <div class="experiencias-grid">
-                @foreach ($datos_exp as $row)
-                <div class="experiencia-card">
-                    <div class="gris-oscuro" style="font-size: 13.5px; padding: 3px;">
-                        <b>{{ $row->ano }}</b>
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Sector:</strong> {{ $row->sectorind }}
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Tipo:</strong> {{ $row->tipoind }}
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Sistema:</strong> {{ $row->systemind }}
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Región:</strong> {{ $row->regionind }}
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Instalación:</strong> {{ $row->facilityind }}
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Orden de Magnitud del Contrato:</strong> {{ $row->magnitud }}
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Esfuerzo H-H — Profesionales y Técnicos:</strong> {{ $row->prof_tech }}
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Esfuerzo H-H — Mano de Obra directa:</strong> {{ $row->manpower }}
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Clasificación del Trabajo — Sector:</strong> {{ $row->exp_sector }}
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Clasificación del Trabajo — Servicios:</strong> {{ $row->exp_service }}
-                    </div>
-                    <div class="exp-grupo">
-                        <strong>Breve descripción del Trabajo realizado:</strong><br>
-                        {{ str_replace('null', ' ', $row->descripcion) }}
-                    </div>
-                </div>
-                @endforeach
-            </div>
-            @else
-            <table>
-                <tr>
-                    <td colspan="3">
-                        @if ($na_flags['experiencias'])
-                        <p><b>NO APLICA — Declarado por la empresa</b></p>
-                        @else
-                        <p><b>No existe información</b></p>
-                        @endif
-                    </td>
-                </tr>
-            </table>
-            @endif
-        </div>
-
-        <!-- PRESENCIA INTERNACIONAL.....................................................................--->
-        <div style="font-size: 13px; border: none;">
-            <table>
-                <tr>
-                    <td colspan="4" style="padding: 0px; border: none">
-                        <h2 class="titulo2 gris-oscuro">Presencia Internacional</h2>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="4" style="padding: 5px; border: none; font-size: 13px;" class="gris-oscuro">
-                        <strong>Tiene Presencia formal en otros Países?</strong>
-                    </td>
-                </tr>
-                @if (sizeof($datos_pres) > 0)
-                <!-- PRESENCIA EN OTROS PAISES.............. -->
-                <tr>
-                    <th>País</th>
-                    <th>Oficinas (Mts2)</th>
-                    <th>Empleados (n)</th>
-                    <th>Activa?</th>
-                </tr>
-
-                @foreach ($datos_pres as $row)
-                @if ($row->hasOfficesYes == 'X')
-                <tr>
-                    <td>{{ $row->pais }}</td>
-                    <td>{{ $row->mts }}</td>
-                    <td>{{ $row->emp_q }}</td>
-                    <td>{{ $row->activa }}</td>
-                </tr>
-
-                @endif
-                @endforeach
-                <!-- EXPERIENCIA EN OTROS PAISES............ -->
-                <tr>
-                    <td colspan="4" style="padding: 5px; border: none; font-size: 13px;" class="gris-oscuro">
-                        <strong>Tiene Experiencia desarrollando proyectos en otros Países?</strong>
-                    </td>
-                </tr>
-
-                @foreach ($datos_pres as $row)
-                @if (($row->hasExperienceYes == 'X') && (strlen($row->paisx) > 0))
-                <tr>
-                    <th colspan=2 style="text-align: left;">País</th>
-                    <th style="text-align: left;">Nro. de Proyectos</th>
-                    <th style="text-align: left;">Rol</th>
-
-                </tr>
-                <tr class="noBorder">
-                    <td colspan=2 style="border: none;">{{ $row->paisx }}</td>
-                    <td style="border: none;">{{ $row->proj_q }}</td>
-                    <td style="border: none;">{{ $row->role }}</td>
-
-                </tr>
-
-                <tr>
-                    <th colspan="2" style="text-align: left;">Monto total Ejecutado</th>
-                    <th style="text-align: left;">Empleados (n)</th>
-                    <th style="text-align: left;">Principales clientes</th>
-
-                </tr>
-                <tr class="noBorder">
-                    <td colspan=2 style="border: none;">{{ $row->montox }}</td>
-                    <td style="border: none;">{{ $row->expemployees }}</td>
-                    <td style="border: none;">{{ $row->clients }}</td>
-
-                </tr>
-                @endif
-                @endforeach
-                @else
-                <tr>
-                    <td colspan="4">
-                        @if ($na_flags['presencia'])
-                        <p><b>NO APLICA — Declarado por la empresa</b></p>
-                        @else
-                        <p><b>No existe información</b></p>
-                        @endif
-                    </td>
-                </tr>
-                @endif
-            </table>
-        </div>
-        <!-- SISTEAS DE GESTIÓN..............................................................................-->
+    {{-- DATOS GENERALES ........................................................................... --}}
+    @if ($want('generales'))
+        <h2 class="titulo2 gris-oscuro">Datos generales</h2>
         <table>
-            <tr>
-                <td colspan="3" style="padding: 0px; border: none">
-                    <h2 class="titulo2 gris-oscuro">Sistemas de Gestión</h2>
+            <tr class="noBorder"><td class="etiqueta">Nombre de la empresa:</td><td>{{ $g->nombre ?? $record->name }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Nro. de RIF:</td><td>{{ $g->rif ?? $record->rif }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Dirección:</td><td>{{ $has($g->direccion) ? $g->direccion : $vacio }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Ciudad / País:</td><td>{{ $has($g->ciudad) ? $g->ciudad : $vacio }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Página web:</td><td>{{ $has($g->website) ? $g->website : $vacio }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Teléfono:</td><td>{{ $has($g->telefono) ? $g->telefono : $vacio }}</td></tr>
+            <tr class="noBorder">
+                <td class="etiqueta">Redes sociales:</td>
+                <td>
+                    @forelse ($redes as $red => $valor)
+                        {{ $red }}: {{ $valor }}<br>
+                    @empty
+                        {{ $vacio }}
+                    @endforelse
                 </td>
             </tr>
-            @if ($na_flags['gestion'])
-            <tr>
-                <td colspan="3">
-                    <p><b>NO APLICA — Declarado por la empresa</b></p>
-                </td>
-            </tr>
+            <tr class="noBorder"><td class="etiqueta">Año de fundación:</td><td>{{ $has($g->fundacion) ? $g->fundacion : $vacio }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Capital de la empresa / Origen:</td><td>{{ $has($g->capital) || $has($g->origen) ? trim(($g->capital ?? '').' / '.($g->origen ?? ''), ' /') : $vacio }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Sector principal:</td><td>{{ $sectorPrincipal ?? $vacio }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Sector secundario:</td><td>{{ $sectorSecundario ?? 'No declarado' }}</td></tr>
+        </table>
+
+        <h4 class="subtitulo gris-oscuro">Operación en Venezuela</h4>
+        <table>
+            <tr class="noBorder"><td class="etiqueta">Facturación anual:</td><td>{{ $has($g->facturacion_anual) ? $g->facturacion_anual : $vacio }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Empleados (rango declarado):</td><td>{{ $empleadosRango ?? $vacio }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Empleados (total en Recursos humanos):</td><td>{{ $has($g->empleados) ? $g->empleados : $vacio }}</td></tr>
+            <tr class="noBorder"><td class="etiqueta">Estatus actual:</td><td>{{ $has($g->estado_actual) ? $g->estado_actual : $vacio }}</td></tr>
+        </table>
+
+        <h4 class="subtitulo gris-oscuro">Contactos</h4>
+        <table>
+            @forelse ($contactos as $contacto)
+                <tr class="noBorder">
+                    <td class="etiqueta"><b>{{ $contacto->name }}</b>@if ($contacto->pivot?->is_principal)<br>(contacto principal)@endif</td>
+                    <td>
+                        @if ($has($contacto->position)) Cargo: {{ $contacto->position }}<br>@endif
+                        @if ($has($contacto->phone)) Teléfono: {{ $contacto->phone }}<br>@endif
+                        @if ($has($contacto->email)) Correo: {{ $contacto->email }}@endif
+                    </td>
+                </tr>
+            @empty
+                <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
+            @endforelse
+        </table>
+    @endif
+
+    {{-- CLIENTES ................................................................................. --}}
+    @if ($want('clientes'))
+        <h2 class="titulo2 gris-oscuro">Clientes</h2>
+        <table>
+            @if ($clientes->isNotEmpty())
+                <tr><th>Nombre</th><th>País</th></tr>
+                @foreach ($clientes as $cliente)
+                    <tr><td>{{ $cliente['nombre'] }}</td><td>{{ $cliente['pais'] }}</td></tr>
+                @endforeach
             @else
-            <!-- PRIMERA FILA....................................................................... -->
-            <tr>
-                <td style="padding: 0px; border: solid #bbbbbb">
-                    <div class="card-sisges" style="display:inline-block; font-size: 14px; padding: 5px;">
-                        <p>Calidad</p>
-                        <fieldset class="cajacheckbox" style="border: none; padding: 0px; margin: 0px">
-                            @if ($datos[0]->iso9001 == 'SÍ')
-                            <input type="checkbox" checked disabled name="iso9001">ISO 9001:2015 Sistema de Gestión de la Calidad<br>
-
-                            @else
-                            <input type="checkbox" disabled name="iso9001">ISO 9001:2015 Sistema de Gestión de la Calidad<br>
-                            @endif
-                            @if ($datos[0]->iso17025 == 'SÍ')
-                            <input type="checkbox" checked disabled name="iso17025">ISO 17025: 2005 Laboratorios de Ensayo y de Calibración<br>
-                            @else
-                            <input type="checkbox" disabled name="iso17025">ISO 17025: 2005 Laboratorios de Ensayo y de Calibración<br>
-                            @endif
-                            <br>
-                            @if ($datos[0]->quality_otros != 'NO')
-                            <input type="checkbox" checked disabled name="quality_otros">Otros: {{ $datos[0]->quality_otros}}<br>
-                            @endif
-                        </fieldset>
-                    </div>
-                </td>
-                <td style="padding: 0px; border: solid #bbbbbb"">
-                    <div class=" card-sisges" style="display:inline-block; font-size: 14px; padding: 5px; ">
-                    <p>Ambiente</p>
-                    <fieldset class="cajacheckbox" style="border: none; padding: 0px; margin: 0px">
-                        @if ($datos[0]->iso14001 == 'SÍ')
-                        <input type="checkbox" checked disabled name="iso14001">ISO 14001:2015 Sistema de Gestión Ambiental<br>
-                        @else
-                        <input type="checkbox" disabled name="iso14001">ISO 14001:2015 Sistema de Gestión Ambiental<br>
-                        @endif
-                        @if ($datos[0]->iso50001 == 'SÍ')
-                        <input type="checkbox" checked disabled name="iso50001">ISO 50001: 2018 Sistemas de Gestión de la Energía<br>
-                        @else
-                        <input type="checkbox" disabled name="iso50001">ISO 50001: 2018 Sistemas de Gestión de la Energía<br>
-                        @endif
-                        <br>
-                        @if ($datos[0]->environment_otros != 'NO')
-                        <input type="checkbox" checked disabled name="environment_otros">Otros: {{ $datos[0]->environment_otros}}<br>
-                        @endif
-                    </fieldset>
-                    </div>
-                </td>
-                <td style="padding: 0px; border: solid #bbbbbb"">
-                    <div class=" card-sisges" style="display:inline-block; font-size: 14px; padding: 5px; ">
-                    <p>Credibilidad y Transparencia</p>
-                    <fieldset class="cajacheckbox" style="border: none; padding: 0px; margin: 0px">
-                        @if ($datos[0]->dun == 'SÍ')
-                        <input type="checkbox" checked disabled name="dun">Dun y Brad Street<br>
-                        @else
-                        <input type="checkbox" disabled name="dun">Dun y Brad Street<br>
-                        @endif
-                        @if ($datos[0]->iso37001 == 'SÍ')
-                        <input type="checkbox" checked disabled name="iso37001">ISO 37001: 2016 Sistemas de Gestión Antisoborno<br>
-                        @else
-                        <input type="checkbox" disabled name="iso37001">ISO 37001: 2016 Sistemas de Gestión Antisoborno<br>
-                        @endif
-                        <br>
-                        @if ($datos[0]->credibility_otros != 'NO')
-                        <input type="checkbox" disabled checked name="credibility_otros">Otros: {{ $datos[0]->credibility_otros}}<br>
-                        @endif
-                    </fieldset>
-                    </div>
-                </td>
-            </tr>
-
-            <!-- SEGUNDA FILA.............................................................................. -->
-            <tr>
-                <td style="padding: 0px; border: solid #bbbbbb"">
-                    <div class=" card-sisges" style="display:inline-block; font-size: 14px; padding: 5px;">
-                    <p>Seguridad</p>
-                    <fieldset class="cajacheckbox" style="border: none; padding: 0px; margin: 0px">
-                        @if ($datos[0]->iso45001 == 'SÍ')
-                        <input type="checkbox" checked disabled name="iso45001">ISO 45001:2018 Seguridad y Salud en el Trabajo<br>
-                        @else
-                        <input type="checkbox" disabled name="iso45001">ISO 45001:2018 Seguridad y Salud en el Trabajo<br>
-                        @endif
-                        @if ($datos[0]->ovid == 'SÍ')
-                        <input type="checkbox" disabled checked name="ovid">OVID<br>
-                        @else
-                        <input type="checkbox" disabled name="ovid">OVID<br>
-                        @endif
-                        <br>
-                        @if ($datos[0]->security_otros != 'NO')
-                        <input type="checkbox" checked disabled name="security_otros">Otros: {{ $datos[0]->security_otros}}<br>
-                        @endif
-                    </fieldset>
-                    </div>
-                </td>
-                <td style="padding: 0px; border: solid #bbbbbb"">
-                    <div class=" card-sisges" style="display:inline-block; font-size: 14px; padding: 5px; ">
-                    <p>Gestión de Proyectos</p>
-                    <!-- <p><b>Posee personal calificado en:</b></p>-->
-                    <fieldset class="cajacheckbox" style="border: none; padding: 0px; margin: 0px">
-                        @if ($datos[0]->pmi == 'SÍ')
-                        <input type="checkbox" disabled checked name="pmi">Project Management Professional (PMI)<br>
-                        @else
-                        <input type="checkbox" disabled name="pmi">Project Management Professional (PMI)<br>
-                        @endif
-
-                        <br>
-                        @if ($datos[0]->pmi_otros != 'NO')
-                        <input type="checkbox" disabled checked name="pmi_otros">Otros: {{ $datos[0]->pmi_otros}}<br>
-                        @endif
-                    </fieldset>
-                    </div>
-                </td>
-                <td style="padding: 0px; border: solid #bbbbbb"">
-                    <div class=" card-sisges" style="display:inline-block; font-size: 14px; padding: 5px; ">
-                    <p>Seguridad de la Información</p>
-
-                    <fieldset class="cajacheckbox" style="border: none; padding: 0px; margin: 0px">
-                        @if ($datos[0]->iso27001 == 'SÍ')
-                        <input type="checkbox" disabled checked name="iso27001">ISO 27001 Sistemas de Gestión de la Seguridad de la Información<br>
-                        @else
-                        <input type="checkbox" disabled name="iso27001">ISO 27001 Sistemas de Gestión de la Seguridad de la Información<br>
-                        @endif
-
-                        <br>
-                        @if ($datos[0]->info_otros != 'NO')
-                        <input type="checkbox" disabled checked name="info_otros">Otros: {{ $datos[0]->info_otros}}<br>
-                        @endif
-                    </fieldset>
-                    </div>
-                </td>
-
-            </tr>
+                <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
             @endif
         </table>
-        <!--<div class="page-break"></div>-->
+    @endif
 
+    {{-- CÁMARAS .................................................................................. --}}
+    @if ($want('camaras'))
+        <h2 class="titulo2 gris-oscuro">Cámaras</h2>
+        <table>
+            @if (count($camaras) > 0)
+                <tr><th>Nombre</th></tr>
+                @foreach ($camaras as $camara)
+                    <tr><td>{{ $camara->name }}</td></tr>
+                @endforeach
+            @else
+                <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
+            @endif
+        </table>
+    @endif
 
+    {{-- SECTORES Y SERVICIOS ..................................................................... --}}
+    @if ($want('sectores'))
+        <h2 class="titulo2 gris-oscuro">Sectores de actividad económica y servicios</h2>
+        <table>
+            @if (count($secSer) > 0)
+                <tr><th style="width: 35%;">Sector</th><th>Servicios</th></tr>
+                @php $anterior = null; @endphp
+                @foreach ($secSer as $fila)
+                    <tr>
+                        <td>{{ $fila->sector === $anterior ? '' : $fila->sector }}</td>
+                        <td>{{ $fila->servicio }}</td>
+                    </tr>
+                    @php $anterior = $fila->sector; @endphp
+                @endforeach
+            @else
+                <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
+            @endif
+        </table>
+    @endif
 
+    {{-- CATEGORÍAS CPV ............................................................................ --}}
+    @if ($want('categorias'))
+        <h2 class="titulo2 gris-oscuro">Categorías CPV</h2>
+        <table>
+            @if ($categorias->isNotEmpty())
+                <tr><th style="width: 60%;">Categoría (Grupo › Familia › Categoría)</th><th>Principal</th><th>Origen</th></tr>
+                @foreach ($categorias as $categoria)
+                    <tr>
+                        <td>{{ $categoria['nombre'] }}</td>
+                        <td>{{ $categoria['principal'] ? 'Sí' : 'No' }}</td>
+                        <td>{{ $categoria['origen'] }}</td>
+                    </tr>
+                @endforeach
+            @else
+                <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
+            @endif
+        </table>
+        <p class="nota">Solo categorías declaradas por la empresa o confirmadas. Las sugerencias sin confirmar no se incluyen.</p>
+    @endif
 
-    </body>
+    {{-- ENFOQUE DE SOSTENIBILIDAD ................................................................. --}}
+    @if ($want('sostenibilidad'))
+        <h2 class="titulo2 gris-oscuro">Enfoque de sostenibilidad</h2>
+        <table>
+            @if (count($sust) > 0)
+                <tr><th style="width: 40%;">Áreas</th><th>Sí: Activo</th><th>Sí: Inactivo</th><th>No</th></tr>
+                @foreach ($sust as $fila)
+                    <tr>
+                        <td>{{ $fila->sust_title }}</td>
+                        <td>{{ (string) $fila->sust_status === '2' ? 'Sí' : '' }}</td>
+                        <td>{{ (string) $fila->sust_status === '1' ? 'Sí' : '' }}</td>
+                        <td>{{ (string) $fila->sust_status === '0' ? 'No' : '' }}</td>
+                    </tr>
+                @endforeach
+            @else
+                <tr><td><p class="vacio">{{ $na['sostenibilidad'] ? $naLabel : $vacio }}</p></td></tr>
+            @endif
+        </table>
+    @endif
+
+    {{-- RECURSOS EN VENEZUELA ..................................................................... --}}
+    @if ($want('recursos'))
+        @php
+            $sinDatos = fn (string $sub) => ($na['recursos'] || $naRecursos[$sub]) ? $naLabel : $vacio;
+            $personal = $rec->data_rec[0] ?? null;
+            $maquinaria = $rec->data_maq[0] ?? null;
+            $instalaciones = $rec->data_ins[0] ?? null;
+            $inventario = $rec->data_inv[0] ?? null;
+            $num = fn ($value) => (int) round((float) trim((string) $value));
+            $tiposPersonal = ['Bachilleres', 'Tecnicos', 'Ingenieros', 'Administrativos', 'Gerentes', 'Directivos'];
+            $tiposMaquinaria = ['Equip_med_lev', 'Equip_mar_flu', 'Mov_terr_cons', 'Equip_men_cons', 'Fab_metal_elec', 'Mont_elec_meca', 'Maq_herr_meca', 'Almac_trans', 'Serv_poz_inst'];
+            $tiposInstalacion = ['Oficinas', 'Talleres', 'Manufactura', 'Almacenes', 'Laboratorios', 'Marinas', 'Otros'];
+            $tiposInventario = ['Materia', 'Producto'];
+        @endphp
+        <h2 class="titulo2 gris-oscuro">Recursos en Venezuela</h2>
+
+        <h4 class="subtitulo gris-oscuro">Recursos humanos</h4>
+        <table>
+            @if ($personal)
+                <tr><th style="width: 32%;">Tipo de recurso</th><th>Junior</th><th>Medium</th><th>Senior</th><th>Total</th></tr>
+                @foreach ($tiposPersonal as $i => $tipo)
+                    <tr>
+                        <td>{{ $rec->value_emp[0][$i] ?? $tipo }}</td>
+                        <td>{{ $num($personal->{$tipo.'_Junior'}) }}</td>
+                        <td>{{ $num($personal->{$tipo.'_Medium'}) }}</td>
+                        <td>{{ $num($personal->{$tipo.'_Senior'}) }}</td>
+                        <td><b>{{ $num($personal->{$tipo.'_Junior'}) + $num($personal->{$tipo.'_Medium'}) + $num($personal->{$tipo.'_Senior'}) }}</b></td>
+                    </tr>
+                @endforeach
+                <tr>
+                    <td><b>Total</b></td>
+                    @foreach (['Junior', 'Medium', 'Senior'] as $nivel)
+                        <td><b>{{ collect($tiposPersonal)->sum(fn ($tipo) => $num($personal->{$tipo.'_'.$nivel})) }}</b></td>
+                    @endforeach
+                    <td><b>{{ $num($personal->Total) }}</b></td>
+                </tr>
+            @else
+                <tr><td><p class="vacio">{{ $sinDatos('employee') }}</p></td></tr>
+            @endif
+        </table>
+
+        <h4 class="subtitulo gris-oscuro">Maquinarias y equipos</h4>
+        <table>
+            @php $filas = $maquinaria ? collect($tiposMaquinaria)->filter(fn ($t) => $has($maquinaria->{$t.'_qua'}) || $has($maquinaria->{$t.'_est'})) : collect(); @endphp
+            @if ($filas->isNotEmpty())
+                <tr><th style="width: 50%;">Equipos</th><th>Cantidad (n)</th><th>Valor estimado USD</th></tr>
+                @foreach ($filas as $i => $tipo)
+                    <tr>
+                        <td>{{ $rec->value_maq[0][$i] ?? $tipo }}</td>
+                        <td>{{ $maquinaria->{$tipo.'_qua'} }}</td>
+                        <td>{{ $maquinaria->{$tipo.'_est'} }}</td>
+                    </tr>
+                @endforeach
+            @else
+                <tr><td><p class="vacio">{{ $sinDatos('machinery') }}</p></td></tr>
+            @endif
+        </table>
+
+        <h4 class="subtitulo gris-oscuro">Instalaciones</h4>
+        <table>
+            @php $filas = $instalaciones ? collect($tiposInstalacion)->filter(fn ($t) => $has($instalaciones->{$t.'_q'}) || $has($instalaciones->{$t.'_surf'}) || $has($instalaciones->{$t.'_own'})) : collect(); @endphp
+            @if ($filas->isNotEmpty())
+                <tr><th style="width: 40%;">Tipo de instalación</th><th>Cantidad</th><th>Sup. (m²)</th><th>Tipo de propiedad</th></tr>
+                @foreach ($filas as $i => $tipo)
+                    <tr>
+                        <td>{{ $rec->value_fac[0][$i] ?? $tipo }}</td>
+                        <td>{{ $instalaciones->{$tipo.'_q'} }}</td>
+                        <td>{{ $instalaciones->{$tipo.'_surf'} }}</td>
+                        <td>{{ $instalaciones->{$tipo.'_own'} }}</td>
+                    </tr>
+                @endforeach
+                <tr>
+                    <td><b>Total</b></td>
+                    <td><b>{{ $filas->sum(fn ($t) => $num($instalaciones->{$t.'_q'})) }}</b></td>
+                    <td><b>{{ $filas->sum(fn ($t) => $num($instalaciones->{$t.'_surf'})) }}</b></td>
+                    <td></td>
+                </tr>
+            @else
+                <tr><td><p class="vacio">{{ $sinDatos('facility') }}</p></td></tr>
+            @endif
+        </table>
+
+        <h4 class="subtitulo gris-oscuro">Inventario</h4>
+        <table>
+            @php $filas = $inventario ? collect($tiposInventario)->filter(fn ($t) => $has($inventario->{$t.'_q'}) || $has($inventario->{$t.'_unit'}) || $has($inventario->{$t.'_est'})) : collect(); @endphp
+            @if ($filas->isNotEmpty())
+                <tr><th style="width: 34%;">Tipo de inventario</th><th>Cantidad (n)</th><th>Unidad</th><th>Valor actual estimado</th></tr>
+                @foreach ($filas as $i => $tipo)
+                    <tr>
+                        <td>{{ $rec->value_inv[0][$i] ?? $tipo }}</td>
+                        <td>{{ $inventario->{$tipo.'_q'} }}</td>
+                        <td>{{ $inventario->{$tipo.'_unit'} }}</td>
+                        <td>{{ $inventario->{$tipo.'_est'} }}</td>
+                    </tr>
+                @endforeach
+            @else
+                <tr><td><p class="vacio">{{ $sinDatos('inventory') }}</p></td></tr>
+            @endif
+        </table>
+    @endif
+
+    {{-- EXPERIENCIA RELEVANTE ..................................................................... --}}
+    @if ($want('experiencia'))
+        <h2 class="titulo2 gris-oscuro">Experiencia relevante</h2>
+        @forelse ($exp as $fila)
+            <div class="experiencia-card">
+                <div class="gris-oscuro" style="font-size: 13px; padding: 3px;"><b>{{ $fila->ano }}</b></div>
+                @foreach ([
+                    'Sector' => $fila->sectorind,
+                    'Tipo' => $fila->tipoind,
+                    'Sistema' => $fila->systemind,
+                    'Región' => $fila->regionind,
+                    'Instalación' => $fila->facilityind,
+                    'Orden de magnitud del contrato' => $fila->magnitud,
+                    'Esfuerzo H-H — Profesionales y técnicos' => $fila->prof_tech,
+                    'Esfuerzo H-H — Mano de obra directa' => $fila->manpower,
+                    'Clasificación del trabajo — Sector' => $fila->exp_sector,
+                    'Clasificación del trabajo — Servicios' => $fila->exp_service,
+                ] as $etiqueta => $valor)
+                    @if ($has($valor))
+                        <div class="exp-grupo"><strong>{{ $etiqueta }}:</strong> {{ $valor }}</div>
+                    @endif
+                @endforeach
+                @if ($has(str_replace('null', '', (string) $fila->descripcion)))
+                    <div class="exp-grupo"><strong>Breve descripción del trabajo realizado:</strong><br>{{ str_replace('null', ' ', $fila->descripcion) }}</div>
+                @endif
+            </div>
+        @empty
+            <table><tr><td><p class="vacio">{{ $na['experiencias'] ? $naLabel : $vacio }}</p></td></tr></table>
+        @endforelse
+    @endif
+
+    {{-- PRESENCIA INTERNACIONAL ................................................................... --}}
+    @if ($want('presencia'))
+        <h2 class="titulo2 gris-oscuro">Presencia internacional</h2>
+        @if (! $presencia['registrada'])
+            <table><tr><td><p class="vacio">{{ $na['presencia'] ? $naLabel : $vacio }}</p></td></tr></table>
+        @else
+            <h4 class="subtitulo gris-oscuro">¿Tiene presencia formal en otros países? {{ $presencia['has_offices'] ? 'Sí' : 'No' }}</h4>
+            @if (count($presencia['oficinas']) > 0)
+                <table>
+                    <tr><th>País</th><th>Oficinas (m²)</th><th>Empleados (n)</th><th>¿Activa?</th></tr>
+                    @foreach ($presencia['oficinas'] as $oficina)
+                        <tr><td>{{ $oficina['pais'] }}</td><td>{{ $oficina['mts'] }}</td><td>{{ $oficina['empleados'] }}</td><td>{{ $oficina['activa'] }}</td></tr>
+                    @endforeach
+                </table>
+            @endif
+
+            <h4 class="subtitulo gris-oscuro">¿Tiene experiencia desarrollando proyectos en otros países? {{ $presencia['has_experience'] ? 'Sí' : 'No' }}</h4>
+            @if (count($presencia['experiencias']) > 0)
+                <table>
+                    <tr><th>País</th><th>Nro. de proyectos</th><th>Rol</th><th>Monto total ejecutado</th><th>Empleados (n)</th><th>Principales clientes</th></tr>
+                    @foreach ($presencia['experiencias'] as $experiencia)
+                        <tr>
+                            <td>{{ $experiencia['pais'] }}</td>
+                            <td>{{ $experiencia['proyectos'] }}</td>
+                            <td>{{ $experiencia['rol'] }}</td>
+                            <td>{{ $experiencia['monto'] }}</td>
+                            <td>{{ $experiencia['empleados'] }}</td>
+                            <td>{{ $experiencia['clientes'] }}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            @endif
+        @endif
+    @endif
+
+    {{-- SISTEMAS DE GESTIÓN ....................................................................... --}}
+    @if ($want('gestion'))
+        @php
+            $tarjetas = [
+                'calidad' => ['Calidad', ['iso9001' => 'ISO 9001:2015 Sistema de Gestión de la Calidad', 'iso17025' => 'ISO 17025:2005 Laboratorios de Ensayo y de Calibración']],
+                'ambiente' => ['Ambiente', ['iso14001' => 'ISO 14001:2015 Sistema de Gestión Ambiental', 'iso50001' => 'ISO 50001:2018 Sistemas de Gestión de la Energía']],
+                'credibilidad' => ['Credibilidad y transparencia', ['dun' => 'Dun & Bradstreet (registro declarado por la empresa)', 'iso37001' => 'ISO 37001:2016 Sistemas de Gestión Antisoborno']],
+                'seguridad' => ['Seguridad', ['iso45001' => 'ISO 45001:2018 Seguridad y Salud en el Trabajo', 'ovid' => 'OVID']],
+                'proyectos' => ['Gestión de proyectos', ['pmi' => 'Project Management Professional (PMI)']],
+                'seguridad_info' => ['Seguridad de la información', ['iso27001' => 'ISO 27001 Sistemas de Gestión de la Seguridad de la Información']],
+            ];
+        @endphp
+        <h2 class="titulo2 gris-oscuro">Sistemas de gestión</h2>
+        @if ($na['gestion'])
+            <table><tr><td><p class="vacio">{{ $naLabel }}</p></td></tr></table>
+        @elseif (! $gestion && ! in_array(true, $naGestion, true))
+            <table><tr><td><p class="vacio">{{ $vacio }}</p></td></tr></table>
+        @else
+            <table style="border: none;">
+                @foreach (array_chunk($tarjetas, 2, true) as $par)
+                    <tr>
+                        @foreach ($par as $clave => [$titulo, $items])
+                            <td style="width: 50%; padding: 3px;">
+                                <div class="card">
+                                    <p class="card-titulo">{{ $titulo }}</p>
+                                    @if ($naGestion[$clave] && ! ($gestion && (in_array(true, array_intersect_key($gestion['flags'], $items), true) || $gestion['otros'][$clave])))
+                                        {{ $naLabel }}
+                                    @elseif (! $gestion)
+                                        {{ $vacio }}
+                                    @else
+                                        @foreach ($items as $campo => $etiqueta)
+                                            {{ $etiqueta }}: <b>{{ $gestion['flags'][$campo] ? 'Sí' : 'No' }}</b><br>
+                                        @endforeach
+                                        @foreach ($gestion['otros'][$clave] as $otro)
+                                            Otros: <b>{{ $otro }}</b><br>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </td>
+                        @endforeach
+                    </tr>
+                @endforeach
+            </table>
+        @endif
+    @endif
+
+</body>
+</html>

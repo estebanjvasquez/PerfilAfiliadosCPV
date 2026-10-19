@@ -28,9 +28,20 @@ class EditEmpresa extends EditRecord
 
     protected static string $resource = EmpresaResource::class;
 
-    protected function getActions(): array
+    /**
+     * CPV-COMPLETE-COMPANY-PDF (`6270558322`): el perfil completo también desde la ficha de la empresa. Es el mismo enlace
+     * protegido que la acción de la lista. La elección de secciones queda solo en la lista, para no duplicar controles.
+     */
+    protected function getHeaderActions(): array
     {
-        return [];
+        return [
+            \Filament\Actions\Action::make('perfil_completo')
+                ->label('Descargar perfil completo (PDF)')
+                ->icon('heroicon-o-document-arrow-down')
+                ->tooltip('Descarga el perfil completo de la empresa en PDF, con todas sus secciones')
+                ->url(fn (): string => route('filament.admin.export.pdf', ['empresa' => $this->getRecord()->getKey()]))
+                ->visible(fn (): bool => Auth::user()?->can('view_empresa') ?? false),
+        ];
     }
 
     /**

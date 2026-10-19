@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\JoinViewExport;
 use App\Models\Empresa;
+use App\Support\CompanyDossier;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -43,7 +44,22 @@ class EmpresaExportController extends Controller
             return static::notAvailable($request);
         }
 
-        $response = Pdf::loadView('pdf', ['record' => $record])->stream(static::filename($record, 'pdf'));
+        // CPV-COMPLETE-COMPANY-PDF (`6270558322`): perfil completo por defecto. `?secciones=` solo elige secciones de la
+        // lista blanca (CompanyDossier::sectionsFrom) y se lee DESPUÉS de autorizar: no cambia la empresa ni el acceso.
+        $sections = CompanyDossier::sectionsFrom($request->query('secciones'));
+        $complete = CompanyDossier::isComplete($sections);
+
+        $pdf = Pdf::loadView('pdf', CompanyDossier::data($record, $sections))
+            ->addInfo([
+                'Title' => ($complete ? 'Perfil completo' : 'Perfil (secciones seleccionadas)').' — '.$record->name,
+                'Creator' => 'Perfil de Afiliados CPV',
+            ]);
+        $pdf->render();
+        $dompdf = $pdf->getDomPDF();
+        $canvas = $dompdf->getCanvas();
+        $canvas->page_text(50, $canvas->get_height() - 40, 'Página {PAGE_NUM} de {PAGE_COUNT}', $dompdf->getFontMetrics()->getFont('Helvetica'), 8, [0.35, 0.35, 0.35]);
+
+        $response = $pdf->download(static::filename($record, 'pdf', $complete ? '' : '-parcial'));
         $response->headers->add(self::PRIVATE_HEADERS);
 
         return $response;
@@ -74,12 +90,15 @@ class EmpresaExportController extends Controller
         return $empresa && Gate::forUser($request->user())->allows('export', $empresa) ? $empresa : null;
     }
 
-    /** `perfil-<rif>.pdf`, sin caracteres raros. Si no hay RIF, `perfil-empresa-<id>`. */
-    public static function filename(Empresa $empresa, string $extension): string
+    /**
+     * `perfil-<rif>.pdf` (o `perfil-<rif>-parcial.pdf` con secciones elegidas), sin caracteres raros. Si no hay RIF,
+     * `perfil-empresa-<id>`.
+     */
+    public static function filename(Empresa $empresa, string $extension, string $suffix = ''): string
     {
         $base = Str::slug((string) $empresa->rif) ?: 'empresa-'.$empresa->getKey();
 
-        return "perfil-{$base}.{$extension}";
+        return "perfil-{$base}{$suffix}.{$extension}";
     }
 
     /**
