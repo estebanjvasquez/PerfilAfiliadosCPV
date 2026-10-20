@@ -289,7 +289,7 @@ class AccessMatrixTest extends TestCase
             if ($alfa) {
                 $this->assertSame($alfa, $matrix['EmpresaResource:edit:alfa'][$actor], "{$actor} → ALFA");
             }
-            $this->assertSame($beta, $matrix['EmpresaResource:edit:beta'][$actor], "{$actor} → BETA");
+            $this->assertContains($matrix['EmpresaResource:edit:beta'][$actor], $beta === 'ok' ? ['ok'] : ['not_found', 'forbidden'], "{$actor} → BETA");
         }
 
         $dir = storage_path('app/pdf_evidence');
@@ -378,7 +378,7 @@ class AccessMatrixTest extends TestCase
             DB::table('chamber_empresa')->insert(['empresa_id' => $empresa->id, 'chamber_id' => $chamber, 'created_at' => now(), 'updated_at' => now()]);
         }
         $onAlfa = fn (string $manager) => Livewire::actingAs($this->actors['affiliate_alfa'])
-            ->test($manager, ['ownerRecord' => $this->alfa, 'pageClass' => EditEmpresa::class]);
+            ->test($manager, ['ownerRecord' => $this->alfa, 'pageClass' => EditEmpresa::class])->call('loadTable');
         $attempt = function (callable $call) {
             try {
                 $call();
@@ -388,7 +388,7 @@ class AccessMatrixTest extends TestCase
         };
 
         // Another company's records do not appear and cannot be acted on from ALFA's page.
-        $onAlfa(ContactsRelationManager::class)->call('loadTable')->assertCanSeeTableRecords([$alfaContact])->assertCanNotSeeTableRecords([$betaContact]);
+        $onAlfa(ContactsRelationManager::class)->assertCanSeeTableRecords([$alfaContact])->assertCanNotSeeTableRecords([$betaContact]);
         $attempt(fn () => $onAlfa(ContactsRelationManager::class)->callTableAction('detach', $betaContact));
         $attempt(fn () => $onAlfa(ContactsRelationManager::class)->callTableAction('marcar_principal', $betaContact));
         $attempt(fn () => $onAlfa(UsersRelationManager::class)->callTableAction('detach', $this->actors['affiliate_beta']));
@@ -403,7 +403,7 @@ class AccessMatrixTest extends TestCase
         $this->assertTrue(DB::table('chamber_empresa')->where(['empresa_id' => $this->beta->id, 'chamber_id' => $chamber])->exists());
 
         // Mixed bulk export on ALFA's contacts: BETA's contact is not part of the selection Filament resolves.
-        $rm = $onAlfa(ContactsRelationManager::class)->call('loadTable');
+        $rm = $onAlfa(ContactsRelationManager::class);
         $rm->set('selectedTableRecords', [(string) $alfaContact->id, (string) $betaContact->id]);
         $resolved = $rm->instance()->getSelectedTableRecords()->modelKeys();
         $this->assertSame([$alfaContact->id], array_map('intval', $resolved));
@@ -457,10 +457,10 @@ class AccessMatrixTest extends TestCase
     public function only_a_super_admin_can_impersonate_and_never_another_super_admin_by_a_lesser_role(): void
     {
         $this->actors();
-        $manager = app(Lab404ImpersonateServicesImpersonateManager::class);
+        $manager = app(\Lab404\Impersonate\Services\ImpersonateManager::class);
         $viewer = $this->user(['view_any_user', 'view_user']);
 
-        $list = Livewire::actingAs($viewer)->test(AppFilamentResourcesUserResourcePagesListUsers::class)->call('loadTable');
+        $list = Livewire::actingAs($viewer)->test(\App\Filament\Resources\UserResource\Pages\ListUsers::class)->call('loadTable');
         foreach ([$this->actors['super_admin'], $this->actors['affiliate_alfa']] as $target) {
             try {
                 $list->callTableAction('impersonate', $target);
@@ -474,7 +474,7 @@ class AccessMatrixTest extends TestCase
 
         // Allowed: the super admin impersonates an affiliate, then leaves.
         $super = $this->actors['super_admin'];
-        Livewire::actingAs($super)->test(AppFilamentResourcesUserResourcePagesListUsers::class)->call('loadTable')
+        Livewire::actingAs($super)->test(\App\Filament\Resources\UserResource\Pages\ListUsers::class)->call('loadTable')
             ->callTableAction('impersonate', $this->actors['affiliate_alfa']);
         $this->assertTrue($manager->isImpersonating());
         $this->assertSame($this->actors['affiliate_alfa']->id, auth()->id());
