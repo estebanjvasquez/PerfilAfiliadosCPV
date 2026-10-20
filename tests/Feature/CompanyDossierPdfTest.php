@@ -317,7 +317,7 @@ class CompanyDossierPdfTest extends TestCase
         $experience = Experience::where('empresa_id', $long->id)->firstOrFail();
         $entries = $experience->exp_year;
         $first = array_key_first($entries);
-        $entries[$first]['data']['Descripcion'] = 'ZZZLARGA '.str_repeat('Descripción sintética extensa de un contrato de ingeniería, procura y construcción con varias fases y entregables. ', 40);
+        $entries[$first]['data']['Descripcion'] = 'ZZZLARGA '.str_repeat('Descripción sintética extensa de un contrato de ingeniería, procura y construcción con varias fases y entregables. ', 120);
         $experience->update(['exp_year' => $entries]);
         auth()->logout();
         $long->refresh();
