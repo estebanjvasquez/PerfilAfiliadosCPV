@@ -78,6 +78,11 @@ class AccessMatrixTest extends TestCase
         foreach (glob(base_path('tests/Fixtures/pgsql_report_views/*.php')) as $file) {
             (require $file)->up();
         }
+        // The company form needs at least one city (EditEmpresa/CreateEmpresa::getSteps() read a loop variable; with no
+        // cities it is undefined: a known reliability defect, registered by SEC-01, not a security control).
+        $country = DB::table('countries')->insertGetId(['country_name' => 'ZZZPAIS', 'created_at' => now(), 'updated_at' => now()]);
+        $state = DB::table('states')->insertGetId(['country_id' => $country, 'state_name' => 'ZZZESTADO', 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('cities')->insert(['country_id' => $country, 'states_id' => $state, 'city_name' => 'ZZZCIUDAD', 'created_at' => now(), 'updated_at' => now()]);
     }
 
     // ------------------------------------------------------------------ fixtures
@@ -109,7 +114,7 @@ class AccessMatrixTest extends TestCase
 
     private function link(Empresa $empresa, User $user): void
     {
-        DB::table('empresa_user')->insert(['empresa_id' => $empresa->id, 'user_id' => $user->id, 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('empresa_user')->insertOrIgnore(['empresa_id' => $empresa->id, 'user_id' => $user->id, 'created_at' => now(), 'updated_at' => now()]);
     }
 
     private function contact(Empresa $empresa, string $marker): Contact
@@ -349,15 +354,17 @@ class AccessMatrixTest extends TestCase
         $this->actors();
         $alfa2 = $this->company('ALFADOS', $this->actors['affiliate_alfa']);
 
+        // The list's bulk actions («Editar», «Exportar listado») act on the records Filament resolves from the selection,
+        // through the resource query (scoped to the user's companies). A forged selection with another company's id:
         $list = Livewire::actingAs($this->actors['affiliate_alfa'])->test(ListEmpresas::class)->call('loadTable');
-        try {
-            $list->callTableBulkAction('delete', [$alfa2->getKey(), $this->beta->getKey()]);
-        } catch (Throwable) {
-            // a selection Filament refuses outright is also a denial; the database is checked below
-        }
+        $list->set('selectedTableRecords', [(string) $alfa2->getKey(), (string) $this->beta->getKey()]);
+        $resolved = array_map('intval', $list->instance()->getSelectedTableRecords()->modelKeys());
+        sort($resolved);
+        $this->assertSame([$alfa2->id], $resolved, 'only the linked company of the mixed selection is resolved');
 
-        $this->assertNotNull(Empresa::find($this->beta->id), 'denied: the other company is not deleted');
-        $this->assertNull(Empresa::find($alfa2->id), 'allowed: the own company in the same batch is deleted');
+        // «Editar» with only the other company selected does not open it.
+        $list->set('selectedTableRecords', [(string) $this->beta->getKey()]);
+        $this->assertCount(0, $list->instance()->getSelectedTableRecords());
     }
 
     #[Test]
@@ -381,7 +388,7 @@ class AccessMatrixTest extends TestCase
         };
 
         // Another company's records do not appear and cannot be acted on from ALFA's page.
-        $onAlfa(ContactsRelationManager::class)->assertCanSeeTableRecords([$alfaContact])->assertCanNotSeeTableRecords([$betaContact]);
+        $onAlfa(ContactsRelationManager::class)->call('loadTable')->assertCanSeeTableRecords([$alfaContact])->assertCanNotSeeTableRecords([$betaContact]);
         $attempt(fn () => $onAlfa(ContactsRelationManager::class)->callTableAction('detach', $betaContact));
         $attempt(fn () => $onAlfa(ContactsRelationManager::class)->callTableAction('marcar_principal', $betaContact));
         $attempt(fn () => $onAlfa(UsersRelationManager::class)->callTableAction('detach', $this->actors['affiliate_beta']));
@@ -396,7 +403,7 @@ class AccessMatrixTest extends TestCase
         $this->assertTrue(DB::table('chamber_empresa')->where(['empresa_id' => $this->beta->id, 'chamber_id' => $chamber])->exists());
 
         // Mixed bulk export on ALFA's contacts: BETA's contact is not part of the selection Filament resolves.
-        $rm = $onAlfa(ContactsRelationManager::class);
+        $rm = $onAlfa(ContactsRelationManager::class)->call('loadTable');
         $rm->set('selectedTableRecords', [(string) $alfaContact->id, (string) $betaContact->id]);
         $resolved = $rm->instance()->getSelectedTableRecords()->modelKeys();
         $this->assertSame([$alfaContact->id], array_map('intval', $resolved));
@@ -440,5 +447,38 @@ class AccessMatrixTest extends TestCase
         $this->assertNotSame($this->beta->id, $empresa->id, 'the id is not taken from input');
         $this->assertSame([$creator->id], DB::table('empresa_user')->where('empresa_id', $empresa->id)->pluck('user_id')->map(fn ($v) => (int) $v)->all(), 'allowed: linked to its creator, and only to them');
         $this->assertSame('ZZZBETAEMPRESA', $this->beta->fresh()->name);
+    }
+
+    /**
+     * SEC-01 F-01: impersonation («Impersonate» in Usuarios) is a super-admin capability. Seeing the user list must not let
+     * anyone else take another account's session. Allowed path: a super admin impersonates an affiliate and leaves.
+     */
+    #[Test]
+    public function only_a_super_admin_can_impersonate_and_never_another_super_admin_by_a_lesser_role(): void
+    {
+        $this->actors();
+        $manager = app(Lab404ImpersonateServicesImpersonateManager::class);
+        $viewer = $this->user(['view_any_user', 'view_user']);
+
+        $list = Livewire::actingAs($viewer)->test(AppFilamentResourcesUserResourcePagesListUsers::class)->call('loadTable');
+        foreach ([$this->actors['super_admin'], $this->actors['affiliate_alfa']] as $target) {
+            try {
+                $list->callTableAction('impersonate', $target);
+            } catch (Throwable) {
+                // a refused action is a denial; the session is checked below
+            }
+            $this->assertFalse($manager->isImpersonating(), 'denied: a user-list viewer does not impersonate');
+            $this->assertSame($viewer->id, auth()->id(), 'denied: the session still belongs to the viewer');
+        }
+        $list->assertTableActionHidden('impersonate', $this->actors['super_admin']);
+
+        // Allowed: the super admin impersonates an affiliate, then leaves.
+        $super = $this->actors['super_admin'];
+        Livewire::actingAs($super)->test(AppFilamentResourcesUserResourcePagesListUsers::class)->call('loadTable')
+            ->callTableAction('impersonate', $this->actors['affiliate_alfa']);
+        $this->assertTrue($manager->isImpersonating());
+        $this->assertSame($this->actors['affiliate_alfa']->id, auth()->id());
+        $manager->leave();
+        $this->assertSame($super->id, auth()->id());
     }
 }

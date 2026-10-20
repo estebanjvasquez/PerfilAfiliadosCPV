@@ -38,6 +38,7 @@ class SurfaceInventoryTest extends TestCase
         'GET|HEAD admin/register' => 'panel registration',
         'GET|HEAD admin/password-reset/request' => 'password reset request',
         'GET|HEAD admin/password-reset/reset' => 'password reset form (signed)',
+        'GET|HEAD filament-impersonate/leave' => 'ends an impersonation held in the session; without one it only redirects',
     ];
 
     /** Framework entrypoints with their own protection (signature, checksum, CSRF, signed temporary URLs). */
@@ -62,7 +63,7 @@ class SurfaceInventoryTest extends TestCase
                 'name' => $route->getName(),
                 'action' => Str::after((string) $route->getActionName(), 'App\\'),
                 'class' => $class,
-                'auth' => str_contains($flat, 'Filament\Http\Middleware\Authenticate') ? 'panel' : (str_contains($flat, 'auth:sanctum') ? 'sanctum' : (str_contains($flat, 'Authenticate') ? 'auth' : 'none')),
+                'auth' => str_contains($flat, 'Filament\Http\Middleware\Authenticate') ? 'panel' : ((str_contains($flat, 'auth:sanctum') || str_contains($flat, 'Authenticate:sanctum')) ? 'sanctum' : (str_contains($flat, 'Authenticate') ? 'auth' : 'none')),
                 'verified' => str_contains($flat, 'EnsureEmailIsVerified') || str_contains($flat, 'verified'),
                 'signed' => str_contains($flat, 'ValidateSignature') || str_contains($flat, 'signed'),
                 'csrf' => str_contains($flat, 'VerifyCsrfToken'),
@@ -138,7 +139,7 @@ class SurfaceInventoryTest extends TestCase
             }
         }
         if (str_starts_with($uri, 'api/')) {
-            return str_contains($middleware, 'auth:sanctum') ? 'api' : 'public';
+            return str_contains($middleware, 'auth:sanctum') || str_contains($middleware, 'Authenticate:sanctum') ? 'api' : 'public';
         }
         if (str_contains($middleware, 'Filament\Http\Middleware\Authenticate')) {
             return 'panel';
