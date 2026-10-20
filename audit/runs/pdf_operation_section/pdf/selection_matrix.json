@@ -1,0 +1,65 @@
+{
+    "generales": {
+        "present": 16,
+        "absent": 61,
+        "pages": 1
+    },
+    "operacion": {
+        "present": 6,
+        "absent": 71,
+        "pages": 1
+    },
+    "clientes": {
+        "present": 2,
+        "absent": 75,
+        "pages": 1
+    },
+    "camaras": {
+        "present": 2,
+        "absent": 75,
+        "pages": 1
+    },
+    "sectores": {
+        "present": 2,
+        "absent": 75,
+        "pages": 1
+    },
+    "categorias": {
+        "present": 4,
+        "absent": 73,
+        "pages": 1
+    },
+    "sostenibilidad": {
+        "present": 4,
+        "absent": 73,
+        "pages": 1
+    },
+    "recursos": {
+        "present": 12,
+        "absent": 65,
+        "pages": 1
+    },
+    "experiencia": {
+        "present": 11,
+        "absent": 66,
+        "pages": 3
+    },
+    "presencia": {
+        "present": 10,
+        "absent": 67,
+        "pages": 1
+    },
+    "gestion": {
+        "present": 8,
+        "absent": 69,
+        "pages": 1
+    },
+    "generales+operacion": {
+        "present": 22,
+        "absent": 55
+    },
+    "all 11": {
+        "present": 77,
+        "absent": 0
+    }
+}

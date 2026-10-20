@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-20 ~08:05Z, en la rama `fix/complete-company-pdf`; staging corre `514fa6e`.
+**Checkpoint:** 2026-10-20 ~08:45Z, en la rama `fix/pdf-operation-section`; staging corre `514fa6e`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,7 +32,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`fix/complete-company-pdf`**: su `514fa6e` corre en staging; encima, solo docs.
+- **Rama canónica:** **`fix/pdf-operation-section`** (en revisión), sobre `fix/complete-company-pdf`, cuyo `514fa6e` corre en staging.
   - Contiene `ce70b7f`, `edf20ed`, `10616af`, `0895258` y `28014c2`.
   - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `514fa6e`; el checkpoint vigente es el de esta rama.
   - Una sesión abierta en un checkout viejo no los carga sola.
@@ -43,7 +43,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `fix/complete-company-pdf` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabajá en la rama `fix/pdf-operation-section` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
@@ -54,12 +54,14 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 | Workflow del último despliegue | run `39390032508`, success, 07:58Z | API pública |
 | Imagen de recuperación | `perfilafiliados-app:pre-dossier-ce70b7f` (`aa44b1884b93`, la imagen de `ce70b7f`) | 2026-10-20 ~07:56Z |
 
-### Desplegado (`6286221372`): CPV-COMPLETE-COMPANY-PDF `514fa6e` — DEPLOYED_FOR_OWNER_REVIEW — MANUAL
+### En revisión (`6286644396`): CPV-PDF-OPERATION-SECTION — READY_FOR_REVIEW, sin desplegar
 
-- **Causa:** la columna «PDF» (`IconColumn::make('')`) no dibujaba ningún ícono; lo visible era el exportador de la tabla (listado). Con `->spa()`, un enlace directo tampoco descargaba.
-- **Arreglo:** «Perfil completo (PDF)» y «Elegir secciones» en cada fila, «Descargar perfil completo (PDF)» en la ficha, «Exportar listado» aparte. El mismo `pdf.blade.php`, reparado; `?secciones=` con lista blanca (`App\Support\CompanyDossier`).
-- **`88713a7`:** suite completa 582 OK, navegador 16/16. Informe `audit/complete_company_pdf_2026-10-19.md`.
-- **PDF-01 (`6272035810`):** no reproducido en la evidencia publicada; sí con nombres de 100 caracteres. Franja de alto fijo, chequeo por página. `0392a14`: enfocadas 34 OK.
+- «Operación en Venezuela» es una sección propia (`operacion`, 11 en total), y el selector describe cada opción.
+- Probadas las 11 opciones, una por una, en PDF real. `3ffa85d`: enfocadas 35 OK. Informe `audit/pdf_operation_section_2026-10-20.md`.
+
+### Desplegado (`6286221372`): CPV-COMPLETE-COMPANY-PDF `514fa6e`
+
+- Perfil completo visible y por defecto, secciones opcionales con lista blanca, encabezado por página. Informe `audit/complete_company_pdf_2026-10-19.md`.
 
 ### Anteriores
 
@@ -72,7 +74,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Propietario:** UAT del perfil completo (`current_task.md`). Smokes: 13/13, 25/25 y 18/18.
+- **Propietario:** revisar CPV-PDF-OPERATION-SECTION; UAT del perfil completo (`current_task.md`).
 - **Propietario:**
   - UAT de Inicio en staging;
   - reglas de caché de Cloudflare para `/pdf/*` y `/xls/*`;

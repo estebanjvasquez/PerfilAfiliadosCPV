@@ -1,8 +1,8 @@
 {
     "manifest": "STARTUP_DRY_RUN",
-    "task": "CPV-COMPLETE-COMPANY-PDF checkpoint (startup rules from CPV-SESSION-CONTINUITY, accepted 6211970495)",
-    "measured_utc": "2026-10-20T08:05:00Z",
-    "measured_at_branch": "fix/complete-company-pdf (on fix/export-access @ 37503c8, deployed runtime ce70b7f)",
+    "task": "CPV-PDF-OPERATION-SECTION checkpoint (startup rules from CPV-SESSION-CONTINUITY, accepted 6211970495)",
+    "measured_utc": "2026-10-20T08:45:00Z",
+    "measured_at_branch": "fix/pdf-operation-section (on fix/complete-company-pdf @ 9253968, deployed runtime 514fa6e)",
     "method": "deterministic: byte sizes of the files as committed on this branch; no AI session, subagent or test run was launched to prove it",
     "caveat": "file sizes are an input budget, not a guarantee of actual session context or token cost; the tool's own system prompt and tool outputs are not counted here",
     "budget": {
@@ -21,8 +21,8 @@
         {
             "step": 1,
             "file": "docs/orquestador/SESSION_RESUME.md",
-            "range": "all (121 lines)",
-            "bytes": 8680,
+            "range": "all (123 lines)",
+            "bytes": 8455,
             "class": "project_doc"
         },
         {
@@ -57,13 +57,13 @@
         }
     ],
     "totals": {
-        "project_docs_bytes": 10022,
-        "project_docs_breakdown": "CLAUDE.md 1342 + SESSION_RESUME.md 8680",
+        "project_docs_bytes": 9797,
+        "project_docs_breakdown": "CLAUDE.md 1342 + SESSION_RESUME.md 8455",
         "project_docs_within_target": true,
         "assigned_input_bytes": 7969,
         "private_memory_bytes": 1413,
-        "total_initial_text_inputs_bytes": 19404,
-        "total_initial_text_inputs_breakdown": "project docs 10022 + assigned comment 7969 + private memory 1413 (settings.json permissions not counted as reading)"
+        "total_initial_text_inputs_bytes": 19179,
+        "total_initial_text_inputs_breakdown": "project docs 9797 + assigned comment 7969 + private memory 1413 (settings.json permissions not counted as reading)"
     },
     "commands": [
         {

@@ -1,7 +1,18 @@
-# Tarea actual (checkpoint 2026-10-20 ~07:50Z, rama `fix/complete-company-pdf`)
+# Tarea actual (checkpoint 2026-10-20 ~08:45Z, rama `fix/pdf-operation-section`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
+
+## CPV-PDF-OPERATION-SECTION — READY_FOR_REVIEW — MANUAL (`6286644396`), sin desplegar
+
+| Campo | Valor |
+|---|---|
+| Rama / BASE | `fix/pdf-operation-section` / `9253968` (runtime idéntico a `514fa6e`) |
+| Cambio | `operacion` es una sección propia, tras `generales` (11 en total); `SECTION_DESCRIPTIONS` en el selector y en el manual; límite de texto derivado de las claves |
+| TESTED_HEAD | `3ffa85d`: enfocadas **35 OK** (2.615 aserciones); las 11 opciones solas, ambas, las 11 y por defecto (`audit/runs/pdf_operation_section/`) |
+| Informe | `audit/pdf_operation_section_2026-10-20.md` |
+
+Al desplegarse, en la UAT: **Elegir secciones** → **Solo las secciones que elija** → deje solo **Datos generales y contactos**: el PDF no trae «Operación en Venezuela». Elija solo **Operación en Venezuela**: trae solo sus cuatro datos.
 
 ## CPV-COMPLETE-COMPANY-PDF — DEPLOYED_FOR_OWNER_REVIEW — MANUAL (`6286221372`)
 
