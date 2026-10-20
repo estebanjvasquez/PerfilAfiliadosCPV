@@ -22,7 +22,7 @@
             "step": 1,
             "file": "docs/orquestador/SESSION_RESUME.md",
             "range": "all (121 lines)",
-            "bytes": 8879,
+            "bytes": 8816,
             "class": "project_doc"
         },
         {
@@ -57,13 +57,13 @@
         }
     ],
     "totals": {
-        "project_docs_bytes": 10221,
-        "project_docs_breakdown": "CLAUDE.md 1342 + SESSION_RESUME.md 8879",
+        "project_docs_bytes": 10158,
+        "project_docs_breakdown": "CLAUDE.md 1342 + SESSION_RESUME.md 8816",
         "project_docs_within_target": true,
         "assigned_input_bytes": 7969,
         "private_memory_bytes": 1413,
-        "total_initial_text_inputs_bytes": 19603,
-        "total_initial_text_inputs_breakdown": "project docs 10221 + assigned comment 7969 + private memory 1413 (settings.json permissions not counted as reading)"
+        "total_initial_text_inputs_bytes": 19540,
+        "total_initial_text_inputs_breakdown": "project docs 10158 + assigned comment 7969 + private memory 1413 (settings.json permissions not counted as reading)"
     },
     "commands": [
         {

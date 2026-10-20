@@ -54,7 +54,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 | Workflow del último despliegue | run `39249485948`, success, 12:06Z | API pública |
 | Imagen de recuperación | `perfilafiliados-app:pre-exportaccess-0f8bdad` (`37e023fd6830`, la imagen de `0f8bdad`) | creada ~11:05Z |
 
-### En revisión: CPV-COMPLETE-COMPANY-PDF (`6270558322`) — READY_FOR_REVIEW — MANUAL, sin desplegar
+### Aceptado para preparar despliegue (`6286080370`): CPV-COMPLETE-COMPANY-PDF, candidato `514fa6e` (sin desplegar)
 
 - **Causa:** la columna «PDF» (`IconColumn::make('')`) no dibujaba ningún ícono; lo visible era el exportador de la tabla (listado). Con `->spa()`, un enlace directo tampoco descargaba.
 - **Arreglo:** «Perfil completo (PDF)» y «Elegir secciones» en cada fila, «Descargar perfil completo (PDF)» en la ficha, «Exportar listado» aparte. El mismo `pdf.blade.php`, reparado; `?secciones=` con lista blanca (`App\Support\CompanyDossier`).
@@ -72,7 +72,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Orquestador/propietario:** revisión manual de `fix/complete-company-pdf`; desplegarlo requiere autorización (el push a la rama de despliegue lo hace el propietario).
+- **Propietario:** autorizar el despliegue de `514fa6e` (exacto; el push lo hace el propietario).
 - **Propietario:**
   - UAT de Inicio en staging;
   - reglas de caché de Cloudflare para `/pdf/*` y `/xls/*`;

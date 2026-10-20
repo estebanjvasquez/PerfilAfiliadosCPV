@@ -3,7 +3,7 @@
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-COMPLETE-COMPANY-PDF — READY_FOR_REVIEW — MANUAL (`6270558322`)
+## CPV-COMPLETE-COMPANY-PDF — ACEPTADO PARA PREPARAR DESPLIEGUE (`6286080370`), candidato `514fa6e09c666a6eefa8178bf56ea58da48b1a20`, DEPLOYED: NO
 
 | Campo | Valor |
 |---|---|
@@ -14,7 +14,7 @@ hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_
 | TESTED_HEAD | `88713a70171ca80903fedac74cd4507498ad8718`: suite completa **582 OK**, enfocadas 109 OK, navegador 16/16 |
 | Informe | `audit/complete_company_pdf_2026-10-19.md`; evidencia `audit/runs/complete_company_pdf/` (PDF sintéticos, texto, páginas PNG) |
 | PDF-01 (`6272035810`) | encabezado por página. La evidencia publicada en `034cf11` tenía el encabezado en las 7 páginas (bytes, texto por página, logos, píxeles): no se reprodujo. Defecto real hallado: nombre de 100 caracteres → la franja crecía hasta ~104 pt; y una descripción más larga que una página dejaba la página 1 casi en blanco. Ambos corregidos en `pdf.blade.php`. Prueba nueva por página. TESTED_HEAD `0392a14`, enfocadas 34 OK (1.288 aserciones). Evidencia `audit/runs/complete_company_pdf/pdf01/` |
-| Siguiente acción | revisión manual; desplegar requiere autorización |
+| Siguiente acción | esperar la instrucción de despliegue del propietario; no tocar el candidato. La observación original de PDF-01 fue retirada por el revisor (no es un defecto) |
 
 ## CPV-INTEGRATED-EXPORT-ACCESS-DEPLOY — DEPLOYED_FOR_OWNER_REVIEW — MANUAL (`6265502896`)
 
