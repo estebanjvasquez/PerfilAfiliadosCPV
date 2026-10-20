@@ -1,0 +1,126 @@
+# Reproduction of PDF-01 against the PUBLISHED evidence at 034cf11 (before any change)
+
+## Byte identity: git blob = working file = raw.githubusercontent.com (md5, first 12)
+page 1: 8872c54c5591
+page 2: 2c3c4b15b241
+page 3: 9e59dd7e04c1
+page 4: 92ad91dd4d1f
+page 5: dc7479d76e2d
+page 6: 8b43b0179d98
+page 7: 1c5a6e3c3cdd
+
+## Per-page check of the published PDFs (poppler, per_page_header_check.sh)
+== complete_full_company.pdf pages=7
+p1 | PERFIL COMPLETO DE LA EMPRESA | · RIF J510695018 | images=2 | Página 1 de 7
+p2 | PERFIL COMPLETO DE LA EMPRESA | · RIF J510695018 | images=2 | Página 2 de 7
+p3 | PERFIL COMPLETO DE LA EMPRESA | · RIF J510695018 | images=2 | Página 3 de 7
+p4 | PERFIL COMPLETO DE LA EMPRESA | · RIF J510695018 | images=2 | Página 4 de 7
+p5 | PERFIL COMPLETO DE LA EMPRESA | · RIF J510695018 | images=2 | Página 5 de 7
+p6 | PERFIL COMPLETO DE LA EMPRESA | · RIF J510695018 | images=2 | Página 6 de 7
+p7 | PERFIL COMPLETO DE LA EMPRESA | · RIF J510695018 | images=2 | Página 7 de 7
+== minimal_new_company.pdf pages=3
+p1 | PERFIL COMPLETO DE LA EMPRESA | · RIF J952328066 | images=2 | Página 1 de 3
+p2 | PERFIL COMPLETO DE LA EMPRESA | · RIF J952328066 | images=2 | Página 2 de 3
+p3 | PERFIL COMPLETO DE LA EMPRESA | · RIF J952328066 | images=2 | Página 3 de 3
+== selected_sections.pdf pages=2
+p1 | PERFIL DE LA EMPRESA — SECCIONES SELECCIONADAS | · RIF J854852451 | images=2 | Página 1 de 2
+p2 | PERFIL DE LA EMPRESA — SECCIONES SELECCIONADAS | · RIF J854852451 | images=2 | Página 2 de 2
+
+## Pixel band check of every published PNG (png_band_check.js)
+complete_full_company-page-1.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-2.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-3.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-4.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-5.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-6.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-7.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-1.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-2.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-3.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-4.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-5.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-6.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-7.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+minimal_new_company-page-1.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+minimal_new_company-page-2.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+minimal_new_company-page-3.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+no_aplica_company-page-1.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+no_aplica_company-page-2.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+no_aplica_company-page-3.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+query_cannot_switch_company-page-1.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+selected_array_form-page-1.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+selected_sections-page-1.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+selected_sections-page-2.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+browser-full-desktop-page-1.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+browser-full-desktop-page-2.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+browser-full-desktop-page-3.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+browser-full-desktop-page-4.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+browser-sections-page-1.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+browser-sections-page-2.png  band@20pt=68%  gap@100pt=0%  HEADER_OK
+
+# After the fix (0392a14): pixel band check of every page rendered by the run
+complete_full_company-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-4.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-5.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-6.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+complete_full_company-page-7.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_full-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_full-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_full-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_full-page-4.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_full-page-5.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_full-page-6.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_full-page-7.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_full-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_full-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_full-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_full-page-4.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_full-page-5.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_full-page-6.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_full-page-7.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_full-page-8.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_partial-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_partial-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_partial-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_partial-page-4.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_long_partial-page-5.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_minimal-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_minimal-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_minimal-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_partial-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_partial-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_partial-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+header_partial-page-4.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-4.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-5.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-6.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_0-page-7.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_1-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_1-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_1-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_1-page-4.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_1-page-5.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_1-page-6.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_1-page-7.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_2-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_2-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_2-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_2-page-4.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_2-page-5.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_2-page-6.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+ignored_selection_2-page-7.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+minimal_new_company-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+minimal_new_company-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+minimal_new_company-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+no_aplica_company-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+no_aplica_company-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+no_aplica_company-page-3.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+query_cannot_switch_company-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+selected_array_form-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+selected_sections-page-1.png  band@20pt=77%  gap@100pt=0%  HEADER_OK
+selected_sections-page-2.png  band@20pt=77%  gap@100pt=0%  HEADER_OK

@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-19 ~16:20Z, en la rama `fix/complete-company-pdf` (sobre `fix/export-access` @ `37503c8`; staging corre `ce70b7f`).
+**Checkpoint:** 2026-10-20 ~07:50Z, en la rama `fix/complete-company-pdf` (sobre `fix/export-access` @ `37503c8`; staging corre `ce70b7f`).
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -58,7 +58,8 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 - **Causa:** la columna «PDF» (`IconColumn::make('')`) no dibujaba ningún ícono; lo visible era el exportador de la tabla (listado). Con `->spa()`, un enlace directo tampoco descargaba.
 - **Arreglo:** «Perfil completo (PDF)» y «Elegir secciones» en cada fila, «Descargar perfil completo (PDF)» en la ficha, «Exportar listado» aparte. El mismo `pdf.blade.php`, reparado; `?secciones=` con lista blanca (`App\Support\CompanyDossier`).
-- **TESTED_HEAD `88713a7`:** suite completa 582 OK, enfocadas 109 OK, navegador 16/16; texto real del PDF (`pdftotext`) y cada página revisada. Informe: `audit/complete_company_pdf_2026-10-19.md`.
+- **TESTED_HEAD `88713a7`:** suite completa 582 OK, enfocadas 109 OK, navegador 16/16. Informe: `audit/complete_company_pdf_2026-10-19.md`.
+- **PDF-01 (`6272035810`):** no reproducido en la evidencia publicada; sí con nombres de 100 caracteres. Franja de alto fijo, chequeo por página. `0392a14`: enfocadas 34 OK.
 
 ### Anteriores
 

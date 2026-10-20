@@ -4,6 +4,7 @@
 - **Branch:** `fix/complete-company-pdf`, from `fix/export-access` @ `37503c8` (checkpoint docs only on top of the deployed runtime `ce70b7f`).
 - **BASE_SHA:** `37503c8382989e29c101f556533e0fd5aadddd33`. Deploy branch and staging verified at `ce70b7f` (`git ls-remote`) before branching; worktrees untouched.
 - **TESTED_HEAD:** `88713a70171ca80903fedac74cd4507498ad8718`. The full suite, the focused set and the browser check all ran at this SHA (§7).
+- **PDF-01 follow-up (§9):** TESTED_HEAD `0392a1417236bd305640ce885ffe30538fdc6960`, focused run only (CSS/header and pagination change).
 - **REVIEW_HEAD:** the commit that adds this report and the checkpoint (documentation and evidence only).
 - **Deployed:** NO.
 
@@ -146,7 +147,36 @@ There were two different paths, and the visible one was the wrong one.
 - **Tests:** the anchors and the manual's own PDF coverage are preserved (`UserManualContentTest`).
 - **Operator note:** `docs/deploy/DESCARGAS_PERFIL.md` gains the actions, the default, the `secciones` allowlist and the validation rules.
 
-## 9. LIMITATIONS
+## 9. PDF-01 follow-up (`6272035810`, review of `034cf11`): repeated header
+
+- **Finding:** the reviewer saw no yellow header on `complete_full_company-page-{1,4,5,7}.png` at `034cf11`, while pages 2, 3 and 6 had it.
+- **Reproduction of the published evidence at `034cf11`, before any change** (`audit/runs/complete_company_pdf/pdf01/reproduction_and_checks.txt`):
+  - **Bytes:** for all 7 pages, the PNG in the git blob, the working file and `raw.githubusercontent.com/…/034cf11…/` have the same md5. The PDF blob equals the file too. The artifacts were not replaced or mismapped.
+  - **The PDF itself, page by page** (poppler: `pdftotext -f N -l N` and `pdfimages -list`): every page of `complete_full_company.pdf` (7), `minimal_new_company.pdf` (3) and `selected_sections.pdf` (2), pages 1, 4, 5 and 7 included, has the title, «· RIF <rif>», «Página N de M» and **2 logo images**.
+  - **Pixels:** each of the 30 published page PNGs was decoded by a small script that uses no image library (`png_band_check.js`). The row at 20 pt is 68% band yellow, and the row at 100 pt has 0% yellow on **every** page.
+  - **Visually:** pages 1, 4, 5 and 7 show the header.
+  - **Conclusion:** the omission described in PDF-01 **does not reproduce** in the delivered PDF or PNGs. I could not determine how it was observed. No code defect is claimed for it.
+- **What the new checks did find (a real defect, reproduced):** with the **longest name the column allows (100 characters)**, the header line wrapped. «RIF» was separated from its number, and the yellow band **grew with its content** to about 104 pt. That is 8 pt from the body, which starts at 112.5 pt; the new gap check failed (row 100 pt: 12% white).
+  - **Cause:** `.page-header` had a fixed height, but the yellow `.row` inside it did not.
+  - **Fix** (`resources/views/pdf.blade.php`, CSS and markup only):
+    - the band has a fixed height of 112px (`overflow: hidden`), inside the 150px top margin;
+    - logos 52/48px (were 60/55), logo cells 56px;
+    - the name line is 10px, with a 12px line height (at most two lines fit);
+    - «RIF …» is `nowrap`.
+  - **Result:** the 100-character name now fits on one line; the band is identical on every page and document.
+- **Second real defect, found in the long partial document:** an experience whose description is taller than a page was pushed whole to the next page by `page-break-inside: avoid`, leaving page 1 nearly blank.
+  - **Fix:** descriptions over 1,500 characters may split. The heading still stays with the start of the first experience. Normal cards are unchanged.
+- **New check** (`CompanyDossierPdfTest::every_page_carries_the_header_in_complete_partial_minimal_and_long_documents`), on **each page** of five synthetic documents (complete, partial `generales,experiencia`, minimal, complete with a 100-character name and a description longer than a page, and partial `experiencia,gestion` of that company):
+  - the page's own text has the title exactly once, the company name, «· RIF <rif>» and «Página N de M»;
+  - the page places **2 logo images**;
+  - at 72 dpi, the row at 20 pt is more than 60% band yellow, and the row at 100 pt is **100% white** (no missing band, no band overflow, no body under the band);
+  - the long description really spans pages, and in the partial it starts on page 1.
+  - The old whole-document text check could not catch a missing header; this one fails on the 100-character name without the fix.
+- **Pages checked by the test:** complete 7, partial 4, minimal 3, long complete 8, long partial 5 (`header_pages.json`). That is 27 pages, each **inspected visually** as well. The pixel check also ran over all 65 page renders of the run: 65/65 `HEADER_OK`.
+- **Evidence (synthetic):** `audit/runs/complete_company_pdf/pdf01/` (PDFs, text, page PNGs, scripts, reproduction log). The evidence in `pdf/` and `ux/` stays as reviewed at `034cf11`.
+- **Not changed:** report data, sections, access rules, controller, UI and manual. The user manual describes neither the header nor pagination, so it stays accurate.
+
+## 10. LIMITATIONS
 
 - **Not deployed.** Staging still shows the empty «PDF» column until a deployment is authorized.
 - **`ExperienceView` / `PresenceView`:** the views are staging-identical and were not changed (no schema change). The PDF now reads experience and presence from the models.
