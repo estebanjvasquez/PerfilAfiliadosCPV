@@ -58,7 +58,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 - **Causa:** la columna «PDF» (`IconColumn::make('')`) no dibujaba ningún ícono; lo visible era el exportador de la tabla (listado). Con `->spa()`, un enlace directo tampoco descargaba.
 - **Arreglo:** «Perfil completo (PDF)» y «Elegir secciones» en cada fila, «Descargar perfil completo (PDF)» en la ficha, «Exportar listado» aparte. El mismo `pdf.blade.php`, reparado; `?secciones=` con lista blanca (`App\Support\CompanyDossier`).
-- **TESTED_HEAD `88713a7`:** suite completa 582 OK, enfocadas 109 OK, navegador 16/16. Informe: `audit/complete_company_pdf_2026-10-19.md`.
+- **`88713a7`:** suite completa 582 OK, navegador 16/16. Informe `audit/complete_company_pdf_2026-10-19.md`.
 - **PDF-01 (`6272035810`):** no reproducido en la evidencia publicada; sí con nombres de 100 caracteres. Franja de alto fijo, chequeo por página. `0392a14`: enfocadas 34 OK.
 
 ### Anteriores
