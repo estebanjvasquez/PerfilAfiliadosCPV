@@ -53,6 +53,16 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
         return true;
     }
 
+    /**
+     * CPV-SEC-01 F-01 (Issue #2 `6293112309`): only a super admin may impersonate («Impersonate» in Usuarios). The
+     * impersonation packages (stechstudio/filament-impersonate, lab404/laravel-impersonate) allow it to anyone when this
+     * method does not exist, so seeing the user list was enough. The rules for who can open Usuarios are unchanged.
+     */
+    public function canImpersonate(): bool
+    {
+        return $this->hasRole(config('filament-shield.super_admin.name'));
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_id');
