@@ -385,12 +385,15 @@
     {{-- EXPERIENCIA RELEVANTE ..................................................................... --}}
     @if ($want('experiencia'))
         @forelse ($exp as $fila)
-            {{-- El título va dentro del bloque de la primera experiencia, para no quedar solo al pie de una página. --}}
-            <div class="{{ $loop->first ? 'bloque' : '' }}">
+            {{-- El título va dentro del bloque de la primera experiencia, para no quedar solo al pie de una página. Una
+                 experiencia con una descripción muy larga (más de una página) SÍ se corta: si no, dompdf la pasaba entera a la
+                 página siguiente y dejaba una página casi en blanco (PDF-01, `6272035810`). --}}
+            @php $larga = mb_strlen((string) $fila->descripcion) > 1500; @endphp
+            <div class="{{ $loop->first && ! $larga ? 'bloque' : '' }}">
                 @if ($loop->first)
                     <h2 class="titulo2 gris-oscuro">Experiencia relevante</h2>
                 @endif
-                <div class="experiencia-card">
+                <div class="experiencia-card" @if ($larga) style="page-break-inside: auto;" @endif>
                     <div class="gris-oscuro" style="font-size: 13px; padding: 3px;"><b>{{ $has($fila->ano) ? $fila->ano : 'Año no indicado' }}</b></div>
                     @foreach ([
                         'Sector' => $fila->sectorind,

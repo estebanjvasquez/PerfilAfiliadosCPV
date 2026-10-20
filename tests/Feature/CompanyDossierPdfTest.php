@@ -339,6 +339,11 @@ class CompanyDossierPdfTest extends TestCase
             $checked[$evidence] = $this->assertHeaderOnEveryPage($evidence, $title, $empresa);
         }
         $this->assertStringContainsString('ZZZLARGA', $text);
+        // A description taller than a page starts right after the «Contenido» box: it is not pushed whole to page 2, which
+        // left page 1 almost blank.
+        $first = Process::run(['pdftotext', '-f', '1', '-l', '1', '-enc', 'UTF-8', storage_path('app/pdf_evidence/header_long_partial.pdf'), '-'])->output();
+        $this->assertStringContainsString('Experiencia relevante', $first);
+        $this->assertStringContainsString('ZZZLARGA', $first);
         // The long description really spans pages, so the check covers a card split across a page break.
         $this->assertGreaterThan($checked['header_full'], $checked['header_long_full']);
         file_put_contents(storage_path('app/pdf_evidence/header_pages.json'), json_encode($checked, JSON_PRETTY_PRINT));
