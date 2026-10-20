@@ -27,13 +27,18 @@
 
         body { font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #111; }
 
-        .page-header { position: fixed; left: 0; right: 0; top: -140px; height: 115px; }
+        /* PDF-01 (`6272035810`): la franja tiene ALTO FIJO (112px) y entra siempre en el margen superior de 150px, en todas las
+           páginas. Antes crecía con el contenido: un nombre de 100 caracteres pasaba a dos líneas y la franja casi tocaba el
+           cuerpo. Ahora el nombre usa a lo sumo dos líneas de 12px dentro de la franja, y «RIF …» no se corta. */
+        .page-header { position: fixed; left: 0; right: 0; top: -140px; height: 112px; }
+
+        .page-header .amarillo { height: 112px; overflow: hidden; }
 
         .row:after { content: ""; display: table; clear: both; }
 
-        .column1 { float: left; width: 48%; padding: 5px; height: 70px; }
+        .column1 { float: left; width: 48%; padding: 4px 5px; height: 56px; }
 
-        .column2 { float: right; width: 48%; padding: 5px; height: 70px; text-align: right; }
+        .column2 { float: right; width: 48%; padding: 4px 5px; height: 56px; text-align: right; }
 
         .amarillo { background-color: #FBB805; }
 
@@ -41,7 +46,9 @@
 
         .page-header h3 { margin: 0; padding: 3px 6px 0 6px; text-align: center; font-size: 13px; }
 
-        .page-header .empresa { margin: 0; padding: 0 6px 4px 6px; text-align: center; font-size: 11px; }
+        .page-header .empresa { margin: 0; padding: 0 6px 3px 6px; text-align: center; font-size: 10px; line-height: 12px; }
+
+        .page-header .rif { white-space: nowrap; }
 
         h2.titulo2 { font-size: 15px; text-align: left; color: #000; padding: 5px; margin: 14px 0 0 0; }
 
@@ -87,14 +94,14 @@
     <div class="page-header">
         <div class="row amarillo">
             <div class="column1">
-                <img src="{{ public_path('images/Campet-Logo.png') }}" style="height: 60px;">
+                <img src="{{ public_path('images/Campet-Logo.png') }}" style="height: 52px;">
             </div>
             <div class="column2">
-                <img src="{{ public_path('images/Perfil-Logo.png') }}" style="height: 55px;">
+                <img src="{{ public_path('images/Perfil-Logo.png') }}" style="height: 48px;">
             </div>
             <div style="width: 100%; clear: both;">
                 <h3>{{ $complete ? 'PERFIL COMPLETO DE LA EMPRESA' : 'PERFIL DE LA EMPRESA — SECCIONES SELECCIONADAS' }}</h3>
-                <p class="empresa">{{ $record->name }} · RIF {{ $record->rif }}</p>
+                <p class="empresa">{{ $record->name }} · <span class="rif">RIF {{ $record->rif }}</span></p>
             </div>
         </div>
     </div>
