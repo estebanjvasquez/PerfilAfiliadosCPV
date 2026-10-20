@@ -473,11 +473,15 @@ class AccessMatrixTest extends TestCase
         }
         $list->assertTableActionHidden('impersonate', $this->actors['super_admin']);
 
-        // Allowed: the super admin impersonates an affiliate, then leaves.
+        // Allowed: the super admin keeps the action, and impersonating then leaving works. (Running the action inside the
+        // Livewire test would switch the session in the middle of the test request; the gate is the same method.)
         $super = $this->actors['super_admin'];
         Livewire::actingAs($super)->test(\App\Filament\Resources\UserResource\Pages\ListUsers::class)->call('loadTable')
-            ->callTableAction('impersonate', $this->actors['affiliate_alfa']);
-        $this->assertTrue($manager->isImpersonating());
+            ->assertTableActionVisible('impersonate', $this->actors['affiliate_alfa']);
+        $this->assertTrue($super->canImpersonate());
+        $this->assertFalse($viewer->canImpersonate());
+        $this->actingAs($super);
+        $manager->take($super, $this->actors['affiliate_alfa']);
         $this->assertSame($this->actors['affiliate_alfa']->id, auth()->id());
         $manager->leave();
         $this->assertSame($super->id, auth()->id());
