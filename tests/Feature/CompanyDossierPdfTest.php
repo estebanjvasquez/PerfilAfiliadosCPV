@@ -295,7 +295,7 @@ class CompanyDossierPdfTest extends TestCase
             $yellow = fn ($r, $g, $b) => $r > 220 && $g > 150 && $g < 215 && $b < 80;
             $white = fn ($r, $g, $b) => $r > 245 && $g > 245 && $b > 245;
             $this->assertGreaterThan(0.6, $share(20, $yellow), "{$label}: yellow band at the top");
-            $this->assertSame(1.0, $share(100, $white), "{$label}: clean gap between band and body");
+            $this->assertSame(1.0, (float) $share(100, $white), "{$label}: clean gap between band and body");
             @unlink("{$png}.png");
         }
 
