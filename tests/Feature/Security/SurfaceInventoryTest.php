@@ -97,7 +97,7 @@ class SurfaceInventoryTest extends TestCase
                 'public_methods' => $this->appPublicMethods($r),
             ];
         }
-        $widgets = array_map(fn ($w) => class_basename(is_string($w) ? $w : get_class($w)), $panel->getWidgets());
+        $widgets = array_values(array_map(fn ($w) => class_basename(is_string($w) ? $w : get_class($w)), $panel->getWidgets()));
 
         $components = [];
         $aliases = (fn () => $this->aliases)->call(app(ComponentRegistry::class));
@@ -168,7 +168,8 @@ class SurfaceInventoryTest extends TestCase
         $methods = [];
         foreach ($r->getMethods(ReflectionMethod::IS_PUBLIC) as $m) {
             $file = (string) $m->getFileName();
-            if ($m->isStatic() || ! str_contains(str_replace('\\', '/', $file), '/app/') || str_starts_with($m->getName(), '__')) {
+            // Only methods written in this application's app/ directory (vendor/ also lives under the project root).
+            if ($m->isStatic() || ! str_starts_with(str_replace('\\', '/', $file), str_replace('\\', '/', app_path()).'/') || str_starts_with($m->getName(), '__')) {
                 continue;
             }
             if (in_array($m->getName(), ['render', 'mount', 'boot', 'booted', 'hydrate', 'dehydrate', 'form', 'table', 'infolist', 'getTitle', 'getHeading', 'getSubheading'], true)) {
