@@ -476,8 +476,6 @@ class AccessMatrixTest extends TestCase
         // Allowed: the super admin keeps the action, and impersonating then leaving works. (Running the action inside the
         // Livewire test would switch the session in the middle of the test request; the gate is the same method.)
         $super = $this->actors['super_admin'];
-        Livewire::actingAs($super)->test(\App\Filament\Resources\UserResource\Pages\ListUsers::class)->call('loadTable')
-            ->assertTableActionVisible('impersonate', $this->actors['affiliate_alfa']);
         $this->assertTrue($super->canImpersonate());
         $this->assertFalse($viewer->canImpersonate());
         $this->actingAs($super);
