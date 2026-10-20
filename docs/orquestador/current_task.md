@@ -1,7 +1,20 @@
-# Tarea actual (checkpoint 2026-10-20 ~10:15Z, rama `fix/pdf-operation-section`)
+# Tarea actual (checkpoint 2026-10-20 ~15:20Z, rama `audit/security-access-01`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
+
+## CPV-SEC-01 — READY_FOR_REVIEW — MANUAL (`6293112309` / `6293203444`), sin desplegar
+
+| Campo | Valor |
+|---|---|
+| Base | `4a56faf` (runtime `87dd997` + docs del plan) |
+| Ramas | `audit/security-access-01` (pruebas, informe, checkpoint) ⊃ `fix/sec-01-impersonation-gate` (`613c359`: solo un super admin puede suplantar) |
+| Pruebas | antes del arreglo (`ab0464b`): 1 falla esperada; después (`7d8531e`): suite completa **593 OK**; enfocadas `4819877`: 25 OK |
+| Cobertura | 131 rutas, 30 recursos, 29 páginas, 151 componentes; matriz de 9 actores × 88 entradas (792 pedidos, 0 violaciones) |
+| Registro | F-01 corregido; F-02/F-03 (datos de roles) y F-06 son decisiones del propietario; F-04/F-05 para la próxima ronda (`audit/security_sec01_2026-10-20.md`) |
+| Restringido | evidencia cruda y mecanismos fuera de git, en el almacenamiento local del ejecutor; entrega a pedido por canal privado |
+
+Gerencia (`planning/management-taxonomy`) en espera hasta aceptar la seguridad; no se promueve esa rama.
 
 ## CPV-PDF-OPERATION-SECTION — DEPLOYED_FOR_OWNER_REVIEW — MANUAL (`6288459314`)
 

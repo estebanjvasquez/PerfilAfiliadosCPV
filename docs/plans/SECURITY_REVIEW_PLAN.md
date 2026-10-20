@@ -16,7 +16,7 @@ Return one reviewable delivery and stop. No deploy without a separate owner auth
 ## Work breakdown
 | ID | State | Scope | Exit evidence |
 |---|---|---|---|
-| SEC-01 | AUTHORIZED / NOT YET EXECUTED | Surface inventory; actor/action/company authorization; first bounded confirmed repairs | Coverage matrix, isolated reproductions, minimal fixes and regressions |
+| SEC-01 | ROUND 1 DELIVERED FOR REVIEW 2026-10-20 (audit/security_sec01_2026-10-20.md); F-01 fixed, not deployed; remaining items registered | Surface inventory; actor/action/company authorization; first bounded confirmed repairs | Coverage matrix, isolated reproductions, minimal fixes and regressions |
 | SEC-02 | PLANNED | All reports/exports, temporary files/storage URLs, cache boundaries, renderer safety | Access and content isolation; safe file/cache behaviour |
 | SEC-03 | PLANNED | Authentication, verification/recovery/session, inputs/uploads, privileged fields/associations | Allowed/denied flow and input regressions |
 | SEC-04 | PLANNED | Dependencies, integrations/outbound requests, infrastructure/configuration review | Versioned advisory/configuration evidence and ranked proposals |

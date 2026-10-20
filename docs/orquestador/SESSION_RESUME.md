@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-20 ~10:15Z, en la rama `fix/pdf-operation-section`; staging corre `87dd997`.
+**Checkpoint:** 2026-10-20 ~15:20Z, en la rama `audit/security-access-01` (seguridad, SEC-01); staging corre `87dd997`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,7 +32,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`fix/pdf-operation-section`**: su `87dd997` corre en staging; encima, solo docs.
+- **Rama canónica:** **`audit/security-access-01`**: `87dd997` + docs + `fix/sec-01-impersonation-gate` (sin desplegar). `planning/management-taxonomy` está EN ESPERA: no se promueve.
   - Contiene `ce70b7f`, `edf20ed`, `10616af`, `0895258` y `28014c2`.
   - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `87dd997`; el checkpoint vigente es el de esta rama.
   - Una sesión abierta en un checkout viejo no los carga sola.
@@ -43,7 +43,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `fix/pdf-operation-section` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabajá en la rama `audit/security-access-01` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
@@ -74,6 +74,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
+- **Seguridad (CPV-SEC-01, `6293112309`/`6293203444`):** ronda 1 en revisión. F-01 (Alta) corregido en `fix/sec-01-impersonation-gate`, sin desplegar; aviso `6293694720`. Estados en `docs/plans/SECURITY_REVIEW_PLAN.md`; informe `audit/security_sec01_2026-10-20.md`. SEC-02..05 sin empezar; gerencia en espera.
 - **Propietario:** UAT de la selección de secciones y del perfil completo (`current_task.md`).
 - **Propietario:**
   - UAT de Inicio en staging;
