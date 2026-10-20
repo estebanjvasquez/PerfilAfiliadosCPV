@@ -251,7 +251,98 @@ class CompanyDossierPdfTest extends TestCase
         return preg_match('/^Pages:\s+(\d+)/m', $info, $m) ? (int) $m[1] : 0;
     }
 
+    /**
+     * PDF-01 (`6272035810`): the header must be on EVERY page, checked page by page in the real PDF, not on the whole text.
+     * - **Text:** the page's own text (`pdftotext -f N -l N`) has the title, the company name, «RIF <rif>» and «Página N de M».
+     * - **Logos:** the page places its two logo images (`pdfimages -list`).
+     * - **Pixels:** rendered at 72 dpi (1 px = 1 pt), the row at 20 pt is mostly the yellow band, and the row at 100 pt (between the
+     *   band, which ends at ~94 pt, and the body, which starts at 112.5 pt) is pure white: no missing band, no band overflowing
+     *   into the body, no body text under the band.
+     *
+     * @return int number of pages checked
+     */
+    private function assertHeaderOnEveryPage(string $evidence, string $title, Empresa $empresa): int
+    {
+        $file = storage_path("app/pdf_evidence/{$evidence}.pdf");
+        $pages = $this->pages($evidence);
+        $this->assertGreaterThan(0, $pages, "{$evidence}: page count");
+        $flat = fn (string $s) => preg_replace('/\s+/u', ' ', $s);
+        for ($p = 1; $p <= $pages; $p++) {
+            $label = "{$evidence} page {$p}/{$pages}";
+            $text = $flat(Process::run(['pdftotext', '-f', (string) $p, '-l', (string) $p, '-enc', 'UTF-8', $file, '-'])->output());
+            $this->assertSame(1, substr_count($text, $title), "{$label}: title once");
+            $this->assertStringContainsString($flat($empresa->name).' · RIF '.$empresa->rif, $text, "{$label}: company name and RIF");
+            $this->assertStringContainsString("Página {$p} de {$pages}", $text, "{$label}: footer");
+
+            $images = collect(explode("\n", Process::run(['pdfimages', '-f', (string) $p, '-l', (string) $p, '-list', $file])->output()))
+                ->filter(fn ($line) => preg_match('/^\s*\d+\s+\d+\s+image\b/', $line))->count();
+            $this->assertSame(2, $images, "{$label}: both logos");
+
+            $png = storage_path("app/pdf_evidence/{$evidence}-p{$p}-72dpi");
+            Process::run(['pdftoppm', '-f', (string) $p, '-l', (string) $p, '-r', '72', '-png', '-singlefile', $file, $png]);
+            $img = imagecreatefrompng("{$png}.png");
+            $this->assertNotFalse($img, "{$label}: rendered");
+            $width = imagesx($img);
+            $share = function (int $y, callable $test) use ($img, $width) {
+                $n = 0;
+                for ($x = 0; $x < $width; $x++) {
+                    $c = imagecolorat($img, $x, $y);
+                    $n += $test(($c >> 16) & 255, ($c >> 8) & 255, $c & 255) ? 1 : 0;
+                }
+
+                return $n / $width;
+            };
+            $yellow = fn ($r, $g, $b) => $r > 220 && $g > 150 && $g < 215 && $b < 80;
+            $white = fn ($r, $g, $b) => $r > 245 && $g > 245 && $b > 245;
+            $this->assertGreaterThan(0.6, $share(20, $yellow), "{$label}: yellow band at the top");
+            $this->assertSame(1.0, $share(100, $white), "{$label}: clean gap between band and body");
+            @unlink("{$png}.png");
+        }
+
+        return $pages;
+    }
+
     // ---------------------------------------------------------------- tests
+
+    #[Test]
+    public function every_page_carries_the_header_in_complete_partial_minimal_and_long_documents(): void
+    {
+        $owner = $this->user();
+        $full = $this->fullCompany($owner, 'A');
+
+        // Longest name the column allows (100), and a long experience description, for wrapping and pagination.
+        $long = $this->fullCompany($owner, 'L');
+        $long->forceFill(['name' => mb_substr('ZZZ CONSORCIO DE SERVICIOS PETROLEROS INTEGRALES DE ORIENTE Y OCCIDENTE, MANTENIMIENTO Y CONSTRUCCION C.A. EXTRA', 0, 100)])->saveQuietly();
+        $this->actingAs($owner);
+        $experience = Experience::where('empresa_id', $long->id)->firstOrFail();
+        $entries = $experience->exp_year;
+        $first = array_key_first($entries);
+        $entries[$first]['data']['Descripcion'] = 'ZZZLARGA '.str_repeat('Descripción sintética extensa de un contrato de ingeniería, procura y construcción con varias fases y entregables. ', 40);
+        $experience->update(['exp_year' => $entries]);
+        auth()->logout();
+        $long->refresh();
+        $this->assertSame(100, mb_strlen($long->name));
+
+        $minimal = $this->company($owner, ['name' => 'ZZZMINIMA']);
+        $complete = 'PERFIL COMPLETO DE LA EMPRESA';
+        $partial = 'PERFIL DE LA EMPRESA — SECCIONES SELECCIONADAS';
+
+        $checked = [];
+        foreach ([
+            ['header_full', $full, [], $complete],
+            ['header_partial', $full, ['secciones' => 'generales,experiencia'], $partial],
+            ['header_minimal', $minimal, [], $complete],
+            ['header_long_full', $long, [], $complete],
+            ['header_long_partial', $long, ['secciones' => 'experiencia,gestion'], $partial],
+        ] as [$evidence, $empresa, $query, $title]) {
+            $text = $this->pdfText($this->hit($owner, $this->url($empresa, $query)), $evidence);
+            $checked[$evidence] = $this->assertHeaderOnEveryPage($evidence, $title, $empresa);
+        }
+        $this->assertStringContainsString('ZZZLARGA', $text);
+        // The long description really spans pages, so the check covers a card split across a page break.
+        $this->assertGreaterThan($checked['header_full'], $checked['header_long_full']);
+        file_put_contents(storage_path('app/pdf_evidence/header_pages.json'), json_encode($checked, JSON_PRETTY_PRINT));
+    }
 
     #[Test]
     public function the_complete_profile_is_the_default_and_contains_every_module(): void
