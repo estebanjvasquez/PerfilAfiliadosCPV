@@ -145,16 +145,6 @@
         </table>
 
         <div class="bloque">
-            <h4 class="subtitulo gris-oscuro">Operación en Venezuela</h4>
-            <table>
-                <tr class="noBorder"><td class="etiqueta">Facturación anual:</td><td>{{ $has($g->facturacion_anual) ? $g->facturacion_anual : $vacio }}</td></tr>
-                <tr class="noBorder"><td class="etiqueta">Empleados (rango declarado):</td><td>{{ $empleadosRango ?? $vacio }}</td></tr>
-                <tr class="noBorder"><td class="etiqueta">Empleados (total en Recursos humanos):</td><td>{{ $has($g->empleados) ? $g->empleados : $vacio }}</td></tr>
-                <tr class="noBorder"><td class="etiqueta">Estatus actual:</td><td>{{ $has($g->estado_actual) ? $g->estado_actual : $vacio }}</td></tr>
-            </table>
-        </div>
-
-        <div class="bloque">
             <h4 class="subtitulo gris-oscuro">Contactos</h4>
             <table>
                 @forelse ($contactos as $contacto)
@@ -169,6 +159,20 @@
                 @empty
                     <tr><td><p class="vacio">{{ $vacio }}</p></td></tr>
                 @endforelse
+            </table>
+        </div>
+    @endif
+
+    {{-- OPERACIÓN EN VENEZUELA: sección propia desde CPV-PDF-OPERATION-SECTION (`6286644396`); antes iba dentro de
+         Datos generales y salía aunque solo se eligieran los datos generales. Los mismos cuatro campos. ............... --}}
+    @if ($want('operacion'))
+        <div class="bloque">
+            <h2 class="titulo2 gris-oscuro">Operación en Venezuela</h2>
+            <table>
+                <tr class="noBorder"><td class="etiqueta">Facturación anual:</td><td>{{ $has($g->facturacion_anual) ? $g->facturacion_anual : $vacio }}</td></tr>
+                <tr class="noBorder"><td class="etiqueta">Empleados (rango declarado):</td><td>{{ $empleadosRango ?? $vacio }}</td></tr>
+                <tr class="noBorder"><td class="etiqueta">Empleados (total en Recursos humanos):</td><td>{{ $has($g->empleados) ? $g->empleados : $vacio }}</td></tr>
+                <tr class="noBorder"><td class="etiqueta">Estatus actual:</td><td>{{ $has($g->estado_actual) ? $g->estado_actual : $vacio }}</td></tr>
             </table>
         </div>
     @endif

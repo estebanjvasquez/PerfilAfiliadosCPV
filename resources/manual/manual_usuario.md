@@ -118,12 +118,23 @@ La lista muestra el nombre de la empresa, si está **Activo**, el año de fundac
 
 ### Descargar el perfil {#descargar-perfil}
 
-El **perfil completo** es un PDF con todo lo que su empresa registró en el sistema:
-- datos generales y contactos (dirección, ciudad, web, redes, teléfono, capital, origen, sectores, facturación, empleados, estatus);
-- clientes, cámaras, sectores y servicios, y categorías CPV;
-- enfoque de sostenibilidad;
-- recursos en Venezuela (recursos humanos, maquinaria y equipos, instalaciones e inventario);
-- experiencia relevante, presencia internacional y sistemas de gestión.
+El **perfil completo** es un PDF con todo lo que su empresa registró en el sistema, en 11 secciones. Son las mismas opciones de **Elegir secciones**, en este orden, y cada una trae solo lo que se indica:
+
+| Sección | Qué incluye |
+|---|---|
+| **Datos generales y contactos** | Nombre, RIF, dirección, ciudad, web, teléfono, redes sociales, fundación, capital y origen, sectores principal y secundario; contactos. |
+| **Operación en Venezuela** | Facturación anual, empleados (rango declarado y total en Recursos humanos) y estatus actual. |
+| **Clientes** | Nombre y país de cada cliente. |
+| **Cámaras** | Cámaras en las que participa la empresa. |
+| **Sectores de actividad económica y servicios** | Sectores de actividad económica y los servicios de cada uno. |
+| **Categorías CPV** | Categorías CPV declaradas o confirmadas, la principal y su origen. |
+| **Enfoque de sostenibilidad** | Áreas de sostenibilidad y su estado. |
+| **Recursos en Venezuela** | Cuatro bloques: recursos humanos, maquinarias y equipos, instalaciones e inventario. |
+| **Experiencia relevante** | Trabajos relevantes: año, clasificación de la infraestructura, monto del contrato, esfuerzo H-H, sector y servicios, descripción. |
+| **Presencia internacional** | Dos bloques: oficinas en otros países y proyectos en otros países. No incluye la Experiencia relevante. |
+| **Sistemas de gestión** | Seis bloques: calidad, ambiente, credibilidad y transparencia, seguridad (con OVID), gestión de proyectos y seguridad de la información, cada uno con «Otros». |
+
+**Datos generales y contactos** y **Operación en Venezuela** son opciones separadas: puede elegir una sola de ellas, o las dos.
 
 Cada sección dice si tiene datos, si su empresa la marcó **No aplica** («Marcado no aplica por el afiliado») o si todavía no hay información registrada. El documento muestra lo que la empresa declaró: no es una calificación crediticia, una certificación ni un aval de la Cámara.
 
@@ -135,8 +146,10 @@ También puede descargarlo desde la ficha de la empresa, con el botón **Descarg
 
 **Descargar solo algunas secciones (opcional):**
 1. En la fila de su empresa, haga clic en el botón de ajustes **Elegir secciones**, junto a **Perfil completo (PDF)**.
-2. Por defecto está marcada **Todas las secciones (perfil completo)**. Para elegir, marque **Solo las secciones que elija** y desmarque las que no quiera.
-3. Haga clic en **Descargar PDF**. El archivo se llama `perfil-<RIF>-parcial.pdf`. Al inicio del documento dice qué secciones incluye y cuáles se omitieron, y aclara que no es el perfil completo.
+2. Por defecto está marcada **Todas las secciones (perfil completo)**. Para elegir, marque **Solo las secciones que elija**: aparecen las 11 secciones, todas marcadas, cada una con una línea que dice qué incluye (la tabla de arriba). Desmarque las que no quiera.
+3. Haga clic en **Descargar PDF**. El archivo se llama `perfil-<RIF>-parcial.pdf`. Al inicio del documento dice qué secciones incluye y cuáles se omitieron, y aclara que no es el perfil completo. Cada página conserva el encabezado con el nombre y el RIF de la empresa.
+
+Si deja marcadas las 11, descarga el perfil completo (`perfil-<RIF>.pdf`).
 
 **Exportar listado no es el perfil:** en **Empresas**, si marca una o más filas, arriba de la tabla aparece **Exportar listado**. Ese botón exporta solo las columnas de la tabla (nombre, año de fundación, ciudad, país, sector…), no el perfil completo de la empresa.
 

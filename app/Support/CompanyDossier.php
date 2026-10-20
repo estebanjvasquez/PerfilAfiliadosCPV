@@ -38,6 +38,7 @@ final class CompanyDossier
     /** Secciones del perfil completo, en el orden del reporte. Las claves son la lista blanca del parámetro `secciones`. */
     public const SECTIONS = [
         'generales' => 'Datos generales y contactos',
+        'operacion' => 'Operación en Venezuela',
         'clientes' => 'Clientes',
         'camaras' => 'Cámaras',
         'sectores' => 'Sectores de actividad económica y servicios',
@@ -49,8 +50,33 @@ final class CompanyDossier
         'gestion' => 'Sistemas de gestión',
     ];
 
-    /** Más de esto en el parámetro no es una selección legítima (hay 10 secciones): se ignora y sale el perfil completo. */
-    private const MAX_PARAM_LENGTH = 300;
+    /**
+     * Qué trae cada sección, para el selector (EmpresaResource::profileSectionsAction) y el manual (#descargar-perfil).
+     * CPV-PDF-OPERATION-SECTION (`6286644396`): «Operación en Venezuela» es una sección propia, y las secciones que agrupan
+     * varios bloques (Recursos, Presencia, Gestión) los nombran.
+     */
+    public const SECTION_DESCRIPTIONS = [
+        'generales' => 'Nombre, RIF, dirección, ciudad, web, teléfono, redes sociales, fundación, capital y origen, sectores principal y secundario; contactos.',
+        'operacion' => 'Facturación anual, empleados (rango declarado y total en Recursos humanos) y estatus actual.',
+        'clientes' => 'Nombre y país de cada cliente.',
+        'camaras' => 'Cámaras en las que participa la empresa.',
+        'sectores' => 'Sectores de actividad económica y los servicios de cada uno.',
+        'categorias' => 'Categorías CPV declaradas o confirmadas, la principal y su origen.',
+        'sostenibilidad' => 'Áreas de sostenibilidad y su estado.',
+        'recursos' => 'Cuatro bloques: recursos humanos, maquinarias y equipos, instalaciones e inventario.',
+        'experiencia' => 'Trabajos relevantes: año, clasificación de la infraestructura, monto del contrato, esfuerzo H-H, sector y servicios, descripción.',
+        'presencia' => 'Dos bloques: oficinas en otros países y proyectos en otros países. No incluye la Experiencia relevante.',
+        'gestion' => 'Seis bloques: calidad, ambiente, credibilidad y transparencia, seguridad (con OVID), gestión de proyectos y seguridad de la información, cada uno con «Otros».',
+    ];
+
+    /**
+     * Un parámetro de más de esto no es una selección legítima: se ignora y sale el perfil completo. Sale de las claves
+     * (tres veces la lista completa, por espacios o repeticiones), no de un número fijo de secciones.
+     */
+    private static function maxParamLength(): int
+    {
+        return 3 * strlen(implode(',', array_keys(self::SECTIONS)));
+    }
 
     private const ROLES = ['1' => 'Subcontratista', '2' => 'Contratista principal', '3' => 'Ambos'];
 
@@ -71,7 +97,7 @@ final class CompanyDossier
     public static function sectionsFrom(mixed $raw): array
     {
         $requested = match (true) {
-            is_string($raw) && strlen($raw) <= self::MAX_PARAM_LENGTH => explode(',', $raw),
+            is_string($raw) && strlen($raw) <= self::maxParamLength() => explode(',', $raw),
             is_array($raw) && count($raw) <= count(self::SECTIONS) => array_filter($raw, 'is_string'),
             default => [],
         };
@@ -98,7 +124,8 @@ final class CompanyDossier
         $want = fn (string $section) => in_array($section, $sections, true);
 
         // Una sola fila de datos generales (la vista tiene una fila por cliente). Si no hay ninguna, todos los campos en null.
-        $datos = $want('generales') || $want('clientes') ? JoinViews::index($id)->data : collect();
+        // La misma fila trae los campos de Operación y los clientes; cada sección imprime solo los suyos (pdf.blade.php).
+        $datos = $want('generales') || $want('operacion') || $want('clientes') ? JoinViews::index($id)->data : collect();
         $g = (object) array_merge(array_fill_keys(self::GENERAL_FIELDS, null), (array) ($datos->first()?->getAttributes() ?? []));
 
         // JoinViews devuelve objetos View. Se sacan sus datos: un View dentro de los datos de otra vista se RENDERIZA al
@@ -148,7 +175,7 @@ final class CompanyDossier
         ];
     }
 
-    /** Campos de `JoinViews::index()` que usa la sección de datos generales. */
+    /** Campos de `JoinViews::index()` que usan las secciones de datos generales, operación y clientes. */
     private const GENERAL_FIELDS = [
         'nombre', 'rif', 'direccion', 'ciudad', 'website', 'telefono', 'contactos', 'fundacion', 'capital', 'origen',
         'facturacion_anual', 'estado_actual', 'empleados', 'clientes', 'cli_pais',

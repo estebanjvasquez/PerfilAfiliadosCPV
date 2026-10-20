@@ -53,6 +53,39 @@ class CompanyDossierPdfTest extends TestCase
         'Instalaciones', 'Inventario', 'Experiencia relevante', 'Presencia internacional', 'Sistemas de gestión',
     ];
 
+    /**
+     * CPV-PDF-OPERATION-SECTION (`6286644396`): what each section, and ONLY that section, prints in the BODY of the PDF for
+     * the full synthetic company «A». Every marker is a heading, a label or a sentinel that no other section prints. A fact a
+     * section legitimately repeats (the sector of an experience, the country of a client) is checked in its own context
+     * («ZZZSECTORPRINCIPAL ZZZSERVICIOCENTINELA» is the sectors table row) or not used as a marker.
+     */
+    private const MARKERS = [
+        'generales' => ['Datos generales', 'Nombre de la empresa:', 'ZZZACALLE 123', 'ZZZCIUDADCENTINELA', 'https://zzzA.test', 'LinkedIn: in/zzzAlinkedin',
+            'Año de fundación:', 'Privado / Internacional', 'Sector secundario:', 'ZZZSECTORSECUNDARIO',
+            'Contactos', 'ZZZACONTACTOUNO', 'ZZZACONTACTODOS', '(contacto principal)', 'ZZZACARGO', 'zzzacontactouno@zzz.test'],
+        'operacion' => ['Operación en Venezuela', 'Facturación anual:', '1.000.001 - 10.000.000 USD', 'Empleados (rango declarado):',
+            'Empleados (total en Recursos humanos):', 'Estatus actual:'],
+        'clientes' => ['Clientes', 'ZZZACLIENTE ZZZPAISCENTINELA'],
+        'camaras' => ['Cámaras', 'ZZZCAMARACENTINELA'],
+        'sectores' => ['Sectores de actividad económica y servicios', 'ZZZSECTORPRINCIPAL ZZZSERVICIOCENTINELA'],
+        'categorias' => ['Categorías CPV', 'ZZZAGRUPOCPV > ZZZACATEGORIACPV', 'Declarada por la empresa', 'Solo categorías declaradas por la empresa o confirmadas.'],
+        'sostenibilidad' => ['Enfoque de sostenibilidad', 'ZZZAREAACTIVA', 'ZZZAREANO', 'Sí: Activo'],
+        'recursos' => ['Recursos en Venezuela', 'Tipo de recurso', 'Ingenieros', 'Maquinarias y equipos', 'Servicios a pozos e instalaciones petroleras',
+            'Instalaciones', 'Tipo de instalación', 'Sup. (m²)', 'Inventario', 'Tipo de inventario', 'Producto terminado', 'ZZZAUNIDAD'],
+        'experiencia' => ['Experiencia relevante', 'ZZZAEXPERIENCIA0', 'ZZZAEXPERIENCIA5', 'ZZZINFRASECTOR', 'ZZZINFRATIPO', 'ZZZINFRASISTEMA', 'ZZZINFRAREGION',
+            'ZZZINFRAINSTALACION', 'Orden de magnitud del contrato', 'Esfuerzo H-H', 'Breve descripción del trabajo realizado'],
+        'presencia' => ['Presencia internacional', '¿Tiene presencia formal en otros países? Sí', '¿Tiene experiencia desarrollando proyectos en otros países? Sí',
+            'ZZZPAISEXTERIOR', 'ZZZACLIENTEEXTERIOR', 'ZZZASEGUNDOCLIENTE', 'Contratista principal', 'Subcontratista', 'Nro. de proyectos', 'Principales clientes'],
+        'gestion' => ['Sistemas de gestión', 'ISO 9001:2015 Sistema de Gestión de la Calidad: Sí', 'Otros: ZZZAOTROCALIDAD', 'Credibilidad y transparencia', 'OVID: Sí',
+            'Gestión de proyectos', 'Seguridad de la información', 'Otros: ZZZAOTROINFO'],
+    ];
+
+    /** The heading of each body block, in the order of the complete report. */
+    private const SECTION_HEADINGS = [
+        'Datos generales', 'Contactos', 'Operación en Venezuela', 'Clientes', 'Cámaras', 'Sectores de actividad económica y servicios', 'Categorías CPV',
+        'Enfoque de sostenibilidad', 'Recursos en Venezuela', 'Experiencia relevante', 'Presencia internacional', 'Sistemas de gestión',
+    ];
+
     private int $pdfRenders = 0;
 
     private int $viewQueries = 0;
@@ -183,14 +216,15 @@ class CompanyDossierPdfTest extends TestCase
         }
         Experience::create(['empresa_id' => $empresa->id, 'exp_year' => $entries]);
         // Los Repeater guardan listas (Repeater::mutateDehydratedStateUsing -> array_values). Una oficina y DOS experiencias:
-        // PresenceView las empareja por posición y perdía la segunda.
+        // PresenceView las empareja por posición y perdía la segunda. Montos 1 y 4: el 3 («1.000.001 - 10.000.000 USD») es la
+        // facturación anual, centinela de Operación en Venezuela.
         Presence::create([
             'empresa_id' => $empresa->id,
             'has_offices' => true,
             'office_data' => [['country_id' => $c['country2'], 'offices_surf' => '120', 'employees_q' => 4, 'status' => true]],
             'has_experience' => true,
             'experience_data' => [
-                ['expcountry_id' => $c['country2'], 'projects_q' => 3, 'role' => '2', 'executed_q' => '3', 'expemployees_q' => 10, 'main_clients' => "ZZZ{$p}CLIENTEEXTERIOR"],
+                ['expcountry_id' => $c['country2'], 'projects_q' => 3, 'role' => '2', 'executed_q' => '1', 'expemployees_q' => 10, 'main_clients' => "ZZZ{$p}CLIENTEEXTERIOR"],
                 ['expcountry_id' => $c['country'], 'projects_q' => 5, 'role' => '1', 'executed_q' => '4', 'expemployees_q' => 2, 'main_clients' => "ZZZ{$p}SEGUNDOCLIENTE"],
             ],
         ]);
@@ -242,6 +276,44 @@ class CompanyDossierPdfTest extends TestCase
         file_put_contents("{$dir}/{$evidence}.txt", $text);
 
         return preg_replace('/\s+/u', ' ', $text);
+    }
+
+    /**
+     * The BODY of a flattened PDF text: after the «Contenido» box (which names the included and OMITTED sections on purpose),
+     * without the header and the footer that every page repeats.
+     */
+    private function body(string $text, Empresa $empresa): string
+    {
+        $end = 'ni un aval de la Cámara.';
+        $this->assertStringContainsString($end, $text, 'the «Contenido» box closes with the disclaimer');
+        $body = substr($text, strpos($text, $end) + strlen($end));
+        $body = str_replace(['PERFIL COMPLETO DE LA EMPRESA', 'PERFIL DE LA EMPRESA — SECCIONES SELECCIONADAS', $empresa->name.' · RIF '.$empresa->rif], ' ', $body);
+
+        return preg_replace('/Página \d+ de \d+/u', ' ', $body);
+    }
+
+    /**
+     * Each marker of `$included` is in the body; no marker of any other section is.
+     *
+     * @return array{present: int, absent: int}
+     */
+    private function assertOnlySections(string $body, array $included, string $label): array
+    {
+        $present = $absent = 0;
+        foreach (self::MARKERS as $section => $markers) {
+            foreach ($markers as $marker) {
+                if (in_array($section, $included, true)) {
+                    $this->assertStringContainsString($marker, $body, "{$label}: «{$marker}» ({$section}) is printed");
+                    $present++;
+                } else {
+                    $this->assertStringNotContainsString($marker, $body, "{$label}: «{$marker}» ({$section}) is NOT printed");
+                    $absent++;
+                }
+            }
+        }
+        $this->assertStringNotContainsString('ZZZB', $body, "{$label}: nothing of another company");
+
+        return ['present' => $present, 'absent' => $absent];
     }
 
     private function pages(string $evidence): int
@@ -303,6 +375,65 @@ class CompanyDossierPdfTest extends TestCase
     }
 
     // ---------------------------------------------------------------- tests
+
+    /**
+     * CPV-PDF-OPERATION-SECTION (`6286644396`): EVERY option on its own, as a real PDF. The body of each single-option PDF has
+     * all the markers of that section and none of any other one (Recursos without Operación, Presencia without Experiencia
+     * relevante, Gestión without Recursos, Clientes without the general fields its query joins). Then generales + operacion,
+     * all 11 (= the complete profile, in the report order) and the default.
+     */
+    #[Test]
+    public function every_section_option_prints_only_its_own_blocks(): void
+    {
+        $owner = $this->user();
+        $a = $this->fullCompany($owner, 'A');
+        $this->fullCompany($this->user(), 'B');
+        $this->assertSame(array_keys(CompanyDossier::SECTIONS), array_keys(self::MARKERS), 'one marker list per section, same order');
+        $this->assertSame(array_keys(CompanyDossier::SECTIONS), array_keys(CompanyDossier::SECTION_DESCRIPTIONS), 'one description per section');
+
+        $matrix = [];
+        foreach (CompanyDossier::SECTIONS as $key => $name) {
+            $r = $this->hit($owner, $this->url($a, ['secciones' => $key]));
+            $this->assertStringContainsString('perfil-'.strtolower($a->rif).'-parcial.pdf', (string) $r->headers->get('Content-Disposition'), $key);
+            $text = $this->pdfText($r, "option_{$key}");
+            $this->assertStringContainsString("Secciones incluidas: {$name}.", $text, $key);
+            $this->assertStringContainsString('Este documento no es el perfil completo.', $text, $key);
+            $matrix[$key] = $this->assertOnlySections($this->body($text, $a), [$key], "only {$key}")
+                + ['pages' => $this->assertHeaderOnEveryPage("option_{$key}", 'PERFIL DE LA EMPRESA — SECCIONES SELECCIONADAS', $a)];
+        }
+
+        // Both: each block once.
+        $text = $this->pdfText($this->hit($owner, $this->url($a, ['secciones' => 'operacion,generales'])), 'option_generales_operacion');
+        $this->assertStringContainsString('Secciones incluidas: Datos generales y contactos, Operación en Venezuela.', $text);
+        $body = $this->body($text, $a);
+        $matrix['generales+operacion'] = $this->assertOnlySections($body, ['generales', 'operacion'], 'generales + operacion');
+        foreach (['Datos generales', 'Contactos', 'Operación en Venezuela', 'Facturación anual:'] as $once) {
+            $this->assertSame(1, substr_count($body, $once), "generales + operacion: «{$once}» once");
+        }
+
+        // All 11, as a list or an array, is the complete profile; so is the default. Same body, in the report order.
+        $all = implode(',', array_keys(CompanyDossier::SECTIONS));
+        $r = $this->hit($owner, $this->url($a, ['secciones' => $all]));
+        $this->assertStringContainsString('perfil-'.strtolower($a->rif).'.pdf', (string) $r->headers->get('Content-Disposition'));
+        $text = $this->pdfText($r, 'option_all_listed');
+        $this->assertStringContainsString('PERFIL COMPLETO DE LA EMPRESA', $text);
+        $bodyAll = $this->body($text, $a);
+        $matrix['all 11'] = $this->assertOnlySections($bodyAll, array_keys(CompanyDossier::SECTIONS), 'all 11');
+        $position = -1;
+        foreach (self::SECTION_HEADINGS as $heading) {
+            $at = strpos($bodyAll, $heading, $position + 1);
+            $this->assertNotFalse($at, "heading «{$heading}»");
+            $this->assertGreaterThan($position, $at, "«{$heading}» follows the previous section");
+            $position = $at;
+        }
+        $bodyDefault = $this->body($this->pdfText($this->hit($owner, $this->url($a)), 'option_default'), $a);
+        $this->assertSame($bodyAll, $bodyDefault, 'all 11 selected = the default complete profile');
+        $text = $this->pdfText($this->hit($owner, $this->url($a).'?'.implode('&', array_map(fn ($k) => "secciones[]={$k}", array_keys(CompanyDossier::SECTIONS)))), 'option_all_array');
+        $this->assertSame($bodyAll, $this->body($text, $a), 'all 11 as an array');
+
+        file_put_contents(storage_path('app/pdf_evidence/selection_matrix.json'), json_encode($matrix, JSON_PRETTY_PRINT));
+    }
+
 
     #[Test]
     public function every_page_carries_the_header_in_complete_partial_minimal_and_long_documents(): void
@@ -468,7 +599,7 @@ class CompanyDossierPdfTest extends TestCase
         $text = $this->pdfText($r, 'selected_sections');
         $this->assertStringContainsString('PERFIL DE LA EMPRESA — SECCIONES SELECCIONADAS', $text);
         $this->assertStringContainsString('Secciones incluidas: Datos generales y contactos, Recursos en Venezuela.', $text);
-        $this->assertStringContainsString('Secciones omitidas por elección del usuario: Clientes, Cámaras,', $text);
+        $this->assertStringContainsString('Secciones omitidas por elección del usuario: Operación en Venezuela, Clientes, Cámaras,', $text);
         $this->assertStringContainsString('Este documento no es el perfil completo.', $text);
         foreach (['ZZZANOMBRE', 'ZZZACONTACTOUNO', 'Servicios a pozos e instalaciones petroleras', 'ZZZAUNIDAD'] as $value) {
             $this->assertStringContainsString($value, $text);
@@ -492,6 +623,18 @@ class CompanyDossierPdfTest extends TestCase
             $this->assertStringNotContainsString('<script>', $text);
         }
         $this->assertSame(array_keys(CompanyDossier::SECTIONS), CompanyDossier::sectionsFrom(['generales' => ['x'], 7, null]));
+        // Revised limits (CPV-PDF-OPERATION-SECTION): derived from the keys, not from a fixed count. An array with one entry
+        // more than there are sections is not a selection; a string up to three times the full key list still is.
+        $keys = array_keys(CompanyDossier::SECTIONS);
+        $this->assertCount(11, $keys);
+        $this->assertSame($keys, CompanyDossier::sectionsFrom($keys));
+        $this->assertSame($keys, CompanyDossier::sectionsFrom(array_merge(['operacion'], array_fill(0, count($keys), 'operacion'))));
+        $this->assertSame(['operacion'], CompanyDossier::sectionsFrom(array_fill(0, count($keys), 'operacion')));
+        $limit = 3 * strlen(implode(',', $keys));
+        $this->assertSame(['operacion'], CompanyDossier::sectionsFrom(str_pad('operacion', $limit)));
+        $this->assertSame($keys, CompanyDossier::sectionsFrom(str_pad('operacion', $limit + 1)));
+        $this->assertSame($keys, CompanyDossier::sectionsFrom('Operación,operacion;generales'));
+        $this->assertSame(['generales', 'operacion'], CompanyDossier::sectionsFrom('OPERACION, generales'));
         $this->assertSame(['generales', 'gestion'], CompanyDossier::sectionsFrom(' Gestion , generales,gestion '));
 
         // Un `empresa` en el query string no cambia la empresa de la ruta.
@@ -539,12 +682,21 @@ class CompanyDossierPdfTest extends TestCase
 
         // «Elegir secciones»: «Todas» lleva al perfil completo; un subconjunto, a ?secciones= con la lista blanca.
         $list->callTableAction('perfil_secciones', $a, data: ['alcance' => 'todas'])->assertRedirect($this->url($a));
-        // La lista se REEMPLAZA (callTableAction(data:) la mezclaría con las 10 marcadas por defecto).
+        // La lista se REEMPLAZA (callTableAction(data:) la mezclaría con todas las marcadas por defecto).
         $choose = fn (array $sections) => $list->mountTableAction('perfil_secciones', $a)
             ->set('mountedTableActionsData.0.alcance', 'elegir')
             ->set('mountedTableActionsData.0.secciones', $sections)
             ->callMountedTableAction();
         $choose(['gestion', 'generales'])->assertRedirect($this->url($a, ['secciones' => 'generales,gestion']));
+        $choose(['operacion'])->assertRedirect($this->url($a, ['secciones' => 'operacion']));
+        $choose(['generales'])->assertRedirect($this->url($a, ['secciones' => 'generales']));
+        $choose(array_reverse(array_keys(CompanyDossier::SECTIONS)))->assertRedirect($this->url($a));
+        // The selector offers the 11 sections, all checked, each with the description of what it contains.
+        $list->mountTableAction('perfil_secciones', $a)
+            ->assertSet('mountedTableActionsData.0.secciones', array_keys(CompanyDossier::SECTIONS))
+            ->set('mountedTableActionsData.0.alcance', 'elegir')
+            ->assertSee(array_values(CompanyDossier::SECTIONS))
+            ->assertSee(array_values(CompanyDossier::SECTION_DESCRIPTIONS));
         $choose([])->assertHasTableActionErrors(['secciones']);
 
         // También desde la ficha de la empresa.
@@ -567,6 +719,12 @@ class CompanyDossierPdfTest extends TestCase
             'Solo las secciones que elija', 'Descargar PDF', '-parcial.pdf', 'Exportar listado', 'no el perfil completo',
             EmpresaModuleStatus::NO_APLICA_LABEL_LARGO, 'no es una calificación crediticia', 'Archivo no disponible'] as $text) {
             $this->assertStringContainsString($text, $section, "manual: «{$text}»");
+        }
+        // CPV-PDF-OPERATION-SECTION: the 11 options with the same names and descriptions as the selector.
+        $this->assertStringContainsString('11 secciones', $section);
+        foreach (CompanyDossier::SECTIONS as $key => $name) {
+            $this->assertStringContainsString(e($name), $section, "manual: option «{$name}»");
+            $this->assertStringContainsString(e(CompanyDossier::SECTION_DESCRIPTIONS[$key]), $section, "manual: description of «{$name}»");
         }
         $this->assertStringNotContainsString('columna <strong>PDF</strong>', $html, 'the invisible PDF column is gone from the manual');
     }

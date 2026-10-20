@@ -29,10 +29,26 @@ Para dar acceso a una persona: vincular su usuario a la empresa (pestaña Usuari
 ## Perfil completo y secciones (CPV-COMPLETE-COMPANY-PDF, `6270558322`)
 
 - **Dónde:** en **Empresas**, cada fila tiene **Perfil completo (PDF)** y **Elegir secciones**; la ficha de la empresa tiene **Descargar perfil completo (PDF)**. **Exportar listado** (acción masiva) es otra cosa: exporta solo las columnas de la tabla.
-- **Por defecto, todo:** sin `secciones`, el PDF trae las 10 secciones (`App\Support\CompanyDossier::SECTIONS`).
-- **`secciones`:** lista blanca de claves: `generales`, `clientes`, `camaras`, `sectores`, `categorias`, `sostenibilidad`, `recursos`, `experiencia`, `presencia`, `gestion`.
+- **Por defecto, todo:** sin `secciones`, el PDF trae todas las secciones (hoy 11, `App\Support\CompanyDossier::SECTIONS`). Elegirlas todas es lo mismo.
+- **`secciones`:** lista blanca de claves, en el orden del reporte. Desde CPV-PDF-OPERATION-SECTION (`6286644396`), `operacion` es una sección propia: antes iba dentro de `generales`.
+
+  | Clave | Opción | Bloques del PDF |
+  |---|---|---|
+  | `generales` | Datos generales y contactos | «Datos generales» (nombre, RIF, dirección, ciudad, web, teléfono, redes, fundación, capital/origen, sectores principal y secundario) y «Contactos» |
+  | `operacion` | Operación en Venezuela | facturación anual, empleados (rango declarado), empleados (total en Recursos humanos), estatus actual |
+  | `clientes` | Clientes | nombre y país (la consulta trae también los campos generales, pero no se imprimen) |
+  | `camaras` | Cámaras | nombres |
+  | `sectores` | Sectores de actividad económica y servicios | sector y servicios |
+  | `categorias` | Categorías CPV | declaradas o confirmadas, principal, origen |
+  | `sostenibilidad` | Enfoque de sostenibilidad | áreas y estado |
+  | `recursos` | Recursos en Venezuela | recursos humanos, maquinarias y equipos, instalaciones, inventario |
+  | `experiencia` | Experiencia relevante | una tarjeta por trabajo (año, clasificación de infraestructura, monto, esfuerzo H-H, sector y servicios, descripción) |
+  | `presencia` | Presencia internacional | oficinas en otros países y proyectos en otros países (no es la Experiencia relevante) |
+  | `gestion` | Sistemas de gestión | calidad, ambiente, credibilidad y transparencia, seguridad (con OVID), gestión de proyectos, seguridad de la información; cada una con «Otros» |
+
   - Acepta `secciones=a,b` o `secciones[]=a`.
-  - Las claves desconocidas se ignoran. Si no queda ninguna válida, o el valor pasa de 300 caracteres, sale el perfil completo.
+  - Las claves desconocidas se ignoran. Si no queda ninguna válida, el arreglo tiene más entradas que secciones, o el texto pasa de tres veces la lista completa de claves, sale el perfil completo.
+  - El selector muestra la misma descripción de cada opción (`CompanyDossier::SECTION_DESCRIPTIONS`), y el manual la repite (`#descargar-perfil`).
   - Solo elige secciones: se lee **después** de autorizar, y no cambia la empresa ni el acceso.
 - **El PDF dice lo que contiene:** al inicio, qué secciones incluye y cuáles se omitieron. Cada sección distingue datos, «Marcado no aplica por el afiliado» y «No hay información registrada».
 

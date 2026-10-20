@@ -399,6 +399,7 @@ class EmpresaResource extends Resource
                 Forms\Components\CheckboxList::make('secciones')
                     ->label('Secciones')
                     ->options(CompanyDossier::SECTIONS)
+                    ->descriptions(CompanyDossier::SECTION_DESCRIPTIONS)
                     ->default(array_keys(CompanyDossier::SECTIONS))
                     ->columns(2)
                     ->bulkToggleable()

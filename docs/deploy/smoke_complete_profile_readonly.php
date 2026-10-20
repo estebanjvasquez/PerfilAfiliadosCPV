@@ -53,7 +53,9 @@ try {
     $check('cabecera de la ficha «Descargar perfil completo (PDF)»', str_contains((string) file_get_contents(app_path('Filament/Resources/EmpresaResource/Pages/EditEmpresa.php')), 'Descargar perfil completo (PDF)'));
 
     $all = array_keys(App\Support\CompanyDossier::SECTIONS);
-    $check('10 secciones; por defecto, todas', count($all) === 10 && App\Support\CompanyDossier::sectionsFrom(null) === $all);
+    // CPV-PDF-OPERATION-SECTION (`6286644396`): 11 secciones, con «Operación en Venezuela» propia y una descripción cada una.
+    $check('11 secciones (operacion propia); por defecto, todas', count($all) === 11 && $all[1] === 'operacion' && App\Support\CompanyDossier::sectionsFrom(null) === $all
+        && array_keys(App\Support\CompanyDossier::SECTION_DESCRIPTIONS) === $all);
     $check('lista blanca: desconocidas ignoradas, orden del reporte', App\Support\CompanyDossier::sectionsFrom('zzz,<script>') === $all && App\Support\CompanyDossier::sectionsFrom('gestion,generales') === ['generales', 'gestion']);
 
     $blade = (string) file_get_contents(resource_path('views/pdf.blade.php'));
