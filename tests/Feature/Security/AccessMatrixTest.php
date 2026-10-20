@@ -389,16 +389,17 @@ class AccessMatrixTest extends TestCase
 
         // Another company's records do not appear and cannot be acted on from ALFA's page.
         $onAlfa(ContactsRelationManager::class)->assertCanSeeTableRecords([$alfaContact])->assertCanNotSeeTableRecords([$betaContact]);
-        $attempt(fn () => $onAlfa(ContactsRelationManager::class)->callTableAction('detach', $betaContact));
-        $attempt(fn () => $onAlfa(ContactsRelationManager::class)->callTableAction('marcar_principal', $betaContact));
-        $attempt(fn () => $onAlfa(UsersRelationManager::class)->callTableAction('detach', $this->actors['affiliate_beta']));
+        // Keys, as a browser would send them: Filament resolves each one through the relation manager's own query.
+        $attempt(fn () => $onAlfa(ContactsRelationManager::class)->callTableAction('detach', $betaContact->getKey()));
+        $attempt(fn () => $onAlfa(ContactsRelationManager::class)->callTableAction('marcar_principal', $betaContact->getKey()));
+        $attempt(fn () => $onAlfa(UsersRelationManager::class)->callTableAction('detach', $this->actors['affiliate_beta']->getKey()));
         $this->assertTrue(DB::table('contact_empresa')->where(['empresa_id' => $this->beta->id, 'contact_id' => $betaContact->id, 'is_principal' => false])->exists());
         $this->assertTrue(DB::table('empresa_user')->where(['empresa_id' => $this->beta->id, 'user_id' => $this->actors['affiliate_beta']->id])->exists());
 
         // Allowed: ALFA's own records. Detaching the shared chamber from ALFA leaves BETA's link alone.
-        $onAlfa(ContactsRelationManager::class)->callTableAction('marcar_principal', $alfaContact);
+        $onAlfa(ContactsRelationManager::class)->callTableAction('marcar_principal', $alfaContact->getKey());
         $this->assertTrue(DB::table('contact_empresa')->where(['empresa_id' => $this->alfa->id, 'contact_id' => $alfaContact->id, 'is_principal' => true])->exists());
-        $onAlfa(ChambersRelationManager::class)->callTableAction('detach', \App\Models\Chamber::find($chamber));
+        $onAlfa(ChambersRelationManager::class)->callTableAction('detach', $chamber);
         $this->assertFalse(DB::table('chamber_empresa')->where(['empresa_id' => $this->alfa->id, 'chamber_id' => $chamber])->exists());
         $this->assertTrue(DB::table('chamber_empresa')->where(['empresa_id' => $this->beta->id, 'chamber_id' => $chamber])->exists());
 
