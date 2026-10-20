@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-20 ~07:50Z, en la rama `fix/complete-company-pdf` (sobre `fix/export-access` @ `37503c8`; staging corre `ce70b7f`).
+**Checkpoint:** 2026-10-20 ~08:05Z, en la rama `fix/complete-company-pdf`; staging corre `514fa6e`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,9 +32,9 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`fix/complete-company-pdf`**, el candidato en revisión. Sale de `fix/export-access` @ `37503c8`, cuyo runtime `ce70b7f` es el que corre en staging.
+- **Rama canónica:** **`fix/complete-company-pdf`**: su `514fa6e` corre en staging; encima, solo docs.
   - Contiene `ce70b7f`, `edf20ed`, `10616af`, `0895258` y `28014c2`.
-  - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `ce70b7f`; el checkpoint vigente es el de esta rama.
+  - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `514fa6e`; el checkpoint vigente es el de esta rama.
   - Una sesión abierta en un checkout viejo no los carga sola.
 - **Cómo situarse sin perder trabajo:**
   1. `git status -sb`. Si hay cambios, **no** se descartan: se commitean en su rama o se usa un worktree aparte.
@@ -49,12 +49,12 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 | Hecho | Valor | Fuente y fecha |
 |---|---|---|
-| HEAD remoto de `feature/upgrade-filament-v3` | `ce70b7f3345f5d196e2e0190356ed8a6e2e091b4` | `git ls-remote`, 2026-10-19 ~12:20Z |
-| Código en staging (checkout del VPS) | `ce70b7f`, 0 modificaciones rastreadas; `app` y `nginx` arriba; mantenimiento apagado; sin migraciones pendientes | SSH de solo lectura, ~12:20Z |
-| Workflow del último despliegue | run `39249485948`, success, 12:06Z | API pública |
-| Imagen de recuperación | `perfilafiliados-app:pre-exportaccess-0f8bdad` (`37e023fd6830`, la imagen de `0f8bdad`) | creada ~11:05Z |
+| HEAD remoto de `feature/upgrade-filament-v3` | `514fa6e09c666a6eefa8178bf56ea58da48b1a20` | `git ls-remote`, 2026-10-20 ~07:57Z |
+| Código en staging (checkout del VPS) | `514fa6e`, 0 modificaciones; imagen `7a557f27edff`; mantenimiento apagado; sin migraciones pendientes | SSH de solo lectura, 08:00Z |
+| Workflow del último despliegue | run `39390032508`, success, 07:58Z | API pública |
+| Imagen de recuperación | `perfilafiliados-app:pre-dossier-ce70b7f` (`aa44b1884b93`, la imagen de `ce70b7f`) | 2026-10-20 ~07:56Z |
 
-### Aceptado para preparar despliegue (`6286080370`): CPV-COMPLETE-COMPANY-PDF, candidato `514fa6e` (sin desplegar)
+### Desplegado (`6286221372`): CPV-COMPLETE-COMPANY-PDF `514fa6e` — DEPLOYED_FOR_OWNER_REVIEW — MANUAL
 
 - **Causa:** la columna «PDF» (`IconColumn::make('')`) no dibujaba ningún ícono; lo visible era el exportador de la tabla (listado). Con `->spa()`, un enlace directo tampoco descargaba.
 - **Arreglo:** «Perfil completo (PDF)» y «Elegir secciones» en cada fila, «Descargar perfil completo (PDF)» en la ficha, «Exportar listado» aparte. El mismo `pdf.blade.php`, reparado; `?secciones=` con lista blanca (`App\Support\CompanyDossier`).
@@ -72,7 +72,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Propietario:** autorizar el despliegue de `514fa6e` (exacto; el push lo hace el propietario).
+- **Propietario:** UAT del perfil completo (`current_task.md`). Smokes: 13/13, 25/25 y 18/18.
 - **Propietario:**
   - UAT de Inicio en staging;
   - reglas de caché de Cloudflare para `/pdf/*` y `/xls/*`;

@@ -1,0 +1,19 @@
+postdeploy 2026-10-20T08:00:36Z
+checkout=514fa6e09c666a6eefa8178bf56ea58da48b1a20 tracked_mods=0
+app running Up 2 minutes
+nginx running Up 20 hours
+maintenance=off
+app_image=sha256:7a557f27edffa58447b1d1ff621601745b5a22ba21f8788a98ba10ac97f5473a
+perfilafiliados-app:latest 7a557f27edff
+perfilafiliados-app:pre-dossier-ce70b7f aa44b1884b93
+portainer/portainer-ce:latest 511f3f06c96f
+alpine:latest 28bd5fe8b56d
+portainer/helper-reset-password:latest ef81b3973cca
+   INFO  No pending migrations.  
+  app.debug ............................................................ false  
+  mail.default ........................................................... log  
+GET /admin/login -> 200 
+GET /no-existe -> 404 
+GET /pdf/999999999 -> 302 https://pruebas.camarapetrolera.app/admin/descargas/empresas/999999999/pdf
+GET /admin/descargas/empresas/999999999/pdf -> 302 https://pruebas.camarapetrolera.app/admin/login
+GET /admin/descargas/empresas/abc/pdf -> 302 https://pruebas.camarapetrolera.app/admin/login

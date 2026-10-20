@@ -1,0 +1,71 @@
+{
+    "checks": [
+        {
+            "check": "panel SPA activo y descargas exceptuadas",
+            "ok": true,
+            "detail": "*\/descargas\/empresas\/*"
+        },
+        {
+            "check": "acción «Perfil completo (PDF)»",
+            "ok": true,
+            "detail": "Perfil completo (PDF)"
+        },
+        {
+            "check": "acción «Elegir secciones»",
+            "ok": true,
+            "detail": "Elegir secciones"
+        },
+        {
+            "check": "exportador de tabla rotulado «Exportar listado»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "acciones antes de las columnas",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "la columna vacía «PDF» ya no existe",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "cabecera de la ficha «Descargar perfil completo (PDF)»",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "10 secciones; por defecto, todas",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "lista blanca: desconocidas ignoradas, orden del reporte",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "vista PDF con franja de alto fijo (PDF-01)",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "vista PDF compilada (view:cache)",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "manual #descargar-perfil con las etiquetas de la interfaz",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "ruta PDF protegida sin cambios",
+            "ok": true,
+            "detail": ""
+        }
+    ],
+    "passed": 13,
+    "failed": 0
+}

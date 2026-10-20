@@ -176,7 +176,47 @@ There were two different paths, and the visible one was the wrong one.
 - **Evidence (synthetic):** `audit/runs/complete_company_pdf/pdf01/` (PDFs, text, page PNGs, scripts, reproduction log). The evidence in `pdf/` and `ux/` stays as reviewed at `034cf11`.
 - **Not changed:** report data, sections, access rules, controller, UI and manual. The user manual describes neither the header nor pagination, so it stays accurate.
 
-## 10. LIMITATIONS
+## 10. Deployment to staging (`6286221372`, 2026-10-20)
+
+- **Authorized candidate:** `514fa6e09c666a6eefa8178bf56ea58da48b1a20` (accepted in `6286080370`).
+- **Preflight (read-only, before promotion):**
+  - deploy branch and staging checkout at `ce70b7f`, 0 tracked modifications;
+  - `app`/`nginx` up, maintenance off, no pending migrations, `app.debug=false`, login 200;
+  - last run `39249485948` success, none in progress;
+  - `ce70b7f` is an ancestor of `514fa6e` (fast-forward); empty `database/` diff;
+  - runtime diff = the 7 reviewed files (`EmpresaResource`, `EditEmpresa`, `EmpresaExportController`, `AdminPanelProvider`, `CompanyDossier`, `manual_usuario.md`, `pdf.blade.php`).
+- **Rollback:** `perfilafiliados-app:pre-dossier-ce70b7f` = `aa44b1884b93`, the image the running `app` used before promotion. Procedure: retag it as `latest`, `git reset --hard ce70b7f` in the checkout, `docker compose up -d`, `artisan up`. Not needed.
+- **Promotion:** a normal push `514fa6e → feature/upgrade-filament-v3` (`ce70b7f..514fa6e`, fast-forward, no force). This time the classifier did not block it.
+- **Workflow:** «Deploy a Contabo» run `39390032508`, head `514fa6e`, **success** (07:57:52Z → 07:58:28Z).
+- **Post-deploy runtime (08:00Z, read-only):**
+  - checkout `514fa6e`, 0 tracked modifications;
+  - `app` restarted on the new image `7a557f27edff`, `nginx` up;
+  - maintenance off, no pending migrations, `app.debug=false`, `mail.default=log`.
+- **Smokes (read-only, in memory, fake ids, READ ONLY transaction; `audit/runs/complete_company_pdf/deploy/`):**
+  - **new `docs/deploy/smoke_complete_profile_readonly.php`: 13/13.**
+    - the SPA exception for downloads;
+    - the «Perfil completo (PDF)» and «Elegir secciones» actions, before the columns;
+    - «Exportar listado» with its «No es el perfil completo» text;
+    - the empty «PDF» column is gone;
+    - the company-page header action;
+    - the 10 sections and the allowlist;
+    - the fixed-height header (PDF-01), and the compiled view;
+    - the manual's `#descargar-perfil` with the UI labels;
+    - the protected route.
+  - **`smoke_export_access_readonly.php`: 25/25**:
+    - panel `Authenticate` + verification, the policy;
+    - guest → login, unverified → prompt;
+    - the same 404 «Archivo no disponible» with `no-store`;
+    - 0 report-view queries, 0 mails.
+  - **`smoke_task_0010c_readonly.php`: 18/18.**
+- **Public HTTP:**
+  - `/admin/login` 200, `/no-existe` 404;
+  - `/pdf/{id}` → 302 to the protected route;
+  - protected PDF (fake and invalid ids) → 302 to the login.
+- **Not exercised by the developer:** an authenticated download of a real company (owner UAT).
+- **First smoke run: 12/13.** The failure was in my check, not the deploy: it matched `IconColumn::make('')` inside a code comment. The check was corrected to the real declaration (`Columns\IconColumn::make('')`) and rerun: 13/13.
+
+## 11. LIMITATIONS
 
 - **Not deployed.** Staging still shows the empty «PDF» column until a deployment is authorized.
 - **`ExperienceView` / `PresenceView`:** the views are staging-identical and were not changed (no schema change). The PDF now reads experience and presence from the models.

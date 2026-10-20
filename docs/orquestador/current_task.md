@@ -3,7 +3,23 @@
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-COMPLETE-COMPANY-PDF — ACEPTADO PARA PREPARAR DESPLIEGUE (`6286080370`), candidato `514fa6e09c666a6eefa8178bf56ea58da48b1a20`, DEPLOYED: NO
+## CPV-COMPLETE-COMPANY-PDF — DEPLOYED_FOR_OWNER_REVIEW — MANUAL (`6286221372`)
+
+| Despliegue | Valor |
+|---|---|
+| Desplegado | `514fa6e` por push normal (fast-forward desde `ce70b7f`); workflow `39390032508` success |
+| Runtime | checkout `514fa6e`, imagen `7a557f27edff`, mantenimiento apagado, `app.debug=false`, `mail.default=log`, sin migraciones pendientes |
+| Recuperación | `perfilafiliados-app:pre-dossier-ce70b7f` (`aa44b1884b93`) + `git reset --hard ce70b7f` (no hizo falta) |
+| Smokes | perfil completo 13/13, descargas 25/25, 0010C 18/18; HTTP público OK. Evidencia `audit/runs/complete_company_pdf/deploy/` |
+
+**UAT del propietario (solo su empresa):**
+1. **Empresas** → en su fila, **Perfil completo (PDF)** → se descarga `perfil-<RIF>.pdf` con todas las secciones.
+2. Revise que **cada página** tenga la franja amarilla con logos, el título, el nombre y el RIF, y abajo «Página N de M». Revise que sus secciones (datos, recursos, experiencia, presencia, gestión, categorías CPV) muestren lo registrado, «Marcado no aplica por el afiliado» o «No hay información registrada».
+3. **Elegir secciones** (ícono junto al botón) → **Solo las secciones que elija** → deje dos → **Descargar PDF** → `perfil-<RIF>-parcial.pdf`, que lista las secciones incluidas y omitidas.
+4. Marque su fila → arriba, **Exportar listado**: es solo la tabla, no el perfil.
+5. La ficha de la empresa → **Descargar perfil completo (PDF)**.
+
+## Antes del despliegue (aceptado en `6286080370`)
 
 | Campo | Valor |
 |---|---|
