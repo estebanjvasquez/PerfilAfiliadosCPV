@@ -691,8 +691,10 @@ class CompanyDossierPdfTest extends TestCase
         $choose(['operacion'])->assertRedirect($this->url($a, ['secciones' => 'operacion']));
         $choose(['generales'])->assertRedirect($this->url($a, ['secciones' => 'generales']));
         $choose(array_reverse(array_keys(CompanyDossier::SECTIONS)))->assertRedirect($this->url($a));
-        // The selector offers the 11 sections, all checked, each with the description of what it contains.
-        $list->mountTableAction('perfil_secciones', $a)
+        // The selector offers the 11 sections, all checked, each with the description of what it contains. A fresh page: the
+        // one above still holds the last list it was given.
+        Livewire::actingAs($owner)->test(ListEmpresas::class)->call('loadTable')
+            ->mountTableAction('perfil_secciones', $a)
             ->assertSet('mountedTableActionsData.0.secciones', array_keys(CompanyDossier::SECTIONS))
             ->set('mountedTableActionsData.0.alcance', 'elegir')
             ->assertSee(array_values(CompanyDossier::SECTIONS))
