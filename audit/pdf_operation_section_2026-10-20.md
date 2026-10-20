@@ -5,7 +5,7 @@
 - **BASE_SHA:** `92539686d8da37a55440ca212a4b69db192dc340`.
 - **TESTED_HEAD:** `3ffa85d47eff92261819d7331666329472082138` (focused run, §4).
 - **REVIEW_HEAD:** the commit that adds this report, the evidence and the checkpoint (documentation and evidence only).
-- **Deployed:** NO. The deploy branch and staging remain at `514fa6e`.
+- **Deployed:** YES, to staging, on owner authorization `6288459314` (accepted review `6288445203`): `87dd997`, workflow `39405700502` success (§8).
 
 ## 1. Finding and cause
 
@@ -101,9 +101,36 @@ Each single-option PDF was generated through the protected route for the full sy
 - **`docs/deploy/DESCARGAS_PERFIL.md`:** the key → option → PDF blocks mapping, `operacion` as its own key, and the derived limits.
 - **`docs/deploy/smoke_complete_profile_readonly.php`:** the check is now «11 sections, `operacion` second, one description each». It is for the next authorized deployment and was not run in this round.
 
-## 7. LIMITATIONS
+## 8. Deployment to staging (`6288459314`, 2026-10-20)
 
-- **Not deployed.** Staging still prints the operation block inside «Datos generales» until a deployment is authorized.
+- **Preflight (read-only):**
+  - the deploy branch and the staging checkout were at `514fa6e` (0 tracked modifications), with no workflow in progress;
+  - `514fa6e` is an ancestor of `87dd997` (fast-forward);
+  - the runtime diff is exactly the 5 reviewed files, with an empty `database/`;
+  - app and nginx up, no pending migrations, `app.debug=false`, `mail.default=log`, maintenance off, login 200.
+- **Rollback point:** the running image `7a557f27edff` was tagged `perfilafiliados-app:pre-opsection-514fa6e` before the push.
+- **Promotion:** normal push `514fa6e..87dd997` to `feature/upgrade-filament-v3`, not blocked. «Deploy a Contabo» run `39405700502`: **success** (10:07:41Z → 10:08:22Z).
+- **Post-deploy (read-only):**
+  - checkout `87dd997`, 0 modifications; `app` on image `f91e97322189`; nginx up;
+  - no pending migrations, `app.debug=false`, `mail.default=log`, maintenance off.
+- **Smokes:**
+  - `smoke_complete_profile_readonly.php`: **13/13**, including «11 secciones (operacion propia)»;
+  - `smoke_export_access_readonly.php`: **25/25**;
+  - `smoke_task_0010c_readonly.php`: **18/18**;
+  - `selector_manual_check_readonly.php` (new, no database access): 11 sections, one description each, the selector uses them, the manual has all 11 names and descriptions, generales-only = `[generales]`, operacion-only = `[operacion]`.
+- **Public HTTP:** `/admin/login` 200; `/no-existe` 404; `/pdf/999999999` 302 to the protected route, then 302 to the login.
+- **Rollback (not needed):**
+  1. `docker tag perfilafiliados-app:pre-opsection-514fa6e perfilafiliados-app:latest`;
+  2. `git reset --hard 514fa6e` in the staging checkout;
+  3. `docker compose up -d app`;
+  4. verify login 200 and the smokes.
+  No database operation is involved.
+- **Scope of the verification:** source and configuration smokes on the running app. The per-option PDF content is proven by the isolated run at `3ffa85d` (§3–5). **Not done by the developer:** an authenticated browser download of a real company (owner UAT).
+- **Evidence:** `audit/runs/pdf_operation_section/deploy/`.
+
+## 9. LIMITATIONS
+
+- **Owner UAT pending:** the authenticated partial and full download of a real company was not exercised by the developer (§8).
 - **Selector on a phone:** single column by Filament's breakpoints (verified in the vendor code). Not viewed in a browser in this round.
 - **Umbrella sections:** Recursos, Presencia and Gestión stay one option each, as instructed. No per-block controls.
 - **Scope of the evidence:** synthetic data only, on staging-identical views. No live profile was downloaded and nothing was written to staging.

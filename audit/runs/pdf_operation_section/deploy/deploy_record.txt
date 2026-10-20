@@ -1,0 +1,37 @@
+CPV-PDF-OPERATION-SECTION deployment to staging (Issue #2 6288459314), 2026-10-20 UTC
+
+PREFLIGHT (read-only, before the push)
+  remote feature/upgrade-filament-v3      514fa6e09c666a6eefa8178bf56ea58da48b1a20 (git ls-remote)
+  candidate fix/pdf-operation-section     87dd9975e7cfcc2c9a5eb72d4686fbc11fc907f4
+  514fa6e ancestor of 87dd997             yes (fast-forward)
+  runtime diff 514fa6e..87dd997           app/Filament/Resources/EmpresaResource.php, app/Support/CompanyDossier.php,
+                                          resources/manual/manual_usuario.md, resources/views/pdf.blade.php,
+                                          tests/Feature/CompanyDossierPdfTest.php (+ audit/, docs/); database/: empty
+  staging checkout <LIVE_APP_DIR>         514fa6e, 0 tracked modifications
+  app image (running)                     sha256:7a557f27edff... = perfilafiliados-app:latest
+  app / nginx                             running / running
+  pending migrations                      none
+  app.debug / mail.default / maintenance  false / log / off
+  /admin/login                            200
+  last workflow                           39390032508 completed success; none in progress
+
+ROLLBACK POINT
+  docker tag 7a557f27edff -> perfilafiliados-app:pre-opsection-514fa6e (before the push)
+
+PROMOTION
+  git push origin 87dd997:refs/heads/feature/upgrade-filament-v3   514fa6e..87dd997 (normal, no force; not blocked)
+  workflow «Deploy a Contabo» 39405700502                         success, 10:07:41Z -> 10:08:22Z
+
+POSTDEPLOY (read-only)
+  staging checkout                        87dd997, 0 tracked modifications
+  app image                               sha256:f91e97322189... (app restarted), nginx up
+  pending migrations                      none
+  app.debug / mail.default / maintenance  false / log / off
+  smoke_complete_profile_readonly.php     13/13 (incl. «11 secciones (operacion propia)»)
+  smoke_export_access_readonly.php        25/25
+  smoke_task_0010c_readonly.php           18/18
+  selector_manual_check_readonly.php      11 sections; one description each; selector uses them; manual has all 11 names
+                                          and descriptions and «11 secciones»; generales-only = [generales];
+                                          operacion-only = [operacion]; operacion is its own block in pdf.blade.php
+  public HTTP                             /admin/login 200; /no-existe 404; /pdf/999999999 302 -> protected route;
+                                          protected route without session 302 -> /admin/login

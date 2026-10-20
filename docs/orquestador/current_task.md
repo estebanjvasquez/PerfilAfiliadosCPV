@@ -1,9 +1,25 @@
-# Tarea actual (checkpoint 2026-10-20 ~08:45Z, rama `fix/pdf-operation-section`)
+# Tarea actual (checkpoint 2026-10-20 ~10:15Z, rama `fix/pdf-operation-section`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-PDF-OPERATION-SECTION — READY_FOR_REVIEW — MANUAL (`6286644396`), sin desplegar
+## CPV-PDF-OPERATION-SECTION — DEPLOYED_FOR_OWNER_REVIEW — MANUAL (`6288459314`)
+
+| Despliegue | Valor |
+|---|---|
+| Desplegado | `87dd997` por push normal (fast-forward desde `514fa6e`); workflow `39405700502` success |
+| Runtime | checkout `87dd997`, imagen `f91e97322189`, mantenimiento apagado, `app.debug=false`, `mail.default=log`, sin migraciones pendientes |
+| Recuperación | `perfilafiliados-app:pre-opsection-514fa6e` (`7a557f27edff`) → `latest`, `git reset --hard 514fa6e`, `docker compose up -d app` (no hizo falta) |
+| Smokes | perfil 13/13 (11 secciones), descargas 25/25, 0010C 18/18, selector y manual OK; HTTP público OK (`audit/runs/pdf_operation_section/deploy/`) |
+
+**UAT del propietario (solo su empresa):**
+1. **Empresas** → **Elegir secciones** → **Solo las secciones que elija**: 11 secciones marcadas, cada una con su descripción (Recursos, Presencia y Gestión nombran sus bloques).
+2. Deje solo **Datos generales y contactos** → **Descargar PDF**: trae datos generales y contactos, **sin** «Operación en Venezuela».
+3. Deje solo **Operación en Venezuela**: trae solo facturación, empleados (rango y total) y estatus, sin datos generales ni contactos; el encabezado sigue con nombre y RIF.
+4. Marque las dos: cada bloque una vez. **Perfil completo (PDF)**: todo, con Operación después de Contactos.
+5. Manual → **Descargar el perfil**: la tabla de las 11 secciones coincide con el selector.
+
+### Revisión (`6286644396`, aceptada en `6288445203`)
 
 | Campo | Valor |
 |---|---|
@@ -11,8 +27,6 @@ hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_
 | Cambio | `operacion` es una sección propia, tras `generales` (11 en total); `SECTION_DESCRIPTIONS` en el selector y en el manual; límite de texto derivado de las claves |
 | TESTED_HEAD | `3ffa85d`: enfocadas **35 OK** (2.615 aserciones); las 11 opciones solas, ambas, las 11 y por defecto (`audit/runs/pdf_operation_section/`) |
 | Informe | `audit/pdf_operation_section_2026-10-20.md` |
-
-Al desplegarse, en la UAT: **Elegir secciones** → **Solo las secciones que elija** → deje solo **Datos generales y contactos**: el PDF no trae «Operación en Venezuela». Elija solo **Operación en Venezuela**: trae solo sus cuatro datos.
 
 ## CPV-COMPLETE-COMPANY-PDF — DEPLOYED_FOR_OWNER_REVIEW — MANUAL (`6286221372`)
 

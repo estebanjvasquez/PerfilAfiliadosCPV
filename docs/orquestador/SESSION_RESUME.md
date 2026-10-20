@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-20 ~08:45Z, en la rama `fix/pdf-operation-section`; staging corre `514fa6e`.
+**Checkpoint:** 2026-10-20 ~10:15Z, en la rama `fix/pdf-operation-section`; staging corre `87dd997`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,9 +32,9 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`fix/pdf-operation-section`** (en revisión), sobre `fix/complete-company-pdf`, cuyo `514fa6e` corre en staging.
+- **Rama canónica:** **`fix/pdf-operation-section`**: su `87dd997` corre en staging; encima, solo docs.
   - Contiene `ce70b7f`, `edf20ed`, `10616af`, `0895258` y `28014c2`.
-  - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `514fa6e`; el checkpoint vigente es el de esta rama.
+  - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `87dd997`; el checkpoint vigente es el de esta rama.
   - Una sesión abierta en un checkout viejo no los carga sola.
 - **Cómo situarse sin perder trabajo:**
   1. `git status -sb`. Si hay cambios, **no** se descartan: se commitean en su rama o se usa un worktree aparte.
@@ -49,17 +49,17 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 | Hecho | Valor | Fuente y fecha |
 |---|---|---|
-| HEAD remoto de `feature/upgrade-filament-v3` | `514fa6e09c666a6eefa8178bf56ea58da48b1a20` | `git ls-remote`, 2026-10-20 ~07:57Z |
-| Código en staging (checkout del VPS) | `514fa6e`, 0 modificaciones; imagen `7a557f27edff`; mantenimiento apagado; sin migraciones pendientes | SSH de solo lectura, 08:00Z |
-| Workflow del último despliegue | run `39390032508`, success, 07:58Z | API pública |
-| Imagen de recuperación | `perfilafiliados-app:pre-dossier-ce70b7f` (`aa44b1884b93`, la imagen de `ce70b7f`) | 2026-10-20 ~07:56Z |
+| HEAD remoto de `feature/upgrade-filament-v3` | `87dd9975e7cfcc2c9a5eb72d4686fbc11fc907f4` | `git ls-remote`, 2026-10-20 ~10:07Z |
+| Código en staging (checkout del VPS) | `87dd997`, 0 modificaciones; imagen `f91e97322189`; mantenimiento apagado; sin migraciones pendientes | SSH de solo lectura, 10:10Z |
+| Workflow del último despliegue | run `39405700502`, success, 10:08Z | API pública |
+| Imagen de recuperación | `perfilafiliados-app:pre-opsection-514fa6e` (`7a557f27edff`, la imagen de `514fa6e`) | 2026-10-20 ~10:07Z |
 
-### En revisión (`6286644396`): CPV-PDF-OPERATION-SECTION — READY_FOR_REVIEW, sin desplegar
+### Desplegado (`6288459314`): CPV-PDF-OPERATION-SECTION `87dd997` — DEPLOYED_FOR_OWNER_REVIEW — MANUAL
 
 - «Operación en Venezuela» es una sección propia (`operacion`, 11 en total), y el selector describe cada opción.
-- Probadas las 11 opciones, una por una, en PDF real. `3ffa85d`: enfocadas 35 OK. Informe `audit/pdf_operation_section_2026-10-20.md`.
+- Probadas las 11 opciones, una por una, en PDF real (`3ffa85d`: enfocadas 35 OK). Smokes 13/13, 25/25, 18/18. Informe `audit/pdf_operation_section_2026-10-20.md` §8.
 
-### Desplegado (`6286221372`): CPV-COMPLETE-COMPANY-PDF `514fa6e`
+### Anterior: CPV-COMPLETE-COMPANY-PDF `514fa6e` (`6286221372`)
 
 - Perfil completo visible y por defecto, secciones opcionales con lista blanca, encabezado por página. Informe `audit/complete_company_pdf_2026-10-19.md`.
 
@@ -74,7 +74,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Propietario:** revisar CPV-PDF-OPERATION-SECTION; UAT del perfil completo (`current_task.md`).
+- **Propietario:** UAT de la selección de secciones y del perfil completo (`current_task.md`).
 - **Propietario:**
   - UAT de Inicio en staging;
   - reglas de caché de Cloudflare para `/pdf/*` y `/xls/*`;

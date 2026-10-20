@@ -1,0 +1,131 @@
+{
+    "checks": [
+        {
+            "check": "transaccion READ ONLY",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "ruta filament.admin.export.pdf",
+            "ok": true,
+            "detail": "admin\/descargas\/empresas\/{empresa}\/pdf"
+        },
+        {
+            "check": "filament.admin.export.pdf: Authenticate del panel + verified",
+            "ok": true,
+            "detail": "Filament\\Http\\Middleware\\SetUpPanel:admin,Illuminate\\Cookie\\Middleware\\EncryptCookies,Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse,Illuminate\\Session\\Middleware\\StartSession,Illuminate\\View\\Middleware\\ShareErrorsFromSession,Filament\\Http\\Middleware\\Authenticate,Filament\\Http\\Middleware\\AuthenticateSession,Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken,Illuminate\\Routing\\Middleware\\SubstituteBindings,Filament\\Http\\Middleware\\DisableBladeIconComponents,Filament\\Http\\Middleware\\DispatchServingFilamentEvent,Illuminate\\Auth\\Middleware\\EnsureEmailIsVerified:filament.admin.auth.email-verification.prompt"
+        },
+        {
+            "check": "filament.admin.export.pdf: controlador",
+            "ok": true,
+            "detail": "App\\Http\\Controllers\\EmpresaExportController@pdf"
+        },
+        {
+            "check": "ruta filament.admin.export.xls",
+            "ok": true,
+            "detail": "admin\/descargas\/empresas\/{empresa}\/xlsx"
+        },
+        {
+            "check": "filament.admin.export.xls: Authenticate del panel + verified",
+            "ok": true,
+            "detail": "Filament\\Http\\Middleware\\SetUpPanel:admin,Illuminate\\Cookie\\Middleware\\EncryptCookies,Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse,Illuminate\\Session\\Middleware\\StartSession,Illuminate\\View\\Middleware\\ShareErrorsFromSession,Filament\\Http\\Middleware\\Authenticate,Filament\\Http\\Middleware\\AuthenticateSession,Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken,Illuminate\\Routing\\Middleware\\SubstituteBindings,Filament\\Http\\Middleware\\DisableBladeIconComponents,Filament\\Http\\Middleware\\DispatchServingFilamentEvent,Illuminate\\Auth\\Middleware\\EnsureEmailIsVerified:filament.admin.auth.email-verification.prompt"
+        },
+        {
+            "check": "filament.admin.export.xls: controlador",
+            "ok": true,
+            "detail": "App\\Http\\Controllers\\EmpresaExportController@xls"
+        },
+        {
+            "check": "política EmpresaPolicy::export",
+            "ok": true,
+            "detail": "App\\Policies\\EmpresaPolicy"
+        },
+        {
+            "check": "PdfController retirado",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "autoload de app\/Models",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "invitado: export PDF -> login del panel, sin consultar vistas",
+            "ok": true,
+            "detail": "status=302 location=https:\/\/pruebas.camarapetrolera.app\/admin\/login vistas=0"
+        },
+        {
+            "check": "invitado: export XLSX (HEAD) -> login del panel",
+            "ok": true,
+            "detail": "status=302"
+        },
+        {
+            "check": "ruta vieja \/pdf\/{id}: solo redirige",
+            "ok": true,
+            "detail": "status=302 location=https:\/\/pruebas.camarapetrolera.app\/admin\/descargas\/empresas\/999999999\/pdf"
+        },
+        {
+            "check": "ruta vieja \/xls\/{id}: solo redirige",
+            "ok": true,
+            "detail": "status=302 location=https:\/\/pruebas.camarapetrolera.app\/admin\/descargas\/empresas\/999999999\/xlsx"
+        },
+        {
+            "check": "URL desconocida -> 404 «Página no encontrada» sin eco de la URL",
+            "ok": true,
+            "detail": "status=404"
+        },
+        {
+            "check": "sin verificar: export -> pantalla de verificación, sin consultar vistas",
+            "ok": true,
+            "detail": "status=302 location=https:\/\/pruebas.camarapetrolera.app\/admin\/email-verification\/prompt"
+        },
+        {
+            "check": "sin verificar: panel -> pantalla de verificación",
+            "ok": true,
+            "detail": "status=302"
+        },
+        {
+            "check": "pantalla de verificación 200, sin 500",
+            "ok": true,
+            "detail": "status=200"
+        },
+        {
+            "check": "verificado sin acceso: 404 «Archivo no disponible» en \/admin\/descargas\/empresas\/999999999\/pdf",
+            "ok": true,
+            "detail": "status=404 vistas=0"
+        },
+        {
+            "check": "verificado sin acceso: 404 «Archivo no disponible» en \/admin\/descargas\/empresas\/999999999\/xlsx",
+            "ok": true,
+            "detail": "status=404 vistas=0"
+        },
+        {
+            "check": "verificado sin acceso: 404 «Archivo no disponible» en \/admin\/descargas\/empresas\/abc\/pdf",
+            "ok": true,
+            "detail": "status=404 vistas=0"
+        },
+        {
+            "check": "cuerpos 404 idénticos (sin oráculo de existencia)",
+            "ok": true,
+            "detail": ""
+        },
+        {
+            "check": "JSON: 404 {\"message\":\"Archivo no disponible\"}",
+            "ok": true,
+            "detail": "status=404"
+        },
+        {
+            "check": "ninguna consulta a vistas de reporte en toda la prueba",
+            "ok": true,
+            "detail": "vistas=0"
+        },
+        {
+            "check": "ningún correo",
+            "ok": true,
+            "detail": "salientes=0"
+        }
+    ],
+    "passed": 25,
+    "failed": 0
+}
