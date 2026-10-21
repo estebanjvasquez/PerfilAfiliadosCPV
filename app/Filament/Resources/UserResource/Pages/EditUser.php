@@ -4,6 +4,7 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Models\User;
 use App\Filament\Resources\UserResource;
+use App\Filament\Resources\UserResource\Concerns\UsesAccountWriteTransaction;
 use App\Support\Security\PrivilegedRoleGuard;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Actions\DeleteAction;
@@ -11,6 +12,9 @@ use STS\FilamentImpersonate\Pages\Actions\Impersonate;
 
 class EditUser extends EditRecord
 {
+    // R2-REV-05: the role sync and the account update are one transaction, enabled explicitly for this page.
+    use UsesAccountWriteTransaction;
+
     protected static string $resource = UserResource::class;
 
     /**

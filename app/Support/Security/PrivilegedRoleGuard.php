@@ -16,8 +16,9 @@ use Spatie\Permission\Models\Role;
  * The role Select on UserResource persists through a relationship, so neither `$fillable` nor the UI stops a forged
  * request. The authoritative control is the relationship save itself (`saveRelationshipsUsing`): the set that reaches
  * `sync()` is reduced to what the current actor may grant, so a forbidden privileged role is NEVER written — there is no
- * post-save cleanup window. Filament already wraps the create/edit save in a database transaction, so the account and
- * its (authorized) roles persist atomically.
+ * post-save cleanup window. Atomicity of the account and its (authorized) roles is NOT a Filament default (v3.3.55
+ * ships panel transactions off); it is enabled explicitly on CreateUser/EditUser by UsesAccountWriteTransaction
+ * (R2-REV-05), and supplements this authorization rather than replacing it.
  *
  * Rules:
  * - a super admin keeps full control of the roles set;
