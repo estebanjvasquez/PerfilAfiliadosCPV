@@ -14,6 +14,9 @@ use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 
 class ChambersRelationManager extends RelationManager
 {
+    // CPV-SEC-01-R3 (F-SEC01-R3-01): every request re-checks that the user may still edit the owner company.
+    use \App\Filament\Resources\EmpresaResource\Concerns\ReauthorizesEmpresaOwner;
+
     protected static string $relationship = 'chambers';
 
     protected static ?string $recordTitleAttribute = 'name';

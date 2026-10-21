@@ -16,6 +16,9 @@ use Filament\Tables;
 
 class SustainabilitiesRelationManager extends RelationManager
 {
+    // CPV-SEC-01-R3 (F-SEC01-R3-01): every request re-checks that the user may still edit the owner company.
+    use \App\Filament\Resources\EmpresaResource\Concerns\ReauthorizesEmpresaOwner;
+
     protected static string $relationship = 'sustainabilities';
 
     protected static ?string $recordTitleAttribute = 'sust_title';
