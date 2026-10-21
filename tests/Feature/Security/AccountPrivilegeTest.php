@@ -128,8 +128,8 @@ class AccountPrivilegeTest extends TestCase
         $this->get(\App\Filament\Resources\UserResource::getUrl('edit', ['record' => $admin->getKey()]))->assertForbidden();
         $this->assertTrue($admin->fresh()->hasRole($this->superName), 'the privileged account is unchanged');
 
-        // A super admin may open it.
-        $superAdmin = $this->user(roles: [$super]);
+        // A super admin with the ordinary management permission may open it.
+        $superAdmin = $this->user(['view_any_user', 'view_user', 'update_user'], [$super]);
         $this->actingAs($superAdmin);
         $this->get(\App\Filament\Resources\UserResource::getUrl('edit', ['record' => $admin->getKey()]))->assertSuccessful();
     }
