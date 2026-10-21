@@ -5,7 +5,7 @@ namespace App\Filament\Resources\UserResource\Concerns;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 /**
  * CPV-SEC-01-R2-ACCOUNT-PATH (Issue #2 `6310273754`): authorization for PRIVILEGE GRANTS at the user write boundary.
@@ -19,11 +19,18 @@ use Spatie\Permission\Models\Role;
  * Only a super admin may grant or remove a privileged role, or edit a user who holds one. Everything else a permitted
  * staff user could do before still works: creating and editing ordinary users, and assigning non-privileged roles.
  *
- * This is scoped to these panel pages on purpose. It is not a global model event, so factories, seeders, the
- * registration flow and other trusted writers are untouched (the owner's guidance in `6310273754` / `6297739082`).
+ * All checks hit the database directly (the role pivot), not the model's in-memory roles relation, which the form may
+ * have cached empty before the save. Whether the ACTOR is a privileged grantor is snapshotted BEFORE the write, so a
+ * user cannot elevate itself in the same save and then be read back as already privileged.
+ *
+ * Scoped to these panel pages on purpose: it is not a global model event, so factories, seeders, registration and other
+ * trusted writers are untouched (the owner's guidance in `6310273754` / `6297739082`).
  */
 trait GuardsPrivilegedRoles
 {
+    /** Set in authorizeAccess() (edit) before any write; whether the actor may grant privileged roles this request. */
+    protected ?bool $actorMayGrantPrivileged = null;
+
     /** Role names that only a super admin may grant, remove or carry into an edited account. */
     protected function privilegedRoleNames(): array
     {
@@ -32,11 +39,28 @@ trait GuardsPrivilegedRoles
         ]));
     }
 
+    private function privilegedGuard(): string
+    {
+        return config('auth.defaults.guard', 'web');
+    }
+
+    /** A fresh pivot query, so a cached (empty) roles relation on the form's record cannot hide a just-synced grant. */
+    private function userHasPrivilegedRole(?User $user): bool
+    {
+        return $user instanceof User
+            && $user->roles()->whereIn('name', $this->privilegedRoleNames())->where('guard_name', $this->privilegedGuard())->exists();
+    }
+
     protected function actorIsSuperAdmin(): bool
     {
-        $actor = Auth::user();
+        return $this->actorMayGrantPrivileged
+            ??= $this->userHasPrivilegedRole(Auth::user() instanceof User ? Auth::user() : null);
+    }
 
-        return $actor instanceof User && $actor->hasRole($this->privilegedRoleNames());
+    /** Call at the start of a save request (before the write) so self-elevation cannot flip this snapshot. */
+    protected function snapshotActorGrantAuthority(): void
+    {
+        $this->actorMayGrantPrivileged = $this->userHasPrivilegedRole(Auth::user() instanceof User ? Auth::user() : null);
     }
 
     /**
@@ -48,7 +72,7 @@ trait GuardsPrivilegedRoles
         if ($this->actorIsSuperAdmin()) {
             return;
         }
-        if ($target->hasRole($this->privilegedRoleNames())) {
+        if ($this->userHasPrivilegedRole($target)) {
             abort(403);
         }
     }
@@ -63,17 +87,18 @@ trait GuardsPrivilegedRoles
         if ($this->actorIsSuperAdmin()) {
             return;
         }
-        $privileged = Role::query()
+        $grantedIds = $record->roles()
             ->whereIn('name', $this->privilegedRoleNames())
-            ->where('guard_name', $record->guard_name ?? config('auth.defaults.guard'))
-            ->get();
-        $granted = $privileged->filter(fn (Role $role) => $record->hasRole($role));
-        if ($granted->isEmpty()) {
+            ->where('guard_name', $this->privilegedGuard())
+            ->pluck('roles.id')
+            ->all();
+        if ($grantedIds === []) {
             return;
         }
-        foreach ($granted as $role) {
-            $record->removeRole($role);
-        }
+        $record->roles()->detach($grantedIds);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $record->unsetRelation('roles');
+
         Notification::make()
             ->warning()
             ->title('No se asignó un rol con privilegios')
