@@ -174,7 +174,9 @@ class NoAplicaCompletionTest extends TestCase
             $this->manager(ManagementRelationManager::class, $empresa, $noPerms)->actWith('no_aplica', data: ['no_aplica' => true]);
             $this->fail('Sin permiso no debería poder usar la acción.');
         } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
-            $this->assertSame(403, $e->getStatusCode());
+            // CPV-SEC-01-R3: the company access re-check (F-SEC01-R3-01) now refuses first, with the same 404 as for a
+            // company that is not the user's; before it, Filament refused with 403. Either is the denial (R2-REV-03).
+            $this->assertContains($e->getStatusCode(), [403, 404]);
         }
         $this->assertFalse(EmpresaModuleStatus::isNoAplica($empresa->id, EmpresaModuleStatus::MODULE_GESTION));
 
