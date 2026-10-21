@@ -17,12 +17,13 @@ class EditUser extends EditRecord
 
     /**
      * CPV-SEC-01-R2-ACCOUNT-PATH: a non-super-admin cannot open a privileged account, so it cannot be modified through
-     * this page. The check runs before the form is filled with the record's data.
+     * this page. This runs in mount(), right after the resource's own edit authorization and before the form is filled,
+     * and also on every hydrated action request.
      */
-    protected function fillForm(): void
+    protected function authorizeAccess(): void
     {
+        parent::authorizeAccess();
         $this->assertMayManagePrivilegedTarget($this->getRecord());
-        parent::fillForm();
     }
 
     /** After save, drop any privileged role a non-super-admin tried to grant. */
