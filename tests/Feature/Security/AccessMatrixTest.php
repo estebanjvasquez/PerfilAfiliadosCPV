@@ -64,6 +64,53 @@ class AccessMatrixTest extends TestCase
         'view_any_chamber', 'view_any_sector', 'view_any_service', 'view_dashboard', 'view_account_widget', 'view_my_profile', 'view_settings',
     ];
 
+    /**
+     * R2-REV-03: literal approved outcomes for high-value entrypoints, independent of the gate under test. Keys are
+     * entrypoint labels; values are actor => expected outcome. These are an authorization ORACLE.
+     */
+    private const INDEPENDENT_EXPECTATIONS = [
+        'EmpresaResource:index' => [
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'ok', 'affiliate_beta' => 'ok',
+            'staff_linked_alfa' => 'ok', 'super_admin' => 'forbidden', 'no_permission' => 'forbidden',
+            'revoked_alfa' => 'ok', 'role_manager' => 'forbidden',
+        ],
+        'EmpresaResource:edit:alfa' => [
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'ok', 'affiliate_beta' => 'not_found',
+            'staff_linked_alfa' => 'forbidden', 'super_admin' => 'forbidden', 'no_permission' => 'not_found',
+            'revoked_alfa' => 'not_found', 'role_manager' => 'not_found',
+        ],
+        'EmpresaResource:edit:beta' => [
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'not_found', 'affiliate_beta' => 'ok',
+            'staff_linked_alfa' => 'not_found', 'super_admin' => 'not_found', 'no_permission' => 'not_found',
+            'revoked_alfa' => 'not_found', 'role_manager' => 'not_found',
+        ],
+        'UserResource:index' => [
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'forbidden', 'affiliate_beta' => 'forbidden',
+            'staff_linked_alfa' => 'ok', 'super_admin' => 'forbidden', 'no_permission' => 'forbidden',
+            'revoked_alfa' => 'forbidden', 'role_manager' => 'forbidden',
+        ],
+        'RoleResource:index' => [
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'forbidden', 'affiliate_beta' => 'forbidden',
+            'staff_linked_alfa' => 'ok', 'super_admin' => 'forbidden', 'no_permission' => 'forbidden',
+            'revoked_alfa' => 'forbidden', 'role_manager' => 'ok',
+        ],
+        'UserManual' => [
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'ok', 'affiliate_beta' => 'ok',
+            'staff_linked_alfa' => 'ok', 'super_admin' => 'ok', 'no_permission' => 'ok',
+            'revoked_alfa' => 'ok', 'role_manager' => 'ok',
+        ],
+        'Dashboard' => [
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'ok', 'affiliate_beta' => 'ok',
+            'staff_linked_alfa' => 'ok', 'super_admin' => 'ok', 'no_permission' => 'ok',
+            'revoked_alfa' => 'ok', 'role_manager' => 'ok',
+        ],
+    ];
+
+    /** The one narrowly-identified reliability defect (backlog), counted not swallowed. Format: "label|actor". */
+    private const KNOWN_RELIABILITY_FAILURES = [
+        'JoinViews|staff_linked_alfa',
+    ];
+
     /** @var array<string, ?User> */
     private array $actors = [];
 
@@ -259,11 +306,22 @@ class AccessMatrixTest extends TestCase
 
         $matrix = [];
         $violations = [];
+        $unexpectedErrors = [];
         foreach ($this->actors as $name => $actor) {
             foreach ($entries as $entry) {
                 $outcome = $this->outcome($actor, $entry['url']);
                 $matrix[$entry['label']][$name] = $outcome;
                 $isEmpresaRecord = $entry['target'] === EmpresaResource::class && $entry['record'] !== null;
+
+                // R2-REV-03: an unexpected 5xx/exception is a FAILURE, except the one narrowly-identified, counted
+                // JoinViews reliability defect (backlog); it is not swallowed as a security pass.
+                if (str_starts_with($outcome, 'exception') || str_starts_with($outcome, 'http_5')) {
+                    $matrix[$entry['label']]['_error'][] = $name;
+                    if (! in_array("{$entry['label']}|{$name}", self::KNOWN_RELIABILITY_FAILURES, true)) {
+                        $unexpectedErrors[] = "{$entry['label']} as {$name}: {$outcome}";
+                    }
+                    continue;
+                }
 
                 $expected = match (true) {
                     $name === 'guest' => $outcome === 'login',
@@ -274,11 +332,21 @@ class AccessMatrixTest extends TestCase
                 if ($name === 'no_permission' && $entry['kind'] !== 'page' && $outcome === 'ok') {
                     $expected = false;
                 }
-                if (str_starts_with($outcome, 'exception') || str_starts_with($outcome, 'http_5')) {
-                    $matrix[$entry['label']]['_error'][] = $name;
-                }
                 if (! $expected) {
                     $violations[] = "{$entry['label']} as {$name}: {$outcome}";
+                }
+            }
+        }
+
+        // R2-REV-03: INDEPENDENT expectations for high-value entrypoints — literal approved rules, not the gate under
+        // test. These rows are an authorization oracle; the full 792-request sweep above stays a gate-comparison
+        // characterization (a wrongly permissive gate would satisfy both sides of its own comparison).
+        $independentViolations = [];
+        foreach (self::INDEPENDENT_EXPECTATIONS as $label => $perActor) {
+            foreach ($perActor as $actor => $want) {
+                $got = $matrix[$label][$actor] ?? 'missing';
+                if ($got !== $want) {
+                    $independentViolations[] = "{$label} as {$actor}: expected {$want}, got {$got}";
                 }
             }
         }
@@ -301,9 +369,15 @@ class AccessMatrixTest extends TestCase
             'requests' => count($entries) * count($this->actors),
             'outcomes' => array_count_values(array_merge(...array_map(fn ($row) => array_values(array_filter($row, 'is_string')), array_values($matrix)))),
             'violations' => $violations,
+            'independent_violations' => $independentViolations,
+            'unexpected_errors' => $unexpectedErrors,
+            'known_reliability_failures' => self::KNOWN_RELIABILITY_FAILURES,
+            'oracle' => 'gate-comparison for the full sweep; INDEPENDENT_EXPECTATIONS rows are literal business rules',
             'matrix' => $matrix,
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
+        $this->assertSame([], $independentViolations, 'high-value entrypoints match the literal approved rules');
+        $this->assertSame([], $unexpectedErrors, 'no unexpected 5xx/exception (only the counted JoinViews defect is allowed)');
         $this->assertSame([], $violations, 'every 200 matches the server-side gate; guests and unverified users never get in');
     }
 

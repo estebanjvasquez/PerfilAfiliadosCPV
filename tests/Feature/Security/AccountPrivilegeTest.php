@@ -66,6 +66,37 @@ class AccountPrivilegeTest extends TestCase
         return $user->fresh();
     }
 
+    /**
+     * R2-REV-01 persistence boundary: run `$save` while watching every statement, and assert that NO insert into the
+     * role pivot ever bound the forbidden role id. This proves the privileged grant is never written, not merely absent
+     * at the end. Returns whatever `$save` returns.
+     */
+    private function assertRoleNeverPersisted(int $forbiddenRoleId, callable $save): void
+    {
+        $connection = \Illuminate\Support\Facades\DB::connection();
+        $connection->flushQueryLog();
+        $connection->enableQueryLog();
+        try {
+            $save();
+        } finally {
+            $log = $connection->getQueryLog();
+            $connection->disableQueryLog();
+            $connection->flushQueryLog();
+        }
+        $insertedForbidden = false;
+        foreach ($log as $entry) {
+            if (! str_contains($entry['query'], 'model_has_roles') || ! preg_match('/\b(insert|update)\b/i', $entry['query'])) {
+                continue;
+            }
+            foreach ($entry['bindings'] as $binding) {
+                if (is_numeric($binding) && (int) $binding === $forbiddenRoleId) {
+                    $insertedForbidden = true;
+                }
+            }
+        }
+        $this->assertFalse($insertedForbidden, 'the forbidden privileged role id was never written to the pivot');
+    }
+
     // ---- primary: privilege injection, fails before the fix / passes after ----
 
     #[Test]
@@ -75,13 +106,16 @@ class AccountPrivilegeTest extends TestCase
         $this->role('plain', ['view_user']);
         $manager = $this->user(['view_any_user', 'view_user', 'create_user', 'update_user']);
 
-        Livewire::actingAs($manager)->test(CreateUser::class)
-            ->set('data.name', 'ZZZ NUEVO STAFF')
-            ->set('data.email', 'zzznuevo@zzz.test')
-            ->set('data.password', 'secret-pass-123')
-            ->set('data.roles', [$super->getKey()])
-            ->call('create')
-            ->assertHasNoErrors();
+        // Boundary: the forbidden role id is never written to the pivot during the save (not merely absent afterwards).
+        $this->assertRoleNeverPersisted($super->getKey(), function () use ($manager, $super) {
+            Livewire::actingAs($manager)->test(CreateUser::class)
+                ->set('data.name', 'ZZZ NUEVO STAFF')
+                ->set('data.email', 'zzznuevo@zzz.test')
+                ->set('data.password', 'secret-pass-123')
+                ->set('data.roles', [$super->getKey()])
+                ->call('create')
+                ->assertHasNoErrors();
+        });
 
         $created = User::where('email', 'zzznuevo@zzz.test')->firstOrFail();
         $this->assertFalse($created->hasRole($this->superName), 'the forged privileged role must not be granted');
@@ -95,10 +129,12 @@ class AccountPrivilegeTest extends TestCase
         $manager = $this->user(['view_any_user', 'view_user', 'update_user']);
         $target = $this->user();
 
-        Livewire::actingAs($manager)->test(EditUser::class, ['record' => $target->getKey()])
-            ->set('data.roles', [$super->getKey()])
-            ->call('save')
-            ->assertHasNoErrors();
+        $this->assertRoleNeverPersisted($super->getKey(), function () use ($manager, $target, $super) {
+            Livewire::actingAs($manager)->test(EditUser::class, ['record' => $target->getKey()])
+                ->set('data.roles', [$super->getKey()])
+                ->call('save')
+                ->assertHasNoErrors();
+        });
 
         $this->assertFalse($target->fresh()->hasRole($this->superName), 'edit must not elevate the target');
     }
