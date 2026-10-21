@@ -1,9 +1,21 @@
-# Tarea actual (checkpoint 2026-10-20 ~15:20Z, rama `audit/security-access-01`)
+# Tarea actual (checkpoint 2026-10-21 ~07:45Z, rama `fix/sec-01-account-path-boundaries`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-SEC-01 — READY_FOR_REVIEW — MANUAL (`6293112309` / `6293203444`), sin desplegar
+## CPV-SEC-01-R2-ACCOUNT-PATH — READY_FOR_REVIEW — MANUAL (`6310273754`), sin desplegar
+
+| Campo | Valor |
+|---|---|
+| Base / rama | `0139e95` (F-01 congelado) / `fix/sec-01-account-path-boundaries` |
+| Fix | inyección de privilegios en usuarios: solo un super admin otorga el rol `super_admin` o edita una cuenta que lo tiene (`GuardsPrivilegedRoles` en Create/EditUser); `/form` removido (F-04); `mutateFormDataBeforeSave` redundante quitado (F-05 no reproducido) |
+| Pruebas | antes (`f3f7c5f`): 4 fallas de inyección; después (`f0f9a18`): enfocadas 22 OK, suite completa **606 OK** (7.013) |
+| Traversal | inventario de sinks + canario fuera de raíz: segmento `{empresa}` todo 404, `secciones` todo perfil completo; sin hallazgos |
+| F-01 | **sigue SIN desplegar** en staging (`87dd997`); riesgo vivo persiste |
+| Decisiones | F-02 editor de roles / F-03 / F-06 del propietario; lote de relation-managers/búsqueda pendiente |
+| Informe | `audit/security_sec01_r2_2026-10-21.md` |
+
+## CPV-SEC-01 R1 — F-01 aceptado (`6293112309` / `6293203444`), sin desplegar
 
 | Campo | Valor |
 |---|---|

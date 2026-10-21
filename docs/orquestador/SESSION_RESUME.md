@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-20 ~15:20Z, en la rama `audit/security-access-01` (seguridad, SEC-01); staging corre `87dd997`.
+**Checkpoint:** 2026-10-21 ~07:45Z, en la rama `fix/sec-01-account-path-boundaries` (seguridad, SEC-01 R2); staging corre `87dd997`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,7 +32,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`audit/security-access-01`**: `87dd997` + docs + `fix/sec-01-impersonation-gate` (sin desplegar). `planning/management-taxonomy` está EN ESPERA: no se promueve.
+- **Rama canónica:** **`fix/sec-01-account-path-boundaries`** (SEC-01 R2, desde `0139e95`): fix de inyección de privilegios en usuarios, F-04 removido, pruebas y evidencia. `fix/sec-01-impersonation-gate` (F-01) y esta rama están aceptadas pendientes de despliegue, sin desplegar. `planning/management-taxonomy` EN ESPERA: no se promueve.
   - Contiene `ce70b7f`, `edf20ed`, `10616af`, `0895258` y `28014c2`.
   - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `87dd997`; el checkpoint vigente es el de esta rama.
   - Una sesión abierta en un checkout viejo no los carga sola.
@@ -43,7 +43,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `audit/security-access-01` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabajá en la rama `fix/sec-01-account-path-boundaries` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
@@ -54,33 +54,23 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 | Workflow del último despliegue | run `39405700502`, success, 10:08Z | API pública |
 | Imagen de recuperación | `perfilafiliados-app:pre-opsection-514fa6e` (`7a557f27edff`, la imagen de `514fa6e`) | 2026-10-20 ~10:07Z |
 
-### Desplegado (`6288459314`): CPV-PDF-OPERATION-SECTION `87dd997` — DEPLOYED_FOR_OWNER_REVIEW — MANUAL
+### Desplegado (`6288459314`): CPV-PDF-OPERATION-SECTION `87dd997`
 
-- «Operación en Venezuela» es una sección propia (`operacion`, 11 en total), y el selector describe cada opción.
-- Probadas las 11 opciones, una por una, en PDF real (`3ffa85d`: enfocadas 35 OK). Smokes 13/13, 25/25, 18/18. Informe `audit/pdf_operation_section_2026-10-20.md` §8.
-
-### Anterior: CPV-COMPLETE-COMPANY-PDF `514fa6e` (`6286221372`)
-
-- Perfil completo visible y por defecto, secciones opcionales con lista blanca, encabezado por página. Informe `audit/complete_company_pdf_2026-10-19.md`.
+- «Operación en Venezuela» es sección propia (`operacion`, 11 en total); selector con descripciones. 11 opciones probadas en PDF real; smokes 13/25/18. `audit/pdf_operation_section_2026-10-20.md` §8.
 
 ### Anteriores
 
 - **CPV-INTEGRATED-EXPORT-ACCESS-DEPLOY** (`6265502896`): `ce70b7f` desplegado por el propietario (el clasificador rechazó el push del agente; no se rodeó). Smoke 25/25 + 0010C 18/18.
+- **CPV-COMPLETE-COMPANY-PDF** (`6286221372`): perfil completo por defecto, secciones con lista blanca. `audit/complete_company_pdf_2026-10-19.md`.
 - **CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES** (aceptado `6265458863`): descargas protegidas, 404 seguro.
 - **CPV-HOME-BRANDING-AND-LAYOUT:** desplegado en `0f8bdad` (`6211360371`); queda la UAT del propietario.
 - **CPV-SESSION-CONTINUITY:** cerrado y aceptado en `6211970495`. Informe: `audit/session_continuity_2026-10-16.md`.
-- **Despliegues previos:** Inicio útil `c02d4ec`, mapa `9e7e379`, manual `37e3b71` y TASK-0010A/B/C.
-- **Correo:** sigue en `log`; la activación está pendiente del propietario (`docs/deploy/CORREO_DEL_SISTEMA.md`).
+- **Correo:** sigue en `log`; activación pendiente del propietario (`docs/deploy/CORREO_DEL_SISTEMA.md`).
 
 ## 3. Siguiente acción
 
-- **Seguridad (CPV-SEC-01, `6293112309`/`6293203444`):** ronda 1 en revisión. F-01 (Alta) corregido en `fix/sec-01-impersonation-gate`, sin desplegar; aviso `6293694720`. Estados en `docs/plans/SECURITY_REVIEW_PLAN.md`; informe `audit/security_sec01_2026-10-20.md`. SEC-02..05 sin empezar; gerencia en espera.
-- **Propietario:** UAT de la selección de secciones y del perfil completo (`current_task.md`).
-- **Propietario:**
-  - UAT de Inicio en staging;
-  - reglas de caché de Cloudflare para `/pdf/*` y `/xls/*`;
-  - el correo (proveedor, credenciales, prueba controlada);
-  - decidir si se reintenta la solicitud #1.
+- **Seguridad (CPV-SEC-01):** R1 (`6293112309`/`6293203444`) F-01 corregido en `fix/sec-01-impersonation-gate` (aviso `6293694720`). R2 (`6310273754`) en `fix/sec-01-account-path-boundaries`: inyección de privilegios en usuarios corregida, F-04 removido, F-05 no reproducido, traversal sin hallazgos; suite completa 606 OK. **F-01 sigue SIN desplegar en staging** (`87dd997`): el riesgo vivo persiste. F-02 editor de roles / F-03 / F-06 son decisiones del propietario. Informes en `audit/security_sec01_*.md`. SEC-02..05 restantes sin empezar; gerencia en espera.
+- **Propietario:** desplegar F-01 y SEC-01 R2 (decisión); UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
 - **Agente:** nada sin una instrucción nueva del Issue #2.
 
 ## 4. Worktrees en uso (no tocar sin instrucción)
