@@ -3,106 +3,87 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Support\Security\PrivilegedRoleGuard;
 use Spatie\Permission\Models\Role;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
+/**
+ * CPV-SEC-01-R4-ROLE-ADMIN (Issue #2 `6318625636`, owner rule 2026-10-21): role administration is exclusively for a
+ * user who CURRENTLY holds the configured super_admin role. A generic permission (`update_role`, a direct grant, or user
+ * management) is never enough by itself. Every ability of the role editor (Shield's RoleResource: list, view, permission
+ * editor, create, edit, delete, bulk delete, and the rest of the prefixes) goes through here.
+ *
+ * The super_admin check is a fresh pivot query (PrivilegedRoleGuard::userHasPrivilegedRole), so a page opened before the
+ * role was removed is refused on its next request; the explicit permission is still required too, because Shield's gate
+ * bypass is off in this project (`define_via_gate = false`). The privileged role's identity itself is protected at the
+ * model boundary (App\Support\Security\PrivilegedRoleDefinitionGuard).
+ */
 class RolePolicy
 {
     use HandlesAuthorization;
 
-    /**
-     * Determine whether the user can view any models.
-     */
+    private function administers(User $user, string $permission): bool
+    {
+        return PrivilegedRoleGuard::userHasPrivilegedRole($user) && $user->can($permission);
+    }
+
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_role');
+        return $this->administers($user, 'view_any_role');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Role $role): bool
     {
-        return $user->can('view_role');
+        return $this->administers($user, 'view_role');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return $user->can('create_role');
+        return $this->administers($user, 'create_role');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Role $role): bool
     {
-        return $user->can('update_role');
+        return $this->administers($user, 'update_role');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Role $role): bool
     {
-        return $user->can('delete_role');
+        return $this->administers($user, 'delete_role');
     }
 
-    /**
-     * Determine whether the user can bulk delete.
-     */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_role');
+        return $this->administers($user, 'delete_any_role');
     }
 
-    /**
-     * Determine whether the user can permanently delete.
-     */
     public function forceDelete(User $user, Role $role): bool
     {
-        return $user->can('force_delete_role');
+        return $this->administers($user, 'force_delete_role');
     }
 
-    /**
-     * Determine whether the user can permanently bulk delete.
-     */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_role');
+        return $this->administers($user, 'force_delete_any_role');
     }
 
-    /**
-     * Determine whether the user can restore.
-     */
     public function restore(User $user, Role $role): bool
     {
-        return $user->can('restore_role');
+        return $this->administers($user, 'restore_role');
     }
 
-    /**
-     * Determine whether the user can bulk restore.
-     */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_role');
+        return $this->administers($user, 'restore_any_role');
     }
 
-    /**
-     * Determine whether the user can replicate.
-     */
     public function replicate(User $user, Role $role): bool
     {
-        return $user->can('replicate_role');
+        return $this->administers($user, 'replicate_role');
     }
 
-    /**
-     * Determine whether the user can reorder.
-     */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_role');
+        return $this->administers($user, 'reorder_role');
     }
 }
