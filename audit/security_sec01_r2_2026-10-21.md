@@ -1,11 +1,13 @@
 # CPV-SEC-01-R2: account privileges and path boundaries (sanitized)
 
-- **Authorization:** Issue #2 `6310273754` (owner, 2026-10-21), activating the account and path checks of SEC-02/SEC-03 for these two surfaces only. Prior round: delivery `6294285848`, review `6297739082`.
+- **Authorization:** Issue #2 `6310273754` (owner, 2026-10-21), activating the account and path checks of SEC-02/SEC-03 for these two surfaces only. Prior round: delivery `6294285848`, review `6297739082`. **Review corrections:** `6310331211` (R2-REV-01…04), addressed here.
 - **BASE_SHA:** `0139e954ec22f0a6bfa2377968a6a3af86c15874` (the accepted, frozen F-01 candidate). A new branch was taken from it; the F-01 candidate was not amended.
-- **BRANCH:** `fix/sec-01-account-path-boundaries`. Tests fail-before at `f3f7c5f`; the fix and corrections follow.
-- **TESTED_HEAD:** `f0f9a18d90ae953706ac3a57b28374a5ba491338` (full isolated suite and focused run).
-- **REVIEW_HEAD:** set at delivery — the commit that adds this report and the checkpoint on top of `f0f9a18`.
+- **BRANCH:** `fix/sec-01-account-path-boundaries`.
+- **TESTED_HEAD:** `6bf8582aa8e7155c10ca560fb6089d7b5bef73ef` (full isolated suite GREEN, 606/7,016); focused at `e7ba59d9deb35198bc9fb3fac857255ebaa9e0e2`.
+- **REVIEW_HEAD:** the commit that adds this updated report and checkpoint.
 - **DEPLOYED:** NO.
+
+> **Review-corrections summary (`6310331211`).** The privilege-grant control was moved to BEFORE the role relationship is persisted (it was an after-sync cleanup); a persistence-boundary test proves the forbidden role is never written. Traversal assertions now read decoded PDF text, assert the exact denial and record the layer, and no OS file is targeted. The access matrix gained a business-level independent oracle for high-value entrypoints and now fails on unexpected 5xx (except the counted JoinViews defect). The cumulative register `docs/security/SECURITY_STATUS.md` is carried into this branch and updated. Sections below reflect these corrections.
 
 ## F-01 deployment status (read-only, prominent)
 
@@ -50,24 +52,27 @@ Business rule: `create_user`/`update_user` manage ordinary accounts; only a supe
 | PDF renderer (dompdf) | — | logos are fixed `public_path(...)`; no user value placed as img src / `url()` | inventoried; not reachable |
 | Uploads / temp files | — | no `FileUpload` component in the panel; Livewire upload/preview are signed | inventoried → SEC-02/03 |
 
-**Canary test:** a harmless canary file was placed OUTSIDE the app root (system temp). Both request-controlled values were driven with traversal payloads — `../`, `..\\`, `....//`, URL-encoded and double-encoded `%2e%2e%2f`/`%252e`, backslash-encoded, absolute, `file://`, and a full URL-encoded absolute path.
-- **`{empresa}` segment:** every payload → **404**, no PDF generated, no 5xx, canary content never disclosed, no filesystem path echoed. The legitimate numeric id still downloads.
-- **`secciones`:** every payload → the **complete profile** (allowlist fallback), never a file, no 5xx, no leak.
-- **Result:** no traversal established on the tested surfaces. This is a negative result for exactly these surfaces, not a claim about all file surfaces. Evidence: `sec01r2_path_*.json` (restricted copy; aggregates here).
+**Canary test (R2-REV-02):** a harmless canary file was placed OUTSIDE the app root (a disposable system-temp directory). **No OS or credential file is ever targeted.** Benign relative payloads reference the canary by name; absolute ones point at it. Payloads cover `../`, `..\\`, `....//`, URL-encoded and double-encoded `%2e%2e%2f`/`%252e`, backslash-encoded, absolute, `file://`, and a URL-encoded absolute path.
+- **`{empresa}` segment:** every payload → **404**, no PDF generated, no 5xx. The **layer** is recorded per payload: when the value reaches the controller it returns the exact «Archivo no disponible» view with **0 report-view queries and 0 PDF renders**; a slash-bearing value the router rejects before the controller is a safe 404/403. Canary content never disclosed, no filesystem path echoed.
+- **`secciones`:** every payload → the **complete profile** (allowlist fallback). For each, the **decoded PDF text** (`pdftotext`) is asserted free of the canary content (compressed bytes alone are not proof). No file, no 5xx, no leak.
+- **Side effects:** the canary file is unchanged (content re-checked) and the legitimate numeric id still downloads a real PDF.
+- **Result:** no traversal established on the tested surfaces — a negative result for exactly these surfaces, not a claim about all file surfaces. Evidence: `sec01r2_path_*.json` (restricted copy; aggregates here).
 
-**Normalization note:** payloads were sent raw with `rawurlencode` on the segment so routing delivered the encoded value to the controller, exercising the stack's own decoding rather than a client that pre-normalizes.
+**Normalization note:** payloads were sent raw with `rawurlencode` on the segment so routing delivered the encoded value to the stack, exercising its own decoding rather than a client that pre-normalizes. No conclusion is drawn about nginx/CDN from an in-process Laravel test.
 
-## INDEPENDENT_EXPECTATIONS_AND_5XX
+## INDEPENDENT_EXPECTATIONS_AND_5XX (R2-REV-03)
 
-- Expectations are literal business rules, not the gate under test.
-- New tests assert exact statuses; `PathBoundaryTest` fails any 5xx.
-- `JoinViews` reliability defect is the one known, explicitly-registered non-security failure (backlog), counted, not hidden.
+- **`AccessMatrixTest`** now carries a business-level independent oracle (`INDEPENDENT_EXPECTATIONS`) for high-value entrypoints — Empresa list and edit (own vs other company), the user and role admin lists, the manual and the dashboard — expressed as `allow` / `deny` / `login` / `verify`, where `deny` accepts either 403 or 404 (the policy is denial; the exact safe status is an implementation nuance). These rows are asserted independently of the gate.
+- **The full 792-request sweep stays a gate-comparison characterization**, explicitly labelled as such in the evidence (`oracle` field): a wrongly permissive gate would satisfy both sides of its own comparison, so it is not claimed as independent business-policy coverage.
+- **Unexpected 5xx/exception now FAILS** the matrix, except the one narrowly-identified `JoinViews` reliability defect (`KNOWN_RELIABILITY_FAILURES`, counted in the evidence, not swallowed).
+- **Representative privileged actor:** the account tests build a super admin WITH the explicit `update_user` permission, since the bare role is not representative in the isolated Shield configuration; the matrix's bare-role super-admin rows are treated as `deny` for company data (no auto cross-company access).
+- **Impersonation:** the allowed action remains partial coverage — the real table action is asserted authorized/offered, then `take()`+leave restore the session; the UI click returns a redirect the Livewire harness cannot follow. Stated plainly, not worked around further.
 
 ## FINDINGS_AND_FIXES (opaque IDs; mechanisms restricted)
 
 | ID | Severity | Status | Safe summary |
 |---|---|---|---|
-| F-SEC01-R2-A (= F-02 account facet) | High | **CONFIRMED and FIXED** (not deployed) | A non-super-admin who can manage users could grant the privileged role (on create, on edit, or to itself) and could open/modify a privileged account. Fixed server-side at the user write boundary. |
+| F-SEC01-02a (= F-02 account facet) | High | **CONFIRMED and FIXED** (not deployed) | A non-super-admin who can manage users could grant the privileged role (on create, on edit, or to itself) and could open/modify a privileged account. Fixed server-side BEFORE the role is persisted. The F-02 role-editor/configuration facet stays an owner decision (finding not closed). |
 | F-04 | Low | **FIXED** | The unused public Livewire test form `/form` was removed (route, class, view), with a route regression. |
 | F-05 | Medium (suspected) | **Not reproduced; redundant code removed** | The only browser-callable method on the user edit page returned data to the framework, not the browser, and the blank-password case is already handled by the form. The redundant lookup was removed; a blank-password edit keeps the old hash (tested). No credential exposure reproduced. |
 | F-07 | Low (SEC-03 lead) | Confirmed benign here | `User::$fillable` includes `email_verified_at`; no panel form exposes it, and registration does not self-verify (tested). Left for SEC-03; not changed, to avoid breaking factories/verification. |
@@ -75,23 +80,26 @@ Business rule: `create_user`/`update_user` manage ordinary accounts; only a supe
 
 **Cap:** one connected high-risk root cause fixed (privilege grants at the user write boundary), plus the bounded F-04 cleanup. Others registered.
 
-## FIX (F-SEC01-R2-A)
+## FIX (F-SEC01-R2-A = F-02 account facet) — enforced BEFORE persistence (R2-REV-01)
 
-- **`GuardsPrivilegedRoles`** trait on `CreateUser` and `EditUser`:
-  - only a super admin may grant or remove the privileged role, or open a privileged account;
-  - enforced after the relationship sync (`afterCreate` / `afterSave`), because the role Select saves separately from mass assignment;
-  - the privileged-account open is blocked in `authorizeAccess` (mount and every hydrated request);
-  - checks hit the role pivot directly (not the form's cached relation), and the actor's grant authority is snapshotted BEFORE the write, so a self-grant cannot flip it.
-- **Preserved:** super admins keep every operation; ordinary staff still create and edit ordinary users and assign non-privileged roles; passwords stay hashed and hidden; registration, verification and reset are untouched.
-- **Scope:** the two panel pages only — not a global model event — so factories, seeders and other trusted writers are unaffected.
+- **`App\Support\Security\PrivilegedRoleGuard`** authorizes the role set at the write boundary, BEFORE the sync:
+  - the role Select's `->saveRelationshipsUsing()` (in `UserResource::form`) computes the authorized role ids and syncs only those, so a forbidden privileged role is **never written** — there is no after-save cleanup window. This runs inside Filament's existing create/edit database transaction, so the account and its authorized roles persist atomically.
+  - a non-super-admin can neither add nor remove the privileged role: the synced privileged set equals the record's current privileged roles; their non-privileged roles are whatever the form set. A super admin keeps full control.
+  - opening (hence modifying) an account that already holds the privileged role is blocked in `EditUser::authorizeAccess`, checked fresh (a pivot query, not mounted/cached state) at mount and at the start of save.
+- **Removed** the earlier after-sync approach (the `GuardsPrivilegedRoles` trait) and its unused snapshot helper.
+- **Preserved:** super admins keep every operation; ordinary staff still create/edit ordinary users and assign non-privileged roles; passwords stay hashed and hidden; registration, verification and reset are untouched.
+- **Scope:** the user panel pages only — not a global model event — so factories, seeders and other trusted writers are unaffected.
 - **Also:** removed the redundant `EditUser::mutateFormDataBeforeSave` (F-05) and the `/form` surface (F-04).
+- **Residual (not closed):** this fixes the account-writing facet of F-02. The role editor (RoleResource) reach and the privilege-delegation configuration remain an explicit owner decision; limiting one named role does not resolve all delegation paths.
+- **Staff-visible behaviour:** a non-super-admin that tries to assign a privileged role sees an in-UI warning that it was not applied; the rest of the save succeeds. Nothing changes for affiliates, and there is no user-administration help page; this is recorded in `docs/security/SECURITY_STATUS.md` (§5 R2).
 
 ## REGRESSION / FOCUSED / FULL / BROWSER
 
-- **Fails-before:** `f3f7c5f`, focused (`AccountPrivilege|PathBoundary|ImpersonationAction`): 4 privilege-injection failures; path and denied-impersonation pass.
-- **Passes-after, focused:** `f0f9a18` (`AccountPrivilege|PathBoundary|ImpersonationAction|AccessMatrix|SurfaceInventory`): **OK (22 tests, 264 assertions)**.
-- **Full isolated suite:** `f0f9a18`, **OK (606 tests, 7,013 assertions)**, run `20261021T074038Z-f0f9a18d90ae`; staging 200 before and after.
-- **Browser:** not run. The changed flows are a server-side write guard and a removed route, both covered by HTTP/Livewire tests; the impersonation UI click is a redirect the harness cannot follow (stated).
+- **Fails-before (original injection), `f3f7c5f`:** the four privilege-injection tests failed; path and denied-impersonation passed.
+- **Fails-before (review corrections), `3e311f8`** (updated tests against the earlier after-sync approach): the **persistence-boundary** assertions failed — proving the old approach wrote the forbidden role to the pivot and then removed it within the transaction. (One matrix expectation was also corrected there from a 403/404 literal to business-level allow/deny.)
+- **Passes-after, focused, `e7ba59d`** (`AccountPrivilege|PathBoundary|ImpersonationAction|AccessMatrix|SurfaceInventory`): **OK (22 tests, 267 assertions)**.
+- **Full isolated suite, `6bf8582`:** **OK (606 tests, 7,016 assertions)**, run `20261021T081844Z-6bf8582aa8e7`; staging 200 before and after. (A first run hit an unrelated, pre-existing flaky collision in `CompanyDossierPdfTest` — a random taxonomy code `CPV-'.random_int(900,999)`, not a file changed this round; the rerun was green. Registered as a reliability flake to de-randomise later.)
+- **Browser:** not run. The changed flows are a server-side write guard and a removed route, both covered by HTTP/Livewire tests; the impersonation UI click is a redirect the harness cannot follow (stated as partial coverage).
 
 ## REMAINING_COVERAGE_AND_OWNER_DECISIONS
 
@@ -107,10 +115,11 @@ Business rule: `create_user`/`update_user` manage ordinary accounts; only a supe
 - **Public:** test code (synthetic names, generic permissions), the fix, and this sanitized report. Screened: no secret, token, real identifier, role-to-permission mapping, or exploit payload for unresolved paths. The canary targets a disposable temp file, never a real secret.
 - **Restricted** (executor-local, outside git/webroot, `%USERPROFILE%\.cpv-restricted\sec-01\`): the raw path-payload results and the finding mechanisms. Handoff on owner request via a private channel; not assumed readable by another executor.
 
-## MANUAL
+## MANUAL (R2-REV-04)
 
-Unchanged. Affiliate behaviour is the same; the guard only limits privileged-role grants between staff accounts, and the removed `/form` had no documented use.
+- **Affiliate manual:** unchanged — nothing an affiliate sees or does changes.
+- **Staff-facing change:** a non-super-admin that tries to assign a privileged role now gets an in-UI warning that the role was not applied (the rest of the save succeeds). There is no user-administration help page in the project to carry this; it is recorded in the cumulative register (`docs/security/SECURITY_STATUS.md` §5 R2) rather than invented as a new doc. The removed `/form` surface had no documented use.
 
 ## RESUME_ENTRYPOINT
 
-Branch `fix/sec-01-account-path-boundaries` @ REVIEW_HEAD. Read `docs/orquestador/SESSION_RESUME.md` and `docs/plans/SECURITY_REVIEW_PLAN.md`, then execute only the next assigned Issue #2 comment. F-01 and this round are accepted-pending-deployment; managerial work stays on hold and its frozen planning branch is never promoted.
+Branch `fix/sec-01-account-path-boundaries` @ REVIEW_HEAD. Read `docs/orquestador/SESSION_RESUME.md`, `docs/plans/SECURITY_REVIEW_PLAN.md` and the cumulative register `docs/security/SECURITY_STATUS.md`, then execute only the next assigned Issue #2 comment. F-01 is accepted (deployment unaccredited); R2 is CHANGES-REQUESTED-addressed, not yet accepted; neither is deployed. Managerial work stays on hold and its frozen planning branch is never promoted.

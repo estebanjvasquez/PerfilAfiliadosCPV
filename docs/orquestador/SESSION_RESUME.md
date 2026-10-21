@@ -69,7 +69,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Seguridad (CPV-SEC-01):** R1 (`6293112309`/`6293203444`) F-01 corregido en `fix/sec-01-impersonation-gate` (aviso `6293694720`). R2 (`6310273754`) en `fix/sec-01-account-path-boundaries`: inyección de privilegios en usuarios corregida, F-04 removido, F-05 no reproducido, traversal sin hallazgos; suite completa 606 OK. **F-01 sigue SIN desplegar en staging** (`87dd997`): el riesgo vivo persiste. F-02 editor de roles / F-03 / F-06 son decisiones del propietario. Informes en `audit/security_sec01_*.md`. SEC-02..05 restantes sin empezar; gerencia en espera.
+- **Seguridad (CPV-SEC-01):** registro acumulativo en `docs/security/SECURITY_STATUS.md`. R1 F-01 en `fix/sec-01-impersonation-gate` (aviso `6293694720`). R2 (`6310273754`, correcciones `6310331211`) en `fix/sec-01-account-path-boundaries`: concesión de roles autorizada ANTES de persistir, F-04 removido, traversal sin hallazgos; suite 606 OK. **F-01 SIGUE SIN desplegar** (`87dd997`): riesgo vivo. R2 no aceptada aún. F-02 editor de roles / F-03 / F-06 son decisiones del propietario. SEC-02..05 restantes sin empezar; gerencia en espera.
 - **Propietario:** desplegar F-01 y SEC-01 R2 (decisión); UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
 - **Agente:** nada sin una instrucción nueva del Issue #2.
 
