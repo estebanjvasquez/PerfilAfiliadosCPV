@@ -26,6 +26,9 @@ use Illuminate\Validation\ValidationException;
 
 class EditEmpresa extends EditRecord
 {
+    // CPV-SEC-01-R3 (F-SEC01-R3-01): every request after the page opened re-checks that the user may still edit this company.
+    use \App\Filament\Resources\EmpresaResource\Concerns\ReauthorizesEmpresaAccess;
+
     use EditRecord\Concerns\HasWizard;
 
     protected static string $resource = EmpresaResource::class;
