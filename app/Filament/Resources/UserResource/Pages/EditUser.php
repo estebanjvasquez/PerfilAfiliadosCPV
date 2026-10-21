@@ -4,23 +4,31 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Models\User;
 use App\Filament\Resources\UserResource;
+use App\Filament\Resources\UserResource\Concerns\GuardsPrivilegedRoles;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Actions\DeleteAction;
 use STS\FilamentImpersonate\Pages\Actions\Impersonate;
 
 class EditUser extends EditRecord
 {
+    use GuardsPrivilegedRoles;
+
     protected static string $resource = UserResource::class;
 
-    public function mutateFormDataBeforeSave(array $data): array
+    /**
+     * CPV-SEC-01-R2-ACCOUNT-PATH: a non-super-admin cannot open a privileged account, so it cannot be modified through
+     * this page. The check runs before the form is filled with the record's data.
+     */
+    protected function fillForm(): void
     {
-        $getUser = User::where('email', $data['email'])->first();
-        if ($getUser) {
-            if (empty($data['password'])) {
-                $data['password'] = $getUser->password;
-            }
-        }
-        return $data;
+        $this->assertMayManagePrivilegedTarget($this->getRecord());
+        parent::fillForm();
+    }
+
+    /** After save, drop any privileged role a non-super-admin tried to grant. */
+    protected function afterSave(): void
+    {
+        $this->stripPrivilegedRoleGrants($this->getRecord());
     }
 
     public function getTitle(): string

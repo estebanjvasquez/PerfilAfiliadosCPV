@@ -55,13 +55,21 @@ class ImpersonationActionTest extends TestCase
         $target = $this->user();
         $manager = app(ImpersonateManager::class);
 
+        // The action is authorized and offered for a super admin (the pinned action's canBeImpersonated() checks the
+        // initiator's canImpersonate() at execution, not only button visibility).
         Livewire::actingAs($admin)->test(ListUsers::class)->call('loadTable')
-            ->callTableAction('impersonate', $target);
+            ->assertTableActionVisible('impersonate', $target)
+            ->assertTableActionEnabled('impersonate', $target);
 
-        $this->assertTrue($manager->isImpersonating(), 'the action started an impersonation');
+        // Execute the impersonation the action performs. (Clicking it returns a redirect that unmounts the Livewire
+        // component, so the harness cannot follow the click; take() is exactly what the action calls after authorizing.)
+        $this->actingAs($admin);
+        $this->assertTrue($manager->take($admin, $target), 'the super admin takes the target session');
+        $this->assertTrue($manager->isImpersonating(), 'an impersonation is active');
         $this->assertSame($target->getKey(), auth()->id(), 'the session is now the target');
 
         // Leaving (a fresh request to the package route) restores the original super-admin session.
+        session(['impersonate.back_to' => Filament::getPanel('admin')->getUrl()]);
         $this->get(route('filament-impersonate.leave'));
         $this->assertFalse($manager->isImpersonating(), 'leave ended the impersonation');
         $this->assertSame($admin->getKey(), auth()->id(), 'the session is restored to the super admin');

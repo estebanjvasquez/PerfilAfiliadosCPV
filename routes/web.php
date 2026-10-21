@@ -34,7 +34,6 @@ Route::get('/', function () {
     return view('campet', compact('user'));
 })->name('home');
 
-\Illuminate\Support\Facades\Route::get('form', Form::class);
 // CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES (Issue #2 `6264837159`): las rutas viejas de descarga ya no generan
 // nada. Solo redirigen a las del panel (filament.admin.export.*), que exigen sesión, correo verificado y
 // acceso a la empresa. Así los enlaces y marcadores viejos siguen funcionando. El parámetro se pasa como texto
