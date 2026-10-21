@@ -87,6 +87,15 @@ class RoleEditorPermissionPreservationTest extends TestCase
     }
 
     #[Test]
+    public function the_panel_serves_the_app_role_editor_only(): void
+    {
+        $resources = Filament::getPanel('admin')->getResources();
+        $this->assertContains(\App\Filament\Resources\Shield\RoleResource::class, $resources);
+        $this->assertNotContains(\BezhanSalleh\FilamentShield\Resources\RoleResource::class, $resources, 'Shield does not register its own');
+        $this->assertSame('shield/roles', \App\Filament\Resources\Shield\RoleResource::getSlug(), 'same address as before');
+    }
+
+    #[Test]
     public function saving_without_changes_keeps_every_permission_of_an_ordinary_and_the_privileged_role(): void
     {
         $ordinary = $this->names($this->ordinary);
