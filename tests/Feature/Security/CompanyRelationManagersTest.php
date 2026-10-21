@@ -161,6 +161,21 @@ class CompanyRelationManagersTest extends TestCase
         }
     }
 
+    /**
+     * Drive a table action the way the browser does (mount by name + record key, fill, call), without the test
+     * helper's own visibility pre-assertion. Whether the server refuses is then judged by the database state.
+     */
+    private function browserAction($component, string $name, int|string|null $key = null, array $data = []): void
+    {
+        $this->attempt(function () use ($component, $name, $key, $data) {
+            $component->call('mountTableAction', $name, $key === null ? null : (string) $key);
+            foreach ($data as $field => $value) {
+                $component->set("mountedTableActionsData.0.{$field}", $value);
+            }
+            $component->call('callMountedTableAction');
+        });
+    }
+
     private function titleKey(string $section): string
     {
         $titles = json_decode(file_get_contents(storage_path('tituloshr.json')), true);
@@ -232,8 +247,8 @@ class CompanyRelationManagersTest extends TestCase
         $this->assertSame([2020], array_map(fn ($e) => (int) $e['data']['exp_year'], array_values($alfaEntries)), 'allowed: ALFA added its entry');
 
         // BETA's key, as a browser would send it: resolved against ALFA's own entries only.
-        $this->attempt(fn () => $this->manager(ExperiencesRelationManager::class, $this->alfaUser)->callTableAction('editar', $betaKey, data: ['exp_year' => 1999]));
-        $this->attempt(fn () => $this->manager(ExperiencesRelationManager::class, $this->alfaUser)->callTableAction('eliminar', $betaKey));
+        $this->browserAction($this->manager(ExperiencesRelationManager::class, $this->alfaUser), 'editar', $betaKey, ['exp_year' => 1999]);
+        $this->browserAction($this->manager(ExperiencesRelationManager::class, $this->alfaUser), 'eliminar', $betaKey);
 
         $this->assertSame([$betaKey => ['type' => 'Experiencia Relevante', 'data' => ['exp_year' => 2001]]], $betaRow->fresh()->exp_year, 'BETA entries unchanged');
         $this->assertCount(1, Experience::where('empresa_id', $this->alfa->id)->firstOrFail()->exp_year, 'ALFA did not gain BETA\'s key');
@@ -254,8 +269,8 @@ class CompanyRelationManagersTest extends TestCase
         $this->assertSame(1, Presence::where('empresa_id', $this->beta->id)->count(), 'the forged id did not add a row to BETA');
 
         // BETA's id from ALFA's tab: not resolvable.
-        $this->attempt(fn () => $this->manager(PresenceRelationManager::class, $this->alfaUser)->callTableAction('edit', $betaRow->getKey(), data: ['has_offices' => false, 'has_experience' => false]));
-        $this->attempt(fn () => $this->manager(PresenceRelationManager::class, $this->alfaUser)->callTableAction('delete', $betaRow->getKey()));
+        $this->browserAction($this->manager(PresenceRelationManager::class, $this->alfaUser), 'edit', $betaRow->getKey(), ['has_offices' => false, 'has_experience' => false]);
+        $this->browserAction($this->manager(PresenceRelationManager::class, $this->alfaUser), 'delete', $betaRow->getKey());
         $fresh = $betaRow->fresh();
         $this->assertNotNull($fresh, 'BETA presence not deleted');
         $this->assertTrue((bool) $fresh->has_offices, 'BETA presence not edited');
@@ -268,7 +283,7 @@ class CompanyRelationManagersTest extends TestCase
         // A linked editor without the presence write permissions is refused by the module policy.
         $editor = $this->user(['view_any_empresa', 'view_empresa', 'update_empresa', 'view_any_presence', 'view_presence']);
         $this->link($this->alfa, $editor);
-        $this->attempt(fn () => $this->manager(PresenceRelationManager::class, $editor)->callTableAction('delete', $alfaRow->getKey()));
+        $this->browserAction($this->manager(PresenceRelationManager::class, $editor), 'delete', $alfaRow->getKey());
         $this->assertNotNull($alfaRow->fresh(), 'denied: no delete_presence');
     }
 
@@ -286,7 +301,7 @@ class CompanyRelationManagersTest extends TestCase
         $this->assertSame(1, Sustainability::where('empresa_id', $this->alfa->id)->count(), 'allowed: ALFA added its approach');
         $this->assertSame(1, Sustainability::where('empresa_id', $this->beta->id)->count(), 'the forged id did not add a row to BETA');
 
-        $this->attempt(fn () => $this->manager(SustainabilitiesRelationManager::class, $this->alfaUser)->callTableAction('delete', $betaRow->getKey()));
+        $this->browserAction($this->manager(SustainabilitiesRelationManager::class, $this->alfaUser), 'delete', $betaRow->getKey());
         $this->assertNotNull($betaRow->fresh(), 'BETA approach not deleted');
         $this->assertEquals($areasBefore, DB::table('areas')->orderBy('id')->get()->toArray(), 'the shared area catalog is unchanged');
     }
@@ -312,8 +327,9 @@ class CompanyRelationManagersTest extends TestCase
             ->assertCanNotSeeTableRecords([\App\Models\Service::find($betaService)]);
         foreach (['detach', 'delete', 'edit', 'attach', 'create', 'dissociate'] as $action) {
             $rm->assertTableActionDoesNotExist($action);
+            $this->browserAction($this->manager(ServicesRelationManager::class, $this->alfaUser), $action, $alfaService);
+            $this->browserAction($this->manager(ServicesRelationManager::class, $this->alfaUser), $action, $betaService);
         }
-        $this->attempt(fn () => $this->manager(ServicesRelationManager::class, $this->alfaUser)->callTableAction('detach', $betaService));
 
         $this->assertEquals($catalogBefore, DB::table('services')->whereIn('id', [$alfaService, $betaService])->orderBy('id')->get()->toArray(), 'catalog unchanged');
         $this->assertEquals($linksBefore, $links(), 'links unchanged');
@@ -341,12 +357,12 @@ class CompanyRelationManagersTest extends TestCase
 
         // A self-declared row cannot be turned into «Confirmada» (the action is offered for suggestions only).
         $own = $alfaLinks->first();
-        $this->attempt(fn () => $this->manager(TaxonomyCategoriesRelationManager::class, $this->alfaUser)->callTableAction('confirmar', $own->getKey()));
+        $this->browserAction($this->manager(TaxonomyCategoriesRelationManager::class, $this->alfaUser), 'confirmar', $own->getKey());
         $this->assertSame(EmpresaTaxonomyCategory::ORIGEN_SELF_DECLARED, $own->fresh()->origen, 'no origin change on a self-declared link');
 
         // BETA's link from ALFA's tab: not resolvable for confirm, principal toggle or removal.
         foreach (['confirmar', 'togglePrincipal', 'quitar'] as $action) {
-            $this->attempt(fn () => $this->manager(TaxonomyCategoriesRelationManager::class, $this->alfaUser)->callTableAction($action, $betaLink->getKey()));
+            $this->browserAction($this->manager(TaxonomyCategoriesRelationManager::class, $this->alfaUser), $action, $betaLink->getKey());
         }
         $betaFresh = $betaLink->fresh();
         $this->assertNotNull($betaFresh, 'BETA link not removed');
