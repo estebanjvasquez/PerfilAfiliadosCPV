@@ -88,16 +88,20 @@ class AccessMatrixTest extends TestCase
             'staff_linked_alfa' => 'deny', 'super_admin' => 'deny', 'no_permission' => 'deny',
             'revoked_alfa' => 'deny', 'role_manager' => 'deny',
         ],
-        // The user and role admin lists: only the staff actor (and, for roles, the role manager) may see them.
+        // The user admin list: only the staff actor may see it. The role admin list: see the R4 note below.
         'UserResource:index' => [
             'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'deny', 'affiliate_beta' => 'deny',
             'staff_linked_alfa' => 'allow', 'super_admin' => 'deny', 'no_permission' => 'deny',
             'revoked_alfa' => 'deny', 'role_manager' => 'deny',
         ],
+        // CPV-SEC-01-R4 (owner rule `6318625636`, 2026-10-21): role administration is exclusively for a current
+        // super_admin; role permissions held by staff or a role manager no longer open it. (This matrix's super_admin
+        // actor holds the role without the explicit permissions, so it is denied too: see RoleAdministrationTest for
+        // the allowed super-admin path.)
         'RoleResource:index' => [
             'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'deny', 'affiliate_beta' => 'deny',
-            'staff_linked_alfa' => 'allow', 'super_admin' => 'deny', 'no_permission' => 'deny',
-            'revoked_alfa' => 'deny', 'role_manager' => 'allow',
+            'staff_linked_alfa' => 'deny', 'super_admin' => 'deny', 'no_permission' => 'deny',
+            'revoked_alfa' => 'deny', 'role_manager' => 'deny',
         ],
         // The manual and the dashboard are open to any verified panel user.
         'UserManual' => [
