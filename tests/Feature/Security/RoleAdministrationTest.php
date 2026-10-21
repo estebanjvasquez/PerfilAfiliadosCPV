@@ -3,10 +3,10 @@
 namespace Tests\Feature\Security;
 
 use App\Models\User;
-use BezhanSalleh\FilamentShield\Resources\RoleResource;
-use BezhanSalleh\FilamentShield\Resources\RoleResource\Pages\CreateRole;
-use BezhanSalleh\FilamentShield\Resources\RoleResource\Pages\EditRole;
-use BezhanSalleh\FilamentShield\Resources\RoleResource\Pages\ListRoles;
+use App\Filament\Resources\Shield\RoleResource;
+use App\Filament\Resources\Shield\RoleResource\Pages\CreateRole;
+use App\Filament\Resources\Shield\RoleResource\Pages\EditRole;
+use App\Filament\Resources\Shield\RoleResource\Pages\ListRoles;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
