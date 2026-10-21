@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-21 ~12:50Z, rama `fix/sec-01-account-path-boundaries` (SEC-01 R2): corrección de atomicidad R2-REV-05 **entregada para revisión**, sin desplegar. Staging corría `87dd997` (el runner lo vio responder 200 durante las pruebas; el SHA no se volvió a comprobar).
+**Checkpoint:** 2026-10-21 ~13:00Z, rama `fix/sec-01-account-path-boundaries`: **SEC-01 R1+R2 desplegado en staging (`cf01e9c`)** por `6316265832` y verificado (solo lectura).
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,9 +32,9 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`fix/sec-01-account-path-boundaries`** (SEC-01 R2, desde `0139e95`), TESTED `f4dd8fb`; REVIEW_HEAD en `current_task.md`. R2: segunda corrección entregada, **no aceptada, sin desplegar**. `fix/sec-01-impersonation-gate` (F-01): aceptada, despliegue no acreditado. `planning/management-taxonomy` EN ESPERA: no se promueve.
+- **Rama canónica:** **`fix/sec-01-account-path-boundaries`** (SEC-01 R2, desde `0139e95`); su `cf01e9c` (F-01 + R2, aceptado) es el runtime desplegado; encima solo hay checkpoints de docs. `planning/management-taxonomy` EN ESPERA: no se promueve.
   - Contiene `ce70b7f`, `edf20ed`, `10616af`, `0895258` y `28014c2`.
-  - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `87dd997`; el checkpoint vigente es el de esta rama.
+  - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `cf01e9c`; el checkpoint vigente es el de esta rama.
   - Una sesión abierta en un checkout viejo no los carga sola.
 - **Cómo situarse sin perder trabajo:**
   1. `git status -sb`. Si hay cambios, **no** se descartan: se commitean en su rama o se usa un worktree aparte.
@@ -49,12 +49,13 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 | Hecho | Valor | Fuente y fecha |
 |---|---|---|
-| HEAD remoto de `feature/upgrade-filament-v3` | `87dd9975e7cfcc2c9a5eb72d4686fbc11fc907f4` | `git ls-remote`, 2026-10-20 ~10:07Z |
-| Código en staging (checkout del VPS) | `87dd997`, 0 modificaciones; imagen `f91e97322189`; mantenimiento apagado; sin migraciones pendientes | SSH de solo lectura, 10:10Z |
+| HEAD remoto de `feature/upgrade-filament-v3` | `cf01e9c3e30415a34ccda60b312a993c1388167d` | `git ls-remote`, 2026-10-21 ~12:48Z |
+| Código en staging | `cf01e9c`, versionados limpios; imagen `081c35c5715d`; mantenimiento y debug apagados; sin migraciones pendientes | SSH de solo lectura, ~12:52Z |
+| Workflow / recuperación | run `39602544527` success; `perfilafiliados-app:pre-sec01-87dd997` (`f91e97322189`) | 2026-10-21 |
 
-### Desplegado (`6288459314`): CPV-PDF-OPERATION-SECTION `87dd997`
+### Desplegado (`6316265832`): CPV-SEC-01-R1-R2-DEPLOY `cf01e9c`
 
-- «Operación en Venezuela» es sección propia (`operacion`, 11 en total); selector con descripciones. 11 opciones probadas en PDF real; smokes 13/25/18. `audit/pdf_operation_section_2026-10-20.md` §8.
+- F-01 (suplantación solo super admin), F-SEC01-02a (guarda de roles antes del sync), F-04 (`/form` retirado), R2-REV-05 (transacción de cuenta). Smoke `smoke_sec01_readonly.php` 17/17; export 25, 0010C 18, perfil 13. Los smokes con acentos se corren desde bash con `<` (PowerShell 5.1 los re-codifica). Antes: `87dd997` (`6288459314`, sección Operación).
 
 ### Anteriores
 
@@ -63,11 +64,10 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **CPV-SEC-01 R2 (entregada para revisión):** transacciones explícitas por página en `CreateUser` y `EditUser` sobre las conexiones de cuenta y pivote + pruebas de inyección de fallo; se conserva la guarda previa a la sincronización. Fuente: sección «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION» de `6310331211`. Detalle y SHAs en [`current_task.md`](current_task.md). Siguiente: esperar la revisión.
-- **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). **F-01 sin desplegar** (última observación `87dd997`): riesgo vivo. F-02 editor de roles / F-03 / F-06: decisiones del propietario. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
+- **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). F-01 y R2 desplegados (`cf01e9c`); atomicidad solo con una conexión de cuenta/pivote. SEC-01 sigue abierto: F-02 editor de roles / F-03 / F-06 (decisiones del propietario), relation managers/búsqueda. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
 - **Accesos:** cada comando que los necesite usa el bootstrap documentado ([`ENVIRONMENT.md`](ENVIRONMENT.md), [`ACCESS_BOOTSTRAP.md`](ACCESS_BOOTSTRAP.md)); cada ejecutor guarda sus credenciales fuera de git. Si faltan `gh` o `python`, no es un bloqueo: se usan los mecanismos documentados.
 - **Reanudar:** solo con una asignación nueva del propietario (un reinicio de cuota no es una instrucción).
-- **Propietario:** desplegar F-01 y SEC-01 R2 (decisión); UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
+- **Propietario:** UAT de SEC-01 (`current_task.md`); UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
 - **Agente:** nada sin una instrucción nueva del Issue #2.
 
 ## 4. Worktrees en uso (no tocar sin instrucción)

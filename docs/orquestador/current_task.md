@@ -1,9 +1,27 @@
-# Tarea actual (checkpoint 2026-10-21 ~12:50Z, rama `fix/sec-01-account-path-boundaries`)
+# Tarea actual (checkpoint 2026-10-21 ~13:00Z, rama `fix/sec-01-account-path-boundaries`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-SEC-01-R2-ACCOUNT-PATH — READY_FOR_REVIEW — MANUAL (corrección de atomicidad R2-REV-05), sin desplegar
+## CPV-SEC-01-R1-R2-DEPLOY — DEPLOYED_FOR_OWNER_REVIEW — MANUAL (`6316265832`)
+
+| Campo | Valor |
+|---|---|
+| Aceptado / desplegado | `cf01e9c3e30415a34ccda60b312a993c1388167d` (aceptación `6310331211`, FINAL R2 REVIEW) por push normal fast-forward desde `87dd997` |
+| Workflow | run `39602544527` success, 12:48–12:50Z |
+| Runtime | checkout `cf01e9c` (versionados limpios), imagen `081c35c5715d`, debug y mantenimiento apagados, sin migraciones pendientes |
+| Recuperación | `perfilafiliados-app:pre-sec01-87dd997` (`f91e97322189`) → `latest`, `git reset --hard 87dd997`, `docker compose up -d app` (no hizo falta) |
+| Misma conexión | cuenta y rol/pivote → `pgsql` (antes y después) |
+| Solo lectura | `docs/deploy/smoke_sec01_readonly.php` 17/17 (antes 3/17); export 25/25, 0010C 18/18, perfil 13/13; HTTP: login 200, `/form` 404 |
+| Sin probar en staging | escrituras de cuentas, rollback, clic de suplantación; evidencia = suite aislada `f4dd8fb` (611 OK) |
+
+**UAT del propietario (solo con sus cuentas habituales; no intentar escalar privilegios en cuentas reales):**
+1. Como super admin: **Usuarios** muestra la lista y la acción «Impersonate» sigue disponible.
+2. Con una cuenta de staff que no es super admin (si la tiene): la acción «Impersonate» ya no aparece.
+3. Editar el nombre de una cuenta de prueba designada y guardar: el cambio queda.
+4. `https://pruebas.camarapetrolera.app/form` → «Página no encontrada».
+
+## CPV-SEC-01-R2-ACCOUNT-PATH — aceptada (`6310331211` FINAL), desplegada arriba (corrección de atomicidad R2-REV-05)
 
 | Campo | Valor |
 |---|---|

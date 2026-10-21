@@ -5,13 +5,29 @@
 - **BRANCH:** `fix/sec-01-account-path-boundaries`.
 - **TESTED_HEAD (second review, R2-REV-05):** `f4dd8fb2c1945f8f4839f710192221672ebca3b0` — focused and full isolated suite (see REGRESSION). Earlier: full `6bf8582aa8e7155c10ca560fb6089d7b5bef73ef` (606/7,016), focused `e7ba59d9deb35198bc9fb3fac857255ebaa9e0e2`; previous REVIEW_HEAD `51a923e`.
 - **REVIEW_HEAD:** the commit that adds this updated report and checkpoint.
-- **DEPLOYED:** NO.
+- **DEPLOYED:** ~~NO~~ → **YES, 2026-10-21:** `cf01e9c` to staging under owner authorization `6316265832` (accepted in `6310331211`, FINAL R2 REVIEW); see DEPLOYMENT below.
 
 > **Second review (`6310331211`, «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION»), addressed here as R2-REV-05.** The earlier claim that Filament already made the account + role save atomic was **incorrect** and is retracted (dated note in FIX below): pinned Filament v3.3.55 ships panel transactions off and this candidate had not enabled them. Transactions are now enabled explicitly on `CreateUser` and `EditUser`, on the account and pivot connections, with failure-injection checks asserted before test teardown. See ATOMICITY.
 
 > **Review-corrections summary (`6310331211`).** The privilege-grant control was moved to BEFORE the role relationship is persisted (it was an after-sync cleanup); a persistence-boundary test proves the forbidden role is never written. Traversal assertions now read decoded PDF text, assert the exact denial and record the layer, and no OS file is targeted. The access matrix gained a business-level independent oracle for high-value entrypoints and now fails on unexpected 5xx (except the counted JoinViews defect). The cumulative register `docs/security/SECURITY_STATUS.md` is carried into this branch and updated. Sections below reflect these corrections.
 
-## F-01 deployment status (read-only, prominent)
+## DEPLOYMENT (CPV-SEC-01-R1-R2-DEPLOY, `6316265832`, 2026-10-21)
+
+- **Deployed:** `cf01e9c3e30415a34ccda60b312a993c1388167d` to `feature/upgrade-filament-v3` by a normal fast-forward push from `87dd997`. Workflow «Deploy a Contabo» run `39602544527`: **success** (12:48–12:50Z).
+- **Runtime:** checkout `cf01e9c`, clean; image `081c35c5715d`; no pending migrations; debug and maintenance off.
+- **Recovery:** `perfilafiliados-app:pre-sec01-87dd997` (`f91e97322189`). It was not needed.
+- **Preflight:**
+  - the account and role/pivot models both resolve to `pgsql`;
+  - the runtime diff contains only the 9 accepted files;
+  - there is no schema, dependency or config change.
+- **Read-only checks:**
+  - `docs/deploy/smoke_sec01_readonly.php`: **17/17** after the deploy, against 3/17 before it;
+  - export 25/25, 0010C 18/18, complete profile 13/13;
+  - public HTTP: login 200, `/form` 404.
+- **Scope of verification:** the source and config checks and the in-memory executions are listed in the register (§5 «Despliegue SEC-01 R1+R2»). No write, account change or impersonation was performed on staging. Rollback evidence remains the isolated failure-injection suite.
+- **Atomicity scope:** it holds only for the current single account/pivot connection. It is not a distributed transaction.
+
+## F-01 deployment status (read-only, prominent) — *superseded 2026-10-21: F-01 deployed in `cf01e9c` (DEPLOYMENT above); kept as recorded*
 
 **F-01 is accepted but NOT deployed. The live risk remains.** On 2026-10-21 staging runs `87dd997`; `feature/upgrade-filament-v3` is at `87dd997`; `User::canImpersonate()` is **absent** from the running checkout; login 200. Reviewing F-01 did not remove the live exposure. The fix stays independently deployable on `fix/sec-01-impersonation-gate` (reviewed head `613c359`), awaiting a separate owner deployment authorization. This round does not touch it.
 
@@ -144,4 +160,4 @@ Business rule: `create_user`/`update_user` manage ordinary accounts; only a supe
 
 ## RESUME_ENTRYPOINT
 
-Branch `fix/sec-01-account-path-boundaries` @ REVIEW_HEAD. Read `docs/orquestador/SESSION_RESUME.md`, `docs/plans/SECURITY_REVIEW_PLAN.md` and the cumulative register `docs/security/SECURITY_STATUS.md`, then execute only the next assigned Issue #2 comment. F-01 is accepted (deployment unaccredited); R2 had a second CHANGES REQUESTED (atomicity, R2-REV-05), addressed in this delivery, not yet accepted; neither is deployed. Browser/coverage limits stay as stated (allowed impersonation is a direct manager call, not an end-to-end browser test). Managerial work stays on hold and its frozen planning branch is never promoted.
+Branch `fix/sec-01-account-path-boundaries` @ REVIEW_HEAD. Read `docs/orquestador/SESSION_RESUME.md`, `docs/plans/SECURITY_REVIEW_PLAN.md` and the cumulative register `docs/security/SECURITY_STATUS.md`, then execute only the next assigned Issue #2 comment. F-01 is accepted (deployment unaccredited); R2 had a second CHANGES REQUESTED (atomicity, R2-REV-05), addressed and accepted. *Update 2026-10-21:* both are deployed in `cf01e9c` (DEPLOYMENT above); SEC-01 remains open. Browser/coverage limits stay as stated (allowed impersonation is a direct manager call, not an end-to-end browser test). Managerial work stays on hold and its frozen planning branch is never promoted.
