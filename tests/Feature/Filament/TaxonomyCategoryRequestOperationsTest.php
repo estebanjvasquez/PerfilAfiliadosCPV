@@ -83,6 +83,8 @@ class TaxonomyCategoryRequestOperationsTest extends TestCase
     private function empresaConAfiliado(): array
     {
         $user = User::factory()->create(['phone' => '0414-5551111']);
+        // CPV-SEC-01-R3: the tab lives on the company edit page (company edit permission, re-checked per request).
+        $user->givePermissionTo(\Spatie\Permission\Models\Permission::findOrCreate('update_empresa', 'web'));
         $this->actingAs($user);
 
         $empresa = Empresa::create([
