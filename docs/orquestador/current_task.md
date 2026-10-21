@@ -1,9 +1,21 @@
-# Tarea actual (checkpoint 2026-10-21 ~14:00Z, rama `audit/sec-01-r3-company-boundaries`)
+# Tarea actual (checkpoint 2026-10-21 ~15:00Z, rama `fix/sec-01-r4-role-administration`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-SEC-01-R3 — READY_FOR_REVIEW — MANUAL (`6316775771`), sin desplegar
+## CPV-SEC-01-R4-ROLE-ADMIN — READY_FOR_REVIEW — MANUAL (`6318625636`); código sin desplegar
+
+| Campo | Valor |
+|---|---|
+| Regla | administrar roles es exclusivo de quien tiene hoy `super_admin` (propietario, 2026-10-21) |
+| Contención en vivo | **BLOQUEADA**: el clasificador de permisos del ejecutor rechazó la escritura; sin cambios (alerta `6318733204`). Verificación previa: 2 roles, 12 asignaciones, 0 permisos directos; continuidad de super_admin con 4 cuentas |
+| Rama / BASE / TESTED | `fix/sec-01-r4-role-administration` / `66f5ce8` (R3 aceptado) / `b51fa3e` |
+| Código | `RolePolicy` (super_admin, consulta fresca, más el permiso) y `PrivilegedRoleDefinitionGuard` (identidad del rol privilegiado) |
+| Pruebas | antes (`4953be6`): fallan 4 de 5; suite completa `b51fa3e` **629 OK** |
+| Ayuda | `docs/manual_usuario/manual_administrador.md` §9.1 |
+| Informe | `audit/security_sec01_r4_2026-10-21.md` |
+
+## CPV-SEC-01-R3 — aceptado (`6318588005`), NO desplegado (`6316775771`)
 
 | Campo | Valor |
 |---|---|

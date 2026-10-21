@@ -37,7 +37,7 @@ Versión 1 — 17 de agosto de 2026
 6. Tablero de métricas gerenciales
 7. Reportes por módulo
 8. Catálogos maestros (Mantenimiento)
-9. Roles y permisos
+9. Roles y permisos (9.1: [quién administra los roles](#administracion-de-roles), solo `super_admin`)
 10. Preguntas frecuentes del administrador (incluye RIF y % de completitud)
 
 ---
@@ -48,7 +48,7 @@ El sistema tiene tres tipos de acceso (gestionados con Filament Shield):
 
 | Rol | Quién es | Qué puede hacer |
 |---|---|---|
-| **super_admin** | Personal de la Cámara (administrador) | Todo: crear/editar/activar/desactivar/eliminar empresas, definir el Sector Principal, ver todos los reportes y el tablero gerencial, administrar catálogos y roles. |
+| **super_admin** | Personal de la Cámara (administrador) | Todo: crear/editar/activar/desactivar/eliminar empresas, definir el Sector Principal, ver todos los reportes y el tablero gerencial, administrar catálogos y roles (administrar roles es **exclusivo** de `super_admin`: ver [9.1](#administracion-de-roles)). |
 | **affiliates** | La empresa afiliada | Solo carga y consulta **su propia** empresa; ve **su propio** porcentaje de perfil. No ve reportes agregados ni el tablero gerencial. |
 | **filament_user** | Acceso básico al panel | Acceso mínimo; se usa como base antes de asignar un rol definitivo. |
 
@@ -241,6 +241,23 @@ Menú **Roles** (Filament Shield). Permite:
 
 > Recomendación: otorgue **super_admin** solo al personal de confianza de la Cámara; los reportes
 > agregados y la eliminación de empresas dependen de ese rol.
+
+### 9.1 Quién administra los roles (regla del 2026-10-21) {#administracion-de-roles}
+
+**Solo un usuario que tiene hoy el rol `super_admin` puede administrar roles.** Esto incluye ver el menú **Roles**, abrir
+el detalle de un rol y su editor de permisos, y crear, editar, eliminar (también en lote) o cambiar los permisos de
+cualquier rol. Rige desde la versión que incorpora esta regla (CPV-SEC-01-R4).
+
+- **Ya no basta un permiso suelto.** Un rol o un usuario con permisos como «ver/editar roles» pero **sin** `super_admin`
+  no ve el menú y no puede usar estas pantallas.
+- **Lo que deja de estar disponible para el personal:** el personal que mantenía roles sin ser `super_admin` ahora debe
+  pedirle el cambio a un `super_admin`.
+- **El rol `super_admin` está protegido:** nadie puede renombrarlo, cambiar su guard ni eliminarlo, y ningún otro rol puede
+  tomar su nombre. Un `super_admin` sí puede ajustar sus permisos. Si lo intenta, el sistema responde «No autorizado» y no
+  cambia nada.
+- **Si se le quita el rol a alguien**, sus pantallas abiertas de Roles dejan de funcionar en la siguiente acción.
+- **Sin cambios:** la gestión de usuarios comunes por el personal autorizado sigue igual. Asignar el rol `super_admin` a
+  una cuenta sigue siendo exclusivo de un `super_admin`.
 
 ![Roles y permisos (Filament Shield)](capturas_admin/26-roles.png)
 

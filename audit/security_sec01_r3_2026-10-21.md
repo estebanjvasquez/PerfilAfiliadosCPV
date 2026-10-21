@@ -33,7 +33,7 @@
 | Services (legacy, read-only) | list; detach/delete/edit/attach/create/dissociate on own and BETA keys | own links listed | no such action exists or runs; catalog and links unchanged; BETA link not listed |
 | TaxonomyCategories | search-and-add (leaf + family in one request); confirm a self-declared row; confirm / toggle-principal / remove on BETA's row; remove own row | only the leaf is linked, as `self_declared`, with no approver; own link removed | family not linked; self-declared origin not changed; BETA origin, flag and row unchanged; the shared taxonomy rows are unchanged |
 | **All seven + the company page** | write after the link is revoked, with the page already mounted | — | **before the fix: written (F-SEC01-R3-01)**; after: every request refused (404), nothing written |
-| Assets, Management, Presence | write after the company edit permission is withdrawn, with the page already mounted | — | before: written; after: refused (404) |
+| ~~Assets,~~ Management, Presence | write after the company edit permission is withdrawn, with the page already mounted | — | before: written; after: refused (404). *Corrected 2026-10-21 (review `6318588005`): executed for the Management header save and the Presence delete only.* |
 | All seven | manager bound directly to BETA (harness only; defence in depth) | — | before: mounts; after: refused (404) |
 
 **Binding layer.** A manager's owner record is server-issued and `#[Locked]`. Lazy loading carries mount parameters inside a checksummed Livewire snapshot (Livewire v3.8.7). So a browser cannot point ALFA's page at BETA; the direct-binding row covers the harness-only path.

@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-21 ~14:00Z, rama `audit/sec-01-r3-company-boundaries`: SEC-01 **R3 entregado para revisión** (sin desplegar). Staging sigue en `cf01e9c` (R1+R2, UAT del propietario PASS).
+**Checkpoint:** 2026-10-21 ~15:00Z, rama `fix/sec-01-r4-role-administration`: SEC-01 **R4** (administración de roles exclusiva de super_admin). El código está listo para revisión, sin desplegar. **La contención en datos vivos quedó BLOQUEADA** (riesgo vivo, `6318733204`). Staging sigue en `cf01e9c`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,7 +32,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`audit/sec-01-r3-company-boundaries`** (SEC-01 R3, desde `eb03b4c`, que es el runtime desplegado `cf01e9c` más docs). TESTED `e95169c`. `audit/sec-01-r3-fails-before` es solo evidencia. `planning/management-taxonomy` EN ESPERA: no se promueve.
+- **Rama canónica:** **`fix/sec-01-r4-role-administration`** (R4, desde el candidato R3 aceptado `66f5ce8`, que está en `audit/sec-01-r3-company-boundaries` y no se desplegó). TESTED `b51fa3e`. `planning/management-taxonomy` EN ESPERA: no se promueve.
   - Contiene `ce70b7f`, `edf20ed`, `10616af`, `0895258` y `28014c2`.
   - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `cf01e9c`; el checkpoint vigente es el de esta rama.
   - Una sesión abierta en un checkout viejo no los carga sola.
@@ -43,7 +43,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `audit/sec-01-r3-company-boundaries` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabajá en la rama `fix/sec-01-r4-role-administration` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
@@ -55,7 +55,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ### Desplegado (`6316265832`): CPV-SEC-01-R1-R2-DEPLOY `cf01e9c`
 
-- F-01 (suplantación solo super admin), F-SEC01-02a (guarda de roles antes del sync), F-04 (`/form` retirado), R2-REV-05 (transacción de cuenta). Smoke `smoke_sec01_readonly.php` 17/17; export 25, 0010C 18, perfil 13. Los smokes con acentos se corren desde bash con `<` (PowerShell 5.1 los re-codifica). Antes: `87dd997` (`6288459314`, sección Operación).
+- F-01 (suplantación solo super admin), F-SEC01-02a (guarda de roles antes del sync), F-04 (`/form` retirado), R2-REV-05 (transacción de cuenta). Smoke `smoke_sec01_readonly.php` 17/17; export 25, 0010C 18, perfil 13. Los smokes con acentos se corren desde bash con `<` (PowerShell 5.1 los re-codifica).
 
 ### Anteriores
 
@@ -64,10 +64,10 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). F-01 y R2 desplegados (`cf01e9c`, UAT PASS). **R3 entregado:** F-SEC01-R3-01 corregido en candidato; R3-02/03 registrados. **Alerta R3-04 (Alta):** el camino del editor de roles se salta las guardas desplegadas; mitigación inmediata del propietario: quitar los permisos de gestión de roles a los roles que no son super admin. Pendientes: 14 relation managers (13 según el denominador anterior) y 9 búsquedas; decisiones F-02/F-03/F-06. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
+- **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). F-01 y R2 desplegados (`cf01e9c`, UAT PASS). R3 aceptado y sin desplegar. **R4:** regla del propietario: solo super_admin administra roles. El código está listo para revisión. **La contención está BLOQUEADA**; el propietario puede aplicarla en la app (Roles → desmarcar los permisos de Role en los roles que no son super_admin). Pendientes: R3-02 y R3-03; 14 de 24 relation managers; 9 búsquedas; decisiones F-03/F-06. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
 - **Accesos:** cada comando que los necesite usa el bootstrap documentado ([`ENVIRONMENT.md`](ENVIRONMENT.md), [`ACCESS_BOOTSTRAP.md`](ACCESS_BOOTSTRAP.md)); cada ejecutor guarda sus credenciales fuera de git. Si faltan `gh` o `python`, no es un bloqueo: se usan los mecanismos documentados.
-- **Reanudar:** solo con una asignación nueva del propietario (un reinicio de cuota no es una instrucción).
-- **Propietario:** mitigar R3-04 (datos de roles); revisar R3; UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
+- **Reanudar:** solo con una nueva asignación del propietario.
+- **Propietario:** aplicar la contención de R4 (datos de roles) y revisar el código de R4; UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
 - **Agente:** nada sin una instrucción nueva del Issue #2.
 
 ## 4. Worktrees en uso (no tocar sin instrucción)
