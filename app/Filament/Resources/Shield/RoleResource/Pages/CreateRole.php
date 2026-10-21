@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Shield\RoleResource\Pages;
 
 use App\Filament\Resources\Shield\RoleResource;
-use BezhanSalleh\FilamentShield\Resources\RoleResource\Pages$p as ShieldCreateRole;
+use BezhanSalleh\FilamentShield\Resources\RoleResource\Pages\CreateRole as ShieldCreateRole;
 
 class CreateRole extends ShieldCreateRole
 {
