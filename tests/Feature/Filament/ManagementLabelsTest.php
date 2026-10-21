@@ -51,7 +51,8 @@ class ManagementLabelsTest extends TestCase
         // Los permisos de Shield que ManagementPolicy exige para ver y editar la pestaña. El afiliado los
         // tiene directos; el Super Admin, por su rol (en este proyecto Shield no lo deja pasar por la gate:
         // define_via_gate = false).
-        $permissions = array_map(fn ($p) => Permission::findOrCreate($p, 'web'), ['view_any_management', 'view_management', 'create_management', 'update_management']);
+        // CPV-SEC-01-R3: plus the company edit permission the tab's page requires (re-checked per request, F-SEC01-R3-01).
+        $permissions = array_map(fn ($p) => Permission::findOrCreate($p, 'web'), ['view_any_management', 'view_management', 'create_management', 'update_management', 'update_empresa']);
         if ($superAdmin) {
             $role = Role::findOrCreate(config('filament-shield.super_admin.name'), 'web');
             $role->givePermissionTo($permissions);

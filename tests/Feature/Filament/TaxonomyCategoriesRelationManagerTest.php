@@ -48,6 +48,9 @@ class TaxonomyCategoriesRelationManagerTest extends TestCase
     private function empresaConUsuario(): array
     {
         $user = User::factory()->create();
+        // CPV-SEC-01-R3: the tab lives on the company edit page, which needs the company edit permission; the
+        // relation manager now re-checks it on every request (F-SEC01-R3-01).
+        $user->givePermissionTo(\Spatie\Permission\Models\Permission::findOrCreate('update_empresa', 'web'));
         $this->actingAs($user);
 
         $empresa = Empresa::create([

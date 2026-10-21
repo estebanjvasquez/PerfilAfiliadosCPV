@@ -197,6 +197,8 @@ class TaxonomyMapPageTest extends TestCase
     public function the_categories_tab_links_to_the_map_in_a_new_tab_without_touching_the_company(): void
     {
         $user = User::factory()->create(['phone' => '0414-5550000']);
+        // CPV-SEC-01-R3: the tab lives on the company edit page (company edit permission, re-checked per request).
+        $user->givePermissionTo(\Spatie\Permission\Models\Permission::findOrCreate('update_empresa', 'web'));
         $this->actingAs($user);
         $empresa = Empresa::create([
             'rif' => 'J'.random_int(10000000, 99999999).'-'.random_int(0, 9),

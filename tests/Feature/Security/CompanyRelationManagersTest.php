@@ -165,15 +165,39 @@ class CompanyRelationManagersTest extends TestCase
      * Drive a table action the way the browser does (mount by name + record key, fill, call), without the test
      * helper's own visibility pre-assertion. Whether the server refuses is then judged by the database state.
      */
-    private function browserAction($component, string $name, int|string|null $key = null, array $data = []): void
+    private function browserAction($component, string $name, int|string|null $key = null, array $data = []): bool
     {
-        $this->attempt(function () use ($component, $name, $key, $data) {
+        $refused = false;
+        $this->attempt(function () use ($component, $name, $key, $data, &$refused) {
             $component->call('mountTableAction', $name, $key === null ? null : (string) $key);
+            if ($refused = $this->refused($component)) {
+                return;
+            }
             foreach ($data as $field => $value) {
                 $component->set("mountedTableActionsData.0.{$field}", $value);
+                if ($refused = $this->refused($component)) {
+                    return;
+                }
             }
             $component->call('callMountedTableAction');
+            $refused = $this->refused($component);
         });
+
+        return $refused;
+    }
+
+    /**
+     * A request the server refused: the harness has no component state left. The refusal must be the safe 404 (the
+     * same answer as for a company that is not the user's), never an error.
+     */
+    private function refused($component): bool
+    {
+        if ($component->instance() !== null) {
+            return false;
+        }
+        $component->assertNotFound();
+
+        return true;
     }
 
     private function titleKey(string $section): string
@@ -405,13 +429,24 @@ class CompanyRelationManagersTest extends TestCase
         // … then the link is revoked.
         $this->revoke($this->alfa, $this->alfaUser);
 
-        $this->attempt(fn () => $mounted['assets']->callTableAction('recursos_humanos', data: ['no_aplica' => false, 'employee' => [['employee_type' => $type, 'junior_q' => 9, 'medium_q' => 9, 'senior_q' => 9]]]));
-        $this->attempt(fn () => $mounted['management']->callTableAction('calidad', data: ['no_aplica' => false, 'iso9001' => true, 'iso17025' => true, 'quality_otros' => false]));
-        $this->attempt(fn () => $mounted['experiences']->callTableAction('eliminar', $entryKey));
-        $this->attempt(fn () => $mounted['presence']->callTableAction('delete', $presence->getKey()));
-        $this->attempt(fn () => $mounted['sustain']->callTableAction('delete', $sustain->getKey()));
-        $this->attempt(fn () => $mounted['taxonomy']->callTableAction('quitar', $link->getKey()));
-        $this->attempt(fn () => $mounted['page']->set('data.name', 'ZZZ REVOCADA')->call('save'));
+        $refusals = [
+            'assets' => $this->browserAction($mounted['assets'], 'recursos_humanos', null, ['no_aplica' => false, 'employee' => [['employee_type' => $type, 'junior_q' => 9, 'medium_q' => 9, 'senior_q' => 9]]]),
+            'management' => $this->browserAction($mounted['management'], 'calidad', null, ['no_aplica' => false, 'iso9001' => true, 'iso17025' => true, 'quality_otros' => false]),
+            'experiences' => $this->browserAction($mounted['experiences'], 'eliminar', $entryKey),
+            'presence' => $this->browserAction($mounted['presence'], 'delete', $presence->getKey()),
+            'sustain' => $this->browserAction($mounted['sustain'], 'delete', $sustain->getKey()),
+            'taxonomy' => $this->browserAction($mounted['taxonomy'], 'quitar', $link->getKey()),
+        ];
+        $this->attempt(function () use ($mounted, &$refusals) {
+            $mounted['page']->set('data.name', 'ZZZ REVOCADA');
+            if (! ($refusals['page'] = $this->refused($mounted['page']))) {
+                $mounted['page']->call('save');
+                $refusals['page'] = $this->refused($mounted['page']);
+            }
+        });
+        foreach ($refusals as $what => $refused) {
+            $this->assertTrue($refused, "{$what}: the request after revocation is refused (404)");
+        }
 
         $this->assertSame(0, Asset::where('empresa_id', $this->alfa->id)->count(), 'assets: no write after revocation');
         $this->assertSame(0, Management::where('empresa_id', $this->alfa->id)->count(), 'management: no write after revocation');
@@ -432,8 +467,8 @@ class CompanyRelationManagersTest extends TestCase
         $this->alfaUser->revokePermissionTo('update_empresa');
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $this->attempt(fn () => $mounted->callTableAction('calidad', data: ['no_aplica' => false, 'iso9001' => true, 'iso17025' => false, 'quality_otros' => false]));
-        $this->attempt(fn () => $presenceTab->callTableAction('delete', $presence->getKey()));
+        $this->assertTrue($this->browserAction($mounted, 'calidad', null, ['no_aplica' => false, 'iso9001' => true, 'iso17025' => false, 'quality_otros' => false]), 'refused (404)');
+        $this->assertTrue($this->browserAction($presenceTab, 'delete', $presence->getKey()), 'refused (404)');
         $this->assertSame(0, Management::where('empresa_id', $this->alfa->id)->count(), 'no write without the company edit permission');
         $this->assertNotNull($presence->fresh());
     }
@@ -442,6 +477,8 @@ class CompanyRelationManagersTest extends TestCase
     public function a_manager_bound_to_another_company_is_refused_even_outside_the_page(): void
     {
         // Defence in depth: only a test harness can bind a manager directly; ALFA's user must still be refused on BETA.
+        // Exception handling off, so the mount refusal surfaces as the HTTP exception itself (404), not as a page.
+        $this->withoutExceptionHandling();
         foreach ([AssetsRelationManager::class, ManagementRelationManager::class, ExperiencesRelationManager::class,
             PresenceRelationManager::class, SustainabilitiesRelationManager::class, ServicesRelationManager::class,
             TaxonomyCategoriesRelationManager::class] as $manager) {
