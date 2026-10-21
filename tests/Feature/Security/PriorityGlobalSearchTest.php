@@ -7,7 +7,7 @@ use App\Filament\Resources\TaxonomyCandidateTermResource;
 use App\Filament\Resources\UserResource;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
-use BezhanSalleh\FilamentShield\Resources\RoleResource;
+use App\Filament\Resources\Shield\RoleResource;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
