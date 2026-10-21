@@ -123,13 +123,15 @@ class AccountPrivilegeTest extends TestCase
         $manager = $this->user(['view_any_user', 'view_user', 'update_user']);
         $admin = $this->user(roles: [$super]);
 
-        try {
-            Livewire::actingAs($manager)->test(EditUser::class, ['record' => $admin->getKey()]);
-            $this->fail('a non-super-admin opened a privileged account');
-        } catch (HttpExceptionInterface $e) {
-            $this->assertSame(403, $e->getStatusCode());
-        }
+        // The edit page is requested over HTTP (as the browser would); the mount guard returns 403.
+        $this->actingAs($manager);
+        $this->get(\App\Filament\Resources\UserResource::getUrl('edit', ['record' => $admin->getKey()]))->assertForbidden();
         $this->assertTrue($admin->fresh()->hasRole($this->superName), 'the privileged account is unchanged');
+
+        // A super admin may open it.
+        $superAdmin = $this->user(roles: [$super]);
+        $this->actingAs($superAdmin);
+        $this->get(\App\Filament\Resources\UserResource::getUrl('edit', ['record' => $admin->getKey()]))->assertSuccessful();
     }
 
     // ---- allowed paths still work ----
