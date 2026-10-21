@@ -269,11 +269,18 @@ class RoleAdministrationTest extends TestCase
         $this->actingAs($admin);
         $before = $this->definitions();
 
-        $this->attempt(fn () => $this->super->update(['name' => 'zzz-renamed']));
-        $this->attempt(fn () => $this->super->update(['guard_name' => 'api']));
-        $this->attempt(fn () => $this->super->delete());
-        $this->attempt(fn () => $this->ordinary->update(['name' => $this->super->name]));
-        $this->attempt(fn () => Role::query()->create(['name' => $this->super->name, 'guard_name' => 'api']));
+        $name = $this->super->name;
+        // Each attempt is checked at once, so the first unprotected field is reported by name.
+        $this->attempt(fn () => Role::find($this->super->getKey())->update(['name' => 'zzz-renamed']));
+        $this->assertSame($name, Role::find($this->super->getKey())->name, 'the privileged role name is protected');
+        $this->attempt(fn () => Role::find($this->super->getKey())->update(['guard_name' => 'api']));
+        $this->assertSame('web', Role::find($this->super->getKey())->guard_name, 'the privileged role guard is protected');
+        $this->attempt(fn () => Role::find($this->super->getKey())->delete());
+        $this->assertNotNull(Role::find($this->super->getKey()), 'the privileged role cannot be deleted');
+        $this->attempt(fn () => Role::find($this->ordinary->getKey())->update(['name' => $name]));
+        $this->assertSame('zzz-r4-ordinary', Role::find($this->ordinary->getKey())->name, 'no other role takes the privileged name');
+        $this->attempt(fn () => Role::query()->create(['name' => $name, 'guard_name' => 'api']));
+        $this->assertSame(1, Role::query()->where('name', $name)->count(), 'no second privileged-name role under another guard');
         // Through the page too: a super admin cannot rename the privileged role by mistake.
         $this->attempt(fn () => Livewire::actingAs($admin)->test(EditRole::class, ['record' => $this->super->getKey()])
             ->set('data.name', 'zzz-renamed')->call('save'));
