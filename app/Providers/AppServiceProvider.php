@@ -58,6 +58,8 @@ class AppServiceProvider extends ServiceProvider
         EmpresaModuleStatus::observe(EmpresaCompletionObserver::class);
         Presence::observe(EmpresaCompletionObserver::class);
         Experience::observe(EmpresaCompletionObserver::class);
+        // CPV-SEC-01-R4-ROLE-ADMIN: the privileged role's name and guard cannot be rewritten, taken or deleted.
+        \App\Support\Security\PrivilegedRoleDefinitionGuard::register();
         Sustainability::observe(EmpresaCompletionObserver::class);
 
         // Mantiene level/path de la taxonomia CPV sincronizados con parent_id/code y previene
