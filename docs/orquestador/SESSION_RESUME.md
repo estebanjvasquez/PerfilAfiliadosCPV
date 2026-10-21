@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-21 ~10:15Z, rama `fix/sec-01-account-path-boundaries` (SEC-01 R2), **sesión en pausa por cuota** (`6313400617`). Staging corría `87dd997` (observación del 2026-10-21; no se volvió a comprobar en este cierre).
+**Checkpoint:** 2026-10-21 ~12:50Z, rama `fix/sec-01-account-path-boundaries` (SEC-01 R2): corrección de atomicidad R2-REV-05 **entregada para revisión**, sin desplegar. Staging corría `87dd997` (el runner lo vio responder 200 durante las pruebas; el SHA no se volvió a comprobar).
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,7 +32,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`fix/sec-01-account-path-boundaries`** (SEC-01 R2, desde `0139e95`), REVIEW_HEAD `51a923e`. R2: **CAMBIOS SOLICITADOS, no aceptada, sin desplegar**. `fix/sec-01-impersonation-gate` (F-01): aceptada, despliegue no acreditado. `planning/management-taxonomy` EN ESPERA: no se promueve.
+- **Rama canónica:** **`fix/sec-01-account-path-boundaries`** (SEC-01 R2, desde `0139e95`), TESTED `f4dd8fb`; REVIEW_HEAD en `current_task.md`. R2: segunda corrección entregada, **no aceptada, sin desplegar**. `fix/sec-01-impersonation-gate` (F-01): aceptada, despliegue no acreditado. `planning/management-taxonomy` EN ESPERA: no se promueve.
   - Contiene `ce70b7f`, `edf20ed`, `10616af`, `0895258` y `28014c2`.
   - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `87dd997`; el checkpoint vigente es el de esta rama.
   - Una sesión abierta en un checkout viejo no los carga sola.
@@ -43,7 +43,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `fix/sec-01-account-path-boundaries` desde el checkpoint (sin descartar cambios); leé `docs/orquestador/SESSION_RESUME.md` y solo la sección «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION» del comentario `6310331211`; implementá esa corrección de atomicidad, sin releer todo el proyecto ni la historia.
+  > Trabajá en la rama `fix/sec-01-account-path-boundaries` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
@@ -63,10 +63,10 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Próxima tarea de código (CPV-SEC-01 R2, en pausa):** transacciones explícitas en `CreateUser` y `EditUser` sobre la conexión real de cuentas/pivote + pruebas de rollback por inyección de fallo, conservando la guarda previa a la sincronización. Detalle en [`current_task.md`](current_task.md); fuente: solo la sección «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION» de `6310331211`. Probado: suite `6bf8582`, enfocadas `e7ba59d`.
+- **CPV-SEC-01 R2 (entregada para revisión):** transacciones explícitas por página en `CreateUser` y `EditUser` sobre las conexiones de cuenta y pivote + pruebas de inyección de fallo; se conserva la guarda previa a la sincronización. Fuente: sección «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION» de `6310331211`. Detalle y SHAs en [`current_task.md`](current_task.md). Siguiente: esperar la revisión.
 - **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). **F-01 sin desplegar** (última observación `87dd997`): riesgo vivo. F-02 editor de roles / F-03 / F-06: decisiones del propietario. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
 - **Accesos:** cada comando que los necesite usa el bootstrap documentado ([`ENVIRONMENT.md`](ENVIRONMENT.md), [`ACCESS_BOOTSTRAP.md`](ACCESS_BOOTSTRAP.md)); cada ejecutor guarda sus credenciales fuera de git. Si faltan `gh` o `python`, no es un bloqueo: se usan los mecanismos documentados.
-- **Reanudar:** el reinicio de cuota **no** es una instrucción; hace falta una asignación nueva del propietario.
+- **Reanudar:** solo con una asignación nueva del propietario (un reinicio de cuota no es una instrucción).
 - **Propietario:** desplegar F-01 y SEC-01 R2 (decisión); UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
 - **Agente:** nada sin una instrucción nueva del Issue #2.
 

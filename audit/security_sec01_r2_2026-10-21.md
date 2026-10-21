@@ -3,9 +3,11 @@
 - **Authorization:** Issue #2 `6310273754` (owner, 2026-10-21), activating the account and path checks of SEC-02/SEC-03 for these two surfaces only. Prior round: delivery `6294285848`, review `6297739082`. **Review corrections:** `6310331211` (R2-REV-01…04), addressed here.
 - **BASE_SHA:** `0139e954ec22f0a6bfa2377968a6a3af86c15874` (the accepted, frozen F-01 candidate). A new branch was taken from it; the F-01 candidate was not amended.
 - **BRANCH:** `fix/sec-01-account-path-boundaries`.
-- **TESTED_HEAD:** `6bf8582aa8e7155c10ca560fb6089d7b5bef73ef` (full isolated suite GREEN, 606/7,016); focused at `e7ba59d9deb35198bc9fb3fac857255ebaa9e0e2`.
+- **TESTED_HEAD (second review, R2-REV-05):** `f4dd8fb2c1945f8f4839f710192221672ebca3b0` — focused and full isolated suite (see REGRESSION). Earlier: full `6bf8582aa8e7155c10ca560fb6089d7b5bef73ef` (606/7,016), focused `e7ba59d9deb35198bc9fb3fac857255ebaa9e0e2`; previous REVIEW_HEAD `51a923e`.
 - **REVIEW_HEAD:** the commit that adds this updated report and checkpoint.
 - **DEPLOYED:** NO.
+
+> **Second review (`6310331211`, «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION»), addressed here as R2-REV-05.** The earlier claim that Filament already made the account + role save atomic was **incorrect** and is retracted (dated note in FIX below): pinned Filament v3.3.55 ships panel transactions off and this candidate had not enabled them. Transactions are now enabled explicitly on `CreateUser` and `EditUser`, on the account and pivot connections, with failure-injection checks asserted before test teardown. See ATOMICITY.
 
 > **Review-corrections summary (`6310331211`).** The privilege-grant control was moved to BEFORE the role relationship is persisted (it was an after-sync cleanup); a persistence-boundary test proves the forbidden role is never written. Traversal assertions now read decoded PDF text, assert the exact denial and record the layer, and no OS file is targeted. The access matrix gained a business-level independent oracle for high-value entrypoints and now fails on unexpected 5xx (except the counted JoinViews defect). The cumulative register `docs/security/SECURITY_STATUS.md` is carried into this branch and updated. Sections below reflect these corrections.
 
@@ -83,7 +85,7 @@ Business rule: `create_user`/`update_user` manage ordinary accounts; only a supe
 ## FIX (F-SEC01-R2-A = F-02 account facet) — enforced BEFORE persistence (R2-REV-01)
 
 - **`App\Support\Security\PrivilegedRoleGuard`** authorizes the role set at the write boundary, BEFORE the sync:
-  - the role Select's `->saveRelationshipsUsing()` (in `UserResource::form`) computes the authorized role ids and syncs only those, so a forbidden privileged role is **never written** — there is no after-save cleanup window. This runs inside Filament's existing create/edit database transaction, so the account and its authorized roles persist atomically.
+  - the role Select's `->saveRelationshipsUsing()` (in `UserResource::form`) computes the authorized role ids and syncs only those, so a forbidden privileged role is **never written** — there is no after-save cleanup window. ~~This runs inside Filament's existing create/edit database transaction, so the account and its authorized roles persist atomically.~~ **Retracted 2026-10-21 (second review):** that transaction was not active — Filament v3.3.55 defaults it off and the pages had not enabled it. Atomicity is now provided explicitly (R2-REV-05, ATOMICITY below).
   - a non-super-admin can neither add nor remove the privileged role: the synced privileged set equals the record's current privileged roles; their non-privileged roles are whatever the form set. A super admin keeps full control.
   - opening (hence modifying) an account that already holds the privileged role is blocked in `EditUser::authorizeAccess`, checked fresh (a pivot query, not mounted/cached state) at mount and at the start of save.
 - **Removed** the earlier after-sync approach (the `GuardsPrivilegedRoles` trait) and its unused snapshot helper.
@@ -93,10 +95,30 @@ Business rule: `create_user`/`update_user` manage ordinary accounts; only a supe
 - **Residual (not closed):** this fixes the account-writing facet of F-02. The role editor (RoleResource) reach and the privilege-delegation configuration remain an explicit owner decision; limiting one named role does not resolve all delegation paths.
 - **Staff-visible behaviour:** a non-super-admin that tries to assign a privileged role sees an in-UI warning that it was not applied; the rest of the save succeeds. Nothing changes for affiliates, and there is no user-administration help page; this is recorded in `docs/security/SECURITY_STATUS.md` (§5 R2).
 
+## ATOMICITY (R2-REV-05, second review)
+
+- **Cause (confirmed in the pinned source):** `Panel::hasDatabaseTransactions()` defaults to `false` in v3.3.55, and the page hooks `beginDatabaseTransaction()`/`commit…`/`rollBack…` are no-ops until enabled. Neither `AdminPanelProvider` nor the user pages enabled them, so the earlier "already atomic" statement was wrong.
+- **Configuration (page-scoped; the panel default is unchanged):** `App\Filament\Resources\UserResource\Concerns\UsesAccountWriteTransaction`, used by **both** `CreateUser` and `EditUser`:
+  - `hasDatabaseTransactions()` returns `true` for these two pages only;
+  - the begin/commit/rollback hooks open the transaction on the connections the writes **actually use** — the `User` model connection (account row) and the configured role model's connection (Spatie writes `model_has_roles` through the related role query) — instead of the default connection by assumption. Today both resolve to the same connection (`pgsql` in the isolated runner), and a test asserts that.
+  - Filament begins before validation and rolls back on any `Throwable`, so nothing written during the request survives a failure.
+- **Pre-sync authorization preserved:** `PrivilegedRoleGuard` still reduces the role set BEFORE `sync()`; the transaction supplements it.
+- **Failure injection (`tests/Feature/Security/AccountWriteAtomicityTest.php`):** a failure is thrown right after the **last** write of the request, and the state is asserted **after the failed request and before teardown** (the outer test transaction is still open, so it cannot mask a missing application transaction). The boundary is also instrumented: transaction-begin events per connection, and the nesting level seen by the failing statement must be above the test wrapper's.
+  - **create** (fail after the role-pivot insert, which follows the account insert) → no account and no role link remain;
+  - **edit** (Filament syncs relationships first, then updates the account; fail after the account update) → the prior name, email and role links are restored;
+  - **complete create and edit** still persist and leave no transaction open;
+  - **forged privileged role + failure** → the privileged id is never bound in a pivot write, and nothing remains.
+- **Fails-before `309146b` (tests only, no fix):** 3 of 5 failed — create and edit: the failing statement ran at nesting level 1 (no application transaction); forged create: the account was left behind after the failure (the privileged id was still never written). The connection check passed.
+- **During the fix:** a first attempt redeclared the framework's trait property, which is a PHP class-composition fatal (caught at `package:discover` on the runner at `c13718e`, before any test ran); replaced by overriding `hasDatabaseTransactions()` at `f4dd8fb`.
+
 ## REGRESSION / FOCUSED / FULL / BROWSER
 
+- **Second review, focused, `f4dd8fb`** (`AccountWriteAtomicity|AccountPrivilege|PathBoundary|ImpersonationAction|AccessMatrix|SurfaceInventory|EmailVerificationFlow|NewAffiliateOnboarding|ExportAccess`): **OK (45 tests, 1,058 assertions)**, run `20261021T123209Z-f4dd8fb2c194`; staging 200 before and after.
+- **Second review, full isolated suite, `f4dd8fb`:** **OK (611 tests, 7,042 assertions)** (606 earlier + the 5 new atomicity tests), run `20261021T123422Z-f4dd8fb2c194`, first attempt green; staging 200 before and after. No rerun for the later docs-only commit.
+- *Earlier rounds, kept as recorded:*
+
 - **Fails-before (original injection), `f3f7c5f`:** the four privilege-injection tests failed; path and denied-impersonation passed.
-- **Fails-before (review corrections), `3e311f8`** (updated tests against the earlier after-sync approach): the **persistence-boundary** assertions failed — proving the old approach wrote the forbidden role to the pivot and then removed it within the transaction. (One matrix expectation was also corrected there from a 403/404 literal to business-level allow/deny.)
+- **Fails-before (review corrections), `3e311f8`** (updated tests against the earlier after-sync approach): the **persistence-boundary** assertions failed — proving the old approach wrote the forbidden role to the pivot and then removed it within the transaction (*note 2026-10-21: within the same request; no application transaction was active — see ATOMICITY*). (One matrix expectation was also corrected there from a 403/404 literal to business-level allow/deny.)
 - **Passes-after, focused, `e7ba59d`** (`AccountPrivilege|PathBoundary|ImpersonationAction|AccessMatrix|SurfaceInventory`): **OK (22 tests, 267 assertions)**.
 - **Full isolated suite, `6bf8582`:** **OK (606 tests, 7,016 assertions)**, run `20261021T081844Z-6bf8582aa8e7`; staging 200 before and after. (A first run hit an unrelated, pre-existing flaky collision in `CompanyDossierPdfTest` — a random taxonomy code `CPV-'.random_int(900,999)`, not a file changed this round; the rerun was green. Registered as a reliability flake to de-randomise later.)
 - **Browser:** not run. The changed flows are a server-side write guard and a removed route, both covered by HTTP/Livewire tests; the impersonation UI click is a redirect the harness cannot follow (stated as partial coverage).
@@ -122,4 +144,4 @@ Business rule: `create_user`/`update_user` manage ordinary accounts; only a supe
 
 ## RESUME_ENTRYPOINT
 
-Branch `fix/sec-01-account-path-boundaries` @ REVIEW_HEAD. Read `docs/orquestador/SESSION_RESUME.md`, `docs/plans/SECURITY_REVIEW_PLAN.md` and the cumulative register `docs/security/SECURITY_STATUS.md`, then execute only the next assigned Issue #2 comment. F-01 is accepted (deployment unaccredited); R2 is CHANGES-REQUESTED-addressed, not yet accepted; neither is deployed. Managerial work stays on hold and its frozen planning branch is never promoted.
+Branch `fix/sec-01-account-path-boundaries` @ REVIEW_HEAD. Read `docs/orquestador/SESSION_RESUME.md`, `docs/plans/SECURITY_REVIEW_PLAN.md` and the cumulative register `docs/security/SECURITY_STATUS.md`, then execute only the next assigned Issue #2 comment. F-01 is accepted (deployment unaccredited); R2 had a second CHANGES REQUESTED (atomicity, R2-REV-05), addressed in this delivery, not yet accepted; neither is deployed. Browser/coverage limits stay as stated (allowed impersonation is a direct manager call, not an end-to-end browser test). Managerial work stays on hold and its frozen planning branch is never promoted.

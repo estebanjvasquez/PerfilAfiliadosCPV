@@ -1,11 +1,20 @@
-# Tarea actual (checkpoint 2026-10-21 ~10:15Z, rama `fix/sec-01-account-path-boundaries`)
+# Tarea actual (checkpoint 2026-10-21 ~12:50Z, rama `fix/sec-01-account-path-boundaries`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-SEC-01-R2-ACCOUNT-PATH — SESSION_PAUSED — CHANGES_REQUESTED / ATOMICITY_PENDING / NOT_DEPLOYED
+## CPV-SEC-01-R2-ACCOUNT-PATH — READY_FOR_REVIEW — MANUAL (corrección de atomicidad R2-REV-05), sin desplegar
 
-Pausa por cuota (`6313400617`). Entrega previa `6311569828`. El reinicio de cuota **no** reanuda el trabajo: hace falta una asignación nueva del propietario.
+| Campo | Valor |
+|---|---|
+| Fuente | sección «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION» de `6310331211` |
+| Arreglo | `UsesAccountWriteTransaction` en `CreateUser` y `EditUser`: `hasDatabaseTransactions()` = true solo en esas páginas; begin/commit/rollback en las conexiones de `User` y del modelo de rol (pivote). Guarda previa a la sincronización intacta; comentarios «ya atómico» corregidos |
+| Pruebas | `AccountWriteAtomicityTest` (5). Antes `309146b`: 3/5 fallan. Después `f4dd8fb`: enfocadas **45 OK** (1.058); suite completa **611 OK** (7.042), staging 200 antes/después |
+| REVIEW_HEAD | el commit de docs sobre `f4dd8fb` (ver el comentario de entrega) |
+
+### Pausa anterior (`6313400617`), ya superada
+
+Pausa por cuota. Entrega previa `6311569828`.
 
 | Campo | Valor |
 |---|---|
