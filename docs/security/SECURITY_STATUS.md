@@ -24,7 +24,7 @@ Este registro resume cada ronda, sus hallazgos, correcciones, aceptación y desp
 | Última entrega de despliegue conocida | Issue #2, comentario 6288589926; run 39405700502 | Despliegue de la selección de secciones; controles de descarga previos incluidos |
 | Candidato de seguridad revisado | `0139e954ec22f0a6bfa2377968a6a3af86c15874` | Reparación F-SEC01-01 aceptada en 6297739082 |
 | Despliegue de F-SEC01-01 | NO ACREDITADO / PENDIENTE | No existe en este registro una entrega que confirme su aplicación al entorno |
-| Ronda 2 — candidato | `fix/sec-01-account-path-boundaries` (TESTED `e7ba59d`) | Entregada con correcciones de revisión; CAMBIOS SOLICITADOS atendidos; no aceptada ni desplegada |
+| Ronda 2 — candidato | `fix/sec-01-account-path-boundaries` (REVIEW_HEAD `51a923e`; suite completa `6bf8582`; enfocadas `e7ba59d`) | Entregada con correcciones de revisión; **segunda revisión: CAMBIOS SOLICITADOS (atomicidad pendiente)**; no aceptada ni desplegada |
 | Despliegue de R2 (F-SEC01-02a, F-04) | NO ACREDITADO / PENDIENTE | Código aceptable pendiente de revisión; sin entrega al entorno |
 
 Cada cambio de estos estados necesita SHA y fuente. No inferir despliegue a partir de un commit en una rama de trabajo.
@@ -35,7 +35,7 @@ Cada cambio de estos estados necesita SHA y fuente. No inferir despliegue a part
 |---|---|---|---|
 | Antecedente: acceso a exportaciones | Descargas por empresa, verificación, permisos, errores y caché | Rutas protegidas, alcance por empresa, identificador validado, XLS limitado y respuestas privadas; rutas antiguas redirigen | Aceptación 6265458863, candidato `ce70b7f`; despliegue comunicado en 6267092324. El residuo de caché previo no quedó acreditado como eliminado |
 | SEC-01 R1 | Inventario efectivo, matriz de actores y primeras pruebas de acciones | Una reparación de privilegios; resto de hallazgos registrado | Entrega 6294285848; revisión 6297739082: reparación aceptada, SEC-01 continúa abierto |
-| SEC-01 R2 — cuentas y archivos | Inyección de privilegios, creación/edición de usuarios, traversal y expectativas de pruebas | Reparación de concesión de roles (faceta de cuentas de F-02), F-04 retirado, F-05 no reproducido, traversal sin hallazgos. BASE `0139e95`, TESTED/REVIEW ver §5. Suite completa verde | Instrucción 6310273754; **revisión 6310331211 (R2-REV): CAMBIOS SOLICITADOS**, corregidos en esta entrega; no aceptada todavía |
+| SEC-01 R2 — cuentas y archivos | Inyección de privilegios, creación/edición de usuarios, traversal y expectativas de pruebas | Reparación de concesión de roles (faceta de cuentas de F-02), F-04 retirado, F-05 no reproducido, traversal sin hallazgos. BASE `0139e95`, TESTED/REVIEW ver §5. Suite completa verde | Instrucción 6310273754; **revisión 6310331211 (R2-REV): CAMBIOS SOLICITADOS**, corregidos en la entrega 6311569828; **segunda revisión (misma 6310331211, sección «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION»): CAMBIOS SOLICITADOS, corrección pendiente**; no aceptada |
 | SEC-02 general | Reportes, archivos y caché | Pendiente, salvo comprobaciones acotadas activadas en R2 | No cerrado |
 | SEC-03 general | Identidad, sesiones y entradas | Pendiente, salvo comprobaciones acotadas activadas en R2 | No cerrado |
 | SEC-04 | Dependencias, integraciones e infraestructura | Pendiente | No cerrado |
@@ -70,6 +70,9 @@ En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas 
 | R2-REV-02 | Aserciones de traversal sobre texto de PDF decodificado; respuesta exacta de denegación; retirar objetivos de SO; capa de denegación e integridad del canario | Hecho: `pdftotext` sobre PDFs; 404 exacto «Archivo no disponible» con 0 consultas/render; sin objetivos de SO; capa registrada; canario intacto |
 | R2-REV-03 | Expectativas independientes en la matriz; fallar 5xx inesperados (JoinViews contado); actor privilegiado representativo; declarar filas solo-gate | Hecho: expectativas de negocio allow/deny en entradas de alto valor; 5xx inesperado falla salvo JoinViews; barrido completo declarado como caracterización |
 | R2-REV-04 | Registro acumulativo con estado; separar aceptado de desplegado; ayuda de administrador | Este documento; comportamiento de staff descrito en §5 R2 |
+| R2-REV-05 (segunda revisión) | Habilitar explícitamente transacciones en `CreateUser` y `EditUser` sobre la conexión real de cuentas/pivote; pruebas de inyección de fallo con rollback antes del teardown; conservar la autorización previa a la sincronización | **PENDIENTE — no ejecutada** |
+
+**Nota fechada 2026-10-21 (cierre de sesión 6313400617).** La segunda revisión de 6310331211 pide una corrección acotada de atomicidad. Motivo: Filament v3.3.55 (versión fijada) deja las transacciones del panel **desactivadas** por defecto y este candidato no las activa en sus páginas ni en el proveedor del panel. Por eso **se retira** la afirmación anterior de que la reparación «ya era atómica / dentro de la transacción de Filament» (aquí y en §5 R2): era incorrecta. La autorización previa a la sincronización sigue siendo válida y se conserva. La pausa se debe a la cuota de sesión del propietario; la corrección no se retiró y es la próxima tarea de código. Progreso revisado que se mantiene: guarda de privilegios previa a la sincronización; pruebas de rutas con canario y texto de PDF; matriz independiente de alto valor y fallo ante errores inesperados; este registro.
 
 ## 5. Correcciones y validación por ronda
 
@@ -100,6 +103,7 @@ En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas 
 - **Traversal:** inventario dirigido de sinks; canario fuera de la raíz; el segmento `{empresa}` devuelve 404 y `secciones` cae al perfil completo en todas las variantes; sin lectura fuera de raíz, sin 5xx, sin fuga; canario intacto.
 - **Informe:** [security_sec01_r2_2026-10-21.md](../../audit/security_sec01_r2_2026-10-21.md).
 - **Estado:** CAMBIOS SOLICITADOS atendidos; no aceptada todavía; sin desplegar.
+- **Actualización 2026-10-21 (segunda revisión):** CAMBIOS SOLICITADOS. La frase «dentro de la transacción de create/edit de Filament» de la reparación F-SEC01-02a queda retirada (ver nota fechada en §4): con Filament v3.3.55 las transacciones del panel están desactivadas por defecto y este candidato no las activa. Corrección de atomicidad (R2-REV-05) pendiente, no ejecutada; pausa por cuota. REVIEW_HEAD `51a923e`; sin desplegar.
 
 ## 6. Cobertura pendiente
 

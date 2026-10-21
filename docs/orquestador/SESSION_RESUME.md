@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-21 ~07:45Z, en la rama `fix/sec-01-account-path-boundaries` (seguridad, SEC-01 R2); staging corre `87dd997`.
+**Checkpoint:** 2026-10-21 ~10:15Z, rama `fix/sec-01-account-path-boundaries` (SEC-01 R2), **sesión en pausa por cuota** (`6313400617`). Staging corría `87dd997` (observación del 2026-10-21; no se volvió a comprobar en este cierre).
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,7 +32,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`fix/sec-01-account-path-boundaries`** (SEC-01 R2, desde `0139e95`): fix de inyección de privilegios en usuarios, F-04 removido, pruebas y evidencia. `fix/sec-01-impersonation-gate` (F-01) y esta rama están aceptadas pendientes de despliegue, sin desplegar. `planning/management-taxonomy` EN ESPERA: no se promueve.
+- **Rama canónica:** **`fix/sec-01-account-path-boundaries`** (SEC-01 R2, desde `0139e95`), REVIEW_HEAD `51a923e`. R2: **CAMBIOS SOLICITADOS, no aceptada, sin desplegar**. `fix/sec-01-impersonation-gate` (F-01): aceptada, despliegue no acreditado. `planning/management-taxonomy` EN ESPERA: no se promueve.
   - Contiene `ce70b7f`, `edf20ed`, `10616af`, `0895258` y `28014c2`.
   - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `87dd997`; el checkpoint vigente es el de esta rama.
   - Una sesión abierta en un checkout viejo no los carga sola.
@@ -43,7 +43,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `fix/sec-01-account-path-boundaries` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabajá en la rama `fix/sec-01-account-path-boundaries` desde el checkpoint (sin descartar cambios); leé `docs/orquestador/SESSION_RESUME.md` y solo la sección «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION» del comentario `6310331211`; implementá esa corrección de atomicidad, sin releer todo el proyecto ni la historia.
 
 ## 2. Estado, con cada SHA por separado
 
@@ -51,8 +51,6 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 |---|---|---|
 | HEAD remoto de `feature/upgrade-filament-v3` | `87dd9975e7cfcc2c9a5eb72d4686fbc11fc907f4` | `git ls-remote`, 2026-10-20 ~10:07Z |
 | Código en staging (checkout del VPS) | `87dd997`, 0 modificaciones; imagen `f91e97322189`; mantenimiento apagado; sin migraciones pendientes | SSH de solo lectura, 10:10Z |
-| Workflow del último despliegue | run `39405700502`, success, 10:08Z | API pública |
-| Imagen de recuperación | `perfilafiliados-app:pre-opsection-514fa6e` (`7a557f27edff`, la imagen de `514fa6e`) | 2026-10-20 ~10:07Z |
 
 ### Desplegado (`6288459314`): CPV-PDF-OPERATION-SECTION `87dd997`
 
@@ -60,23 +58,22 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ### Anteriores
 
-- **CPV-INTEGRATED-EXPORT-ACCESS-DEPLOY** (`6265502896`): `ce70b7f` desplegado por el propietario (el clasificador rechazó el push del agente; no se rodeó). Smoke 25/25 + 0010C 18/18.
-- **CPV-COMPLETE-COMPANY-PDF** (`6286221372`): perfil completo por defecto, secciones con lista blanca. `audit/complete_company_pdf_2026-10-19.md`.
-- **CPV-EXPORT-ACCESS-REPAIR-AND-ERROR-PAGES** (aceptado `6265458863`): descargas protegidas, 404 seguro.
-- **CPV-HOME-BRANDING-AND-LAYOUT:** desplegado en `0f8bdad` (`6211360371`); queda la UAT del propietario.
-- **CPV-SESSION-CONTINUITY:** cerrado y aceptado en `6211970495`. Informe: `audit/session_continuity_2026-10-16.md`.
+- Export-access (`ce70b7f`, desplegado por el propietario), perfil completo, home branding (`0f8bdad`, UAT pendiente) y continuidad: ver [`current_task.md`](current_task.md).
 - **Correo:** sigue en `log`; activación pendiente del propietario (`docs/deploy/CORREO_DEL_SISTEMA.md`).
 
 ## 3. Siguiente acción
 
-- **Seguridad (CPV-SEC-01):** registro acumulativo en `docs/security/SECURITY_STATUS.md`. R1 F-01 en `fix/sec-01-impersonation-gate` (aviso `6293694720`). R2 (`6310273754`, correcciones `6310331211`) en `fix/sec-01-account-path-boundaries`: concesión de roles autorizada ANTES de persistir, F-04 removido, traversal sin hallazgos; suite 606 OK. **F-01 SIGUE SIN desplegar** (`87dd997`): riesgo vivo. R2 no aceptada aún. F-02 editor de roles / F-03 / F-06 son decisiones del propietario. SEC-02..05 restantes sin empezar; gerencia en espera.
+- **Próxima tarea de código (CPV-SEC-01 R2, en pausa):** transacciones explícitas en `CreateUser` y `EditUser` sobre la conexión real de cuentas/pivote + pruebas de rollback por inyección de fallo, conservando la guarda previa a la sincronización. Detalle en [`current_task.md`](current_task.md); fuente: solo la sección «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION» de `6310331211`. Probado: suite `6bf8582`, enfocadas `e7ba59d`.
+- **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). **F-01 sin desplegar** (última observación `87dd997`): riesgo vivo. F-02 editor de roles / F-03 / F-06: decisiones del propietario. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
+- **Accesos:** cada comando que los necesite usa el bootstrap documentado ([`ENVIRONMENT.md`](ENVIRONMENT.md), [`ACCESS_BOOTSTRAP.md`](ACCESS_BOOTSTRAP.md)); cada ejecutor guarda sus credenciales fuera de git. Si faltan `gh` o `python`, no es un bloqueo: se usan los mecanismos documentados.
+- **Reanudar:** el reinicio de cuota **no** es una instrucción; hace falta una asignación nueva del propietario.
 - **Propietario:** desplegar F-01 y SEC-01 R2 (decisión); UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
 - **Agente:** nada sin una instrucción nueva del Issue #2.
 
 ## 4. Worktrees en uso (no tocar sin instrucción)
 
 - `..\wt-task-0010a` (`b43737e`) y `..\wt-task-0010b` (`964550d`) son históricos.
-- El runner aislado es `infra/contabo-test-runner` @ `3e76459`: phpunit con 512M, poppler-utils (texto y páginas de los PDF de evidencia); `ux_check_dossier.mjs` + `ux_seed_dossier.php`. El seed recibe `CPV_UX_BASE_URL`, y la app servida usa caché en archivo.
+- El runner aislado es `infra/contabo-test-runner` @ `3e76459` (phpunit 512M, poppler-utils, scripts UX del dossier).
 
 ## 5. Pendientes conocidos (no arrancan solos)
 

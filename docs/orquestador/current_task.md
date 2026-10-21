@@ -1,14 +1,27 @@
-# Tarea actual (checkpoint 2026-10-21 ~07:45Z, rama `fix/sec-01-account-path-boundaries`)
+# Tarea actual (checkpoint 2026-10-21 ~10:15Z, rama `fix/sec-01-account-path-boundaries`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-SEC-01-R2-ACCOUNT-PATH — READY_FOR_REVIEW — MANUAL (`6310273754`, correcciones `6310331211`), sin desplegar
+## CPV-SEC-01-R2-ACCOUNT-PATH — SESSION_PAUSED — CHANGES_REQUESTED / ATOMICITY_PENDING / NOT_DEPLOYED
+
+Pausa por cuota (`6313400617`). Entrega previa `6311569828`. El reinicio de cuota **no** reanuda el trabajo: hace falta una asignación nueva del propietario.
 
 | Campo | Valor |
 |---|---|
+| REVIEW_HEAD | `51a923ee0e8ea3fb8c9b0566bd53de4ca6e0f078` (runtime = `e7ba59d`; encima solo docs) |
+| Probado | suite completa `6bf8582aa8e7155c10ca560fb6089d7b5bef73ef` (606 OK); enfocadas `e7ba59d9deb35198bc9fb3fac857255ebaa9e0e2` (22 OK). Los informes son evidencia de ejecución del desarrollador, no una revisión independiente |
+| Estado | segunda revisión: **CAMBIOS SOLICITADOS**, no aceptada, sin desplegar |
+| Próxima corrección (acotada) | activar explícitamente las transacciones en `CreateUser` **y** `EditUser` sobre la conexión real de cuentas/pivote; pruebas de inyección de fallo con rollback comprobado antes del teardown; conservar la autorización previa a la sincronización |
+| Fuente | **solo** la sección «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION» de `6310331211` |
+| Por qué | Filament v3.3.55 (fijado) deja las transacciones del panel desactivadas por defecto y este candidato no las activó; la afirmación «ya atómico» era incorrecta (retirada en el registro) |
+| Progreso revisado que se mantiene | guarda previa a la sincronización; pruebas de rutas con canario y texto de PDF; matriz independiente de alto valor con fallo ante errores inesperados; registro acumulativo |
+| Cobertura y decisiones | sin re-inventariar: conteos existentes; F-02 editor de roles / F-03 / F-06 del propietario (ver registro) |
+
+| Campo (entrega anterior) | Valor |
+|---|---|
 | Base / rama | `0139e95` (F-01 congelado) / `fix/sec-01-account-path-boundaries` |
-| Fix (R2-REV-01) | concesión de roles autorizada ANTES de sincronizar (`PrivilegedRoleGuard` en `saveRelationshipsUsing`), dentro de la transacción; apertura de cuenta privilegiada bloqueada en `authorizeAccess`; `/form` removido (F-04); método redundante quitado (F-05 no reproducido) |
+| Fix (R2-REV-01) | concesión de roles autorizada ANTES de sincronizar (`PrivilegedRoleGuard` en `saveRelationshipsUsing`); apertura de cuenta privilegiada bloqueada en `authorizeAccess`; `/form` removido (F-04); método redundante quitado (F-05 no reproducido) |
 | Pruebas | antes (`3e311f8`, enfoque viejo): la prueba de frontera de persistencia falla (el rol se escribía y se retiraba); después (`e7ba59d`): enfocadas 22 OK; suite completa `6bf8582` **606 OK** (7.016) |
 | Traversal (R2-REV-02) | canario fuera de raíz; `{empresa}` todo 404 con capa registrada, `secciones` perfil completo con texto de PDF decodificado; sin hallazgos |
 | Matriz (R2-REV-03) | oráculo de negocio allow/deny en entradas de alto valor; 5xx inesperado falla salvo JoinViews |
