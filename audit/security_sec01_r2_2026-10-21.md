@@ -26,6 +26,7 @@
   - public HTTP: login 200, `/form` 404.
 - **Scope of verification:** the source and config checks and the in-memory executions are listed in the register (§5 «Despliegue SEC-01 R1+R2»). No write, account change or impersonation was performed on staging. Rollback evidence remains the isolated failure-injection suite.
 - **Atomicity scope:** it holds only for the current single account/pivot connection. It is not a distributed transaction.
+- **Owner UAT, 2026-10-21: PASS.** Source: the owner's chat confirmation, recorded in `6316775771`. This closes the UAT hold for this release only; SEC-01 stays open. No per-action or browser results are inferred. *Later finding:* R3 (F-SEC01-R3-04) shows a role-editor path that bypasses these deployed guards (see the R3 report and the register).
 
 ## F-01 deployment status (read-only, prominent) — *superseded 2026-10-21: F-01 deployed in `cf01e9c` (DEPLOYMENT above); kept as recorded*
 

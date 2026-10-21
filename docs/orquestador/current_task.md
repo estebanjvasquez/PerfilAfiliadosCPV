@@ -1,9 +1,22 @@
-# Tarea actual (checkpoint 2026-10-21 ~13:00Z, rama `fix/sec-01-account-path-boundaries`)
+# Tarea actual (checkpoint 2026-10-21 ~14:00Z, rama `audit/sec-01-r3-company-boundaries`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-SEC-01-R1-R2-DEPLOY — DEPLOYED_FOR_OWNER_REVIEW — MANUAL (`6316265832`)
+## CPV-SEC-01-R3 — READY_FOR_REVIEW — MANUAL (`6316775771`), sin desplegar
+
+| Campo | Valor |
+|---|---|
+| Rama / BASE / TESTED | `audit/sec-01-r3-company-boundaries` / `eb03b4c` / `e95169c` (suite completa **624 OK**) |
+| Fails-before | `audit/sec-01-r3-fails-before` @ `9fb0469` (solo evidencia): fallan las 3 pruebas de re-autorización |
+| Corregido | F-SEC01-R3-01: `EditEmpresa` y sus 10 gestores re-autorizan en cada petición (`EmpresaAccess`, `ReauthorizesEmpresaAccess`) |
+| Registrado | R3-02 (permisos de módulo en acciones propias), R3-03 (categoría inactiva por id forjado), **R3-04 (Alta, alerta: editor de roles)**, Q-05, Q-06 |
+| Matrices | 7 gestores; búsquedas en Customer, TaxonomyCandidateTerm y Role (no buscable) |
+| Cobertura restante | 14 relation managers (recuento; 13 según el denominador anterior); 9 búsquedas |
+| Restringido | sonda y salida en `%USERPROFILE%\.cpv-restricted\sec-01\r3\` (fuera de git) |
+| Informe | `audit/security_sec01_r3_2026-10-21.md`; registro `docs/security/SECURITY_STATUS.md` |
+
+## CPV-SEC-01-R1-R2-DEPLOY — desplegado, **UAT del propietario PASS** (`6316265832`, registrado en `6316775771`)
 
 | Campo | Valor |
 |---|---|

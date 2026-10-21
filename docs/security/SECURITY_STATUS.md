@@ -13,6 +13,7 @@ Este registro resume cada ronda, sus hallazgos, correcciones, aceptación y desp
 - Las descargas de perfil de empresa recibieron controles de sesión, verificación, autorización por empresa y respuestas privadas en una ronda previa al programa SEC.
 - SEC-01 ronda 1 identificó una vulnerabilidad de privilegios y entregó una reparación aceptada para preparar su despliegue. **Aceptada no significa desplegada.**
 - **2026-10-21:** las reparaciones de R1 (F-SEC01-01) y R2 (F-SEC01-02a, F-SEC01-04, atomicidad R2-REV-05) están **desplegadas en staging (`cf01e9c`) y verificadas con comprobaciones de solo lectura**. Esto no cierra SEC-01 ni el programa: siguen abiertos F-02 (editor de roles/configuración), F-03, F-06, la cobertura de relation managers/búsqueda y SEC-02..05.
+- **2026-10-21, UAT del propietario: PASS** para esa entrega. **R3** (relaciones de empresa) corrige en candidato la re-autorización después de montar (F-SEC01-R3-01), sin desplegar. **Alerta: F-SEC01-R3-04**: un camino de privilegios que queda abierto se salta las guardas desplegadas; la mitigación inmediata es una acción del propietario sobre los datos de roles.
 - Quedan decisiones sobre permisos y asociaciones de usuarios, hipótesis por reproducir y superficies todavía no probadas.
 - La siguiente ronda asignada verifica creación/edición de cuentas, concesión de privilegios y límites de acceso a archivos.
 - Gerencia y nuevos reportes permanecen en espera del cierre acordado de seguridad.
@@ -39,6 +40,8 @@ Cada cambio de estos estados necesita SHA y fuente. No inferir despliegue a part
 | SEC-01 R1 | Inventario efectivo, matriz de actores y primeras pruebas de acciones | Una reparación de privilegios; resto de hallazgos registrado | Entrega 6294285848; revisión 6297739082: reparación aceptada, SEC-01 continúa abierto |
 | SEC-01 R2 — cuentas y archivos | Inyección de privilegios, creación/edición de usuarios, traversal y expectativas de pruebas | Reparación de concesión de roles (faceta de cuentas de F-02), F-04 retirado, F-05 no reproducido, traversal sin hallazgos. BASE `0139e95`, TESTED/REVIEW ver §5. Suite completa verde | Instrucción 6310273754; **revisión 6310331211 (R2-REV): CAMBIOS SOLICITADOS**, corregidos en la entrega 6311569828; **segunda revisión (misma 6310331211, sección «SECOND REVIEW UPDATE — NARROW ATOMICITY CORRECTION»): CAMBIOS SOLICITADOS**; pausa por cuota (6313459342); corrección R2-REV-05 entregada después en la misma rama; no aceptada |
 | Despliegue SEC-01 R1+R2 (2026-10-21) | F-SEC01-01 + F-SEC01-02a + F-SEC01-04 + R2-REV-05 a staging | `87dd997` → `cf01e9c` (fast-forward, push normal); run 39602544527 success (12:48–12:50Z) | Autorización 6316265832; aceptación 6310331211 (FINAL R2 REVIEW). Desplegado y verificado con comprobaciones de solo lectura; UAT del propietario pendiente. SEC-01 sigue abierto |
+| UAT de la entrega desplegada (2026-10-21) | `cf01e9c` | OWNER_UAT: **PASS** (confirmación del propietario, registrada en 6316775771) | Cierra la espera de UAT de esa entrega; SEC-01 sigue abierto |
+| SEC-01 R3 — relaciones de empresa, búsquedas, permisos | 7 gestores de relación de Empresa, 3 búsquedas, propuestas F-02/F-03/F-06 | F-SEC01-R3-01 corregido; R3-02/R3-03/R3-04 confirmados en aislamiento y registrados. BASE `eb03b4c`, TESTED `e95169c`, suite 624 OK | Instrucción 6316775771; listo para revisión; sin desplegar. **Alerta al propietario: R3-04** |
 | SEC-02 general | Reportes, archivos y caché | Pendiente, salvo comprobaciones acotadas activadas en R2 | No cerrado |
 | SEC-03 general | Identidad, sesiones y entradas | Pendiente, salvo comprobaciones acotadas activadas en R2 | No cerrado |
 | SEC-04 | Dependencias, integraciones e infraestructura | Pendiente | No cerrado |
@@ -51,9 +54,9 @@ Las severidades son las comunicadas por la ronda, sujetas a revisión. Una confi
 | ID | Ronda / severidad | Hallazgo resumido sin mecanismo sensible | Confirmación | Corrección / decisión | Estado y siguiente paso |
 |---|---|---|---|---|---|
 | F-SEC01-01 | R1 / Alta | Capacidad de suplantación disponible a un actor sin autoridad suficiente | Reproducido en aislamiento | Restricción de la capacidad en servidor al rol autorizado; un archivo de runtime | Reparación aceptada en `0139e95`; **desplegada y verificada (solo lectura) en `cf01e9c`, 2026-10-21** |
-| F-SEC01-02 | R1 / Alta, configuración | Delegación de administración de privilegios que requiere revisión | Permiso y acceso al editor observados; no confundir con demostración de toda cadena de escalación | Propuesta de mínimo privilegio; sin cambios en roles compartidos | **Parcial.** Faceta de escritura de cuentas corregida en R2 (ver F-SEC01-02a). El editor de roles (RoleResource) y la configuración de autoridad de concesión siguen como decisión del propietario; el hallazgo NO se cierra |
+| F-SEC01-02 | R1 / Alta, configuración | Delegación de administración de privilegios que requiere revisión | Permiso y acceso al editor observados; no confundir con demostración de toda cadena de escalación | Propuesta de mínimo privilegio; sin cambios en roles compartidos | **Parcial.** Faceta de escritura de cuentas corregida en R2 (ver F-SEC01-02a). El editor de roles (RoleResource) y la configuración de autoridad de concesión siguen como decisión del propietario. **R3 (2026-10-21): demostrado en aislamiento como F-SEC01-R3-04 (Alta, alerta), un camino que se salta las guardas desplegadas**; propuesta en el informe R3. El hallazgo NO se cierra |
 | F-SEC01-02a | R2 / Alta | Un actor con gestión de usuarios podía otorgarse o asignar el rol con privilegios al crear/editar una cuenta, o editar una cuenta privilegiada | Reproducido en aislamiento; prueba de frontera de persistencia (el rol prohibido nunca se escribe en el pivote) | Autorización en servidor ANTES de la sincronización de la relación de roles (`PrivilegedRoleGuard` en `saveRelationshipsUsing`); bloqueo de apertura de cuenta privilegiada en `authorizeAccess` | Corregido en candidato R2; aceptado (6310331211 FINAL); **desplegado y verificado (solo lectura) en `cf01e9c`, 2026-10-21**; atomicidad solo para la conexión única actual |
-| F-SEC01-03 | R1 / Baja–media, configuración | Permisos de escritura en catálogos globales para un rol de afiliación | Hipótesis derivada de permisos; no ejecutada | Confirmar necesidad y efecto antes de cambiar | Pendiente de prueba y decisión |
+| F-SEC01-03 | R1 / Baja–media, configuración | Permisos de escritura en catálogos globales para un rol de afiliación | Hipótesis derivada de permisos; no ejecutada | Confirmar necesidad y efecto antes de cambiar | ~~Pendiente de prueba y decisión~~ → **R3: efecto confirmado en aislamiento** (sonda restringida: el rol de afiliado puede abrir el alta de los dos catálogos). Propuesta: solo cambio de datos de roles (quitar esos dos permisos de alta); decisión del propietario |
 | F-SEC01-04 | R1 / Baja | Superficie pública de prueba sin función de negocio vigente | Alcanzabilidad confirmada por inventario | Retirada (ruta, clase y vista) con regresión | **Corregido en candidato R2**; desplegado y verificado en `cf01e9c` (2026-10-21: `/form` → 404, ruta y clase ausentes) |
 | F-SEC01-05 | R1 / Media provisional | Posible exposición excesiva de datos mediante una acción de cuentas | **No reproducido en el alcance probado** (el único método invocable devolvía datos al framework, no al navegador; el caso de contraseña vacía ya lo maneja el formulario) | Se retiró el método redundante; edición con contraseña vacía conserva el hash (probado) | Negativo acotado; no refutado globalmente. El indicio de campo de verificación (F-SEC01-07) permanece para SEC-03 |
 | F-SEC01-06 | R1 / Regla de negocio | Autoridad para desvincular a otros usuarios de una empresa sin definición suficientemente explícita | Comportamiento observado | Definir autoridad de gestión de usuarios por empresa | Decisión pendiente; no modificar vínculos reales |
@@ -61,6 +64,12 @@ Las severidades son las comunicadas por la ronda, sujetas a revisión. Una confi
 | F-SEC01-08 | R1 / Informativa provisional | Archivos históricos de diagnóstico en el repositorio | Existencia observada; entrega web no comprobada | Evaluar exposición, contenido y saneamiento | SEC-04; no afirmar ausencia de secretos por coincidencia de palabras |
 | R-SEC01-01 | R1 / Fiabilidad | Formularios de empresa fallan si no hay ciudades | Confirmado en aislamiento; antecedente conocido | Reparación independiente pendiente | No cerrado |
 | Q-SEC01-01 | Revisión R1 / Calidad de evidencia | Parte de la matriz usa el propio gate como expectativa | Confirmado por revisión del test | Añadir expectativas de negocio independientes | R2 |
+| **F-SEC01-R3-01** | R3 / Alta | La página de edición de empresa y sus gestores de relación no volvían a comprobar el acceso después de abrirse: una página abierta (o una copia guardada) seguía escribiendo después de perder el vínculo o el permiso de edición | Reproducido en aislamiento (falla antes en `9fb0469`) | Re-autorización en cada petición (`hydrate`) y al montar; 404 | **Corregido en candidato R3** (`e95169c`); sin desplegar |
+| F-SEC01-R3-02 | R3 / Media | Algunas acciones de módulos de empresa no aplican el permiso de escritura propio del módulo | Confirmado en aislamiento (sonda restringida, 2 módulos) | Autorizar esas acciones con el permiso del módulo; corrección pequeña con regresión | Registrado; siguiente ronda (el presupuesto de R3 se usó en R3-01) |
+| F-SEC01-R3-03 | R3 / Baja | El alta de categorías de una empresa acepta, por id forjado, una categoría inactiva | Confirmado en aislamiento (sonda restringida) | Filtrar por categoría activa en el servidor; corrección pequeña con regresión | Registrado; siguiente ronda |
+| **F-SEC01-R3-04** | R3 / **Alta, alerta al propietario** | Un titular no super admin del permiso de edición de roles puede volverse privilegiado y saltarse las dos guardas desplegadas (suplantación y concesión de roles), porque el editor de roles no protege la definición del rol privilegiado | Confirmado en aislamiento (sonda restringida). Roles reales tienen ese permiso (instantánea restringida): **riesgo vivo** | Mitigación inmediata (dato de roles, acción del propietario): quitar los permisos de gestión de roles a todo rol que no sea super admin. Regla de código: solo un super admin administra roles; definición del rol privilegiado protegida (detalle en notas restringidas) | **Abierto**; forma parte de F-02 |
+| Q-SEC01-R3-05 | R3 / Gobierno | Significado ambiguo del origen «Confirmada» (`validated`): el manual dice que la empresa confirma sugerencias, pero el campo de aprobador describe una aprobación de la Cámara | Lectura de código y manual | Definir la regla | Decisión del propietario; sin cambios |
+| Q-SEC01-R3-06 | R3 / Higiene | Archivo `error_log` de PHP versionado en directorios de la aplicación desde el primer commit | Inventario | Revisarlo y retirarlo en una ronda de higiene | Registrado |
 | Q-SEC01-02 | Revisión R1 / Calidad de evidencia | Errores inesperados y ciertos accesos legítimos no siempre hacen fallar la matriz | Confirmado por revisión del test | Fallar ante 5xx/excepciones inesperadas, comprobar caminos permitidos y actor privilegiado representativo | **Atendido en R2** |
 
 En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas (F-SEC01-02a). NO se estableció traversal de directorios en las superficies probadas (segmento de id numérico y `secciones` con lista blanca): resultado negativo acotado, no certificación general.
@@ -142,14 +151,38 @@ En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas 
 - **Resuelto en runtime (dentro de lo comprobado):** F-SEC01-01, F-SEC01-02a, F-SEC01-04, R2-REV-05.
 - **Pendiente:** UAT del propietario con sus cuentas, el clic real de suplantación por un super admin y los flujos de escritura en staging. Siguen abiertos F-02 (editor de roles/configuración), F-03, F-06, 20/23 relation managers, la búsqueda global en 12/13 recursos y SEC-02..05. **No se afirma que el sistema sea seguro.**
 
+### Validación del propietario de la entrega desplegada — 2026-10-21
+
+- **OWNER_UAT: PASS.** Fuente: confirmación del propietario en el chat, del 2026-10-21, registrada en el Issue #2 `6316775771`. No se infieren resultados por acción ni de navegador más allá de esa confirmación, y no hubo una prueba de navegador del revisor.
+- **Qué cierra:** la espera de UAT de la entrega desplegada (`cf01e9c`: F-SEC01-01, F-SEC01-02a, F-SEC01-04, R2-REV-05). **No cierra SEC-01 ni el programa.**
+
+### SEC-01 R3 — relaciones de empresa, búsquedas prioritarias y decisiones de permisos (6316775771)
+
+- **Rama / BASE:** `audit/sec-01-r3-company-boundaries` desde `eb03b4c` (el runtime es igual al desplegado `cf01e9c`).
+- **TESTED_HEAD:** `e95169c`; REVIEW_HEAD en el comentario de entrega.
+- **Fails-before:** rama de evidencia `audit/sec-01-r3-fails-before` @ `9fb0469`.
+- **Reparación F-SEC01-R3-01 (Alta), corregida en candidato:**
+  - `EmpresaAccess::mayEdit()` aplica las condiciones de la propia página de edición, leídas en el momento: autenticado, verificado, vinculado ahora a la empresa y con permiso para editarla;
+  - el trait `ReauthorizesEmpresaAccess` repite esa comprobación en cada petición Livewire (`hydrate`) de `EditEmpresa` y de los 10 gestores de relación de Empresa; los gestores también la hacen al montarse;
+  - el rechazo es el mismo 404 que da una empresa ajena;
+  - antes, una página abierta mientras el usuario estaba vinculado seguía escribiendo después de revocarle el vínculo o el permiso de edición.
+- **Pruebas:**
+  - antes (`9fb0469`): fallan exactamente las 3 pruebas de re-autorización;
+  - después (`e95169c`): suite completa **624 OK** (7.201 aserciones), en el primer intento.
+  - Cinco fixtures existentes recibieron el permiso de edición de empresa que exige la página que contiene esas pestañas. Una prueba existente acepta ahora el 404 además del 403 (oráculo R2-REV-03).
+- **Matrices:** 7 gestores (permitido / denegado, claves y ids de otra empresa, ids forjados, catálogos compartidos sin cambios, gobierno de la taxonomía, revocación después de montar) y 3 búsquedas (Customer, TaxonomyCandidateTerm, Role). Detalle en el informe.
+- **Comportamiento visible:** ninguno para un usuario con acceso. Una página que quedó abierta después de perder el acceso responde «no encontrado» en su siguiente acción. El manual no cambia.
+- **Informe:** [security_sec01_r3_2026-10-21.md](../../audit/security_sec01_r3_2026-10-21.md).
+- **Estado:** listo para revisión; no aceptado; sin desplegar.
+
 ## 6. Cobertura pendiente
 
 R1 informó 131 rutas inventariadas y 792 solicitudes sobre 88 entradas con nueve actores. Son conteos de inventario y caracterización, no porcentaje global de seguridad.
 
 | Superficie | Evidencia R1 | Pendiente |
 |---|---|---|
-| Relation managers | 3 de 23 (sin cambio en R2) | 20 — lote acotado siguiente |
-| Búsqueda global | 1 de 13 recursos (sin cambio en R2) | 12 — lote acotado siguiente |
+| Relation managers | ~~3 de 23 (sin cambio en R2)~~ → **R3 (2026-10-21): 10 probados** (R1: Contacts, Users, Chambers; R3: Assets, Management, Experiences, Presence, Sustainabilities, Services, TaxonomyCategories). **Discrepancia de denominador:** el inventario de R1 dice 23; el recuento en `e95169c` da **24** registros activos (recurso × gestor; Empresa 10 + 14 en otros recursos) | **14 por el recuento** (13 por el denominador anterior); los 14 están fuera de Empresa |
+| Búsqueda global | ~~1 de 13 recursos (sin cambio en R2)~~ → **R3:** 13 en inventario, de los que **12 son buscables de verdad** (RoleResource está desactivado por la configuración de Shield, y ahora se prueba). Probados: Empresa (R1), Customer y TaxonomyCandidateTerm (R3), más Role como no buscable | **9** |
 | Actor administrador | Rol sintético sin conjunto explícito representativo | Expectativas y capacidades efectivas de fixture |
 | Acciones Livewire / exportaciones generales | Inventario y pruebas parciales | Ejecución negativa y positiva por operación |
 | Registro, perfil, roles, verificación y recuperación | Comprobaciones parciales | Pruebas específicas de escritores y flujos |
