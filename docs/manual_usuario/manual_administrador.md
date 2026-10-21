@@ -259,6 +259,16 @@ cualquier rol. Rige desde la versión que incorpora esta regla (CPV-SEC-01-R4).
 - **Sin cambios:** la gestión de usuarios comunes por el personal autorizado sigue igual. Asignar el rol `super_admin` a
   una cuenta sigue siendo exclusivo de un `super_admin`.
 
+**Guardar un rol cambia solo las casillas que se ven** (corrección F-SEC01-R4-01):
+
+- Un rol puede tener permisos que el editor **no muestra**, por ejemplo los de módulos de empresa o de pantallas antiguas.
+  Al guardar, esos permisos **se conservan tal como estén en ese momento**. Marcar o desmarcar casillas visibles funciona igual
+  que antes.
+- El editor no crea ni concede permisos que no aparecen entre sus casillas.
+- Si algo falla al guardar, no se guarda nada: ni el nombre ni los permisos.
+- **Hasta que esta corrección esté publicada**, guardar un rol en el editor **borra** sus permisos ocultos. Mientras tanto, no
+  guarde roles desde el editor, y menos `super_admin`. Si hace falta un cambio, pídalo a soporte para hacerlo de forma controlada.
+
 ![Roles y permisos (Filament Shield)](capturas_admin/26-roles.png)
 
 ---

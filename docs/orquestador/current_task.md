@@ -1,7 +1,18 @@
-# Tarea actual (checkpoint 2026-10-21 ~15:25Z, rama `fix/sec-01-r4-role-administration`)
+# Tarea actual (checkpoint 2026-10-21 ~16:40Z, rama `fix/sec-01-r4-01-role-editor-preserve`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
+
+## F-SEC01-R4-01 — READY_FOR_REVIEW — MANUAL (`6320241495`); sin desplegar, sin restaurar
+
+| Campo | Valor |
+|---|---|
+| Rama / BASE / TESTED | `fix/sec-01-r4-01-role-editor-preserve` / `f41bcb6` / `24413d5` |
+| Causa | Shield `afterSave`/`afterCreate` sincronizan solo lo enviado (desvincula lo no mostrado; `CheckboxList` acepta nombres forjados) |
+| Código | RoleResource publicado en la app; `RolePermissionSync` (enviado ∩ mostrado ∪ ocultos actuales, fila bloqueada); transacción en las páginas de rol |
+| Pruebas | antes (`44da9a3`): fallan 5 de 6; enfocadas 74 OK; suite completa **636 OK** |
+| Recuperación | solo propuesta: ≤1 vínculo (lista de usuarios del rol ocupado, si el propietario lo confirma); 0 en el rol sin usuarios; nunca permisos de Role. Delta exacto en `%USERPROFILE%\.cpv-restricted\sec-01\r4\` |
+| Informe | `audit/security_sec01_r4_01_2026-10-21.md` |
 
 ## CPV-SEC-01-R4-ROLE-ADMIN — código ACEPTADO (`6319407886`, `97737ba`), sin desplegar; CONTAINMENT_VERIFIED — MANUAL (`6319443716`)
 

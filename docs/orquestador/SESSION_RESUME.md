@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-21 ~15:25Z, rama `fix/sec-01-r4-role-administration`: SEC-01 **R4** (roles solo super_admin). Código aceptado (`97737ba`, 6319407886), sin desplegar. Contención manual del propietario **verificada** en solo lectura (6319443716). Staging en `cf01e9c`.
+**Checkpoint:** 2026-10-21 ~16:40Z, rama `fix/sec-01-r4-01-role-editor-preserve` (desde `f41bcb6`): **F-SEC01-R4-01** (el editor de roles conserva lo que no muestra), lista para revisión, sin desplegar. R4 aceptado; contención verificada. Staging en `cf01e9c`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -32,7 +32,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 1. Arranque canónico y distribución
 
-- **Rama canónica:** **`fix/sec-01-r4-role-administration`** (R4, desde el candidato R3 aceptado `66f5ce8`, que está en `audit/sec-01-r3-company-boundaries` y no se desplegó). TESTED `b51fa3e`. `planning/management-taxonomy` EN ESPERA: no se promueve.
+- **Rama canónica:** **`fix/sec-01-r4-01-role-editor-preserve`** (desde R4 aceptado `97737ba` + docs `f41bcb6`; R3 `66f5ce8` por ancestro). TESTED `24413d5`. `planning/management-taxonomy` EN ESPERA: no se promueve.
   - Contiene `ce70b7f`, `edf20ed`, `10616af`, `0895258` y `28014c2`.
   - Los archivos de arranque (`CLAUDE.md`, `AGENTS.md`, `ENVIRONMENT.md`, `check_tools.ps1` y este archivo) ya están también en `feature/upgrade-filament-v3`, en su versión de `cf01e9c`; el checkpoint vigente es el de esta rama.
   - Una sesión abierta en un checkout viejo no los carga sola.
@@ -43,7 +43,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `fix/sec-01-r4-role-administration` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabajá en la rama `fix/sec-01-r4-01-role-editor-preserve` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
@@ -64,10 +64,10 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). F-01 y R2 desplegados (`cf01e9c`, UAT PASS). R3 aceptado y sin desplegar. **R4:** regla del propietario: solo super_admin administra roles. Código aceptado, sin desplegar; contención verificada. **F-SEC01-R4-01:** guardar un rol en el editor quita permisos ocultos; no guardar super_admin ahí. Pendientes: R3-02 y R3-03; 14 de 24 relation managers; 9 búsquedas; decisiones F-03/F-06. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
+- **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). F-01 y R2 desplegados (`cf01e9c`, UAT PASS). R3 aceptado y sin desplegar. **R4:** regla del propietario: solo super_admin administra roles. Código aceptado, sin desplegar; contención verificada. **F-SEC01-R4-01:** corrección lista para revisión; hasta desplegarla, guardar un rol en el editor vivo quita sus permisos ocultos (no guardar roles ahí). Recuperación: solo propuesta (≤1 vínculo). Pendientes: R3-02 y R3-03; 14 de 24 relation managers; 9 búsquedas; decisiones F-03/F-06. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
 - **Accesos:** cada comando que los necesite usa el bootstrap documentado ([`ENVIRONMENT.md`](ENVIRONMENT.md), [`ACCESS_BOOTSTRAP.md`](ACCESS_BOOTSTRAP.md)); cada ejecutor guarda sus credenciales fuera de git. Si faltan `gh` o `python`, no es un bloqueo: se usan los mecanismos documentados.
 - **Reanudar:** solo con una nueva asignación del propietario.
-- **Propietario:** decidir F-SEC01-R4-01 y el despliegue de R3+R4; UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
+- **Propietario:** revisar F-SEC01-R4-01 y su propuesta de recuperación; despliegue R3+R4(+R4-01); UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
 - **Agente:** nada sin una instrucción nueva del Issue #2.
 
 ## 4. Worktrees en uso (no tocar sin instrucción)

@@ -33,8 +33,9 @@
 - **Collateral effect, F-SEC01-R4-01** (opened in the register):
   - Shield's role editor syncs only the permissions it displays. Because the custom-permission tab is disabled, saving a role **silently drops** every permission the form does not show. Staging has 116 such permissions, and 73 of them are referenced in code.
   - Against the restricted 2026-10-20 baseline:
-    - the role with no users lost 115 hidden permissions besides its Role ones;
-    - the role with one user lost 1 permission the app checks, in user management.
+    - ~~the role with no users lost 115 hidden permissions besides its Role ones;~~
+    - ~~the role with one user lost 1 permission the app checks, in user management.~~
+    - **Attribution corrected in `6320241495`:** the defect removed **109 hidden permissions, all on the role with no users**. The role with one user held no hidden permissions and lost none to the defect. Separately, the saves cleared **visible** checkboxes outside Role: 6 user-management ones on the unoccupied role, and 1 (the user list) on the occupied role. See `audit/security_sec01_r4_01_2026-10-21.md`.
   - Nothing was added. This only reduces access; it is not an exposure.
   - The exact diff is restricted. Restoring anything needs owner approval.
   - **Until the editor is fixed, do not save the super_admin role in it.** It holds all 116 hidden permissions.

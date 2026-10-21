@@ -16,6 +16,7 @@ Este registro resume cada ronda, sus hallazgos, correcciones, aceptación y desp
 - **2026-10-21, UAT del propietario: PASS** para esa entrega. **R3** (relaciones de empresa) corrige en candidato la re-autorización después de montar (F-SEC01-R3-01), sin desplegar. **Alerta: F-SEC01-R3-04**: un camino de privilegios que queda abierto se salta las guardas desplegadas; la mitigación inmediata es una acción del propietario sobre los datos de roles.
 - **2026-10-21, R3 aceptado (NO desplegado). R4:** el propietario fijó que administrar roles es **exclusivo de super_admin**. La contención en datos vivos quedó **bloqueada** por el clasificador del ejecutor (sin cambios; **el riesgo vivo sigue**). La reparación de código está lista para revisión, sin desplegar.
 - **2026-10-21, R4 código aceptado en 6319407886 (candidato `97737ba`, NO desplegado). Contención manual: confirmada por el propietario (6319443716) y VERIFICADA en solo lectura:** 0 permisos de administración de roles fuera de super_admin, continuidad de super_admin PASS y caché coherente. **Efecto colateral (F-SEC01-R4-01):** al guardar, el editor de roles quitó además permisos que no muestra; requiere decisión del propietario.
+- **2026-10-21, F-SEC01-R4-01 (6320241495):** corrección del editor lista para revisión (TESTED `24413d5`, sin desplegar) y propuesta de recuperación de permisos **solo propuesta**: no se cambió ningún dato vivo.
 - Quedan decisiones sobre permisos y asociaciones de usuarios, hipótesis por reproducir y superficies todavía no probadas.
 - La siguiente ronda asignada verifica creación/edición de cuentas, concesión de privilegios y límites de acceso a archivos.
 - Gerencia y nuevos reportes permanecen en espera del cierre acordado de seguridad.
@@ -73,7 +74,7 @@ Las severidades son las comunicadas por la ronda, sujetas a revisión. Una confi
 | **F-SEC01-R3-04** | R3 / **Alta, alerta al propietario** | Un titular no super admin del permiso de edición de roles puede volverse privilegiado y saltarse las dos guardas desplegadas (suplantación y concesión de roles), porque el editor de roles no protege la definición del rol privilegiado | Confirmado en aislamiento (sonda restringida). Roles reales tienen ese permiso (instantánea restringida): **riesgo vivo** | Mitigación inmediata (dato de roles, acción del propietario): quitar los permisos de gestión de roles a todo rol que no sea super admin. Regla de código: solo un super admin administra roles; definición del rol privilegiado protegida (detalle en notas restringidas) | **Abierto**; forma parte de F-02. **2026-10-21 (R4):** regla del propietario: solo super_admin administra roles. Corregido en candidato R4 (`b51fa3e`), sin desplegar. Contención en datos vivos **bloqueada** (sin cambios); **el riesgo vivo sigue**. **2026-10-21 (posterior):** contención aplicada a mano por el propietario y verificada en solo lectura (0 concesiones fuera de super_admin; caché coherente). Código aceptado (`97737ba`), **sin desplegar**: sigue **abierto** hasta el despliegue |
 | Q-SEC01-R3-05 | R3 / Gobierno | Significado ambiguo del origen «Confirmada» (`validated`): el manual dice que la empresa confirma sugerencias, pero el campo de aprobador describe una aprobación de la Cámara | Lectura de código y manual | Definir la regla | Decisión del propietario; sin cambios |
 | Q-SEC01-R3-06 | R3 / Higiene | Archivo `error_log` de PHP versionado en directorios de la aplicación desde el primer commit | Inventario | Revisarlo y retirarlo en una ronda de higiene | Registrado |
-| **F-SEC01-R4-01** | R4 / Media, integridad de permisos (disponibilidad) | Al guardar un rol, el editor de roles de Shield sincroniza solo los permisos que muestra. Como la pestaña de permisos personalizados está desactivada, **quita sin avisar** los permisos que no aparecen en el formulario (116 en staging; 73 se usan en el código) | Confirmado en solo lectura tras la contención manual, contra la instantánea restringida del 2026-10-20: el rol sin usuarios perdió 115 permisos ocultos además de los de Role, y el rol con 1 usuario perdió 1 que la app comprueba (gestión de usuarios). Nada se añadió; super_admin, el resto de roles y las membresías no cambiaron | Decisión del propietario: restaurar o no lo perdido (lista exacta restringida; restaurar requiere aprobación). Antes de volver a guardar un rol en el editor: no guardar super_admin (tiene 116 ocultos) hasta decidir la corrección (mostrar los permisos personalizados o conservar los no mostrados) | **Abierto**; no es una exposición: solo reduce acceso |
+| **F-SEC01-R4-01** | R4 / Media, integridad de permisos (disponibilidad) | Al guardar un rol, el editor de roles de Shield sincroniza solo los permisos que muestra. Como la pestaña de permisos personalizados está desactivada, **quita sin avisar** los permisos que no aparecen en el formulario (116 en staging; 73 se usan en el código) | Confirmado en solo lectura tras la contención manual, contra la instantánea restringida del 2026-10-20. ~~el rol sin usuarios perdió 115 permisos ocultos además de los de Role, y el rol con 1 usuario perdió 1 que la app comprueba (gestión de usuarios)~~ → **atribución corregida (6320241495):** el defecto quitó **109 permisos ocultos, todos en el rol sin usuarios**; el rol con 1 usuario no tenía ocultos y no perdió ninguno por el defecto. Además se desmarcaron casillas **visibles** fuera de Role: 6 de gestión de usuarios en el rol sin usuarios y 1 (lista de usuarios) en el rol con 1 usuario. Nada se añadió; super_admin, el resto de roles y las membresías no cambiaron | Decisión del propietario: restaurar o no lo perdido (lista exacta restringida; restaurar requiere aprobación). Antes de volver a guardar un rol en el editor: no guardar super_admin (tiene 116 ocultos) hasta decidir la corrección (mostrar los permisos personalizados o conservar los no mostrados) | **Abierto**; no es una exposición: solo reduce acceso. **2026-10-21:** corrección en candidato (`fix/sec-01-r4-01-role-editor-preserve`, TESTED `24413d5`), **sin desplegar**; propuesta de recuperación preparada (§5), **sin restaurar** |
 | Q-SEC01-02 | Revisión R1 / Calidad de evidencia | Errores inesperados y ciertos accesos legítimos no siempre hacen fallar la matriz | Confirmado por revisión del test | Fallar ante 5xx/excepciones inesperadas, comprobar caminos permitidos y actor privilegiado representativo | **Atendido en R2** |
 
 En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas (F-SEC01-02a). NO se estableció traversal de directorios en las superficies probadas (segmento de id numérico y `secciones` con lista blanca): resultado negativo acotado, no certificación general.
@@ -213,6 +214,45 @@ En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas 
 - **Ayuda de administración:** `docs/manual_usuario/manual_administrador.md` §9.1. El manual del afiliado no cambia.
 - **Informe:** [security_sec01_r4_2026-10-21.md](../../audit/security_sec01_r4_2026-10-21.md).
 - **Riesgo residual:** ~~**alto y vivo** en staging hasta que se aplique la contención~~ → **contenido en los datos** (verificado). El código de R4 (aceptado, `97737ba`) **no está desplegado**: hasta entonces, si alguien vuelve a otorgar a otro rol los permisos de Role, el camino reaparece. Contención y código son protecciones distintas, y hacen falta las dos. SEC-01 sigue abierto.
+
+### SEC-01 F-SEC01-R4-01 — el editor de roles conserva lo que no muestra (6320241495)
+
+- **Causa exacta (Shield 3.9.10 instalado, sin editar vendor):**
+  - `EditRole::afterSave` y `CreateRole::afterCreate` hacen `firstOrCreate` con cada valor enviado y luego `syncPermissions` con **exactamente** esa lista. Lo que el formulario no muestra se desvincula.
+  - Las casillas son las opciones de los campos visibles: los prefijos de cada recurso registrado, las páginas y widgets no excluidos, y los personalizados **solo** si esa pestaña está activa. Aquí está desactivada.
+  - En staging hay 116 permisos sin casilla. Son nombres de recursos que ya no están registrados en el panel o con otro identificador, `export_*`, `taxonomy_*` y páginas o widgets antiguos. Las políticas de la app usan 73 de ellos.
+  - `CheckboxList` no valida los valores contra sus opciones, así que un nombre forjado se creaba y se concedía (tras R4, solo un super_admin llega a esa vía).
+  - Activar la pestaña de personalizados **no** basta: mostraría todo permiso que no sea de entidad, y seguiría creando lo forjado.
+- **Corrección** (rama `fix/sec-01-r4-01-role-editor-preserve`, desde `f41bcb6`):
+  - **Recurso de la app:** `App\Filament\Resources\Shield\RoleResource` es el recurso publicado, la vía que Shield admite. Conserva el formulario, la tabla, la dirección (`shield/roles`) y las etiquetas, y cambia solo las páginas.
+  - **Regla de escritura:** final = (enviado ∩ opciones que el formulario muestra ahora, calculadas en el servidor) ∪ (permisos que el rol tiene **ahora** fuera de ese conjunto).
+    - Se lee en el momento, con la fila del rol bloqueada.
+    - Solo se crea un nombre que el formulario muestra, y con el guard guardado del rol.
+  - **Transacción:** el rol y sus permisos son una sola transacción sobre las conexiones de rol y de permiso. La caché de permisos se vacía otra vez después del commit.
+  - **Sin cambios:** R4 (solo un super_admin vigente administra roles), la protección de identidad del rol privilegiado y las asignaciones de cuentas.
+- **Pruebas** (`RoleEditorPermissionPreservationTest`, 7):
+  - el panel sirve solo el editor de la app;
+  - guardar sin cambios en un rol común y en el privilegiado;
+  - quitar y agregar una casilla visible conservando las ocultas;
+  - parte oculta leída en el momento: no se repone lo quitado ni se pierde lo agregado desde que se abrió la página;
+  - nombres forjados, ids, nombres ocultos en un campo visible y un campo inventado: nada se crea ni se concede;
+  - página abierta como super_admin después de perder el rol;
+  - fallo inyectado después de desvincular y vincular: se revierten el rol y cada vínculo;
+  - en todas, conjuntos exactos, número de filas `Permission` y membresías.
+- **Resultados:**
+  - **antes de la corrección** (`44da9a3`, páginas que solo heredan): **fallan 5 de 6**; la revocación ya la cubría R4;
+  - **enfocadas** en `24413d5` (seguridad, suplantación, usuarios, exportación, verificación, alta): **74 OK**;
+  - **suite completa** en `24413d5`: **636 OK** (7.388 aserciones), en el primer intento.
+- **Recuperación: solo PROPUESTA, nada restaurado.** El delta exacto está en notas restringidas.
+  - **Rol con 1 usuario** (7 perdidos): 6 de administración de roles, que **nunca** se restauran, y 1 de lista de usuarios (visible). Propuesta: restaurar ese 1 **solo si** el propietario confirma que quitarlo no fue intencional.
+  - **Rol sin usuarios** (121 perdidos):
+    - 7 de administración de roles: **nunca**;
+    - 6 visibles de gestión de usuarios (1 de lectura y 5 de escritura). La escritura permite asignar roles no privilegiados, así que solo se restauran con una intención explícita;
+    - 66 ocultos **activos**: CRUD de módulos de empresa y de catálogos geográficos e infraestructura. Escribir en catálogos globales es la clase de riesgo de F-03;
+    - 42 ocultos **sin referencia** en el código (`export_*` y páginas o widgets antiguos): no se restauran.
+    - Propuesta: **0 ahora**, porque no tiene usuarios. Si el rol vuelve a usarse, se decide por bloques.
+  - **Requisitos de cualquier restauración:** aprobación del propietario, **después** de desplegar esta corrección (si no, el siguiente guardado lo vuelve a borrar), con un script revisado y transaccional y no con el editor, y vaciando la caché.
+- **Informe:** [security_sec01_r4_01_2026-10-21.md](../../audit/security_sec01_r4_01_2026-10-21.md).
 
 ## 6. Cobertura pendiente
 
