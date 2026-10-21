@@ -21,7 +21,11 @@ use Illuminate\Support\Facades\DB;
  */
 trait UsesAccountWriteTransaction
 {
-    protected ?bool $hasDatabaseTransactions = true;
+    /** Enabled for this page regardless of the panel default (off in v3.3.55). */
+    public function hasDatabaseTransactions(): bool
+    {
+        return true;
+    }
 
     /** @return array<int, string> distinct connection names of the account row and the role pivot */
     public static function accountWriteConnections(): array
