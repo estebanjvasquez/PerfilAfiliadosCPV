@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Shield\RoleResource\Pages;
 
 use App\Filament\Resources\Shield\RoleResource;
-use BezhanSalleh\FilamentShield\Resources\RoleResource\Pages$p as ShieldEditRole;
+use BezhanSalleh\FilamentShield\Resources\RoleResource\Pages\EditRole as ShieldEditRole;
 
 class EditRole extends ShieldEditRole
 {
