@@ -20,6 +20,26 @@
 - **Restricted** (executor-local, outside git and webroot): the before-snapshot, the reviewed apply script and the inverse plan. Restoring anything requires owner approval.
 - **Status:** the **R3-04 live risk remains** until the owner acts or allows the write. The fastest route, in the app as super_admin, is: **Roles** → each non-super role → uncheck its **Role** permissions → save.
 
+## A2. MANUAL CONTAINMENT: owner-confirmed, then VERIFIED read-only (`6319443716`)
+
+- **Review `6319407886`:** code accepted at `97737ba`, not deployed; containment still blocked at that point.
+- **Owner confirmation (`6319443716`):** the owner removed the Role permissions from the non-super roles in the app. This is recorded as owner-confirmed and was then verified independently.
+- **Verification** (2026-10-21 ~15:20Z, runtime `cf01e9c`, `SET TRANSACTION READ ONLY`, no write and no cache mutation; if the cache entry had been absent, the probe would have used an in-memory store):
+  - **Recomputed:** 12 derived names, 6 existing permissions, 0 wildcards. The earlier snapshot was not reused.
+  - **Outside super_admin:** **0 role assignments** (12 before) and **0 direct user grants**.
+  - **super_admin continuity: PASS.** One super_admin role holds all 6, and all **4 verified accounts** pass every role-administration gate check.
+  - **Cache and access:** `file` store; the entry is present and **matches the database** (0 non-super pairs, 6 super pairs), so the UI saves invalidated it and it was rebuilt. In a fresh process (what the next request sees), the deployed gate gives **0 of 325** non-super users any role-administration ability. Staging returns 200.
+  - **Unchanged:** 5 roles, 329 memberships, 366 users. super_admin and the two roles that never held Role permissions are identical to the 2026-10-20 restricted baseline.
+- **Collateral effect, F-SEC01-R4-01** (opened in the register):
+  - Shield's role editor syncs only the permissions it displays. Because the custom-permission tab is disabled, saving a role **silently drops** every permission the form does not show. Staging has 116 such permissions, and 73 of them are referenced in code.
+  - Against the restricted 2026-10-20 baseline:
+    - the role with no users lost 115 hidden permissions besides its Role ones;
+    - the role with one user lost 1 permission the app checks, in user management.
+  - Nothing was added. This only reduces access; it is not an exposure.
+  - The exact diff is restricted. Restoring anything needs owner approval.
+  - **Until the editor is fixed, do not save the super_admin role in it.** It holds all 116 hidden permissions.
+- **Restricted:** the verification scripts, the after-state and the diff, all in `r4/` outside git.
+
 ## B. SERVER_SIDE_SURFACE_AND_RULE
 
 **Installed role-administration surface** (Shield 3.9.10, `RoleResource`; vendor not edited):
@@ -33,7 +53,7 @@
 - **`RolePolicy`:** every ability (view-any, view, create, update, delete, delete-any, force-delete, restore, replicate, reorder) requires `PrivilegedRoleGuard::userHasPrivilegedRole($user)` **and** the explicit permission.
   - The super_admin check is a fresh pivot query on each request. A page opened before the role was removed is therefore refused on its next request, even if the user still holds the generic permissions directly.
   - The explicit permission stays required because Shield's gate bypass is off here (`define_via_gate = false`).
-- **`PrivilegedRoleDefinitionGuard`** (registered at boot) applies at the model boundary, for any writer:
+- **`PrivilegedRoleDefinitionGuard`** (registered at boot) applies at the model boundary, to Eloquent writes that dispatch model events. It is not a database constraint and does not intercept raw SQL, query-builder mass updates or deletes, `saveQuietly` or `withoutEvents` (precision requested in `6319407886`):
   - the privileged role cannot be renamed, moved to another guard or deleted;
   - no other role may take its name, under any guard;
   - creating it when none exists, under the default guard, stays possible for setup;
@@ -88,7 +108,8 @@ Runs:
 
 ## REMAINING_RISKS / LIMITATIONS
 
-- **Live risk (High) remains until containment is applied:** the role-editor path can still bypass the deployed guards on staging (`cf01e9c`). The code repair here is not deployed.
+- ~~**Live risk (High) remains until containment is applied:** the role-editor path can still bypass the deployed guards on staging (`cf01e9c`).~~ **Contained in the data and verified (A2).** The code repair (accepted, `97737ba`) is **not deployed**, so re-granting the Role permissions to another role would reopen the path.
+- **F-SEC01-R4-01** is open: the role editor drops hidden permissions on save (A2).
 - Removing the named grants (containment) and the code repair are separate protections. Neither substitutes for the other; both are needed.
 - Arbitrary active sessions are not claimed to be invalidated. Each request re-checks after the code repair.
 - No browser run.

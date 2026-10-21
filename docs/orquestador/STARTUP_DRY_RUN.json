@@ -1,7 +1,7 @@
 {
     "manifest": "STARTUP_DRY_RUN",
     "task": "CPV-SEC-01-R2 checkpoint (startup rules from CPV-SESSION-CONTINUITY, accepted 6211970495)",
-    "measured_utc": "2026-10-21T08:25:00Z",
+    "measured_utc": "2026-10-21T15:25:00Z",
     "measured_at_branch": "fix/sec-01-r4-role-administration (deployed runtime cf01e9c)",
     "method": "deterministic: byte sizes of the files as committed on this branch; no AI session, subagent or test run was launched to prove it",
     "caveat": "file sizes are an input budget, not a guarantee of actual session context or token cost; the tool's own system prompt and tool outputs are not counted here",
@@ -21,8 +21,8 @@
         {
             "step": 1,
             "file": "docs/orquestador/SESSION_RESUME.md",
-            "range": "all (114 lines)",
-            "bytes": 8898,
+            "range": "all (111 lines)",
+            "bytes": 8803,
             "class": "project_doc"
         },
         {
@@ -57,13 +57,13 @@
         }
     ],
     "totals": {
-        "project_docs_bytes": 10240,
-        "project_docs_breakdown": "CLAUDE.md 1342 + SESSION_RESUME.md 8851",
+        "project_docs_bytes": 10145,
+        "project_docs_breakdown": "CLAUDE.md 1342 + SESSION_RESUME.md 8803",
         "project_docs_within_target": true,
         "assigned_input_bytes": 7969,
         "private_memory_bytes": 1413,
-        "total_initial_text_inputs_bytes": 19622,
-        "total_initial_text_inputs_breakdown": "project docs 10193 + assigned comment 7969 + private memory 1413 (settings.json permissions not counted as reading)"
+        "total_initial_text_inputs_bytes": 19527,
+        "total_initial_text_inputs_breakdown": "project docs 10145 + assigned comment 7969 + private memory 1413 (settings.json permissions not counted as reading)"
     },
     "commands": [
         {

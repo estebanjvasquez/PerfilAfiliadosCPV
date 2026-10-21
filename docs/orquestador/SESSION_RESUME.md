@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-10-21 ~15:00Z, rama `fix/sec-01-r4-role-administration`: SEC-01 **R4** (administración de roles exclusiva de super_admin). El código está listo para revisión, sin desplegar. **La contención en datos vivos quedó BLOQUEADA** (riesgo vivo, `6318733204`). Staging sigue en `cf01e9c`.
+**Checkpoint:** 2026-10-21 ~15:25Z, rama `fix/sec-01-r4-role-administration`: SEC-01 **R4** (roles solo super_admin). Código aceptado (`97737ba`, 6319407886), sin desplegar. Contención manual del propietario **verificada** en solo lectura (6319443716). Staging en `cf01e9c`.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -64,10 +64,10 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 ## 3. Siguiente acción
 
-- **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). F-01 y R2 desplegados (`cf01e9c`, UAT PASS). R3 aceptado y sin desplegar. **R4:** regla del propietario: solo super_admin administra roles. El código está listo para revisión. **La contención está BLOQUEADA**; el propietario puede aplicarla en la app (Roles → desmarcar los permisos de Role en los roles que no son super_admin). Pendientes: R3-02 y R3-03; 14 de 24 relation managers; 9 búsquedas; decisiones F-03/F-06. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
+- **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). F-01 y R2 desplegados (`cf01e9c`, UAT PASS). R3 aceptado y sin desplegar. **R4:** regla del propietario: solo super_admin administra roles. Código aceptado, sin desplegar; contención verificada. **F-SEC01-R4-01:** guardar un rol en el editor quita permisos ocultos; no guardar super_admin ahí. Pendientes: R3-02 y R3-03; 14 de 24 relation managers; 9 búsquedas; decisiones F-03/F-06. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
 - **Accesos:** cada comando que los necesite usa el bootstrap documentado ([`ENVIRONMENT.md`](ENVIRONMENT.md), [`ACCESS_BOOTSTRAP.md`](ACCESS_BOOTSTRAP.md)); cada ejecutor guarda sus credenciales fuera de git. Si faltan `gh` o `python`, no es un bloqueo: se usan los mecanismos documentados.
 - **Reanudar:** solo con una nueva asignación del propietario.
-- **Propietario:** aplicar la contención de R4 (datos de roles) y revisar el código de R4; UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
+- **Propietario:** decidir F-SEC01-R4-01 y el despliegue de R3+R4; UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
 - **Agente:** nada sin una instrucción nueva del Issue #2.
 
 ## 4. Worktrees en uso (no tocar sin instrucción)

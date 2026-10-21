@@ -1,14 +1,15 @@
-# Tarea actual (checkpoint 2026-10-21 ~15:00Z, rama `fix/sec-01-r4-role-administration`)
+# Tarea actual (checkpoint 2026-10-21 ~15:25Z, rama `fix/sec-01-r4-role-administration`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## CPV-SEC-01-R4-ROLE-ADMIN — READY_FOR_REVIEW — MANUAL (`6318625636`); código sin desplegar
+## CPV-SEC-01-R4-ROLE-ADMIN — código ACEPTADO (`6319407886`, `97737ba`), sin desplegar; CONTAINMENT_VERIFIED — MANUAL (`6319443716`)
 
 | Campo | Valor |
 |---|---|
 | Regla | administrar roles es exclusivo de quien tiene hoy `super_admin` (propietario, 2026-10-21) |
-| Contención en vivo | **BLOQUEADA**: el clasificador de permisos del ejecutor rechazó la escritura; sin cambios (alerta `6318733204`). Verificación previa: 2 roles, 12 asignaciones, 0 permisos directos; continuidad de super_admin con 4 cuentas |
+| Contención en vivo | **Aplicada a mano por el propietario y VERIFICADA** en solo lectura (6319443716): 0 asignaciones fuera de super_admin, 0 permisos directos, continuidad 4/4 PASS, caché `file` coherente, gate fresco 0/325. Antes: ~~**BLOQUEADA**: el clasificador de permisos del ejecutor rechazó la escritura; sin cambios (alerta `6318733204`). Verificación previa: 2 roles, 12 asignaciones, 0 permisos directos; continuidad de super_admin con 4 cuentas~~ |
+| Colateral | **F-SEC01-R4-01**: el editor de roles quita al guardar los permisos que no muestra (116 ocultos; se perdieron 115 en el rol sin usuarios y 1 de gestión de usuarios en el rol con 1 usuario). Decisión del propietario; no guardar super_admin en el editor. Diferencia exacta en `%USERPROFILE%\.cpv-restricted\sec-01\r4\` (fuera de git) |
 | Rama / BASE / TESTED | `fix/sec-01-r4-role-administration` / `66f5ce8` (R3 aceptado) / `b51fa3e` |
 | Código | `RolePolicy` (super_admin, consulta fresca, más el permiso) y `PrivilegedRoleDefinitionGuard` (identidad del rol privilegiado) |
 | Pruebas | antes (`4953be6`): fallan 4 de 5; suite completa `b51fa3e` **629 OK** |
