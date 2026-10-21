@@ -4,32 +4,32 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Models\User;
 use App\Filament\Resources\UserResource;
-use App\Filament\Resources\UserResource\Concerns\GuardsPrivilegedRoles;
+use App\Support\Security\PrivilegedRoleGuard;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Actions\DeleteAction;
 use STS\FilamentImpersonate\Pages\Actions\Impersonate;
 
 class EditUser extends EditRecord
 {
-    use GuardsPrivilegedRoles;
-
     protected static string $resource = UserResource::class;
 
     /**
-     * CPV-SEC-01-R2-ACCOUNT-PATH: a non-super-admin cannot open a privileged account, so it cannot be modified through
-     * this page. This runs in mount(), right after the resource's own edit authorization and before the form is filled,
-     * and also on every hydrated action request.
+     * CPV-SEC-01-R2-ACCOUNT-PATH (`6310331211` R2-REV-01): a non-super-admin cannot open — and so cannot modify — an
+     * account that already holds the privileged role. Checked fresh (a pivot query, not mounted/cached state), right
+     * after the resource's own edit authorization. authorizeAccess() runs in mount() and again at the start of save(),
+     * so the privileged target is rejected before any write. The role set itself is authorized before it is synced, in
+     * the roles field's saveRelationshipsUsing (UserResource::form).
      */
     protected function authorizeAccess(): void
     {
         parent::authorizeAccess();
-        $this->assertMayManagePrivilegedTarget($this->getRecord());
-    }
 
-    /** After save, drop any privileged role a non-super-admin tried to grant. */
-    protected function afterSave(): void
-    {
-        $this->stripPrivilegedRoleGrants($this->getRecord());
+        $record = $this->getRecord();
+        if ($record instanceof User
+            && ! PrivilegedRoleGuard::actorMayGrantPrivileged()
+            && PrivilegedRoleGuard::userHasPrivilegedRole($record)) {
+            abort(403);
+        }
     }
 
     public function getTitle(): string

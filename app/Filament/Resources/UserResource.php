@@ -17,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use App\Filament\Resources\UserResource\Pages;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
@@ -87,7 +88,25 @@ class UserResource extends Resource
             $rows[] = Forms\Components\Select::make('roles')
                 ->multiple()
                 ->relationship('roles', 'name')
-                ->label(trans('filament-user::user.resource.roles'));
+                ->label(trans('filament-user::user.resource.roles'))
+                // CPV-SEC-01-R2-ACCOUNT-PATH (`6310331211` R2-REV-01): authorize the role set BEFORE it is synced, so a
+                // forbidden privileged role is never persisted (no post-save cleanup window). Runs inside Filament's
+                // create/edit transaction. Only a super admin may add or remove the privileged role; ordinary role
+                // assignment by permitted staff is unchanged.
+                ->saveRelationshipsUsing(function (Forms\Components\Select $component, Model $record): void {
+                    $requested = array_values((array) ($component->getState() ?? []));
+                    $authorized = \App\Support\Security\PrivilegedRoleGuard::authorizedRoleIds($requested, $record);
+                    $record->roles()->sync($authorized);
+
+                    if (\App\Support\Security\PrivilegedRoleGuard::requestWasReduced($requested, $authorized)) {
+                        \Filament\Notifications\Notification::make()
+                            ->warning()
+                            ->title('No se asignó un rol con privilegios')
+                            ->body('Solo un Super Admin puede otorgar o quitar ese rol. El resto de los cambios se guardó.')
+                            ->persistent()
+                            ->send();
+                    }
+                });
         }
 
         $form->schema($rows);

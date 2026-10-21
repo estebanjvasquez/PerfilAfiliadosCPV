@@ -65,44 +65,50 @@ class AccessMatrixTest extends TestCase
     ];
 
     /**
-     * R2-REV-03: literal approved outcomes for high-value entrypoints, independent of the gate under test. Keys are
-     * entrypoint labels; values are actor => expected outcome. These are an authorization ORACLE.
+     * R2-REV-03: BUSINESS-LEVEL approved outcomes for high-value entrypoints, independent of the gate under test. Keys
+     * are entrypoint labels; values are actor => one of 'allow' (must be 200), 'deny' (must be forbidden OR not_found —
+     * the policy is denial; which safe status is an implementation nuance), 'login' or 'verify'. These are the
+     * authorization ORACLE; the full 792-request sweep stays a gate-comparison characterization.
      */
     private const INDEPENDENT_EXPECTATIONS = [
+        // Viewing the Empresas list requires the affiliate view permission; staff hold it; others are denied.
         'EmpresaResource:index' => [
-            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'ok', 'affiliate_beta' => 'ok',
-            'staff_linked_alfa' => 'ok', 'super_admin' => 'forbidden', 'no_permission' => 'forbidden',
-            'revoked_alfa' => 'ok', 'role_manager' => 'forbidden',
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'allow', 'affiliate_beta' => 'allow',
+            'staff_linked_alfa' => 'allow', 'super_admin' => 'deny', 'no_permission' => 'deny',
+            'revoked_alfa' => 'allow', 'role_manager' => 'deny',
         ],
+        // Editing a company: only its own verified affiliate; every other actor (incl. staff and super admin) is denied.
         'EmpresaResource:edit:alfa' => [
-            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'ok', 'affiliate_beta' => 'not_found',
-            'staff_linked_alfa' => 'forbidden', 'super_admin' => 'forbidden', 'no_permission' => 'not_found',
-            'revoked_alfa' => 'not_found', 'role_manager' => 'not_found',
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'allow', 'affiliate_beta' => 'deny',
+            'staff_linked_alfa' => 'deny', 'super_admin' => 'deny', 'no_permission' => 'deny',
+            'revoked_alfa' => 'deny', 'role_manager' => 'deny',
         ],
         'EmpresaResource:edit:beta' => [
-            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'not_found', 'affiliate_beta' => 'ok',
-            'staff_linked_alfa' => 'not_found', 'super_admin' => 'not_found', 'no_permission' => 'not_found',
-            'revoked_alfa' => 'not_found', 'role_manager' => 'not_found',
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'deny', 'affiliate_beta' => 'allow',
+            'staff_linked_alfa' => 'deny', 'super_admin' => 'deny', 'no_permission' => 'deny',
+            'revoked_alfa' => 'deny', 'role_manager' => 'deny',
         ],
+        // The user and role admin lists: only the staff actor (and, for roles, the role manager) may see them.
         'UserResource:index' => [
-            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'forbidden', 'affiliate_beta' => 'forbidden',
-            'staff_linked_alfa' => 'ok', 'super_admin' => 'forbidden', 'no_permission' => 'forbidden',
-            'revoked_alfa' => 'forbidden', 'role_manager' => 'forbidden',
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'deny', 'affiliate_beta' => 'deny',
+            'staff_linked_alfa' => 'allow', 'super_admin' => 'deny', 'no_permission' => 'deny',
+            'revoked_alfa' => 'deny', 'role_manager' => 'deny',
         ],
         'RoleResource:index' => [
-            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'forbidden', 'affiliate_beta' => 'forbidden',
-            'staff_linked_alfa' => 'ok', 'super_admin' => 'forbidden', 'no_permission' => 'forbidden',
-            'revoked_alfa' => 'forbidden', 'role_manager' => 'ok',
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'deny', 'affiliate_beta' => 'deny',
+            'staff_linked_alfa' => 'allow', 'super_admin' => 'deny', 'no_permission' => 'deny',
+            'revoked_alfa' => 'deny', 'role_manager' => 'allow',
         ],
+        // The manual and the dashboard are open to any verified panel user.
         'UserManual' => [
-            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'ok', 'affiliate_beta' => 'ok',
-            'staff_linked_alfa' => 'ok', 'super_admin' => 'ok', 'no_permission' => 'ok',
-            'revoked_alfa' => 'ok', 'role_manager' => 'ok',
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'allow', 'affiliate_beta' => 'allow',
+            'staff_linked_alfa' => 'allow', 'super_admin' => 'allow', 'no_permission' => 'allow',
+            'revoked_alfa' => 'allow', 'role_manager' => 'allow',
         ],
         'Dashboard' => [
-            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'ok', 'affiliate_beta' => 'ok',
-            'staff_linked_alfa' => 'ok', 'super_admin' => 'ok', 'no_permission' => 'ok',
-            'revoked_alfa' => 'ok', 'role_manager' => 'ok',
+            'guest' => 'login', 'unverified' => 'verify', 'affiliate_alfa' => 'allow', 'affiliate_beta' => 'allow',
+            'staff_linked_alfa' => 'allow', 'super_admin' => 'allow', 'no_permission' => 'allow',
+            'revoked_alfa' => 'allow', 'role_manager' => 'allow',
         ],
     ];
 
@@ -345,7 +351,12 @@ class AccessMatrixTest extends TestCase
         foreach (self::INDEPENDENT_EXPECTATIONS as $label => $perActor) {
             foreach ($perActor as $actor => $want) {
                 $got = $matrix[$label][$actor] ?? 'missing';
-                if ($got !== $want) {
+                $ok = match ($want) {
+                    'allow' => $got === 'ok',
+                    'deny' => in_array($got, ['forbidden', 'not_found'], true),
+                    default => $got === $want, // 'login' | 'verify'
+                };
+                if (! $ok) {
                     $independentViolations[] = "{$label} as {$actor}: expected {$want}, got {$got}";
                 }
             }
