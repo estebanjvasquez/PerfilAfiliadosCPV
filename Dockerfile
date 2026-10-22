@@ -5,7 +5,9 @@
 # pdo_pgsql (Supabase/Postgres), zip/gd (maatwebsite/excel, mpdf), bcmath (casts decimales de
 # Laravel), el resto (mbstring/xml/curl/etc.) ya vienen en la imagen base php:8.2-fpm.
 
-FROM php:8.2-fpm AS base
+# Base fijada por digest a PHP 8.2.35 (CVE-2026-109618 / CVE-2026-109619, ver contabo-admin Issue #1): una
+# etiqueta mutable no prueba qué PHP queda construido. Al subir de parche, cambiar versión y digest juntos.
+FROM php:8.2.35-fpm@sha256:a58479410c94b3f0f7dfacc27fba8befc122290743fd0eb8c88a99ff2a0b1ba1 AS base
 
 RUN apt-get update && apt-get install -y \
         libpq-dev \
