@@ -17,7 +17,9 @@
 # away with it. That also satisfies the requirement that tests have their own
 # vendor rather than sharing the live app's.
 
-FROM php:8.2-fpm AS test
+# BASE PINNED BY DIGEST to PHP 8.2.35 (CVE-2026-109618 / CVE-2026-109619). A mutable tag does not
+# prove which PHP a rebuild gets; keep this in step with the app Dockerfile pin (version + digest together).
+FROM php:8.2.35-fpm@sha256:a58479410c94b3f0f7dfacc27fba8befc122290743fd0eb8c88a99ff2a0b1ba1 AS test
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libpq-dev \
