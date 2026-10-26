@@ -1,14 +1,16 @@
 # Correo del sistema: configuración, aprovisionamiento y activación
 
-> **Estado: CORREO ACTIVADO en staging el 2026-10-26**, con autorización explícita del propietario.
+> **Estado actual (staging): CORREO ACTIVO desde el 2026-10-26**, con autorización explícita del propietario.
 > - **Transporte:** `smtp` global por el relay del proveedor de correo del dominio, autorizado por la IP del
 >   servidor. No hay usuario ni contraseña SMTP; TLS por STARTTLS.
-> - **Remitente:** `perfilafiliados@camarapetrolera.org`.
+> - **Remitente:** la dirección institucional de Perfil de Afiliados.
 > - **Cómo se activó:** el único cambio en vivo fue `config:cache` en el contenedor `app`, cuyo entorno ya tenía
 >   esos valores. Antes se comparó en privado la configuración resuelta: solo cambiaban claves `mail.*`.
-> - **Prueba:** se envió **una** prueba controlada al buzón del propietario y el proveedor la aceptó. La llegada
->   al buzón la confirma el propietario.
-> - Las secciones §4–§6 conservan el procedimiento. La vuelta atrás a `log` sigue siendo la de §6.
+> - **Prueba:** se envió **una** prueba controlada. El proveedor la aceptó y **el propietario confirmó que llegó
+>   al buzón**. No se enviaron más pruebas ni se reenviaron avisos anteriores.
+> - **Lo que sigue siendo genérico:** §4 (cómo aplicar un cambio futuro de configuración de correo) y §6
+>   (requisitos para cambiar de proveedor o de configuración, y la vuelta atrás a `log`) describen procedimientos,
+>   no el estado actual.
 
 Este documento describe el mecanismo **real** que hoy usa la aplicación. Solo contiene **nombres** de variables y ubicaciones lógicas, **nunca valores**. Las credenciales viven fuera de git (ver §3).
 
@@ -17,7 +19,7 @@ Este documento describe el mecanismo **real** que hoy usa la aplicación. Solo c
 Toda la aplicación envía con **el mailer por defecto de Laravel**. No hay un segundo almacén SMTP ni credenciales en código.
 
 - **Archivo que traduce variables a configuración:** `config/mail.php`.
-  - `default` ← `MAIL_MAILER`. El valor por defecto del archivo es `smtp`; en staging es `log`.
+  - `default` ← `MAIL_MAILER`. El valor por defecto del archivo es `smtp`; en staging es `smtp` desde el 2026-10-26 (antes, `log`).
   - `mailers.smtp`:
     - `transport` = `smtp`;
     - `host` ← `MAIL_HOST`;
@@ -27,7 +29,7 @@ Toda la aplicación envía con **el mailer por defecto de Laravel**. No hay un s
     - `password` ← `MAIL_PASSWORD`;
     - `local_domain` ← `MAIL_EHLO_DOMAIN` (opcional).
   - `from.address` ← `MAIL_FROM_ADDRESS`; `from.name` ← `MAIL_FROM_NAME`.
-  - Otros mailers definidos y **no usados hoy**: `ses`, `mailgun`, `postmark`, `sendmail` (`MAIL_SENDMAIL_PATH`), `log` (`MAIL_LOG_CHANNEL`), `array`, `failover`. Los mailers de proveedor (`ses`, `mailgun`, `postmark`) toman sus credenciales de `config/services.php` y necesitan su paquete; elegir uno de ellos es parte de la decisión del proveedor.
+  - Otros mailers definidos y **no usados como transporte por defecto**: `ses`, `mailgun`, `postmark`, `sendmail` (`MAIL_SENDMAIL_PATH`), `log` (`MAIL_LOG_CHANNEL`), `array`, `failover`. Los mailers de proveedor (`ses`, `mailgun`, `postmark`) toman sus credenciales de `config/services.php` y necesitan su paquete; elegir uno de ellos es parte de la decisión del proveedor.
 - **Versión instalada:** Laravel 12 con `symfony/mailer`. Las variables de arriba son las que lee `config/mail.php` de este repositorio. La plantilla de nombres está en `.env.example`.
 
 ### Flujos que envían correo (inventario)
@@ -40,15 +42,16 @@ Toda la aplicación envía con **el mailer por defecto de Laravel**. No hay un s
 
 No hay ninguna llamada a `Mail::mailer(...)` ni configuración que cambie el mailer en tiempo de ejecución. **No hay sobrescrituras.**
 
-### Verificación de cuentas mientras el correo no está activo (`6215451160`)
+### Verificación de cuentas según el transporte (`6215451160`)
 
 - **Qué ve el usuario:** un usuario sin verificar ve **Verifique su correo electrónico**, sin el 500 de antes, y no puede abrir ninguna otra página del panel.
   - Con el transporte `log` o `array`, la pantalla y el reenvío **no dicen que el correo se envió**. Dicen que el mensaje no llegará todavía y que se comunique con la Cámara.
   - El criterio es el mismo de las solicitudes de categoría: `TaxonomyCategoryRequestService::transportSendsExternally()`.
   - No se muestra el modo ni la configuración.
 - **Con `log`, el aviso queda escrito en el log del servidor**, con su enlace firmado. Esto vale para todo correo en ese modo. Ese log no se publica.
-- **Esta ronda no activa el envío.** Mientras no se configure el correo (la decisión del proveedor es aparte), una cuenta nueva no puede verificarse sola.
-  - La entrega no tiene aquí un procedimiento manual de verificación para la Cámara. No se verificó ninguna cuenta real.
+- **Con `smtp`, que es el estado actual de staging,** la pantalla y el reenvío envían de verdad el aviso de verificación, y el usuario puede verificar su cuenta con el enlace recibido.
+  - El comportamiento con `log` o `array` descrito arriba solo vuelve a aplicar si se regresa al modo sin envío (§6).
+  - Ninguna cuenta real se verificó ni recibió avisos como parte de la activación.
 
 ### Dos cosas distintas que no hay que confundir
 
@@ -59,10 +62,12 @@ No hay ninguna llamada a `Mail::mailer(...)` ni configuración que cambie el mai
 
 Configurar el destinatario **no** activa el envío, y activar el envío **no** fija el destinatario.
 
-## 2. Consecuencias del modo sin envío
+## 2. Consecuencias del modo sin envío (`log`; solo si se vuelve a él)
+
+Esta sección describe lo que pasa con `log` o `array`. Staging estuvo así hasta el 2026-10-26; hoy envía (estado al inicio).
 
 - **Avisos de solicitudes:** se registran como **simulados** (o como **fallidos** si no hay destinatario). La solicitud se guarda igual.
-- **Verificación de correo:** un usuario que se registra **no recibe** el correo de verificación, y el panel exige un correo verificado. El panel no ofrece hoy una acción para que la Cámara marque a un usuario como verificado. **Hay que resolverlo al activar el correo** (ver §6).
+- **Verificación de correo:** un usuario que se registra **no recibe** el correo de verificación, y el panel exige un correo verificado. El panel no ofrece hoy una acción para que la Cámara marque a un usuario como verificado. Por eso los usuarios que se registraron mientras staging estaba en `log` pueden seguir sin verificar (ver §6, pendientes).
 
 ## 3. Dónde se aprovisionan los valores
 
@@ -72,9 +77,11 @@ Configurar el destinatario **no** activa el envío, y activar el envío **no** f
 - **El repositorio público** contiene solo nombres (`.env.example`, este documento). Las credenciales no van a git, ni a informes, ni a comentarios del Issue, ni a la ayuda en pantalla.
 - **No confundir con los secretos del workflow de despliegue** (`CONTABO_*` en GitHub), que solo sirven para entrar al servidor por SSH. No contienen ni deben contener credenciales de correo.
 
-## 4. Cómo aplica un cambio un operador autorizado (cambio FUTURO, no autorizado todavía)
+## 4. Cómo aplica un cambio un operador autorizado
 
-Esta sección describe el procedimiento para cuando el propietario autorice un cambio de configuración de correo. **No se ha ejecutado** y no se ejecuta como parte de esta documentación.
+Este es el procedimiento genérico para **cualquier cambio futuro** de configuración de correo: otro proveedor, otro remitente o volver a `log`. Cada cambio necesita su propia autorización del propietario.
+
+**Activación del 2026-10-26:** el contenedor `app` ya se había recreado después de aprovisionar el `.env`, así que su entorno ya tenía los valores. Por eso bastó el paso 4 de §4.3 (`config:cache` en ese contenedor) más la validación del paso 5. Los demás pasos aplican cuando el `.env` cambia después de crear el contenedor.
 
 ### 4.1 Dos cosas distintas que hay que refrescar
 
@@ -132,15 +139,22 @@ Informa:
 
 **No usar** como validación `env`, `printenv`, `cat .env`, `php artisan config:show mail`, `tinker` ni la lectura de `bootstrap/cache/config.php`: todos exponen valores.
 
-## 6. Activación futura: requisitos previos (no autorizada todavía)
+## 6. Cambiar de proveedor o de configuración; pendientes tras la activación; vuelta atrás
+
+Los puntos 1–4 son los requisitos para un **cambio futuro** de proveedor o de configuración. Para la activación del 2026-10-26 ya se cumplieron:
+- el propietario decidió el proveedor y el remitente;
+- los valores se aprovisionaron en el `.env`;
+- se hizo una prueba controlada, aceptada por el proveedor y confirmada en el buzón.
 
 1. **Decisiones del propietario:** proveedor (correo corporativo o servicio transaccional), dirección y dominio del remitente, y destinatario responsable.
 2. **Dominio del remitente:** SPF, DKIM y DMARC configurados para que los correos no caigan en no deseado.
 3. **Aprovisionamiento seguro** de las credenciales en el `.env` del entorno (§3–§4). Nunca por chat ni por el Issue.
 4. **Prueba controlada:** un envío a una dirección del propietario, confirmando que llega. El panel solo puede afirmar que el servidor «aceptó» el mensaje; la llegada al buzón la confirma una persona.
-5. **Riesgos a revisar antes de activar:**
+5. **Pendientes y riesgos que siguen abiertos con el correo activo** (decisiones del propietario):
    - La reserva de 10 minutos del reintento de avisos **no garantiza un único envío** si el proceso cae después de que el servidor aceptó el mensaje, o si el transporte falla de forma ambigua.
    - Los avisos **simulados** no se pueden reintentar hoy.
    - Hay que decidir si se reintenta la solicitud **#1**.
-   - Los usuarios registrados durante el modo sin envío no pudieron verificar su correo.
+   - Los usuarios registrados durante el modo sin envío no pudieron verificar su correo; pueden pedir un nuevo enlace.
+   - **Entrega a destinatarios externos:** la prueba fue a un buzón del mismo dominio. La entrega a otros dominios (SPF, DKIM, DMARC) no está demostrada todavía.
+   - **Verificación TLS de la app:** `config/mail.php` desactiva la verificación del certificado y del nombre del servidor SMTP (`stream.ssl`), aunque el relay presenta un certificado válido. La corrección de la app se registra aparte (`RT-MAIL-TLS-2026-10` en `docs/security/SECURITY_STATUS.md`) y no forma parte de esta rama.
 6. **Vuelta atrás al modo sin envío:** restaurar el `.env` de respaldo, o poner `MAIL_MAILER=log`, y aplicar la **misma secuencia completa de §4.3**: `docker compose config --quiet`, recrear `app` (`up -d --no-deps --no-build --force-recreate app`), `config:cache` en el contenedor refrescado y validar que `mail_status_readonly.php` muestre `transporte=log` y `envia_fuera_del_servidor=no (simulado)`. **Editar el `.env` y ejecutar `config:cache` con `exec` en el contenedor existente NO desactiva el envío**: regenera la configuración con el entorno viejo. Hasta que la validación muestre `log`, hay que asumir que el sistema todavía puede enviar.
