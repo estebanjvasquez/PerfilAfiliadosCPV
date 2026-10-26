@@ -33,8 +33,24 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-scripts --no-interaction
 
+# Solo código fuente: .dockerignore deja fuera .env y variantes, .git, credenciales, logs, volcados y
+# estado generado. La configuración llega en ejecución por env_file (docker-compose.yml), nunca en la imagen.
 COPY . .
-RUN composer dump-autoload --optimize \
+
+# Defensa en profundidad: si .dockerignore cambia o falla, la build se detiene aquí antes de producir una
+# imagen. Solo lista nombres de archivo, nunca su contenido.
+RUN set -eu; \
+    bad="$(find . -path ./vendor -prune -o \( -name .git -o -name .env -o \( -name '.env.*' ! -name .env.example \) \
+        -o -name auth.json -o -name '*.key' -o -name '*.pem' -o -name '*.sql' -o -name '*.log' -o -name error_log \) -print)"; \
+    if [ -n "$bad" ]; then echo 'Archivos prohibidos en el contexto de build:'; echo "$bad"; exit 1; fi; \
+    if [ -n "$(find bootstrap/cache storage -type f ! -name .gitignore ! -path 'storage/fonts/*' ! -name 'titulos*.json')" ]; then \
+        echo 'Estado generado en bootstrap/cache o storage dentro del contexto de build'; exit 1; fi
+
+# Estructura escribible de Laravel (los .gitignore la conservan, esto la garantiza). En ejecución
+# storage/ y bootstrap/cache/ se montan desde el host y tapan este contenido.
+RUN mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions \
+        storage/framework/testing storage/framework/views storage/logs bootstrap/cache \
+    && composer dump-autoload --optimize \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 9000
