@@ -38,15 +38,23 @@ auth.json
 *.ppk
 **/*.ppk
 **/id_rsa*
+**/id_dsa*
+**/id_ecdsa*
 **/id_ed25519*
+# .dockerignore distingue mayúsculas; las variantes habituales van explícitas. La guarda del Dockerfile
+# compara estas dos clases sin distinguir mayúsculas.
 **/*credential*
+**/*Credential*
+**/*CREDENTIAL*
 **/*secret*
-**/*.secret
+**/*Secret*
+**/*SECRET*
 
-# --- Backups, dumps and logs -----------------------------------------------------------------------
+# --- Backups, dumps and logs (also compressed) ------------------------------------------------------
 **/*.sql
-**/*.sql.gz
+**/*.sql.*
 **/*.dump
+**/*.dump.*
 **/*.bak
 **/*.backup
 **/*.orig
@@ -54,9 +62,9 @@ auth.json
 **/*~
 **/*.log
 **/error_log
-composer.json-*
-composer.lock-*
-*.js-bk
+**/composer.json-*
+**/composer.lock-*
+**/*.js-bk
 
 # --- Dependencies and generated state (rebuilt in the image or mounted at runtime) -----------------
 vendor

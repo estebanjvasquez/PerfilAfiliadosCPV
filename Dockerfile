@@ -38,10 +38,23 @@ RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-scripts -
 COPY . .
 
 # Defensa en profundidad: si .dockerignore cambia o falla, la build se detiene aquí antes de producir una
-# imagen. Solo lista nombres de archivo, nunca su contenido.
+# imagen. Cubre las mismas clases sensibles que .dockerignore, a cualquier profundidad: metadatos de git,
+# .env y variantes, credenciales y llaves, volcados y respaldos (también comprimidos), sufijos de editor y
+# logs. Las clases *credential* y *secret* se comparan sin distinguir mayúsculas, así que la guarda es más
+# estricta que .dockerignore. Solo lista nombres de archivo, nunca su contenido. vendor/ lo instala composer
+# dentro de la imagen y no viene del contexto.
 RUN set -eu; \
-    bad="$(find . -path ./vendor -prune -o \( -name .git -o -name .env -o \( -name '.env.*' ! -name .env.example \) \
-        -o -name auth.json -o -name '*.key' -o -name '*.pem' -o -name '*.sql' -o -name '*.log' -o -name error_log \) -print)"; \
+    bad="$(find . -path ./vendor -prune -o \( \
+          -name .git \
+          -o -name .env -o \( -name '.env.*' ! -name .env.example \) \
+          -o -name auth.json -o -name '*.key' -o -name '*.pem' -o -name '*.p12' -o -name '*.pfx' -o -name '*.ppk' \
+          -o -name 'id_rsa*' -o -name 'id_dsa*' -o -name 'id_ecdsa*' -o -name 'id_ed25519*' \
+          -o -iname '*credential*' -o -iname '*secret*' \
+          -o -name '*.sql' -o -name '*.sql.*' -o -name '*.dump' -o -name '*.dump.*' \
+          -o -name '*.bak' -o -name '*.backup' -o -name '*.orig' -o -name '*.swp' -o -name '*~' \
+          -o -name 'composer.json-*' -o -name 'composer.lock-*' -o -name '*.js-bk' \
+          -o -name '*.log' -o -name error_log \
+        \) -print)"; \
     if [ -n "$bad" ]; then echo 'Archivos prohibidos en el contexto de build:'; echo "$bad"; exit 1; fi; \
     if [ -n "$(find bootstrap/cache storage -type f ! -name .gitignore ! -path 'storage/fonts/*' ! -name 'titulos*.json')" ]; then \
         echo 'Estado generado en bootstrap/cache o storage dentro del contexto de build'; exit 1; fi
