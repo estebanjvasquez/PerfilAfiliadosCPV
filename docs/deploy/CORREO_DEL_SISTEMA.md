@@ -27,7 +27,8 @@ Toda la aplicación envía con **el mailer por defecto de Laravel**. No hay un s
     - `encryption` ← `MAIL_ENCRYPTION`;
     - `username` ← `MAIL_USERNAME`;
     - `password` ← `MAIL_PASSWORD`;
-    - `local_domain` ← `MAIL_EHLO_DOMAIN` (opcional).
+    - `local_domain` ← `MAIL_EHLO_DOMAIN` (opcional);
+    - sin excepciones de TLS: se verifican el certificado y el nombre del servidor SMTP (comportamiento por defecto). La prueba `tests/Feature/Security/MailTransportTlsTest.php` falla si se vuelven a desactivar.
   - `from.address` ← `MAIL_FROM_ADDRESS`; `from.name` ← `MAIL_FROM_NAME`.
   - Otros mailers definidos y **no usados como transporte por defecto**: `ses`, `mailgun`, `postmark`, `sendmail` (`MAIL_SENDMAIL_PATH`), `log` (`MAIL_LOG_CHANNEL`), `array`, `failover`. Los mailers de proveedor (`ses`, `mailgun`, `postmark`) toman sus credenciales de `config/services.php` y necesitan su paquete; elegir uno de ellos es parte de la decisión del proveedor.
 - **Versión instalada:** Laravel 12 con `symfony/mailer`. Las variables de arriba son las que lee `config/mail.php` de este repositorio. La plantilla de nombres está en `.env.example`.
@@ -156,5 +157,5 @@ Los puntos 1–4 son los requisitos para un **cambio futuro** de proveedor o de 
    - Hay que decidir si se reintenta la solicitud **#1**.
    - Los usuarios registrados durante el modo sin envío no pudieron verificar su correo; pueden pedir un nuevo enlace.
    - **Entrega a destinatarios externos:** la prueba fue a un buzón del mismo dominio. La entrega a otros dominios (SPF, DKIM, DMARC) no está demostrada todavía.
-   - **Verificación TLS de la app:** `config/mail.php` desactiva la verificación del certificado y del nombre del servidor SMTP (`stream.ssl`), aunque el relay presenta un certificado válido. La corrección de la app se registra aparte (`RT-MAIL-TLS-2026-10` en `docs/security/SECURITY_STATUS.md`) y no forma parte de esta rama.
+   - **Verificación TLS de la app (`RT-MAIL-TLS-2026-10`):** `config/mail.php` traía un bloque `stream.ssl` que desactivaba la verificación del certificado y del nombre del servidor SMTP. La rama `fix/mail-tls-verify` lo quita. Con Laravel 12.69 y `symfony/mailer` 7.4.17, Laravel no pasa `stream` al transporte, así que en local el transporte construido ya verificaba aun con ese bloque: era una configuración engañosa más que efectiva. Falta confirmarlo en el servidor con una lectura del transporte en vivo. La opción que sí desactiva la verificación es `verify_peer` en el primer nivel del mailer; la prueba también la vigila.
 6. **Vuelta atrás al modo sin envío:** restaurar el `.env` de respaldo, o poner `MAIL_MAILER=log`, y aplicar la **misma secuencia completa de §4.3**: `docker compose config --quiet`, recrear `app` (`up -d --no-deps --no-build --force-recreate app`), `config:cache` en el contenedor refrescado y validar que `mail_status_readonly.php` muestre `transporte=log` y `envia_fuera_del_servidor=no (simulado)`. **Editar el `.env` y ejecutar `config:cache` con `exec` en el contenedor existente NO desactiva el envío**: regenera la configuración con el entorno viejo. Hasta que la validación muestre `log`, hay que asumir que el sistema todavía puede enviar.
