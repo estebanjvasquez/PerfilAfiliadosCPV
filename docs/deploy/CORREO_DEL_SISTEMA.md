@@ -1,8 +1,14 @@
 # Correo del sistema: configuración, aprovisionamiento y activación
 
-> **Estado: ACTIVACIÓN GLOBAL DEL CORREO PENDIENTE.**
-> Se espera que el propietario entregue el proveedor, la configuración y las credenciales, y que autorice explícitamente una activación controlada.
-> Mientras tanto, staging está en **modo sin envío** (`MAIL_MAILER=log`, verificado el 2026-10-15 con `mail_status_readonly.php`). Ningún correo sale del servidor.
+> **Estado: CORREO ACTIVADO en staging el 2026-10-26**, con autorización explícita del propietario.
+> - **Transporte:** `smtp` global por el relay del proveedor de correo del dominio, autorizado por la IP del
+>   servidor. No hay usuario ni contraseña SMTP; TLS por STARTTLS.
+> - **Remitente:** `perfilafiliados@camarapetrolera.org`.
+> - **Cómo se activó:** el único cambio en vivo fue `config:cache` en el contenedor `app`, cuyo entorno ya tenía
+>   esos valores. Antes se comparó en privado la configuración resuelta: solo cambiaban claves `mail.*`.
+> - **Prueba:** se envió **una** prueba controlada al buzón del propietario y el proveedor la aceptó. La llegada
+>   al buzón la confirma el propietario.
+> - Las secciones §4–§6 conservan el procedimiento. La vuelta atrás a `log` sigue siendo la de §6.
 
 Este documento describe el mecanismo **real** que hoy usa la aplicación. Solo contiene **nombres** de variables y ubicaciones lógicas, **nunca valores**. Las credenciales viven fuera de git (ver §3).
 
@@ -81,7 +87,7 @@ Comprobado el 2026-10-15 con un proyecto Compose desechable y valores marcadores
 
 Datos de esta aplicación que importan aquí:
 - **La configuración está cacheada** en staging, así que la app **no** lee las variables de entorno en cada petición: lee `config.php`. Cambiar el entorno sin regenerar la caché no cambia el comportamiento, y regenerarla con el entorno viejo tampoco.
-- **La imagen no habilita opcache.** El `Dockerfile` no lo instala ni lo configura, así que PHP-FPM vuelve a leer `config.php` en cada petición: una caché regenerada surte efecto sin reiniciar PHP-FPM. Esto se verificó en el código fuente, no se midió en vivo.
+- **OPcache sí está activo en PHP-FPM.** La imagen base lo trae habilitado, con `validate_timestamps=On` y `revalidate_freq=2`, medido en vivo el 2026-10-26. Corrige una versión anterior de este documento, que decía que no estaba habilitado. Una caché regenerada surte efecto en unos 2 segundos, sin reiniciar PHP-FPM; así ocurrió en la activación del 2026-10-26.
 - **nginx no usa estas variables.** Solo el servicio `app` tiene `env_file`.
 
 ### 4.2 Requisitos previos
