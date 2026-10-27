@@ -155,7 +155,7 @@ class HomeBrandingLayoutTest extends TestCase
         // TASK-0011: antes eran dos tarjetas lado a lado con la misma frase repetida; ahora una sola, al final y con
         // tamaño de nota. Las dos frases siguen completas.
         $this->assertSame(1, substr_count($html, 'cpv-home-notice'), 'Un solo aviso.');
-        $this->assertStringNotContainsString('md:grid-cols-2', $html);
+        $this->assertStringContainsString('fi-wi-stats-overview-stats-ctn grid gap-6 md:grid-cols-1', $html, 'Una sola columna a todo el ancho.');
         $this->assertStringContainsString('La Cámara Petrolera de Venezuela no se hace responsable de la veracidad', $html);
         $this->assertStringContainsString('La empresa afiliada es responsable de la veracidad de la información suministrada', $html);
     }
