@@ -2,7 +2,8 @@
 
 /*
  * TASK-0011 (D5): la aplicación usa `locale = es` y no tenía este archivo, así que los mensajes de validación salían en
- * inglés («The sector principal field is required.»). Mismas claves que lang/en de Laravel 12.
+ * inglés («The sector principal field is required.»). Mismas claves que las de Laravel 12. Va en resources/lang porque, al
+ * existir esa carpeta, Laravel la usa en lugar de lang/ (Application::langPath).
  */
 return [
 

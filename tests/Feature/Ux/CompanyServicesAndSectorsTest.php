@@ -351,7 +351,15 @@ class CompanyServicesAndSectorsTest extends TestCase
         $this->link($this->alfa, $viewer);
         $this->withServices($this->alfa, 'X');
 
-        $this->browserAction($this->manager(ServicesRelationManager::class, $viewer), 'detach', $this->service['X']);
+        // Sin permiso de edición la pestaña ni siquiera monta (el mismo 404 que una empresa ajena).
+        $refused = false;
+        $this->withoutExceptionHandling();
+        try {
+            $this->manager(ServicesRelationManager::class, $viewer)->call('mountTableAction', 'detach', (string) $this->service['X'])->call('callMountedTableAction');
+        } catch (HttpExceptionInterface|ModelNotFoundException) {
+            $refused = true;
+        }
+        $this->assertTrue($refused, 'rechazado (404)');
         $this->assertSame([$this->service['X']], $this->linkedServices($this->alfa));
     }
 
