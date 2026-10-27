@@ -24,7 +24,10 @@ class NoAplicaAction
         return Action::make('no_aplica')
             ->label('No Aplica')
             ->icon('heroicon-o-x-circle')
-            ->color('warning')
+            // TASK-0011: acción secundaria (contorno gris), distinta de los botones de las secciones y del estado.
+            ->color('gray')
+            ->outlined()
+            ->tooltip('Declarar que esta sección no aplica a su empresa')
             ->modalHeading("No Aplica — {$label}")
             ->modalButton('Guardar')
             // CPV-VERIFICATION-FLOW-AND-COMPLETION (`6215451160`): la marca y el porcentaje cacheado (que

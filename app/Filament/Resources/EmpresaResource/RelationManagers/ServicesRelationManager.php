@@ -21,6 +21,9 @@ class ServicesRelationManager extends RelationManager
 
     protected static string $relationship = 'services';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static ?string $label = 'Servicio';

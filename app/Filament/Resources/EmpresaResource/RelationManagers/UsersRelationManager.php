@@ -17,6 +17,11 @@ class UsersRelationManager extends RelationManager
 
     protected static string $relationship = 'users';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
+    protected static ?string $title = 'Usuarios';
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static ?string $label = 'Usuarios';
@@ -51,6 +56,7 @@ class UsersRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->description('Cuentas con acceso a esta empresa en el sistema. Para dar o quitar acceso, contacte a la Cámara.')
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Nombre'),
             ])

@@ -40,6 +40,9 @@ class TaxonomyCategoriesRelationManager extends RelationManager
 
     protected static string $relationship = 'taxonomyCategories';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
     protected static ?string $recordTitleAttribute = 'id';
 
     public static ?string $label = 'Categorías CPV';
@@ -64,6 +67,7 @@ class TaxonomyCategoriesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->description('Declare aquí lo que ofrece su empresa: busque las categorías específicas de la Taxonomía CPV y marque como principal lo que la empresa realmente hace. Es la clasificación vigente. Los cambios se guardan al instante.')
             ->recordTitleAttribute('id')
             ->modifyQueryUsing(fn ($query) => $query->with('category.translations'))
             ->columns([

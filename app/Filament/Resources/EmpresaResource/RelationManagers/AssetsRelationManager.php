@@ -26,6 +26,9 @@ class AssetsRelationManager extends RelationManager
 
     protected static string $relationship = 'assets';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
     public static ?string $label = 'Recursos en Venezuela';
 
     public static ?string $navigationLabel = 'Recursos en Venezuela';
@@ -143,6 +146,7 @@ class AssetsRelationManager extends RelationManager
         $titles = static::titles();
 
         return $table
+            ->description('Personal, maquinaria, instalaciones e inventario en Venezuela. Abra cada tipo con su botón y guarde en la ventana; si un tipo no aplica a su empresa, márquelo ahí.')
             ->columns([
                 static::summaryColumn('employee', 'employee', 'Recursos humanos', [
                     'employee_type' => 'Tipo de recurso',

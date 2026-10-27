@@ -20,6 +20,11 @@ class ContactsRelationManager extends RelationManager
 
     protected static string $relationship = 'contacts';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
+    protected static ?string $title = 'Contactos';
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static ?string $label = 'Contacto';
@@ -68,11 +73,12 @@ class ContactsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->description('Personas de contacto de su empresa. Marque una como principal: la Cámara la usa en reportes y gráficas. Los cambios se guardan al instante.')
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Nombre'),
                 Tables\Columns\TextColumn::make('position')->label('Posición'),
                 Tables\Columns\TextColumn::make('phone')->label('Teléfono'),
-                Tables\Columns\TextColumn::make('email'),
+                Tables\Columns\TextColumn::make('email')->label('Correo electrónico'),
                 Tables\Columns\IconColumn::make('pivot.is_principal')
                     ->label('Principal')
                     ->boolean()
@@ -125,7 +131,8 @@ class ContactsRelationManager extends RelationManager
             ])
             ->bulkActions([
                 FilamentExportBulkAction::make('export')
-                    ->additionalColumnsAddButtonLabel('Add Column'),
+                    ->label('Exportar')
+                    ->additionalColumnsAddButtonLabel('Agregar columna'),
             ])
             ->filters([
                 //

@@ -184,13 +184,15 @@ Los datos generales se completan en un formulario de 4 pasos. Avance con **Sigui
 
 ### Guardar los cambios {#guardar}
 
-Al presionar **Siguiente**, el sistema revisa los campos obligatorios del paso actual. En el último paso presione **Guardar cambios**. El aviso **Guardado** confirma que los datos quedaron registrados.
+Puede abrir cualquier paso haciendo clic en su título, sin recorrer los anteriores. Al presionar **Siguiente**, el sistema revisa los campos obligatorios del paso actual.
 
-> **IMPORTANTE:** Las pestañas que aparecen debajo del formulario (Categorías CPV, contactos, recursos, etc.) guardan cada acción por separado, en el momento en que usted la confirma. No dependen del botón **Guardar cambios** del formulario.
+Para guardar, presione **Guardar cambios**: está arriba, junto al título de la página, en cualquier paso, y también al final del último paso. Guarda los datos de los cuatro pasos a la vez. El aviso **Guardado** confirma que quedaron registrados. Si falta un dato, aparece **No se guardó: hay datos por corregir**, con el nombre del paso que debe revisar; el campo con error aparece en rojo.
+
+> **IMPORTANTE:** Las **Secciones del perfil**, debajo del formulario (Categorías CPV, contactos, recursos, etc.), guardan cada acción por separado, en el momento en que usted la confirma. No dependen del botón **Guardar cambios** del formulario. Cada sección muestra arriba una línea que explica qué registrar y, cuando corresponde, su avance (**Completado: N%**, que es un indicador y no un botón).
 
 ## Las pestañas de su empresa {#resto-del-perfil}
 
-Debajo del formulario de datos generales aparecen varias pestañas, en este orden: **Cámaras**, **Contactos**, **Usuarios**, **Sectores y servicios (histórico)**, **Categorías CPV**, **Recursos en Venezuela**, **Sistemas de gestión**, **Experiencia relevante**, **Presencia internacional** y **Enfoque de sostenibilidad**. Cada una tiene su propia sección en este manual. Según los permisos de su cuenta, puede ver algunas o todas. Cada acción de estas pestañas se guarda en el momento en que usted la confirma.
+Debajo del formulario de datos generales, bajo el título **Secciones del perfil**, aparecen varias pestañas (en la pantalla de un teléfono, o en una ventana angosta, pasan a varias filas para que todas queden a la vista), en este orden: **Cámaras**, **Contactos**, **Usuarios**, **Sectores y servicios (histórico)**, **Categorías CPV**, **Recursos en Venezuela**, **Sistemas de gestión**, **Experiencia relevante**, **Presencia internacional** y **Enfoque de sostenibilidad**. Cada una tiene su propia sección en este manual. Según los permisos de su cuenta, puede ver algunas o todas. Cada acción de estas pestañas se guarda en el momento en que usted la confirma.
 
 ### Los botones de las ventanas {#botones-ventanas}
 

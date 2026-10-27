@@ -21,6 +21,7 @@ use Filament\Forms\Components\Repeater;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class EditEmpresa extends EditRecord
 {
@@ -38,6 +39,13 @@ class EditEmpresa extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            // TASK-0011 (Bloque 2): guardar desde cualquier paso. Antes «Guardar cambios» solo estaba en el paso 4 y
+            // corregir un dato del paso 1 obligaba a recorrer los cuatro. Es el mismo save() del formulario completo.
+            \Filament\Actions\Action::make('guardar')
+                ->label('Guardar cambios')
+                ->icon('heroicon-o-check')
+                ->keyBindings(['mod+s'])
+                ->action('save'),
             \Filament\Actions\Action::make('perfil_completo')
                 ->label('Descargar perfil completo (PDF)')
                 ->icon('heroicon-o-document-arrow-down')
@@ -45,6 +53,44 @@ class EditEmpresa extends EditRecord
                 ->url(fn (): string => route('filament.admin.export.pdf', ['empresa' => $this->getRecord()->getKey()]))
                 ->visible(fn (): bool => Auth::user()?->can('view_empresa') ?? false),
         ];
+    }
+
+    /** TASK-0011: entre el formulario y las secciones, un título que explica que ellas guardan al instante. */
+    protected static string $view = 'filament.resources.empresa-resource.pages.edit-empresa';
+
+    public function getSubheading(): ?string
+    {
+        return 'Los datos de los 4 pasos se guardan con «Guardar cambios», arriba o al final del último paso. '
+            .'Puede abrir cualquier paso con su título. Las secciones del perfil, más abajo, guardan cada cambio al instante.';
+    }
+
+    /** Pasos navegables: la validación completa ocurre igual al guardar. */
+    protected function hasSkippableSteps(): bool
+    {
+        return true;
+    }
+
+    /** Con pasos navegables, el error puede estar en un paso que no se ve: se dice cuál. */
+    protected function onValidationError(ValidationException $exception): void
+    {
+        $wizard = collect($this->form->getComponents())->first(fn ($component) => $component instanceof Forms\Components\Wizard);
+        $errorKeys = array_keys($exception->errors());
+        $steps = [];
+        foreach ($wizard?->getChildComponentContainer()->getComponents() ?? [] as $step) {
+            foreach ($step->getChildComponentContainer()->getFlatFields(withHidden: true) as $field) {
+                $path = $field->getStatePath();
+                if (collect($errorKeys)->contains(fn (string $key) => $key === $path || str_starts_with($key, $path.'.'))) {
+                    $steps[] = '«'.$step->getLabel().'»';
+                    break;
+                }
+            }
+        }
+
+        Notification::make()
+            ->danger()
+            ->title('No se guardó: hay datos por corregir')
+            ->body(($steps !== [] ? 'Revise el paso '.implode(', ', $steps).'. ' : '').'Los campos con error aparecen en rojo.')
+            ->send();
     }
 
     /** Aviso para después de guardar (empresa con servicios viejos fuera de sus sectores), armado en beforeSave(). */

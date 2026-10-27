@@ -19,6 +19,11 @@ class ChambersRelationManager extends RelationManager
 
     protected static string $relationship = 'chambers';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
+    protected static ?string $title = 'Cámaras';
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static ?string $label = 'Cámara';
@@ -46,6 +51,7 @@ class ChambersRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -54,8 +60,9 @@ class ChambersRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->description('Cámaras y asociaciones en las que participa su empresa. «Vincular» y «Desvincular» se guardan al instante.')
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')->label('Nombre'),
             ])
             ->filters([
                 //
@@ -77,7 +84,8 @@ class ChambersRelationManager extends RelationManager
             ])
             ->bulkActions([
                 FilamentExportBulkAction::make('export')
-                    ->additionalColumnsAddButtonLabel('Add Column'),
+                    ->label('Exportar')
+                    ->additionalColumnsAddButtonLabel('Agregar columna'),
             ]);
     }
 }
