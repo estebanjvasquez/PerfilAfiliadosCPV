@@ -9,6 +9,7 @@ use App\Filament\Resources\EmpresaResource;
 use App\Models\Country;
 use Closure;
 use App\Models\City;
+use App\Models\Empresa;
 use App\Models\Sector;
 //use App\Models\State;
 use Filament\Notifications\Notification;
@@ -95,6 +96,27 @@ class EditEmpresa extends EditRecord
 
     /** Aviso para después de guardar (empresa con servicios viejos fuera de sus sectores), armado en beforeSave(). */
     protected ?string $sectorNotice = null;
+
+    /** TASK-0011: «www.x.com» → «https://www.x.com»; vacío → null. No corrige letras: solo agrega el esquema. */
+    public static function normalizeWebsite(?string $value): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        return preg_match('#^[a-z][a-z0-9+.-]*://#i', $value) ? $value : 'https://'.$value;
+    }
+
+    /** http(s), con un dominio que tenga al menos un punto (descarta `http://wwwgeohidracom`). */
+    public static function isValidWebsite(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+
+        return filter_var($url, FILTER_VALIDATE_URL) !== false
+            && in_array(strtolower((string) parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true)
+            && is_string($host) && preg_match('/^[^.]+(\.[^.]+)+$/', $host) === 1;
+    }
 
     /** El sector principal lo define la Cámara: solo quien administra (super_admin) lo elige; para el resto no se envía. */
     public static function definesSectors(): bool
@@ -282,7 +304,26 @@ class EditEmpresa extends EditRecord
             Forms\Components\Wizard\Step::make('2 - Datos de contacto')
                 ->schema([
                     Fieldset::make('Redes sociales')->schema([
-                        Forms\Components\TextInput::make('website')->mask('http://********************************'),
+                        // TASK-0011: sin la máscara `http://***…` (forzaba http:// y cortaba en 32 caracteres; en datos
+                        // quedaron valores como `http://wwwgeohidracom`). Se normaliza al guardar y se valida solo si
+                        // el valor cambia: una web vieja mal escrita no impide guardar otros datos.
+                        Forms\Components\TextInput::make('website')
+                            ->label('Página web')
+                            ->placeholder('https://www.suempresa.com')
+                            ->maxLength(255)
+                            ->helperText('Escriba la dirección completa, por ejemplo www.suempresa.com; el sistema agrega https:// si falta.')
+                            ->rule(fn (?Empresa $record) => function (string $attribute, mixed $value, \Closure $fail) use ($record): void {
+                                $normalized = static::normalizeWebsite($value);
+                                if ($normalized === null || $normalized === static::normalizeWebsite($record?->website)) {
+                                    return;
+                                }
+                                if (! static::isValidWebsite($normalized)) {
+                                    $fail('Escriba una dirección web válida, por ejemplo https://www.suempresa.com.');
+                                }
+                            })
+                            ->dehydrateStateUsing(fn (?string $state, ?Empresa $record): ?string => static::normalizeWebsite($state) === static::normalizeWebsite($record?->website)
+                                ? $record?->website
+                                : static::normalizeWebsite($state)),
                         Forms\Components\TextInput::make('linkedin_profile')->mask('@********************')
                             ->label('Perfil de LinkedIn'),
                         Forms\Components\TextInput::make('twitter_profile')->mask('@********************')

@@ -214,14 +214,28 @@ class EmpresaResource extends Resource
                 // Columnas "Servicios" y "% Perfil" removidas (ver getEloquentQuery()): forzaban
                 // eager-loading de 7 relaciones para calcular completionPercentage() por fila,
                 // el origen del N+1.
-
+                // TASK-0011: el % vuelve, pero desde la columna cacheada `completion_percentage` (ya está en la fila:
+                // 0 consultas extra). La recalculan Empresa::refreshCompletionPercentage() y empresas:refresh-completion.
+                Tables\Columns\TextColumn::make('completion_percentage')
+                    ->label('Perfil completado')
+                    ->formatStateUsing(fn ($state): string => ((int) $state).'%')
+                    ->badge()
+                    ->color(fn ($state): string => match (true) {
+                        (int) $state >= 100 => 'success',
+                        (int) $state > 0 => 'warning',
+                        default => 'danger',
+                    })
+                    ->sortable(),
             ])
-            // Antes de las columnas, donde estaba la columna «PDF»: el perfil completo es lo primero de la fila, también en
-            // un teléfono, sin desplazar la tabla.
+            // Antes de las columnas: la acción principal de la fila es abrir el perfil para editarlo (antes solo el
+            // nombre era clicable y nada lo indicaba). El PDF queda como acción secundaria, también en un teléfono.
             ->actions([
+                static::editProfileAction(),
                 static::fullProfileAction(),
                 static::profileSectionsAction(),
             ], position: Tables\Enums\ActionsPosition::BeforeColumns)
+            ->defaultPaginationPageOption(10)
+            ->paginated([10, 25, 50])
 
             ->bulkActions([
                 BulkAction::make('editar')
@@ -359,12 +373,29 @@ class EmpresaResource extends Resource
      * protegida (EmpresaExportController::pdf), no al exportador de la tabla. La lista ya muestra solo las empresas
      * vinculadas al usuario, y el permiso se mira una vez (sin consulta por fila). El controlador vuelve a autorizar todo.
      */
+    /**
+     * TASK-0011: «Editar perfil», la acción principal de cada fila. Lleva a la misma ficha que el nombre; la página
+     * vuelve a autorizar como siempre (EditEmpresa, EmpresaAccess).
+     */
+    public static function editProfileAction(): Action
+    {
+        return Action::make('editar_perfil')
+            ->label('Editar perfil')
+            ->icon('heroicon-o-pencil-square')
+            ->button()
+            ->url(fn (Empresa $record): string => static::getUrl('edit', ['record' => $record]))
+            ->visible(fn (Empresa $record): bool => static::canEdit($record));
+    }
+
     public static function fullProfileAction(): Action
     {
         return Action::make('perfil_completo')
             ->label('Perfil completo (PDF)')
             ->icon('heroicon-o-document-arrow-down')
+            // TASK-0011: secundaria (contorno gris), para que «Editar perfil» sea lo primero que se ve.
             ->button()
+            ->outlined()
+            ->color('gray')
             ->tooltip('Descarga el perfil completo de la empresa en PDF, con todas sus secciones')
             ->url(fn (Empresa $record): string => route('filament.admin.export.pdf', ['empresa' => $record->getKey()]))
             ->visible(fn (): bool => Auth::user()?->can('view_empresa') ?? false);

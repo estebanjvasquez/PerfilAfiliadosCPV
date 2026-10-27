@@ -55,7 +55,7 @@ Cada persona de su empresa que vaya a trabajar en el sistema necesita **su propi
 
 1. En la pantalla de acceso, haga clic en **Abrir una cuenta**.
 2. Complete **Nombre**, **Correo electrónico**, **Contraseña** y **Confirmar contraseña**.
-3. Complete la verificación anti-bot y presione **Registrarse**.
+3. Complete la verificación anti-bot y presione **Registrarse**. Debajo del formulario, **Después de registrarse** le recuerda los dos pasos siguientes: verificar su correo y avisar a la Cámara.
 
 El sistema exige que su correo electrónico esté verificado para trabajar en el panel.
 
@@ -71,7 +71,7 @@ Cuando el envío de correos esté activo:
 2. El enlace vence a los 60 minutos y solo sirve para su propia cuenta.
 3. Si no lo encuentra, revise la carpeta de correo no deseado («spam»). En la pantalla de verificación puede pedir otro mensaje; el sistema admite como máximo 2 pedidos por minuto.
 
-Verificar el correo no le da acceso a ninguna empresa: la Cámara debe asociar su usuario (ver la nota de abajo). Para salir de la pantalla de verificación, presione **Cerrar sesión**.
+Verificar el correo no le da acceso a ninguna empresa: la Cámara debe asociar su usuario (ver la nota de abajo). La misma pantalla lo resume en **Próximos pasos**. Para salir de la pantalla de verificación, presione **Cerrar sesión**.
 
 > **IMPORTANTE:** Crear una cuenta no le da acceso automático a los datos de su empresa. La Cámara debe asociar su usuario con la empresa correspondiente. Después de registrarse, avise a la Cámara.
 
@@ -95,11 +95,12 @@ Al entrar verá la pantalla de **Inicio**, encabezada por el logo de **Perfil de
 
 En Inicio verá estas tarjetas, en este orden:
 
-- **Bienvenida/o**, con su nombre y el botón **Salir** para cerrar la sesión.
+- **Bienvenida/o**, con su nombre y el enlace **Salir** para cerrar la sesión (también está en el menú de usuario, arriba a la derecha).
 - **Ayuda para completar su perfil**, con dos botones: **Manual de usuario**, que abre esta guía, y **Mapa de la taxonomía**, que muestra todas las categorías de la Taxonomía CPV para que se ubique antes de elegir (ver [Mapa de la taxonomía](#mapa-taxonomia)). El mapa no agrega categorías a su empresa: eso se hace desde la pestaña **Categorías CPV** de su empresa. En la computadora está a la derecha de la tarjeta **Bienvenida/o**.
-- Debajo, a todo el ancho, los avisos sobre la **veracidad de la información** que su empresa registra.
+- **Mi empresa**, a todo el ancho: el nombre de su empresa, cuánto tiene completado, qué secciones faltan (**Pendiente:**) y el botón **Editar perfil**, que la abre directamente. Si atiende hasta 3 empresas, verá cada una (**Mis empresas**); si tiene acceso a más, verá cuántas y el botón **Ver empresas**. La tarjeta aparece cuando la Cámara ya asoció su usuario con su empresa.
+- Al final, en letra más pequeña, el aviso sobre la **veracidad de la información** que su empresa registra.
 
-En el teléfono las tarjetas se ven una debajo de otra, en el mismo orden: primero **Bienvenida/o**, luego **Ayuda para completar su perfil** y al final los avisos. Para volver a Inicio desde cualquier parte del sistema, use la opción **Inicio** del menú lateral.
+En el teléfono las tarjetas se ven una debajo de otra, en el mismo orden: primero **Bienvenida/o**, luego **Ayuda para completar su perfil**, **Mi empresa** y al final el aviso. Para volver a Inicio desde cualquier parte del sistema, use la opción **Inicio** del menú lateral.
 
 > **CONSEJO:** En el teléfono, donde el menú lateral está oculto, los botones de la tarjeta **Ayuda para completar su perfil** son la forma más rápida de llegar al manual y al mapa.
 
@@ -112,9 +113,9 @@ En el menú **Empresas** solo aparecen las empresas asociadas a su usuario. Si l
 ### Abrir su empresa {#abrir-empresa}
 
 1. En el menú lateral, entre a **Empresas**.
-2. Haga clic sobre la fila de su empresa para abrir la edición.
+2. En la fila de su empresa, presione **Editar perfil** (también puede hacer clic en el nombre).
 
-La lista muestra el nombre de la empresa, si está **Activo**, el año de fundación, la ciudad, el país y el sector principal. Al inicio de cada fila está el botón **Perfil completo (PDF)** y, a su lado, el botón de ajustes **Elegir secciones** (ícono de controles deslizantes; al pasar el cursor muestra su nombre). Ver [Descargar el perfil](#descargar-perfil).
+La lista muestra 10 empresas por página (puede elegir 25 o 50 abajo) con el nombre, si está **Activo**, el año de fundación, la ciudad, el país, el sector principal y **Perfil completado** (el porcentaje del perfil). Al inicio de cada fila está el botón **Editar perfil**; después, el botón **Perfil completo (PDF)** y, a su lado, el botón de ajustes **Elegir secciones** (ícono de controles deslizantes; al pasar el cursor muestra su nombre). Ver [Descargar el perfil](#descargar-perfil).
 
 ### Descargar el perfil {#descargar-perfil}
 
@@ -164,7 +165,7 @@ Si deja marcadas las 11, descarga el perfil completo (`perfil-<RIF>.pdf`).
 Los datos generales se completan en un formulario de 4 pasos. Avance con **Siguiente** y retroceda con **Anterior**.
 
 1. **1- Datos generales**: arriba verá el indicador **Completado del perfil** (ver [Indicadores de completitud](#completitud)). Luego aparecen **Rif**, **Nombre de la empresa**, **Año de fundación** (formato aaaa) y el grupo **Dirección**: **Teléfono**, **Dirección** y **Ciudad** (puede escribir para buscar la ciudad).
-2. **2 - Datos de contacto**: sitio web y redes sociales (**Perfil de LinkedIn**, **Perfil de Twitter**, **Perfil de Instagram**, **Perfil de Facebook**, **Youtube**, **Otros**).
+2. **2 - Datos de contacto**: **Página web** (escriba la dirección completa, por ejemplo www.suempresa.com; el sistema agrega https:// si falta y avisa si la dirección no es válida) y redes sociales (**Perfil de LinkedIn**, **Perfil de Twitter**, **Perfil de Instagram**, **Perfil de Facebook**, **Youtube**, **Otros**).
 3. **3 - Operaciones**:
     - **Sectores de actividad económica (máximo 2)**: **Sector principal** y **Sector secundario (opcional)**.
     - **Operaciones en Venezuela**: **Facturación anual promedio (últimos 5 años)**, **Empleados** y **Estatus actual**.

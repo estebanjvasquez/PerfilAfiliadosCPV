@@ -55,9 +55,9 @@ class ServiceResource extends Resource
                 Tables\Columns\TextColumn::make('sectors.name')->sortable()->label('Sectores'),
                 Tables\Columns\TextColumn::make('name')->label('Nombre'),
                 Tables\Columns\TextColumn::make('created_at')->label('Creado')
-                    ->dateTime(),
+                    ->dateTime('d/m/Y H:i')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')->label('Actualizado')
-                    ->dateTime(),
+                    ->dateTime('d/m/Y H:i')->toggleable(isToggledHiddenByDefault: true),
             ])->defaultSort('sectors.name', 'asc')
             ->filters([
                 //

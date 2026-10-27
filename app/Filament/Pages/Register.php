@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Support\Turnstile;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use DanHarrin\LivewireRateLimiting\WithRateLimiting;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\View;
 use Filament\Forms\Form;
@@ -96,6 +97,10 @@ class Register extends \Filament\Pages\Auth\Register
                             ->extraInputAttributes(['tabindex' => -1, 'autocomplete' => 'off'])
                             ->dehydrated(),
                         View::make('partials.turnstile'),
+                        // TASK-0011: lo que sigue después de registrarse, antes de hacerlo.
+                        Placeholder::make('proximos_pasos')
+                            ->label('Después de registrarse')
+                            ->content('Verifique su correo electrónico y avise a la Cámara para que asocie su usuario con su empresa afiliada: crear la cuenta no da acceso automático a la empresa.'),
                     ])
                     ->statePath('data'),
             ),

@@ -17,7 +17,7 @@
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Camara Petrolera de Venezuela</title>
+    <title>Cámara Petrolera de Venezuela</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,14 +26,14 @@
       rel="stylesheet"
     />
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=3" />
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=4" />
   </head>
   <body>
     <main>
       <picture class="logo">
         <img
           src="{{ asset('images/Campet-Logo.png') }}"
-          alt="Logo de la Camara Petrolera de Venezuela"
+          alt="Logo de la Cámara Petrolera de Venezuela"
         />
       </picture>
       <article class="articulo-principal">
@@ -41,7 +41,7 @@
           <figure class="articulo-imagen">
             <img
               src="{{ asset('images/Perfil-Afiliados.png') }}"
-              alt="Perfil de Afiliados a la Camara Petrolera de Venezuela"
+              alt="Perfil de Afiliados a la Cámara Petrolera de Venezuela"
             />
           </figure>
           <div class="articulo-contenido">
@@ -51,7 +51,7 @@
               tu crecimiento, facilitando la exposición de la oferta de tus
               bienes y servicios a clientes, potenciales financistas y aliados
               estratégicos para identificar oportunidades para la generación de
-              negocios. Para formar parte haz clic aquí
+              negocios. Para formar parte, <a class="inline-link" href="{{ route('filament.admin.auth.register') }}">haz clic aquí y regístrate</a>.
             </p>
             <div class="cta-group">
               <a class="link-btn" href="{{ route('filament.admin.auth.login') }}"
