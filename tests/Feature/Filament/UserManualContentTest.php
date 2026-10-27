@@ -147,8 +147,10 @@ class UserManualContentTest extends TestCase
             $this->assertStringContainsString($label, $source, "«{$label}» ya no existe en la UI real: actualice el manual.");
         }
 
-        $this->assertStringContainsString('Categorías CPV (taxonomía nueva)', $text);
-        $this->assertStringContainsString("'Categorías CPV (taxonomía nueva)'", $source);
+        // TASK-0011: la pestaña se llama «Categorías CPV» (sin la jerga «taxonomía nueva»).
+        $this->assertStringContainsString('Categorías CPV', $text);
+        $this->assertStringNotContainsString('taxonomía nueva', $text);
+        $this->assertStringContainsString("\$title = 'Categorías CPV';", $source);
     }
 
     #[Test]

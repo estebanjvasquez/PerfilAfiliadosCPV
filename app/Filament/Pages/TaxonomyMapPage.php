@@ -9,7 +9,7 @@ use Filament\Pages\Page;
 /**
  * CPV-TAXONOMY-MAP: «Mapa de la taxonomía», la Taxonomía CPV publicada completa para que el
  * afiliado se ubique (Grupo > Familia > Categoría). Solo lectura: desde aquí no se agrega ninguna
- * categoría; eso sigue en la pestaña «Categorías CPV (taxonomía nueva)» de la empresa.
+ * categoría; eso sigue en la pestaña «Categorías CPV» de la empresa.
  *
  * ACCESO. Es exactamente el del manual de usuario (revisión `6191485610`, punto C): `canAccess()`
  * delega en `UserManual::canAccess()`, y la página vive en el mismo panel, con los mismos

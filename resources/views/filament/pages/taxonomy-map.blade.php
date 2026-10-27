@@ -106,7 +106,7 @@
             </p>
             <p>
                 Es solo para ubicarse: <strong>desde aquí no se agregan categorías</strong>. Para agregarlas a su empresa use
-                <strong>Buscar y agregar categoría</strong> en la pestaña <strong>Categorías CPV (taxonomía nueva)</strong> de su empresa.
+                <strong>Buscar y agregar categoría</strong> en la pestaña <strong>Categorías CPV</strong> de su empresa.
                 Solo se pueden agregar Categorías, nunca un Grupo ni una Familia completos.
             </p>
             <p>

@@ -48,7 +48,7 @@ class TaxonomyCategoriesRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Categorías CPV';
 
-    protected static ?string $title = 'Categorías CPV (taxonomía nueva)';
+    protected static ?string $title = 'Categorías CPV';
 
     // El alta no pasa por el formulario de Crear por defecto de Filament - ver headerActions().
     protected function canCreate(): bool
@@ -105,8 +105,21 @@ class TaxonomyCategoriesRelationManager extends RelationManager
                     ->label(fn (EmpresaTaxonomyCategory $record) => $record->es_principal ? 'Marcar como secundaria' : 'Marcar como principal')
                     ->icon('heroicon-o-star')
                     ->action(function (EmpresaTaxonomyCategory $record) {
+                        // TASK-0011 (R4): el cambio de principal es secuencial; el aviso dice el paso previo.
                         if (! $record->es_principal && $bloqueo = $this->limiteExcedido($record->empresa_id, principal: true, agregar: 1)) {
-                            Notification::make()->danger()->title('Límite alcanzado')->body($bloqueo)->send();
+                            Notification::make()->danger()->title('Límite de categorías principales alcanzado')
+                                ->body($bloqueo.' Para cambiar la principal, use primero «Marcar como secundaria» en la principal actual y después marque esta.')
+                                ->persistent()
+                                ->send();
+
+                            return;
+                        }
+
+                        if ($record->es_principal && $bloqueo = $this->limiteExcedido($record->empresa_id, principal: false, agregar: 1)) {
+                            Notification::make()->danger()->title('Límite de categorías secundarias alcanzado')
+                                ->body($bloqueo.' Quite antes una secundaria que ya no corresponda, o marque otra como principal.')
+                                ->persistent()
+                                ->send();
 
                             return;
                         }

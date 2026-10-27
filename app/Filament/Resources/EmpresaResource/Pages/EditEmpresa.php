@@ -47,33 +47,88 @@ class EditEmpresa extends EditRecord
         ];
     }
 
+    /** Aviso para después de guardar (empresa con servicios viejos fuera de sus sectores), armado en beforeSave(). */
+    protected ?string $sectorNotice = null;
+
+    /** El sector principal lo define la Cámara: solo quien administra (super_admin) lo elige; para el resto no se envía. */
+    public static function definesSectors(): bool
+    {
+        return Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false;
+    }
+
     /**
-     * Las empresas solo pueden operar en 2 sectores (principal y secundario).
-     * Si la empresa tiene servicios asociados a sectores fuera de los 2 elegidos,
-     * se bloquea el guardado hasta que desvincule esos servicios o ajuste sus sectores.
+     * Regla de 2 sectores (cbc1e37) con TASK-0011 (R3). Recibe los sectores de los servicios viejos de la empresa y los
+     * sectores permitidos antes y después del guardado. `blocked`: sectores cuyos servicios este cambio dejaría fuera y
+     * hoy están dentro (el guardado empeora la empresa: se detiene). `outside`: los que quedan fuera después (incluye una
+     * inconsistencia previa, que no impide guardar otros datos; se avisa).
+     *
+     * @param  int[]  $serviceSectors
+     * @param  int[]  $current
+     * @param  int[]  $next
+     * @return array{blocked: int[], outside: int[]}
+     */
+    public static function sectorCoherence(array $serviceSectors, array $current, array $next): array
+    {
+        $outsideNow = array_diff($serviceSectors, $current);
+        $outside = array_values(array_diff($serviceSectors, $next));
+
+        return ['blocked' => array_values(array_diff($outside, $outsideNow)), 'outside' => $outside];
+    }
+
+    /**
+     * Las empresas solo pueden operar en 2 sectores (principal y secundario). Antes (D2/D3 de TASK-0011) esto bloqueaba
+     * cualquier guardado con servicios viejos fuera de los sectores, sin forma de desvincularlos, y además leía el sector
+     * principal del formulario, donde no viene cuando el campo está deshabilitado (Filament no deshidrata un campo
+     * disabled). Ahora el principal que no se envía es el guardado, y solo se detiene un cambio de sectores que empeora.
      */
     protected function beforeSave(): void
     {
         $data = $this->form->getState();
+        $record = $this->record;
 
-        $allowed = array_map('intval', array_filter([
-            $data['sector_principal_id'] ?? null,
-            $data['sector_secundario_id'] ?? null,
-        ]));
+        $principal = array_key_exists('sector_principal_id', $data) ? $data['sector_principal_id'] : $record->sector_principal_id;
+        $next = array_map('intval', array_values(array_filter([
+            $principal,
+            array_key_exists('sector_secundario_id', $data) ? $data['sector_secundario_id'] : $record->sector_secundario_id,
+        ])));
 
-        $outside = array_diff($this->record->distinctSectorIds(), $allowed);
+        $check = static::sectorCoherence($record->distinctSectorIds(), $record->allowedSectorIds(), $next);
 
-        if (count($outside) > 0) {
-            $names = Sector::whereIn('id', $outside)->pluck('name')->implode(', ');
+        if ($check['blocked'] !== []) {
+            $names = Sector::whereIn('id', $check['blocked'])->pluck('name')->implode(', ');
 
             Notification::make()
                 ->danger()
-                ->title('Su empresa tiene servicios en más de 2 sectores')
-                ->body("Solo se permiten un sector principal y uno secundario. En la pestaña \"Sectores y servicios\" desvincule los servicios de: {$names}; o ajuste sus sectores seleccionados.")
+                ->title('Este cambio de sectores deja servicios fuera')
+                ->body("Su empresa tiene servicios de: {$names}. Solo se permiten un sector principal y uno secundario. "
+                    .'Primero desvincule esos servicios en la sección «Sectores y servicios (histórico)», más abajo, y luego cambie el sector; '
+                    .'o conserve el sector actual. No se guardó ningún cambio.')
                 ->persistent()
                 ->send();
 
             $this->halt();
+        }
+
+        $this->sectorNotice = null;
+        if ($check['outside'] !== []) {
+            $names = Sector::whereIn('id', $check['outside'])->pluck('name')->implode(', ');
+            $this->sectorNotice = blank($principal)
+                ? "La Cámara aún no definió el sector principal de su empresa, y tiene servicios anteriores de: {$names}. "
+                    .'Puede seguir actualizando su perfil. Para definir el sector, contacte a la CPV; los servicios que no correspondan se quitan con «Desvincular» en «Sectores y servicios (histórico)».'
+                : "Su empresa tiene servicios anteriores fuera de sus sectores: {$names}. "
+                    .'Quítelos con «Desvincular» en la sección «Sectores y servicios (histórico)», o pida a la CPV revisar sus sectores.';
+        }
+    }
+
+    protected function afterSave(): void
+    {
+        if ($this->sectorNotice !== null) {
+            Notification::make()
+                ->warning()
+                ->title('Cambios guardados, con un pendiente')
+                ->body($this->sectorNotice)
+                ->persistent()
+                ->send();
         }
     }
 
@@ -203,11 +258,13 @@ class EditEmpresa extends EditRecord
                         Select::make('sector_principal_id')
                             ->label('Sector principal')
                             ->options(Sector::orderBy('name')->pluck('name', 'id'))
-                            ->placeholder('Por favor seleccione una opción')
+                            ->placeholder(fn (): string => static::definesSectors() ? 'Por favor seleccione una opción' : 'Sin definir por la Cámara')
                             ->reactive()
-                            ->required()
-                            ->disabled(fn (): bool => ! (Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false))
-                            ->helperText(fn (): ?string => (Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false)
+                            // TASK-0011 (D4): obligatorio solo para quien lo puede elegir. Un campo deshabilitado
+                            // y obligatorio bloqueaba «Siguiente» en las empresas sin sector (p. ej. id 72).
+                            ->required(fn (): bool => static::definesSectors())
+                            ->disabled(fn (): bool => ! static::definesSectors())
+                            ->helperText(fn (): ?string => static::definesSectors()
                                 ? null
                                 : 'Este dato lo define la Cámara Petrolera al registrar tu empresa. Si no estás de acuerdo, contacta a la CPV para solicitar el cambio.'),
                         Select::make('sector_secundario_id')
