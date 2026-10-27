@@ -9,6 +9,7 @@ use App\Filament\Resources\EmpresaResource;
 use App\Models\Country;
 use Closure;
 use App\Models\City;
+use App\Models\Empresa;
 use App\Models\Sector;
 //use App\Models\State;
 use Filament\Notifications\Notification;
@@ -21,6 +22,7 @@ use Filament\Forms\Components\Repeater;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class EditEmpresa extends EditRecord
 {
@@ -35,6 +37,13 @@ class EditEmpresa extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            // TASK-0011 (Bloque 2): guardar desde cualquier paso. Antes «Guardar cambios» solo estaba en el paso 4 y
+            // corregir un dato del paso 1 obligaba a recorrer los cuatro. Es el mismo save() del formulario completo.
+            \Filament\Actions\Action::make('guardar')
+                ->label('Guardar cambios')
+                ->icon('heroicon-o-check')
+                ->keyBindings(['mod+s'])
+                ->action(fn () => $this->save()),
             \Filament\Actions\Action::make('perfil_completo')
                 ->label('Descargar perfil completo (PDF)')
                 ->icon('heroicon-o-document-arrow-down')
@@ -44,33 +53,147 @@ class EditEmpresa extends EditRecord
         ];
     }
 
+    /** TASK-0011: entre el formulario y las secciones, un título que explica que ellas guardan al instante. */
+    protected static string $view = 'filament.resources.empresa-resource.pages.edit-empresa';
+
+    public function getSubheading(): ?string
+    {
+        return 'Los datos de los 4 pasos se guardan con «Guardar cambios», arriba o al final del último paso. '
+            .'Puede abrir cualquier paso con su título. Las secciones del perfil, más abajo, guardan cada cambio al instante.';
+    }
+
+    /** Pasos navegables: la validación completa ocurre igual al guardar. */
+    protected function hasSkippableSteps(): bool
+    {
+        return true;
+    }
+
+    /** Con pasos navegables, el error puede estar en un paso que no se ve: se dice cuál. */
+    protected function onValidationError(ValidationException $exception): void
+    {
+        $wizard = collect($this->form->getComponents())->first(fn ($component) => $component instanceof Forms\Components\Wizard);
+        $errorKeys = array_keys($exception->errors());
+        $steps = [];
+        foreach ($wizard?->getChildComponentContainer()->getComponents() ?? [] as $step) {
+            foreach ($step->getChildComponentContainer()->getFlatFields(withHidden: true) as $field) {
+                $path = $field->getStatePath();
+                if (collect($errorKeys)->contains(fn (string $key) => $key === $path || str_starts_with($key, $path.'.'))) {
+                    $steps[] = '«'.$step->getLabel().'»';
+                    break;
+                }
+            }
+        }
+
+        Notification::make()
+            ->danger()
+            ->title('No se guardó: hay datos por corregir')
+            ->body(($steps !== [] ? 'Revise el paso '.implode(', ', $steps).'. ' : '').'Los campos con error aparecen en rojo.')
+            ->send();
+    }
+
+    /** Aviso para después de guardar (empresa con servicios viejos fuera de sus sectores), armado en beforeSave(). */
+    protected ?string $sectorNotice = null;
+
+    /** TASK-0011: «www.x.com» → «https://www.x.com»; vacío → null. No corrige letras: solo agrega el esquema. */
+    public static function normalizeWebsite(?string $value): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        return preg_match('#^[a-z][a-z0-9+.-]*://#i', $value) ? $value : 'https://'.$value;
+    }
+
+    /** http(s), con un dominio que tenga al menos un punto (descarta `http://wwwgeohidracom`). */
+    public static function isValidWebsite(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+
+        return filter_var($url, FILTER_VALIDATE_URL) !== false
+            && in_array(strtolower((string) parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true)
+            && is_string($host) && preg_match('/^[^.]+(\.[^.]+)+$/', $host) === 1;
+    }
+
+    /** El sector principal lo define la Cámara: solo quien administra (super_admin) lo elige; para el resto no se envía. */
+    public static function definesSectors(): bool
+    {
+        return Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false;
+    }
+
     /**
-     * Las empresas solo pueden operar en 2 sectores (principal y secundario).
-     * Si la empresa tiene servicios asociados a sectores fuera de los 2 elegidos,
-     * se bloquea el guardado hasta que desvincule esos servicios o ajuste sus sectores.
+     * Regla de 2 sectores (cbc1e37) con TASK-0011 (R3). Recibe los sectores de los servicios viejos de la empresa y los
+     * sectores permitidos antes y después del guardado. `blocked`: sectores cuyos servicios este cambio dejaría fuera y
+     * hoy están dentro (el guardado empeora la empresa: se detiene). `outside`: los que quedan fuera después (incluye una
+     * inconsistencia previa, que no impide guardar otros datos; se avisa).
+     *
+     * @param  int[]  $serviceSectors
+     * @param  int[]  $current
+     * @param  int[]  $next
+     * @return array{blocked: int[], outside: int[]}
+     */
+    public static function sectorCoherence(array $serviceSectors, array $current, array $next): array
+    {
+        $outsideNow = array_diff($serviceSectors, $current);
+        $outside = array_values(array_diff($serviceSectors, $next));
+
+        return ['blocked' => array_values(array_diff($outside, $outsideNow)), 'outside' => $outside];
+    }
+
+    /**
+     * Las empresas solo pueden operar en 2 sectores (principal y secundario). Antes (D2/D3 de TASK-0011) esto bloqueaba
+     * cualquier guardado con servicios viejos fuera de los sectores, sin forma de desvincularlos, y además leía el sector
+     * principal del formulario, donde no viene cuando el campo está deshabilitado (Filament no deshidrata un campo
+     * disabled). Ahora el principal que no se envía es el guardado, y solo se detiene un cambio de sectores que empeora.
      */
     protected function beforeSave(): void
     {
         $data = $this->form->getState();
+        $record = $this->record;
 
-        $allowed = array_map('intval', array_filter([
-            $data['sector_principal_id'] ?? null,
-            $data['sector_secundario_id'] ?? null,
-        ]));
+        $principal = array_key_exists('sector_principal_id', $data) ? $data['sector_principal_id'] : $record->sector_principal_id;
+        $next = array_map('intval', array_values(array_filter([
+            $principal,
+            array_key_exists('sector_secundario_id', $data) ? $data['sector_secundario_id'] : $record->sector_secundario_id,
+        ])));
 
-        $outside = array_diff($this->record->distinctSectorIds(), $allowed);
+        $check = static::sectorCoherence($record->distinctSectorIds(), $record->allowedSectorIds(), $next);
 
-        if (count($outside) > 0) {
-            $names = Sector::whereIn('id', $outside)->pluck('name')->implode(', ');
+        if ($check['blocked'] !== []) {
+            $names = Sector::whereIn('id', $check['blocked'])->pluck('name')->implode(', ');
 
             Notification::make()
                 ->danger()
-                ->title('Su empresa tiene servicios en más de 2 sectores')
-                ->body("Solo se permiten un sector principal y uno secundario. En la pestaña \"Sectores y servicios\" desvincule los servicios de: {$names}; o ajuste sus sectores seleccionados.")
+                ->title('Este cambio de sectores deja servicios fuera')
+                ->body("Su empresa tiene servicios de: {$names}. Solo se permiten un sector principal y uno secundario. "
+                    .'Primero desvincule esos servicios en la sección «Sectores y servicios (histórico)», más abajo, y luego cambie el sector; '
+                    .'o conserve el sector actual. No se guardó ningún cambio.')
                 ->persistent()
                 ->send();
 
             $this->halt();
+        }
+
+        $this->sectorNotice = null;
+        if ($check['outside'] !== []) {
+            $names = Sector::whereIn('id', $check['outside'])->pluck('name')->implode(', ');
+            $this->sectorNotice = blank($principal)
+                ? "La Cámara aún no definió el sector principal de su empresa, y tiene servicios anteriores de: {$names}. "
+                    .'Puede seguir actualizando su perfil. Para definir el sector, contacte a la CPV; los servicios que no correspondan se quitan con «Desvincular» en «Sectores y servicios (histórico)».'
+                : "Su empresa tiene servicios anteriores fuera de sus sectores: {$names}. "
+                    .'Quítelos con «Desvincular» en la sección «Sectores y servicios (histórico)», o pida a la CPV revisar sus sectores.';
+        }
+    }
+
+    protected function afterSave(): void
+    {
+        if ($this->sectorNotice !== null) {
+            Notification::make()
+                ->warning()
+                ->title('Cambios guardados, con un pendiente')
+                ->body($this->sectorNotice)
+                ->persistent()
+                ->send();
         }
     }
 
@@ -178,7 +301,26 @@ class EditEmpresa extends EditRecord
             Forms\Components\Wizard\Step::make('2 - Datos de contacto')
                 ->schema([
                     Fieldset::make('Redes sociales')->schema([
-                        Forms\Components\TextInput::make('website')->mask('http://********************************'),
+                        // TASK-0011: sin la máscara `http://***…` (forzaba http:// y cortaba en 32 caracteres; en datos
+                        // quedaron valores como `http://wwwgeohidracom`). Se normaliza al guardar y se valida solo si
+                        // el valor cambia: una web vieja mal escrita no impide guardar otros datos.
+                        Forms\Components\TextInput::make('website')
+                            ->label('Página web')
+                            ->placeholder('https://www.suempresa.com')
+                            ->maxLength(255)
+                            ->helperText('Escriba la dirección completa, por ejemplo www.suempresa.com; el sistema agrega https:// si falta.')
+                            ->rule(fn (?Empresa $record) => function (string $attribute, mixed $value, \Closure $fail) use ($record): void {
+                                $normalized = static::normalizeWebsite($value);
+                                if ($normalized === null || $normalized === static::normalizeWebsite($record?->website)) {
+                                    return;
+                                }
+                                if (! static::isValidWebsite($normalized)) {
+                                    $fail('Escriba una dirección web válida, por ejemplo https://www.suempresa.com.');
+                                }
+                            })
+                            ->dehydrateStateUsing(fn (?string $state, ?Empresa $record): ?string => static::normalizeWebsite($state) === static::normalizeWebsite($record?->website)
+                                ? $record?->website
+                                : static::normalizeWebsite($state)),
                         Forms\Components\TextInput::make('linkedin_profile')->mask('@********************')
                             ->label('Perfil de LinkedIn'),
                         Forms\Components\TextInput::make('twitter_profile')->mask('@********************')
@@ -200,11 +342,13 @@ class EditEmpresa extends EditRecord
                         Select::make('sector_principal_id')
                             ->label('Sector principal')
                             ->options(Sector::orderBy('name')->pluck('name', 'id'))
-                            ->placeholder('Por favor seleccione una opción')
+                            ->placeholder(fn (): string => static::definesSectors() ? 'Por favor seleccione una opción' : 'Sin definir por la Cámara')
                             ->reactive()
-                            ->required()
-                            ->disabled(fn (): bool => ! (Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false))
-                            ->helperText(fn (): ?string => (Auth::user()?->hasRole(config('filament-shield.super_admin.name')) ?? false)
+                            // TASK-0011 (D4): obligatorio solo para quien lo puede elegir. Un campo deshabilitado
+                            // y obligatorio bloqueaba «Siguiente» en las empresas sin sector (p. ej. id 72).
+                            ->required(fn (): bool => static::definesSectors())
+                            ->disabled(fn (): bool => ! static::definesSectors())
+                            ->helperText(fn (): ?string => static::definesSectors()
                                 ? null
                                 : 'Este dato lo define la Cámara Petrolera al registrar tu empresa. Si no estás de acuerdo, contacta a la CPV para solicitar el cambio.'),
                         Select::make('sector_secundario_id')

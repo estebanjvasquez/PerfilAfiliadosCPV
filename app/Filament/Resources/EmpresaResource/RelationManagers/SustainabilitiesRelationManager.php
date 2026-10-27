@@ -18,6 +18,9 @@ class SustainabilitiesRelationManager extends RelationManager
 {
     protected static string $relationship = 'sustainabilities';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
     protected static ?string $recordTitleAttribute = 'sust_title';
 
     public static ?string $label = 'Enfoque de sostenibilidad';
@@ -73,6 +76,7 @@ class SustainabilitiesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->description('Enfoques de sostenibilidad de su empresa por área. Cada enfoque se guarda al confirmar su ventana.')
             ->columns([
                 Tables\Columns\TextColumn::make('areas.sust_title'),
                 Tables\Columns\TextColumn::make('areas.sust_description')->limit(50)->label('Descripción'),

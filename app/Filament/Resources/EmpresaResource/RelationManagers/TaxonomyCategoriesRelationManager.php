@@ -37,6 +37,9 @@ class TaxonomyCategoriesRelationManager extends RelationManager
 {
     protected static string $relationship = 'taxonomyCategories';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
     protected static ?string $recordTitleAttribute = 'id';
 
     public static ?string $label = 'Categorías CPV';
@@ -45,7 +48,7 @@ class TaxonomyCategoriesRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Categorías CPV';
 
-    protected static ?string $title = 'Categorías CPV (taxonomía nueva)';
+    protected static ?string $title = 'Categorías CPV';
 
     // El alta no pasa por el formulario de Crear por defecto de Filament - ver headerActions().
     protected function canCreate(): bool
@@ -61,6 +64,7 @@ class TaxonomyCategoriesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->description('Declare aquí lo que ofrece su empresa: busque las categorías específicas de la Taxonomía CPV y marque como principal lo que la empresa realmente hace. Es la clasificación vigente. Los cambios se guardan al instante.')
             ->recordTitleAttribute('id')
             ->modifyQueryUsing(fn ($query) => $query->with('category.translations'))
             ->columns([
@@ -102,8 +106,21 @@ class TaxonomyCategoriesRelationManager extends RelationManager
                     ->label(fn (EmpresaTaxonomyCategory $record) => $record->es_principal ? 'Marcar como secundaria' : 'Marcar como principal')
                     ->icon('heroicon-o-star')
                     ->action(function (EmpresaTaxonomyCategory $record) {
+                        // TASK-0011 (R4): el cambio de principal es secuencial; el aviso dice el paso previo.
                         if (! $record->es_principal && $bloqueo = $this->limiteExcedido($record->empresa_id, principal: true, agregar: 1)) {
-                            Notification::make()->danger()->title('Límite alcanzado')->body($bloqueo)->send();
+                            Notification::make()->danger()->title('Límite de categorías principales alcanzado')
+                                ->body($bloqueo.' Para cambiar la principal, use primero «Marcar como secundaria» en la principal actual y después marque esta.')
+                                ->persistent()
+                                ->send();
+
+                            return;
+                        }
+
+                        if ($record->es_principal && $bloqueo = $this->limiteExcedido($record->empresa_id, principal: false, agregar: 1)) {
+                            Notification::make()->danger()->title('Límite de categorías secundarias alcanzado')
+                                ->body($bloqueo.' Quite antes una secundaria que ya no corresponda, o marque otra como principal.')
+                                ->persistent()
+                                ->send();
 
                             return;
                         }

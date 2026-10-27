@@ -12,11 +12,21 @@
     @media (min-width: 640px) { .cpv-home-logo-img { height: 4.5rem; } }
     .dark .cpv-home-logo { background-color: #fff; padding: 0.5rem 0.75rem; }
 
-    /* Avisos de veracidad: texto de lectura, no cifra de estadística. */
+    /* Avisos de veracidad: nota al pie de Inicio (TASK-0011: menos peso que las tarjetas útiles). */
     .cpv-home-notice .fi-wi-stats-overview-stat-value {
-        font-size: 1rem;
-        line-height: 1.5rem;
-        font-weight: 500;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        font-weight: 400;
         letter-spacing: normal;
+        color: rgb(107 114 128);
+    }
+    .cpv-home-notice { padding-top: 0.75rem; padding-bottom: 0.75rem; box-shadow: none; }
+
+    /* TASK-0011: «Salir» junto al saludo pasa a ser un enlace discreto; sigue también en el menú de la cuenta. */
+    .fi-account-widget form .fi-btn {
+        background: transparent;
+        box-shadow: none;
+        font-weight: 400;
+        color: rgb(107 114 128);
     }
 </style>

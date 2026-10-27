@@ -31,6 +31,9 @@ class ExperiencesRelationManager extends RelationManager
 {
     protected static string $relationship = 'experiences';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
     public static ?string $label = 'Experiencia relevante';
 
     public static ?string $navigationLabel = 'Experiencia relevante';
@@ -272,6 +275,7 @@ class ExperiencesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->description('Proyectos relevantes de su empresa en los últimos años. Cada experiencia se guarda al confirmar su ventana.')
             ->columns([
                 Tables\Columns\TextColumn::make('row_year')->label('Año')->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->label('Registrado')->dateTime('d/m/Y H:i'),

@@ -25,6 +25,9 @@ class PresenceRelationManager extends RelationManager
 {
     protected static string $relationship = 'presence';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
     public static ?string $label = 'Presencia internacional';
 
     public static ?string $navigationLabel = 'Presencia internacional';
@@ -106,6 +109,7 @@ class PresenceRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->description('Oficinas y experiencia de su empresa fuera de Venezuela. Se guarda al confirmar la ventana.')
             ->columns([
                 Tables\Columns\BooleanColumn::make('has_offices')->label('Tiene presencia internacional'),
                 Tables\Columns\BooleanColumn::make('has_experience')->label('Tiene experiencia internacional'),
@@ -128,7 +132,8 @@ class PresenceRelationManager extends RelationManager
             ])
             ->bulkActions([
                 FilamentExportBulkAction::make('export')
-                    ->additionalColumnsAddButtonLabel('Add Column'),
+                    ->label('Exportar')
+                    ->additionalColumnsAddButtonLabel('Agregar columna'),
             ]);
     }
 }

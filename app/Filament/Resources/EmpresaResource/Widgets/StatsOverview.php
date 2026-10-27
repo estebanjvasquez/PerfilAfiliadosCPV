@@ -9,33 +9,25 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 
 class StatsOverview extends BaseWidget
 {
-    /** CPV-HOME-BRANDING-AND-LAYOUT: los dos avisos lado a lado a todo el ancho, sin una tercera columna vacía. */
+    /** TASK-0011: los avisos van al final de Inicio; el espacio principal es para la cuenta, la ayuda y «Mi empresa». */
+    protected static ?int $sort = 10;
+
+    /** TASK-0011: una sola tarjeta a todo el ancho (antes dos, con la misma frase repetida). */
     protected function getColumns(): int
     {
-        return 2;
+        return 1;
     }
 
     protected function getCards(): array
     {
-        $vemp = 'assets';
-        //$emps = Empresa::get();
-        $user_count = Empresa::whereRelation('users', 'users.id', '=', Auth::User()->id)->count();
-        /* foreach ($emps as $key => $valuemp) {
-        } */
-        //$user_count = $valuemp->getAllEmpresaUser()->count();
-        $total_count = Empresa::count();
-        //$percentage = (100 * $user_count) / $total_count;
-        $percentage = (100 * $user_count) / $total_count;
-
-        // CPV-HOME-BRANDING-AND-LAYOUT: la clase cpv-home-notice les da tamaño de texto de lectura
-        // (filament.pages.home-styles); el texto de los avisos no cambia.
+        // TASK-0011: se quitaron dos conteos sin uso ($user_count, $total_count) que solo hacían consultas y dividían
+        // por cero con la tabla de empresas vacía (pendiente «StatsOverview falla con empresas vacía»).
+        // La clase cpv-home-notice da tamaño de nota (filament.pages.home-styles); el texto de los avisos no cambia.
         return [
-            Card::make('','La Cámara Petrolera de Venezuela no se hace responsable de la veracidad de la información suministrada por la empresa afiliada en esta plataforma','La empresa afiliada es responsable de la veracidad de la información suministrada de manera directa y voluntaria en este formulario')
+            // Filament 3 ignora un tercer argumento de make(): la segunda frase va en description().
+            Card::make('', 'La Cámara Petrolera de Venezuela no se hace responsable de la veracidad de la información suministrada por la empresa afiliada en esta plataforma')
+                ->description('La empresa afiliada es responsable de la veracidad de la información suministrada de manera directa y voluntaria en este formulario')
                 ->extraAttributes(['class' => 'cpv-home-notice']),
-            Card::make('','La empresa afiliada es responsable de la veracidad de la información suministrada de manera directa y voluntaria en este formulario')
-                ->extraAttributes(['class' => 'cpv-home-notice']),
-            //Card::make('Porcentaje en Sistema', number_format($percentage, 2) . ' ' . '%'),
-            //Card::make('Enlace', 'Manual de Usuario')->url("user.pdf", true)->descriptionIcon('heroicon-s-arrow-trending-up'),
         ];
     }
 }

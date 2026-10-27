@@ -115,8 +115,10 @@ class HomeBrandingLayoutTest extends TestCase
     #[Test]
     public function the_cards_keep_their_order_and_get_balanced_spans(): void
     {
-        $widgets = array_values(Filament::getPanel('admin')->getWidgets());
-        $this->assertSame([AccountWidget::class, ProfileHelpWidget::class, StatsOverview::class], $widgets, 'Mismas tarjetas, mismo orden: cuenta, ayuda, avisos.');
+        // TASK-0011: «Mi empresa» entra antes de los avisos; Filament pinta las tarjetas ordenadas por getSort().
+        $widgets = collect(Filament::getPanel('admin')->getWidgets())->unique()->sortBy(fn (string $widget) => $widget::getSort())->values()->all();
+        $this->assertSame([AccountWidget::class, ProfileHelpWidget::class, \App\Filament\Widgets\MyCompaniesWidget::class, StatsOverview::class], $widgets, 'Orden: cuenta, ayuda, mi empresa, avisos.');
+        $this->assertSame('full', (new \App\Filament\Widgets\MyCompaniesWidget)->getColumnSpan(), '«Mi empresa» va a todo el ancho.');
 
         $this->assertSame(['default' => 1, 'lg' => 3], (new Dashboard)->getColumns());
         $this->assertSame(1, (new AccountWidget)->getColumnSpan(), 'La cuenta ocupa 1 de 3 columnas.');
@@ -143,15 +145,17 @@ class HomeBrandingLayoutTest extends TestCase
     }
 
     #[Test]
-    public function the_two_notices_render_side_by_side_with_their_text_unchanged(): void
+    public function the_notice_renders_once_with_its_text_unchanged(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $html = Livewire::actingAs($user)->test(StatsOverview::class)->html();
 
-        $this->assertSame(2, substr_count($html, 'cpv-home-notice'), 'Deben estar los dos avisos.');
-        $this->assertStringContainsString('md:grid-cols-2', $html, 'Los avisos van en 2 columnas.');
+        // TASK-0011: antes eran dos tarjetas lado a lado con la misma frase repetida; ahora una sola, al final y con
+        // tamaño de nota. Las dos frases siguen completas.
+        $this->assertSame(1, substr_count($html, 'cpv-home-notice'), 'Un solo aviso.');
+        $this->assertStringContainsString('fi-wi-stats-overview-stats-ctn grid gap-6 md:grid-cols-1', $html, 'Una sola columna a todo el ancho.');
         $this->assertStringContainsString('La Cámara Petrolera de Venezuela no se hace responsable de la veracidad', $html);
         $this->assertStringContainsString('La empresa afiliada es responsable de la veracidad de la información suministrada', $html);
     }

@@ -24,6 +24,9 @@ class ManagementRelationManager extends RelationManager
 {
     protected static string $relationship = 'management';
 
+    // TASK-0011: sin carga diferida, la sección se ve con su título y ayuda en vez de una caja vacía.
+    protected static bool $isLazy = false;
+
     public static ?string $label = 'Sistemas de gestión';
 
     public static ?string $navigationLabel = 'Sistemas de gestión';
@@ -120,6 +123,7 @@ class ManagementRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->description('Certificaciones y sistemas de gestión por área (calidad, ambiente, seguridad, etc.). Abra cada área con su botón y guarde en la ventana.')
             ->columns([
                 static::summaryColumn('calidad', 'calidad', 'Calidad', [
                     'iso9001' => 'ISO 9001',

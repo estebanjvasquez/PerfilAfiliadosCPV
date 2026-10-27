@@ -132,11 +132,25 @@ main {
   position: relative;
   text-decoration: none;
   font-size: 1rem;
-  color: inherit;
-  background-color: var(--accent-clr);
+  /* TASK-0011: texto blanco sobre el gris oscuro del texto; antes naranja claro sobre el fondo naranja apenas se distinguía. */
+  color: #fff;
+  background-color: var(--text-clr);
   padding: 0.5rem 2rem;
   border: solid 2px white;
   border-radius: 0 2rem 2rem 0;
+}
+
+.link-btn:hover,
+.link-btn:focus-visible {
+  background-color: #000;
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.inline-link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
 }
 
 @media (min-width: 660px) {
