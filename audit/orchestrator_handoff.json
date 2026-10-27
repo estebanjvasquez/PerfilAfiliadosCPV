@@ -1,4 +1,36 @@
 {
+  "task_0011_ux_company_profile_services": {
+      "task_id":  "TASK-0011",
+      "title":  "UX end-to-end: company profile and services",
+      "source_comment":  "6438570942",
+      "status":  "READY_FOR_REVIEW",
+      "branch":  "fix/sec-01-r4-01-role-editor-preserve",
+      "review_base_sha":  "65b858cfd65245d0a5f2e4de590693aee42dc567",
+      "review_head_sha":  "c3bce84f5078545aa755dc94ecc4a224bd8eaae8",
+      "handoff_commit_sha":  "the commit that adds this block (child of review_head_sha); see the Issue #2 delivery comment",
+      "fails_before":  {
+                           "run_id":  "20261027T095727Z-0f99b9c7ab98",
+                           "result":  "10 expected failures of 33 focused tests",
+                           "sha":  "0f99b9c7ab987f3dd7541bb469ca617ab78129cc"
+                       },
+      "tests":  {
+                    "full_suite":  {
+                                       "run_id":  "20261027T103636Z-c3bce84f5078",
+                                       "staging_before":  200,
+                                       "result":  "OK (658 tests, 7591 assertions)",
+                                       "staging_after":  200,
+                                       "sha":  "c3bce84f5078545aa755dc94ecc4a224bd8eaae8"
+                                   },
+                    "new_test_files":  [
+                                           "tests/Feature/Ux/CompanyServicesAndSectorsTest.php",
+                                           "tests/Feature/Ux/CompanyProfilePageTest.php",
+                                           "tests/Feature/Ux/ListHomePublicAndDataQualityTest.php"
+                                       ]
+                },
+      "database_mutations":  "none; one read-only aggregate count on staging (READ ONLY transaction, rolled back): 406 companies, 194 without principal sector, 195 with legacy services outside their sectors",
+      "deploy":  "none",
+      "task_file":  "docs/orquestador/tasks/0011-ux-company-profile-services.md"
+  },
   "current_task": "CPV-HOME-USEFUL-HELP accepted (6195972738) and DEPLOYED to staging at c02d4ec via the normal workflow (run 38762292519), authorized by the owner in chat. Awaiting owner UAT.",
   "current_status": "HOME_USEFUL_HELP_DEPLOYED_FOR_OWNER_REVIEW__RUNTIME_C02D4EC__MAIL_PENDING_OWNER_CONFIGURATION__AUTOMATION_SUSPENDED",
   "superseded_current_fields_2026_10_15": {
