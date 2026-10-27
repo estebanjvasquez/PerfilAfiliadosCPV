@@ -24,7 +24,9 @@ class StatsOverview extends BaseWidget
         // por cero con la tabla de empresas vacía (pendiente «StatsOverview falla con empresas vacía»).
         // La clase cpv-home-notice da tamaño de nota (filament.pages.home-styles); el texto de los avisos no cambia.
         return [
-            Card::make('', 'La Cámara Petrolera de Venezuela no se hace responsable de la veracidad de la información suministrada por la empresa afiliada en esta plataforma', 'La empresa afiliada es responsable de la veracidad de la información suministrada de manera directa y voluntaria en este formulario')
+            // Filament 3 ignora un tercer argumento de make(): la segunda frase va en description().
+            Card::make('', 'La Cámara Petrolera de Venezuela no se hace responsable de la veracidad de la información suministrada por la empresa afiliada en esta plataforma')
+                ->description('La empresa afiliada es responsable de la veracidad de la información suministrada de manera directa y voluntaria en este formulario')
                 ->extraAttributes(['class' => 'cpv-home-notice']),
         ];
     }
