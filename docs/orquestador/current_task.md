@@ -1,7 +1,19 @@
-# Tarea actual (checkpoint 2026-10-21 ~16:40Z, rama `fix/sec-01-r4-01-role-editor-preserve`)
+# Tarea actual (checkpoint 2026-10-27, rama `fix/sec-01-r4-01-role-editor-preserve`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
+
+## Activa: TASK-0011 — UX perfil de empresa y servicios — IN_PROGRESS (`6438570942`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0011-ux-company-profile-services.md`](tasks/0011-ux-company-profile-services.md) (diagnóstico, decisiones, evidencia, pendientes) |
+| Fuente | Issue #2 `6438570942` (propietario, 2026-10-27); valoración UX `20261027T0834Z` |
+| Rama / BASE | `fix/sec-01-r4-01-role-editor-preserve` / `65b858c` |
+| Gates | sin merge, sin despliegue, datos reales solo lectura |
+
+Lo que sigue debajo es el checkpoint anterior (2026-10-21 ~16:40Z), sin cambios: F-SEC01-R4-01 sigue
+READY_FOR_REVIEW y sin desplegar.
 
 ## F-SEC01-R4-01 — READY_FOR_REVIEW — MANUAL (`6320241495`); sin desplegar, sin restaurar
 

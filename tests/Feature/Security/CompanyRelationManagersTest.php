@@ -330,10 +330,15 @@ class CompanyRelationManagersTest extends TestCase
         $this->assertEquals($areasBefore, DB::table('areas')->orderBy('id')->get()->toArray(), 'the shared area catalog is unchanged');
     }
 
-    // ------------------------------------------------------------------ Services (legacy catalog, read only)
+    // ------------------------------------------------------------------ Services (legacy catalog; only «Desvincular»)
 
+    /**
+     * TASK-0011 (R1, Issue #2 `6438570942`): the tab gained «Desvincular» for the company's OWN links (the save guard
+     * asks the user to detach, and there was no way to). Everything else stays closed; BETA's link is not resolvable
+     * from ALFA's tab and the catalog never changes. Allowed detach paths: tests/Feature/Ux/CompanyServicesAndSectorsTest.
+     */
     #[Test]
-    public function services_tab_is_read_only_shows_only_the_companys_links_and_never_changes_the_catalog(): void
+    public function services_tab_only_detaches_the_companys_own_links_and_never_changes_the_catalog(): void
     {
         $sector = DB::table('sectors')->insertGetId(['name' => 'ZZZSECSERV', 'created_at' => now(), 'updated_at' => now()]);
         $alfaService = DB::table('services')->insertGetId(['sectors_id' => $sector, 'name' => 'ZZZSERVALFA', 'created_at' => now(), 'updated_at' => now()]);
@@ -349,11 +354,13 @@ class CompanyRelationManagersTest extends TestCase
         $rm = $this->manager(ServicesRelationManager::class, $this->alfaUser);
         $rm->assertCanSeeTableRecords([\App\Models\Service::find($alfaService)])
             ->assertCanNotSeeTableRecords([\App\Models\Service::find($betaService)]);
-        foreach (['detach', 'delete', 'edit', 'attach', 'create', 'dissociate'] as $action) {
+        foreach (['delete', 'edit', 'attach', 'create', 'dissociate'] as $action) {
             $rm->assertTableActionDoesNotExist($action);
             $this->browserAction($this->manager(ServicesRelationManager::class, $this->alfaUser), $action, $alfaService);
             $this->browserAction($this->manager(ServicesRelationManager::class, $this->alfaUser), $action, $betaService);
         }
+        $rm->assertTableActionExists('detach');
+        $this->browserAction($this->manager(ServicesRelationManager::class, $this->alfaUser), 'detach', $betaService);
 
         $this->assertEquals($catalogBefore, DB::table('services')->whereIn('id', [$alfaService, $betaService])->orderBy('id')->get()->toArray(), 'catalog unchanged');
         $this->assertEquals($linksBefore, $links(), 'links unchanged');
