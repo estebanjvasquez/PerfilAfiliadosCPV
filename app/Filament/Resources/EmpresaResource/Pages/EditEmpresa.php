@@ -46,7 +46,7 @@ class EditEmpresa extends EditRecord
                 ->label('Guardar cambios')
                 ->icon('heroicon-o-check')
                 ->keyBindings(['mod+s'])
-                ->action('save'),
+                ->action(fn () => $this->save()),
             \Filament\Actions\Action::make('perfil_completo')
                 ->label('Descargar perfil completo (PDF)')
                 ->icon('heroicon-o-document-arrow-down')
