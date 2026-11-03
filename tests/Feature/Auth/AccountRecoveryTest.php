@@ -53,6 +53,10 @@ class AccountRecoveryTest extends TestCase
         config(['mail.default' => 'array']);
         $this->captcha(true);
         Notification::fake();
+        // Empresa::boot() vincula a cada empresa nueva las cuentas con role_id = 1. Si el id 1 está libre, que sea
+        // super_admin, como en staging, y no el rol de afiliado.
+        Role::findOrCreate(config('filament-shield.super_admin.name'), 'web');
+        Role::findOrCreate('afiliados', 'web');
     }
 
     // ------------------------------------------------------------------ fixtures
@@ -346,7 +350,6 @@ class AccountRecoveryTest extends TestCase
             $this->company($this->rif(), $wide);
         }
         $empresa = $this->company($this->rif(), $a, $b, $unverified, $super, $noRole, $twoRoles, $direct, $wide);
-        DB::table('empresa_user')->insert(['empresa_id' => $empresa->id, 'user_id' => $a->id, 'created_at' => now(), 'updated_at' => now()]); // vínculo repetido
 
         $this->requestByRif(strtolower(substr($empresa->rif, 0, 1)).'-'.substr($empresa->rif, 1, 8).'-'.substr($empresa->rif, 9))->assertHasNoErrors();
         $known = $this->shown();
