@@ -2,13 +2,17 @@
 
 namespace App\Filament\Pages;
 
+use App\Support\Auth\AccountRecovery;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use DanHarrin\LivewireRateLimiting\WithRateLimiting;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Component;
 use Filament\Forms\Components\View;
 use Filament\Forms\Form;
 use Filament\Http\Responses\Auth\Contracts\LoginResponse;
 use Filament\Pages\Auth\Login as BaseLogin;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use Phpsa\FilamentPasswordReveal\Password;
 
@@ -82,10 +86,37 @@ class Login extends BaseLogin
         ];
     }
 
+    /** TASK-0012: el usuario es el correo; se dice en la propia pantalla. */
+    protected function getEmailFormComponent(): Component
+    {
+        return parent::getEmailFormComponent()
+            ->helperText('Su usuario es su correo electrónico.');
+    }
+
+    /**
+     * TASK-0012 (D3): Postgres compara el correo exacto y hay correos guardados con mayúsculas. Si el correo escrito
+     * coincide con una sola cuenta sin distinguir mayúsculas ni espacios, se usa el guardado; si no, el escrito. La
+     * contraseña se comprueba igual que antes.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function getCredentialsFromFormData(array $data): array
+    {
+        $credentials = parent::getCredentialsFromFormData($data);
+        if ($user = AccountRecovery::findByEmail((string) $credentials['email'])) {
+            $credentials['email'] = $user->email;
+        }
+
+        return $credentials;
+    }
+
     protected function getPasswordFormComponent(): Password
     {
         return Password::make('password')
             ->label(__('filament-panels::pages/auth/login.form.password.label'))
+            // TASK-0012: el enlace que Filament pone en este campo; se perdía al redefinirlo.
+            ->hint(filament()->hasPasswordReset() ? new HtmlString(Blade::render('<x-filament::link :href="filament()->getRequestPasswordResetUrl()" tabindex="3">¿Olvidaste tu contraseña?</x-filament::link>')) : null)
             ->autocomplete('current-password')
             ->required()
             ->revealable(true)

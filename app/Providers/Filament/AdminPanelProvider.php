@@ -104,6 +104,14 @@ class AdminPanelProvider extends PanelProvider
             ->domain(env('FILAMENT_DOMAIN'))
             ->authGuard(env('FILAMENT_AUTH_GUARD', 'web'))
             ->login(Login::class)
+            // TASK-0012 (`6602168914`): recuperación de acceso. Por correo, con la página propia (respuesta genérica,
+            // envío diferido, Turnstile y límites) y el restablecimiento firmado de Filament; por RIF, como ayuda que
+            // escribe a los buzones afiliados de la empresa (App\Support\Auth\AccountRecovery).
+            ->passwordReset(\App\Filament\Pages\Auth\RequestPasswordReset::class)
+            ->routes(function (): void {
+                \Illuminate\Support\Facades\Route::get('recuperar-acceso', \App\Filament\Pages\Auth\RecoverAccessByRif::class)
+                    ->name('auth.account-recovery.rif');
+            })
             ->registration(Register::class)
             // CPV-VERIFICATION-FLOW-AND-COMPLETION (`6215451160`): verificación de correo de Filament. Registra la
             // página «Verifique su correo electrónico» y el enlace firmado (`signed`, `throttle:6,1`). Cada
