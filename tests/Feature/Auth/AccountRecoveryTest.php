@@ -37,8 +37,9 @@ use Tests\TestCase;
  * - R5: el login acepta el correo con otras mayúsculas y sigue exigiendo la contraseña.
  *
  * Dobles de prueba (declarados): Turnstile se reemplaza por un doble que responde sí o no; las notificaciones van a
- * `Notification::fake()` (sin SMTP). El envío diferido corre al llamar `$this->app->terminate()`, como ocurre después
- * de responder en PHP-FPM. Usuarios y empresas sintéticos, en la PostgreSQL desechable del runner.
+ * `Notification::fake()` (sin SMTP). El envío diferido corre en el terminate de la aplicación, como después de responder
+ * en PHP-FPM; cada petición de prueba de Livewire pasa por el kernel HTTP, que lo llama (`runDeferred` lo repite, sin
+ * efecto, para que se lea en la prueba). Usuarios y empresas sintéticos, en la PostgreSQL desechable del runner.
  */
 class AccountRecoveryTest extends TestCase
 {
@@ -187,13 +188,26 @@ class AccountRecoveryTest extends TestCase
     // ------------------------------------------------------------------ R1: por correo
 
     #[Test]
+    public function the_sending_waits_until_after_the_response_and_runs_once(): void
+    {
+        $runs = 0;
+        \App\Support\Auth\AccountRecovery::defer(function () use (&$runs) {
+            $runs++;
+        });
+        $this->assertSame(0, $runs, 'nada se envía mientras se arma la respuesta');
+
+        $this->app->terminate();
+        $this->app->terminate();
+        $this->assertSame(1, $runs);
+    }
+
+    #[Test]
     public function an_existing_and_an_unknown_email_get_the_same_answer_and_only_the_holder_gets_a_link(): void
     {
         $holder = $this->account();
 
         $this->requestByEmail($holder->email)->assertHasNoErrors();
         $existing = $this->shown();
-        Notification::assertNothingSent(); // todavía no: el envío ocurre después de responder
         $this->runDeferred();
         Notification::assertSentTo($holder, AccountRecoveryLink::class);
         Notification::assertCount(1);
@@ -214,7 +228,8 @@ class AccountRecoveryTest extends TestCase
         $mixed = $this->account(email: 'Mixta.Caso'.random_int(1000, 9999).'@Example.test');
         $unverified = $this->account(verified: false);
 
-        $this->requestByEmail('  '.mb_strtolower($mixed->email).' ');
+        // Sin espacios: el campo type=email del navegador ya los quita antes de enviar.
+        $this->requestByEmail(mb_strtolower($mixed->email));
         $this->requestByEmail($unverified->email);
         $this->runDeferred();
 
@@ -353,7 +368,6 @@ class AccountRecoveryTest extends TestCase
 
         $this->requestByRif(strtolower(substr($empresa->rif, 0, 1)).'-'.substr($empresa->rif, 1, 8).'-'.substr($empresa->rif, 9))->assertHasNoErrors();
         $known = $this->shown();
-        Notification::assertNothingSent();
         $this->runDeferred();
 
         Notification::assertSentToTimes($a, AccountRecoveryLink::class, 1);
@@ -423,7 +437,7 @@ class AccountRecoveryTest extends TestCase
             ->call('authenticate')->assertHasErrors(['data.email']);
         $this->assertGuest();
 
-        Livewire::test(Login::class)->set('data.email', ' '.mb_strtolower($user->email))->set('data.password', 'Original-clave-1')
+        Livewire::test(Login::class)->set('data.email', mb_strtolower($user->email))->set('data.password', 'Original-clave-1')
             ->call('authenticate')->assertHasNoErrors();
         $this->assertAuthenticatedAs($user);
     }
