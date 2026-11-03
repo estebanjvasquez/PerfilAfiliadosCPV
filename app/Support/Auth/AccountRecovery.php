@@ -106,10 +106,18 @@ final class AccountRecovery
         return true;
     }
 
-    /** Corre después de enviar la respuesta (en PHP-FPM, tras fastcgi_finish_request). */
+    /**
+     * Corre después de enviar la respuesta (en PHP-FPM, tras fastcgi_finish_request). Una sola vez: la aplicación no
+     * olvida sus callbacks de terminate, y un proceso que atiende varias peticiones (las pruebas) los repetiría.
+     */
     public static function defer(\Closure $work): void
     {
-        app()->terminating(function () use ($work): void {
+        $done = false;
+        app()->terminating(function () use ($work, &$done): void {
+            if ($done) {
+                return;
+            }
+            $done = true;
             try {
                 $work();
             } catch (\Throwable $e) {
