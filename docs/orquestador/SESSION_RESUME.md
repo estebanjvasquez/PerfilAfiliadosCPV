@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-11-03, rama `fix/sec-01-r4-01-role-editor-preserve`: **TASK-0012** (recuperación de acceso por correo y RIF, Issue #2 `6602168914`) READY_FOR_REVIEW, sin desplegar ([`tasks/0012-account-recovery.md`](tasks/0012-account-recovery.md)). TASK-0011 APPROVED (`6440840198`) y aplicada por el propietario en staging (`feature/upgrade-filament-v3` @ `7831e01`). Anterior, sin cambios (2026-10-21 ~16:40Z, desde `f41bcb6`): **F-SEC01-R4-01** (el editor de roles conserva lo que no muestra), lista para revisión, sin desplegar. R4 aceptado; contención verificada.
+**Checkpoint:** 2026-11-03, rama `fix/sec-01-r4-01-role-editor-preserve`: **TASK-0012** (recuperación de acceso por correo y RIF, Issue #2 `6602168914`) desplegada en staging por autorización del propietario; UAT y prueba de correo real pendientes ([`tasks/0012-account-recovery.md`](tasks/0012-account-recovery.md)). Staging `feature/upgrade-filament-v3` @ `06155ce` (workflow `41630703105` success; rutas de login/recuperación GET 200). TASK-0011 APPROVED (`6440840198`) y aplicada previamente en staging. Anterior, sin cambios (2026-10-21 ~16:40Z, desde `f41bcb6`): **F-SEC01-R4-01** (el editor de roles conserva lo que no muestra), lista para revisión, sin desplegar. R4 aceptado; contención verificada.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -49,7 +49,8 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 
 | Hecho | Valor | Fuente y fecha |
 |---|---|---|
-| HEAD remoto de `feature/upgrade-filament-v3` | `cf01e9c3e30415a34ccda60b312a993c1388167d` | `git ls-remote`, 2026-10-21 ~12:48Z |
+| HEAD remoto de `feature/upgrade-filament-v3` | `06155ce0579654c4c8b0d8f4dd4901d835b3dbb7` | push verificado, 2026-11-03; TASK-0012 |
+| Staging TASK-0012 | workflow `41630703105` success; `/admin/login`, `/admin/password-reset/request`, `/admin/recuperar-acceso` HTTP 200 | verificación GET, 2026-11-03; sin envío de formulario/correo |
 | Código en staging | `cf01e9c`, versionados limpios; imagen `081c35c5715d`; mantenimiento y debug apagados; sin migraciones pendientes | SSH de solo lectura, ~12:52Z |
 | Workflow / recuperación | run `39602544527` success; `perfilafiliados-app:pre-sec01-87dd997` (`f91e97322189`) | 2026-10-21 |
 
@@ -68,7 +69,8 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Accesos:** cada comando que los necesite usa el bootstrap documentado ([`ENVIRONMENT.md`](ENVIRONMENT.md), [`ACCESS_BOOTSTRAP.md`](ACCESS_BOOTSTRAP.md)); cada ejecutor guarda sus credenciales fuera de git. Si faltan `gh` o `python`, no es un bloqueo: se usan los mecanismos documentados.
 - **Reanudar:** solo con una nueva asignación del propietario.
 - **Propietario:** revisar F-SEC01-R4-01 y su propuesta de recuperación; despliegue R3+R4(+R4-01); UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
-- **Agente:** TASK-0012 en READY_FOR_REVIEW (STOP); nada más sin una instrucción nueva del Issue #2.
+- **Propietario:** hacer UAT de recuperación; autorizar aparte, si lo desea, una prueba de correo real a su buzón de prueba.
+- **Agente:** TASK-0012 desplegada en staging; detenerse hasta nueva instrucción del propietario.
 
 ## 4. Worktrees en uso (no tocar sin instrucción)
 

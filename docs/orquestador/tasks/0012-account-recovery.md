@@ -7,8 +7,8 @@
 | Referencias directas | `6440840198` (TASK-0011 APPROVED, estado de referencia; TASK-0011 no se reabre ni se modifica) |
 | Rama | `fix/sec-01-r4-01-role-editor-preserve` (rama canónica del estado vigente, `SESSION_RESUME.md` §1) |
 | BASE | `73b5f2d9373e98c643df983e91a708856b1207b9` |
-| Estado | **READY_FOR_REVIEW** (2026-11-03); REVIEW_HEAD `b1b9146dae6a8f1dd3a135c871a523cf1480ccf6`; sin merge ni despliegue |
-| Gates | sin merge, sin despliegue, sin cambios en cuentas ni datos reales; sin enviar correos reales sin autorización |
+| Estado | **DESPLEGADA EN STAGING; UAT PENDIENTE** (2026-11-03, autorización del propietario en este chat); código REVIEW_HEAD `b1b9146dae6a8f1dd3a135c871a523cf1480ccf6` |
+| Gates | staging autorizado y desplegado; sin merge a `main`, sin producción, sin cambios en cuentas ni datos reales y sin enviar correos reales |
 
 Cambios locales del propietario en `AGENTS.md`, `CLAUDE.md`, `docs/orquestador/PROTOCOL.md` y
 `docs/orquestador/SESSION_RESUME.md`: conservados, sin commitear, no restaurados ni descartados.
@@ -246,3 +246,14 @@ por correo. Las 128 empresas sin buzón elegible reciben la misma respuesta gen�
 > **ACEPTACIÓN:** el titular puede restablecer su propia contraseña por email; el RIF ayuda a llegar a los buzones afiliados sin revelar identidades ni permitir escoger otra cuenta; cuentas internas quedan excluidas del flujo RIF; límites contra enumeración/abuso están probados; los correos llegan en el entorno habilitado; fallos y fallback quedan explicados en español. Si la elegibilidad segura por RIF no se puede demostrar, entregar esa conclusión y el fallback como decisión pendiente, sin implementar un envío inseguro.
 >
 > **ENTREGA:** trabajar en bloques 1→2→3 con pocos ciclos; reportar causa y decisión sobre RIF, alcance afiliado/admin, pruebas, verificación de correo, commit/SHAs y limitaciones. Terminar en READY_FOR_REVIEW conforme al protocolo.
+
+---
+
+## Addendum — despliegue autorizado a staging (2026-11-03)
+
+- Autorización explícita del propietario en este chat para publicar TASK-0012 en `pruebas.camarapetrolera.app`.
+- Promoción aislada desde el baseline de staging `7831e01`: solo commits de recuperación y manuales TASK-0012; no se incorporó el trabajo de seguridad pendiente de la rama canónica.
+- Rama de despliegue `feature/upgrade-filament-v3`, HEAD `06155ce0579654c4c8b0d8f4dd4901d835b3dbb7`; workflow Deploy a Contabo run `41630703105`: `success`.
+- Verificación HTTP de solo lectura: `/admin/login`, `/admin/password-reset/request` y `/admin/recuperar-acceso` responden 200; login y formularios muestran los textos/Turnstile esperados. No se enviaron formularios ni correos.
+- Sin migraciones nuevas, cambios de cuenta o datos. SSH directo no permitió verificar el SHA del checkout por separado; la evidencia de despliegue es el workflow exitoso para el SHA exacto más las rutas vivas.
+- Pendiente: UAT del propietario y, con autorización específica, prueba de entrega a un buzón de prueba del propietario. No se hizo merge ni despliegue a producción.

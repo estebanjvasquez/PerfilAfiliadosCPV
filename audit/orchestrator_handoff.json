@@ -3,7 +3,7 @@
     "task_id": "TASK-0012",
     "title": "Account recovery by email and by company RIF",
     "source_comment": "6602168914",
-    "status": "READY_FOR_REVIEW",
+    "status": "DEPLOYED_TO_STAGING (owner authorized; UAT and real email delivery pending)",
     "branch": "fix/sec-01-r4-01-role-editor-preserve",
     "review_base_sha": "73b5f2d9373e98c643df983e91a708856b1207b9",
     "review_head_sha": "b1b9146dae6a8f1dd3a135c871a523cf1480ccf6",
@@ -32,7 +32,16 @@
     "rif_decision": "eligibility demonstrable: linked, verified, affiliate role by name only, no direct permissions, <=3 linked companies; shared mailboxes skipped; >5 mailboxes sends nothing; internal accounts (super_admin auto-linked to every company, no-role, other roles) excluded",
     "mail_verification": "staging SMTP handshake only (EHLO+STARTTLS TLSv1.3, closed; no MAIL FROM/DATA); no real message sent; real delivery pending owner authorization after deployment",
     "database_mutations": "none; read-only aggregate queries on staging (READ ONLY transaction, rolled back)",
-    "deploy": "none",
+    "deploy": {
+      "authorized_by_owner_in_chat": "2026-11-03",
+      "target": "staging / pruebas.camarapetrolera.app",
+      "branch": "feature/upgrade-filament-v3",
+      "deployed_sha": "06155ce0579654c4c8b0d8f4dd4901d835b3dbb7",
+      "workflow_run": "41630703105 (success)",
+      "readonly_smoke": "GET /admin/login, /admin/password-reset/request, /admin/recuperar-acceso -> HTTP 200; no forms submitted, no emails sent",
+      "ssh_checkout_sha": "not independently confirmed; direct SSH authentication was denied",
+      "production": false
+    },
     "task_file": "docs/orquestador/tasks/0012-account-recovery.md"
   },
   "task_0011_ux_company_profile_services": {
