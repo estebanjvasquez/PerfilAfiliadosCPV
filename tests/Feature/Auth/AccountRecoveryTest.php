@@ -185,6 +185,24 @@ class AccountRecoveryTest extends TestCase
             ->assertSee('Cámara');
     }
 
+    #[Test]
+    public function the_manual_describes_both_paths_with_the_labels_the_screens_really_show(): void
+    {
+        $manual = file_get_contents(resource_path('manual/manual_usuario.md'));
+        $source = file_get_contents(app_path('Filament/Pages/Auth/RequestPasswordReset.php'))
+            .file_get_contents(app_path('Filament/Pages/Auth/RecoverAccessByRif.php'))
+            .file_get_contents(app_path('Filament/Pages/Login.php'))
+            .file_get_contents(app_path('Notifications/Auth/AccountRecoveryLink.php'));
+
+        foreach (['¿Olvidaste tu contraseña?', 'No recuerdo el correo de acceso', 'Enviar el enlace', 'Enviar la ayuda',
+            'RIF de la empresa', 'Recuperar el acceso al Perfil de Afiliados', 'Elegir una contraseña nueva'] as $label) {
+            $this->assertStringContainsString($label, $manual, "El manual no cita «{$label}».");
+            $this->assertStringContainsString($label, $source, "«{$label}» ya no existe en la pantalla: actualice el manual.");
+        }
+        $this->assertStringContainsString('{#olvido-correo}', $manual);
+        $this->assertStringNotContainsString('no ofrece hoy una opción para recuperar la contraseña', $manual);
+    }
+
     // ------------------------------------------------------------------ R1: por correo
 
     #[Test]

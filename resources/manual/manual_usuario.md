@@ -44,7 +44,7 @@ Cada persona de su empresa que vaya a trabajar en el sistema necesita **su propi
 ### Ingresar al sistema {#ingresar}
 
 1. Abra en su navegador la dirección del sistema que le indicó la Cámara. Verá la pantalla **Entre a su cuenta**.
-2. Escriba su **Correo electrónico** y su **Contraseña**. Puede hacer clic en el ícono del ojo para ver la contraseña mientras la escribe.
+2. Escriba su **Correo electrónico**, que es su usuario, y su **Contraseña**. Puede hacer clic en el ícono del ojo para ver la contraseña mientras la escribe. Si la olvidó, vea [Si olvidó su contraseña](#olvido-contrasena).
 3. Marque **Recordarme** solo si usa un equipo personal.
 4. Complete la verificación anti-bot que aparece en la pantalla.
 5. Presione **Entrar**.
@@ -77,7 +77,24 @@ Verificar el correo no le da acceso a ninguna empresa: la Cámara debe asociar s
 
 ### Si olvidó su contraseña {#olvido-contrasena}
 
-La pantalla de acceso no ofrece hoy una opción para recuperar la contraseña por su cuenta. Si la olvidó, contacte a la Cámara.
+Su **usuario es su correo electrónico**: el mismo con el que se registró. No hay un nombre de usuario aparte. Al entrar, no importa si escribe el correo con mayúsculas o minúsculas.
+
+1. En la pantalla de acceso, haga clic en **¿Olvidaste tu contraseña?**, junto al campo **Contraseña**.
+2. Escriba su **Correo electrónico**, complete la verificación anti-bot y presione **Enviar el enlace**.
+3. Abra el mensaje **Recuperar el acceso al Perfil de Afiliados** y presione **Elegir una contraseña nueva**. Escriba la contraseña nueva en **Contraseña** y en **Confirmar contraseña** (al menos 8 caracteres) y presione **Restablecer contraseña**. Después, entre con ella.
+
+- El enlace vence a los 60 minutos y sirve una sola vez. Si pide otro, el anterior deja de servir.
+- La pantalla siempre responde lo mismo, exista o no una cuenta con ese correo: por seguridad no confirma qué correos están registrados. Si no recibe el mensaje en unos minutos, revise la carpeta de correo no deseado («spam») y que el correo esté bien escrito.
+- Para evitar abusos, el sistema limita las solicitudes seguidas. Si ve **Demasiadas solicitudes**, espere unos minutos.
+- Al cambiar la contraseña, se cierran las sesiones abiertas con la contraseña anterior.
+
+### Si no recuerda con qué correo se registró {#olvido-correo}
+
+1. En la pantalla **¿Olvidaste tu contraseña?**, haga clic en **No recuerdo el correo de acceso**.
+2. Escriba el **RIF de la empresa** (por ejemplo, J-12345678-9; puede escribirlo con o sin guiones), complete la verificación anti-bot y presione **Enviar la ayuda**.
+3. Cada usuario afiliado asociado a esa empresa, con su correo verificado, recibe en **su propio correo** un mensaje con su usuario y un enlace para elegir **su propia** contraseña. Nadie puede cambiar la contraseña de otro usuario.
+
+> **NOTA:** Por seguridad, la pantalla no muestra ni cuenta los correos de la empresa, y responde lo mismo aunque el RIF no exista. Si nadie de su empresa recibe el mensaje, si ya no tiene acceso a ese correo o si su correo no está verificado, contacte a la Cámara e indique el nombre y el RIF de la empresa.
 
 ### Su perfil de usuario {#mi-perfil}
 

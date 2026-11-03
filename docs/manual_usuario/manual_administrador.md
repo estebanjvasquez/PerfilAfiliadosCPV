@@ -61,7 +61,8 @@ El sistema tiene tres tipos de acceso (gestionados con Filament Shield):
 
 **Ingreso:** https://camarapetrolera.app/admin/login
 
-1. Escriba su correo y contraseña de administrador.
+1. Escriba su correo y contraseña de administrador. El correo es el usuario. Si olvidó la contraseña, use
+   **¿Olvidaste tu contraseña?** (ver la sección 10, «Un afiliado olvidó su contraseña…»).
 2. El menú lateral muestra los grupos según sus permisos: **Empresas**, **Reportes**, **Gerencia**,
    **Mantenimiento** y **Roles**.
 
@@ -263,6 +264,32 @@ define la Cámara y aparece bloqueado para el afiliado.
 **Un afiliado no ve su empresa. ¿Por qué?**
 Su usuario no está vinculado a la empresa. Vincúlelo desde la empresa → pestaña **Usuarios**
 (sección 4.3).
+
+**Un afiliado olvidó su contraseña o con qué correo se registró. ¿Qué hago?** {#recuperacion-de-acceso}
+Desde el 2026-11-03 (TASK-0012), lo resuelve el propio afiliado, si controla su correo:
+- **¿Olvidaste tu contraseña?**, en la pantalla de ingreso, le envía un enlace a su correo, que es también su usuario.
+  El enlace vence a los 60 minutos y sirve una sola vez.
+- **No recuerdo el correo de acceso** pide el RIF de la empresa. Escribe al correo de cada cuenta que cumpla todo esto:
+  - está vinculada a esa empresa y tiene el correo verificado;
+  - tiene **solo** el rol `afiliados`, sin permisos directos;
+  - está vinculada a 3 empresas o menos.
+
+  Cada cuenta recibe su propio enlace. Las cuentas de la Cámara (`super_admin`, que el sistema vincula a cada empresa
+  nueva, cuentas sin rol o con otro rol) nunca reciben estos correos.
+
+Por seguridad, la pantalla no dice si el correo o el RIF existen. Si un correo es compartido por dos cuentas, no se le
+escribe. Si una empresa tiene más de 5 buzones elegibles, no se envía nada. Atienda usted estos casos:
+- el afiliado ya no tiene acceso a su correo;
+- su correo no está verificado;
+- su cuenta está vinculada a más de 3 empresas;
+- comparte el correo con otra cuenta;
+- la empresa supera ese tope.
+
+Antes de cambiar el correo de una cuenta, confirme la identidad de la persona por un canal de la Cámara. **Nunca** dé
+por teléfono ni por correo una contraseña o el correo de otra cuenta. Los límites (`config/account_recovery.php`) y el
+rol de afiliado se ajustan por configuración, no por id de rol. Los correos de recuperación solo salen si el envío de
+correo del sistema está activo: con el transporte `log` no se envían, para que el enlace no quede escrito en los
+registros.
 
 **¿Por qué una empresa aparece con menos de 100 % aunque cargó datos?**
 Alguna de las 8 secciones está vacía y sin marcar "No Aplica". Marcar "No Aplica" en lo que no
