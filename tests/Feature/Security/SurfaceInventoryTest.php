@@ -38,6 +38,7 @@ class SurfaceInventoryTest extends TestCase
         'GET|HEAD admin/register' => 'panel registration',
         'GET|HEAD admin/password-reset/request' => 'password reset request',
         'GET|HEAD admin/password-reset/reset' => 'password reset form (signed)',
+        'GET|HEAD admin/recuperar-acceso' => 'TASK-0012: access help by company RIF (Turnstile, limits, generic answer)',
         'GET|HEAD filament-impersonate/leave' => 'ends an impersonation held in the session; without one it only redirects',
     ];
 
