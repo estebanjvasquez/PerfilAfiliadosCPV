@@ -7,7 +7,7 @@
 | Referencias directas | `6440840198` (TASK-0011 APPROVED, estado de referencia; TASK-0011 no se reabre ni se modifica) |
 | Rama | `fix/sec-01-r4-01-role-editor-preserve` (rama canónica del estado vigente, `SESSION_RESUME.md` §1) |
 | BASE | `73b5f2d9373e98c643df983e91a708856b1207b9` |
-| Estado | **IN_PROGRESS** (2026-11-03) |
+| Estado | **READY_FOR_REVIEW** (2026-11-03); REVIEW_HEAD `b1b9146dae6a8f1dd3a135c871a523cf1480ccf6`; sin merge ni despliegue |
 | Gates | sin merge, sin despliegue, sin cambios en cuentas ni datos reales; sin enviar correos reales sin autorización |
 
 Cambios locales del propietario en `AGENTS.md`, `CLAUDE.md`, `docs/orquestador/PROTOCOL.md` y
@@ -117,13 +117,98 @@ Filament 3.3.55):
 
 ## Bloque 2 — Implementación
 
-*(en curso)*
+| Archivo | Cambio |
+|---|---|
+| `app/Support/Auth/AccountRecovery.php` (nuevo) | Normaliza correo y RIF; busca la cuenta del correo sin distinguir mayúsculas, solo si es única; elegibles por RIF (R3); límites (`attempt`); envío diferido una sola vez (`defer`); token del broker, que no se reemite antes de 60 s; no envía con transporte `log` fuera de local/testing (R4) |
+| `app/Notifications/Auth/AccountRecoveryLink.php` (nuevo) | Correo en español para una sola cuenta: su usuario, su enlace, el vencimiento; con el RIF, explica que cada usuario cambia solo su clave |
+| `app/Filament/Pages/Auth/RequestPasswordReset.php` (nuevo) | Reemplaza la solicitud de Filament: respuesta fija (también con límite), Turnstile, límites por IP (5/15 min) y por correo (3/h); enlace a la ayuda por RIF |
+| `app/Filament/Pages/Auth/RecoverAccessByRif.php` (nuevo, `/admin/recuperar-acceso`) | «No recuerdo el correo de acceso»: RIF validado (letra + 8–9 dígitos, con o sin guiones), Turnstile, límites por IP (5/15 min) y por RIF (3/h), respuesta fija |
+| `app/Providers/Filament/AdminPanelProvider.php` | `->passwordReset(RequestPasswordReset::class)` (el restablecimiento firmado es el de Filament) y la ruta pública de la ayuda por RIF |
+| `app/Filament/Pages/Login.php` | «Su usuario es su correo electrónico»; el enlace «¿Olvidaste tu contraseña?» que se perdía; correo sin distinguir mayúsculas cuando la coincidencia es única (D3) |
+| `config/account_recovery.php` (nuevo) | rol de afiliado por nombre, máximo de empresas por cuenta (3), tope de buzones por RIF (5), límites |
+| `resources/lang/es/passwords.php` (nuevo) | estados del broker en español (enlace vencido, ya usado o de otra cuenta) |
+
+**Decisión sobre el RIF.** La elegibilidad segura se pudo demostrar con los datos actuales. El RIF es único y está
+normalizado en las 406 empresas. Las cuentas internas se distinguen por rol, por nombre y no por id: `super_admin`,
+sin rol, `reportes` y `lectura`. Ninguna cuenta tiene dos roles ni permisos directos. La cuenta interna sin rol, con
+229 empresas, queda fuera por rol y por número de empresas.
+
+El único caso dudoso es una cuenta `afiliados` con 6 o más empresas. Queda fuera de la vía por RIF y conserva la vía
+por correo. Las 128 empresas sin buzón elegible reciben la misma respuesta genérica y remiten a la Cámara (R6).
+
+**Fuera de alcance, sin cambio:**
+- `Empresa::boot()` sigue vinculando las cuentas con `role_id = 1` a cada empresa nueva. La regla R3 no depende de eso.
+- El registro no normaliza el correo y podría crear variantes en mayúsculas. El login y la recuperación se protegen
+  porque solo resuelven una coincidencia única.
 
 ---
 
 ## Bloque 3 — Pruebas, correo y documentación
 
-*(pendiente)*
+### Pruebas (runner aislado de Contabo, PostgreSQL desechable, PHP 8.2.35)
+
+| Corrida | SHA | Resultado |
+|---|---|---|
+| Antes (solo pruebas) | `2737f27` | `AccountRecoveryTest`: **12 de 13 fallan** como se esperaba, entre ellas el login con otras mayúsculas (D3). La prueba que pasa es el inventario de superficie: su lista ya preveía las rutas de reset |
+| Primera implementación | `debee38` | 6 fallos. Se corrigieron dos cosas. Las pruebas de Livewire pasan por el kernel HTTP, que ejecuta los callbacks de terminate en cada petición, y la aplicación no los olvida: el envío diferido se repetía, y ahora `defer` corre una sola vez. Además, en la prueba el correo con espacios no pasa la regla `email`; en el navegador, `type=email` ya los quita |
+| Focalizada | `af522c0` | `AccountRecoveryTest`, `SurfaceInventoryTest`, `AccessMatrixTest`, `EmailVerificationFlowTest`: **OK (31 tests, 261 aserciones)** |
+| Suite completa | `b1b9146` | **OK (672 tests, 7683 aserciones)**, run `20261103T112638Z-b1b9146dae6a`; staging 200 antes y después; sin contenedores `cpvtest` restantes |
+
+**Escenarios cubiertos** (`tests/Feature/Auth/AccountRecoveryTest.php`):
+- correo existente e inexistente con la misma respuesta;
+- solo el titular recibe el enlace;
+- búsqueda sin distinguir mayúsculas;
+- afiliado sin verificar, por correo;
+- enlace válido;
+- el token de una cuenta no cambia la contraseña de otra;
+- un solo uso y vencimiento a los 61 minutos;
+- error de reset en español;
+- límites por correo y por origen, con la misma respuesta;
+- Turnstile fallido;
+- transporte `log` en producción;
+- por RIF:
+  - dos afiliados elegibles reciben un enlace cada uno;
+  - quedan fuera el no verificado, `super_admin`, la cuenta sin rol, la de dos roles, la de permiso directo y la
+    vinculada a 4 empresas;
+  - RIF escrito con guiones y en minúsculas;
+  - RIF inexistente con la misma respuesta;
+  - la pantalla no muestra correos;
+  - buzón compartido por dos cuentas omitido;
+  - más de 5 buzones: nada;
+  - formato inválido;
+  - límite por RIF;
+- envío diferido que corre una sola vez;
+- login sin distinguir mayúsculas, con contraseña errada rechazada;
+- textos del login y de las dos pantallas;
+- manual sincronizado con las etiquetas reales.
+
+### Correo (staging, sin enviar mensajes)
+- 2026-11-03, prueba inocua en el contenedor de staging: con el mailer `smtp` se abrió la conexión (EHLO + STARTTLS,
+  **TLSv1.3**, verificación de certificado por defecto) y se cerró. No hubo `MAIL FROM` ni `DATA`, así que no se envió
+  ningún mensaje. Remitente configurado; sin usuario SMTP (relay autorizado por IP).
+- **No se envió ningún correo real.** La entrega del mensaje de recuperación a un buzón queda pendiente de la
+  autorización del propietario, después del despliegue y a una cuenta de prueba suya.
+- El enlace no queda en los logs: con `smtp` el cuerpo no se registra; con `log`, R4 impide el envío; los errores de
+  envío se registran solo con la clase de la excepción.
+
+### Documentación
+- `resources/manual/manual_usuario.md`:
+  - «Ingresar al sistema» dice que el correo es el usuario;
+  - «Si olvidó su contraseña» describe la vía por correo;
+  - sección nueva «Si no recuerda con qué correo se registró» (`#olvido-correo`), con la ayuda por RIF.
+- `docs/manual_usuario/manual_administrador.md` §2 y §10 «Un afiliado olvidó su contraseña…»: qué resuelve el
+  afiliado solo, quién es elegible por RIF, qué casos atiende la Cámara y la regla de no dar contraseñas ni correos
+  ajenos.
+
+### Limitaciones
+- Sin recorrido en navegador ni en un teléfono. El código no está desplegado y en este equipo las páginas de Filament
+  no corren (falta `ext-intl`). Los textos y enlaces se comprueban en el HTML que renderiza el runner.
+- Sin Turnstile real: en las pruebas se usa un doble. En el navegador, el widget es el mismo parcial del login.
+- Sin entrega real de correo (ver arriba).
+- El manual del usuario todavía dice en «Verificar su correo electrónico» que el sistema no envía correos. Staging los
+  envía desde el 2026-10-26. No se cambió porque es otra sección y depende de la decisión de despliegue del propietario.
+- Staging corre `feature/upgrade-filament-v3`. Pasar esta tarea allí, como se hizo con TASK-0011, lo decide el
+  propietario.
 
 ---
 

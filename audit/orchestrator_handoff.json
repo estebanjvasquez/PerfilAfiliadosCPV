@@ -1,4 +1,40 @@
 {
+  "task_0012_account_recovery": {
+    "task_id": "TASK-0012",
+    "title": "Account recovery by email and by company RIF",
+    "source_comment": "6602168914",
+    "status": "READY_FOR_REVIEW",
+    "branch": "fix/sec-01-r4-01-role-editor-preserve",
+    "review_base_sha": "73b5f2d9373e98c643df983e91a708856b1207b9",
+    "review_head_sha": "b1b9146dae6a8f1dd3a135c871a523cf1480ccf6",
+    "handoff_commit_sha": "the commit that adds this block (child of review_head_sha); see the Issue #2 delivery comment",
+    "fails_before": {
+      "sha": "2737f2783b61b8f4802fc26724ac6bea2cf1e033",
+      "run_id": "20261103T111617Z-2737f2783b61",
+      "result": "12 of 13 new tests fail (the surface inventory allow-list already listed the reset routes)"
+    },
+    "tests": {
+      "focused": {
+        "sha": "af522c0460ee1f4c6ef9f669fbd7b8c5cbf6fad1",
+        "result": "OK (31 tests, 261 assertions)"
+      },
+      "full_suite": {
+        "sha": "b1b9146dae6a8f1dd3a135c871a523cf1480ccf6",
+        "run_id": "20261103T112638Z-b1b9146dae6a",
+        "result": "OK (672 tests, 7683 assertions)",
+        "staging_before": 200,
+        "staging_after": 200
+      },
+      "new_test_files": [
+        "tests/Feature/Auth/AccountRecoveryTest.php"
+      ]
+    },
+    "rif_decision": "eligibility demonstrable: linked, verified, affiliate role by name only, no direct permissions, <=3 linked companies; shared mailboxes skipped; >5 mailboxes sends nothing; internal accounts (super_admin auto-linked to every company, no-role, other roles) excluded",
+    "mail_verification": "staging SMTP handshake only (EHLO+STARTTLS TLSv1.3, closed; no MAIL FROM/DATA); no real message sent; real delivery pending owner authorization after deployment",
+    "database_mutations": "none; read-only aggregate queries on staging (READ ONLY transaction, rolled back)",
+    "deploy": "none",
+    "task_file": "docs/orquestador/tasks/0012-account-recovery.md"
+  },
   "task_0011_ux_company_profile_services": {
       "task_id":  "TASK-0011",
       "title":  "UX end-to-end: company profile and services",

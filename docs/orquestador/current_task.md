@@ -3,13 +3,15 @@
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## Activa: TASK-0012 — Recuperación de acceso por correo y RIF — IN_PROGRESS (`6602168914`)
+## Activa: TASK-0012 — Recuperación de acceso por correo y RIF — READY_FOR_REVIEW (`6602168914`); sin desplegar
 
 | Campo | Valor |
 |---|---|
 | Archivo | [`tasks/0012-account-recovery.md`](tasks/0012-account-recovery.md) (diagnóstico, decisiones, evidencia, pendientes; comentario fuente íntegro) |
 | Fuente | Issue #2 `6602168914` (propietario, 2026-11-03) |
-| Rama / BASE | `fix/sec-01-r4-01-role-editor-preserve` / `73b5f2d` |
+| Rama / BASE / REVIEW_HEAD | `fix/sec-01-r4-01-role-editor-preserve` / `73b5f2d` / `b1b9146` |
+| Pruebas | antes `2737f27`: 12 de 13 fallan; suite completa `b1b9146`: **672 OK** |
+| Decisión RIF | elegibilidad demostrable (R3): afiliado por nombre de rol, verificado, sin otros roles ni permisos directos, ≤3 empresas; internas excluidas; correo real pendiente de autorización |
 | Gates | sin merge, sin despliegue, sin cambios en cuentas ni datos reales, sin correos reales sin autorización |
 
 Debajo sigue el checkpoint de TASK-0011, sin cambios salvo su estado: el propietario la aprobó en `6440840198`.
