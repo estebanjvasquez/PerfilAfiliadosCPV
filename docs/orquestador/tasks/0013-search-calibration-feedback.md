@@ -170,3 +170,20 @@ Fuera de alcance: aplicar la migración en la base compartida, conectar logs o v
 
 Autoría: instrucción publicada por el orquestador a petición expresa del propietario en este chat.
 
+
+---
+
+## Migración aplicada en la base compartida (2026-11-06)
+
+- **Autorización:** la dio el propietario en el chat de desarrollo («the migration to shared database is authorized»).
+- **Qué se aplicó:** `php artisan migrate --database=pgsql --path=…/2026_11_06_120000_create_cira_search_log_and_feedback_tables.php --force`. Era la única migración pendiente y quedó como lote 61.
+- **Verificación:**
+  - `cira_search_log`: 4 CHECK;
+  - `cira_search_feedback`: 7 CHECK y 3 claves foráneas;
+  - 6 índices, incluido `cira_search_feedback_one_vote_idx`;
+  - las dos tablas, vacías;
+  - **RLS activado** sin políticas.
+- **Permisos de `anon` y `authenticated`:** los roles de Supabase tienen los permisos por defecto sobre las tablas nuevas, igual que en las demás. RLS sin políticas les bloquea el acceso por la API REST.
+- **Staging:** sitio y `/cira-test/` responden 200 después de aplicar.
+- **Reversión:** `down()` elimina las dos tablas; está probado en el runner aislado.
+- **Sin conectar todavía:** ni el registro de búsquedas en n8n ni los votos. Son pasos aparte.
