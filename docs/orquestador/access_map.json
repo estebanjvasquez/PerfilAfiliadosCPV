@@ -121,11 +121,24 @@
     },
     {
       "id": "n8n_cira",
-      "description": "n8n workflow backing the CIRA UAT chat page",
-      "credentials": [],
-      "value_location": "owner_managed",
-      "status": "out_of_agent_scope",
-      "notes": "Pre-flight check before any UAT session: if the workflow is stopped, every query fails identically and a whole UAT looks like a catastrophic search failure."
+      "description": "n8n workflow backing the CIRA UAT chat page (\"Chat CIRA V5 - MCP\", zbVLoCdR09IA9yQK) and its public REST API",
+      "credentials": [
+        "N8N_BASE_URL",
+        "N8N_API_KEY"
+      ],
+      "value_location": "local_store",
+      "status": "enabled_2026-11-06",
+      "notes": "Community edition keys are unscoped (read AND write every workflow). Export a backup outside the repo before any change; every workflow change needs explicit owner authorization. Pre-flight check before any UAT session: if the workflow is stopped, every query fails identically and a whole UAT looks like a catastrophic search failure."
+    },
+    {
+      "id": "worker_mcp",
+      "description": "Bearer token for the Worker /mcp endpoint (same value as the Worker secret MCP_TOKEN and the n8n credential \"MCP Perfil Afiliados CPV\"); used by docs/uat/tools/evaluate_search.mjs",
+      "credentials": [
+        "CPV_MCP_TOKEN"
+      ],
+      "value_location": "local_store",
+      "status": "enabled_2026-11-06",
+      "notes": "Rotated by the owner 2026-11-06. Only n8n and the evaluation script use it; Laravel uses MCP_EMBED_TOKEN. Rotating it again means updating the Worker secret and the n8n credential together."
     },
     {
       "id": "system_mail",

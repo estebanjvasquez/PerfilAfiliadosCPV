@@ -1,0 +1,1652 @@
+{
+  "_comment": "Lista de referencia (golden set) del lote 001 de pruebas del cliente del buscador CIRA. Generada desde docs/uat/RESULTADOS_BUSCADOR_LOTE001.xlsx. Los nombres escritos por el evaluador se resolvieron a empresas.id contra la base (lectura, 2026-11-06). Ver docs/uat/GOLDEN_SET_LOTE001.md para semántica y uso.",
+  "schema_version": 1,
+  "source": {
+    "file": "docs/uat/RESULTADOS_BUSCADOR_LOTE001.xlsx",
+    "sheet": "Resultados buscador",
+    "evaluated_between": [
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "evaluators": [
+      "EVAL_A",
+      "EVAL_B"
+    ],
+    "client_rows_skipped": [
+      "G8-01",
+      "G8-02",
+      "G8-03",
+      "G8-04",
+      "G8-05",
+      "G8-06",
+      "G8-07",
+      "G8-08",
+      "G8-09",
+      "G8-10"
+    ],
+    "generated_on": "2026-11-06"
+  },
+  "semantics": {
+    "relevant": "Juicio positivo del cliente (la empresa SÍ corresponde a la consulta).",
+    "not_relevant": "Juicio negativo del cliente (apareció y NO corresponde).",
+    "unjudged": "Toda empresa que no esté en ninguna de las dos listas es DESCONOCIDA, no negativa. El cliente no pudo indicar empresas ausentes (N vacía en todas las filas).",
+    "order": "El orden dentro de cada lista es el que escribió el evaluador; NO es la posición en el ranking.",
+    "analysis_tags": "Etiquetas técnicas añadidas al convertir; no las escribió el cliente."
+  },
+  "client_general_observations": [
+    "Con más de ~10 resultados aparece mucho ruido; las relevantes suelen estar entre las primeras diez.",
+    "\"similar a\" (semántico por vectores) rara vez acierta; necesita un criterio adicional.",
+    "\"coincidió con\" fue el método que mejor funcionó.",
+    "Es muy difícil indicar qué empresas faltan (más de 400 afiliadas, conocidas sobre todo por su perfil).",
+    "Algunas filas tienen más de 5 empresas porque había relevantes fuera del top 5.",
+    "Algunas casillas de relevantes quedaron vacías porque el resultado estaba muy contaminado.",
+    "No se llenaron las filas propuestas por el cliente (G8)."
+  ],
+  "summary": {
+    "cases": 35,
+    "scored": 33,
+    "avg_score_all_scored": 2.52,
+    "domain_scored": 29,
+    "avg_score_domain": 2.21,
+    "domain_score_ge_4": [
+      "G1-01",
+      "G2-04",
+      "G2-09"
+    ],
+    "positive_judgments": 49,
+    "negative_judgments": 66,
+    "unresolved_names": 2
+  },
+  "recurring_noise_companies": [
+    {
+      "empresa_id": 187,
+      "db_name": "HOLANDA VENEZUELA C.A.",
+      "queries": [
+        "G1-02",
+        "G2-10",
+        "G3-03",
+        "G3-04",
+        "G6-02",
+        "G6-04"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 391,
+      "db_name": "TOTAL CLEAN, C.A.",
+      "queries": [
+        "G2-03",
+        "G2-07",
+        "G5-01",
+        "G5-02",
+        "G6-04"
+      ],
+      "also_relevant_in": [
+        "G2-09"
+      ]
+    },
+    {
+      "empresa_id": 72,
+      "db_name": "GEOHIDRA CONSULTORES, C.A.",
+      "queries": [
+        "G1-02",
+        "G2-04",
+        "G2-06",
+        "G3-05"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 257,
+      "db_name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+      "queries": [
+        "G1-02",
+        "G3-01",
+        "G3-02",
+        "G5-01"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 86,
+      "db_name": "TUBOACERO, C.A.",
+      "queries": [
+        "G2-01",
+        "G2-02",
+        "G6-04"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 157,
+      "db_name": "LUKIVEN, S.A.",
+      "queries": [
+        "G2-01",
+        "G2-02",
+        "G6-02"
+      ],
+      "also_relevant_in": [
+        "G1-03",
+        "G2-07",
+        "G5-02",
+        "G6-01",
+        "G6-04"
+      ]
+    },
+    {
+      "empresa_id": 170,
+      "db_name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+      "queries": [
+        "G2-01",
+        "G2-02",
+        "G6-04"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 107,
+      "db_name": "SERVI COMPRESORES, C.A.",
+      "queries": [
+        "G3-05",
+        "G4-01",
+        "G5-02"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 91,
+      "db_name": "DISTEINSA, C.A.",
+      "queries": [
+        "G1-03",
+        "G2-07"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 74,
+      "db_name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+      "queries": [
+        "G1-04",
+        "G5-01"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 138,
+      "db_name": "ALCAVE VENEZUELA C.A.",
+      "queries": [
+        "G2-01",
+        "G2-02"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 83,
+      "db_name": "ELEKTROMEK, C.A.",
+      "queries": [
+        "G2-06",
+        "G5-02"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 141,
+      "db_name": "OXICORTE DE VENEZUELA, C.A.",
+      "queries": [
+        "G2-06",
+        "G6-01"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 333,
+      "db_name": "CONSORCIO OGS, C.A.",
+      "queries": [
+        "G2-07",
+        "G5-02"
+      ],
+      "also_relevant_in": []
+    },
+    {
+      "empresa_id": 563,
+      "db_name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+      "queries": [
+        "G2-10",
+        "G3-04"
+      ],
+      "also_relevant_in": []
+    }
+  ],
+  "cases": [
+    {
+      "test_id": "G1-01",
+      "group": "G1_PRODUCTOS_SERVICIOS_DIRECTOS",
+      "query": "tratamiento de aguas de perforación",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "excelente",
+      "score_1_5": 5,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "EVERGREEN",
+          "empresa_id": 96,
+          "db_name": "EVERGREEN SERVICE, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "MARITIME CONTRACTOS",
+          "empresa_id": 152,
+          "db_name": "MARITIME CONTRACTORS DE VENEZUELA S.A",
+          "match": "manual"
+        },
+        {
+          "written": "SYSVENCOL",
+          "empresa_id": 179,
+          "db_name": "SYSVENCOL, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "ADVANCE LOGGING AND EXPLORATIONS",
+          "empresa_id": 79,
+          "db_name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+          "match": "manual"
+        },
+        {
+          "written": "CLAM.",
+          "empresa_id": 115,
+          "db_name": "CLAM INSTALACIONES, S.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G1-02",
+      "group": "G1_PRODUCTOS_SERVICIOS_DIRECTOS",
+      "query": "levantamiento artificial",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "TASPSA",
+          "empresa_id": 276,
+          "db_name": "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA)",
+          "match": "auto"
+        },
+        {
+          "written": "SCAN GEOFISICA",
+          "empresa_id": 383,
+          "db_name": "SCAN GEOFÍSICA, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "GEOHIDRA",
+          "empresa_id": 72,
+          "db_name": "GEOHIDRA CONSULTORES, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "EMPRESA NACIONAL DE FABRICACIÓN",
+          "empresa_id": 257,
+          "db_name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+          "match": "auto"
+        },
+        {
+          "written": "HOLANDA",
+          "empresa_id": 187,
+          "db_name": "HOLANDA VENEZUELA C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "Desde la 4 para abajo nignuna empresa pertenece.",
+      "analysis_tags": [
+        "ruido_despues_de_top3"
+      ]
+    },
+    {
+      "test_id": "G1-03",
+      "group": "G1_PRODUCTOS_SERVICIOS_DIRECTOS",
+      "query": "revestidor",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "LUKIVEN",
+          "empresa_id": 157,
+          "db_name": "LUKIVEN, S.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "DISTEINSA",
+          "empresa_id": 91,
+          "db_name": "DISTEINSA, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "SHIBARI",
+          "empresa_id": 312,
+          "db_name": "CORPORACION SHIBARI, C.A",
+          "match": "auto"
+        },
+        {
+          "written": "KALA'S",
+          "empresa_id": 317,
+          "db_name": "KALA'S, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "COATINGS DE ORIENTE",
+          "empresa_id": 145,
+          "db_name": "COATINGS DE ORIENTE C A",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G1-04",
+      "group": "G1_PRODUCTOS_SERVICIOS_DIRECTOS",
+      "query": "mecha",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "incorrecto",
+      "score_1_5": 1,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [
+        {
+          "written": "COSTA NORTE",
+          "empresa_id": 140,
+          "db_name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "VINCCLER",
+          "empresa_id": 1,
+          "db_name": "VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+          "match": "auto"
+        },
+        {
+          "written": "N&V",
+          "empresa_id": 73,
+          "db_name": "N&V CONSULTORES, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "P.A.P",
+          "empresa_id": 74,
+          "db_name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "Mecha no puede ser simliar a obras mecánicas",
+      "analysis_tags": [
+        "similitud_superficial",
+        "termino_regional_sin_cobertura"
+      ]
+    },
+    {
+      "test_id": "G2-01",
+      "group": "G2_TERMINOLOGIA_REGIONAL",
+      "query": "cabria",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "incorrecto",
+      "score_1_5": 1,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [
+        {
+          "written": "ALCAVE",
+          "empresa_id": 138,
+          "db_name": "ALCAVE VENEZUELA C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "TUBOACERO",
+          "empresa_id": 86,
+          "db_name": "TUBOACERO, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "LUKIVEN",
+          "empresa_id": 157,
+          "db_name": "LUKIVEN, S.A.",
+          "match": "auto"
+        },
+        {
+          "written": "INDUSTRIAS METAL MECANICA MÉRIDA",
+          "empresa_id": 170,
+          "db_name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "relacionado con - no es coincidencia directa.",
+      "analysis_tags": [
+        "candidato_relacionado_mostrado",
+        "termino_regional_sin_cobertura"
+      ]
+    },
+    {
+      "test_id": "G2-02",
+      "group": "G2_TERMINOLOGIA_REGIONAL",
+      "query": "cabrias",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "incorrecto",
+      "score_1_5": 1,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [
+        {
+          "written": "ALCAVE",
+          "empresa_id": 138,
+          "db_name": "ALCAVE VENEZUELA C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "TUBOACERO",
+          "empresa_id": 86,
+          "db_name": "TUBOACERO, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "LUKIVEN",
+          "empresa_id": 157,
+          "db_name": "LUKIVEN, S.A.",
+          "match": "auto"
+        },
+        {
+          "written": "INDUSTRIAS METAL MECANICA MÉRIDA",
+          "empresa_id": 170,
+          "db_name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "relacionado con - no es coincidencia directa.",
+      "analysis_tags": [
+        "candidato_relacionado_mostrado",
+        "termino_regional_sin_cobertura"
+      ]
+    },
+    {
+      "test_id": "G2-03",
+      "group": "G2_TERMINOLOGIA_REGIONAL",
+      "query": "mechurrio",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "aceptable",
+      "score_1_5": 3,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "Costa Norte",
+          "empresa_id": 140,
+          "db_name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "Total Clean",
+          "empresa_id": 391,
+          "db_name": "TOTAL CLEAN, C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G2-04",
+      "group": "G2_TERMINOLOGIA_REGIONAL",
+      "query": "macolla",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "bueno",
+      "score_1_5": 4,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "Rafay",
+          "empresa_id": 155,
+          "db_name": "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "Topieca",
+          "empresa_id": 171,
+          "db_name": "TOPIECA, S.A.",
+          "match": "auto"
+        },
+        {
+          "written": "Vinccler",
+          "empresa_id": 1,
+          "db_name": "VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+          "match": "auto"
+        },
+        {
+          "written": "Ineletcra",
+          "empresa_id": 76,
+          "db_name": "INELECTRA,S.A.C.A.",
+          "match": "manual"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "Geohidra",
+          "empresa_id": 72,
+          "db_name": "GEOHIDRA CONSULTORES, C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "\"Coincide con\" arroja mejores reultados.",
+      "analysis_tags": [
+        "literal_mejor_que_semantico"
+      ]
+    },
+    {
+      "test_id": "G2-05",
+      "group": "G2_TERMINOLOGIA_REGIONAL",
+      "query": "guaya fina",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "UNIÓN VENEZUELA SERVICIOS",
+          "empresa_id": 182,
+          "db_name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+          "match": "auto"
+        },
+        {
+          "written": "DYNA DRILL",
+          "empresa_id": 458,
+          "db_name": "DYNA DRILL, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "ESSENZA SERVICES",
+          "empresa_id": 198,
+          "db_name": "ESSENZA SERVICES C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "MODELO AFILIADOS",
+          "empresa_id": 128,
+          "db_name": "MODELO AFILIADOS",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "No detecta la palabra guayas si se busca. Aperece \"modelo afiliados por similitud a: \"fgjf\"",
+      "analysis_tags": [
+        "termino_regional_sin_cobertura",
+        "dato_de_prueba_en_resultados"
+      ]
+    },
+    {
+      "test_id": "G2-06",
+      "group": "G2_TERMINOLOGIA_REGIONAL",
+      "query": "guaya eléctrica",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "ADVANCED LOGGING",
+          "empresa_id": 79,
+          "db_name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "GEOHIDRA",
+          "empresa_id": 72,
+          "db_name": "GEOHIDRA CONSULTORES, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "DATA POWER",
+          "empresa_id": 213,
+          "db_name": "DATA POWER DEAR, C.A",
+          "match": "auto"
+        },
+        {
+          "written": "ELEKTROMEK",
+          "empresa_id": 83,
+          "db_name": "ELEKTROMEK, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "OXICORTE.",
+          "empresa_id": 141,
+          "db_name": "OXICORTE DE VENEZUELA, C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "LOS QUE IDCEN MAQUINARIA Y EQUIPOS PARA ELECTRICIDAD NO COINCIDEN.",
+      "analysis_tags": [
+        "termino_generico_domina"
+      ]
+    },
+    {
+      "test_id": "G2-07",
+      "group": "G2_TERMINOLOGIA_REGIONAL",
+      "query": "balancín",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "LUKIVEN",
+          "empresa_id": 157,
+          "db_name": "LUKIVEN, S.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "DISTEINSA",
+          "empresa_id": 91,
+          "db_name": "DISTEINSA, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "CONSORCIO OGS",
+          "empresa_id": 333,
+          "db_name": "CONSORCIO OGS, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "TOTAL CLEAN",
+          "empresa_id": 391,
+          "db_name": "TOTAL CLEAN, C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G2-08",
+      "group": "G2_TERMINOLOGIA_REGIONAL",
+      "query": "caballito",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "no puede juzgar",
+      "score_1_5": null,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": "no encontramos resultados",
+      "analysis_tags": [
+        "sin_resultados"
+      ]
+    },
+    {
+      "test_id": "G2-09",
+      "group": "G2_TERMINOLOGIA_REGIONAL",
+      "query": "camión chupón",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "bueno",
+      "score_1_5": 4,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "TOTAL CLEAN",
+          "empresa_id": 391,
+          "db_name": "TOTAL CLEAN, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G2-10",
+      "group": "G2_TERMINOLOGIA_REGIONAL",
+      "query": "gandola",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "OEG",
+          "empresa_id": 165,
+          "db_name": "OEG INTERNACIONAL SERVICE, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "Clover",
+          "empresa_id": 204,
+          "db_name": "CLOVER INTERNACIONAL, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "Consorcio Padalca",
+          "empresa_id": 433,
+          "db_name": "CONSORCIO PALDACA, C.A.",
+          "match": "manual"
+        },
+        {
+          "written": "Holanda",
+          "empresa_id": 187,
+          "db_name": "HOLANDA VENEZUELA C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES",
+          "empresa_id": 563,
+          "db_name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G3-01",
+      "group": "G3_INTENCION_MAS_CAPACIDAD",
+      "query": "mantenimiento de cabrias",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "aceptable",
+      "score_1_5": 3,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "PEMINSER",
+          "empresa_id": 173,
+          "db_name": "PEMINSER, C.A (PETROLEUM AND MINING SERVICES)",
+          "match": "auto"
+        },
+        {
+          "written": "CLAM",
+          "empresa_id": 115,
+          "db_name": "CLAM INSTALACIONES, S.A.",
+          "match": "auto"
+        },
+        {
+          "written": "SYSVENCOL",
+          "empresa_id": 179,
+          "db_name": "SYSVENCOL, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "EVERGREEN",
+          "empresa_id": 96,
+          "db_name": "EVERGREEN SERVICE, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "EMPRESA NACIONAL DE FABRICACIONES",
+          "empresa_id": 257,
+          "db_name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": [
+        "intencion_ignorada"
+      ]
+    },
+    {
+      "test_id": "G3-02",
+      "group": "G3_INTENCION_MAS_CAPACIDAD",
+      "query": "fabricantes de cabrias",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "aceptable",
+      "score_1_5": 3,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "PEMINSER",
+          "empresa_id": 173,
+          "db_name": "PEMINSER, C.A (PETROLEUM AND MINING SERVICES)",
+          "match": "auto"
+        },
+        {
+          "written": "CLAM",
+          "empresa_id": 115,
+          "db_name": "CLAM INSTALACIONES, S.A.",
+          "match": "auto"
+        },
+        {
+          "written": "SYSVENCOL",
+          "empresa_id": 179,
+          "db_name": "SYSVENCOL, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "EVERGREEN",
+          "empresa_id": 96,
+          "db_name": "EVERGREEN SERVICE, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "EMPRESA NACIONAL DE FABRICACIONES",
+          "empresa_id": 257,
+          "db_name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": [
+        "intencion_ignorada"
+      ]
+    },
+    {
+      "test_id": "G3-03",
+      "group": "G3_INTENCION_MAS_CAPACIDAD",
+      "query": "transporte de gandolas",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "aceptable",
+      "score_1_5": 3,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "Clover",
+          "empresa_id": 204,
+          "db_name": "CLOVER INTERNACIONAL, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "Taurel",
+          "empresa_id": 452,
+          "db_name": "TAUREL & CÍA SUCRS, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "Losan",
+          "empresa_id": 426,
+          "db_name": "LOSAN LOGISTICA, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "Holanda",
+          "empresa_id": 187,
+          "db_name": "HOLANDA VENEZUELA C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G3-04",
+      "group": "G3_INTENCION_MAS_CAPACIDAD",
+      "query": "alquiler de gandolas",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "OEG",
+          "empresa_id": 165,
+          "db_name": "OEG INTERNACIONAL SERVICE, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "CLOVER",
+          "empresa_id": 204,
+          "db_name": "CLOVER INTERNACIONAL, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "LOSAN",
+          "empresa_id": 426,
+          "db_name": "LOSAN LOGISTICA, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "Holanda",
+          "empresa_id": 187,
+          "db_name": "HOLANDA VENEZUELA C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES",
+          "empresa_id": 563,
+          "db_name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "Salen alquileres de otros productos. (edificios, Almacenes, etc) Salen empresas que no tienen nada que ver.",
+      "analysis_tags": [
+        "termino_generico_domina"
+      ]
+    },
+    {
+      "test_id": "G3-05",
+      "group": "G3_INTENCION_MAS_CAPACIDAD",
+      "query": "mantenimiento de levantamiento artificial",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "incorrecto",
+      "score_1_5": 1,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [
+        {
+          "written": "SERVI COMPRESORES",
+          "empresa_id": 107,
+          "db_name": "SERVI COMPRESORES, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "TEMI",
+          "empresa_id": 78,
+          "db_name": "TEMI, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "GEOHIDRA",
+          "empresa_id": 72,
+          "db_name": "GEOHIDRA CONSULTORES, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "HERMANOS FURLANETTO.",
+          "empresa_id": 94,
+          "db_name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [
+        {
+          "written": "INSERVEN",
+          "empresa_id": null,
+          "unresolved_reason": "Ambiguo: hay dos empresas (122 \"INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN\" y 286 \"INSERVEN, C.A.\"). Confirmar con el cliente.",
+          "candidates": [
+            122,
+            286
+          ],
+          "list": "not_relevant"
+        }
+      ],
+      "client_comment": "Agarra la palabra mantenimiento,  aparecieron empresas de mantenimiento de parada de planta.",
+      "analysis_tags": [
+        "termino_generico_domina"
+      ]
+    },
+    {
+      "test_id": "G4-01",
+      "group": "G4_TERMINOS_AMPLIOS_GENERICOS",
+      "query": "operadores",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "aceptable",
+      "score_1_5": 3,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "REPSOL",
+          "empresa_id": 146,
+          "db_name": "REPSOL SERVICIOS CARIBE S.A.S., SUCURSAL VENEZUELA",
+          "match": "auto"
+        },
+        {
+          "written": "I.O.E.D",
+          "empresa_id": 177,
+          "db_name": "INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+          "match": "auto"
+        },
+        {
+          "written": "INEPETROL",
+          "empresa_id": 325,
+          "db_name": "INEPETROL, S.A.",
+          "match": "auto"
+        },
+        {
+          "written": "CHEVRON",
+          "empresa_id": 218,
+          "db_name": "CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "DBS SEAPORT",
+          "empresa_id": 124,
+          "db_name": "DBS SEAPORT S.A.",
+          "match": "auto"
+        },
+        {
+          "written": "RESTOVEN",
+          "empresa_id": 326,
+          "db_name": "RESTOVEN DE VENEZUELA, .C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "SERVI COMPRESORES",
+          "empresa_id": 107,
+          "db_name": "SERVI COMPRESORES, C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G4-02",
+      "group": "G4_TERMINOS_AMPLIOS_GENERICOS",
+      "query": "dame todas las empresas",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "bueno",
+      "score_1_5": 4,
+      "expected_behavior": "clarification",
+      "expected_behavior_basis": "cliente: \"Pide un criterio más específico\" (calificado 4)",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": "Pide un criterio más específico.",
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G4-03",
+      "group": "G4_TERMINOS_AMPLIOS_GENERICOS",
+      "query": "servicios petroleros",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "incorrecto",
+      "score_1_5": 1,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": "Todas, demasiado genérico",
+      "analysis_tags": [
+        "consulta_demasiado_generica"
+      ]
+    },
+    {
+      "test_id": "G4-04",
+      "group": "G4_TERMINOS_AMPLIOS_GENERICOS",
+      "query": "construcción",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": "Todas, demasiado genérico. Hay empresas que son de otros sectores que aparecen , debajo del #10.",
+      "analysis_tags": [
+        "consulta_demasiado_generica",
+        "ruido_despues_de_top10"
+      ]
+    },
+    {
+      "test_id": "G5-01",
+      "group": "G5_TECNICAS_COMPUESTAS",
+      "query": "tratamiento de aguas de perforación en el lago",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "CLAM",
+          "empresa_id": 115,
+          "db_name": "CLAM INSTALACIONES, S.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "TOTAL CLEAN",
+          "empresa_id": 391,
+          "db_name": "TOTAL CLEAN, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "ENDEFCA",
+          "empresa_id": 257,
+          "db_name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+          "match": "auto"
+        },
+        {
+          "written": "P.A.P.",
+          "empresa_id": 74,
+          "db_name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match": "auto"
+        },
+        {
+          "written": "OILPLEX",
+          "empresa_id": 137,
+          "db_name": "OILPLEX, C.A",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G5-02",
+      "group": "G5_TECNICAS_COMPUESTAS",
+      "query": "empresas que fabriquen y mantengan balancines",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "LUKIVEN",
+          "empresa_id": 157,
+          "db_name": "LUKIVEN, S.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "CONSORCIO OGS",
+          "empresa_id": 333,
+          "db_name": "CONSORCIO OGS, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "TOTAL CLEAN",
+          "empresa_id": 391,
+          "db_name": "TOTAL CLEAN, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "SERVI COMPRESORES",
+          "empresa_id": 107,
+          "db_name": "SERVI COMPRESORES, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "ELEKTROMEK",
+          "empresa_id": 83,
+          "db_name": "ELEKTROMEK, C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": null,
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G5-03",
+      "group": "G5_TECNICAS_COMPUESTAS",
+      "query": "inspección y mantenimiento de guaya eléctrica",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "incorrecto",
+      "score_1_5": 1,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": "Asocia unicamente el término mantenimiento.",
+      "analysis_tags": [
+        "termino_generico_domina"
+      ]
+    },
+    {
+      "test_id": "G5-04",
+      "group": "G5_TECNICAS_COMPUESTAS",
+      "query": "transporte de crudo por gandola",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-04",
+      "evaluator": "EVAL_B",
+      "overall_label": "no puede juzgar",
+      "score_1_5": null,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": "Asocia el transporte de crudo a gasoductos y oleoductos.",
+      "analysis_tags": [
+        "interpretacion_desviada"
+      ]
+    },
+    {
+      "test_id": "G6-01",
+      "group": "G6_INGLES_BILINGUE",
+      "query": "pipeline",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "aceptable",
+      "score_1_5": 3,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "LUKIVEN",
+          "empresa_id": 157,
+          "db_name": "LUKIVEN, S.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "OXICORTE",
+          "empresa_id": 141,
+          "db_name": "OXICORTE DE VENEZUELA, C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "Es un término muy general; puedo vender, fabricar o instalar pipelines.",
+      "analysis_tags": [
+        "consulta_ambigua"
+      ]
+    },
+    {
+      "test_id": "G6-02",
+      "group": "G6_INGLES_BILINGUE",
+      "query": "refinery",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "incorrecto",
+      "score_1_5": 1,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [
+        {
+          "written": "LUKIVEN",
+          "empresa_id": 157,
+          "db_name": "LUKIVEN, S.A.",
+          "match": "auto"
+        },
+        {
+          "written": "VHICOA",
+          "empresa_id": 85,
+          "db_name": "VENEZUELAN HEAVY INDUSTRIES, C.A. (VHICOA)",
+          "match": "auto"
+        },
+        {
+          "written": "HOLANDA",
+          "empresa_id": 187,
+          "db_name": "HOLANDA VENEZUELA C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "OTERCA",
+          "empresa_id": 125,
+          "db_name": "OTERCA MAQUINARIAS, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "VENEZOLANA DE PINTURAS.",
+          "empresa_id": 149,
+          "db_name": "C.A. VENEZOLANA DE PINTURAS",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "La experiencia en refinación hace los resultados de búsqueda muy generales.",
+      "analysis_tags": [
+        "contexto_vs_capacidad"
+      ]
+    },
+    {
+      "test_id": "G6-03",
+      "group": "G6_INGLES_BILINGUE",
+      "query": "refinería",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "incorrecto",
+      "score_1_5": 1,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": "Salen muchas empresas de otros sectores que tuvieron contratos con refinería. No se cuales tienen que estar y cuales no; hay empresas de todos los sectores. La palabra no me dice nada.",
+      "analysis_tags": [
+        "contexto_vs_capacidad",
+        "consulta_demasiado_generica"
+      ]
+    },
+    {
+      "test_id": "G6-04",
+      "group": "G6_INGLES_BILINGUE",
+      "query": "drilling",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "aceptable",
+      "score_1_5": 3,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "extended_beyond_top5",
+      "relevant": [
+        {
+          "written": "CLAM",
+          "empresa_id": 115,
+          "db_name": "CLAM INSTALACIONES, S.A.",
+          "match": "auto"
+        },
+        {
+          "written": "ADVANCED LOGGING",
+          "empresa_id": 79,
+          "db_name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "MARITIME",
+          "empresa_id": 152,
+          "db_name": "MARITIME CONTRACTORS DE VENEZUELA S.A",
+          "match": "auto"
+        },
+        {
+          "written": "EVERGREEN",
+          "empresa_id": 96,
+          "db_name": "EVERGREEN SERVICE, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "TROIL",
+          "empresa_id": 77,
+          "db_name": "TROIL SERVICES, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "STRATA",
+          "empresa_id": 133,
+          "db_name": "STRATA SERVICES, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "LUKIVEN",
+          "empresa_id": 157,
+          "db_name": "LUKIVEN, S.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "TUBOACERO",
+          "empresa_id": 86,
+          "db_name": "TUBOACERO, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "METAL MECANICA DE MERIDA",
+          "empresa_id": 170,
+          "db_name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match": "manual"
+        },
+        {
+          "written": "TOTAL CLEAM",
+          "empresa_id": 391,
+          "db_name": "TOTAL CLEAN, C.A.",
+          "match": "manual"
+        },
+        {
+          "written": "HOLANDA",
+          "empresa_id": 187,
+          "db_name": "HOLANDA VENEZUELA C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [],
+      "client_comment": "Se hizo una evaluación un poco más extensa ya que la mayoría de las empresas que si pertenecpian no estaban en el top 5.",
+      "analysis_tags": [
+        "relevantes_fuera_de_top5"
+      ]
+    },
+    {
+      "test_id": "G7-01",
+      "group": "G7_DIFICILES_FUERA_DE_ALCANCE",
+      "query": "como me afilio a la camara?",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "excelente",
+      "score_1_5": 5,
+      "expected_behavior": "institutional_answer_no_companies",
+      "expected_behavior_basis": "cliente: mensaje adecuado con contactos de la Cámara (5)",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": "No arroja empresas, arroja un mensaje adecuado que incluye los contactos de la Cámara.",
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G7-02",
+      "group": "G7_DIFICILES_FUERA_DE_ALCANCE",
+      "query": "necesito arbolitos para pozos petroleros",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "deficiente",
+      "score_1_5": 2,
+      "expected_behavior": "results",
+      "expected_behavior_basis": "consulta de dominio: se esperan empresas relevantes",
+      "judged_depth": "top5_or_more",
+      "relevant": [
+        {
+          "written": "SYSVENCOL",
+          "empresa_id": 179,
+          "db_name": "SYSVENCOL, C.A.",
+          "match": "auto"
+        }
+      ],
+      "not_relevant": [
+        {
+          "written": "PROBE",
+          "empresa_id": 207,
+          "db_name": "PROBE, C.A.",
+          "match": "auto"
+        },
+        {
+          "written": "REPRESENTACIONES LANDAETA",
+          "empresa_id": 112,
+          "db_name": "REPRESENTACIONES LANDAETA RELANSA, S.A.",
+          "match": "auto"
+        },
+        {
+          "written": "AZEX",
+          "empresa_id": 80,
+          "db_name": "AZEX INDUSTRIAL C.A.",
+          "match": "auto"
+        }
+      ],
+      "unresolved": [
+        {
+          "written": "ECOPEC.",
+          "empresa_id": null,
+          "unresolved_reason": "No existe ninguna empresa con ese nombre ni variante cercana en `empresas` (406 filas, 2026-11-06).",
+          "candidates": [],
+          "list": "not_relevant"
+        }
+      ],
+      "client_comment": null,
+      "analysis_tags": [
+        "termino_regional_sin_cobertura"
+      ]
+    },
+    {
+      "test_id": "G7-03",
+      "group": "G7_DIFICILES_FUERA_DE_ALCANCE",
+      "query": "venta de zapatos",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "excelente",
+      "score_1_5": 5,
+      "expected_behavior": "no_results",
+      "expected_behavior_basis": "cliente: \"No encontramos empresas afiliadas...\" (5)",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": "El resultado es el siguiente: No encontramos empresas afiliadas que coincidan con su búsqueda. Intente con otro sector, servicio o ciudad.",
+      "analysis_tags": []
+    },
+    {
+      "test_id": "G7-04",
+      "group": "G7_DIFICILES_FUERA_DE_ALCANCE",
+      "query": "xyzqw",
+      "proposed_by": "SISTEG",
+      "evaluated_on": "2026-11-03",
+      "evaluator": "EVAL_A",
+      "overall_label": "excelente",
+      "score_1_5": 5,
+      "expected_behavior": "out_of_scope_message",
+      "expected_behavior_basis": "cliente: \"No puedo ayudarte con xyzqw...\" (5)",
+      "judged_depth": "top5_or_more",
+      "relevant": [],
+      "not_relevant": [],
+      "unresolved": [],
+      "client_comment": "El resultado es el siguiente: No puedo ayudarte con “xyzqw” porque no identifica un producto, servicio, empresa o actividad empresarial relacionada con la Cámara Petrolera.",
+      "analysis_tags": []
+    }
+  ]
+}

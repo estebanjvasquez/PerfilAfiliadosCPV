@@ -1,0 +1,4704 @@
+{
+  "meta": {
+    "mode": "mcp",
+    "intent": true,
+    "url": "https://perfilafiliados-mcp.sisteg.workers.dev",
+    "ran_at": "2026-11-06T10:57:17.040Z",
+    "label": "2026-11-06_base.json",
+    "golden_file": "golden_set_lote001.json",
+    "golden_generated_on": "2026-11-06"
+  },
+  "summary": {
+    "cases_run": 35,
+    "errors": [],
+    "results_cases": 31,
+    "cases_with_known_relevant": 20,
+    "mean_returned": 17.71,
+    "pct_relevant_in_top5": 0.85,
+    "mrr_known": 0.742,
+    "mean_recall_known_at_10": 0.821,
+    "total_hits_at_10": 36,
+    "total_relevant_known": 49,
+    "total_noise_at_5": 48,
+    "total_noise_at_10": 56,
+    "total_not_relevant_known": 66,
+    "behavior_pass": [
+      "G7-01",
+      "G7-03",
+      "G7-04"
+    ],
+    "behavior_fail": [
+      "G4-02"
+    ],
+    "behavior_unverifiable": [],
+    "recurring_noise_in_top10": [
+      {
+        "empresa_id": 187,
+        "db_name": "HOLANDA VENEZUELA C.A.",
+        "top10_in": [
+          "G1-02",
+          "G2-10",
+          "G3-02",
+          "G3-03",
+          "G3-04"
+        ]
+      },
+      {
+        "empresa_id": 391,
+        "db_name": "TOTAL CLEAN, C.A.",
+        "top10_in": [
+          "G2-03",
+          "G2-07",
+          "G5-01",
+          "G5-02"
+        ]
+      },
+      {
+        "empresa_id": 72,
+        "db_name": "GEOHIDRA CONSULTORES, C.A.",
+        "top10_in": [
+          "G1-02",
+          "G2-04",
+          "G2-06",
+          "G3-05",
+          "G4-04",
+          "G5-04",
+          "G6-04"
+        ]
+      },
+      {
+        "empresa_id": 257,
+        "db_name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+        "top10_in": [
+          "G1-02",
+          "G5-01"
+        ]
+      },
+      {
+        "empresa_id": 86,
+        "db_name": "TUBOACERO, C.A.",
+        "top10_in": [
+          "G1-03",
+          "G2-01",
+          "G2-02",
+          "G3-02",
+          "G6-01",
+          "G6-04"
+        ]
+      },
+      {
+        "empresa_id": 157,
+        "db_name": "LUKIVEN, S.A.",
+        "top10_in": [
+          "G2-01",
+          "G2-02",
+          "G3-01",
+          "G3-02",
+          "G4-03",
+          "G6-02",
+          "G6-03"
+        ]
+      },
+      {
+        "empresa_id": 170,
+        "db_name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+        "top10_in": [
+          "G1-01",
+          "G2-01",
+          "G2-02",
+          "G3-04",
+          "G6-04"
+        ]
+      },
+      {
+        "empresa_id": 107,
+        "db_name": "SERVI COMPRESORES, C.A.",
+        "top10_in": [
+          "G3-01",
+          "G3-02",
+          "G3-05",
+          "G4-01",
+          "G5-02",
+          "G5-03"
+        ]
+      },
+      {
+        "empresa_id": 91,
+        "db_name": "DISTEINSA, C.A.",
+        "top10_in": [
+          "G1-03",
+          "G2-07",
+          "G6-01"
+        ]
+      },
+      {
+        "empresa_id": 74,
+        "db_name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+        "top10_in": [
+          "G1-04",
+          "G3-01",
+          "G4-04",
+          "G5-01",
+          "G5-03"
+        ]
+      },
+      {
+        "empresa_id": 138,
+        "db_name": "ALCAVE VENEZUELA C.A.",
+        "top10_in": [
+          "G2-01",
+          "G2-02",
+          "G3-02",
+          "G6-04"
+        ]
+      },
+      {
+        "empresa_id": 83,
+        "db_name": "ELEKTROMEK, C.A.",
+        "top10_in": [
+          "G1-04",
+          "G2-04",
+          "G5-02",
+          "G6-02",
+          "G6-03"
+        ]
+      },
+      {
+        "empresa_id": 141,
+        "db_name": "OXICORTE DE VENEZUELA, C.A.",
+        "top10_in": [
+          "G1-03",
+          "G3-02",
+          "G5-02",
+          "G5-04",
+          "G6-01"
+        ]
+      },
+      {
+        "empresa_id": 333,
+        "db_name": "CONSORCIO OGS, C.A.",
+        "top10_in": [
+          "G1-01",
+          "G2-07",
+          "G3-05",
+          "G5-02",
+          "G5-03"
+        ]
+      },
+      {
+        "empresa_id": 563,
+        "db_name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+        "top10_in": [
+          "G2-10",
+          "G3-03",
+          "G3-04"
+        ]
+      }
+    ]
+  },
+  "per_case": [
+    {
+      "test_id": "G1-01",
+      "query": "tratamiento de aguas de perforación",
+      "expected": "results",
+      "returned": 20,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 5,
+      "not_relevant_known": 0,
+      "hits_at_5": 4,
+      "noise_at_5": 0,
+      "unjudged_at_5": 1,
+      "hits_at_10": 5,
+      "noise_at_10": 0,
+      "unjudged_at_10": 5,
+      "hits_all": 5,
+      "noise_all": 0,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G1-02",
+      "query": "levantamiento artificial",
+      "expected": "results",
+      "returned": 17,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 2,
+      "not_relevant_known": 3,
+      "hits_at_5": 2,
+      "noise_at_5": 3,
+      "unjudged_at_5": 0,
+      "hits_at_10": 2,
+      "noise_at_10": 3,
+      "unjudged_at_10": 5,
+      "hits_all": 2,
+      "noise_all": 3,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G1-03",
+      "query": "revestidor",
+      "expected": "results",
+      "returned": 11,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 1,
+      "not_relevant_known": 4,
+      "hits_at_5": 1,
+      "noise_at_5": 4,
+      "unjudged_at_5": 0,
+      "hits_at_10": 1,
+      "noise_at_10": 4,
+      "unjudged_at_10": 5,
+      "hits_all": 1,
+      "noise_all": 4,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G1-04",
+      "query": "mecha",
+      "expected": "results",
+      "returned": 23,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 4,
+      "hits_at_5": 0,
+      "noise_at_5": 4,
+      "unjudged_at_5": 1,
+      "hits_at_10": 0,
+      "noise_at_10": 4,
+      "unjudged_at_10": 6,
+      "hits_all": 0,
+      "noise_all": 4,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G2-01",
+      "query": "cabria",
+      "expected": "results",
+      "returned": 7,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 4,
+      "hits_at_5": 0,
+      "noise_at_5": 4,
+      "unjudged_at_5": 1,
+      "hits_at_10": 0,
+      "noise_at_10": 4,
+      "unjudged_at_10": 3,
+      "hits_all": 0,
+      "noise_all": 4,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G2-02",
+      "query": "cabrias",
+      "expected": "results",
+      "returned": 7,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 4,
+      "hits_at_5": 0,
+      "noise_at_5": 4,
+      "unjudged_at_5": 1,
+      "hits_at_10": 0,
+      "noise_at_10": 4,
+      "unjudged_at_10": 3,
+      "hits_all": 0,
+      "noise_all": 4,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G2-03",
+      "query": "mechurrio",
+      "expected": "results",
+      "returned": 2,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 1,
+      "not_relevant_known": 1,
+      "hits_at_5": 1,
+      "noise_at_5": 1,
+      "unjudged_at_5": 0,
+      "hits_at_10": 1,
+      "noise_at_10": 1,
+      "unjudged_at_10": 0,
+      "hits_all": 1,
+      "noise_all": 1,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G2-04",
+      "query": "macolla",
+      "expected": "results",
+      "returned": 13,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 4,
+      "not_relevant_known": 1,
+      "hits_at_5": 4,
+      "noise_at_5": 1,
+      "unjudged_at_5": 0,
+      "hits_at_10": 4,
+      "noise_at_10": 1,
+      "unjudged_at_10": 5,
+      "hits_all": 4,
+      "noise_all": 1,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G2-05",
+      "query": "guaya fina",
+      "expected": "results",
+      "returned": 4,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 2,
+      "not_relevant_known": 2,
+      "hits_at_5": 2,
+      "noise_at_5": 2,
+      "unjudged_at_5": 0,
+      "hits_at_10": 2,
+      "noise_at_10": 2,
+      "unjudged_at_10": 0,
+      "hits_all": 2,
+      "noise_all": 2,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G2-06",
+      "query": "guaya eléctrica",
+      "expected": "results",
+      "returned": 2,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 1,
+      "not_relevant_known": 4,
+      "hits_at_5": 1,
+      "noise_at_5": 1,
+      "unjudged_at_5": 0,
+      "hits_at_10": 1,
+      "noise_at_10": 1,
+      "unjudged_at_10": 0,
+      "hits_all": 1,
+      "noise_all": 1,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G2-07",
+      "query": "balancín",
+      "expected": "results",
+      "returned": 4,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 1,
+      "not_relevant_known": 3,
+      "hits_at_5": 1,
+      "noise_at_5": 3,
+      "unjudged_at_5": 0,
+      "hits_at_10": 1,
+      "noise_at_10": 3,
+      "unjudged_at_10": 0,
+      "hits_all": 1,
+      "noise_all": 3,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G2-08",
+      "query": "caballito",
+      "expected": "results",
+      "returned": 0,
+      "error": null,
+      "behavior": {
+        "pass": false,
+        "detail": "no devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 0,
+      "hits_at_5": 0,
+      "noise_at_5": 0,
+      "unjudged_at_5": 0,
+      "hits_at_10": 0,
+      "noise_at_10": 0,
+      "unjudged_at_10": 0,
+      "hits_all": 0,
+      "noise_all": 0,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G2-09",
+      "query": "camión chupón",
+      "expected": "results",
+      "returned": 0,
+      "error": null,
+      "behavior": {
+        "pass": false,
+        "detail": "no devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 1,
+      "not_relevant_known": 0,
+      "hits_at_5": 0,
+      "noise_at_5": 0,
+      "unjudged_at_5": 0,
+      "hits_at_10": 0,
+      "noise_at_10": 0,
+      "unjudged_at_10": 0,
+      "hits_all": 0,
+      "noise_all": 0,
+      "recall_known_at_10": 0,
+      "relevant_missing": [
+        391
+      ]
+    },
+    {
+      "test_id": "G2-10",
+      "query": "gandola",
+      "expected": "results",
+      "returned": 7,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 2,
+      "relevant_known": 2,
+      "not_relevant_known": 3,
+      "hits_at_5": 2,
+      "noise_at_5": 2,
+      "unjudged_at_5": 1,
+      "hits_at_10": 2,
+      "noise_at_10": 3,
+      "unjudged_at_10": 2,
+      "hits_all": 2,
+      "noise_all": 3,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G3-01",
+      "query": "mantenimiento de cabrias",
+      "expected": "results",
+      "returned": 20,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 12,
+      "relevant_known": 4,
+      "not_relevant_known": 1,
+      "hits_at_5": 0,
+      "noise_at_5": 0,
+      "unjudged_at_5": 5,
+      "hits_at_10": 0,
+      "noise_at_10": 0,
+      "unjudged_at_10": 10,
+      "hits_all": 1,
+      "noise_all": 0,
+      "recall_known_at_10": 0,
+      "relevant_missing": [
+        173,
+        179,
+        96
+      ]
+    },
+    {
+      "test_id": "G3-02",
+      "query": "fabricantes de cabrias",
+      "expected": "results",
+      "returned": 14,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 12,
+      "relevant_known": 4,
+      "not_relevant_known": 1,
+      "hits_at_5": 0,
+      "noise_at_5": 0,
+      "unjudged_at_5": 5,
+      "hits_at_10": 0,
+      "noise_at_10": 0,
+      "unjudged_at_10": 10,
+      "hits_all": 1,
+      "noise_all": 0,
+      "recall_known_at_10": 0,
+      "relevant_missing": [
+        173,
+        115,
+        96
+      ]
+    },
+    {
+      "test_id": "G3-03",
+      "query": "transporte de gandolas",
+      "expected": "results",
+      "returned": 6,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 3,
+      "relevant_known": 3,
+      "not_relevant_known": 1,
+      "hits_at_5": 3,
+      "noise_at_5": 1,
+      "unjudged_at_5": 1,
+      "hits_at_10": 3,
+      "noise_at_10": 1,
+      "unjudged_at_10": 2,
+      "hits_all": 3,
+      "noise_all": 1,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G3-04",
+      "query": "alquiler de gandolas",
+      "expected": "results",
+      "returned": 10,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 3,
+      "not_relevant_known": 2,
+      "hits_at_5": 3,
+      "noise_at_5": 1,
+      "unjudged_at_5": 1,
+      "hits_at_10": 3,
+      "noise_at_10": 2,
+      "unjudged_at_10": 5,
+      "hits_all": 3,
+      "noise_all": 2,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G3-05",
+      "query": "mantenimiento de levantamiento artificial",
+      "expected": "results",
+      "returned": 20,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 4,
+      "hits_at_5": 0,
+      "noise_at_5": 4,
+      "unjudged_at_5": 1,
+      "hits_at_10": 0,
+      "noise_at_10": 4,
+      "unjudged_at_10": 6,
+      "hits_all": 0,
+      "noise_all": 4,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G4-01",
+      "query": "operadores",
+      "expected": "results",
+      "returned": 30,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 3,
+      "relevant_known": 4,
+      "not_relevant_known": 3,
+      "hits_at_5": 1,
+      "noise_at_5": 3,
+      "unjudged_at_5": 1,
+      "hits_at_10": 4,
+      "noise_at_10": 3,
+      "unjudged_at_10": 3,
+      "hits_all": 4,
+      "noise_all": 3,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G4-02",
+      "query": "dame todas las empresas",
+      "expected": "clarification",
+      "returned": 0,
+      "error": null,
+      "behavior": {
+        "pass": false,
+        "detail": "interpretación: out_of_scope"
+      }
+    },
+    {
+      "test_id": "G4-03",
+      "query": "servicios petroleros",
+      "expected": "results",
+      "returned": 50,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 0,
+      "hits_at_5": 0,
+      "noise_at_5": 0,
+      "unjudged_at_5": 5,
+      "hits_at_10": 0,
+      "noise_at_10": 0,
+      "unjudged_at_10": 10,
+      "hits_all": 0,
+      "noise_all": 0,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G4-04",
+      "query": "construcción",
+      "expected": "results",
+      "returned": 91,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 0,
+      "hits_at_5": 0,
+      "noise_at_5": 0,
+      "unjudged_at_5": 5,
+      "hits_at_10": 0,
+      "noise_at_10": 0,
+      "unjudged_at_10": 10,
+      "hits_all": 0,
+      "noise_all": 0,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G5-01",
+      "query": "tratamiento de aguas de perforación en el lago",
+      "expected": "results",
+      "returned": 16,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 2,
+      "relevant_known": 1,
+      "not_relevant_known": 4,
+      "hits_at_5": 1,
+      "noise_at_5": 1,
+      "unjudged_at_5": 3,
+      "hits_at_10": 1,
+      "noise_at_10": 3,
+      "unjudged_at_10": 6,
+      "hits_all": 1,
+      "noise_all": 3,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G5-02",
+      "query": "empresas que fabriquen y mantengan balancines",
+      "expected": "results",
+      "returned": 20,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 1,
+      "not_relevant_known": 4,
+      "hits_at_5": 1,
+      "noise_at_5": 3,
+      "unjudged_at_5": 1,
+      "hits_at_10": 1,
+      "noise_at_10": 4,
+      "unjudged_at_10": 5,
+      "hits_all": 1,
+      "noise_all": 4,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G5-03",
+      "query": "inspección y mantenimiento de guaya eléctrica",
+      "expected": "results",
+      "returned": 20,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 0,
+      "hits_at_5": 0,
+      "noise_at_5": 0,
+      "unjudged_at_5": 5,
+      "hits_at_10": 0,
+      "noise_at_10": 0,
+      "unjudged_at_10": 10,
+      "hits_all": 0,
+      "noise_all": 0,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G5-04",
+      "query": "transporte de crudo por gandola",
+      "expected": "results",
+      "returned": 9,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 0,
+      "hits_at_5": 0,
+      "noise_at_5": 0,
+      "unjudged_at_5": 5,
+      "hits_at_10": 0,
+      "noise_at_10": 0,
+      "unjudged_at_10": 9,
+      "hits_all": 0,
+      "noise_all": 0,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G6-01",
+      "query": "pipeline",
+      "expected": "results",
+      "returned": 20,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 1,
+      "not_relevant_known": 1,
+      "hits_at_5": 1,
+      "noise_at_5": 1,
+      "unjudged_at_5": 3,
+      "hits_at_10": 1,
+      "noise_at_10": 1,
+      "unjudged_at_10": 8,
+      "hits_all": 1,
+      "noise_all": 1,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G6-02",
+      "query": "refinery",
+      "expected": "results",
+      "returned": 20,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 5,
+      "hits_at_5": 0,
+      "noise_at_5": 2,
+      "unjudged_at_5": 3,
+      "hits_at_10": 0,
+      "noise_at_10": 3,
+      "unjudged_at_10": 7,
+      "hits_all": 0,
+      "noise_all": 4,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G6-03",
+      "query": "refinería",
+      "expected": "results",
+      "returned": 20,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": null,
+      "relevant_known": 0,
+      "not_relevant_known": 0,
+      "hits_at_5": 0,
+      "noise_at_5": 0,
+      "unjudged_at_5": 5,
+      "hits_at_10": 0,
+      "noise_at_10": 0,
+      "unjudged_at_10": 10,
+      "hits_all": 0,
+      "noise_all": 0,
+      "recall_known_at_10": null,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G6-04",
+      "query": "drilling",
+      "expected": "results",
+      "returned": 46,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 7,
+      "not_relevant_known": 4,
+      "hits_at_5": 2,
+      "noise_at_5": 2,
+      "unjudged_at_5": 1,
+      "hits_at_10": 3,
+      "noise_at_10": 2,
+      "unjudged_at_10": 5,
+      "hits_all": 7,
+      "noise_all": 4,
+      "recall_known_at_10": 0.429,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G7-01",
+      "query": "como me afilio a la camara?",
+      "expected": "institutional_answer_no_companies",
+      "returned": 0,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "interpretación: out_of_scope; 0 empresas"
+      }
+    },
+    {
+      "test_id": "G7-02",
+      "query": "necesito arbolitos para pozos petroleros",
+      "expected": "results",
+      "returned": 20,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "devolvió empresas"
+      },
+      "first_relevant_rank": 1,
+      "relevant_known": 1,
+      "not_relevant_known": 3,
+      "hits_at_5": 1,
+      "noise_at_5": 1,
+      "unjudged_at_5": 3,
+      "hits_at_10": 1,
+      "noise_at_10": 3,
+      "unjudged_at_10": 6,
+      "hits_all": 1,
+      "noise_all": 3,
+      "recall_known_at_10": 1,
+      "relevant_missing": []
+    },
+    {
+      "test_id": "G7-03",
+      "query": "venta de zapatos",
+      "expected": "no_results",
+      "returned": 0,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "0 empresas"
+      }
+    },
+    {
+      "test_id": "G7-04",
+      "query": "xyzqw",
+      "expected": "out_of_scope_message",
+      "returned": 0,
+      "error": null,
+      "behavior": {
+        "pass": true,
+        "detail": "interpretación: out_of_scope; 0 empresas"
+      }
+    }
+  ],
+  "runs": {
+    "G1-01": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "tratamiento de aguas de perforación"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 96,
+          "name": "EVERGREEN SERVICE, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"tratamiento de aguas de perforación\""
+        },
+        {
+          "empresa_id": 152,
+          "name": "MARITIME CONTRACTORS DE VENEZUELA S.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 79,
+          "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (servicio: PERFORACIÓN DIRECCIONAL)"
+        },
+        {
+          "empresa_id": 115,
+          "name": "CLAM INSTALACIONES, S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 333,
+          "name": "CONSORCIO OGS, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"tratamiento de aguas de perforación\""
+        },
+        {
+          "empresa_id": 170,
+          "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"tratamiento de aguas de perforación\""
+        },
+        {
+          "empresa_id": 179,
+          "name": "SYSVENCOL, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 173,
+          "name": "PEMINSER, C.A (PETROLEUM AND MINING SERVICES) ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 77,
+          "name": "TROIL SERVICES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 133,
+          "name": "STRATA SERVICES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (categoría CPV: Planta de Tratamiento de Agua)"
+        },
+        {
+          "empresa_id": 257,
+          "name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA) ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (experiencia: Fabricación de tanques para planta de tratamiento de agua potable.)"
+        },
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (experiencia: PROYECTO DE EXPANSION SISTEMA DE TRATAMIENTO DE AGUA EN PLANTA DESHIDRATADORA PLD3, CAMPO BOSCAN.)"
+        },
+        {
+          "empresa_id": 312,
+          "name": "CORPORACION SHIBARI, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 100,
+          "name": "QUIMICOS DE MANTENIMIENTO INDUSTRIAL QUIMAINCA CA ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (experiencia: ALICE NEUMÁTICOS DE VENEZUELA \n(FIRESTONE)\nServicio de tratamiento químico de generación de vapor, e…)"
+        },
+        {
+          "empresa_id": 458,
+          "name": "DYNA DRILL, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 523,
+          "name": "VENEZOLANA DE LIMPIEZAS INDUSTRIALES (VENELIN), C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (experiencia: Servicio trasegado de agua de cortado de la fosa de fino de los tambores de coque del Mejorador Petr…)"
+        },
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (experiencia: SERVICIO DE MANTENIMIENTO DE LOS SISTEMAS DE AIRES DE LAS ESTACIONES DE FLUJO Y PLANTAS DESHIDRATADO…)"
+        },
+        {
+          "empresa_id": 361,
+          "name": "CORPORACION KBBO, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación\" (experiencia: SERVICIO TECNICO ESPECIALIZADO PARA TRATAMIENTO QUIMICO CAMPO PESADO \n\nSuminsitros de productos quim…)"
+        }
+      ]
+    },
+    "G1-02": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "levantamiento artificial"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 276,
+          "name": "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA) ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"levantamiento artificial\" (experiencia: Suministro y servicio de equipos de levantamiento artificial mediante Bombas de Cavidad Progresiva.…)"
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"levantamiento artificial\""
+        },
+        {
+          "empresa_id": 383,
+          "name": "SCAN GEOFÍSICA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (servicio: GEOFÍSICA DE ALTA RESOLUCIÓN Y EVALUACIÓN DE RIESGOS DE PERFORACIÓN)"
+        },
+        {
+          "empresa_id": 257,
+          "name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA) ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (experiencia: Desmontaje de planta de leche. Trabajo en sitio.)"
+        },
+        {
+          "empresa_id": 187,
+          "name": "HOLANDA VENEZUELA C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (servicio: GEOFÍSICA DE ALTA RESOLUCIÓN Y EVALUACIÓN DE RIESGOS DE PERFORACIÓN)"
+        },
+        {
+          "empresa_id": 372,
+          "name": "DENARIUS PUMPING SERVICES DE VENEZUELA, C.A. (DPSV, C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (experiencia: SERVICIO BOMBEO DE ALTA PRESION)"
+        },
+        {
+          "empresa_id": 112,
+          "name": "REPRESENTACIONES LANDAETA RELANSA, S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (experiencia: SUMINISTRO, MONTAJE, PUESTA EN MARCHA Y CAPACITACIÓN PARA EL COMPRESOR ATLAS COPCO.)"
+        },
+        {
+          "empresa_id": 331,
+          "name": "INGENIERIA DE CONSULTA INCOSTAS, S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (servicio: GEOFÍSICA DE ALTA RESOLUCIÓN Y EVALUACIÓN DE RIESGOS DE PERFORACIÓN)"
+        },
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (servicio: MONTAJE MECÁNICO DE EQUIPOS DE ELECTRICIDAD)"
+        },
+        {
+          "empresa_id": 80,
+          "name": "AZEX INDUSTRIAL C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (experiencia: VALVULAS DE BOLA SHUT OFF ACTUADAS)"
+        },
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (experiencia: SUMINISTRO DE ESTADIOMETROS PORTABLE.)"
+        },
+        {
+          "empresa_id": 83,
+          "name": "ELEKTROMEK, C.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (servicio: MONTAJE MECÁNICO DE EQUIPOS DE ELECTRICIDAD)"
+        },
+        {
+          "empresa_id": 73,
+          "name": "N&V CONSULTORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (servicio: MONTAJE MECÁNICO DE EQUIPOS DE ELECTRICIDAD)"
+        },
+        {
+          "empresa_id": 202,
+          "name": "LECVEN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (experiencia: INGENIERIA PROCURA Y CONSTRUCCION DE SISTEMAS DE PUESTA A TIERRA Y PROTECCION CONTRA DESCARGAS ATMOS…)"
+        },
+        {
+          "empresa_id": 75,
+          "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (servicio: MONTAJE MECÁNICO DE EQUIPOS DE ELECTRICIDAD)"
+        },
+        {
+          "empresa_id": 140,
+          "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (experiencia: Mechanical Works. CONSORCIO CONGENEGRO.)"
+        },
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"levantamiento artificial\" (categoría CPV: Levantamientos Topográficos)"
+        }
+      ]
+    },
+    "G1-03": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "revestidor"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"revestidor\" (experiencia: Evaluación de Integridad de Revestidores, Inspección de Tuberías, Cabillas y Mecanizado requeridas d…)"
+        },
+        {
+          "empresa_id": 91,
+          "name": "DISTEINSA, C.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"revestidor\" (servicio: PINTURAS, REVESTIMIENTOS Y RECUBRIMIENTOS METÁLICOS)"
+        },
+        {
+          "empresa_id": 312,
+          "name": "CORPORACION SHIBARI, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"revestidor\" (servicio: PINTURAS, REVESTIMIENTOS Y RECUBRIMIENTOS METÁLICOS)"
+        },
+        {
+          "empresa_id": 317,
+          "name": "KALA'S, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"revestidor\" (servicio: PINTURAS, REVESTIMIENTOS Y RECUBRIMIENTOS METÁLICOS)"
+        },
+        {
+          "empresa_id": 145,
+          "name": "COATINGS DE ORIENTE C A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"revestidor\" (servicio: PINTURAS, REVESTIMIENTOS Y RECUBRIMIENTOS METÁLICOS)"
+        },
+        {
+          "empresa_id": 86,
+          "name": "TUBOACERO, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"revestidor\" (servicio: PINTURAS, REVESTIMIENTOS Y RECUBRIMIENTOS METÁLICOS)"
+        },
+        {
+          "empresa_id": 141,
+          "name": "OXICORTE DE VENEZUELA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"revestidor\" (servicio: PINTURAS, REVESTIMIENTOS Y RECUBRIMIENTOS METÁLICOS)"
+        },
+        {
+          "empresa_id": 81,
+          "name": "REPRESENTACIONES BARCAN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"revestidor\" (servicio: PINTURAS, REVESTIMIENTOS Y RECUBRIMIENTOS METÁLICOS)"
+        },
+        {
+          "empresa_id": 487,
+          "name": "COSAPI SERVICIOS, C.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"revestidor\" (servicio: PINTURAS, REVESTIMIENTOS Y RECUBRIMIENTOS METÁLICOS)"
+        },
+        {
+          "empresa_id": 80,
+          "name": "AZEX INDUSTRIAL C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"revestidor\" (experiencia: REVESTIMIENTOS PARA TUBERIAS, EPOXI, MANGAS TERMOCONTRACTILES)"
+        },
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"revestidor\" (experiencia: SUMINISTRO DE ESTADIOMETROS PORTABLE.)"
+        }
+      ]
+    },
+    "G1-04": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "mecha"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 140,
+          "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (experiencia: Mechanical Works. CONSORCIO CONGENEGRO.)"
+        },
+        {
+          "empresa_id": 1,
+          "name": "VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 73,
+          "name": "N&V CONSULTORES, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 75,
+          "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Comisionamiento Mecánico, Eléctrico y de Instrumentación)"
+        },
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 83,
+          "name": "ELEKTROMEK, C.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 92,
+          "name": "EHCOPEK S.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 94,
+          "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 122,
+          "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 137,
+          "name": "OILPLEX, C.A",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 155,
+          "name": "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 208,
+          "name": "SAMPIERI & FORTUNATO, S.A. (SAMFOR SA)",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 214,
+          "name": "CONSTRUCTORA B&P, C.A",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 229,
+          "name": "INDIGO ENERGY INTERNATIONAL, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 305,
+          "name": "TRABAJOS INDUSTRIALES Y MECANICOS, C.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 311,
+          "name": "CORPORACION KR5, C.A",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 467,
+          "name": "METALMEINCA, C.A",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 487,
+          "name": "COSAPI SERVICIOS, C.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 524,
+          "name": "SADEVEN CONSTRUCCIONES, S.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 525,
+          "name": "PROYEINVER 0410, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        },
+        {
+          "empresa_id": 561,
+          "name": "CORPORACIÓN ZUMAQUE, S.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mecha\" (categoría CPV: Obras Mecánicas)"
+        }
+      ]
+    },
+    "G2-01": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "cabria"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 86,
+          "name": "TUBOACERO, C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabria\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 138,
+          "name": "ALCAVE VENEZUELA C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabria\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabria\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 170,
+          "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabria\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 179,
+          "name": "SYSVENCOL, C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabria\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 182,
+          "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabria\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 428,
+          "name": "JARBO SERVICES, C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabria\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        }
+      ]
+    },
+    "G2-02": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "cabrias"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 86,
+          "name": "TUBOACERO, C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 138,
+          "name": "ALCAVE VENEZUELA C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 170,
+          "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 179,
+          "name": "SYSVENCOL, C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 182,
+          "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 428,
+          "name": "JARBO SERVICES, C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        }
+      ]
+    },
+    "G2-03": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "mechurrio"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 140,
+          "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mechurrio\" (experiencia: Desmontaje y montaje y fabricacion de tuberias de ignicion del mechurrio.)"
+        },
+        {
+          "empresa_id": 391,
+          "name": "TOTAL CLEAN, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mechurrio\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - Bajo Grande / Mantenimiento Mayor Integral\nde Planta 1…)"
+        }
+      ]
+    },
+    "G2-04": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "macolla"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 155,
+          "name": "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: “RECUPERACIÓN, ADECUACIÓN Y CONSTRUCCIÓN DE OCEMI PARA MACOLLAS”, para las facilidades de producción…)"
+        },
+        {
+          "empresa_id": 171,
+          "name": "TOPIECA, S.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: Comprende la descripción de los trabajos de las obras civiles, mecánicas, electricidad e instrumenta…)"
+        },
+        {
+          "empresa_id": 1,
+          "name": "VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: EL PROYECTO INCLUYE LA CONSTRUCCION DE LAS OBRAS CIVILES INCLUYENDO ASFALTADO DE VIAS Y MACOLLAS)"
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: Proyecto:\nDocumentos Ambientales para la Construcción y Puesta en Marcha de una Estación de Flujo (E…)"
+        },
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: INGENIERÍA BÁSICA Y DETALLE PARA LA 2DA FASE DE INYECCIÓN ALTERNADA DE VAPOR (IAV) EN LAS MACOLLAS D…)"
+        },
+        {
+          "empresa_id": 83,
+          "name": "ELEKTROMEK, C.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: Fabricacion, intergracion, pruebas, transporte, instalacion y arranque de PowerHouse Macollas I3 y F…)"
+        },
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: Diseño, fabricación, pruebas, instalación, puesta a punto y puesta en marcha de 04 CENTROS DE CONTRO…)"
+        },
+        {
+          "empresa_id": 77,
+          "name": "TROIL SERVICES, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: Contrato con la ASC POES para la Intervención de 18 pozos pertenecientes a la EM Petro San Felix, Bl…)"
+        },
+        {
+          "empresa_id": 115,
+          "name": "CLAM INSTALACIONES, S.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: OBRAS CIVILES PARA LA CONSTRUCCION Y MANTENIMIENTO DE MACOLLAS EN PETROBOSCAN. (Movimiento de tierra…)"
+        },
+        {
+          "empresa_id": 317,
+          "name": "KALA'S, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: SERVICIO TECNICO ESPECIALIZADO PARA LA RECUPERACION DE LAS FACILIDADES ELECTRICAS, MECANICAS Y DE IN…)"
+        },
+        {
+          "empresa_id": 159,
+          "name": "VENEZOLANA DE PROYECTOS INTEGRADOS VEPICA, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: Servicio De Ingeniería Para El Desarrollo De Las Facilidades De Superficie (Línea De Flujo y Línea E…)"
+        },
+        {
+          "empresa_id": 489,
+          "name": "PETROLEUM CONTRACTOR, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"macolla\" (experiencia: CONSTRUCCION DE OBRAS CIVILES PARA LAS FACILIDADES DE LA MACOLLA 22 COPEM)"
+        },
+        {
+          "empresa_id": 536,
+          "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"macolla\""
+        }
+      ]
+    },
+    "G2-05": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "guaya fina"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 182,
+          "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"guaya fina\""
+        },
+        {
+          "empresa_id": 458,
+          "name": "DYNA DRILL, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"guaya fina\""
+        },
+        {
+          "empresa_id": 198,
+          "name": "ESSENZA SERVICES C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"guaya fina\" (experiencia: El 2023 ejecutamos diferentes líneas de servicios en los campos de anaco de PDVSA Gas, S.A. Y Pdvsa…)"
+        },
+        {
+          "empresa_id": 128,
+          "name": "MODELO AFILIADOS",
+          "match_type": "semantic",
+          "matched_via": "similar a \"guaya fina\" (experiencia: fgjf)"
+        }
+      ]
+    },
+    "G2-06": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "guaya eléctrica"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 79,
+          "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"guaya eléctrica\" (experiencia: Servicios de guaya eléctrica con taladro en sitio para recuperación y rehabilitación de pozos y Serv…)"
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"guaya eléctrica\" (experiencia: Proyecto:\nIngeniería, Adquisición y Construcción de la Planta Bahía Tacoa, Barcazas I y II. Generado…)"
+        }
+      ]
+    },
+    "G2-07": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "balancín"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"balancín\" (experiencia: -\tRevisión y actualización de los programas de optimización\n-\tSimulación para el diseño y diagnostic…)"
+        },
+        {
+          "empresa_id": 91,
+          "name": "DISTEINSA, C.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"balancín\" (experiencia: Suministro y Asesoría para la Instalación de Sistemas de Sellado de Fluidos Chesterton en Balancines…)"
+        },
+        {
+          "empresa_id": 333,
+          "name": "CONSORCIO OGS, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"balancín\" (experiencia: Comprende el período de 1998 a 2012 (Contratos varios) MAXUS VENEZUELA C.I.LTD - Repsol YPF - PDVSA…)"
+        },
+        {
+          "empresa_id": 391,
+          "name": "TOTAL CLEAN, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"balancín\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY-SERVICIO DE ASESORÍA Y SOPORTE ESPECIALIZADO PARA EL ASEG…)"
+        }
+      ]
+    },
+    "G2-08": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "caballito"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": []
+    },
+    "G2-09": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "camión chupón"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": []
+    },
+    "G2-10": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "gandola"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 433,
+          "name": "CONSORCIO PALDACA, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"gandola\" (experiencia: La planta y el sistema de llenado de Gandolas con Nitrógeno Líquido en la Unidad U-94 de Refinería d…)"
+        },
+        {
+          "empresa_id": 165,
+          "name": "OEG INTERNACIONAL SERVICE, C.A.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"gandola\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 187,
+          "name": "HOLANDA VENEZUELA C.A.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"gandola\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 204,
+          "name": "CLOVER INTERNACIONAL, C.A.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"gandola\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 426,
+          "name": "LOSAN LOGISTICA, C.A.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"gandola\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 452,
+          "name": "TAUREL & CÍA SUCRS, C.A.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"gandola\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 563,
+          "name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"gandola\" vía taxonomía CPV"
+        }
+      ]
+    },
+    "G3-01": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "mantenimiento de cabrias"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 107,
+          "name": "SERVI COMPRESORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (experiencia: Servicios de Mantenimiento y Reparación de Tuberías de Producción y Revestimiento , así como también…)"
+        },
+        {
+          "empresa_id": 73,
+          "name": "N&V CONSULTORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 75,
+          "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 137,
+          "name": "OILPLEX, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+        },
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 81,
+          "name": "REPRESENTACIONES BARCAN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (experiencia: MANTENIMIENTO, REPARACIÓN Y CALIBRACIÓN DE LOS DETECTORES DE GAS PORTÁTILES MARCA BW PERTENECIENTES…)"
+        },
+        {
+          "empresa_id": 92,
+          "name": "EHCOPEK S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 536,
+          "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (experiencia: Mantenimiento multidisciplinario para operaciones portuarias críticas\nEl servicio abarcó el mantenim…)"
+        },
+        {
+          "empresa_id": 94,
+          "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 115,
+          "name": "CLAM INSTALACIONES, S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (experiencia: Servicio de mantenimiento de vías, accesos y locaciones en Campo Boscán.)"
+        },
+        {
+          "empresa_id": 333,
+          "name": "CONSORCIO OGS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (experiencia: 2015 - 2019 y 2021 - mayo 2025\nLos contratos ejecutados en mantenimiento: \n\nContratos 4600000562/460…)"
+        },
+        {
+          "empresa_id": 122,
+          "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 391,
+          "name": "TOTAL CLEAN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - Bajo Grande / Mantenimiento Mayor Integral\nde Planta 1…)"
+        },
+        {
+          "empresa_id": 433,
+          "name": "CONSORCIO PALDACA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (experiencia: La planta y el sistema de llenado de Gandolas con Nitrógeno Líquido en la Unidad U-94 de Refinería d…)"
+        },
+        {
+          "empresa_id": 177,
+          "name": "INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de cabrias\" (experiencia: Ofrecemos una amplia gama de servicios en diques y astilleros, realizamos trabajos de mantenimiento…)"
+        },
+        {
+          "empresa_id": 86,
+          "name": "TUBOACERO, C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"mantenimiento de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 138,
+          "name": "ALCAVE VENEZUELA C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"mantenimiento de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 170,
+          "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"mantenimiento de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        }
+      ]
+    },
+    "G3-02": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "fabricantes de cabrias"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+        },
+        {
+          "empresa_id": 151,
+          "name": "ELOLAM, C.A ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+        },
+        {
+          "empresa_id": 141,
+          "name": "OXICORTE DE VENEZUELA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+        },
+        {
+          "empresa_id": 210,
+          "name": "TORINDUCA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+        },
+        {
+          "empresa_id": 107,
+          "name": "SERVI COMPRESORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+        },
+        {
+          "empresa_id": 458,
+          "name": "DYNA DRILL, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+        },
+        {
+          "empresa_id": 187,
+          "name": "HOLANDA VENEZUELA C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+        },
+        {
+          "empresa_id": 100,
+          "name": "QUIMICOS DE MANTENIMIENTO INDUSTRIAL QUIMAINCA CA ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+        },
+        {
+          "empresa_id": 86,
+          "name": "TUBOACERO, C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 138,
+          "name": "ALCAVE VENEZUELA C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 170,
+          "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 179,
+          "name": "SYSVENCOL, C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 182,
+          "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        },
+        {
+          "empresa_id": 428,
+          "name": "JARBO SERVICES, C.A.",
+          "match_type": "canonical_related_candidate",
+          "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+        }
+      ]
+    },
+    "G3-03": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "transporte de gandolas"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 165,
+          "name": "OEG INTERNACIONAL SERVICE, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+        },
+        {
+          "empresa_id": 187,
+          "name": "HOLANDA VENEZUELA C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+        },
+        {
+          "empresa_id": 204,
+          "name": "CLOVER INTERNACIONAL, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+        },
+        {
+          "empresa_id": 426,
+          "name": "LOSAN LOGISTICA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+        },
+        {
+          "empresa_id": 452,
+          "name": "TAUREL & CÍA SUCRS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+        },
+        {
+          "empresa_id": 563,
+          "name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+        }
+      ]
+    },
+    "G3-04": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "alquiler de gandolas"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 165,
+          "name": "OEG INTERNACIONAL SERVICE, C.A.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"alquiler de gandolas\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 187,
+          "name": "HOLANDA VENEZUELA C.A.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"alquiler de gandolas\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 204,
+          "name": "CLOVER INTERNACIONAL, C.A.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"alquiler de gandolas\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 426,
+          "name": "LOSAN LOGISTICA, C.A.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"alquiler de gandolas\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 452,
+          "name": "TAUREL & CÍA SUCRS, C.A.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"alquiler de gandolas\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 563,
+          "name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+          "match_type": "canonical_direct",
+          "matched_via": "coincide con \"alquiler de gandolas\" vía taxonomía CPV"
+        },
+        {
+          "empresa_id": 75,
+          "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"alquiler de gandolas\" (servicio: ARRENDAMIENTO)"
+        },
+        {
+          "empresa_id": 184,
+          "name": "CONSTRUCTORA NASE, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"alquiler de gandolas\" (servicio: ARRENDAMIENTO)"
+        },
+        {
+          "empresa_id": 153,
+          "name": "SERVINTSA COMERCIAL S A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"alquiler de gandolas\" (categoría CPV: Alquiler de Almacenamiento)"
+        },
+        {
+          "empresa_id": 170,
+          "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"alquiler de gandolas\" (categoría CPV: Alquiler de Almacenamiento)"
+        }
+      ]
+    },
+    "G3-05": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "mantenimiento de levantamiento artificial"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 107,
+          "name": "SERVI COMPRESORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"mantenimiento de levantamiento artificial\""
+        },
+        {
+          "empresa_id": 122,
+          "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 94,
+          "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 276,
+          "name": "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA) ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Suministros y servicios de sistemas de levantamiento artificial mediante bombas de cavidad progresiv…)"
+        },
+        {
+          "empresa_id": 333,
+          "name": "CONSORCIO OGS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: 2009-2010\nMantenimiento Preventivo  y correctivo a los sistemas mecánicos de la planta, tanto de equ…)"
+        },
+        {
+          "empresa_id": 92,
+          "name": "EHCOPEK S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 137,
+          "name": "OILPLEX, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+        },
+        {
+          "empresa_id": 75,
+          "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 536,
+          "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Mantenimiento multidisciplinario para operaciones portuarias críticas\nEl servicio abarcó el mantenim…)"
+        },
+        {
+          "empresa_id": 489,
+          "name": "PETROLEUM CONTRACTOR, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: SERVICIOS DE MANTENIMIENTO DE EQUIPOS ESTATICOS DE PLANTA 2 METANOL DE ORIENTE)"
+        },
+        {
+          "empresa_id": 73,
+          "name": "N&V CONSULTORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 83,
+          "name": "ELEKTROMEK, C.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Reconstrucción, adecuación tecnica, mantenimiento, pruebas a sub estaciones en Planta VDU)"
+        },
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 433,
+          "name": "CONSORCIO PALDACA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: La planta y el sistema de llenado de Gandolas con Nitrógeno Líquido en la Unidad U-94 de Refinería d…)"
+        },
+        {
+          "empresa_id": 407,
+          "name": "CONSTRUCTORA ARZA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO GENERAL DE LAS REDES DE DISTRIBUCION DE GAS METANO DE LA GRAN CARACAS Y ZONAS FORANEAS)"
+        },
+        {
+          "empresa_id": 391,
+          "name": "TOTAL CLEAN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - Bajo Grande / Mantenimiento Mayor Integral\nde Planta 1…)"
+        },
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO DE BOMBAS CENTRIFUGAS CONTRATO)"
+        },
+        {
+          "empresa_id": 480,
+          "name": "SERVIC METAL SUCRE, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: PDVSA A-159-17-0577\nSERVICIO TECNICO ESPECIALIZADO PARA MANTENIMIENTO DE\nSISTEMAS DE AUTOMATIZACION…)"
+        }
+      ]
+    },
+    "G4-01": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "operadores"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 124,
+          "name": "DBS SEAPORT S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 326,
+          "name": "RESTOVEN DE VENEZUELA, .C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 146,
+          "name": "REPSOL SERVICIOS CARIBE S.A.S., SUCURSAL VENEZUELA",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 107,
+          "name": "SERVI COMPRESORES, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 494,
+          "name": "INDUSTRIAL VOX ANALYZER, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 177,
+          "name": "INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 240,
+          "name": "SHELL VENEZUELA, S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 487,
+          "name": "COSAPI SERVICIOS, C.A. ",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 325,
+          "name": "INEPETROL, S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 218,
+          "name": "CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 418,
+          "name": "CORPORACIÓN SOLSICA, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"operadores\" (experiencia: Adecuación de Sala de Operadores para empresa de Telecomunicaciones. Incluyó sistemas de Aire Acondi…)"
+        },
+        {
+          "empresa_id": 367,
+          "name": "A&B OIL AND GAS, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 451,
+          "name": "CÁMARA PETROLERA DE VENEZUELA",
+          "match_type": "exact",
+          "matched_via": "coincide con \"operadores\""
+        },
+        {
+          "empresa_id": 333,
+          "name": "CONSORCIO OGS, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 571,
+          "name": "OPERADORA INDIOIL, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 182,
+          "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 523,
+          "name": "VENEZOLANA DE LIMPIEZAS INDUSTRIALES (VENELIN), C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 204,
+          "name": "CLOVER INTERNACIONAL, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 458,
+          "name": "DYNA DRILL, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 391,
+          "name": "TOTAL CLEAN, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 100,
+          "name": "QUIMICOS DE MANTENIMIENTO INDUSTRIAL QUIMAINCA CA ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 164,
+          "name": "SOCIEDAD CIVIL BAKER MCKENZIE",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 171,
+          "name": "TOPIECA, S.A. ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 202,
+          "name": "LECVEN, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 159,
+          "name": "VENEZOLANA DE PROYECTOS INTEGRADOS VEPICA, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 179,
+          "name": "SYSVENCOL, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 96,
+          "name": "EVERGREEN SERVICE, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 90,
+          "name": "J.A.P CONSULTORES DE ORIENTE, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        },
+        {
+          "empresa_id": 110,
+          "name": "BLC OIL & GAS",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"operadores\""
+        }
+      ]
+    },
+    "G4-02": {
+      "intent": {
+        "interpretation": "out_of_scope",
+        "search_phrases": [],
+        "clarification_question": null
+      },
+      "results": [],
+      "searched": false
+    },
+    "G4-03": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "servicios petroleros"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 96,
+          "name": "EVERGREEN SERVICE, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"servicios petroleros\" (experiencia: PDVSA SERVICIOS PETROLEROS. / PDVSA PETROLEO, S.A.\n\nSERVICIO INTEGRAL DE CONTROL AMBIENTAL DE POZOS…)"
+        },
+        {
+          "empresa_id": 198,
+          "name": "ESSENZA SERVICES C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"servicios petroleros\" (experiencia: El 2023 ejecutamos diferentes líneas de servicios en los campos de anaco de PDVSA Gas, S.A. Y Pdvsa…)"
+        },
+        {
+          "empresa_id": 85,
+          "name": "VENEZUELAN HEAVY INDUSTRIES, C.A. (VHICOA)",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"servicios petroleros\" (experiencia: SUMINISTRO Y FABRICACIÓN DE PERFILERÍA METÁLICA REQUERIDA POR PDVSA SERVICIOS PETROLEROS EN ANACO)"
+        },
+        {
+          "empresa_id": 179,
+          "name": "SYSVENCOL, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 115,
+          "name": "CLAM INSTALACIONES, S.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 207,
+          "name": "PROBE, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 276,
+          "name": "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA) ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 182,
+          "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 110,
+          "name": "BLC OIL & GAS",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 92,
+          "name": "EHCOPEK S.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 487,
+          "name": "COSAPI SERVICIOS, C.A. ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 355,
+          "name": "TAMORCA, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 178,
+          "name": "AIC TECH, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 204,
+          "name": "CLOVER INTERNACIONAL, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 361,
+          "name": "CORPORACION KBBO, C.A",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 170,
+          "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 451,
+          "name": "CÁMARA PETROLERA DE VENEZUELA",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 298,
+          "name": "RENDIMIENTO NÁUTICO PETROLERO INDUSTRIAL C A ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 536,
+          "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 508,
+          "name": "INSUMOS PETROLEROS ARVAS, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 152,
+          "name": "MARITIME CONTRACTORS DE VENEZUELA S.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 164,
+          "name": "SOCIEDAD CIVIL BAKER MCKENZIE",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 82,
+          "name": "WALCO INDUSTRIAL, S.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 155,
+          "name": "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 433,
+          "name": "CONSORCIO PALDACA, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 177,
+          "name": "INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"servicios petroleros\""
+        },
+        {
+          "empresa_id": 535,
+          "name": "CORPORACION JF, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: SERVICIOS DE TRANSPORTE DE PERSONAL A TRABAJADORES DE LAS EMPRESAS petropiAR ZONA NORTE, PETROPIAR Z…)"
+        },
+        {
+          "empresa_id": 356,
+          "name": "INVERSIONES VENZA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: SERVICIO DE QUÍMICOS NECESARIOS PARA EL TRATAMIENTO DEL PETRÓLEO CRUDO Y AGUA DE PRODUCCIÓN DE LA EM…)"
+        },
+        {
+          "empresa_id": 391,
+          "name": "TOTAL CLEAN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - SERVICIO DE ALQUILER DE CAMIONES DE VACIO Y ALTO VACIO…)"
+        },
+        {
+          "empresa_id": 107,
+          "name": "SERVI COMPRESORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: SERVICIO DE MANTENIMIENTO PARA PETROSUCRE DE VALVULAS COMPRESORAS, UBICADAS EN \nLAS INSTALACIONES CO…)"
+        },
+        {
+          "empresa_id": 372,
+          "name": "DENARIUS PUMPING SERVICES DE VENEZUELA, C.A. (DPSV, C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: SERVICIO BOMBEO DE ALTA PRESION)"
+        },
+        {
+          "empresa_id": 333,
+          "name": "CONSORCIO OGS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: 1999 - 2006 Sincor\nServicio profesional en mantenimiento y producción, el cual consiste en suplir eq…)"
+        },
+        {
+          "empresa_id": 489,
+          "name": "PETROLEUM CONTRACTOR, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: SERVICIOS DE MANTENIMIENTO DE EQUIPOS ESTATICOS DE PLANTA 2 METANOL DE ORIENTE)"
+        },
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: SERVICIOS PROFESIONALES DE INGENIERÍA PARA EJECUTAR PROYECTOS DE INVERSIÓN DE LA GERENCIA DE PROYECT…)"
+        },
+        {
+          "empresa_id": 383,
+          "name": "SCAN GEOFÍSICA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: 2665 HORAS HOMBRES DE SERVICIOS PROFESIONALES DE ASESORIAS ESPECIALIZADAS EN GEOCIENCIAS DEL PROYECT…)"
+        },
+        {
+          "empresa_id": 382,
+          "name": "VENEZOLANA DE INSTRUMENTACION MECANICA Y ELECTRICIDAD (VENIMECA), C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: EMPRESA: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY\nPROYECTO: “SERVICIO DE MANTENIMIENTO CORRECTIVO…)"
+        },
+        {
+          "empresa_id": 480,
+          "name": "SERVIC METAL SUCRE, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: PDVSA\nPRESTACION DE SERVICIOS DE MANTENIMIENTO DE EQUIPOS O\nUNIDADES DE A/A EN ÁREAS ADMINISTRATIVAS…)"
+        },
+        {
+          "empresa_id": 126,
+          "name": "RG, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: “SERVICIO DE MANTENIMIENTO MAYOR A EQUIPOS ROTATIVOS PERTENECIENTES AL CAMPO HUYAPARI PETROPIAR, S.A…)"
+        },
+        {
+          "empresa_id": 171,
+          "name": "TOPIECA, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: La ejecución del servicio \"Servicios Especializados de Ingeniería para el Desarrollo del Proyecto de…)"
+        },
+        {
+          "empresa_id": 137,
+          "name": "OILPLEX, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+        },
+        {
+          "empresa_id": 523,
+          "name": "VENEZOLANA DE LIMPIEZAS INDUSTRIALES (VENELIN), C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: Servicio de limpieza con agua a presión, succión y trasegado de hidrocarburos y otros fluidos en la…)"
+        },
+        {
+          "empresa_id": 194,
+          "name": "ELECTRIN C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: Servcicio Reacondicionamiento de Motores de Media Tensión Parada de Planta PetroCedeño)"
+        },
+        {
+          "empresa_id": 317,
+          "name": "KALA'S, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (experiencia: SERVICIO DE LIMPIEZA Y MANTENIMIENTO GENERAL DEL DESHIDRATADOR D3004C DE LA ESTACION PRINCIPAL DE PE…)"
+        },
+        {
+          "empresa_id": 173,
+          "name": "PEMINSER, C.A (PETROLEUM AND MINING SERVICES) ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 77,
+          "name": "TROIL SERVICES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 79,
+          "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 133,
+          "name": "STRATA SERVICES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"servicios petroleros\" (categoría CPV: Servicios de Perforación Onshore)"
+        }
+      ]
+    },
+    "G4-04": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "construcción"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 1,
+          "name": "VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 140,
+          "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 75,
+          "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 115,
+          "name": "CLAM INSTALACIONES, S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 94,
+          "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 155,
+          "name": "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 122,
+          "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 185,
+          "name": "CONSTRUCTORES VENEZOLANOS C.A. (CONVECA)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 184,
+          "name": "CONSTRUCTORA NASE, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 92,
+          "name": "EHCOPEK S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 141,
+          "name": "OXICORTE DE VENEZUELA, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 214,
+          "name": "CONSTRUCTORA B&P, C.A",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 305,
+          "name": "TRABAJOS INDUSTRIALES Y MECANICOS, C.A. ",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 229,
+          "name": "INDIGO ENERGY INTERNATIONAL, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 495,
+          "name": "CONSTRUCCIONES YAMARO, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 73,
+          "name": "N&V CONSULTORES, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 425,
+          "name": "PILOTES PERFORADOS, C.A. PILPERCA",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 518,
+          "name": "ROLINI CONSTRUCTORS, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 561,
+          "name": "CORPORACIÓN ZUMAQUE, S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 524,
+          "name": "SADEVEN CONSTRUCCIONES, S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 138,
+          "name": "ALCAVE VENEZUELA C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 85,
+          "name": "VENEZUELAN HEAVY INDUSTRIES, C.A. (VHICOA)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 183,
+          "name": "CONSTRUCCIONES MONSERCA S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 211,
+          "name": "CONSTRUCCIONES Y PROYECTOS DEL NORTE, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 331,
+          "name": "INGENIERIA DE CONSULTA INCOSTAS, S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 208,
+          "name": "SAMPIERI & FORTUNATO, S.A. (SAMFOR SA)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 482,
+          "name": "SERVICIOS Y CONSTRUCCIONES CENTRO SUR, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 224,
+          "name": "EMPRESA DE CONSTRUCCIÓN SAN ANTONIO, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 497,
+          "name": "SERVICIOS Y CONSTRUCCIONES RORANCA, C.A",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 311,
+          "name": "CORPORACION KR5, C.A",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 467,
+          "name": "METALMEINCA, C.A",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 487,
+          "name": "COSAPI SERVICIOS, C.A. ",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 82,
+          "name": "WALCO INDUSTRIAL, S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 90,
+          "name": "J.A.P CONSULTORES DE ORIENTE, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 354,
+          "name": "Y&V INGENIERÍA Y CONSTRUCCIÓN, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 420,
+          "name": "PREFABRICADOS Y CONSTRUCCIONES DE ACERO PELLIZZARI, C.A. (PREACERO PELLIZZARI, .C.A.)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 486,
+          "name": "GESTION ESTRATEGIA LOGISTICA SERVICIOS, C.A. (GELSCA)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 455,
+          "name": "OFINOVA PROYECTO CONSTRUCCIÓN (OFINOVA PC) C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 475,
+          "name": "GRUPO VENEZOLANO DE PUBLICIDAD Y CONSTRUCCIÓN COMPAÑÍA ANÓNIMA",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 536,
+          "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 541,
+          "name": "CONSTRUCCIONES Y SERVICIOS LAS RIAS C.A. ",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 568,
+          "name": "ROSA MISTICA CONSTRUCCIONES , C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 489,
+          "name": "PETROLEUM CONTRACTOR, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 570,
+          "name": "MULTISERVICIOS Y CONSTRUCCIONES GLOBAL XXI, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 83,
+          "name": "ELEKTROMEK, C.A. ",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 107,
+          "name": "SERVI COMPRESORES, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 126,
+          "name": "RG, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 137,
+          "name": "OILPLEX, C.A",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 143,
+          "name": "FABRICA DE PRODUCTOS IMPERMEABILIZANTES EDIL C.A (EDIL, C.A.)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 209,
+          "name": "SAMFOR GROUP, COMPAÑIA ANONIMA",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 226,
+          "name": "FSVEN INDUSTRIAL SOLUTIONS, S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 247,
+          "name": "K.B.T,  C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 253,
+          "name": "CONSTRUCTORES ELÉCTRICOS E INDUSTRIALES, C.A. (CEICA) ",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 254,
+          "name": "CONTRATISTA BERMÚDEZ, C.A. (CONTRATISTA BERMÚDEZ, C.A CONBERCA)",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 255,
+          "name": "CVCON, C.A. (CEVCONCA) ",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 259,
+          "name": "HERMANOS PIETRALUNGA, S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 260,
+          "name": "INNOVEN, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 269,
+          "name": "RAYMOND DE VENEZUELA, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 279,
+          "name": "INSTALACIONES INDUSTRIALES, C.A. ININCA",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 202,
+          "name": "LECVEN, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"construcción\""
+        },
+        {
+          "empresa_id": 292,
+          "name": "HAFRAN SERVICIOS MÚLTIPLES, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 315,
+          "name": "INVERSIONES SS&P, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 321,
+          "name": "PEDECA ORIENTE C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 324,
+          "name": "VENALMAQ, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 339,
+          "name": "CONSTRUCTORA TURAGUAL C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 344,
+          "name": "INSUMOS Y PROYECTOS DE OCCIDENTE, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 366,
+          "name": "INVERSIONES GHALMACA, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 375,
+          "name": "CORPORACION GRICEMAR GB, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 376,
+          "name": "VENECIA & SERVICE, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 391,
+          "name": "TOTAL CLEAN, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 407,
+          "name": "CONSTRUCTORA ARZA, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 414,
+          "name": "TANZACA INDUSTRIAL, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 433,
+          "name": "CONSORCIO PALDACA, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 434,
+          "name": "CONSTRUCTORA TAMPA, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 437,
+          "name": "GREEN PARK CONSTRUCTION, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 446,
+          "name": "YSR SOLUCIONES, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 451,
+          "name": "CÁMARA PETROLERA DE VENEZUELA",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 465,
+          "name": "CARDINAL INVERSIONES Y SERVICIOS, S.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 496,
+          "name": "GEOPOL DE VENEZUELA, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 525,
+          "name": "PROYEINVER 0410, C.A.",
+          "match_type": "exact",
+          "matched_via": "coincide con \"construcción\""
+        },
+        {
+          "empresa_id": 333,
+          "name": "CONSORCIO OGS, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"construcción\""
+        },
+        {
+          "empresa_id": 171,
+          "name": "TOPIECA, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"construcción\" (experiencia: Trabajo realizado en gasoducto)"
+        },
+        {
+          "empresa_id": 170,
+          "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"construcción\" (experiencia: Construccion de Estructuras Metalicas para la Construccion de Casas UniFamiliares para GyP Contrucci…)"
+        },
+        {
+          "empresa_id": 257,
+          "name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA) ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"construcción\" (experiencia: Fabricación de eje de triturador. Planta cementera.)"
+        },
+        {
+          "empresa_id": 163,
+          "name": "TECNO CONTROLES ORIENTE C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"construcción\" (experiencia: CONSTRUCCION Y TRANSPORTE DE PANELES DE CONTROL ACTIVOS, MONITORES Y PARA VALVULAS DE CONTROL DE PRE…)"
+        },
+        {
+          "empresa_id": 372,
+          "name": "DENARIUS PUMPING SERVICES DE VENEZUELA, C.A. (DPSV, C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"construcción\" (experiencia: SERVICIO DE CEMENTACION SEGUNDARIA)"
+        }
+      ]
+    },
+    "G5-01": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "tratamiento de aguas de perforación en el lago"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 173,
+          "name": "PEMINSER, C.A (PETROLEUM AND MINING SERVICES) ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (servicio: MANEJO DE FLUIDOS Y LODOS DE PERFORACIÓN)"
+        },
+        {
+          "empresa_id": 115,
+          "name": "CLAM INSTALACIONES, S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 96,
+          "name": "EVERGREEN SERVICE, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (servicio: MANEJO DE FLUIDOS Y LODOS DE PERFORACIÓN)"
+        },
+        {
+          "empresa_id": 179,
+          "name": "SYSVENCOL, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (servicio: MANEJO DE FLUIDOS Y LODOS DE PERFORACIÓN)"
+        },
+        {
+          "empresa_id": 391,
+          "name": "TOTAL CLEAN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (servicio: MANEJO DE FLUIDOS Y LODOS DE PERFORACIÓN)"
+        },
+        {
+          "empresa_id": 257,
+          "name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA) ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (experiencia: Fabricación de tanques para planta de tratamiento de agua potable.)"
+        },
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (experiencia: PROYECTO DE EXPANSION SISTEMA DE TRATAMIENTO DE AGUA EN PLANTA DESHIDRATADORA PLD3, CAMPO BOSCAN.)"
+        },
+        {
+          "empresa_id": 152,
+          "name": "MARITIME CONTRACTORS DE VENEZUELA S.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (experiencia: Servicios de perforacion y rehabilitacion de pozos con 04 taladros de 1500 HP)"
+        },
+        {
+          "empresa_id": 182,
+          "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (servicio: MANEJO DE FLUIDOS Y LODOS DE PERFORACIÓN)"
+        },
+        {
+          "empresa_id": 85,
+          "name": "VENEZUELAN HEAVY INDUSTRIES, C.A. (VHICOA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (experiencia: FABRICACIÓN DE PLATAFORMA COSTA AFUERA PARA PERFORACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 133,
+          "name": "STRATA SERVICES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 79,
+          "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (experiencia: Servicios de guaya eléctrica con taladro en sitio para recuperación y rehabilitación de pozos y Serv…)"
+        },
+        {
+          "empresa_id": 77,
+          "name": "TROIL SERVICES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 523,
+          "name": "VENEZOLANA DE LIMPIEZAS INDUSTRIALES (VENELIN), C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (experiencia: Servicio trasegado de agua de cortado de la fosa de fino de los tambores de coque del Mejorador Petr…)"
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (experiencia: Proyecto:\nServicio de Estudio Geotécnico costa afuera para el proyecto segundo cruce del Lago de Mar…)"
+        },
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"tratamiento de aguas de perforación en el lago\" (categoría CPV: Planta de Tratamiento de Agua)"
+        }
+      ]
+    },
+    "G5-02": {
+      "intent": {
+        "interpretation": "multi_concept",
+        "search_phrases": [
+          "fabricación de balancines",
+          "mantenimiento de balancines"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"fabricación de balancines\" (experiencia: Fabricación de balancines (unidad de bombeo) C-912D, C-640D, M-640D, C-456D, M-456D, C-320D y M-320D)"
+        },
+        {
+          "empresa_id": 333,
+          "name": "CONSORCIO OGS, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"mantenimiento de balancines\" (experiencia: Comprende el período de 1998 a 2012 (Contratos varios) MAXUS VENEZUELA C.I.LTD - Repsol YPF - PDVSA…)"
+        },
+        {
+          "empresa_id": 107,
+          "name": "SERVI COMPRESORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricación de balancines\" (servicio: TORNILLERÍA)"
+        },
+        {
+          "empresa_id": 391,
+          "name": "TOTAL CLEAN, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"mantenimiento de balancines\""
+        },
+        {
+          "empresa_id": 141,
+          "name": "OXICORTE DE VENEZUELA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricación de balancines\" (servicio: TORNILLERÍA)"
+        },
+        {
+          "empresa_id": 83,
+          "name": "ELEKTROMEK, C.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricación de balancines\" (categoría CPV: Máquinas de Fabricación)"
+        },
+        {
+          "empresa_id": 126,
+          "name": "RG, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricación de balancines\" (servicio: MAQUINARIAS Y EQUIPOS PARA PLANTAS, EQUIPOS MECÁNICOS Y DE PROCESOS)"
+        },
+        {
+          "empresa_id": 480,
+          "name": "SERVIC METAL SUCRE, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"empresas que fabriquen y mantengan balancines\" (servicio: MAQUINARIAS Y EQUIPOS PARA PLANTAS, EQUIPOS MECÁNICOS Y DE PROCESOS)"
+        },
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de balancines\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 560,
+          "name": "INGENIERÍA DE VÁLVULAS VENEZOLANAS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricación de balancines\" (servicio: MATERIALES, EQUIPOS Y ACCESORIOS PARA INSTRUMENTACIÓN)"
+        },
+        {
+          "empresa_id": 73,
+          "name": "N&V CONSULTORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de balancines\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 94,
+          "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de balancines\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de balancines\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 75,
+          "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de balancines\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 138,
+          "name": "ALCAVE VENEZUELA C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricación de balancines\" (servicio: MATERIALES, EQUIPOS Y ACCESORIOS PARA INSTRUMENTACIÓN)"
+        },
+        {
+          "empresa_id": 92,
+          "name": "EHCOPEK S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de balancines\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 122,
+          "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de balancines\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 140,
+          "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"mantenimiento de balancines\" (categoría CPV: Mantenimiento de Planta)"
+        },
+        {
+          "empresa_id": 458,
+          "name": "DYNA DRILL, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"fabricación de balancines\" (servicio: TORNILLERÍA)"
+        },
+        {
+          "empresa_id": 518,
+          "name": "ROLINI CONSTRUCTORS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"empresas que fabriquen y mantengan balancines\" (servicio: MAQUINARIAS Y EQUIPOS PARA PLANTAS, EQUIPOS MECÁNICOS Y DE PROCESOS)"
+        }
+      ]
+    },
+    "G5-03": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "inspección y mantenimiento de guaya eléctrica"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 107,
+          "name": "SERVI COMPRESORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 122,
+          "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 193,
+          "name": "SUMINISTROS NACIONALES E IMPORTADOS,C.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (categoría CPV: Reparación y Mantenimiento de Equipos)"
+        },
+        {
+          "empresa_id": 79,
+          "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: Servicios de guaya eléctrica con taladro en sitio para recuperación y rehabilitación de pozos y Serv…)"
+        },
+        {
+          "empresa_id": 94,
+          "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 112,
+          "name": "REPRESENTACIONES LANDAETA RELANSA, S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: EVALUACIÓN DE SISTEMA ELÉCTRICO Y PROPUESTA DE MEJORAS)"
+        },
+        {
+          "empresa_id": 92,
+          "name": "EHCOPEK S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 333,
+          "name": "CONSORCIO OGS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: Contrato N° 4600005244. Mantenimiento de la Instrumentación  y Automatización  de las Instalaciones…)"
+        },
+        {
+          "empresa_id": 75,
+          "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 81,
+          "name": "REPRESENTACIONES BARCAN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: MANTENIMIENTO, REPARACIÓN Y CALIBRACIÓN DE LOS DETECTORES DE GAS PORTÁTILES MARCA BW PERTENECIENTES…)"
+        },
+        {
+          "empresa_id": 73,
+          "name": "N&V CONSULTORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+        },
+        {
+          "empresa_id": 83,
+          "name": "ELEKTROMEK, C.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: Reconstrucción, adecuación tecnica, mantenimiento, pruebas a sub estaciones en Planta VDU)"
+        },
+        {
+          "empresa_id": 137,
+          "name": "OILPLEX, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+        },
+        {
+          "empresa_id": 171,
+          "name": "TOPIECA, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: La actividad comprende la evaluación y mantenimiento del sistema de instrumentación y electricidad a…)"
+        },
+        {
+          "empresa_id": 480,
+          "name": "SERVIC METAL SUCRE, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: TURBOPRE SERVICES Servicio de Inspeccion y mantenimiento del generador electrico del TG-02\nBloque E-…)"
+        },
+        {
+          "empresa_id": 213,
+          "name": "DATA POWER DEAR, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: SERVICIO TECNICO POR CONTRATO DE MANTENIMIENTO PREVENTIVO Y ASISTENCIA TECNICA PARA UPS, RECTIFICADO…)"
+        },
+        {
+          "empresa_id": 177,
+          "name": "INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: Se conformaron grupos y equipos de especialistas, para llevar a cabo una serie de actividades defini…)"
+        },
+        {
+          "empresa_id": 140,
+          "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: Limpieza y Mantenimiento de 3 Unidades Turbogeneradoras GE Modelo TM-2500 PLUS. PENTECH)"
+        }
+      ]
+    },
+    "G5-04": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "transporte de crudo por gandola"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 185,
+          "name": "CONSTRUCTORES VENEZOLANOS C.A. (CONVECA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de crudo por gandola\" (servicio: GASODUCTOS Y POLIDUCTOS)"
+        },
+        {
+          "empresa_id": 92,
+          "name": "EHCOPEK S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de crudo por gandola\" (servicio: COSTA AFUERA-OLEODUCTOS, GASODUCTOS, POLIDUCTOS, ACUEDUCTOS, MONOBOYAS)"
+        },
+        {
+          "empresa_id": 171,
+          "name": "TOPIECA, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de crudo por gandola\" (experiencia: Trabajo realizado en gasoducto)"
+        },
+        {
+          "empresa_id": 140,
+          "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de crudo por gandola\" (servicio: COSTA AFUERA-OLEODUCTOS, GASODUCTOS, POLIDUCTOS, ACUEDUCTOS, MONOBOYAS)"
+        },
+        {
+          "empresa_id": 305,
+          "name": "TRABAJOS INDUSTRIALES Y MECANICOS, C.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de crudo por gandola\" (servicio: COSTA AFUERA-OLEODUCTOS, GASODUCTOS, POLIDUCTOS, ACUEDUCTOS, MONOBOYAS)"
+        },
+        {
+          "empresa_id": 141,
+          "name": "OXICORTE DE VENEZUELA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de crudo por gandola\" (servicio: COSTA AFUERA-OLEODUCTOS, GASODUCTOS, POLIDUCTOS, ACUEDUCTOS, MONOBOYAS)"
+        },
+        {
+          "empresa_id": 331,
+          "name": "INGENIERIA DE CONSULTA INCOSTAS, S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de crudo por gandola\" (servicio: COSTA AFUERA-OLEODUCTOS, GASODUCTOS, POLIDUCTOS, ACUEDUCTOS, MONOBOYAS)"
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de crudo por gandola\" (servicio: COSTA AFUERA-OLEODUCTOS, GASODUCTOS, POLIDUCTOS, ACUEDUCTOS, MONOBOYAS)"
+        },
+        {
+          "empresa_id": 208,
+          "name": "SAMPIERI & FORTUNATO, S.A. (SAMFOR SA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"transporte de crudo por gandola\" (servicio: GASODUCTOS Y POLIDUCTOS)"
+        }
+      ]
+    },
+    "G6-01": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "pipeline"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 141,
+          "name": "OXICORTE DE VENEZUELA, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 151,
+          "name": "ELOLAM, C.A ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 86,
+          "name": "TUBOACERO, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 80,
+          "name": "AZEX INDUSTRIAL C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 82,
+          "name": "WALCO INDUSTRIAL, S.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 91,
+          "name": "DISTEINSA, C.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 207,
+          "name": "PROBE, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 177,
+          "name": "INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 1,
+          "name": "VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (experiencia: ARA PETROSINOVENSA: CIVIL WORKS - OF FS PLANT PACKAGE # 1;  CIVIL WORKS OF DSDS CONTROL ROOM AND PIP…)"
+        },
+        {
+          "empresa_id": 312,
+          "name": "CORPORACION SHIBARI, C.A",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 407,
+          "name": "CONSTRUCTORA ARZA, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 483,
+          "name": "SERVICOS Y SOLUCIONES API, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Tubos de Línea / Ductos)"
+        },
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"pipeline\" (categoría CPV: Ductos Offshore)"
+        },
+        {
+          "empresa_id": 171,
+          "name": "TOPIECA, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"pipeline\" (experiencia: Trabajo realizado en gasoducto)"
+        },
+        {
+          "empresa_id": 85,
+          "name": "VENEZUELAN HEAVY INDUSTRIES, C.A. (VHICOA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"pipeline\" (experiencia: REPARACIONES DE ESTRUCTURAS PIPE RACK N. 2 DE PLANTA I DE METANOL DE ORIENTE, METOR, S.A. FASE 1C)"
+        },
+        {
+          "empresa_id": 122,
+          "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+          "match_type": "semantic",
+          "matched_via": "similar a \"pipeline\" (servicio: PRE-FABRICACIÓN E INSTALACIÓN DE TUBERÍAS)"
+        },
+        {
+          "empresa_id": 115,
+          "name": "CLAM INSTALACIONES, S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"pipeline\" (servicio: PRE-FABRICACIÓN E INSTALACIÓN DE TUBERÍAS)"
+        },
+        {
+          "empresa_id": 94,
+          "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"pipeline\" (servicio: PRE-FABRICACIÓN E INSTALACIÓN DE TUBERÍAS)"
+        },
+        {
+          "empresa_id": 75,
+          "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"pipeline\" (servicio: PRE-FABRICACIÓN E INSTALACIÓN DE TUBERÍAS)"
+        }
+      ]
+    },
+    "G6-02": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "refinería"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"refinería\" (experiencia: TÜPRAŞ - İZMİT & İZMİR & KIRIKKALE REFINERIES - FLARE REVAMP PROJECT BASIC ENGINEERING SERVICES. LIT…)"
+        },
+        {
+          "empresa_id": 85,
+          "name": "VENEZUELAN HEAVY INDUSTRIES, C.A. (VHICOA)",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"refinería\" (experiencia: SUMINISTRO Y FABRICACIÓN DE DOS TORRES DE FRACCIONAMIENTO PARA LA REFINERÍA DE LAKE CHARLES DE CITGO…)"
+        },
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 83,
+          "name": "ELEKTROMEK, C.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"refinería\" (experiencia: Mantenimiento Preventivo Nivel 3 Sistema Vanguard, Sistema DAC, Tableros HIMA Refineria El Palito)"
+        },
+        {
+          "empresa_id": 90,
+          "name": "J.A.P CONSULTORES DE ORIENTE, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"refinería\" (experiencia: SERVICIOS PROFESIONALES DE CONSULTORÍA  PARA LA EJECUCIÓN DE LAS FASES CONCEPTUALIZAR DEFINIR E IMPL…)"
+        },
+        {
+          "empresa_id": 523,
+          "name": "VENEZOLANA DE LIMPIEZAS INDUSTRIALES (VENELIN), C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 140,
+          "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 159,
+          "name": "VENEZOLANA DE PROYECTOS INTEGRADOS VEPICA, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 480,
+          "name": "SERVIC METAL SUCRE, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 125,
+          "name": "OTERCA MAQUINARIAS, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 91,
+          "name": "DISTEINSA, C.A. ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 134,
+          "name": "COMERCIAL SANTIAGO ORIENTE, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 96,
+          "name": "EVERGREEN SERVICE, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 433,
+          "name": "CONSORCIO PALDACA, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 155,
+          "name": "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 202,
+          "name": "LECVEN, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 141,
+          "name": "OXICORTE DE VENEZUELA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"refinería\" (servicio: TORNILLERÍA)"
+        },
+        {
+          "empresa_id": 107,
+          "name": "SERVI COMPRESORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"refinería\" (servicio: TORNILLERÍA)"
+        },
+        {
+          "empresa_id": 187,
+          "name": "HOLANDA VENEZUELA C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"refinery\" (servicio: PINTURAS, REVESTIMIENTOS Y RECUBRIMIENTOS METÁLICOS)"
+        }
+      ]
+    },
+    "G6-03": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "refinería"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"refinería\" (experiencia: TÜPRAŞ - İZMİT & İZMİR & KIRIKKALE REFINERIES - FLARE REVAMP PROJECT BASIC ENGINEERING SERVICES. LIT…)"
+        },
+        {
+          "empresa_id": 85,
+          "name": "VENEZUELAN HEAVY INDUSTRIES, C.A. (VHICOA)",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"refinería\" (experiencia: SUMINISTRO Y FABRICACIÓN DE DOS TORRES DE FRACCIONAMIENTO PARA LA REFINERÍA DE LAKE CHARLES DE CITGO…)"
+        },
+        {
+          "empresa_id": 83,
+          "name": "ELEKTROMEK, C.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"refinería\" (experiencia: Mantenimiento Preventivo Nivel 3 Sistema Vanguard, Sistema DAC, Tableros HIMA Refineria El Palito)"
+        },
+        {
+          "empresa_id": 90,
+          "name": "J.A.P CONSULTORES DE ORIENTE, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"refinería\" (experiencia: SERVICIOS PROFESIONALES DE CONSULTORÍA  PARA LA EJECUCIÓN DE LAS FASES CONCEPTUALIZAR DEFINIR E IMPL…)"
+        },
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 523,
+          "name": "VENEZOLANA DE LIMPIEZAS INDUSTRIALES (VENELIN), C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 140,
+          "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 480,
+          "name": "SERVIC METAL SUCRE, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 159,
+          "name": "VENEZOLANA DE PROYECTOS INTEGRADOS VEPICA, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 125,
+          "name": "OTERCA MAQUINARIAS, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 96,
+          "name": "EVERGREEN SERVICE, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 202,
+          "name": "LECVEN, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 91,
+          "name": "DISTEINSA, C.A. ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 134,
+          "name": "COMERCIAL SANTIAGO ORIENTE, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 433,
+          "name": "CONSORCIO PALDACA, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 78,
+          "name": "TEMI, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 155,
+          "name": "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 487,
+          "name": "COSAPI SERVICIOS, C.A. ",
+          "match_type": "fulltext",
+          "matched_via": "coincide en texto con \"refinería\""
+        },
+        {
+          "empresa_id": 107,
+          "name": "SERVI COMPRESORES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"refinería\" (servicio: TORNILLERÍA)"
+        },
+        {
+          "empresa_id": 141,
+          "name": "OXICORTE DE VENEZUELA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"refinería\" (servicio: TORNILLERÍA)"
+        }
+      ]
+    },
+    "G6-04": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "drilling"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (experiencia: INSPECCION Y EVALUACION EQUIPOS GENIE (CESTA ELEVADORA) NABORS DRILLINGS.)"
+        },
+        {
+          "empresa_id": 96,
+          "name": "EVERGREEN SERVICE, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (experiencia: BOHAI DRILLING SERVICE VENEZUELA S.A.\nSERVICIO INTEGRAL DE CONTROL AMBIENTAL REGION FAJA BOHAI DRILL…)"
+        },
+        {
+          "empresa_id": 179,
+          "name": "SYSVENCOL, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Equipos de Perforación)"
+        },
+        {
+          "empresa_id": 86,
+          "name": "TUBOACERO, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Equipos de Perforación)"
+        },
+        {
+          "empresa_id": 170,
+          "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Equipos de Perforación)"
+        },
+        {
+          "empresa_id": 138,
+          "name": "ALCAVE VENEZUELA C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Equipos de Perforación)"
+        },
+        {
+          "empresa_id": 182,
+          "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Equipos de Perforación)"
+        },
+        {
+          "empresa_id": 115,
+          "name": "CLAM INSTALACIONES, S.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 428,
+          "name": "JARBO SERVICES, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Equipos de Perforación)"
+        },
+        {
+          "empresa_id": 72,
+          "name": "GEOHIDRA CONSULTORES, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 193,
+          "name": "SUMINISTROS NACIONALES E IMPORTADOS,C.A. ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (experiencia: Empresa: NABORS DRILLING\nTrabajo ejecutado: Remanufactured CAT Long Block Diesel Engine)"
+        },
+        {
+          "empresa_id": 77,
+          "name": "TROIL SERVICES, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 79,
+          "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 152,
+          "name": "MARITIME CONTRACTORS DE VENEZUELA S.A",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 173,
+          "name": "PEMINSER, C.A (PETROLEUM AND MINING SERVICES) ",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 383,
+          "name": "SCAN GEOFÍSICA, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 391,
+          "name": "TOTAL CLEAN, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 133,
+          "name": "STRATA SERVICES, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 312,
+          "name": "CORPORACION SHIBARI, C.A",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 528,
+          "name": "TÉCNICA DEL ACERO, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 187,
+          "name": "HOLANDA VENEZUELA C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 331,
+          "name": "INGENIERIA DE CONSULTA INCOSTAS, S.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 458,
+          "name": "DYNA DRILL, C.A.",
+          "match_type": "lexical",
+          "matched_via": "coincide con \"drilling\" (categoría CPV: Servicios de Perforación Onshore)"
+        },
+        {
+          "empresa_id": 140,
+          "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (servicio: VIALIDAD Y DRENAJES)"
+        },
+        {
+          "empresa_id": 229,
+          "name": "INDIGO ENERGY INTERNATIONAL, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (servicio: VIALIDAD Y DRENAJES)"
+        },
+        {
+          "empresa_id": 171,
+          "name": "TOPIECA, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: Trabajo realizado en gasoducto)"
+        },
+        {
+          "empresa_id": 214,
+          "name": "CONSTRUCTORA B&P, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (servicio: VIALIDAD Y DRENAJES)"
+        },
+        {
+          "empresa_id": 1,
+          "name": "VENEZOLANA DE INVERSIONES Y CONSTRUCCIONES CLÉRICO, C.A.VINCCLER",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (servicio: VIALIDAD Y DRENAJES)"
+        },
+        {
+          "empresa_id": 75,
+          "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (servicio: VIALIDAD Y DRENAJES)"
+        },
+        {
+          "empresa_id": 257,
+          "name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA) ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: Desmontaje de planta de leche. Trabajo en sitio.)"
+        },
+        {
+          "empresa_id": 208,
+          "name": "SAMPIERI & FORTUNATO, S.A. (SAMFOR SA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (servicio: VIALIDAD Y DRENAJES)"
+        },
+        {
+          "empresa_id": 74,
+          "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (servicio: VIALIDAD Y DRENAJES)"
+        },
+        {
+          "empresa_id": 85,
+          "name": "VENEZUELAN HEAVY INDUSTRIES, C.A. (VHICOA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: FABRICACIÓN DE DOS STRIPPING TOWERS)"
+        },
+        {
+          "empresa_id": 155,
+          "name": "RAFAY INGENIEROS & ASOCIADOS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: \"POWER PLANT WÁRTSILA 4X12V50DF - GENERACION ELECTRICA PLANTA ORIMULSION EN MORICHAL - PETROLERA SIN…)"
+        },
+        {
+          "empresa_id": 202,
+          "name": "LECVEN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: INGENIERIA PROCURA Y CONSTRUCCION DE SISTEMAS DE PUESTA A TIERRA Y PROTECCION CONTRA DESCARGAS ATMOS…)"
+        },
+        {
+          "empresa_id": 185,
+          "name": "CONSTRUCTORES VENEZOLANOS C.A. (CONVECA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: INGENIERIA, PROCURA Y CONSTRUCCION DE PERFORACION HORIZONTAL DIRIGIDA (HDD) Ø 16\" CRUCE DEL RIO CHIR…)"
+        },
+        {
+          "empresa_id": 94,
+          "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: Movimiento de tierra para planta de tratamiento de crudo de COPEM.\n\nObras civiles, electromecánicas…)"
+        },
+        {
+          "empresa_id": 92,
+          "name": "EHCOPEK S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: Aproximación de Poliducto de 20in a costa este, sector el mene.\n\nActividades de Dragado.\nEstudios Ba…)"
+        },
+        {
+          "empresa_id": 333,
+          "name": "CONSORCIO OGS, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: Comprende el período de 1998 a 2012 (Contratos varios) MAXUS VENEZUELA C.I.LTD - Repsol YPF - PDVSA…)"
+        },
+        {
+          "empresa_id": 177,
+          "name": "INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: Realizamos procuras internacionales necesarias para la exploraciòn y producciòn de hidrocarburos, fu…)"
+        },
+        {
+          "empresa_id": 76,
+          "name": "INELECTRA,S.A.C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: CAMARGO CORREA.\nINGENIERÍA DE DETALLE Y SOPORTE A LA PROCURA PARA AMPLIACIÓN Y ADECUACIÓN DE LA SUBE…)"
+        },
+        {
+          "empresa_id": 224,
+          "name": "EMPRESA DE CONSTRUCCIÓN SAN ANTONIO, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: Extracción, carga, cribado, trituración y acarreo de material TEU y MPNC en la  mina Los Barrancos -…)"
+        },
+        {
+          "empresa_id": 178,
+          "name": "AIC TECH, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: SERVICIOS DE PRUEBAS DE PRODUCCION CON EQUIPOS DE SUPERFICIE PARA POZOS PDVSA GAS OCCIDENTE, 2016 -…)"
+        },
+        {
+          "empresa_id": 372,
+          "name": "DENARIUS PUMPING SERVICES DE VENEZUELA, C.A. (DPSV, C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: SERVICIO DE BOMBEO DE ALTA PRESION)"
+        },
+        {
+          "empresa_id": 433,
+          "name": "CONSORCIO PALDACA, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: A través de los terrenos blandos, se realizaron 17 perforaciones por el método convencional de lavad…)"
+        },
+        {
+          "empresa_id": 536,
+          "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"drilling\" (experiencia: Construcción de nuevas macollas para el plan de perforación 2024 y adelanto 2025: movimiento de tier…)"
+        }
+      ]
+    },
+    "G7-01": {
+      "intent": {
+        "interpretation": "out_of_scope",
+        "search_phrases": [],
+        "clarification_question": null
+      },
+      "results": [],
+      "searched": false
+    },
+    "G7-02": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "arbolitos para pozos petroleros"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": [
+        {
+          "empresa_id": 179,
+          "name": "SYSVENCOL, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 115,
+          "name": "CLAM INSTALACIONES, S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 77,
+          "name": "TROIL SERVICES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 85,
+          "name": "VENEZUELAN HEAVY INDUSTRIES, C.A. (VHICOA)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (experiencia: FABRICACIÓN DE PLATAFORMA COSTA AFUERA PARA PERFORACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 112,
+          "name": "REPRESENTACIONES LANDAETA RELANSA, S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (experiencia: SUMINISTRO DE RODILLOS DE EJE LARGO PARA CRIBAS, PARA PLANTA DE PELLAS.)"
+        },
+        {
+          "empresa_id": 80,
+          "name": "AZEX INDUSTRIAL C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"arbolitos para pozos petroleros\" (experiencia: REVESTIMIENTOS PARA TUBERIAS, EPOXI, MANGAS TERMOCONTRACTILES)"
+        },
+        {
+          "empresa_id": 152,
+          "name": "MARITIME CONTRACTORS DE VENEZUELA S.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 137,
+          "name": "OILPLEX, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+        },
+        {
+          "empresa_id": 207,
+          "name": "PROBE, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"arbolitos para pozos petroleros\" (servicio: OTROS SERVICIOS ESPECIALIZADOS PETROLEROS)"
+        },
+        {
+          "empresa_id": 312,
+          "name": "CORPORACION SHIBARI, C.A",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 182,
+          "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"arbolitos para pozos petroleros\" (servicio: OTROS SERVICIOS ESPECIALIZADOS PETROLEROS)"
+        },
+        {
+          "empresa_id": 458,
+          "name": "DYNA DRILL, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 133,
+          "name": "STRATA SERVICES, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 157,
+          "name": "LUKIVEN, S.A. ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"arbolitos para pozos petroleros\" (servicio: OTROS SERVICIOS ESPECIALIZADOS PETROLEROS)"
+        },
+        {
+          "empresa_id": 110,
+          "name": "BLC OIL & GAS",
+          "match_type": "semantic",
+          "matched_via": "similar a \"arbolitos para pozos petroleros\" (servicio: OTROS SERVICIOS ESPECIALIZADOS PETROLEROS)"
+        },
+        {
+          "empresa_id": 92,
+          "name": "EHCOPEK S.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"arbolitos para pozos petroleros\" (servicio: OTROS SERVICIOS ESPECIALIZADOS PETROLEROS)"
+        },
+        {
+          "empresa_id": 96,
+          "name": "EVERGREEN SERVICE, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"arbolitos para pozos petroleros\" (servicio: OTROS SERVICIOS ESPECIALIZADOS PETROLEROS)"
+        },
+        {
+          "empresa_id": 276,
+          "name": "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA) ",
+          "match_type": "semantic",
+          "matched_via": "similar a \"arbolitos para pozos petroleros\" (servicio: OTROS SERVICIOS ESPECIALIZADOS PETROLEROS)"
+        },
+        {
+          "empresa_id": 528,
+          "name": "TÉCNICA DEL ACERO, C.A.",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (servicio: PERFORACIÓN Y REHABILITACIÓN DE POZOS)"
+        },
+        {
+          "empresa_id": 372,
+          "name": "DENARIUS PUMPING SERVICES DE VENEZUELA, C.A. (DPSV, C.A.)",
+          "match_type": "semantic",
+          "matched_via": "similar a \"necesito arbolitos para pozos petroleros\" (experiencia: SERVICIO DE BOMBEO DE ALTA PRESION)"
+        }
+      ]
+    },
+    "G7-03": {
+      "intent": {
+        "interpretation": "single_compound",
+        "search_phrases": [
+          "venta de zapatos"
+        ],
+        "clarification_question": null
+      },
+      "searched": true,
+      "results": []
+    },
+    "G7-04": {
+      "intent": {
+        "interpretation": "out_of_scope",
+        "search_phrases": [],
+        "clarification_question": null
+      },
+      "results": [],
+      "searched": false
+    }
+  }
+}

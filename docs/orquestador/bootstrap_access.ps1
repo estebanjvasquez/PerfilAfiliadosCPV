@@ -76,7 +76,10 @@ if (Test-Path $storePath) {
         }
 
         if ($val.Length -gt 0) {
-            Set-Item -Path "env:$name" -Value $val
+            # NUNCA Set-Item aqui: si quien hace dot-source corre con -WhatIf, PowerShell imprime
+            # "What if: Set Item ... Value: <secreto>" (incidente 2026-11-06). La API de .NET no
+            # participa de ShouldProcess y no muestra nada.
+            [Environment]::SetEnvironmentVariable($name, $val, 'Process')
             $loaded += $name
         }
     }

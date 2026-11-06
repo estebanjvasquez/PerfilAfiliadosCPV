@@ -51,7 +51,8 @@ Qué se puede hacer, con qué credencial, y de dónde sale el valor.
 | 8 | Regresión 32-query / `POST /debug-search` | `DEBUG_TOKEN` | **Worker secret de Cloudflare** — plaintext **no recuperable** | ⚠️ requiere GATE D |
 | 9 | Deploy / secretos del Worker (`wrangler`) | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | almacén local (§3) | ⬜ no configurado |
 | 10 | API de gestión de Supabase | `SUPABASE_ACCESS_TOKEN` | almacén local (§3) | ⬜ opcional |
-| 11 | Flujo n8n / CIRA (UAT) | credenciales de n8n | propiedad del propietario | 🔒 fuera del agente |
+| 11 | Flujo n8n / CIRA (UAT): API REST de n8n | `N8N_BASE_URL`, `N8N_API_KEY` | almacén local (§3) | ✅ **habilitado 2026-11-06**. La key de Community no tiene alcance limitado (lee **y** escribe todos los workflows): antes de cualquier cambio se exporta un respaldo fuera del repo, y cada cambio de flujo necesita autorización explícita del propietario |
+| 11b | `/mcp` del Worker (medición del buscador, `docs/uat/tools/evaluate_search.mjs`) | `CPV_MCP_TOKEN` | almacén local (§3) | ✅ **rotado por el propietario el 2026-11-06**. Mismo valor que el secret `MCP_TOKEN` del Worker y la credencial de n8n «MCP Perfil Afiliados CPV»; si se rota de nuevo, hay que cambiar los dos a la vez |
 | 12 | **Correo del sistema** (verificación de registro, avisos de solicitudes) | `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_ENCRYPTION`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME` | `.env` del directorio de despliegue de cada entorno, en el servidor (fuera de git), inyectado con `env_file` | ⏳ **pendiente del propietario**: staging en modo sin envío (`log`). Ver `docs/deploy/CORREO_DEL_SISTEMA.md` |
 
 Leyenda: ✅ funciona · ⚠️ limitación conocida · ⬜ no configurado, se configura si se necesita ·
