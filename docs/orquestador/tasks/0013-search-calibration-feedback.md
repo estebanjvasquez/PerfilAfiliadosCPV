@@ -187,3 +187,11 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
 - **Staging:** sitio y `/cira-test/` responden 200 después de aplicar.
 - **Reversión:** `down()` elimina las dos tablas; está probado en el runner aislado.
 - **Sin conectar todavía:** ni el registro de búsquedas en n8n ni los votos. Son pasos aparte.
+
+## Explicación por resultado (v3), promovida a staging (2026-11-06)
+
+- **Aprobación:** del propietario en el chat.
+- **Worker:** commit `836a00b` desplegado como versión `9c99cec7`. La regresión congelada no dio cambios.
+- **n8n:** el flujo de staging pasó a `0f55cd97…`.
+- **Detalle, verificación y reversión:** `docs/uat/n8n/INFORME_TASK0013_PASO1.md` §7.
+- **Decisión sobre los votos:** todos los usuarios de staging son personal de la Cámara, así que los votos se registran como `voter_kind = 'staff'`.

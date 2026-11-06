@@ -155,3 +155,29 @@ Un caso, «como me afilio a la camara?», respondió HTTP 500 una vez; al reinte
 - `https://pruebas.camarapetrolera.app/cira-test/` responde 200.
 
 La copia `3PtTduMeifEe2fg9` sigue desactivada. Se puede borrar cuando ya no haga falta.
+
+## 7. Explicación por resultado (v3): fuentes, aporte y puntaje (2026-11-06)
+
+- **Pedido y aprobaciones:** el propietario pidió en el chat que `cira-test` muestre de dónde sale cada resultado y con qué peso quedó en su posición. Autorizó modificar y desplegar el Worker y editar el flujo de staging, y aprobó la promoción después de ver la prueba.
+- **Worker** `perfilafiliados-mcp`, rama `feat/search-explain-on-live`, commit `836a00b`:
+  - `search_empresas` acepta `explain` (opcional, desactivado por defecto);
+  - con `explain`, cada empresa trae sus fuentes (nombre, servicio, sector, certificación, experiencia, taxonomía CPV, texto del perfil), el tipo (coincide, capacidad CPV, similar, relacionado), el peso, la posición en cada fuente, el aporte, el porcentaje del total y el puntaje relativo al primero;
+  - todo sale de las mismas contribuciones con que se ordena (`perEmpresaContributions`). El campo exacto de la lista `structured` se consulta aparte y solo para las empresas que se devuelven.
+- **Base del despliegue:** la rama sale de `12a7fbd` y no de `master`, porque `29de993` (2026-09-28) estaba en `master` pero nunca se había desplegado. La versión preview, sin `explain`, dio la misma respuesta que el Worker vivo en 8 consultas.
+- **Despliegue:** versión `9c99cec7`, al 100 %.
+  - Regresión congelada después del despliegue: «Sin cambios en ninguna de las 32 queries».
+  - Medición directa sin intención: MRR 0,708, 36 de 49 relevantes en el top 10, 47 de ruido en el top 5. Son los mismos valores que la línea base en modo `debug`.
+- **n8n:**
+  - «Parse Intent JSON3» pide `explain: true` solo para `search_empresas`;
+  - «Format Cards2» muestra en cada fila las fuentes con tipo y porcentaje, el puntaje relativo y un «cálculo del puntaje» desplegable. Arriba agrega «¿Cómo se ordenan los resultados?», con la fórmula y la tabla de pesos;
+  - el texto que viene de los datos se escapa;
+  - sin `explain`, vuelve a la línea `matched_via` anterior.
+- **Promoción:** primero se probó en la copia aislada, apuntada a la versión preview. Luego se aplicó en `zbVLoCdR09IA9yQK`: de `279690f8…` (v2) a `0f55cd97…` (v3). El contenido es idéntico a la copia probada, salvo el webhook y la URL del Worker.
+  - Respaldo: `zbVLoCdR09IA9yQK_2026-11-06_pre-promote-v3.json`.
+  - Reversión a v2: `promote_v3.ps1 -Revert`.
+- **Verificación por el webhook de staging:** [`../runs/2026-11-06_n8n_staging_v3_explain.json`](../runs/2026-11-06_n8n_staging_v3_explain.json), 8 casos × 2 repeticiones.
+  - Mismas consultas y resultados que v2.
+  - El HTML trae el puntaje, el cálculo y la leyenda.
+  - `/cira-test/` responde 200.
+  - Captura: [`v3_explicacion_servicios_a_pozos.png`](v3_explicacion_servicios_a_pozos.png).
+- **Costo:** una lista amplia, como «servicios a pozos» con 54 empresas, produce unos 164 KB de HTML. Para producción convendría mostrarlo solo al personal.

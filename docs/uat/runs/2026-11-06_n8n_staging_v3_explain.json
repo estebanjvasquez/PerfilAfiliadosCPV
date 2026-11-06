@@ -1,0 +1,1066 @@
+{
+ "meta": {
+  "mode": "n8n",
+  "workflow_id": "zbVLoCdR09IA9yQK",
+  "workflow_name": "Chat CIRA V5 - MCP",
+  "workflow_version_id": "0f55cd97-291b-45a5-9efc-2d396cf24ad4",
+  "workflow_updated_at": "2026-11-06T16:55:09.890Z",
+  "reps": 2,
+  "ran_at": "2026-11-06T16:55:21.730Z",
+  "label": "staging_v3.json"
+ },
+ "calls": [
+  {
+   "rep": 1,
+   "case_id": "G2-09",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20734",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "camión chupón",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "camión chupón"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "camion chupon",
+    "resolvedPhrases": [
+     "camión chupón"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "similar a \"camion chupon\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - “SUMINISTRO DE CAMIONES DE VACÍO PARA APOYO DE OPERACIO…)"
+    }
+   ],
+   "status": "success",
+   "ms": 11267
+  },
+  {
+   "rep": 1,
+   "case_id": "G3-02",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20735",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "fabricantes de cabrias",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "fabricantes de cabrias"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "fabricantes de cabrias",
+    "resolvedPhrases": [
+     "fabricantes de cabrias"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 151,
+     "name": "ELOLAM, C.A",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 141,
+     "name": "OXICORTE DE VENEZUELA, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 210,
+     "name": "TORINDUCA, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 458,
+     "name": "DYNA DRILL, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 187,
+     "name": "HOLANDA VENEZUELA C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+    },
+    {
+     "empresa_id": 100,
+     "name": "QUIMICOS DE MANTENIMIENTO INDUSTRIAL QUIMAINCA CA",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+    },
+    {
+     "empresa_id": 86,
+     "name": "TUBOACERO, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 138,
+     "name": "ALCAVE VENEZUELA C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 170,
+     "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 179,
+     "name": "SYSVENCOL, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 182,
+     "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 428,
+     "name": "JARBO SERVICES, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    }
+   ],
+   "status": "success",
+   "ms": 10649
+  },
+  {
+   "rep": 1,
+   "case_id": "G3-03",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20736",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "transporte de gandolas",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "transporte de gandolas"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "transporte de gandolas",
+    "resolvedPhrases": [
+     "transporte de gandolas"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 165,
+     "name": "OEG INTERNACIONAL SERVICE, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 187,
+     "name": "HOLANDA VENEZUELA C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 204,
+     "name": "CLOVER INTERNACIONAL, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 426,
+     "name": "LOSAN LOGISTICA, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 452,
+     "name": "TAUREL & CÍA SUCRS, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 563,
+     "name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    }
+   ],
+   "status": "success",
+   "ms": 9798
+  },
+  {
+   "rep": 1,
+   "case_id": "X-GUAYAS",
+   "golden": false,
+   "kind": "termino_mayusculas",
+   "execution_id": "20737",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "GUAYAS",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "out_of_scope",
+    "search_phrases": []
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "guayas",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 458,
+     "name": "DYNA DRILL, C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 182,
+     "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 435,
+     "name": "CONTINENTAL DE GUAYAS C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 79,
+     "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 198,
+     "name": "ESSENZA SERVICES C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    }
+   ],
+   "status": "success",
+   "ms": 12412
+  },
+  {
+   "rep": 1,
+   "case_id": "X-N1",
+   "golden": false,
+   "kind": "nombre",
+   "execution_id": "20738",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "dame información sobre la empresa COSTA NORTE CONSTRUCCIONES, C.A.",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": "get_empresa",
+   "params": {
+    "nombre": "costa norte"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": null
+    }
+   ],
+   "status": "success",
+   "ms": 3959
+  },
+  {
+   "rep": 1,
+   "case_id": "X-R1",
+   "golden": false,
+   "kind": "rif",
+   "execution_id": "20739",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "busca la empresa con rif J070115076",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": "get_empresa",
+   "params": {
+    "rif": "J070115076"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": null
+    }
+   ],
+   "status": "success",
+   "ms": 3209
+  },
+  {
+   "rep": 1,
+   "case_id": "X-F1",
+   "golden": false,
+   "kind": "filtro",
+   "execution_id": "20740",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "empresas de construccion en maracaibo",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "empresas de construcción en maracaibo"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "construccion",
+    "ciudad": "maracaibo",
+    "resolvedPhrases": [
+     "empresas de construcción en maracaibo"
+    ],
+    "queryIntent": "MIXED",
+    "explain": true
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 115,
+     "name": "CLAM INSTALACIONES, S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 185,
+     "name": "CONSTRUCTORES VENEZOLANOS C.A. (CONVECA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 184,
+     "name": "CONSTRUCTORA NASE, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 183,
+     "name": "CONSTRUCCIONES MONSERCA S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 208,
+     "name": "SAMPIERI & FORTUNATO, S.A. (SAMFOR SA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 486,
+     "name": "GESTION ESTRATEGIA LOGISTICA SERVICIOS, C.A. (GELSCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 475,
+     "name": "GRUPO VENEZOLANO DE PUBLICIDAD Y CONSTRUCCIÓN COMPAÑÍA ANÓNIMA",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 536,
+     "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 209,
+     "name": "SAMFOR GROUP, COMPAÑIA ANONIMA",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 253,
+     "name": "CONSTRUCTORES ELÉCTRICOS E INDUSTRIALES, C.A. (CEICA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 254,
+     "name": "CONTRATISTA BERMÚDEZ, C.A. (CONTRATISTA BERMÚDEZ, C.A CONBERCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 255,
+     "name": "CVCON, C.A. (CEVCONCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 260,
+     "name": "INNOVEN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 269,
+     "name": "RAYMOND DE VENEZUELA, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 339,
+     "name": "CONSTRUCTORA TURAGUAL C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 344,
+     "name": "INSUMOS Y PROYECTOS DE OCCIDENTE, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 257,
+     "name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+     "matched_via": "similar a \"construccion\" (experiencia: Fabricación de eje de triturador. Planta cementera.)"
+    }
+   ],
+   "status": "success",
+   "ms": 11580
+  },
+  {
+   "rep": 1,
+   "case_id": "X-O1",
+   "golden": false,
+   "kind": "fuera_de_alcance",
+   "execution_id": "20741",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "como esta el clima hoy en caracas",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": null,
+   "params": null,
+   "query_restored_from": null,
+   "responded_with": "Respond Conversation5",
+   "reply_text": "No puedo consultar el clima. Este asistente ayuda a buscar empresas afiliadas a la Cámara Petrolera de Venezuela.",
+   "tool_error": null,
+   "results": [],
+   "status": "success",
+   "ms": 3161
+  },
+  {
+   "rep": 2,
+   "case_id": "G2-09",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20742",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "camión chupón",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "camión chupón"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "camion chupon",
+    "resolvedPhrases": [
+     "camión chupón"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "similar a \"camion chupon\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - “SUMINISTRO DE CAMIONES DE VACÍO PARA APOYO DE OPERACIO…)"
+    }
+   ],
+   "status": "success",
+   "ms": 9161
+  },
+  {
+   "rep": 2,
+   "case_id": "G3-02",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20743",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "fabricantes de cabrias",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "fabricantes de cabrias"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "fabricantes de cabrias",
+    "resolvedPhrases": [
+     "fabricantes de cabrias"
+    ],
+    "queryIntent": "MIXED",
+    "explain": true
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 151,
+     "name": "ELOLAM, C.A",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 141,
+     "name": "OXICORTE DE VENEZUELA, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 210,
+     "name": "TORINDUCA, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 458,
+     "name": "DYNA DRILL, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 187,
+     "name": "HOLANDA VENEZUELA C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+    },
+    {
+     "empresa_id": 100,
+     "name": "QUIMICOS DE MANTENIMIENTO INDUSTRIAL QUIMAINCA CA",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+    },
+    {
+     "empresa_id": 86,
+     "name": "TUBOACERO, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 138,
+     "name": "ALCAVE VENEZUELA C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 170,
+     "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 179,
+     "name": "SYSVENCOL, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 182,
+     "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 428,
+     "name": "JARBO SERVICES, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    }
+   ],
+   "status": "success",
+   "ms": 7899
+  },
+  {
+   "rep": 2,
+   "case_id": "G3-03",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20744",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "transporte de gandolas",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "transporte de gandolas"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "transporte de gandolas",
+    "resolvedPhrases": [
+     "transporte de gandolas"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 165,
+     "name": "OEG INTERNACIONAL SERVICE, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 187,
+     "name": "HOLANDA VENEZUELA C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 204,
+     "name": "CLOVER INTERNACIONAL, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 426,
+     "name": "LOSAN LOGISTICA, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 452,
+     "name": "TAUREL & CÍA SUCRS, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 563,
+     "name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    }
+   ],
+   "status": "success",
+   "ms": 10339
+  },
+  {
+   "rep": 2,
+   "case_id": "X-GUAYAS",
+   "golden": false,
+   "kind": "termino_mayusculas",
+   "execution_id": "20745",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "GUAYAS",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "out_of_scope",
+    "search_phrases": []
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "guayas",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 458,
+     "name": "DYNA DRILL, C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 182,
+     "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 435,
+     "name": "CONTINENTAL DE GUAYAS C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 79,
+     "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 198,
+     "name": "ESSENZA SERVICES C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    }
+   ],
+   "status": "success",
+   "ms": 9957
+  },
+  {
+   "rep": 2,
+   "case_id": "X-N1",
+   "golden": false,
+   "kind": "nombre",
+   "execution_id": "20746",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "dame información sobre la empresa COSTA NORTE CONSTRUCCIONES, C.A.",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": "get_empresa",
+   "params": {
+    "nombre": "costa norte"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": null
+    }
+   ],
+   "status": "success",
+   "ms": 3556
+  },
+  {
+   "rep": 2,
+   "case_id": "X-R1",
+   "golden": false,
+   "kind": "rif",
+   "execution_id": "20747",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "busca la empresa con rif J070115076",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": "get_empresa",
+   "params": {
+    "rif": "J070115076"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": null
+    }
+   ],
+   "status": "success",
+   "ms": 2742
+  },
+  {
+   "rep": 2,
+   "case_id": "X-F1",
+   "golden": false,
+   "kind": "filtro",
+   "execution_id": "20748",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "empresas de construccion en maracaibo",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "empresas de construcción en maracaibo"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "construccion",
+    "ciudad": "maracaibo",
+    "resolvedPhrases": [
+     "empresas de construcción en maracaibo"
+    ],
+    "queryIntent": "MIXED",
+    "explain": true
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 115,
+     "name": "CLAM INSTALACIONES, S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 185,
+     "name": "CONSTRUCTORES VENEZOLANOS C.A. (CONVECA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 184,
+     "name": "CONSTRUCTORA NASE, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 183,
+     "name": "CONSTRUCCIONES MONSERCA S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 208,
+     "name": "SAMPIERI & FORTUNATO, S.A. (SAMFOR SA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 486,
+     "name": "GESTION ESTRATEGIA LOGISTICA SERVICIOS, C.A. (GELSCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 475,
+     "name": "GRUPO VENEZOLANO DE PUBLICIDAD Y CONSTRUCCIÓN COMPAÑÍA ANÓNIMA",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 536,
+     "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 209,
+     "name": "SAMFOR GROUP, COMPAÑIA ANONIMA",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 253,
+     "name": "CONSTRUCTORES ELÉCTRICOS E INDUSTRIALES, C.A. (CEICA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 254,
+     "name": "CONTRATISTA BERMÚDEZ, C.A. (CONTRATISTA BERMÚDEZ, C.A CONBERCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 255,
+     "name": "CVCON, C.A. (CEVCONCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 260,
+     "name": "INNOVEN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 269,
+     "name": "RAYMOND DE VENEZUELA, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 339,
+     "name": "CONSTRUCTORA TURAGUAL C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 344,
+     "name": "INSUMOS Y PROYECTOS DE OCCIDENTE, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 257,
+     "name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+     "matched_via": "similar a \"construccion\" (experiencia: Fabricación de eje de triturador. Planta cementera.)"
+    }
+   ],
+   "status": "success",
+   "ms": 7160
+  },
+  {
+   "rep": 2,
+   "case_id": "X-O1",
+   "golden": false,
+   "kind": "fuera_de_alcance",
+   "execution_id": "20749",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "como esta el clima hoy en caracas",
+   "prompt_version": "TASK-0013-step1-v2+explain",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": null,
+   "params": null,
+   "query_restored_from": null,
+   "responded_with": "Respond Conversation5",
+   "reply_text": "No puedo consultar el clima. Mi función es ayudarte a buscar empresas afiliadas a la Cámara Petrolera de Venezuela.",
+   "tool_error": null,
+   "results": [],
+   "status": "success",
+   "ms": 2767
+  }
+ ]
+}
