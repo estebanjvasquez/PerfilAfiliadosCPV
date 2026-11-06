@@ -181,3 +181,24 @@ La copia `3PtTduMeifEe2fg9` sigue desactivada. Se puede borrar cuando ya no haga
   - `/cira-test/` responde 200.
   - Captura: [`v3_explicacion_servicios_a_pozos.png`](v3_explicacion_servicios_a_pozos.png).
 - **Costo:** una lista amplia, como «servicios a pozos» con 54 empresas, produce unos 164 KB de HTML. Para producción convendría mostrarlo solo al personal.
+
+## 8. Votos 👍/👎 (construido y probado en aislamiento, sin promover; 2026-11-06)
+
+- **Decisión del propietario:** en staging solo entra personal de la Cámara, así que todos sus votos se registran como `voter_kind = 'staff'`.
+- **Cambio de diseño:** la credencial Postgres de n8n apunta a **otra base**, no a la compartida (`agent_learnings` y `chat_memory` no están en la compartida). Por eso el registro y los votos los escribe el Worker:
+  - `POST /search-log` y `POST /search-feedback`, con el mismo Bearer que `/mcp`, que solo tiene n8n. El navegador nunca ve tokens.
+  - El voto se valida contra la búsqueda registrada: la empresa tiene que estar entre los resultados, y la posición sale del registro, no del navegador.
+  - Si el mismo votante vuelve a votar, se reemplaza su voto.
+  - Rama `feat/cira-feedback` (`1613ce8`, `3983488`, `f85987e`), sobre `836a00b`.
+- **n8n:**
+  - el flujo principal registra cada búsqueda («Build Search Log» → «Log Search» → «Attach Log Id»); si el registro falla, la búsqueda sigue igual, solo que sin botones;
+  - las tarjetas muestran 👍/👎 por empresa, «¿Te sirvió esta búsqueda?» y «Falta una empresa»;
+  - un flujo aparte, «CIRA votos», recibe el voto, fuerza `voter_kind = 'staff'` y lo reenvía al Worker.
+- **`cira-test`:** funciones `ciraVote` y `ciraMissing`. El 👎 pide motivo y un comentario opcional. El votante es la sesión de la página.
+- **Pruebas en aislamiento** (versión preview del Worker, copia del flujo principal y flujo de votos de prueba):
+  - 14 de 14 comprobaciones de los endpoints: token, validaciones, cambio de voto, segundo votante, voto sobre el resultado completo, empresa ajena, entradas malformadas;
+  - una búsqueda real por la copia quedó registrada con sus ids en orden, la evidencia por posición, los parámetros, la versión y el tiempo;
+  - en Edge headless, con el código real de `cira-test`, 👍, 👎 con motivo, 👍 del resultado completo y «falta empresa» quedaron registrados con su posición, motivo, comentario y `staff`. Hacer clic en un botón no abre la ficha de la empresa (0 propagaciones);
+  - se corrigieron tres errores encontrados en estas pruebas: el formato del arreglo de ids, la posición calculada sobre texto y el JSON guardado como texto.
+- **Limpieza:** se borraron las 5 búsquedas de prueba, con sus votos; las tablas quedaron vacías. Los flujos de prueba quedaron desactivados.
+- **Pendiente de aprobación:** desplegar la página, el Worker y n8n, en ese orden.
