@@ -129,3 +129,44 @@ Orden de trabajo acordado con el propietario. Ningún paso cambia el ranking sin
 5. **Votos 👍/👎 en CIRA.** Primero aplicar la migración de esta tarea (autorización aparte). Después conectar en n8n el registro de búsquedas y la interfaz de votos, con mayor peso para los votos del personal de la Cámara. Nada se aplica automáticamente al ranking: los votos van a una cola de revisión.
 6. **Análisis de datos:** empresas que aparecen como ruido en muchas consultas (GEOHIDRA, LUKIVEN, TUBOACERO, SERVI COMPRESORES) y experiencias donde el cliente del proyecto se confunde con lo que la empresa sabe hacer («refinería»).
 - El agente de intención no es determinista: la misma frase produjo búsquedas distintas, por ejemplo «transporte de gandolas» → `transporte`, que devolvió 32 resultados.
+
+---
+
+## Paso 1 — Consulta completa en el agente de n8n (asignación `6686193637`)
+
+| Campo | Valor |
+|---|---|
+| Fuente | Issue #2 [`6686193637`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6686193637) (orquestador, a pedido expreso del propietario). Texto íntegro abajo. No aprueba la entrega anterior de TASK-0013 |
+| Estado | **READY_FOR_REVIEW** (2026-11-06). Propuesta v2 probada en una copia aislada, **no aplicada** al flujo de staging |
+| Informe | [`docs/uat/n8n/INFORME_TASK0013_PASO1.md`](../../uat/n8n/INFORME_TASK0013_PASO1.md): flujo y alcance, prompt exacto y diferencias, antes/después, casos que empeoran, límites y reversión |
+| Flujo de la UAT | «Chat CIRA V5 - MCP» `zbVLoCdR09IA9yQK`, solo tráfico de staging (87/87 ejecuciones); sin modificar (`versionId` `e22c8dd5…`) |
+| Copia de prueba | `3PtTduMeifEe2fg9` (`versionId` `171a9f6d…`), **desactivada** al terminar |
+| Respaldos | fuera del repo, `%USERPROFILE%\.cpv\n8n_backups\` |
+| Gates | sin producción; sin migración, registro ni votos; sin cambios de ranking ni del Worker; sin merge |
+| Bloqueo | regresión congelada del Worker no ejecutada: falta `DEBUG_TOKEN` en el almacén local; sin alterar credenciales |
+
+**Resultado (3 repeticiones, 48 casos):**
+- casos con variantes entre repeticiones: de 15 a 3;
+- consultas recortadas: de 9 a 3 (las 3 son el filtro «lago» de un aprendizaje);
+- búsquedas del agente por su cuenta: de 4 a 0;
+- MRR: de 0,78-0,82 a 0,817 en las 3 repeticiones;
+- relevantes conocidas en el top 10: 37 de 49 sin cambio;
+- ruido conocido en el top 5: de 52-53 a 53-55, sobre todo porque «mecha» se busca siempre, una variabilidad de `resolve_search_intent`.
+
+### Comentario fuente `6686193637` (íntegro)
+
+[ORQUESTADOR — AUTORIZACIÓN Y ASIGNACIÓN] Continuación de TASK-0013: estabilizar la consulta de CIRA en n8n
+
+El propietario autoriza expresamente al desarrollador a trabajar en el paso 1 descrito en 6685054227, incluida la edición necesaria de n8n para esta finalidad. Esta instrucción no constituye aprobación de la entrega TASK-0013, que continúa pendiente de revisión.
+
+1. Verifica en solo lectura qué workflow y webhook atendieron el UAT, su estado y si comparten tráfico de producción. Documenta el identificador y el alcance del cambio. Conserva una copia recuperable del flujo fuera del repositorio y sin exponer credenciales.
+2. Prepara un cambio acotado del prompt y, si hace falta, de la construcción de parámetros: preservar la consulta completa del usuario en la búsqueda de capacidad, sin reducirla a una palabra genérica; permitir filtros y frases adicionales cuando estén sustentados. Distingue búsquedas de empresa por evidencia de nombre o RIF, sin tratar una palabra en mayúsculas como nombre por defecto. Mantén la atención de consultas generales y fuera de alcance.
+3. Prueba primero en un flujo aislado o de pruebas. Si el único flujo disponible atiende producción, detente antes de modificarlo y reporta el alcance; la autorización actual no incluye producción. No actives ni conectes componentes de registro o votos.
+4. Mide la ruta completa de chat/n8n/MCP, capturando consulta original, parámetros enviados, resultados ordenados y versión; usa conversaciones nuevas y varias repeticiones para «transporte de gandolas», «mantenimiento de levantamiento artificial», «inspección y mantenimiento de guaya eléctrica», «GUAYAS» y el lote de referencia aplicable. Incluye búsquedas por nombre/RIF, filtros y consultas amplias o fuera de alcance. Compara con observaciones anteriores y documenta cambios, variabilidad y regresiones, sin tratar resultados no juzgados como negativos.
+5. Ejecuta también `evaluate_search.mjs --compare` contra la base registrada y la regresión congelada del Worker cuando sus accesos lo permitan. Su guía indica que este script llama al MCP directamente y no reproduce la reescritura del agente: sus resultados complementan, pero no sustituyen, la medición de n8n. Si no puedes ejecutar una verificación, informa el bloqueo sin alterar credenciales.
+6. Entrega el texto exacto del prompt propuesto, diferencia de configuración, evidencia antes/después, casos que empeoran, límites y reversión. Registra el trabajo conforme al protocolo, preservando TASK-0013 y los cambios locales existentes. No declares aceptación automática con una mejora aislada.
+
+Fuera de alcance: aplicar la migración en la base compartida, conectar logs o votos, modificar ranking o pesos del Worker, publicar taxonomía, fusionar ramas o desplegar a producción. Los pendientes de rotación de tres credenciales y de los dos hallazgos de seguridad continúan vigentes para producción; no publiques secretos ni detalles sensibles en este Issue público.
+
+Autoría: instrucción publicada por el orquestador a petición expresa del propietario en este chat.
+

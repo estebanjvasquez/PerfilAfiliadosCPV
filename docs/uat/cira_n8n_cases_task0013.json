@@ -1,0 +1,15 @@
+[
+  { "id": "X-GUAYAS", "query": "GUAYAS", "kind": "termino_mayusculas" },
+  { "id": "X-CABRIAS", "query": "CABRIAS", "kind": "termino_mayusculas" },
+  { "id": "X-N1", "query": "dame información sobre la empresa COSTA NORTE CONSTRUCCIONES, C.A.", "kind": "nombre" },
+  { "id": "X-N2", "query": "dame información sobre la empresa SUMINISTROS NACIONALES E IMPORTADOS,C.A.", "kind": "nombre" },
+  { "id": "X-N3", "query": "LUKIVEN, S.A.", "kind": "nombre" },
+  { "id": "X-R1", "query": "busca la empresa con rif J070115076", "kind": "rif" },
+  { "id": "X-F1", "query": "empresas de construccion en maracaibo", "kind": "filtro" },
+  { "id": "X-F2", "query": "perforacion en anzoategui", "kind": "filtro" },
+  { "id": "X-F3", "query": "transporte de gandolas en el zulia", "kind": "filtro" },
+  { "id": "X-A1", "query": "abogados", "kind": "amplia" },
+  { "id": "X-A2", "query": "servicios a pozos", "kind": "amplia" },
+  { "id": "X-O1", "query": "como esta el clima hoy en caracas", "kind": "fuera_de_alcance" },
+  { "id": "X-O2", "query": "hola", "kind": "saludo" }
+]

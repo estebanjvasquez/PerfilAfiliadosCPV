@@ -1,0 +1,58 @@
+﻿diff --git a/old_Parse_Intent_JSON3.js b/new_Parse_Intent_JSON3.js
+index fba77da..90703d0 100644
+--- a/old_Parse_Intent_JSON3.js
++++ b/new_Parse_Intent_JSON3.js
+@@ -57,6 +57,44 @@ if (isReady) {
+   // es un lugar mucho mas confiable para armar este objeto que la expresion del nodo HTTP de mas
+   // abajo (un spread `{...$json.params, queryIntent: $json.queryIntent}` alli resolvia queryIntent
+   // como undefined - JSON.stringify lo descartaba en silencio sin ningun error visible).
++  // TASK-0013 paso 1 (6 nov 2026): guarda determinista contra la reduccion a una palabra generica.
++  // Si el agente mando en "query" UNA sola palabra de contenido y la primera frase de resolvedPhrases
++  // (la interpretacion de la frase completa) tiene varias y la contiene, se restituye la frase
++  // completa en "query". La palabra suelta no se agrega como frase adicional.
++  let queryRestoredFrom = null;
++  let queryAccentsStripped = false;
++  if (parsed.tool === 'search_empresas' && typeof parsed.params.query === 'string') {
++    const norm = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
++    const STOP = new Set(['de', 'del', 'la', 'las', 'el', 'los', 'y', 'e', 'o', 'u', 'en', 'para', 'por', 'con', 'a', 'al', 'un', 'una']);
++    const content = (s) => norm(s).split(' ').filter((t) => t && !STOP.has(t));
++    const phrases = Array.isArray(parsed.params.resolvedPhrases) ? parsed.params.resolvedPhrases : [];
++    const full = phrases.find((f) => typeof f === 'string' && f.trim());
++    const qWords = content(parsed.params.query);
++    // No actua si la frase completa trae relleno de pedido o la ubicacion que ya va en "ciudad":
++    // restituirla meteria "empresas" o la ciudad en el texto buscado (bug documentado en el Worker).
++    const FILLER = new Set(['empresa', 'empresas', 'necesito', 'busco', 'quiero', 'quien', 'donde', 'dame']);
++    const ciudad = norm(parsed.params.ciudad);
++    if (full && qWords.length === 1 && !(ciudad && norm(full).includes(ciudad))) {
++      const fWords = content(full);
++      const stem = (t) => t.replace(/(es|s)$/, '');
++      if (fWords.length > 1 && !fWords.some((t) => FILLER.has(t)) && fWords.some((t) => stem(t) === stem(qWords[0]))) {
++        queryRestoredFrom = parsed.params.query;
++        parsed.params.query = full.trim();
++      }
++    }
++    // "query" va sin tildes: si la frase original las tenia, sigue en resolvedPhrases y el Worker
++    // busca las dos variantes (mismo efecto que tenia el flujo anterior, medido en "camion chupon").
++    const plain = parsed.params.query.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
++    if (plain !== parsed.params.query) {
++      const original = parsed.params.query;
++      parsed.params.query = plain;
++      queryAccentsStripped = true;
++      if (!phrases.some((f) => typeof f === 'string' && f.trim() === original.trim())) {
++        parsed.params.resolvedPhrases = [...phrases, original];
++      }
++    }
++  }
++
+   const paramsWithIntent = parsed.tool === 'search_empresas'
+     ? { ...parsed.params, queryIntent: queryIntentClean }
+     : parsed.params;
+@@ -68,6 +106,8 @@ if (isReady) {
+       tool: parsed.tool,
+       params: paramsWithIntent,
+       queryIntent: queryIntentClean,
++      queryRestoredFrom,
++      queryAccentsStripped,
+       humanSummary: (parsed.humanSummary || 'Búsqueda de empresas').replace(/[\n\r]/g, '').trim()
+     }
+   };

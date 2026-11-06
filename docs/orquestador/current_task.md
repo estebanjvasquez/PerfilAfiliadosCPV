@@ -15,6 +15,11 @@ hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_
 | Gates | migración `cira_search_log`/`cira_search_feedback` escrita y probada, **no aplicada**; sin editar n8n; sin cambios de ranking; sin merge ni producción |
 | Pendiente antes de producción | rotar `N8N_API_KEY`, `CPV_GITHUB_TOKEN` y `CPV_MCP_TOKEN` (expuestas en la salida de una sesión local el 2026-11-06); corregir dos hallazgos de seguridad del flujo n8n |
 
+**Paso 1 (asignación `6686193637`): READY_FOR_REVIEW.**
+- Qué se hizo: la consulta completa en el agente de n8n, probada en la copia aislada `3PtTduMeifEe2fg9`, que quedó desactivada. El flujo de staging `zbVLoCdR09IA9yQK` no se modificó.
+- Dónde está: informe en `docs/uat/n8n/INFORME_TASK0013_PASO1.md`; sección «Paso 1» en el archivo de la tarea.
+- Bloqueo: la regresión congelada del Worker no corrió porque falta `DEBUG_TOKEN`.
+
 TASK-0012 sigue igual que abajo: desplegada en staging y con la UAT pendiente.
 
 ## TASK-0012 — Recuperación de acceso por correo y RIF — DESPLEGADA EN STAGING; UAT PENDIENTE (`6602168914`, autorización de despliegue del propietario)
