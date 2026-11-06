@@ -125,3 +125,23 @@ Esa diferencia es variabilidad del LLM del Worker entre dos corridas. Esta medic
 - El ruido conocido no baja con este paso. Viene del ranking del Worker, que es el paso 2 del plan.
 - La sensibilidad a las tildes de una parte del Worker queda registrada para el paso 2.
 - Cada envío deja filas de memoria de chat (`chat_memory`) con un `sessionId` `eval-…`, igual que cualquier conversación de staging.
+
+## 6. Promoción al flujo de staging (2026-11-06)
+
+- **Aprobación:** la dio el propietario en el chat de desarrollo («It is approved»), después de la entrega `6687648330`.
+- **Quién aplicó el cambio:** el propietario ejecutó el script de promoción en su máquina, porque el control de permisos del agente bloqueó la escritura en el flujo compartido.
+- **Qué se aplicó:** sobre «Chat CIRA V5 - MCP» `zbVLoCdR09IA9yQK`, el mismo contenido que la prueba v2, nodo por nodo. Se conservan el nombre y el webhook `4882efaf-…`.
+
+| Versión | `versionId` |
+|---|---|
+| Antes | `e22c8dd5-d37c-4fe4-bc16-42cda305dc61` |
+| Después | `279690f8-e861-421f-8563-a4ad9f00c668` (activo) |
+
+- **Respaldo previo**, fuera del repo: `zbVLoCdR09IA9yQK_2026-11-06_pre-promote-v2.json`. Para revertir, el mismo script se ejecuta con `-Revert` y restaura ese respaldo con `PUT`.
+
+**Verificación por el webhook real de staging:** [`../runs/2026-11-06_n8n_staging_v2_promovido.json`](../runs/2026-11-06_n8n_staging_v2_promovido.json), 10 casos × 3 repeticiones.
+- Los 10 casos dan la misma consulta y la misma cantidad de resultados en las 3 repeticiones, y coinciden con la prueba v2: «transporte de gandolas» 6, «fabricantes de cabrias» 14, «camión chupón» 1, «GUAYAS» 5, «costa norte» 1, RIF 1, construcción en Maracaibo 25 y clima sin búsqueda.
+- La única diferencia: en una repetición, `resolve_search_intent` dividió «inspección y mantenimiento de guaya eléctrica» en dos frases. Igual devolvió 20 resultados.
+- `https://pruebas.camarapetrolera.app/cira-test/` responde 200.
+
+La copia `3PtTduMeifEe2fg9` sigue desactivada. Se puede borrar cuando ya no haga falta.

@@ -137,7 +137,7 @@ Orden de trabajo acordado con el propietario. Ningún paso cambia el ranking sin
 | Campo | Valor |
 |---|---|
 | Fuente | Issue #2 [`6686193637`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6686193637) (orquestador, a pedido expreso del propietario). Texto íntegro abajo. No aprueba la entrega anterior de TASK-0013 |
-| Estado | **READY_FOR_REVIEW** (2026-11-06). Propuesta v2 probada en una copia aislada, **no aplicada** al flujo de staging |
+| Estado | **READY_FOR_REVIEW** (2026-11-06). v2 probada en una copia aislada y **promovida a staging** con la aprobación del propietario en el chat («It is approved»). La aplicó el propietario: `zbVLoCdR09IA9yQK` pasó de `e22c8dd5…` a `279690f8…`. Verificación y reversión: informe §6 |
 | Informe | [`docs/uat/n8n/INFORME_TASK0013_PASO1.md`](../../uat/n8n/INFORME_TASK0013_PASO1.md): flujo y alcance, prompt exacto y diferencias, antes/después, casos que empeoran, límites y reversión |
 | Flujo de la UAT | «Chat CIRA V5 - MCP» `zbVLoCdR09IA9yQK`, solo tráfico de staging (87/87 ejecuciones); sin modificar (`versionId` `e22c8dd5…`) |
 | Copia de prueba | `3PtTduMeifEe2fg9` (`versionId` `171a9f6d…`), **desactivada** al terminar |

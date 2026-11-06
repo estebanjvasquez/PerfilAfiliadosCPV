@@ -1,0 +1,2401 @@
+{
+ "meta": {
+  "mode": "n8n",
+  "workflow_id": "zbVLoCdR09IA9yQK",
+  "workflow_name": "Chat CIRA V5 - MCP",
+  "workflow_version_id": "279690f8-e861-421f-8563-a4ad9f00c668",
+  "workflow_updated_at": "2026-11-06T15:18:40.675Z",
+  "reps": 3,
+  "ran_at": "2026-11-06T15:19:21.308Z",
+  "label": "staging_post.json"
+ },
+ "calls": [
+  {
+   "rep": 1,
+   "case_id": "G2-09",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20696",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "camión chupón",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "camión chupón"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "camion chupon",
+    "resolvedPhrases": [
+     "camión chupón"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "similar a \"camion chupon\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - “SUMINISTRO DE CAMIONES DE VACÍO PARA APOYO DE OPERACIO…)"
+    }
+   ],
+   "status": "success",
+   "ms": 15244
+  },
+  {
+   "rep": 1,
+   "case_id": "G3-02",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20697",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "fabricantes de cabrias",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "fabricantes de cabrias"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "fabricantes de cabrias",
+    "resolvedPhrases": [
+     "fabricantes de cabrias"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 151,
+     "name": "ELOLAM, C.A",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 141,
+     "name": "OXICORTE DE VENEZUELA, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 210,
+     "name": "TORINDUCA, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 458,
+     "name": "DYNA DRILL, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 187,
+     "name": "HOLANDA VENEZUELA C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+    },
+    {
+     "empresa_id": 100,
+     "name": "QUIMICOS DE MANTENIMIENTO INDUSTRIAL QUIMAINCA CA",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+    },
+    {
+     "empresa_id": 86,
+     "name": "TUBOACERO, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 138,
+     "name": "ALCAVE VENEZUELA C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 170,
+     "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 179,
+     "name": "SYSVENCOL, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 182,
+     "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 428,
+     "name": "JARBO SERVICES, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    }
+   ],
+   "status": "success",
+   "ms": 12289
+  },
+  {
+   "rep": 1,
+   "case_id": "G3-03",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20698",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "transporte de gandolas",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "transporte de gandolas"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "transporte de gandolas",
+    "resolvedPhrases": [
+     "transporte de gandolas"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 165,
+     "name": "OEG INTERNACIONAL SERVICE, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 187,
+     "name": "HOLANDA VENEZUELA C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 204,
+     "name": "CLOVER INTERNACIONAL, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 426,
+     "name": "LOSAN LOGISTICA, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 452,
+     "name": "TAUREL & CÍA SUCRS, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 563,
+     "name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    }
+   ],
+   "status": "success",
+   "ms": 11997
+  },
+  {
+   "rep": 1,
+   "case_id": "G3-05",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20699",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "mantenimiento de levantamiento artificial",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "mantenimiento de levantamiento artificial"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "mantenimiento de levantamiento artificial",
+    "resolvedPhrases": [
+     "mantenimiento de levantamiento artificial"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 78,
+     "name": "TEMI, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 72,
+     "name": "GEOHIDRA CONSULTORES, C.A.",
+     "matched_via": "coincide en texto con \"mantenimiento de levantamiento artificial\""
+    },
+    {
+     "empresa_id": 122,
+     "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 94,
+     "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 276,
+     "name": "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Suministros y servicios de sistemas de levantamiento artificial mediante bombas de cavidad progresiv…)"
+    },
+    {
+     "empresa_id": 333,
+     "name": "CONSORCIO OGS, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: 2009-2010\nMantenimiento Preventivo  y correctivo a los sistemas mecánicos de la planta, tanto de equ…)"
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 536,
+     "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Mantenimiento multidisciplinario para operaciones portuarias críticas\nEl servicio abarcó el mantenim…)"
+    },
+    {
+     "empresa_id": 489,
+     "name": "PETROLEUM CONTRACTOR, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: SERVICIOS DE MANTENIMIENTO DE EQUIPOS ESTATICOS DE PLANTA 2 METANOL DE ORIENTE)"
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 83,
+     "name": "ELEKTROMEK, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Reconstrucción, adecuación tecnica, mantenimiento, pruebas a sub estaciones en Planta VDU)"
+    },
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 433,
+     "name": "CONSORCIO PALDACA, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: La planta y el sistema de llenado de Gandolas con Nitrógeno Líquido en la Unidad U-94 de Refinería d…)"
+    },
+    {
+     "empresa_id": 407,
+     "name": "CONSTRUCTORA ARZA, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO GENERAL DE LAS REDES DE DISTRIBUCION DE GAS METANO DE LA GRAN CARACAS Y ZONAS FORANEAS)"
+    },
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - Bajo Grande / Mantenimiento Mayor Integral\nde Planta 1…)"
+    },
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO DE BOMBAS CENTRIFUGAS CONTRATO)"
+    },
+    {
+     "empresa_id": 480,
+     "name": "SERVIC METAL SUCRE, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: PDVSA A-159-17-0577\nSERVICIO TECNICO ESPECIALIZADO PARA MANTENIMIENTO DE\nSISTEMAS DE AUTOMATIZACION…)"
+    }
+   ],
+   "status": "success",
+   "ms": 11915
+  },
+  {
+   "rep": 1,
+   "case_id": "G5-03",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20700",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "inspección y mantenimiento de guaya eléctrica",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "inspección y mantenimiento de guaya eléctrica"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "inspeccion y mantenimiento de guaya electrica",
+    "resolvedPhrases": [
+     "inspección y mantenimiento de guaya eléctrica"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 78,
+     "name": "TEMI, C.A.",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 122,
+     "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 193,
+     "name": "SUMINISTROS NACIONALES E IMPORTADOS,C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (categoría CPV: Reparación y Mantenimiento de Equipos)"
+    },
+    {
+     "empresa_id": 94,
+     "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 79,
+     "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: Servicios de guaya eléctrica con taladro en sitio para recuperación y rehabilitación de pozos y Serv…)"
+    },
+    {
+     "empresa_id": 112,
+     "name": "REPRESENTACIONES LANDAETA RELANSA, S.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: EVALUACIÓN DE SISTEMA ELÉCTRICO Y PROPUESTA DE MEJORAS)"
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 333,
+     "name": "CONSORCIO OGS, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: Contrato N° 4600005244. Mantenimiento de la Instrumentación  y Automatización  de las Instalaciones…)"
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 81,
+     "name": "REPRESENTACIONES BARCAN, C.A.",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: MANTENIMIENTO, REPARACIÓN Y CALIBRACIÓN DE LOS DETECTORES DE GAS PORTÁTILES MARCA BW PERTENECIENTES…)"
+    },
+    {
+     "empresa_id": 83,
+     "name": "ELEKTROMEK, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: Reconstrucción, adecuación tecnica, mantenimiento, pruebas a sub estaciones en Planta VDU)"
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 171,
+     "name": "TOPIECA, S.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: La actividad comprende la evaluación y mantenimiento del sistema de instrumentación y electricidad a…)"
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+    },
+    {
+     "empresa_id": 480,
+     "name": "SERVIC METAL SUCRE, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: TURBOPRE SERVICES Servicio de Inspeccion y mantenimiento del generador electrico del TG-02\nBloque E-…)"
+    },
+    {
+     "empresa_id": 213,
+     "name": "DATA POWER DEAR, C.A",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: SERVICIO TECNICO POR CONTRATO DE MANTENIMIENTO PREVENTIVO Y ASISTENCIA TECNICA PARA UPS, RECTIFICADO…)"
+    },
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: Limpieza y Mantenimiento de 3 Unidades Turbogeneradoras GE Modelo TM-2500 PLUS. PENTECH)"
+    },
+    {
+     "empresa_id": 177,
+     "name": "INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: Se conformaron grupos y equipos de especialistas, para llevar a cabo una serie de actividades defini…)"
+    }
+   ],
+   "status": "success",
+   "ms": 12204
+  },
+  {
+   "rep": 1,
+   "case_id": "X-GUAYAS",
+   "golden": false,
+   "kind": "termino_mayusculas",
+   "execution_id": "20701",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "GUAYAS",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "out_of_scope",
+    "search_phrases": []
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "guayas",
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 458,
+     "name": "DYNA DRILL, C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 182,
+     "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 435,
+     "name": "CONTINENTAL DE GUAYAS C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 79,
+     "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 198,
+     "name": "ESSENZA SERVICES C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    }
+   ],
+   "status": "success",
+   "ms": 11570
+  },
+  {
+   "rep": 1,
+   "case_id": "X-N1",
+   "golden": false,
+   "kind": "nombre",
+   "execution_id": "20702",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "dame información sobre la empresa COSTA NORTE CONSTRUCCIONES, C.A.",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": "get_empresa",
+   "params": {
+    "nombre": "costa norte"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": null
+    }
+   ],
+   "status": "success",
+   "ms": 5862
+  },
+  {
+   "rep": 1,
+   "case_id": "X-R1",
+   "golden": false,
+   "kind": "rif",
+   "execution_id": "20703",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "busca la empresa con rif J070115076",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": "get_empresa",
+   "params": {
+    "rif": "J070115076"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": null
+    }
+   ],
+   "status": "success",
+   "ms": 6011
+  },
+  {
+   "rep": 1,
+   "case_id": "X-F1",
+   "golden": false,
+   "kind": "filtro",
+   "execution_id": "20704",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "empresas de construccion en maracaibo",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "empresas de construcción en maracaibo"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "construccion",
+    "ciudad": "maracaibo",
+    "resolvedPhrases": [
+     "empresas de construcción en maracaibo"
+    ],
+    "queryIntent": "MIXED"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 115,
+     "name": "CLAM INSTALACIONES, S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 185,
+     "name": "CONSTRUCTORES VENEZOLANOS C.A. (CONVECA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 184,
+     "name": "CONSTRUCTORA NASE, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 183,
+     "name": "CONSTRUCCIONES MONSERCA S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 208,
+     "name": "SAMPIERI & FORTUNATO, S.A. (SAMFOR SA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 486,
+     "name": "GESTION ESTRATEGIA LOGISTICA SERVICIOS, C.A. (GELSCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 475,
+     "name": "GRUPO VENEZOLANO DE PUBLICIDAD Y CONSTRUCCIÓN COMPAÑÍA ANÓNIMA",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 536,
+     "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 209,
+     "name": "SAMFOR GROUP, COMPAÑIA ANONIMA",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 253,
+     "name": "CONSTRUCTORES ELÉCTRICOS E INDUSTRIALES, C.A. (CEICA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 254,
+     "name": "CONTRATISTA BERMÚDEZ, C.A. (CONTRATISTA BERMÚDEZ, C.A CONBERCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 255,
+     "name": "CVCON, C.A. (CEVCONCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 260,
+     "name": "INNOVEN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 269,
+     "name": "RAYMOND DE VENEZUELA, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 339,
+     "name": "CONSTRUCTORA TURAGUAL C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 344,
+     "name": "INSUMOS Y PROYECTOS DE OCCIDENTE, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 257,
+     "name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+     "matched_via": "similar a \"construccion\" (experiencia: Fabricación de eje de triturador. Planta cementera.)"
+    }
+   ],
+   "status": "success",
+   "ms": 13795
+  },
+  {
+   "rep": 1,
+   "case_id": "X-O1",
+   "golden": false,
+   "kind": "fuera_de_alcance",
+   "execution_id": "20705",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "como esta el clima hoy en caracas",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": null,
+   "params": null,
+   "query_restored_from": null,
+   "responded_with": "Respond Conversation5",
+   "reply_text": "Disculpa, no puedo consultar el clima. Soy el asistente de CIRA y ayudo a buscar empresas afiliadas a la Cámara Petrolera de Venezuela.",
+   "tool_error": null,
+   "results": [],
+   "status": "success",
+   "ms": 3151
+  },
+  {
+   "rep": 2,
+   "case_id": "G2-09",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20706",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "camión chupón",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "camión chupón"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "camion chupon",
+    "resolvedPhrases": [
+     "camión chupón"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "similar a \"camion chupon\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - “SUMINISTRO DE CAMIONES DE VACÍO PARA APOYO DE OPERACIO…)"
+    }
+   ],
+   "status": "success",
+   "ms": 8871
+  },
+  {
+   "rep": 2,
+   "case_id": "G3-02",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20707",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "fabricantes de cabrias",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "fabricantes de cabrias"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "fabricantes de cabrias",
+    "resolvedPhrases": [
+     "fabricantes de cabrias"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 151,
+     "name": "ELOLAM, C.A",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 141,
+     "name": "OXICORTE DE VENEZUELA, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 210,
+     "name": "TORINDUCA, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 458,
+     "name": "DYNA DRILL, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 187,
+     "name": "HOLANDA VENEZUELA C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+    },
+    {
+     "empresa_id": 100,
+     "name": "QUIMICOS DE MANTENIMIENTO INDUSTRIAL QUIMAINCA CA",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+    },
+    {
+     "empresa_id": 86,
+     "name": "TUBOACERO, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 138,
+     "name": "ALCAVE VENEZUELA C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 170,
+     "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 179,
+     "name": "SYSVENCOL, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 182,
+     "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 428,
+     "name": "JARBO SERVICES, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    }
+   ],
+   "status": "success",
+   "ms": 9484
+  },
+  {
+   "rep": 2,
+   "case_id": "G3-03",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20708",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "transporte de gandolas",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "transporte de gandolas"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "transporte de gandolas",
+    "resolvedPhrases": [
+     "transporte de gandolas"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 165,
+     "name": "OEG INTERNACIONAL SERVICE, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 187,
+     "name": "HOLANDA VENEZUELA C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 204,
+     "name": "CLOVER INTERNACIONAL, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 426,
+     "name": "LOSAN LOGISTICA, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 452,
+     "name": "TAUREL & CÍA SUCRS, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 563,
+     "name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    }
+   ],
+   "status": "success",
+   "ms": 9447
+  },
+  {
+   "rep": 2,
+   "case_id": "G3-05",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20709",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "mantenimiento de levantamiento artificial",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "mantenimiento de levantamiento artificial"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "mantenimiento de levantamiento artificial",
+    "resolvedPhrases": [
+     "mantenimiento de levantamiento artificial"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 78,
+     "name": "TEMI, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 72,
+     "name": "GEOHIDRA CONSULTORES, C.A.",
+     "matched_via": "coincide en texto con \"mantenimiento de levantamiento artificial\""
+    },
+    {
+     "empresa_id": 122,
+     "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 94,
+     "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 276,
+     "name": "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Suministros y servicios de sistemas de levantamiento artificial mediante bombas de cavidad progresiv…)"
+    },
+    {
+     "empresa_id": 333,
+     "name": "CONSORCIO OGS, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: 2009-2010\nMantenimiento Preventivo  y correctivo a los sistemas mecánicos de la planta, tanto de equ…)"
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 536,
+     "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Mantenimiento multidisciplinario para operaciones portuarias críticas\nEl servicio abarcó el mantenim…)"
+    },
+    {
+     "empresa_id": 489,
+     "name": "PETROLEUM CONTRACTOR, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: SERVICIOS DE MANTENIMIENTO DE EQUIPOS ESTATICOS DE PLANTA 2 METANOL DE ORIENTE)"
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 83,
+     "name": "ELEKTROMEK, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Reconstrucción, adecuación tecnica, mantenimiento, pruebas a sub estaciones en Planta VDU)"
+    },
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 433,
+     "name": "CONSORCIO PALDACA, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: La planta y el sistema de llenado de Gandolas con Nitrógeno Líquido en la Unidad U-94 de Refinería d…)"
+    },
+    {
+     "empresa_id": 407,
+     "name": "CONSTRUCTORA ARZA, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO GENERAL DE LAS REDES DE DISTRIBUCION DE GAS METANO DE LA GRAN CARACAS Y ZONAS FORANEAS)"
+    },
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - Bajo Grande / Mantenimiento Mayor Integral\nde Planta 1…)"
+    },
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO DE BOMBAS CENTRIFUGAS CONTRATO)"
+    },
+    {
+     "empresa_id": 480,
+     "name": "SERVIC METAL SUCRE, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: PDVSA A-159-17-0577\nSERVICIO TECNICO ESPECIALIZADO PARA MANTENIMIENTO DE\nSISTEMAS DE AUTOMATIZACION…)"
+    }
+   ],
+   "status": "success",
+   "ms": 11079
+  },
+  {
+   "rep": 2,
+   "case_id": "G5-03",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20710",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "inspección y mantenimiento de guaya eléctrica",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "inspección y mantenimiento de guaya eléctrica"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "inspeccion y mantenimiento de guaya electrica",
+    "resolvedPhrases": [
+     "inspección y mantenimiento de guaya eléctrica"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 78,
+     "name": "TEMI, C.A.",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 122,
+     "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 193,
+     "name": "SUMINISTROS NACIONALES E IMPORTADOS,C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (categoría CPV: Reparación y Mantenimiento de Equipos)"
+    },
+    {
+     "empresa_id": 94,
+     "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 79,
+     "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: Servicios de guaya eléctrica con taladro en sitio para recuperación y rehabilitación de pozos y Serv…)"
+    },
+    {
+     "empresa_id": 112,
+     "name": "REPRESENTACIONES LANDAETA RELANSA, S.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: EVALUACIÓN DE SISTEMA ELÉCTRICO Y PROPUESTA DE MEJORAS)"
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 333,
+     "name": "CONSORCIO OGS, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: Contrato N° 4600005244. Mantenimiento de la Instrumentación  y Automatización  de las Instalaciones…)"
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 81,
+     "name": "REPRESENTACIONES BARCAN, C.A.",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: MANTENIMIENTO, REPARACIÓN Y CALIBRACIÓN DE LOS DETECTORES DE GAS PORTÁTILES MARCA BW PERTENECIENTES…)"
+    },
+    {
+     "empresa_id": 83,
+     "name": "ELEKTROMEK, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: Reconstrucción, adecuación tecnica, mantenimiento, pruebas a sub estaciones en Planta VDU)"
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 171,
+     "name": "TOPIECA, S.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: La actividad comprende la evaluación y mantenimiento del sistema de instrumentación y electricidad a…)"
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+    },
+    {
+     "empresa_id": 480,
+     "name": "SERVIC METAL SUCRE, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: TURBOPRE SERVICES Servicio de Inspeccion y mantenimiento del generador electrico del TG-02\nBloque E-…)"
+    },
+    {
+     "empresa_id": 213,
+     "name": "DATA POWER DEAR, C.A",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: SERVICIO TECNICO POR CONTRATO DE MANTENIMIENTO PREVENTIVO Y ASISTENCIA TECNICA PARA UPS, RECTIFICADO…)"
+    },
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: Limpieza y Mantenimiento de 3 Unidades Turbogeneradoras GE Modelo TM-2500 PLUS. PENTECH)"
+    },
+    {
+     "empresa_id": 177,
+     "name": "INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+     "matched_via": "similar a \"inspección y mantenimiento de guaya eléctrica\" (experiencia: Se conformaron grupos y equipos de especialistas, para llevar a cabo una serie de actividades defini…)"
+    }
+   ],
+   "status": "success",
+   "ms": 12018
+  },
+  {
+   "rep": 2,
+   "case_id": "X-GUAYAS",
+   "golden": false,
+   "kind": "termino_mayusculas",
+   "execution_id": "20711",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "GUAYAS",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "out_of_scope",
+    "search_phrases": []
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "guayas",
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 458,
+     "name": "DYNA DRILL, C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 182,
+     "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 435,
+     "name": "CONTINENTAL DE GUAYAS C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 79,
+     "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 198,
+     "name": "ESSENZA SERVICES C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    }
+   ],
+   "status": "success",
+   "ms": 9174
+  },
+  {
+   "rep": 2,
+   "case_id": "X-N1",
+   "golden": false,
+   "kind": "nombre",
+   "execution_id": "20712",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "dame información sobre la empresa COSTA NORTE CONSTRUCCIONES, C.A.",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": "get_empresa",
+   "params": {
+    "nombre": "costa norte"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": null
+    }
+   ],
+   "status": "success",
+   "ms": 4111
+  },
+  {
+   "rep": 2,
+   "case_id": "X-R1",
+   "golden": false,
+   "kind": "rif",
+   "execution_id": "20713",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "busca la empresa con rif J070115076",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": "get_empresa",
+   "params": {
+    "rif": "J070115076"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": null
+    }
+   ],
+   "status": "success",
+   "ms": 3668
+  },
+  {
+   "rep": 2,
+   "case_id": "X-F1",
+   "golden": false,
+   "kind": "filtro",
+   "execution_id": "20714",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "empresas de construccion en maracaibo",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "empresas de construcción en maracaibo"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "construccion",
+    "ciudad": "maracaibo",
+    "resolvedPhrases": [
+     "empresas de construcción en maracaibo"
+    ],
+    "queryIntent": "MIXED"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 115,
+     "name": "CLAM INSTALACIONES, S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 185,
+     "name": "CONSTRUCTORES VENEZOLANOS C.A. (CONVECA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 184,
+     "name": "CONSTRUCTORA NASE, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 183,
+     "name": "CONSTRUCCIONES MONSERCA S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 208,
+     "name": "SAMPIERI & FORTUNATO, S.A. (SAMFOR SA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 486,
+     "name": "GESTION ESTRATEGIA LOGISTICA SERVICIOS, C.A. (GELSCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 475,
+     "name": "GRUPO VENEZOLANO DE PUBLICIDAD Y CONSTRUCCIÓN COMPAÑÍA ANÓNIMA",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 536,
+     "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 209,
+     "name": "SAMFOR GROUP, COMPAÑIA ANONIMA",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 253,
+     "name": "CONSTRUCTORES ELÉCTRICOS E INDUSTRIALES, C.A. (CEICA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 254,
+     "name": "CONTRATISTA BERMÚDEZ, C.A. (CONTRATISTA BERMÚDEZ, C.A CONBERCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 255,
+     "name": "CVCON, C.A. (CEVCONCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 260,
+     "name": "INNOVEN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 269,
+     "name": "RAYMOND DE VENEZUELA, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 339,
+     "name": "CONSTRUCTORA TURAGUAL C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 344,
+     "name": "INSUMOS Y PROYECTOS DE OCCIDENTE, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 257,
+     "name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+     "matched_via": "similar a \"construccion\" (experiencia: Fabricación de eje de triturador. Planta cementera.)"
+    }
+   ],
+   "status": "success",
+   "ms": 9863
+  },
+  {
+   "rep": 2,
+   "case_id": "X-O1",
+   "golden": false,
+   "kind": "fuera_de_alcance",
+   "execution_id": "20715",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "como esta el clima hoy en caracas",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": null,
+   "params": null,
+   "query_restored_from": null,
+   "responded_with": "Respond Conversation5",
+   "reply_text": "Disculpa, solo puedo ayudar a buscar empresas afiliadas y servicios relacionados con la industria petrolera y energética venezolana.",
+   "tool_error": null,
+   "results": [],
+   "status": "success",
+   "ms": 2968
+  },
+  {
+   "rep": 3,
+   "case_id": "G2-09",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20716",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "camión chupón",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "camión chupón"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "camion chupon",
+    "resolvedPhrases": [
+     "camión chupón"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "similar a \"camion chupon\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - “SUMINISTRO DE CAMIONES DE VACÍO PARA APOYO DE OPERACIO…)"
+    }
+   ],
+   "status": "success",
+   "ms": 11472
+  },
+  {
+   "rep": 3,
+   "case_id": "G3-02",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20717",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "fabricantes de cabrias",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "fabricantes de cabrias"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "fabricantes de cabrias",
+    "resolvedPhrases": [
+     "fabricantes de cabrias"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 151,
+     "name": "ELOLAM, C.A",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 141,
+     "name": "OXICORTE DE VENEZUELA, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TUBERÍAS, TUBOS Y CONEXIONES)"
+    },
+    {
+     "empresa_id": 210,
+     "name": "TORINDUCA, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 458,
+     "name": "DYNA DRILL, C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: TORNILLERÍA)"
+    },
+    {
+     "empresa_id": 187,
+     "name": "HOLANDA VENEZUELA C.A.",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+    },
+    {
+     "empresa_id": 100,
+     "name": "QUIMICOS DE MANTENIMIENTO INDUSTRIAL QUIMAINCA CA",
+     "matched_via": "similar a \"fabricantes de cabrias\" (servicio: PRODUCTOS QUÍMICOS INDUSTRIALES)"
+    },
+    {
+     "empresa_id": 86,
+     "name": "TUBOACERO, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 138,
+     "name": "ALCAVE VENEZUELA C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 170,
+     "name": "INDUSTRIAS METAL MECANICA MERIDA, C.A",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 179,
+     "name": "SYSVENCOL, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 182,
+     "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    },
+    {
+     "empresa_id": 428,
+     "name": "JARBO SERVICES, C.A.",
+     "matched_via": "candidato relacionado con \"fabricantes de cabrias\" (familia relacionada con: Torre y Mástil de Perforación) - no es coincidencia directa"
+    }
+   ],
+   "status": "success",
+   "ms": 11419
+  },
+  {
+   "rep": 3,
+   "case_id": "G3-03",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20718",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "transporte de gandolas",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "transporte de gandolas"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "transporte de gandolas",
+    "resolvedPhrases": [
+     "transporte de gandolas"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 165,
+     "name": "OEG INTERNACIONAL SERVICE, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 187,
+     "name": "HOLANDA VENEZUELA C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 204,
+     "name": "CLOVER INTERNACIONAL, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 426,
+     "name": "LOSAN LOGISTICA, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 452,
+     "name": "TAUREL & CÍA SUCRS, C.A.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    },
+    {
+     "empresa_id": 563,
+     "name": "ASOCIACIÓN COOPERATIVA NACIONAL DE UNIFORMES, R.S.",
+     "matched_via": "similar a \"transporte de gandolas\" (categoría CPV: Transporte de Mercancías)"
+    }
+   ],
+   "status": "success",
+   "ms": 8003
+  },
+  {
+   "rep": 3,
+   "case_id": "G3-05",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20719",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "mantenimiento de levantamiento artificial",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "mantenimiento de levantamiento artificial"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "mantenimiento de levantamiento artificial",
+    "resolvedPhrases": [
+     "mantenimiento de levantamiento artificial"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 78,
+     "name": "TEMI, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 72,
+     "name": "GEOHIDRA CONSULTORES, C.A.",
+     "matched_via": "coincide en texto con \"mantenimiento de levantamiento artificial\""
+    },
+    {
+     "empresa_id": 122,
+     "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 94,
+     "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 276,
+     "name": "TIERRA ALTA SISTEMAS DE PRODUCCIÓN, S.A. (TASPSA)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Suministros y servicios de sistemas de levantamiento artificial mediante bombas de cavidad progresiv…)"
+    },
+    {
+     "empresa_id": 333,
+     "name": "CONSORCIO OGS, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: 2009-2010\nMantenimiento Preventivo  y correctivo a los sistemas mecánicos de la planta, tanto de equ…)"
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 536,
+     "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Mantenimiento multidisciplinario para operaciones portuarias críticas\nEl servicio abarcó el mantenim…)"
+    },
+    {
+     "empresa_id": 489,
+     "name": "PETROLEUM CONTRACTOR, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: SERVICIOS DE MANTENIMIENTO DE EQUIPOS ESTATICOS DE PLANTA 2 METANOL DE ORIENTE)"
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 83,
+     "name": "ELEKTROMEK, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: Reconstrucción, adecuación tecnica, mantenimiento, pruebas a sub estaciones en Planta VDU)"
+    },
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 433,
+     "name": "CONSORCIO PALDACA, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: La planta y el sistema de llenado de Gandolas con Nitrógeno Líquido en la Unidad U-94 de Refinería d…)"
+    },
+    {
+     "empresa_id": 407,
+     "name": "CONSTRUCTORA ARZA, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO GENERAL DE LAS REDES DE DISTRIBUCION DE GAS METANO DE LA GRAN CARACAS Y ZONAS FORANEAS)"
+    },
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: CHEVRON GLOBAL TECHNOLOGY SERVICES COMPANY - Bajo Grande / Mantenimiento Mayor Integral\nde Planta 1…)"
+    },
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: MANTENIMIENTO DE BOMBAS CENTRIFUGAS CONTRATO)"
+    },
+    {
+     "empresa_id": 480,
+     "name": "SERVIC METAL SUCRE, C.A.",
+     "matched_via": "similar a \"mantenimiento de levantamiento artificial\" (experiencia: PDVSA A-159-17-0577\nSERVICIO TECNICO ESPECIALIZADO PARA MANTENIMIENTO DE\nSISTEMAS DE AUTOMATIZACION…)"
+    }
+   ],
+   "status": "success",
+   "ms": 8171
+  },
+  {
+   "rep": 3,
+   "case_id": "G5-03",
+   "golden": true,
+   "kind": null,
+   "execution_id": "20720",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "inspección y mantenimiento de guaya eléctrica",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "multi_concept",
+    "search_phrases": [
+     "inspección de guaya eléctrica",
+     "mantenimiento de guaya eléctrica"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "inspeccion y mantenimiento de guaya electrica",
+    "resolvedPhrases": [
+     "inspección de guaya eléctrica",
+     "mantenimiento de guaya eléctrica"
+    ],
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 78,
+     "name": "TEMI, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 94,
+     "name": "CONSTRUCTORA HERMANOS FURLANETTO, C.A. ( CONFURCA)",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "similar a \"inspección de guaya eléctrica\" (servicio: MONTAJE MECÁNICO DE EQUIPOS DE ELECTRICIDAD)"
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 107,
+     "name": "SERVI COMPRESORES, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 79,
+     "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: Servicios de guaya eléctrica con taladro en sitio para recuperación y rehabilitación de pozos y Serv…)"
+    },
+    {
+     "empresa_id": 112,
+     "name": "REPRESENTACIONES LANDAETA RELANSA, S.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: EVALUACIÓN DE SISTEMA ELÉCTRICO Y PROPUESTA DE MEJORAS)"
+    },
+    {
+     "empresa_id": 83,
+     "name": "ELEKTROMEK, C.A.",
+     "matched_via": "similar a \"inspección de guaya eléctrica\" (servicio: MONTAJE MECÁNICO DE EQUIPOS DE ELECTRICIDAD)"
+    },
+    {
+     "empresa_id": 122,
+     "name": "INSTALACIONES Y SERVICIOS DE VENEZUELA, C.A. INSERVEN",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (servicio: MANTENIMIENTO Y PARADA DE PLANTA)"
+    },
+    {
+     "empresa_id": 171,
+     "name": "TOPIECA, S.A.",
+     "matched_via": "similar a \"inspección de guaya eléctrica\" (experiencia: Trabajo realizado en gasoducto)"
+    },
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "similar a \"inspección de guaya eléctrica\" (experiencia: INSPECCION Y EVALUACION EQUIPOS GENIE (CESTA ELEVADORA) NABORS DRILLINGS.)"
+    },
+    {
+     "empresa_id": 433,
+     "name": "CONSORCIO PALDACA, C.A.",
+     "matched_via": "similar a \"inspección de guaya eléctrica\" (experiencia: Los trabajos de instrumentación estuvieron delimitados por el perímetro de U74-1 y U742 (excluyendo…)"
+    },
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": "similar a \"mantenimiento de guaya eléctrica\" (categoría CPV: Mantenimiento de Planta)"
+    },
+    {
+     "empresa_id": 193,
+     "name": "SUMINISTROS NACIONALES E IMPORTADOS,C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (categoría CPV: Reparación y Mantenimiento de Equipos)"
+    },
+    {
+     "empresa_id": 333,
+     "name": "CONSORCIO OGS, C.A.",
+     "matched_via": "similar a \"mantenimiento de guaya eléctrica\" (experiencia: Contrato N° 4600005244. Mantenimiento de la Instrumentación  y Automatización  de las Instalaciones…)"
+    },
+    {
+     "empresa_id": 81,
+     "name": "REPRESENTACIONES BARCAN, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: MANTENIMIENTO, REPARACIÓN Y CALIBRACIÓN DE LOS DETECTORES DE GAS PORTÁTILES MARCA BW PERTENECIENTES…)"
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "similar a \"mantenimiento de guaya eléctrica\" (experiencia: MANTENIMIENTO  DE PARARRAYOS Y SISTEMAS DE  PUESTA A TIERRA DE LA EMPRESA MIXTA PETROREGIONAL DEL LA…)"
+    },
+    {
+     "empresa_id": 480,
+     "name": "SERVIC METAL SUCRE, C.A.",
+     "matched_via": "similar a \"inspeccion y mantenimiento de guaya electrica\" (experiencia: TURBOPRE SERVICES Servicio de Inspeccion y mantenimiento del generador electrico del TG-02\nBloque E-…)"
+    }
+   ],
+   "status": "success",
+   "ms": 12045
+  },
+  {
+   "rep": 3,
+   "case_id": "X-GUAYAS",
+   "golden": false,
+   "kind": "termino_mayusculas",
+   "execution_id": "20721",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "GUAYAS",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "out_of_scope",
+    "search_phrases": []
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "guayas",
+    "queryIntent": "SERVICE"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 458,
+     "name": "DYNA DRILL, C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 182,
+     "name": "UNIÓN VENEZUELA SERVICIOS, C.A (U.V SERVICIOS, C.A)",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 435,
+     "name": "CONTINENTAL DE GUAYAS C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 79,
+     "name": "ADVANCED LOGGING AND EXPLORATIONS, C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    },
+    {
+     "empresa_id": 198,
+     "name": "ESSENZA SERVICES C.A.",
+     "matched_via": "coincide en texto con \"guayas\""
+    }
+   ],
+   "status": "success",
+   "ms": 11596
+  },
+  {
+   "rep": 3,
+   "case_id": "X-N1",
+   "golden": false,
+   "kind": "nombre",
+   "execution_id": "20722",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "dame información sobre la empresa COSTA NORTE CONSTRUCCIONES, C.A.",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": "get_empresa",
+   "params": {
+    "nombre": "costa norte"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": null
+    }
+   ],
+   "status": "success",
+   "ms": 4665
+  },
+  {
+   "rep": 3,
+   "case_id": "X-R1",
+   "golden": false,
+   "kind": "rif",
+   "execution_id": "20723",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "busca la empresa con rif J070115076",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": "get_empresa",
+   "params": {
+    "rif": "J070115076"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": null
+    }
+   ],
+   "status": "success",
+   "ms": 3765
+  },
+  {
+   "rep": 3,
+   "case_id": "X-F1",
+   "golden": false,
+   "kind": "filtro",
+   "execution_id": "20724",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "empresas de construccion en maracaibo",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": {
+    "interpretation": "single_compound",
+    "search_phrases": [
+     "empresas de construcción en maracaibo"
+    ]
+   },
+   "agent_tool_calls": [
+    "resolve_search_intent"
+   ],
+   "agent_direct_search": false,
+   "tool": "search_empresas",
+   "params": {
+    "query": "construccion",
+    "ciudad": "maracaibo",
+    "resolvedPhrases": [
+     "empresas de construcción en maracaibo"
+    ],
+    "queryIntent": "MIXED"
+   },
+   "query_restored_from": null,
+   "responded_with": "Final Respond3",
+   "reply_text": null,
+   "tool_error": null,
+   "results": [
+    {
+     "empresa_id": 74,
+     "name": "PROMOTORES DE INGENIERIA PROYECTOS Y CONSTRUCCIONES, C.A. (P.A.P. CONSTRUCCIONES C.A.)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 115,
+     "name": "CLAM INSTALACIONES, S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 140,
+     "name": "COSTA NORTE CONSTRUCCIONES, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 75,
+     "name": "ZULIA INDUSTRIAL CONSTRUCTIONS C.A (ZIC, C.A)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 185,
+     "name": "CONSTRUCTORES VENEZOLANOS C.A. (CONVECA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 184,
+     "name": "CONSTRUCTORA NASE, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 92,
+     "name": "EHCOPEK S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 73,
+     "name": "N&V CONSULTORES, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 183,
+     "name": "CONSTRUCCIONES MONSERCA S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 208,
+     "name": "SAMPIERI & FORTUNATO, S.A. (SAMFOR SA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 486,
+     "name": "GESTION ESTRATEGIA LOGISTICA SERVICIOS, C.A. (GELSCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 475,
+     "name": "GRUPO VENEZOLANO DE PUBLICIDAD Y CONSTRUCCIÓN COMPAÑÍA ANÓNIMA",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 536,
+     "name": "LATINO AMERICANA DE LA CONSTRUCCIÓN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 137,
+     "name": "OILPLEX, C.A",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 157,
+     "name": "LUKIVEN, S.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 209,
+     "name": "SAMFOR GROUP, COMPAÑIA ANONIMA",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 253,
+     "name": "CONSTRUCTORES ELÉCTRICOS E INDUSTRIALES, C.A. (CEICA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 254,
+     "name": "CONTRATISTA BERMÚDEZ, C.A. (CONTRATISTA BERMÚDEZ, C.A CONBERCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 255,
+     "name": "CVCON, C.A. (CEVCONCA)",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 260,
+     "name": "INNOVEN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 269,
+     "name": "RAYMOND DE VENEZUELA, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 339,
+     "name": "CONSTRUCTORA TURAGUAL C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 344,
+     "name": "INSUMOS Y PROYECTOS DE OCCIDENTE, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 391,
+     "name": "TOTAL CLEAN, C.A.",
+     "matched_via": "coincide con \"construccion\""
+    },
+    {
+     "empresa_id": 257,
+     "name": "EMPRESA NACIONAL DE FABRICACIONES, C.A. (ENDEFCA)",
+     "matched_via": "similar a \"construccion\" (experiencia: Fabricación de eje de triturador. Planta cementera.)"
+    }
+   ],
+   "status": "success",
+   "ms": 9837
+  },
+  {
+   "rep": 3,
+   "case_id": "X-O1",
+   "golden": false,
+   "kind": "fuera_de_alcance",
+   "execution_id": "20725",
+   "workflow_id": "zbVLoCdR09IA9yQK",
+   "input": "como esta el clima hoy en caracas",
+   "prompt_version": "TASK-0013-step1-v2",
+   "learnings_count": 6,
+   "intent": null,
+   "agent_tool_calls": [],
+   "agent_direct_search": false,
+   "tool": null,
+   "params": null,
+   "query_restored_from": null,
+   "responded_with": "Respond Conversation5",
+   "reply_text": "No puedo proporcionar información meteorológica. Mi función es ayudarte a buscar empresas afiliadas a la Cámara Petrolera de Venezuela.",
+   "tool_error": null,
+   "results": [],
+   "status": "success",
+   "ms": 2926
+  }
+ ]
+}
