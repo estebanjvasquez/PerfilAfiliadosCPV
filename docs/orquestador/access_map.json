@@ -94,11 +94,12 @@
       "id": "worker_debug_search",
       "description": "POST /debug-search and the frozen 32-query regression suite",
       "credentials": [
-        "DEBUG_TOKEN"
+        "DEBUG_TOKEN",
+        "CPV_DEBUG_TOKEN"
       ],
-      "value_location": "cloudflare_worker_secret",
-      "status": "not_recoverable",
-      "notes": "By design the plaintext exists only in Cloudflare's secret store and in the sessionStorage of the admin browser that typed /debug-on <key>. Reading it back through a metadata-only API is explicitly forbidden. Rotation is GATE D."
+      "value_location": "cloudflare_worker_secret + local_store + owner_password_manager",
+      "status": "available",
+      "notes": "Rotated by the owner on 2026-11-06 with docs/orquestador/rotate_debug_token.ps1 (previous value lost with the old machine). Worker secret DEBUG_TOKEN = local store CPV_DEBUG_TOKEN; owner keeps a copy in a password manager. Cloudflare secrets cannot be read back. Only consumers: admin scripts and /debug-on typed by hand in cira-test. Frozen 32-query regression baseline: docs/uat/runs/2026-11-06_worker_regression_baseline.json. A new rotation still needs owner authorization (GATE D)."
     },
     {
       "id": "worker_deploy",

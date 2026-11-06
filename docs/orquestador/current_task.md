@@ -18,7 +18,7 @@ hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_
 **Paso 1 (asignación `6686193637`): READY_FOR_REVIEW.**
 - Qué se hizo: la consulta completa en el agente de n8n, probada en la copia aislada `3PtTduMeifEe2fg9`, que quedó desactivada. Después, con la aprobación del propietario en el chat, v2 se promovió al flujo de staging `zbVLoCdR09IA9yQK` (`versionId` `279690f8…`), que el propietario aplicó y quedó verificado (informe §6).
 - Dónde está: informe en `docs/uat/n8n/INFORME_TASK0013_PASO1.md`; sección «Paso 1» en el archivo de la tarea.
-- Bloqueo: la regresión congelada del Worker no corrió porque falta `DEBUG_TOKEN`.
+- Regresión congelada: `DEBUG_TOKEN` rotado por el propietario. La línea base de 32 consultas se tomó el 2026-11-06 y la segunda corrida no dio cambios.
 
 TASK-0012 sigue igual que abajo: desplegada en staging y con la UAT pendiente.
 

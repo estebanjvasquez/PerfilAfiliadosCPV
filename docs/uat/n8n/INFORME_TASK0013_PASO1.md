@@ -112,12 +112,22 @@ Diferencia con el actual: [`prompt_task0013_paso1_v2.diff`](prompt_task0013_paso
 
 Esa diferencia es variabilidad del LLM del Worker entre dos corridas. Esta medición llama al MCP directo y no pasa por el agente, así que complementa la de n8n pero no la reemplaza.
 
-**Regresión congelada del Worker (`perfilafiliados-mcp/scripts/regression-suite.mjs`): no se ejecutó.**
-- Necesita el token de `/debug-search` (`DEBUG_TOKEN`), que no está en el almacén local.
-- Tampoco hay en esta máquina una copia de su línea base.
-- No se alteraron credenciales.
-- El Worker no cambió en este paso.
+**Regresión congelada del Worker (`perfilafiliados-mcp/scripts/regression-suite.mjs`).** En la primera
+entrega estaba bloqueada porque faltaba `DEBUG_TOKEN`. El propietario lo rotó el 2026-11-06 con
+`docs/orquestador/rotate_debug_token.ps1`, y la regresión se ejecutó:
+- **línea base de 32 consultas** guardada en
+  [`../runs/2026-11-06_worker_regression_baseline.json`](../runs/2026-11-06_worker_regression_baseline.json),
+  sin errores. La línea base anterior («32/32, 288 campos, 0 diferencias») se perdió con la máquina anterior;
+- **segunda corrida** contra esa base: «Sin cambios en ninguna de las 32 queries del fixture». El Worker
+  es estable y este paso no lo tocó.
 
+**Medición base en modo `debug`** (ranking completo más allá del corte):
+[`../runs/2026-11-06_debug_base.json`](../runs/2026-11-06_debug_base.json), para el paso 2.
+- MRR 0,708;
+- 36 de 49 relevantes conocidas en el top 10;
+- ruido conocido de 47 en el top 5 y 53 en el top 10.
+
+Un caso, «como me afilio a la camara?», respondió HTTP 500 una vez; al reintentarlo dio 200, con y sin «?».
 ## 5. Límites
 
 - 3 repeticiones por caso muestran tendencias, no garantías. El agente y `resolve_search_intent` siguen siendo LLM.

@@ -105,7 +105,10 @@ if (-not $Quiet) {
         'CLOUDFLARE_ACCOUNT_ID',
         'SUPABASE_ACCESS_TOKEN',
         'DB_PGSQL_HOST',
-        'DB_PGSQL_PASSWORD'
+        'DB_PGSQL_PASSWORD',
+        'CPV_MCP_TOKEN',
+        'CPV_DEBUG_TOKEN',
+        'N8N_API_KEY'
     )
     foreach ($name in $watched) {
         $v = [Environment]::GetEnvironmentVariable($name)
@@ -118,7 +121,7 @@ if (-not $Quiet) {
 
     Write-Host ''
     Write-Host '  nota: leer Issue #2 NO requiere token (los repos son publicos).' -ForegroundColor DarkGray
-    Write-Host '  nota: DEBUG_TOKEN vive solo en Cloudflare y no es recuperable (GATE D).' -ForegroundColor DarkGray
+    Write-Host '  nota: DEBUG_TOKEN del Worker = CPV_DEBUG_TOKEN del almacen; Cloudflare no lo devuelve (copia en el gestor de contrasenas).' -ForegroundColor DarkGray
 
     # .env de Laravel: se comprueba la EXISTENCIA, nunca se lee su contenido.
     $dotenv = Join-Path $PSScriptRoot '..\..\.env'

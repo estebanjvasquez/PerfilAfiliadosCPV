@@ -48,7 +48,7 @@ Qué se puede hacer, con qué credencial, y de dónde sale el valor.
 | 5 | Postgres directo (psql / scripts) | `DB_PGSQL_*` | mismos valores que (4) | ✅ ya persistente |
 | 6 | SSH a staging (Contabo) | clave privada OpenSSH | `%USERPROFILE%\.ssh\` en la máquina del propietario | ✅ local |
 | 7 | Deploy automático a staging | `CONTABO_HOST`, `CONTABO_USER`, `CONTABO_SSH_KEY` | **GitHub repository secrets** | ✅ ya configurado |
-| 8 | Regresión 32-query / `POST /debug-search` | `DEBUG_TOKEN` | **Worker secret de Cloudflare** — plaintext **no recuperable** | ⚠️ requiere GATE D |
+| 8 | Regresión 32-query / `POST /debug-search` / `/debug-on` en `cira-test` | `DEBUG_TOKEN` (Worker) = `CPV_DEBUG_TOKEN` (almacén local) | secret del Worker en Cloudflare (no se puede leer de vuelta) + almacén local (§3) + gestor de contraseñas del propietario | ✅ **rotado por el propietario el 2026-11-06** con `rotate_debug_token.ps1` |
 | 9 | Deploy / secretos del Worker (`wrangler`) | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | almacén local (§3) | ⬜ no configurado |
 | 10 | API de gestión de Supabase | `SUPABASE_ACCESS_TOKEN` | almacén local (§3) | ⬜ opcional |
 | 11 | Flujo n8n / CIRA (UAT): API REST de n8n | `N8N_BASE_URL`, `N8N_API_KEY` | almacén local (§3) | ✅ **habilitado 2026-11-06**. La key de Community no tiene alcance limitado (lee **y** escribe todos los workflows): antes de cualquier cambio se exporta un respaldo fuera del repo, y cada cambio de flujo necesita autorización explícita del propietario |
@@ -74,11 +74,17 @@ Leyenda: ✅ funciona · ⚠️ limitación conocida · ⬜ no configurado, se c
   su lugar el scope `public_repo`. Tabla comparativa y diagnóstico en §5.2.
 - **(4)/(5) Base de datos.** `.env` ya existe y está en `.gitignore`. **No hay base local separada:
   estos valores apuntan a la misma Supabase que usa staging** (ver `PROJECT_KNOWLEDGE.md` §3).
-- **(8) `DEBUG_TOKEN`.** Por diseño el único plaintext está en el almacén de Cloudflare y en el
-  `sessionStorage` del navegador del administrador que escribió `/debug-on <key>`. **No es recuperable
-  por API**, y está explícitamente prohibido intentar leerlo por una API que sólo expone metadatos.
-  Si una tarea necesita la regresión, el camino autorizado es que el **propietario** la corra, o que
-  autorice una rotación (GATE D).
+- **(8) `DEBUG_TOKEN`.** Cloudflare no deja leer un secret ya cargado, y está prohibido intentar
+  leerlo por una API que sólo expone metadatos. El valor anterior se perdió con la máquina anterior.
+  El 2026-11-06 el propietario lo rotó con [`rotate_debug_token.ps1`](rotate_debug_token.ps1):
+  - el script genera un token nuevo, lo carga en el Worker, lo guarda como `CPV_DEBUG_TOKEN` en el
+    almacén local y lo deja en el portapapeles para que el propietario lo guarde en su gestor de
+    contraseñas, que es la copia que sobrevive a un cambio de máquina;
+  - nada más lo usa: ni Laravel ni ningún flujo de n8n. Solo `cira-test` cuando un administrador escribe
+    `/debug-on <clave>` a mano;
+  - una rotación nueva sigue requiriendo la autorización del propietario (GATE D).
+  - Línea base de la regresión de 32 consultas, tomada el 2026-11-06:
+    `docs/uat/runs/2026-11-06_worker_regression_baseline.json`.
 
 ---
 

@@ -143,7 +143,7 @@ Orden de trabajo acordado con el propietario. Ningún paso cambia el ranking sin
 | Copia de prueba | `3PtTduMeifEe2fg9` (`versionId` `171a9f6d…`), **desactivada** al terminar |
 | Respaldos | fuera del repo, `%USERPROFILE%\.cpv\n8n_backups\` |
 | Gates | sin producción; sin migración, registro ni votos; sin cambios de ranking ni del Worker; sin merge |
-| Bloqueo | regresión congelada del Worker no ejecutada: falta `DEBUG_TOKEN` en el almacén local; sin alterar credenciales |
+| Regresión congelada | el propietario rotó `DEBUG_TOKEN` el 2026-11-06. Hay línea base nueva de 32 consultas, y una segunda corrida contra ella no dio cambios (informe §4) |
 
 **Resultado (3 repeticiones, 48 casos):**
 - casos con variantes entre repeticiones: de 15 a 3;
