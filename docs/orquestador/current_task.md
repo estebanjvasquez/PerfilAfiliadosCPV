@@ -3,13 +3,14 @@
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## Activa: TASK-0013 — Calibración del buscador CIRA: lista de referencia, medición y registro de búsquedas y votos — IN_PROGRESS (`6684941317`)
+## Activa: TASK-0013 — Calibración del buscador CIRA: lista de referencia, medición y registro de búsquedas y votos — READY_FOR_REVIEW (`6684941317`)
 
 | Campo | Valor |
 |---|---|
 | Archivo | [`tasks/0013-search-calibration-feedback.md`](tasks/0013-search-calibration-feedback.md) (decisiones, entregables, evidencia; comentario fuente íntegro) |
 | Fuente | Issue #2 `6684941317`: registro publicado por el agente a pedido explícito del propietario en el chat (2026-11-06) |
-| Rama / BASE | `fix/sec-01-r4-01-role-editor-preserve` / `8e22d0c` |
+| Rama / BASE / REVIEW_HEAD | `fix/sec-01-r4-01-role-editor-preserve` / `8e22d0c` / `bc8212b` |
+| Pruebas | runner aislado `20261106T123818Z-bc8212b42e08`: `CiraSearchLogMigrationTest` **OK (7 tests, 77 assertions)**; staging 200 antes y después |
 | Medición base | `docs/uat/runs/2026-11-06_base.json`: ruido conocido 48/66 en el top 5, MRR 0,742, 36/49 relevantes conocidas en el top 10 |
 | Gates | migración `cira_search_log`/`cira_search_feedback` escrita y probada, **no aplicada**; sin editar n8n; sin cambios de ranking; sin merge ni producción |
 | Pendiente antes de producción | rotar `N8N_API_KEY`, `CPV_GITHUB_TOKEN` y `CPV_MCP_TOKEN` (expuestas en la salida de una sesión local el 2026-11-06); corregir dos hallazgos de seguridad del flujo n8n |

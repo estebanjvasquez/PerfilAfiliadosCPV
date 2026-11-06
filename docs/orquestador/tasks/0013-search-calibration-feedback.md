@@ -6,7 +6,7 @@
 | Fuente | Issue #2, comentario [`6684941317`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6684941317): registro publicado por el agente a pedido explícito del propietario en el chat del 2026-11-06 («registralo y crea la tabla requerida»). Texto íntegro al final |
 | Rama | `fix/sec-01-r4-01-role-editor-preserve` (rama canónica del estado vigente) |
 | BASE | `8e22d0c81c1d63da4467310ae210a28d6ea76a9f` |
-| Estado | **IN_PROGRESS** |
+| Estado | **READY_FOR_REVIEW** (2026-11-06). Código y pruebas en `bc8212b` |
 | Gates | migración escrita y probada, **no aplicada** en la base compartida; sin editar n8n; sin cambios de ranking; sin merge a `main`; sin producción |
 
 Cambios locales del propietario en `AGENTS.md`, `CLAUDE.md`, `docs/orquestador/PROTOCOL.md` y
@@ -33,7 +33,21 @@ Cambios locales del propietario en `AGENTS.md`, `CLAUDE.md`, `docs/orquestador/P
 
 ## Evidencia
 
-(Se completa al cerrar: commit, corrida del runner aislado y estado de staging antes y después.)
+**Commit de entrega:** `bc8212b42e084d170c4b20b73984f6381d0fd1f6`.
+
+**Runner aislado** (Contabo, run `20261106T123818Z-bc8212b42e08`, `--suite Feature --filter CiraSearchLogMigrationTest`):
+- `OK (7 tests, 77 assertions)`, 0 omitidas: la base era `cpv_test`, así que la guarda de base desechable no saltó ninguna;
+- `migrate` aplicó `2026_11_06_120000_create_cira_search_log_and_feedback_tables` en 10,72 ms;
+- `staging_before=200` y `staging_after=200`, sin contenedores `cpvtest-*` restantes;
+- el único «finding» del runner es informativo: «0 migration ordering violation(s) at this SHA».
+
+**La migración no se aplicó en la base compartida.**
+
+**Medición base del buscador** (2026-11-06, `evaluate_search.mjs`, modo `mcp`): ruido conocido 48 de 66 en el top 5 y 56 de 66 en el top 10; MRR 0,742; relevantes conocidas en el top 10: 36 de 49; empresas devueltas por consulta: 17,7 de media. Con lo que el cliente vio el 3 de noviembre, sacado de 60 ejecuciones guardadas en n8n, el ruido conocido da 50 de 57 en el top 5.
+
+**`bootstrap_access.ps1`:** lo verifiqué con un almacén falso (`CPV_CREDENTIAL_STORE`) bajo `-WhatIf`, y el valor de prueba ya no aparece en la salida.
+
+**Estado:** READY_FOR_REVIEW para el alcance de esta tarea. Siguiente paso propuesto: punto 1 del plan del comentario fuente, estabilizar la consulta del agente de n8n. Requiere autorización para editar n8n.
 
 ---
 
