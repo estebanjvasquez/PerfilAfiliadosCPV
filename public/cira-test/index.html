@@ -208,6 +208,105 @@
 
   window.sendPrompt = function(text){ sendMsg(text); };
 
+  // ---- TASK-0013: votos 👍/👎 sobre los resultados ----
+  // Las tarjetas que arma n8n traen <span class="cira-vote" data-log="<id de la búsqueda>" data-emp="<empresa>">
+  // con botones que llaman a ciraVote(). El voto va a un webhook de n8n, que lo reenvía al Worker con su
+  // credencial (el navegador nunca ve tokens ni la base). En staging vota solo el personal de la Cámara:
+  // n8n registra voter_kind = 'staff' y el votante se identifica por la sesión de esta página (sid).
+  // Los votos no cambian el ranking: quedan para revisión.
+  var VOTE_URL = window.CIRA_VOTE_URL || "https://vmi2945958.contaboserver.net/webhook/4a8c9cf1-ffd0-403d-bd74-7a6e839364d2";
+  var VOTE_REASONS = [
+    ["otro_sector", "Es de otro sector o actividad"],
+    ["solo_coincide_palabra", "Solo coincide la palabra"],
+    ["empresa_inactiva", "La empresa ya no opera"],
+    ["otro", "Otro motivo"]
+  ];
+  var missingCount = 0;
+
+  function voteStatus(box, text, ok){
+    var s = box.querySelector(".cira-vote-status");
+    if(!s){ s = document.createElement("span"); s.className = "cira-vote-status"; s.style.cssText = "font-size:11px;margin-left:4px"; box.appendChild(s); }
+    s.textContent = text;
+    s.style.color = ok === false ? "#c62828" : "#1a7f37";
+  }
+
+  function markChosen(box, vote){
+    var btns = box.querySelectorAll("button");
+    if(btns.length >= 2){
+      btns[0].style.outline = vote === 1 ? "2px solid #1a7f37" : "";
+      btns[1].style.outline = vote === -1 ? "2px solid #c62828" : "";
+    }
+  }
+
+  function sendVote(box, payload, okText){
+    voteStatus(box, "enviando…");
+    var ref = payload.voter_ref || sid;
+    fetch(VOTE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        search_log_id: Number(box.getAttribute("data-log")),
+        empresa_id: payload.empresa_id,
+        vote: payload.vote,
+        reason: payload.reason || null,
+        comment: payload.comment || null,
+        voter_ref: ref
+      })
+    }).then(function(r){ return r.json(); }).then(function(j){
+      if(j && j.ok){
+        if(payload.reason !== "falta_empresa") markChosen(box, payload.vote);
+        voteStatus(box, j.updated ? "✓ voto actualizado" : okText);
+      } else {
+        voteStatus(box, "no se registró: " + ((j && (j.error || j.message)) || "error"), false);
+      }
+    }).catch(function(e){ voteStatus(box, "error de conexión: " + e.message, false); });
+  }
+
+  function reasonPicker(box, onSend){
+    var old = box.parentNode.querySelector(".cira-reasons");
+    if(old) old.remove();
+    var wrap = document.createElement("div");
+    wrap.className = "cira-reasons";
+    wrap.style.cssText = "margin-top:6px;font-size:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center";
+    wrap.onclick = function(e){ e.stopPropagation(); };
+    var sel = document.createElement("select");
+    VOTE_REASONS.forEach(function(r){ var o = document.createElement("option"); o.value = r[0]; o.textContent = r[1]; sel.appendChild(o); });
+    var txt = document.createElement("input");
+    txt.type = "text"; txt.maxLength = 1000; txt.placeholder = "comentario (opcional)"; txt.style.cssText = "flex:1;min-width:140px;font-size:12px";
+    var ok = document.createElement("button"); ok.type = "button"; ok.textContent = "Enviar";
+    var no = document.createElement("button"); no.type = "button"; no.textContent = "Cancelar";
+    ok.onclick = function(e){ e.stopPropagation(); onSend(sel.value, txt.value.trim()); wrap.remove(); };
+    no.onclick = function(e){ e.stopPropagation(); wrap.remove(); };
+    wrap.appendChild(document.createTextNode("¿Por qué no corresponde? "));
+    wrap.appendChild(sel); wrap.appendChild(txt); wrap.appendChild(ok); wrap.appendChild(no);
+    box.insertAdjacentElement("afterend", wrap);
+  }
+
+  window.ciraVote = function(btn, vote){
+    var box = btn.closest(".cira-vote");
+    if(!box) return;
+    var emp = box.getAttribute("data-emp");
+    var empresaId = emp ? Number(emp) : null;
+    if(vote === -1){
+      reasonPicker(box, function(reason, comment){
+        sendVote(box, { empresa_id: empresaId, vote: -1, reason: reason, comment: comment }, "✓ registrado, gracias");
+      });
+      return;
+    }
+    sendVote(box, { empresa_id: empresaId, vote: 1 }, "✓ gracias");
+  };
+
+  // "Falta una empresa": cada reporte usa su propia referencia (sid#falta-N) para no pisar el voto
+  // sobre el resultado completo ni otros reportes de la misma sesión (el índice único es por votante).
+  window.ciraMissing = function(el){
+    var box = el.closest(".cira-vote");
+    if(!box) return;
+    var name = window.prompt("¿Qué empresa afiliada debería aparecer en esta búsqueda?");
+    if(!name || !name.trim()) return;
+    missingCount++;
+    sendVote(box, { empresa_id: null, vote: -1, reason: "falta_empresa", comment: name.trim().slice(0, 1000), voter_ref: sid + "#falta-" + missingCount }, "✓ reporte registrado");
+  };
+
   // ---- Fase 23B: modo DEBUG (/debug-on, /debug-off, /debug-status) ----
   // Observa el pipeline, no lo altera: la respuesta normal de CIRA sigue viniendo del MISMO
   // webhook de n8n, sin ningún cambio. Cuando debug está ON, en paralelo (nunca en vez de) se
