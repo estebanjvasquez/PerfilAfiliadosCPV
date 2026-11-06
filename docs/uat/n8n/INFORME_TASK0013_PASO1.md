@@ -202,3 +202,28 @@ La copia `3PtTduMeifEe2fg9` sigue desactivada. Se puede borrar cuando ya no haga
   - se corrigieron tres errores encontrados en estas pruebas: el formato del arreglo de ids, la posición calculada sobre texto y el JSON guardado como texto.
 - **Limpieza:** se borraron las 5 búsquedas de prueba, con sus votos; las tablas quedaron vacías. Los flujos de prueba quedaron desactivados.
 - **Pendiente de aprobación:** desplegar la página, el Worker y n8n, en ese orden.
+
+## 9. Votos 👍/👎 promovidos a staging (2026-11-06)
+
+El propietario aprobó en el chat los tres pasos.
+
+1. **Página:** `feature/upgrade-filament-v3` avanzó por fast-forward de `06155ce` a `60c43cf` (rama `deploy/cira-test-votos`), que solo cambia `public/cira-test/index.html`.
+   - Workflow «Deploy a Contabo», run `42259603797`: `success`.
+   - La página servida en staging ya incluye `ciraVote` y la URL de votos.
+2. **Worker:** versión `e7ad2079` (`f85987e`), al 100 %.
+   - Regresión congelada: «Sin cambios en ninguna de las 32 queries».
+   - La comparación con y sin `explain` pasa en 8 de 8 consultas.
+   - `/search-log` sin token responde 401.
+3. **n8n:**
+   - flujo nuevo «CIRA votos (staging)», `iVDEEo0oaEHDOvlp`, activo, con webhook `4a8c9cf1-…`;
+   - el flujo principal `zbVLoCdR09IA9yQK` pasó de `0f55cd97…` a `0d0b2ac1…`;
+   - es idéntico a la copia probada, salvo los ids de los nodos, el webhook y las URL.
+   - Reversión: `promote_v4.ps1 -Revert`, que restaura v3 y desactiva el flujo de votos.
+
+**Prueba real en staging:**
+- una búsqueda por el webhook de `cira-test` quedó registrada en el log (`source = 'n8n_chat'`, 6 resultados, evidencia, versión del flujo);
+- con el código servido por la página, 👍 (posición 1), 👎 con motivo (posición 2), 👍 del resultado completo y «falta empresa» quedaron registrados como `staff`;
+- hacer clic en un botón no abre la ficha (0 propagaciones);
+- los datos de prueba se borraron y las tablas quedaron vacías para el uso real.
+
+**Para revisar los votos:** consultar `cira_search_feedback` unida a `cira_search_log`. Los votos no cambian el ranking automáticamente.

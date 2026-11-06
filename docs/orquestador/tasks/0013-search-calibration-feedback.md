@@ -195,3 +195,14 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
 - **n8n:** el flujo de staging pasó a `0f55cd97…`.
 - **Detalle, verificación y reversión:** `docs/uat/n8n/INFORME_TASK0013_PASO1.md` §7.
 - **Decisión sobre los votos:** todos los usuarios de staging son personal de la Cámara, así que los votos se registran como `voter_kind = 'staff'`.
+
+## Votos 👍/👎 en staging (2026-11-06)
+
+- **Aprobación:** del propietario en el chat, para los tres pasos (página, Worker y n8n).
+- **Página:** `feature/upgrade-filament-v3` en `60c43cf`; despliegue `42259603797` con `success`.
+- **Worker:** versión `e7ad2079`. La regresión congelada no dio cambios.
+- **n8n:**
+  - flujo nuevo «CIRA votos (staging)», `iVDEEo0oaEHDOvlp`;
+  - el flujo principal quedó en `0d0b2ac1…`.
+- **Prueba real:** la búsqueda y los 4 tipos de voto quedaron registrados como `staff`, y los datos de prueba se borraron.
+- **Detalle y reversión:** `docs/uat/n8n/INFORME_TASK0013_PASO1.md` §9.
