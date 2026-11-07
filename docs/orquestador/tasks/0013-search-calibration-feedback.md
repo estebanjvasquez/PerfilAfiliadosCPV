@@ -322,7 +322,7 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
   - relevantes en el top 10: 36 → 37 de 44;
   - no relevantes en el top 5 / top 10: 44 / 49 → 31 / 34;
   - empresas devueltas, media: 11.2 → 8.0.
-- **Por caso:** mejoran 8 y ninguna empeora. Son «fabricantes de cabrias», «levantamiento artificial», «guaya fina», «guaya eléctrica», «arbolitos para pozos», «mantenimiento de levantamiento artificial», «refinery» y una más. Las excelentes y buenas quedan igual.
+- **Por caso:** mejoran 7 y ninguna empeora: «fabricantes de cabrias», «levantamiento artificial», «guaya fina», «guaya eléctrica», «arbolitos para pozos», «mantenimiento de levantamiento artificial» y «refinery». Las excelentes y buenas quedan igual.
 - **Golden set, ruta MCP:**
   - mejoran «mantenimiento de cabrias», «fabricantes de cabrias», «guaya fina», «guaya eléctrica», «refinery» y «arbolitos»;
   - «…en el lago»: la relevante baja del puesto 2 al 3, pero sale el ruido conocido;
