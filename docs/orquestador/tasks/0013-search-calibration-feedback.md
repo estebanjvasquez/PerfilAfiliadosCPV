@@ -280,3 +280,53 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
 - **Decisiones de datos del propietario, fuera del código:**
   - si la Cámara debe aparecer como empresa;
   - completar `sector_principal_id`.
+
+## Paso 3: comparación con la evaluación del cliente y ajuste de «similar a» (2026-11-07)
+
+**Pedido del propietario:** comparar los resultados actuales con la evaluación del cliente (lote 001), ver si el paso 2 degradó las consultas buenas o excelentes y si mejoró las malas. Después autorizó en el chat ajustar «similar a» (preview y pruebas; el pase a vivo espera su aprobación).
+
+**Método:**
+- Se repitieron las 27 consultas con registro de lo que vio el cliente (03-11). Se usaron la misma consulta y las mismas frases que envió CIRA, y se midió el top 15.
+- Versiones comparadas: el Worker anterior a hoy (`e7ad2079`), el vivo (`fb72aa80`, paso 2) y la preview del paso 3.
+- Las métricas se calcularon con `evaluate_search.mjs --from` sobre los juicios del golden set.
+- Complementos: el golden set por la ruta MCP del evaluador y la regresión congelada.
+- **Resultados detallados:** `docs/uat/privado/2026-11-07_comparacion_cliente/`. Es una carpeta local excluida por `.gitignore`, porque tiene nombres de empresas.
+
+**Paso 2 (vivo) frente a lo que vio el cliente:**
+
+| | Cliente 03-11 | Antes de hoy | Paso 2 (vivo) |
+|---|---|---|---|
+| MRR (relevantes conocidas) | 0.839 | 0.805 | 0.884 |
+| Relevantes en top 10 | 36/44 | 35/44 | 36/44 |
+| No relevantes en top 5 / top 10 | 50 / 53 | 46 / 50 | 44 / 49 |
+
+- **Excelentes y buenas:** ninguna empeoró por el paso 2.
+  - «Tratamiento de aguas de perforación»: una relevante bajó del puesto 3 al 7. Ya pasaba antes de hoy.
+- **Aceptables:** mejoran «operadores» y «transporte de gandolas» (la relevante pasa al puesto 1); las demás quedan igual.
+- **Deficientes e incorrectas:** sin cambios por el paso 2.
+- **Causa:** en esas consultas, 22 de las 41 no relevantes del top 10 entran por «similar a» (embeddings). Casi siempre no hay coincidencias de catálogo, así que la compuerta del paso 2 no se activa.
+
+**Diagnóstico de «similar a»:**
+- Las relevantes que entran por «similar a» suelen coincidir por dos o más vías: servicio, categoría CPV y experiencia.
+- El ruido suele coincidir por una sola.
+- Se descartó extender la compuerta de catálogo a `service` y `taxonomy` (commit `31d81b8`, revertido en `4f4c01a`): no cambió ninguna consulta del cliente.
+- Se descartó la regla «sin "similar a" si hay coincidencia literal», que quitaba 4 de 5 relevantes de una consulta excelente.
+
+**Ajuste (Worker `feat/semantic-gate`, commit `ecb8e47`, preview `4742a36f`, NO promovido):**
+- **Regla, `applySingleSimilarGate`:** si la frase tiene al menos una empresa con respaldo más fuerte (otra lista, o «similar a» por dos o más vías), se quitan las empresas que solo aparecen en una lista «similar a» (`service`, `taxonomy` o `experiencia`).
+- Si no hay nada más fuerte, no se toca nada, por ejemplo «camión chupón».
+- `canonical_related` (familia CPV) queda fuera de la regla.
+- **Consultas del cliente, frente al vivo:**
+  - relevante conocida en el top 5: 94 % → 100 % de los casos;
+  - MRR: 0.884 → 0.891;
+  - relevantes en el top 10: 36 → 37 de 44;
+  - no relevantes en el top 5 / top 10: 44 / 49 → 31 / 34;
+  - empresas devueltas, media: 11.2 → 8.0.
+- **Por caso:** mejoran 8 y ninguna empeora. Son «fabricantes de cabrias», «levantamiento artificial», «guaya fina», «guaya eléctrica», «arbolitos para pozos», «mantenimiento de levantamiento artificial», «refinery» y una más. Las excelentes y buenas quedan igual.
+- **Golden set, ruta MCP:**
+  - mejoran «mantenimiento de cabrias», «fabricantes de cabrias», «guaya fina», «guaya eléctrica», «refinery» y «arbolitos»;
+  - «…en el lago»: la relevante baja del puesto 2 al 3, pero sale el ruido conocido;
+  - «balancines» varía en ambas versiones;
+  - «gandola» tuvo un error puntual del servicio de embeddings y al repetir da igual que en vivo.
+- **Regresión congelada:** muchas consultas devuelven menos candidatos, y los quitados son de una sola vía «similar a». Ejemplos: «camiones» 24→5, «levantamiento artificial» 17→3, «fabricantes de balancines» 9→1. Las coincidencias literales se conservan.
+- **Riesgo para decidir el pase a vivo:** se pierden empresas no juzgadas que solo se parecían por una vía. Si alguna era relevante, el cliente ya no la ve.
