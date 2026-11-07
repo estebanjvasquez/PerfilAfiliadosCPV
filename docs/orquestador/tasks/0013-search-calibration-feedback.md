@@ -261,7 +261,12 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
     - `/`, `/admin/login` y `/cira-test/` responden 200;
     - la app lee la base (406 empresas activas);
     - el código nuevo está en el contenedor.
-  - **Pendiente (el propietario pidió prepararlo):** bajar `origin_connection_limit` de Hyperdrive, probado y con reversión. Requiere su aprobación antes de aplicarlo.
+  - **Corrección de fondo (aprobada por el propietario en el chat, 2026-11-07):** se bajó `origin_connection_limit` de Hyperdrive de 60 a 8 (`wrangler hyperdrive update … --origin-connection-limit 8`).
+    - **Bajo carga:** durante la regresión congelada completa, el Worker usó como máximo 5 conexiones (muestreo cada 3 s).
+    - **Regresión:** los mismos 3 cambios esperados.
+    - **Latencia:** mediana de 2.6 s, igual que antes del cambio.
+    - **Staging:** sigue leyendo la base.
+    - **Reversión:** el mismo comando con 60.
 - **Lista de «X» para revisión manual:** se generó fuera del repo, porque contiene nombres de empresas. Tiene 250 filas en 236 empresas:
   - 119 de prioridad alta, que perderían el sector;
   - 125 de prioridad media, cubiertas por el sector declarado;
