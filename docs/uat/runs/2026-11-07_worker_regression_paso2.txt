@@ -1,0 +1,10 @@
+﻿
+[A_baseline] "reciclaje" cambió:
+  candidates_after_dedup: 45 -> 44
+
+[A_baseline] "construccion" cambió:
+  candidates_after_dedup: 90 -> 85
+  direct_company_count: 86 -> 85
+
+[B_regional] "guaya fina" cambió:
+  top_empresa_ids: ["182","458","198","128"] -> ["458","182","198","128"]

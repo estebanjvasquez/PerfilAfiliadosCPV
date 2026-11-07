@@ -206,3 +206,54 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
   - el flujo principal quedó en `0d0b2ac1…`.
 - **Prueba real:** la búsqueda y los 4 tipos de voto quedaron registrados como `staff`, y los datos de prueba se borraron.
 - **Detalle y reversión:** `docs/uat/n8n/INFORME_TASK0013_PASO1.md` §9.
+
+## Paso 2: ranking del Worker (2026-11-07, en curso)
+
+- **Origen:** el propietario buscó «operadores» en `cira-test`. Las empresas dedicadas al sector (Repsol, Chevron…) quedaban por debajo de empresas generalistas que solo tienen ese sector entre muchos otros. Desde el puesto 11 aparecían empresas sin sector, servicio ni categoría de operador.
+- **Diagnóstico (solo lectura):**
+  - El full-text en español reduce «operadores», «operaciones», «operativo» y «operado» a la misma raíz `oper`.
+  - Los puestos 14 a 30 venían solo de esa coincidencia, sobre todo en experiencias y en algunos nombres de servicio.
+  - Dentro del sector, el orden era arbitrario y premiaba a las empresas con más servicios.
+  - `sector_principal_id` existe pero no se usaba.
+- **Decisión del propietario (2026-11-07):** los sectores y servicios legados se conservan y no se reemplazan por la taxonomía nueva. La taxonomía CPV es información adicional.
+- **Autorización:** del propietario en el chat, para los cambios 1 a 4 contemplando sectores y servicios legados. La promoción a staging requiere una aprobación aparte, con el antes y después.
+- **Cambios en el Worker:** rama `feat/ranking-specialization`, commit `4c8f3fd`, sin desplegar.
+  1. El texto libre (full-text, experiencias) ya no agrega empresas nuevas cuando la frase tiene al menos 3 empresas con coincidencia de catálogo (legado o taxonomía CPV); sigue sumando puntaje a las que ya tienen otro respaldo.
+  2. Lista nueva `sector_focus`, con peso 2.0: sector principal o secundario declarado, o al menos la mitad de los servicios de la empresa en lo buscado. La lista `structured` se ordena por la misma especialización.
+  3. El sector principal o secundario cuenta como coincidencia aunque la empresa no tenga servicios cargados.
+  4. La explicación muestra la palabra que coincidió de verdad («operaciones» por «operadores») y el sector principal o secundario.
+- **Ajuste tras la regresión:** commit `7a351f0`. La compuerta ya no se activa por `canonical_cpv` (capacidad CPV inferida). Con ella activa, «gandola», «gandolas» y «mantenimiento de gandolas» perdían a la empresa 433, la única que menciona gandolas literalmente en su experiencia.
+- **Preview `fb72aa80` (sin desplegar):**
+  - **«operadores»:** pasa de 30 a 13 resultados. Son las 13 empresas del sector, con las dedicadas primero (Repsol, DBS, Restoven, Shell, Chevron, Indioil, A&B, Inepetrol) y las generalistas después. Salen las 17 que solo coincidían por texto.
+  - **Regresión congelada:** cambian 3 de 32 consultas (`docs/uat/runs/2026-11-07_worker_regression_paso2.txt`):
+    - «reciclaje»: sale una empresa en el puesto 36, solo por una experiencia similar;
+    - «construccion»: salen 6 empresas de la cola, de los puestos 66 a 90, solo por texto o experiencia similar, y entra PETROCOR por su sector declarado;
+    - «guaya fina»: se intercambian los puestos 1 y 2.
+  - **Golden set:** `docs/uat/runs/2026-11-07_paso2_preview.json`.
+    - El MRR pasa de 0.742 a 0.775.
+    - «operadores» mejora en todas las métricas.
+    - «refinery» empeora frente a la línea base del 06-11, pero hoy da el mismo resultado en el Worker vivo, así que no viene de este cambio.
+    - El ruido total en el top 5 pasa de 48 a 49, por esa misma consulta.
+- **Promoción:** pendiente de aprobación del propietario.
+
+### Sectores y servicios editables (2026-11-07)
+
+- **Instrucción del propietario en el chat:**
+  - quitar la restricción de solo lectura de sectores y servicios;
+  - quitar las notas de «legacy» y de «histórico»;
+  - permitir corregir las empresas que tienen «X»;
+  - después, retirar «X» del catálogo.
+- **App:** rama `feat/sectores-servicios-editables` (desde staging `60c43cf`), commits `40cd5ca` y `90044f3`, sin desplegar.
+  - `SectorPolicy` y `ServicePolicy` vuelven a depender de los permisos del rol. Hoy los tienen `super_admin` y `filament_user`; los afiliados no editan el catálogo.
+  - La ficha de la empresa recupera «Vincular servicio» con la regla de 2 sectores de `cbc1e37` y sin duplicados, revisada en el servidor. «X» ya no se puede vincular.
+  - Se quitaron «(histórico)», «clasificación anterior» y «legacy» de la ficha, de los avisos, de las pantallas de taxonomía que muestran servicios y del manual.
+- **Pruebas:** suite completa en el runner aislado, 656 pruebas en verde. Staging respondió 200 antes y después.
+- **Al integrar con la rama SEC-01:** `tests/Feature/Security/CompanyRelationManagersTest.php` afirma que «attach» no existe y hay que ajustarlo.
+- **«X» en datos (solo lectura, 2026-11-07):**
+  - Hay 8 servicios «X», uno por sector, con 250 vínculos en 236 empresas.
+  - En 244 vínculos, «X» es la única pertenencia de la empresa a ese sector.
+  - De esos, 125 ya están cubiertos por el sector principal o secundario declarado.
+  - Los otros 119 vínculos son de 109 empresas sin sector declarado, que perderían el sector si se borra «X» sin corregirlas antes.
+- **Decisiones de datos del propietario, fuera del código:**
+  - si la Cámara debe aparecer como empresa;
+  - completar `sector_principal_id`.
