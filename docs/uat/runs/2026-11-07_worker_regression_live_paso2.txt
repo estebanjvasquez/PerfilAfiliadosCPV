@@ -1,0 +1,21 @@
+﻿
+[A_baseline] "reciclaje" cambió:
+  candidates_after_dedup: 45 -> 44
+
+[A_baseline] "construccion" cambió:
+  candidates_after_dedup: 90 -> 85
+  direct_company_count: 86 -> 85
+
+[B_regional] "guaya fina" cambió:
+  top_empresa_ids: ["182","458","198","128"] -> ["458","182","198","128"]
+
+[B_regional] "caballito" cambió:
+  candidates_after_dedup: 0 -> undefined
+  direct_company_count: 0 -> undefined
+  detected_intent: "generic" -> undefined
+  regional_terms: ["caballito"] -> undefined
+  canonical_concepts: ["Balancín"] -> undefined
+  cpv_relations: ["CPV-29.04.02G"] -> undefined
+  diagnostic_flags: ["CPV_WITHOUT_COMPANIES","EXPANSION_NOT_PROPAGATED","NO_CRAWLER_EVIDENCE"] -> undefined
+  top_empresa_ids: [] -> undefined
+  top_evidence_strengths: [] -> undefined

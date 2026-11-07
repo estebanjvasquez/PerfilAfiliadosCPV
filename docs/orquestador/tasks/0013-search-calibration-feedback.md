@@ -234,7 +234,10 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
     - «operadores» mejora en todas las métricas.
     - «refinery» empeora frente a la línea base del 06-11, pero hoy da el mismo resultado en el Worker vivo, así que no viene de este cambio.
     - El ruido total en el top 5 pasa de 48 a 49, por esa misma consulta.
-- **Promoción:** pendiente de aprobación del propietario.
+- **Promoción (aprobada por el propietario en el chat, 2026-11-07):** `fb72aa80` (`7a351f0`) al 100 % en el Worker vivo.
+  - Regresión en vivo: los mismos 3 cambios esperados («reciclaje», «construccion», «guaya fina»).
+  - En una de tres corridas aparecieron «caballito» o «cabria». Desaparecen al repetir: es la variabilidad conocida del intérprete de consultas del Worker.
+  - `/search-log` sin token responde 401.
 
 ### Sectores y servicios editables (2026-11-07)
 
@@ -248,6 +251,21 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
   - La ficha de la empresa recupera «Vincular servicio» con la regla de 2 sectores de `cbc1e37` y sin duplicados, revisada en el servidor. «X» ya no se puede vincular.
   - Se quitaron «(histórico)», «clasificación anterior» y «legacy» de la ficha, de los avisos, de las pantallas de taxonomía que muestran servicios y del manual.
 - **Pruebas:** suite completa en el runner aislado, 656 pruebas en verde. Staging respondió 200 antes y después.
+- **Despliegue a staging (aprobado por el propietario en el chat, 2026-11-07):** `feature/upgrade-filament-v3` avanzó de `60c43cf` a `90044f3` (fast-forward).
+  - **Falla:** el run `42364833420` falló en `migrate`, porque el pooler de sesión de la base compartida estaba lleno (15 de 15).
+  - **Causa:** las 15 conexiones eran del Worker por Hyperdrive, inactivas desde las pruebas de la mañana. Hyperdrive tiene `origin_connection_limit` 60 contra un pool de 15. Staging quedó en mantenimiento (503).
+  - **Reparación:**
+    - Se terminaron con `pg_terminate_backend` las 15 conexiones inactivas `postgres.js`, por el puerto 6543. Contó con la autorización del propietario y no tocó datos.
+    - Se completaron en el servidor los mismos pasos del workflow; `migrate` respondió «Nothing to migrate».
+  - **Verificación:**
+    - `/`, `/admin/login` y `/cira-test/` responden 200;
+    - la app lee la base (406 empresas activas);
+    - el código nuevo está en el contenedor.
+  - **Pendiente (el propietario pidió prepararlo):** bajar `origin_connection_limit` de Hyperdrive, probado y con reversión. Requiere su aprobación antes de aplicarlo.
+- **Lista de «X» para revisión manual:** se generó fuera del repo, porque contiene nombres de empresas. Tiene 250 filas en 236 empresas:
+  - 119 de prioridad alta, que perderían el sector;
+  - 125 de prioridad media, cubiertas por el sector declarado;
+  - 6 de prioridad baja, con otro servicio en el sector.
 - **Al integrar con la rama SEC-01:** `tests/Feature/Security/CompanyRelationManagersTest.php` afirma que «attach» no existe y hay que ajustarlo.
 - **«X» en datos (solo lectura, 2026-11-07):**
   - Hay 8 servicios «X», uno por sector, con 250 vínculos en 236 empresas.
