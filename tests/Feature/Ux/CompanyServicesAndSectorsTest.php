@@ -436,8 +436,23 @@ class CompanyServicesAndSectorsTest extends TestCase
         $rm = $this->manager(ServicesRelationManager::class, $this->alfaUser);
         DB::table('empresa_user')->where(['empresa_id' => $this->alfa->id, 'user_id' => $this->alfaUser->id])->delete();
 
-        $this->attach($rm, ['sector_id' => $this->sector['P'], 'service_id' => $extra]);
-        $this->assertSame([], $this->linkedServices($this->alfa));
+        // Como lo manda el navegador (la acción ya no se muestra, así que el asistente de prueba no sirve aquí).
+        $refused = false;
+        try {
+            $rm->call('mountTableAction', 'attach');
+            if ($rm->instance() === null) {
+                $refused = true;
+            } else {
+                $rm->set('mountedTableActionsData.0.sector_id', $this->sector['P'])
+                    ->set('mountedTableActionsData.0.service_id', $extra)
+                    ->call('callMountedTableAction');
+                $refused = $rm->instance() === null;
+            }
+        } catch (HttpExceptionInterface|ModelNotFoundException) {
+            $refused = true;
+        }
+        $this->assertSame([], $this->linkedServices($this->alfa), 'no se vinculó nada');
+        $this->assertTrue($refused, 'rechazado (404)');
     }
 
     #[Test]
