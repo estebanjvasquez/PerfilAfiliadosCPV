@@ -34,11 +34,11 @@ class LegacyServiceResource extends Resource
 
     protected static ?string $navigationGroup = 'Taxonomía CPV';
 
-    protected static ?string $navigationLabel = 'Servicios legacy';
+    protected static ?string $navigationLabel = 'Servicios y CPV';
 
-    public static ?string $label = 'Servicio legacy';
+    public static ?string $label = 'Servicio';
 
-    protected static ?string $pluralModelLabel = 'Servicios legacy';
+    protected static ?string $pluralModelLabel = 'Servicios';
 
     protected static ?int $navigationSort = 7;
 
@@ -87,7 +87,7 @@ class LegacyServiceResource extends Resource
                     Forms\Components\Select::make('status')
                         ->label('Estado')
                         ->options([
-                            LegacyService::STATUS_LEGACY_ACTIVE => 'Activo (legacy)',
+                            LegacyService::STATUS_LEGACY_ACTIVE => 'Activo en el catálogo',
                             LegacyService::STATUS_DEPRECATED => 'Deprecado',
                             LegacyService::STATUS_DISABLED => 'Deshabilitado',
                         ])
@@ -112,7 +112,7 @@ class LegacyServiceResource extends Resource
                 Tables\Columns\SelectColumn::make('status')
                     ->label('Estado')
                     ->options([
-                        LegacyService::STATUS_LEGACY_ACTIVE => 'Activo (legacy)',
+                        LegacyService::STATUS_LEGACY_ACTIVE => 'Activo en el catálogo',
                         LegacyService::STATUS_DEPRECATED => 'Deprecado',
                         LegacyService::STATUS_DISABLED => 'Deshabilitado',
                     ])
@@ -124,7 +124,7 @@ class LegacyServiceResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Estado')
                     ->options([
-                        LegacyService::STATUS_LEGACY_ACTIVE => 'Activo (legacy)',
+                        LegacyService::STATUS_LEGACY_ACTIVE => 'Activo en el catálogo',
                         LegacyService::STATUS_DEPRECATED => 'Deprecado',
                         LegacyService::STATUS_DISABLED => 'Deshabilitado',
                     ]),

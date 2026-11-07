@@ -29,7 +29,7 @@ Cada persona de su empresa que vaya a trabajar en el sistema necesita **su propi
 | Indicar en qué cámaras participa su empresa | Pestaña **Cámaras** | [Cámaras](#camaras) |
 | Registrar las personas de contacto | Pestaña **Contactos** | [Contactos](#contactos) |
 | Ver quién tiene acceso a su empresa | Pestaña **Usuarios** | [Usuarios](#usuarios) |
-| Consultar la clasificación anterior o quitar servicios que no corresponden | Pestaña **Sectores y servicios (histórico)** | [Sectores y servicios (histórico)](#sectores-y-servicios) |
+| Vincular los servicios de su empresa o quitar los que no corresponden | Pestaña **Sectores y servicios** | [Sectores y servicios](#sectores-y-servicios) |
 | Declarar lo que su empresa ofrece | Pestaña **Categorías CPV** | [Categorías CPV (Taxonomía)](#taxonomia-cpv) |
 | Ver toda la Taxonomía CPV para ubicarse | Botón **Ver mapa de la taxonomía** | [Mapa de la taxonomía](#mapa-taxonomia) |
 | Declarar personal, maquinaria, instalaciones e inventario | Pestaña **Recursos en Venezuela** | [Recursos en Venezuela](#recursos) |
@@ -210,7 +210,7 @@ Para guardar, presione **Guardar cambios**: está arriba, junto al título de la
 
 ## Las pestañas de su empresa {#resto-del-perfil}
 
-Debajo del formulario de datos generales, bajo el título **Secciones del perfil**, aparecen varias pestañas (en la pantalla de un teléfono, o en una ventana angosta, pasan a varias filas para que todas queden a la vista), en este orden: **Cámaras**, **Contactos**, **Usuarios**, **Sectores y servicios (histórico)**, **Categorías CPV**, **Recursos en Venezuela**, **Sistemas de gestión**, **Experiencia relevante**, **Presencia internacional** y **Enfoque de sostenibilidad**. Cada una tiene su propia sección en este manual. Según los permisos de su cuenta, puede ver algunas o todas. Cada acción de estas pestañas se guarda en el momento en que usted la confirma.
+Debajo del formulario de datos generales, bajo el título **Secciones del perfil**, aparecen varias pestañas (en la pantalla de un teléfono, o en una ventana angosta, pasan a varias filas para que todas queden a la vista), en este orden: **Cámaras**, **Contactos**, **Usuarios**, **Sectores y servicios**, **Categorías CPV**, **Recursos en Venezuela**, **Sistemas de gestión**, **Experiencia relevante**, **Presencia internacional** y **Enfoque de sostenibilidad**. Cada una tiene su propia sección en este manual. Según los permisos de su cuenta, puede ver algunas o todas. Cada acción de estas pestañas se guarda en el momento en que usted la confirma.
 
 ### Los botones de las ventanas {#botones-ventanas}
 
@@ -245,13 +245,16 @@ Muestra las personas de contacto de su empresa.
 
 Muestra los usuarios que tienen acceso a su empresa. Para dar acceso a un nuevo usuario de su empresa o retirarlo, contacte a la Cámara.
 
-## Sectores y servicios (histórico) {#sectores-y-servicios}
+## Sectores y servicios {#sectores-y-servicios}
 
-Muestra la clasificación anterior de sectores y servicios de su empresa. Se conserva por historia y la Cámara la usa en reportes actuales, pero **ya no se agregan servicios aquí**. Para describir lo que su empresa ofrece, use la pestaña **Categorías CPV** (ver [Cómo agregar categorías CPV](#agregar-categorias)).
+Muestra los sectores y servicios de su empresa. La Cámara los usa en el buscador y en los reportes. Además, puede describir con más detalle lo que su empresa ofrece en la pestaña **Categorías CPV** (ver [Cómo agregar categorías CPV](#agregar-categorias)).
 
+- **Vincular servicio**: elija el **Sector** y luego el **Servicio** que presta su empresa. Solo aparecen los sectores principal y secundario de su empresa, y no aparecen los servicios que ya tiene. El cambio se guarda al instante.
 - **Desvincular**: quita de su empresa un servicio que no corresponde. Para quitar varios, márquelos y use **Desvincular seleccionados**. El servicio no se borra del catálogo de la Cámara, solo deja de estar asociado a su empresa. El cambio se guarda al instante.
 
-> **NOTA:** Su empresa opera en un **sector principal** (lo define la Cámara) y, si quiere, un **sector secundario**. Si tiene servicios anteriores de otro sector, al guardar el formulario verá el aviso **Cambios guardados, con un pendiente**: sus cambios sí se guardaron, y el aviso indica qué servicios quitar con **Desvincular**. Si la Cámara aún no definió su sector principal, puede seguir actualizando su perfil; para definirlo, contacte a la CPV.
+> **NOTA:** Si su empresa tiene el servicio **X**, reemplácelo: vincule el servicio que de verdad presta en ese sector y luego desvincule **X**. **X** no describe ningún servicio y la Cámara lo va a retirar del catálogo.
+
+> **NOTA:** Su empresa opera en un **sector principal** (lo define la Cámara) y, si quiere, un **sector secundario**. Si tiene servicios de otro sector, al guardar el formulario verá el aviso **Cambios guardados, con un pendiente**: sus cambios sí se guardaron, y el aviso indica qué servicios quitar con **Desvincular**. Si la Cámara aún no definió su sector principal, puede seguir actualizando su perfil; para definirlo, contacte a la CPV.
 
 ## Categorías CPV (Taxonomía) {#taxonomia-cpv}
 
@@ -538,7 +541,7 @@ Las pestañas **Recursos en Venezuela**, **Sistemas de gestión**, **Experiencia
 
 Una sección cuenta como completa si tiene datos cargados o si está marcada **No Aplica**. En Recursos y Sistemas de gestión, el porcentaje refleja cuántos de sus tipos están completos o marcados como No Aplica.
 
-> **NOTA:** Actualmente el porcentaje de completitud no incluye las Categorías CPV, y el punto «Sectores y Servicios» se calcula con la clasificación anterior, que ya no puede editar. Aun así, las Categorías CPV son la forma en que su empresa aparece en las búsquedas: manténgalas al día.
+> **NOTA:** Actualmente el porcentaje de completitud no incluye las Categorías CPV; el punto «Sectores y Servicios» se calcula con los servicios vinculados en **Sectores y servicios**. Su empresa aparece en las búsquedas por sus sectores, sus servicios y sus Categorías CPV: mantenga los tres al día.
 
 ## Errores y dudas frecuentes {#errores-frecuentes}
 
@@ -555,8 +558,8 @@ Una sección cuenta como completa si tiene datos cargados o si está marcada **N
 | En el mapa, una Familia dice «sin categorías todavía» | No tiene Categorías publicadas, así que no se puede elegir. Busque una Categoría relacionada o solicite una revisión a la Cámara (ver [Mapa de la taxonomía](#mapa-taxonomia)). |
 | El filtro del mapa no encuentra lo que busco | El filtro solo mira las letras de los nombres del mapa. Use **Buscar y agregar categoría**, que también reconoce sinónimos y términos en inglés. |
 | No puedo avanzar con **Siguiente** | Hay un campo obligatorio vacío o con formato incorrecto en el paso actual; el sistema lo marca en rojo. Si el campo marcado es **Sector principal** y aparece bloqueado, contacte a la Cámara para que lo asigne. |
-| Aparece «Cambios guardados, con un pendiente» | Sus cambios se guardaron. Su clasificación anterior tiene servicios de un sector distinto de los suyos: quítelos con **Desvincular** en **Sectores y servicios (histórico)**, o pida a la Cámara revisar sus sectores. |
-| Aparece «Este cambio de sectores deja servicios fuera» y no se guarda | Eligió un **Sector secundario** que deja fuera servicios que hoy tiene. Primero desvincule esos servicios en **Sectores y servicios (histórico)** y luego cambie el sector, o conserve el sector anterior. |
+| Aparece «Cambios guardados, con un pendiente» | Sus cambios se guardaron. Su empresa tiene servicios de un sector distinto de los suyos: quítelos con **Desvincular** en **Sectores y servicios**, o pida a la Cámara revisar sus sectores. |
+| Aparece «Este cambio de sectores deja servicios fuera» y no se guarda | Eligió un **Sector secundario** que deja fuera servicios que hoy tiene. Primero desvincule esos servicios en **Sectores y servicios** y luego cambie el sector, o conserve el sector anterior. |
 | No estoy seguro de si se guardaron los cambios | En el formulario de datos generales debe presionar **Guardar cambios** en el último paso y ver el aviso **Guardado**. En las pestañas, cada acción se guarda al confirmarla. |
 | El RIF o el Sector principal están bloqueados | Es intencional: solo la Cámara los modifica. Contáctela si hay un error. |
 | La lista de Empresas está vacía | Su usuario todavía no está asociado a su empresa. Contacte a la Cámara. |

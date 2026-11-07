@@ -29,7 +29,8 @@ use Tests\TestCase;
  *
  * Reglas de negocio escritas como literales (ver el archivo de la tarea, R1–R4):
  * - R1: quien puede editar la empresa (afiliado vinculado o admin vinculado) desvincula servicios viejos de SU empresa;
- *   el catálogo no cambia, vincular sigue cerrado, otra empresa no se toca y una página revocada no escribe;
+ *   el catálogo no cambia, otra empresa no se toca y una página revocada no escribe; desde TASK-0013 (2026-11-07)
+ *   también vincula, con la regla de 2 sectores y sin el servicio marcador «X»;
  * - R2: sin sector principal, quien no es super_admin guarda igual (el campo no es obligatorio para él); el super_admin
  *   sí debe elegirlo y el mensaje sale en español;
  * - R3: un guardado se detiene solo si el cambio de sectores deja fuera servicios que estaban dentro; una
@@ -289,7 +290,7 @@ class CompanyServicesAndSectorsTest extends TestCase
 
         $rm = $this->manager(ServicesRelationManager::class, $this->alfaUser);
         $rm->assertTableActionExists('detach')
-            ->assertTableActionDoesNotExist('attach')
+            ->assertTableActionExists('attach')
             ->assertTableActionDoesNotExist('edit')
             ->assertTableActionDoesNotExist('delete');
         $rm->callTableAction('detach', $this->service['X'])->assertHasNoTableActionErrors();
@@ -361,6 +362,98 @@ class CompanyServicesAndSectorsTest extends TestCase
         }
         $this->assertTrue($refused, 'rechazado (404)');
         $this->assertSame([$this->service['X']], $this->linkedServices($this->alfa));
+    }
+
+    // ------------------------------------------------------------------ Vincular (TASK-0013, 2026-11-07)
+    // Sectores y servicios vuelven a ser dato vigente y editable: se vincula con la regla de 2 sectores y sin «X».
+
+    private function attach($component, array $data): void
+    {
+        try {
+            $component->callTableAction('attach', data: $data);
+        } catch (HttpExceptionInterface|ModelNotFoundException) {
+            // rechazado por el servidor: los vínculos se verifican igual abajo
+        }
+    }
+
+    #[Test]
+    public function the_owner_links_a_service_of_its_principal_sector_and_the_catalog_does_not_change(): void
+    {
+        $extra = DB::table('services')->insertGetId(['sectors_id' => $this->sector['P'], 'name' => 'ZZZSERVICIOP2', 'created_at' => now(), 'updated_at' => now()]);
+        $this->withServices($this->alfa, 'P');
+        $catalog = $this->catalog();
+
+        $this->attach($this->manager(ServicesRelationManager::class, $this->alfaUser), ['sector_id' => $this->sector['P'], 'service_id' => $extra]);
+
+        $this->assertSame([$this->service['P'], $extra], $this->linkedServices($this->alfa), 'se vinculó el servicio elegido');
+        $this->assertSame([], $this->linkedServices($this->beta), 'BETA no cambió');
+        $this->assertEquals($catalog, $this->catalog(), 'el catálogo de servicios no cambió');
+    }
+
+    #[Test]
+    public function a_service_outside_the_principal_and_secondary_sectors_is_refused_even_if_forged(): void
+    {
+        $this->attach($this->manager(ServicesRelationManager::class, $this->alfaUser), ['sector_id' => $this->sector['S'], 'service_id' => $this->service['S']]);
+        $this->attach($this->manager(ServicesRelationManager::class, $this->alfaUser), ['sector_id' => $this->sector['P'], 'service_id' => $this->service['S']]);
+
+        $this->assertSame([], $this->linkedServices($this->alfa), 'el sector S no es el principal ni el secundario de ALFA');
+        $this->assertNotNull(ServicesRelationManager::attachRefusal($this->alfa->fresh(), Service::find($this->service['S'])));
+    }
+
+    #[Test]
+    public function without_declared_sectors_a_third_sector_is_refused(): void
+    {
+        $sinSector = $this->company('SINSECTOR', $this->alfaUser, null);
+        $this->withServices($sinSector, 'P', 'S');
+
+        $this->attach($this->manager(ServicesRelationManager::class, $this->alfaUser, $sinSector), ['sector_id' => $this->sector['X'], 'service_id' => $this->service['X']]);
+
+        $this->assertSame([$this->service['P'], $this->service['S']], $this->linkedServices($sinSector), 'máximo 2 sectores');
+        $selectable = ServicesRelationManager::selectableSectorIds($sinSector->fresh());
+        sort($selectable);
+        $this->assertSame([$this->sector['P'], $this->sector['S']], $selectable);
+    }
+
+    #[Test]
+    public function the_placeholder_service_x_cannot_be_linked_and_a_duplicate_is_refused(): void
+    {
+        $placeholder = DB::table('services')->insertGetId(['sectors_id' => $this->sector['P'], 'name' => 'X', 'created_at' => now(), 'updated_at' => now()]);
+        $this->withServices($this->alfa, 'P');
+
+        $this->attach($this->manager(ServicesRelationManager::class, $this->alfaUser), ['sector_id' => $this->sector['P'], 'service_id' => $placeholder]);
+        $this->attach($this->manager(ServicesRelationManager::class, $this->alfaUser), ['sector_id' => $this->sector['P'], 'service_id' => $this->service['P']]);
+
+        $this->assertSame([$this->service['P']], $this->linkedServices($this->alfa), 'ni «X» ni un duplicado');
+        $this->assertTrue(ServicesRelationManager::isPlaceholder(Service::find($placeholder)));
+        $this->assertSame('Servicio no disponible', ServicesRelationManager::attachRefusal($this->alfa->fresh(), Service::find($placeholder))[0]);
+        $this->assertSame('Servicio ya vinculado', ServicesRelationManager::attachRefusal($this->alfa->fresh(), Service::find($this->service['P']))[0]);
+    }
+
+    #[Test]
+    public function a_services_tab_mounted_before_the_link_was_revoked_cannot_attach(): void
+    {
+        $extra = DB::table('services')->insertGetId(['sectors_id' => $this->sector['P'], 'name' => 'ZZZSERVICIOP3', 'created_at' => now(), 'updated_at' => now()]);
+        $rm = $this->manager(ServicesRelationManager::class, $this->alfaUser);
+        DB::table('empresa_user')->where(['empresa_id' => $this->alfa->id, 'user_id' => $this->alfaUser->id])->delete();
+
+        $this->attach($rm, ['sector_id' => $this->sector['P'], 'service_id' => $extra]);
+        $this->assertSame([], $this->linkedServices($this->alfa));
+    }
+
+    #[Test]
+    public function the_sector_and_service_catalogs_follow_the_role_permissions(): void
+    {
+        $affiliate = $this->user(self::AFFILIATE);
+        $staff = $this->user(['view_any_sector', 'view_any_service', 'create_sector', 'update_sector', 'create_service', 'update_service', 'delete_service']);
+
+        foreach (['create', 'update', 'delete', 'deleteAny'] as $ability) {
+            $this->assertFalse((new \App\Policies\SectorPolicy())->{$ability}($affiliate), "afiliado: sector {$ability}");
+            $this->assertFalse((new \App\Policies\ServicePolicy())->{$ability}($affiliate), "afiliado: servicio {$ability}");
+        }
+        $this->assertTrue((new \App\Policies\SectorPolicy())->update($staff));
+        $this->assertTrue((new \App\Policies\ServicePolicy())->create($staff));
+        $this->assertTrue((new \App\Policies\ServicePolicy())->delete($staff));
+        $this->assertFalse((new \App\Policies\SectorPolicy())->delete($staff), 'sin delete_sector');
     }
 
     // ------------------------------------------------------------------ R4 (principal de Categorías CPV)

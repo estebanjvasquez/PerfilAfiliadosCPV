@@ -67,7 +67,7 @@ class TaxonomyOverviewWidget extends BaseWidget
                 ->description('Referenciados por el diccionario pero sin categoría existente')
                 ->color($orphanCodes > 0 ? 'danger' : 'success'),
 
-            Stat::make('Servicios legacy', $servicesByStatus->sum())
+            Stat::make('Servicios', $servicesByStatus->sum())
                 ->description(sprintf(
                     '%d activos · %d deprecados · %d deshabilitados',
                     $servicesByStatus[LegacyService::STATUS_LEGACY_ACTIVE] ?? 0,

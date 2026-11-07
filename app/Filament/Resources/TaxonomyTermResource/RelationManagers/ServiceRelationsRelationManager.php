@@ -20,17 +20,17 @@ class ServiceRelationsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'id';
 
-    public static ?string $label = 'Relación con servicio legacy';
+    public static ?string $label = 'Relación con servicio';
 
-    public static ?string $navigationLabel = 'Servicios legacy relacionados';
+    public static ?string $navigationLabel = 'Servicios relacionados';
 
-    protected static ?string $pluralModelLabel = 'Servicios legacy relacionados';
+    protected static ?string $pluralModelLabel = 'Servicios relacionados';
 
     public function form(Form $form): Form
     {
         return $form->schema([
             Forms\Components\Select::make('legacy_service_id')
-                ->label('Servicio legacy')
+                ->label('Servicio')
                 ->relationship('legacyService', 'name')
                 ->searchable()
                 ->preload()
@@ -41,7 +41,7 @@ class ServiceRelationsRelationManager extends RelationManager
             Forms\Components\Select::make('status')
                 ->label('Estado del servicio')
                 ->options([
-                    LegacyService::STATUS_LEGACY_ACTIVE => 'Activo (legacy)',
+                    LegacyService::STATUS_LEGACY_ACTIVE => 'Activo en el catálogo',
                     LegacyService::STATUS_DEPRECATED => 'Deprecado',
                     LegacyService::STATUS_DISABLED => 'Deshabilitado',
                 ])
@@ -63,7 +63,7 @@ class ServiceRelationsRelationManager extends RelationManager
                     ->label('Estado')
                     ->badge()
                     ->formatStateUsing(fn (string $state) => match ($state) {
-                        LegacyService::STATUS_LEGACY_ACTIVE => 'Activo (legacy)',
+                        LegacyService::STATUS_LEGACY_ACTIVE => 'Activo en el catálogo',
                         LegacyService::STATUS_DEPRECATED => 'Deprecado',
                         LegacyService::STATUS_DISABLED => 'Deshabilitado',
                         default => $state,

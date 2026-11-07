@@ -91,7 +91,7 @@ class EditEmpresa extends EditRecord
             ->send();
     }
 
-    /** Aviso para después de guardar (empresa con servicios viejos fuera de sus sectores), armado en beforeSave(). */
+    /** Aviso para después de guardar (empresa con servicios fuera de sus sectores), armado en beforeSave(). */
     protected ?string $sectorNotice = null;
 
     /** TASK-0011: «www.x.com» → «https://www.x.com»; vacío → null. No corrige letras: solo agrega el esquema. */
@@ -166,7 +166,7 @@ class EditEmpresa extends EditRecord
                 ->danger()
                 ->title('Este cambio de sectores deja servicios fuera')
                 ->body("Su empresa tiene servicios de: {$names}. Solo se permiten un sector principal y uno secundario. "
-                    .'Primero desvincule esos servicios en la sección «Sectores y servicios (histórico)», más abajo, y luego cambie el sector; '
+                    .'Primero desvincule esos servicios en la sección «Sectores y servicios», más abajo, y luego cambie el sector; '
                     .'o conserve el sector actual. No se guardó ningún cambio.')
                 ->persistent()
                 ->send();
@@ -178,10 +178,10 @@ class EditEmpresa extends EditRecord
         if ($check['outside'] !== []) {
             $names = Sector::whereIn('id', $check['outside'])->pluck('name')->implode(', ');
             $this->sectorNotice = blank($principal)
-                ? "La Cámara aún no definió el sector principal de su empresa, y tiene servicios anteriores de: {$names}. "
-                    .'Puede seguir actualizando su perfil. Para definir el sector, contacte a la CPV; los servicios que no correspondan se quitan con «Desvincular» en «Sectores y servicios (histórico)».'
-                : "Su empresa tiene servicios anteriores fuera de sus sectores: {$names}. "
-                    .'Quítelos con «Desvincular» en la sección «Sectores y servicios (histórico)», o pida a la CPV revisar sus sectores.';
+                ? "La Cámara aún no definió el sector principal de su empresa, y tiene servicios de: {$names}. "
+                    .'Puede seguir actualizando su perfil. Para definir el sector, contacte a la CPV; los servicios que no correspondan se quitan con «Desvincular» en «Sectores y servicios».'
+                : "Su empresa tiene servicios fuera de sus sectores: {$names}. "
+                    .'Quítelos con «Desvincular» en la sección «Sectores y servicios», o pida a la CPV revisar sus sectores.';
         }
     }
 

@@ -52,7 +52,7 @@ class LegacyServiceCpvRelationResource extends Resource
     {
         return $form->schema([
             Forms\Components\Select::make('legacy_service_id')
-                ->label('Servicio legacy')
+                ->label('Servicio')
                 ->relationship('legacyService', 'name')
                 ->searchable()
                 ->preload()
@@ -72,7 +72,7 @@ class LegacyServiceCpvRelationResource extends Resource
             Forms\Components\TextInput::make('weight')
                 ->label('Peso')
                 ->numeric()->step(0.0001)->minValue(0)->maxValue(1)->required()
-                ->helperText('Fuerza semántica entre este servicio legacy y este código CPV.'),
+                ->helperText('Fuerza semántica entre este servicio y este código CPV.'),
             Forms\Components\TextInput::make('confidence')
                 ->label('Confianza')
                 ->numeric()->step(0.0001)->minValue(0)->maxValue(1)->required(),
@@ -94,7 +94,7 @@ class LegacyServiceCpvRelationResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('legacyService.name')->label('Servicio legacy')->searchable()->wrap(),
+                Tables\Columns\TextColumn::make('legacyService.name')->label('Servicio')->searchable()->wrap(),
                 Tables\Columns\TextColumn::make('cpv_code')->label('Código CPV')->searchable(),
                 Tables\Columns\TextColumn::make('category_breadcrumb')
                     ->label('Categoría')
@@ -126,7 +126,7 @@ class LegacyServiceCpvRelationResource extends Resource
                 Tables\Filters\QueryBuilder::make()
                     ->constraints([
                         TextConstraint::make('service_name')
-                            ->label('Servicio legacy')
+                            ->label('Servicio')
                             ->relationship('legacyService', 'name'),
                         TextConstraint::make('cpv_code')->label('Código CPV'),
                         SelectConstraint::make('relation_type')

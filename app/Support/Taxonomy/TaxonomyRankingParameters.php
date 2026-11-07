@@ -17,7 +17,7 @@ class TaxonomyRankingParameters
 {
     public const GROUP_DECLARED_PROFILE = 'Perfil CPV declarado';
     public const GROUP_WEBSITE_EVIDENCE = 'Evidencia en la web';
-    public const GROUP_LEGACY_SERVICES = 'Servicios legacy';
+    public const GROUP_LEGACY_SERVICES = 'Servicios';
     public const GROUP_RELATION_THRESHOLDS = 'Umbrales de relación';
     public const GROUP_MATCHING = 'Matching (fuzzy/semántico)';
     public const GROUP_CONTEXT = 'Contexto y control de ruido';
@@ -93,8 +93,8 @@ class TaxonomyRankingParameters
                 'group' => self::GROUP_WEBSITE_EVIDENCE,
             ],
             'legacy_services.declared_service' => [
-                'label' => 'Servicio legacy declarado',
-                'description' => 'Peso cuando la empresa declaró un servicio del catálogo legacy (`services`) relacionado con el término.',
+                'label' => 'Servicio declarado',
+                'description' => 'Peso cuando la empresa declaró un servicio del catálogo de servicios (`services`) relacionado con el término.',
                 'default' => 0.75, 'min' => 0.0, 'max' => 1.5,
                 'example' => 'Empresa con el servicio "SERVICIOS DE INYECCIÓN DE GAS Y VAPOR" ya cargado.',
                 'group' => self::GROUP_LEGACY_SERVICES,
@@ -401,10 +401,10 @@ class TaxonomyRankingParameters
                 'group' => self::GROUP_CONCEPT_BUILDER,
             ],
             'concept_builder.weight_legacy_service_overlap' => [
-                'label' => 'Peso: solapamiento de servicios legacy',
+                'label' => 'Peso: solapamiento de servicios',
                 'description' => 'Phase 3: peso del signal legacy_service_overlap (taxonomy_term_service_relations compartidas).',
                 'default' => 0.08, 'min' => 0.0, 'max' => 1.0,
-                'example' => 'Candidato y miembro del concepto comparten el mismo servicio legacy declarado.',
+                'example' => 'Candidato y miembro del concepto comparten el mismo servicio declarado.',
                 'group' => self::GROUP_CONCEPT_BUILDER,
             ],
             'concept_builder.weight_embedding_similarity' => [

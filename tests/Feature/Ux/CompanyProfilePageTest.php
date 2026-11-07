@@ -105,7 +105,7 @@ class CompanyProfilePageTest extends TestCase
         $this->assertSame('Cámaras', EmpresaResource\RelationManagers\ChambersRelationManager::getTitle($this->empresa, EditEmpresa::class));
         $this->assertSame('Contactos', EmpresaResource\RelationManagers\ContactsRelationManager::getTitle($this->empresa, EditEmpresa::class));
         $this->assertSame('Categorías CPV', EmpresaResource\RelationManagers\TaxonomyCategoriesRelationManager::getTitle($this->empresa, EditEmpresa::class));
-        $this->assertSame('Sectores y servicios (histórico)', EmpresaResource\RelationManagers\ServicesRelationManager::getTitle($this->empresa, EditEmpresa::class));
+        $this->assertSame('Sectores y servicios', EmpresaResource\RelationManagers\ServicesRelationManager::getTitle($this->empresa, EditEmpresa::class));
     }
 
     #[Test]
