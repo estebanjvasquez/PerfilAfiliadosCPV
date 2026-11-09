@@ -84,6 +84,48 @@ El propietario pidió llevar esta tarea a una sesión nueva y dejar la sesión a
    - `TaxonomyTermCpvRelationResource` administra las relaciones, con estados y aprobación.
    - **Falta en la ficha de categoría:** no muestra los términos asociados ni permite asociar uno existente. Sus relation managers son solo Traducciones y Sinónimos.
 
+## Reproducción (2026-11-09, sesión nueva)
+
+**Fuente verificada:** staging (`/opt/perfilafiliados`) está en `90044f3`, el mismo código que la rama de trabajo.
+Corridas en solo lectura (transacción `read only` revertida, sin cuentas reales, solo nombres de categorías):
+`balancin_probe.php` desde esta máquina contra la base compartida, y el mismo selector dentro del contenedor
+`app` de staging. La sonda tenía un error (`taxonomy_terms.status` no existe; la columna es
+`mapping_review_status`) y se corrigió.
+
+**Evidencia directa:**
+
+| Qué | Resultado |
+|---|---|
+| Nivel semántico | **apagado** en staging y en local: falta `MCP_EMBED_URL`/`MCP_EMBED_TOKEN`, `EmbeddingClient` devuelve null. Hoy ningún resultado del selector es semántico |
+| Selector, «balancín», «balancin», «Balancín», «BALANCIN» | **una** opción: `CPV-29.04.02G` (id 2558), nivel 2, activa, *Belongs*, «Terminación de Pozos > Equipos > Balancín», por nombre (`lexical`) |
+| Selector, «balan», «balanc», «Balanc» (mientras se escribe) | **dos** opciones: `CPV-29.04.02G` «Balancín» y `CPV-27.03.19S` (id 2437) «Servicios de Perforación > Servicios de Perforación Onshore > Perforación Bajobalanceada (UBD)», las dos por nombre |
+| Selector, «balanci», «balancí» | una: `CPV-29.04.02G` |
+| Selector, «bal» | 15 (tope), entre ellas «Gestión de Instalaciones > Servicio Integral» (Familia `CPV-44.01`), que coincide por un nombre que no se ve; ninguna muestra el motivo |
+| Selector, «balancines», «pumping unit», «pump jack» | ninguna |
+| Admin, Nombre (ES) con `like` | «Balancín» encuentra `CPV-29.04.02G`; «balancín» y «balancin» **no encuentran nada** (distingue mayúsculas y tildes). Familias y grupos: nada |
+| Nombres ES/EN normalizados con «balanc» | `CPV-29.04.02G` (es «Balancín»), `CPV-27.03.19S` (es «Perforación Bajobalanceada (UBD)», en «Underbalanced Drilling (UBD)»), `CPV-21.02.04G` (**inactiva**, «Sistemas de Estabilización del Balanceo mediante el Timón») |
+| Sinónimos de categoría | ninguno con «balanc»; la tabla tiene 3 filas en total |
+| Diccionario | término «balancín», canónico «pumpjack», `mapping_review_status = auto_mapped`, sin alias. Una relación: `CPV-29.04.02G`, **approved**, `exact`, peso 0,99, fuente `auto_mapping_v2` |
+
+**Conclusión:** las dos opciones que vio el propietario son, con alta probabilidad, las de la consulta parcial
+(«balan»/«balanc»). Es inferencia: no se vio su pantalla, pero es la única forma de obtener exactamente dos
+opciones con este código y estos datos. **No son equivalentes:**
+- `CPV-29.04.02G` «Balancín» es la categoría correcta, coincide por nombre y además tiene la relación de
+  diccionario aprobada;
+- `CPV-27.03.19S` «Perforación Bajobalanceada (UBD)» es un servicio de perforación que entra solo porque
+  «Bajo**balanc**eada» contiene la subcadena. Es ruido de la coincidencia por subcadena.
+
+La administración no la encuentra «del mismo modo» porque su búsqueda por nombre usa `like` sin `unaccent` ni
+`ilike`: «balancin» o «balancín» en minúscula no devuelven nada. Además no busca en EN, sinónimos ni diccionario,
+y las familias y grupos no tienen ninguna coincidencia que mostrar (la jerarquía de «Balancín» es
+`CPV-29` Terminación de Pozos > `CPV-29.04` Equipos).
+
+**Otros hallazgos:**
+- el diccionario no ayuda con «pumping unit»/«pump jack»: su canónico es «pumpjack» y no tiene alias;
+- el plural «balancines» no encuentra nada (sin derivación de plurales).
+
+Ninguno de los dos se corrige en esta tarea sin autorización: agregar alias es un cambio de datos.
+
 ## Próximos pasos
 
 1. **Reproducir** con `balancin_probe.php` y documentar aquí las dos opciones que ve la empresa: código, ruta, estado, fuente, relaciones aprobadas y si son correctas. Comparar con la administración. Si hace falta, confirmar la vista real en staging con una cuenta del propietario, solo lectura.

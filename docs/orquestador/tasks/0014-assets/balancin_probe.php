@@ -34,7 +34,7 @@ $out['normalizado_nombres_es_en'] = array_map(fn ($r) => "$r->code | nivel $r->l
         where unaccent(t.name) ilike unaccent('%balanc%') or t.name ilike '%pumping unit%' or t.name ilike '%pump jack%' order by tc.code"));
 $out['sinonimos_categoria'] = array_map(fn ($r) => "$r->code | $r->term", $db->select("select tc.code, s.term from taxonomy_category_synonyms s join taxonomy_categories tc on tc.id=s.category_id where unaccent(s.term) ilike unaccent('%balanc%')"));
 $out['sinonimos_total'] = $db->selectOne('select count(*) n from taxonomy_category_synonyms')->n;
-$terms = $db->select("select t.id, t.term, t.canonical_term, t.status, (select string_agg(a.alias, ', ') from taxonomy_term_aliases a where a.term_id=t.id) aliases
+$terms = $db->select("select t.id, t.term, t.canonical_term, t.mapping_review_status as status, (select string_agg(a.alias, ', ') from taxonomy_term_aliases a where a.term_id=t.id) aliases
     from taxonomy_terms t where unaccent(t.term) ilike unaccent('%balanc%') or unaccent(t.canonical_term) ilike unaccent('%balanc%')
     or exists (select 1 from taxonomy_term_aliases a where a.term_id=t.id and unaccent(a.alias) ilike unaccent('%balanc%')) order by t.term");
 foreach ($terms as $t) {
