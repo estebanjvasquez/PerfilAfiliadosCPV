@@ -154,6 +154,7 @@ class TermCategoryLinkTest extends TestCase
 
         Livewire::actingAs($user)
             ->test(TermRelationsRelationManager::class, ['ownerRecord' => $this->nodes['cabezal'], 'pageClass' => EditTaxonomyCategory::class])
+            ->loadTable()
             ->assertCanSeeTableRecords(TaxonomyTermCpvRelation::query()->where('category_id', $this->nodes['cabezal']->id)->get())
             ->assertSee("wellhead{$this->tok}")
             ->assertSee('En revisión')
@@ -174,6 +175,7 @@ class TermCategoryLinkTest extends TestCase
     {
         Livewire::actingAs($this->user())
             ->test(TermRelationsRelationManager::class, ['ownerRecord' => $this->nodes['cabezal'], 'pageClass' => EditTaxonomyCategory::class])
+            ->loadTable()
             ->assertTableActionHidden('asociarTermino');
     }
 
@@ -184,17 +186,20 @@ class TermCategoryLinkTest extends TestCase
 
         Livewire::actingAs($this->user(['taxonomy_edit_relations']))
             ->test(TermRelationsRelationManager::class, ['ownerRecord' => $this->nodes['cabezal'], 'pageClass' => EditTaxonomyCategory::class])
+            ->loadTable()
             ->assertTableActionHidden('approve', $pending);
 
         $publisher = $this->user(['taxonomy_publish']);
         Livewire::actingAs($publisher)
             ->test(TermRelationsRelationManager::class, ['ownerRecord' => $this->nodes['cabezal'], 'pageClass' => EditTaxonomyCategory::class])
+            ->loadTable()
             ->callTableAction('approve', $pending, data: ['reason' => ''])
             ->assertHasTableActionErrors(['reason' => 'required']);
         $this->assertSame(TaxonomyTermCpvRelation::STATUS_NEEDS_REVIEW, $pending->fresh()->status);
 
         Livewire::actingAs($publisher)
             ->test(TermRelationsRelationManager::class, ['ownerRecord' => $this->nodes['cabezal'], 'pageClass' => EditTaxonomyCategory::class])
+            ->loadTable()
             ->callTableAction('approve', $pending, data: ['reason' => 'Revisado con el cliente']);
 
         $this->assertSame(TaxonomyTermCpvRelation::STATUS_APPROVED, $pending->fresh()->status);

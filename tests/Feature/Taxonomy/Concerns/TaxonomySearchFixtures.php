@@ -36,6 +36,11 @@ trait TaxonomySearchFixtures
 
     protected function buildBalancinTree(): void
     {
+        // La base real (Supabase) ya tiene `unaccent`, que usa la búsqueda desde antes de esta tarea.
+        // La base desechable del runner solo la tiene si un fixture la crea, así que se crea aquí,
+        // dentro de la transacción de la prueba: se revierte con ella.
+        \Illuminate\Support\Facades\DB::connection('pgsql')->statement('CREATE EXTENSION IF NOT EXISTS unaccent');
+
         $this->tok = 'zq'.strtolower(substr(str_replace('.', '', uniqid('', true)), -8));
 
         $group = $this->node('CPV-'.random_int(900, 999), null, ['es' => "Terminación de Pozos {$this->tok}"]);
