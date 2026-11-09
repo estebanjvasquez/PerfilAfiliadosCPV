@@ -159,7 +159,10 @@ class TaxonomySearchCoherenceTest extends TestCase
         $this->assertSame([$this->nodes['grupo']->id], $byLevel(TaxonomyCategory::LEVEL_GROUP));
 
         $reasons = $this->lookup()->adminReasonsFor($this->nodes['familia']->id, $q, [$this->nodes['familia']->id]);
-        $this->assertStringStartsWith('Contiene '.$this->nodes['balancin']->code, $reasons[0]);
+        $this->assertNotEmpty(
+            array_filter($reasons, fn (string $line) => str_starts_with($line, 'Contiene '.$this->nodes['balancin']->code.': Nombre ES «Balancín')),
+            'La familia dice qué categoría hija coincidió: '.implode(' | ', $reasons)
+        );
     }
 
     #[Test]
@@ -203,6 +206,7 @@ class TaxonomySearchCoherenceTest extends TestCase
         $this->actingAs($admin);
 
         Livewire::test(ListTaxonomyCategories::class)
+            ->loadTable()
             ->searchTable("balancin {$this->tok}")
             ->assertCanSeeTableRecords([$this->nodes['balancin']])
             ->assertCanNotSeeTableRecords([$this->nodes['bajo'], $this->nodes['cabezal']])
@@ -211,15 +215,18 @@ class TaxonomySearchCoherenceTest extends TestCase
             ->assertSee('relación aprobada');
 
         Livewire::test(ListTaxonomyFamilies::class)
+            ->loadTable()
             ->searchTable("balancin {$this->tok}")
             ->assertCanSeeTableRecords([$this->nodes['familia']])
             ->assertSee('Contiene '.$this->nodes['balancin']->code);
 
         Livewire::test(ListTaxonomyGroups::class)
+            ->loadTable()
             ->searchTable("balancin {$this->tok}")
             ->assertCanSeeTableRecords([$this->nodes['grupo']]);
 
         Livewire::test(ListTaxonomyCategories::class)
+            ->loadTable()
             ->filterTable('termino_diccionario', ['termino' => "wellhead{$this->tok}", 'estado' => 'needs_review'])
             ->assertCanSeeTableRecords([$this->nodes['cabezal']])
             ->assertCanNotSeeTableRecords([$this->nodes['balancin']]);
