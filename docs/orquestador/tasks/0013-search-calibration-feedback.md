@@ -312,7 +312,7 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
 - Se descartó extender la compuerta de catálogo a `service` y `taxonomy` (commit `31d81b8`, revertido en `4f4c01a`): no cambió ninguna consulta del cliente.
 - Se descartó la regla «sin "similar a" si hay coincidencia literal», que quitaba 4 de 5 relevantes de una consulta excelente.
 
-**Ajuste (Worker `feat/semantic-gate`, commit `ecb8e47`, preview `4742a36f`, NO promovido):**
+**Ajuste (Worker `feat/semantic-gate`, commit `ecb8e47`, versión `4742a36f`; promovido el 2026-11-09, ver abajo):**
 - **Regla, `applySingleSimilarGate`:** si la frase tiene al menos una empresa con respaldo más fuerte (otra lista, o «similar a» por dos o más vías), se quitan las empresas que solo aparecen en una lista «similar a» (`service`, `taxonomy` o `experiencia`).
 - Si no hay nada más fuerte, no se toca nada, por ejemplo «camión chupón».
 - `canonical_related` (familia CPV) queda fuera de la regla.
@@ -330,3 +330,11 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
   - «gandola» tuvo un error puntual del servicio de embeddings y al repetir da igual que en vivo.
 - **Regresión congelada:** muchas consultas devuelven menos candidatos, y los quitados son de una sola vía «similar a». Ejemplos: «camiones» 24→5, «levantamiento artificial» 17→3, «fabricantes de balancines» 9→1. Las coincidencias literales se conservan.
 - **Riesgo para decidir el pase a vivo:** se pierden empresas no juzgadas que solo se parecían por una vía. Si alguna era relevante, el cliente ya no la ve.
+
+**Promoción (aprobada por el propietario en el chat, 2026-11-09):**
+- **Despliegue:** `wrangler versions deploy 4742a36f…@100%`. La versión anterior era `fb72aa80`.
+- **Verificación en vivo:**
+  - **Consultas del cliente:** mismas cifras que la preview. Relevante conocida en el top 5 en el 100 % de los casos, MRR 0.891, no relevantes en el top 5 / top 10: 31 / 34, media de 8.1 empresas. Mejoran 7 y ninguna empeora.
+  - **Regresión congelada:** los mismos cambios que la preview, más «caballito» (0→1) y diferencias de diagnóstico en «balancín». Vienen de la expansión CPV, que ya variaba de forma intermitente, no de la regla.
+  - **Staging:** `/` y `/cira-test/` responden 200.
+- **Reversión:** `wrangler versions deploy fb72aa80-bd26-4b33-b365-a5c2a931a683@100% --yes`.
