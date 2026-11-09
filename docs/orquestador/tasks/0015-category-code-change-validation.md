@@ -2,8 +2,8 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | **READY_FOR_REVIEW** (2026-11-09). Rama `feat/category-code-change`, REVIEW_HEAD `d0ecbf9`, BASE `a8020cf` (staging, TASK-0014). **No desplegada** |
-| Fuente | Pedido del propietario en el chat de la sesión de TASK-0014, 2026-11-09, con una captura de la ficha de edición de `CPV-29.04.02G`. Sin comentario en el Issue #2 todavía |
+| Estado | **READY_FOR_REVIEW, desplegada en staging** (2026-11-09). Rama `feat/category-code-change`, REVIEW_HEAD `d8e2aae`, BASE `a8020cf` (TASK-0014). Staging: `a8020cf..d0ecbf9` (run `42603503471`) y `d0ecbf9..d8e2aae` (run `42605041183`), los dos success, por instrucción del propietario en el chat («despliega y si agregalo»); verificado en `d8e2aae`. UAT del propietario pendiente; sin producción |
+| Fuente | Pedidos del propietario en el chat de la sesión de TASK-0014, 2026-11-09: (1) la ficha de edición de `CPV-29.04.02G` (captura); (2) «si agregalo», que extiende la misma protección a Familias y Grupos. Sin comentario en el Issue #2 todavía |
 | Relación | Nueva; no cambia el propósito ni el identificador de TASK-0014. Se apoya en su rama porque esa es la que está en staging |
 | Gates | sin producción; despliegue a staging solo con autorización explícita del propietario; ningún cambio de datos reales en esta tarea |
 
@@ -77,11 +77,45 @@ antes y después, y no quedaron contenedores `cpvtest`.
 - un código inválido en la acción no cambia nada;
 - sin permiso `update` no se puede cambiar.
 
+## Ampliación: Familias y Grupos (`d8e2aae`)
+
+**Nomenclatura medida en staging:** 48 grupos `CPV-NN` y 333 familias `CPV-<grupo>.NN`, todos consistentes.
+
+**Fichas de edición:**
+- **Familia:** muestra el Grupo con código y nombre; código y Grupo quedan bloqueados.
+- **Grupo:** código bloqueado.
+- **Al crear:** se valida la forma, `CPV-NN.NN` para una Familia y `CPV-NN` para un Grupo.
+
+**Acción común** (`ChangesTaxonomyCode`): «Cambiar código o grupo» en Familia y «Cambiar código» en Grupo.
+Ofrece el siguiente código libre (`CategoryCodeChanger::nextParentCode`) o uno escrito a mano. Muestra cuántos
+descendientes se renumeran.
+
+**`CategoryCodeChanger` en los tres niveles:**
+- **Renumeración:** todos los descendientes cambian el prefijo y conservan su correlativo y su letra:
+  `CPV-29.04` → `CPV-29.07` lleva `CPV-29.04.02G` a `CPV-29.07.02G`.
+- **Choques:** antes de aplicar comprueba que ningún código renumerado exista ya fuera del subárbol.
+- **Referencias:** actualiza las de texto de todo el subárbol.
+- **Auditoría:** registra cada código renumerado con «Renumerada por el cambio de X a Y: <motivo>».
+
+**Familias protegidas.** `CPV-29.02`, `CPV-12.04` y `CPV-48.02` no se pueden renumerar, ni directamente ni a
+través de su grupo:
+- el código fuente las nombra fijas: `BuildEmpresaSearchDocuments::GENERIC_ATTRACTOR_FAMILY_CODES` y
+  `HomologateServicesTaxonomy::CODIGOS_FAMILIA_EXCLUIDOS`, que ahora son públicas y que el servicio lee de su
+  fuente;
+- el Worker externo `empresa-tools.ts` también usa esos códigos;
+- renumerarlas dejaría de excluirlas del índice de búsqueda sin aviso.
+
+**Pruebas:** suite completa en `d8e2aae`, **OK (690 tests, 7662 assertions)**; staging respondió 200 antes y
+después. `CategoryCodeChangeTest` suma 4 casos:
+- renumerar una familia (4 categorías, referencias y auditoría);
+- renumerar un grupo (familia y categoría, y rechazo de las formas inválidas);
+- familias protegidas, directamente y por su grupo;
+- fichas de Familia y Grupo bloqueadas, y mover una familia a otro grupo con el código siguiente.
+
 ## Limitaciones y pendientes
 
-- **Familias y Grupos:** su código sigue editable a mano. Cambiarlo dejaría a las hijas con un código que ya no
-  empieza por el del padre. Requiere la misma protección y, además, decidir si se renumeran las hijas: queda
-  como propuesta para el propietario.
+- **Familias protegidas:** para renumerarlas hay que cambiar primero las listas del código fuente y la del
+  Worker externo.
 - **Índice de búsqueda de empresas** (`empresa_search_documents`) y servicios externos (n8n, el Worker MCP): ven
   el código nuevo recién al reconstruir el índice. Las empresas no se pierden porque se vinculan por id.
 - **Ediciones normales:** el resto de la ficha (nombres, relevancia) se sigue guardando sin registro en la

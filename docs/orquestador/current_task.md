@@ -6,15 +6,16 @@ hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_
 Hay dos tareas abiertas en sesiones separadas, por decisión del propietario (2026-11-09). En la sesión de TASK-0014
 se abrió además TASK-0015.
 
-## Abierta, sesión de TASK-0014: TASK-0015 — Edición de categoría: jerarquía visible y cambio de código validado y auditado — READY_FOR_REVIEW, sin desplegar
+## Abierta, sesión de TASK-0014: TASK-0015 — Edición de categoría: jerarquía visible y cambio de código validado y auditado — READY_FOR_REVIEW, EN STAGING
 
 | Campo | Valor |
 |---|---|
 | Archivo | [`tasks/0015-category-code-change-validation.md`](tasks/0015-category-code-change-validation.md) |
-| Fuente | pedido del propietario en el chat, 2026-11-09 (sin comentario en el Issue #2 todavía) |
-| Rama / BASE / REVIEW_HEAD | `feat/category-code-change` / `a8020cf` (staging) / `d0ecbf9` |
-| Pruebas | runner aislado, suite completa: **OK (686 tests, 7607 assertions)**; staging 200 antes y después |
-| Siguiente paso | despliegue a staging solo con autorización explícita del propietario; decidir si Familias y Grupos llevan la misma protección |
+| Fuente | pedidos del propietario en el chat, 2026-11-09, incluida la extensión a Familias y Grupos (sin comentario en el Issue #2 todavía) |
+| Rama / BASE / REVIEW_HEAD | `feat/category-code-change` / `a8020cf` / `d8e2aae` |
+| Pruebas | runner aislado, suite completa en `d8e2aae`: **OK (690 tests, 7662 assertions)**; staging 200 antes y después |
+| Staging | `feature/upgrade-filament-v3` en `d8e2aae` (runs `42603503471` y `42605041183`, success), por instrucción del propietario en el chat |
+| Siguiente paso | UAT del propietario en staging |
 
 ## Abierta, sesión nueva: TASK-0014 — Coherencia de búsqueda de taxonomía y asociación de términos desde la categoría — READY_FOR_REVIEW, EN STAGING (`6736283026`)
 
