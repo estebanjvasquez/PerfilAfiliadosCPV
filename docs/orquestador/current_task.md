@@ -1,9 +1,20 @@
-# Tarea actual (checkpoint 2026-11-06, rama `fix/sec-01-r4-01-role-editor-preserve`)
+# Tarea actual (checkpoint 2026-11-09, rama `fix/sec-01-r4-01-role-editor-preserve`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## Activa: TASK-0013 — Calibración del buscador CIRA: lista de referencia, medición y registro de búsquedas y votos — READY_FOR_REVIEW (`6684941317`)
+## Activa: TASK-0014 — Coherencia de búsqueda de taxonomía y asociación de términos desde la categoría — IN_PROGRESS (`6736283026`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0014-taxonomy-search-coherence-term-linking.md`](tasks/0014-taxonomy-search-coherence-term-linking.md) (comentario fuente íntegro, diagnóstico, diseño, evidencia) |
+| Fuente | Issue #2 `6736283026` (orquestador, a pedido del propietario, 2026-11-09) |
+| Código examinado | el desplegado en staging (`feature/upgrade-filament-v3`) |
+| Gates | sin producción, sin publicación masiva de relaciones, sin cambios en datos reales; despliegue a staging solo con autorización explícita |
+
+TASK-0013 sigue abajo con su estado; el paso 3 («similar a») se promovió al Worker vivo el 2026-11-09 (`6735662390`).
+
+## Anterior: TASK-0013 — Calibración del buscador CIRA: lista de referencia, medición y registro de búsquedas y votos — READY_FOR_REVIEW (`6684941317`)
 
 | Campo | Valor |
 |---|---|
