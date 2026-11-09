@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | **READY_FOR_REVIEW** (2026-11-09). Rama `feat/taxonomy-search-coherence`, REVIEW_HEAD `a8020cf`, BASE `90044f3`; suite completa verde en el runner aislado. **No desplegada** |
+| Estado | **READY_FOR_REVIEW, desplegada en staging** (2026-11-09). Rama `feat/taxonomy-search-coherence`, REVIEW_HEAD `a8020cf`, BASE `90044f3`; suite completa verde en el runner aislado. Por instrucción del propietario en el chat, `feature/upgrade-filament-v3` avanzó `90044f3..a8020cf` (fast-forward); workflow `42600556875` **success**; staging verificado en `a8020cf` (solo lectura). UAT del propietario pendiente; sin producción |
 | Fuente | Issue #2 `6736283026` (estebanjvasquez, 2026-11-09T09:08:19Z): «[ORQUESTADOR — SOLICITUD DEL PROPIETARIO]», publicado por el orquestador a petición expresa del propietario |
 | Relación | Nueva; no modifica TASK-0013 (calibración del buscador CIRA), que conserva su identificador y propósito |
 | Código examinado | el que corre en staging: `feature/upgrade-filament-v3` (se verifica su SHA antes de concluir) |
