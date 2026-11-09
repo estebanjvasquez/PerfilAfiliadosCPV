@@ -359,3 +359,30 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
   - **Causa:** las dos fuentes pesan igual y, en empate, el Worker muestra la primera que revisa.
   - **Propuesta:** en empate, mostrar primero lo declarado (categoría o servicio). No cambia el puntaje ni el orden.
   - **Estado:** espera autorización para preview.
+
+## Paso 4: primero lo declarado (pedido del propietario, 2026-11-09; preview, NO promovido)
+
+- **Pedido del propietario:** mostrar primero las empresas cuya categoría CPV, sector o servicio coincide con lo buscado. Lo que coincide en experiencias u otra parte del perfil va después, visible como coincidencia adicional, como en un buscador web.
+- **Rama y versión:** Worker `feat/declared-first`, commits `c359586` y `77ce273`; preview `1005d61f`. En vivo sigue `4742a36f`.
+- **Regla:**
+  - **Niveles de cada fuente:**
+    - **declarado:** nombre, servicio, sector o certificación; especialización en el sector; categoría CPV escrita; CPV de relación aprobada;
+    - **similar:** servicio o categoría CPV parecidos; familia CPV relacionada; nombre con posible error de tipeo;
+    - **adicional:** experiencia y texto del perfil.
+  - **Orden:** primero las empresas con algo declarado que coincide, luego todas las demás. Cada bloque se ordena por el puntaje de siempre.
+  - **Similar y adicional no se separan para ordenar.** Separarlos (preview `ebcb3593`) bajaba en «revestidor» la empresa relevante del puesto 1 al 9: coincidía literalmente en su experiencia y quedaba debajo de servicios solo parecidos («revestimientos»).
+  - **Texto y explicación:** la etiqueta y las fuentes de la explicación siguen el mismo criterio. Se corrige así que Lukiven mostrara «experiencia» con «balancín» aunque coincide por su categoría.
+  - **Campos nuevos:** `match_level` en el resultado; `explain.nivel` y `fuentes[].nivel` en la explicación.
+- **Consultas del cliente (lote 001), vivo frente a preview, mismo momento:**
+  - relevante en el top 5: 100 % en ambas;
+  - MRR 0.891 en ambas;
+  - relevantes en el top 10: 37/44 en ambas;
+  - no relevantes en el top 5: 31 → 30;
+  - mejora «gandola» (relevante del puesto 2 al 1), y ninguna empeora.
+  - Una diferencia en «balancín» resultó ser un cambio de datos durante la medición: el vínculo de Lukiven con «Balancín» se volvió a crear a las 13:07 UTC y VINCCLER lo perdió. Con los mismos datos, vivo y preview dan el mismo orden.
+- **Regresión congelada, frente a vivo:** cambian «camiones», «gandola», «gandolas» y «mantenimiento de gandolas».
+  - En «gandola», la empresa 433 (el cliente la juzgó no relevante, y coincidía solo en texto) deja el primer lugar a 165, 204, 426 y 452, que el cliente juzgó relevantes en G2-10, G3-03 y G3-04.
+- **Pendiente para que el usuario lo vea:**
+  - promover la versión del Worker;
+  - ajustar «Format Cards2» en n8n para marcar «Coincidencia adicional» y corregir la leyenda del orden.
+  - Ambas cosas requieren autorización del propietario.
