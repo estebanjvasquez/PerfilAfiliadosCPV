@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | IN_PROGRESS, en pausa para retomarla en una sesión nueva (2026-11-09; ver «Traspaso») |
+| Estado | **READY_FOR_REVIEW** (2026-11-09). Rama `feat/taxonomy-search-coherence`, REVIEW_HEAD `a8020cf`, BASE `90044f3`; suite completa verde en el runner aislado. **No desplegada** |
 | Fuente | Issue #2 `6736283026` (estebanjvasquez, 2026-11-09T09:08:19Z): «[ORQUESTADOR — SOLICITUD DEL PROPIETARIO]», publicado por el orquestador a petición expresa del propietario |
 | Relación | Nueva; no modifica TASK-0013 (calibración del buscador CIRA), que conserva su identificador y propósito |
 | Código examinado | el que corre en staging: `feature/upgrade-filament-v3` (se verifica su SHA antes de concluir) |
@@ -126,7 +126,10 @@ y las familias y grupos no tienen ninguna coincidencia que mostrar (la jerarquí
 
 Ninguno de los dos se corrige en esta tarea sin autorización: agregar alias es un cambio de datos.
 
-## Próximos pasos
+## Próximos pasos (plan del traspaso)
+
+> Hechos el 2026-11-09, salvo el despliegue a staging, que espera autorización. El resultado está en «Diseño y
+> cambios» y en «Evidencia y limitaciones».
 
 1. **Reproducir** con `balancin_probe.php` y documentar aquí las dos opciones que ve la empresa: código, ruta, estado, fuente, relaciones aprobadas y si son correctas. Comparar con la administración. Si hace falta, confirmar la vista real en staging con una cuenta del propietario, solo lectura.
 2. **Diseñar un servicio común de búsqueda** (por ejemplo `TaxonomyLookup`) con un solo criterio:
@@ -154,8 +157,150 @@ Ninguno de los dos se corrige en esta tarea sin autorización: agregar alias es 
 
 ## Diseño y cambios
 
-_Pendiente (sesión nueva)._
+Rama `feat/taxonomy-search-coherence`. Commits: `2a171de` (código, manual y pruebas), `3eae680` y `a8020cf`
+(ajustes de pruebas). Sin migraciones, sin cambios de datos, sin cambios de permisos.
+
+### 1. Servicio común `App\Services\Taxonomy\TaxonomyLookup`
+
+**Campos:**
+- código;
+- nombre ES y nombre EN;
+- sinónimo de categoría;
+- término, `canonical_term` y alias del diccionario, a través de su relación término→CPV.
+
+**Normalización:** `unaccent` sin distinguir mayúsculas. Los comodines `%` y `_` de lo que se escribe se toman
+literalmente.
+
+**Resultado:** una fila por categoría, con todos sus motivos (campo, texto que coincidió y estado de la
+relación) y una **calidad** que fija el orden:
+- 0, el texto completo es igual;
+- 1, empieza una palabra;
+- 2, está dentro de una palabra.
+
+**Alcances:**
+- **Empresa:** activas, sin Grupos, del diccionario solo `approved`.
+- **Administración:** todos los estados y niveles. La jerarquía se recorre hacia arriba: una Familia aparece si
+  coincide una hija, y un Grupo si coincide una familia o una nieta.
+
+**Sin semántica:** el servicio nunca escribe.
+
+### 2. Selector de la empresa
+
+**Búsqueda principal (`TaxonomyCategorySearch`):** los niveles léxico y de diccionario salen del servicio común.
+- La semántica sigue de relleno.
+- Cada opción muestra «ruta · código · motivo»:
+  - «por nombre» o «por nombre en inglés «…»»;
+  - «por código»;
+  - «por sinónimo «…»»;
+  - «término aprobado del diccionario «…»»;
+  - «sugerencia por similitud, sin confirmar».
+- Las subcadenas dentro de una palabra van al final con «(parte de una palabra)».
+- Las rutas salen en 2 consultas para todos los resultados, en vez de 2 por resultado.
+
+**Explorador de familias:** usa el mismo criterio. Escribir una categoría lleva a su Familia («contiene CPV-…»).
+
+### 3. Administración (concern `SearchesTaxonomyCoherently`)
+
+Se aplica a Categorías, Familias y Grupos.
+
+**Búsqueda y columnas:**
+- el cuadro de búsqueda usa el criterio común;
+- columna **Coincidencia**, que solo aparece al buscar: dice por qué apareció cada fila, con el estado de la
+  relación y «Contiene CPV-… (inactiva)» para las coincidencias de las hijas;
+- columna **Familia / Grupo** en Categorías.
+
+**Filtros:**
+- **Término del diccionario** (filtro nuevo): término, canónico o alias, con estado opcional de la relación;
+- **Sinónimo de la categoría (no incluye el diccionario)**: es el filtro de sinónimos, renombrado.
+
+**Familias:** la búsqueda por código del Grupo pasa de `like` a `ilike`.
+
+### 4. Pestaña «Términos del diccionario»
+
+Está en la ficha de la categoría, la familia y el grupo (`TermRelationsRelationManager`).
+
+**Qué muestra:** las relaciones término→CPV del nodo en cualquier estado, con el término, su canónico y sus alias.
+
+**Asociar término existente:** busca por término, canónico o alias. Cada opción dice si ya está relacionado aquí
+y en qué estado. Muestra las relaciones actuales del término y pide peso y motivo. Las reglas viven en
+`TermCategoryLinker`:
+- **Permiso:** `create_taxonomy::term::cpv::relation`, el mismo del alta manual.
+- **Relación nueva:** queda `needs_review`, tipo `manual`, fuente `manual_category_link`, `confidence` 1,0, y se
+  audita con el motivo.
+- **Relación viva** (candidata, auto-mapeada, en revisión o aprobada): no se duplica ni se toca; se informa su
+  estado. Se compara por `category_id` y por `cpv_code`, con `lockForUpdate`. Si hay una carrera, el
+  `UNIQUE` existente corta y se informa la que quedó.
+- **Relación rechazada o descartada:** solo se reabre a `needs_review` si se marca «Reabrir» y se tiene
+  `taxonomy_edit_relations`. Se reabre la misma fila y se audita.
+
+**Aprobar y Rechazar:** son las acciones existentes de `ManagesTaxonomyRelationReview`, con `taxonomy_publish`
+o `taxonomy_edit_relations`, motivo obligatorio y auditoría.
+
+**Fuera de la pestaña:** «Abrir relación» lleva a la ficha existente, y la edición y el borrado se hacen allí.
+
+### 5. Ayuda y manual
+
+- **Manual del afiliado**, sección «Búsqueda libre»: los motivos, el ejemplo «balanc», el consejo de terminar la
+  palabra, y la búsqueda por categoría en el explorador.
+- **Ayuda de administración** (`ayuda_solicitudes_admin.md`), sección nueva «Verificar si una categoría existente
+  cubre la solicitud»: la búsqueda, la columna Coincidencia, los filtros, la pestaña y las reglas de asociar.
+
+**Diferencias de alcance justificadas:**
+- la empresa no ve categorías inactivas, Grupos ni relaciones sin aprobar;
+- la administración ve todo con su estado y no ve semántica.
 
 ## Evidencia y limitaciones
 
-_Pendiente (sesión nueva)._
+**Pruebas en el runner aislado de Contabo:**
+
+| Corrida | Resultado |
+|---|---|
+| `a8020cf`, suite completa | **OK (679 tests, 7542 assertions)**; staging 200 antes y después; ningún contenedor `cpvtest` al terminar; las tablas de taxonomía gobernadas quedaron iguales |
+
+**Qué cubren las pruebas nuevas:**
+- `TaxonomySearchCoherenceTest` (11 casos, uno con 5 variantes):
+  - tildes y mayúsculas en las dos superficies;
+  - el orden «balanc» con su rótulo;
+  - ruta, código y motivo;
+  - EN, código, alias y canónico;
+  - sinónimo frente a término;
+  - activa e inactiva, grupo y relación no aprobada;
+  - la jerarquía en administración;
+  - los comodines;
+  - el rótulo de la semántica;
+  - **el id que elige la empresa es la categoría que ve el administrador**: mismo id, código y ruta;
+  - los tres listados de Livewire y el filtro del diccionario.
+- `TermCategoryLinkTest` (7 casos):
+  - una relación nueva queda en revisión, auditada y fuera del buscador;
+  - sin permiso no se puede asociar;
+  - no se duplica;
+  - una relación rechazada se reabre solo si se pide y con permiso;
+  - la pestaña lista y asocia;
+  - la acción se oculta sin permiso;
+  - aprobar exige `taxonomy_publish` y motivo, queda auditado, y después la relación sí lleva a la empresa a la
+    categoría.
+- `UserManualContentTest`: el manual explica los motivos con las palabras del código.
+
+**Comprobaciones con datos reales, solo lectura:** `TaxonomyLookup` sobre la base compartida y en el contenedor
+de staging, en transacción `read only` revertida.
+
+| Comprobación | Resultado |
+|---|---|
+| Empresa, «balanc» | «Balancín» primero («por nombre; término aprobado del diccionario «balancín»»); «Perforación Bajobalanceada (UBD)» después («parte de una palabra») |
+| Empresa, «balancin», «BALANCÍN», «pumpjack», «CPV-29.04.02G», «29.04.02» | `CPV-29.04.02G` |
+| Administración, «balancin» | la categoría, la Familia `CPV-29.04` y el Grupo `CPV-29` |
+| Tiempo en staging | ~70–80 ms por búsqueda (~310 ms con «a»), frente a 0,2–1,9 s del selector anterior, que hacía 2 consultas por resultado |
+
+**Limitaciones:**
+- **Sin semántica en staging:** el nivel semántico está apagado en staging y en local (falta
+  `MCP_EMBED_URL`/`MCP_EMBED_TOKEN`), así que su rótulo solo se probó con un resultado construido. Configurarlo
+  es decisión del propietario.
+- **Sin pruebas de navegador:** las pruebas de Livewire cubren el HTML de los listados y la pestaña, no un
+  navegador.
+- **Datos no corregidos:** «pumping unit», «pump jack» y el plural «balancines» siguen sin encontrar
+  «Balancín». Haría falta agregar alias o sinónimos, que es un cambio de datos no autorizado por esta tarea.
+- **Búsqueda global del panel** (la lupa superior): sigue buscando solo código, branch y subbranch. No se cambió.
+- **Coincidencias por subcadena:** se conservan, rotuladas y al final, en vez de ocultarse. Así no se pierden
+  resultados legítimos como «Válvulas» con «valv».
+- **Sin desplegar:** no hay despliegue a staging, merge ni producción. Desplegar requiere autorización explícita
+  del propietario.

@@ -5,14 +5,16 @@ hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_
 
 Hay dos tareas abiertas en sesiones separadas, por decisión del propietario (2026-11-09).
 
-## Abierta, sesión nueva: TASK-0014 — Coherencia de búsqueda de taxonomía y asociación de términos desde la categoría — IN_PROGRESS, en traspaso (`6736283026`)
+## Abierta, sesión nueva: TASK-0014 — Coherencia de búsqueda de taxonomía y asociación de términos desde la categoría — READY_FOR_REVIEW (`6736283026`)
 
 | Campo | Valor |
 |---|---|
-| Archivo | [`tasks/0014-taxonomy-search-coherence-term-linking.md`](tasks/0014-taxonomy-search-coherence-term-linking.md) (comentario fuente íntegro, traspaso con el mensaje para la sesión nueva, diagnóstico de código y próximos pasos) |
+| Archivo | [`tasks/0014-taxonomy-search-coherence-term-linking.md`](tasks/0014-taxonomy-search-coherence-term-linking.md) (comentario fuente íntegro, reproducción, diseño, evidencia y limitaciones) |
 | Fuente | Issue #2 `6736283026` (orquestador, a pedido del propietario, 2026-11-09) |
-| Código | staging `90044f3`; rama `feat/taxonomy-search-coherence` en el worktree `PerfilAfiliadosCPV-wt-servicios`, todavía sin cambios |
-| Siguiente paso | reproducir «balancín» con `tasks/0014-assets/balancin_probe.php` (solo lectura) |
+| Rama / BASE / REVIEW_HEAD | `feat/taxonomy-search-coherence` (worktree `PerfilAfiliadosCPV-wt-servicios`, pusheada) / `90044f3` (staging) / `a8020cf` |
+| Reproducción | las dos opciones de «balancín» son las de la consulta parcial «balan»/«balanc»: `CPV-29.04.02G` «Balancín» (correcta) y `CPV-27.03.19S` «Perforación Bajobalanceada (UBD)» (subcadena, ruido); semántica apagada en staging |
+| Pruebas | runner aislado, suite completa en `a8020cf`: **OK (679 tests, 7542 assertions)**; staging 200 antes y después |
+| Siguiente paso | revisión del propietario; despliegue a staging solo con su autorización explícita |
 | Gates | sin producción, sin publicación masiva de relaciones, sin cambios en datos reales; despliegue a staging solo con autorización explícita |
 
 ## Abierta, sesión actual: TASK-0013 — Calibración del buscador CIRA: lista de referencia, medición y registro de búsquedas y votos — READY_FOR_REVIEW (`6684941317`)
