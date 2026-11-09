@@ -3,7 +3,18 @@
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-Hay dos tareas abiertas en sesiones separadas, por decisión del propietario (2026-11-09).
+Hay dos tareas abiertas en sesiones separadas, por decisión del propietario (2026-11-09). En la sesión de TASK-0014
+se abrió además TASK-0015.
+
+## Abierta, sesión de TASK-0014: TASK-0015 — Edición de categoría: jerarquía visible y cambio de código validado y auditado — READY_FOR_REVIEW, sin desplegar
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0015-category-code-change-validation.md`](tasks/0015-category-code-change-validation.md) |
+| Fuente | pedido del propietario en el chat, 2026-11-09 (sin comentario en el Issue #2 todavía) |
+| Rama / BASE / REVIEW_HEAD | `feat/category-code-change` / `a8020cf` (staging) / `d0ecbf9` |
+| Pruebas | runner aislado, suite completa: **OK (686 tests, 7607 assertions)**; staging 200 antes y después |
+| Siguiente paso | despliegue a staging solo con autorización explícita del propietario; decidir si Familias y Grupos llevan la misma protección |
 
 ## Abierta, sesión nueva: TASK-0014 — Coherencia de búsqueda de taxonomía y asociación de términos desde la categoría — READY_FOR_REVIEW, EN STAGING (`6736283026`)
 
