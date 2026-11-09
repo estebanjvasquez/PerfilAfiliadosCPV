@@ -360,7 +360,7 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
   - **Propuesta:** en empate, mostrar primero lo declarado (categoría o servicio). No cambia el puntaje ni el orden.
   - **Estado:** espera autorización para preview.
 
-## Paso 4: primero lo declarado (pedido del propietario, 2026-11-09; preview, NO promovido)
+## Paso 4: primero lo declarado (pedido del propietario, 2026-11-09; PROMOVIDO)
 
 - **Pedido del propietario:** mostrar primero las empresas cuya categoría CPV, sector o servicio coincide con lo buscado. Lo que coincide en experiencias u otra parte del perfil va después, visible como coincidencia adicional, como en un buscador web.
 - **Rama y versión:** Worker `feat/declared-first`, commits `c359586` y `77ce273`; preview `1005d61f`. En vivo sigue `4742a36f`.
@@ -386,3 +386,15 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
   - promover la versión del Worker;
   - ajustar «Format Cards2» en n8n para marcar «Coincidencia adicional» y corregir la leyenda del orden.
   - Ambas cosas requieren autorización del propietario.
+- **Promoción (autorizada por el propietario en el chat, 2026-11-09):**
+  - **Worker:** `1005d61f` al 100 %. Reversión: `wrangler versions deploy 4742a36f-ad0c-464a-abad-b39bd7f12bfe@100% --yes`.
+  - **n8n, «Format Cards2»:**
+    - etiqueta «coincidencia adicional» en las empresas que no coinciden en lo declarado;
+    - separador «Coincidencias adicionales: …» antes de la primera de ellas;
+    - aviso cuando ninguna empresa coincide en lo declarado;
+    - leyenda del orden corregida, con la columna «grupo» y la especialización en el sector.
+  - **Respaldo previo del flujo, fuera del repo:** `zbVLoCdR09IA9yQK_2026-11-09_pre-cards-levels.json`.
+  - **Verificación por el webhook:**
+    - **«balancin»:** Lukiven primera, con «Taxonomía CPV» como fuente principal, y el separador antes de las tres que coinciden solo en experiencia;
+    - **«revestidor»:** muestra el aviso de que ninguna coincide en lo declarado, con Lukiven primera;
+    - **en ambas:** votos y registro funcionando, y `metadata.modelo = gpt-6-luna`.
