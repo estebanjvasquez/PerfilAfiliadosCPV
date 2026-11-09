@@ -57,6 +57,33 @@ Qué ocurre:
 
 > **NOTA:** El sistema nunca reintenta solo. Cada reintento lo pide una persona.
 
+## Verificar si una categoría existente cubre la solicitud {#verificar-categoria}
+
+Muchas solicitudes son un problema de palabras: la categoría existe, pero la empresa la buscó con otro término. Antes de decidir, busque lo que la empresa escribió en **Taxonomía CPV → Categorías**, **Familias** o **Grupos**.
+
+- **Qué encuentra el cuadro de búsqueda:** el código, el nombre en español o en inglés, los sinónimos de la categoría y los términos, términos canónicos y alias del diccionario. No distingue tildes ni mayúsculas. Es el mismo criterio que usa el buscador de la empresa.
+- **Familias y Grupos:** una Familia aparece si coincide una de sus categorías, y un Grupo si coincide una de sus familias o categorías. Así llega desde una categoría a su familia y a su grupo.
+- **Columna Familia / Grupo:** en **Categorías**, muestra la ruta de cada fila.
+- **Columna Coincidencia:** aparece al buscar y dice por qué apareció cada fila. Por ejemplo: **Nombre ES**, **Sinónimo de la categoría**, **Término del diccionario … — relación aprobada**, o **Contiene** seguido del código de la hija que coincidió. **(parte de una palabra)** marca una coincidencia accidental, como «balanc» dentro de «Bajobalanceada».
+- **Todos los estados:** la administración ve categorías activas e inactivas y relaciones en cualquier estado. La empresa solo ve categorías activas, y del diccionario solo las relaciones aprobadas.
+- **Filtros:** **Término del diccionario** busca en el diccionario y permite elegir el estado de la relación. **Sinónimo de la categoría (no incluye el diccionario)** busca solo en los sinónimos de la categoría, que son otra lista.
+
+> **NOTA:** La administración no muestra sugerencias por similitud. Lo que ve en estas listas son coincidencias y vínculos que existen.
+
+### Asociar un término existente a una categoría {#asociar-termino}
+
+Si la categoría existe y la empresa la buscó con un término que el diccionario ya tiene, ese término se puede vincular a la categoría:
+
+1. Abra la categoría (o la familia o el grupo) y vaya a la pestaña **Términos del diccionario**. Ahí ve los términos ya relacionados, con su canónico, sus alias y el estado de cada relación.
+2. Presione **Asociar término existente** y busque el término por su texto, su canónico o un alias. Cada opción indica si ya tiene relación con esta categoría y en qué estado.
+3. Revise **Relaciones actuales de este término**, indique el peso y el motivo, y confirme.
+
+**Qué pasa con la relación:**
+- **Queda en revisión.** No llega al buscador de la empresa hasta que alguien con permiso de publicar la aprueba con **Aprobar**, que pide un motivo y queda en la auditoría.
+- **No se duplica.** Si el término ya tiene una relación aprobada, en revisión, candidata o auto-mapeada con la categoría, el sistema avisa y no crea otra.
+- **Relación rechazada o descartada.** No se reabre sola. Marque **Reabrir la relación rechazada o descartada para revisarla de nuevo**; hace falta el permiso de revisar relaciones.
+- **Términos nuevos.** Esta acción nunca crea términos en el diccionario.
+
 ## Qué ve la empresa {#que-ve-la-empresa}
 
 Al enviar la solicitud, la empresa recibe su **número de solicitud** como referencia. Si el aviso no se pudo enviar, ve que la solicitud quedó registrada y que el aviso por correo está pendiente. No ve el modo del servidor ni ningún detalle técnico.

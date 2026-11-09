@@ -3,6 +3,7 @@
 namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\EmpresaResource\RelationManagers\TaxonomyCategoriesRelationManager;
+use App\Services\Taxonomy\TaxonomyLookup;
 use App\Support\UserManual\UserManualRenderer;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -298,6 +299,35 @@ class UserManualContentTest extends TestCase
      * falla y dice cuál. Es la reconciliación convertida en garantía comprobable en vez de en una
      * nota que alguien tiene que acordarse de leer.
      */
+    /**
+     * TASK-0014: la sección «Búsqueda libre» explica los motivos que muestra cada opción del buscador,
+     * con las mismas palabras que produce `TaxonomyLookup::describeForCompany()`.
+     */
+    #[Test]
+    public function the_free_search_section_explains_the_reasons_the_selector_shows(): void
+    {
+        $text = $this->section($this->manual()['html'], 'busqueda-libre');
+
+        foreach ([
+            TaxonomyLookup::describeForCompany(['kind' => TaxonomyLookup::KIND_NAME_ES, 'matched' => 'x', 'quality' => 0]),
+            TaxonomyLookup::describeForCompany(['kind' => TaxonomyLookup::KIND_CODE, 'matched' => 'x', 'quality' => 0]),
+            TaxonomyLookup::describeForCompany(['kind' => TaxonomyLookup::KIND_SEMANTIC, 'matched' => '', 'quality' => 0]),
+            'por nombre en inglés',
+            'por sinónimo',
+            'término aprobado del diccionario',
+            '(parte de una palabra)',
+        ] as $phrase) {
+            $this->assertStringContainsString($phrase, $text, "La sección no explica «{$phrase}».");
+        }
+
+        $this->assertStringEndsWith('(parte de una palabra)', TaxonomyLookup::describeForCompany(
+            ['kind' => TaxonomyLookup::KIND_NAME_ES, 'matched' => 'x', 'quality' => TaxonomyLookup::QUALITY_INSIDE_WORD]
+        ));
+
+        $this->assertMatchesRegularExpression('/sin tildes/u', $text);
+        $this->assertStringContainsString('No es un vínculo revisado', $text, 'La similitud no se presenta como prueba de capacidad.');
+    }
+
     #[Test]
     public function the_manual_cites_the_final_task_0010a_labels_read_from_the_implementation(): void
     {

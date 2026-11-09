@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\Concerns\ManagesInlineTranslations;
+use App\Filament\Resources\Concerns\SearchesTaxonomyCoherently;
 use App\Filament\Support\QueryBuilder\WideSelectIsOperator;
 use App\Models\TaxonomyCategory;
 use Filament\Forms;
@@ -37,6 +38,7 @@ class TaxonomyCategoryResource extends Resource
     // Solo se usa translationFields() acá (estático) - el resto del trait (guardar/precargar las
     // traducciones) lo usan las páginas de Crear/Editar, no el Resource.
     use ManagesInlineTranslations;
+    use SearchesTaxonomyCoherently;
 
     protected static ?string $model = TaxonomyCategory::class;
 
@@ -129,7 +131,12 @@ class TaxonomyCategoryResource extends Resource
         // (mismo criterio de rendimiento ya establecido en Empresa::moduleBreakdown()).
         return parent::getEloquentQuery()
             ->where('level', TaxonomyCategory::LEVEL_CATEGORY)
-            ->with(['translations' => fn ($q) => $q->whereIn('locale', ['es', 'en'])])
+            ->with([
+                'translations' => fn ($q) => $q->whereIn('locale', ['es', 'en']),
+                // TASK-0014: la columna «Familia / Grupo» sin una consulta extra por fila.
+                'parent.translations' => fn ($q) => $q->whereIn('locale', ['es', 'en']),
+                'parent.parent.translations' => fn ($q) => $q->whereIn('locale', ['es', 'en']),
+            ])
             ->withCount(['children', 'empresaLinks']);
     }
 
@@ -284,10 +291,19 @@ class TaxonomyCategoryResource extends Resource
                     ->label('Nombre (ES)')
                     ->getStateUsing(fn (TaxonomyCategory $record) => $record->translations->firstWhere('locale', 'es')?->name)
                     ->placeholder('— sin traducir —')
-                    ->searchable(query: fn (Builder $query, string $search) => $query->whereHas(
-                        'translations',
-                        fn ($q) => $q->where('locale', 'es')->where('name', 'like', "%{$search}%")
-                    )),
+                    // TASK-0014: antes `like` sobre el nombre ES (distinguía tildes y mayúsculas:
+                    // «balancin» no encontraba «Balancín»). Ahora el criterio común de TaxonomyLookup.
+                    ->searchable(query: static::coherentSearch()),
+                static::matchReasonColumn(),
+                Tables\Columns\TextColumn::make('ruta_padre')
+                    ->label('Familia / Grupo')
+                    ->getStateUsing(fn (TaxonomyCategory $record) => collect([$record->parent?->parent, $record->parent])
+                        ->filter()
+                        ->map(fn (TaxonomyCategory $node) => "{$node->code} {$node->displayName()}")
+                        ->implode(' > '))
+                    ->placeholder('—')
+                    ->wrap()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('name_en')
                     ->label('Nombre (EN)')
                     ->getStateUsing(fn (TaxonomyCategory $record) => $record->translations->firstWhere('locale', 'en')?->name)
@@ -337,8 +353,10 @@ class TaxonomyCategoryResource extends Resource
                             ->label('Nombre (ES)')
                             ->relationship('translations', 'name', fn (Builder $query) => $query->where('locale', 'es'))
                             ->nullable(),
+                        // TASK-0014: esta regla mira `taxonomy_category_synonyms` (pocas filas), no
+                        // el diccionario de términos. Para el diccionario está el filtro aparte.
                         TextConstraint::make('synonym_term')
-                            ->label('Sinónimo / término local (diccionario)')
+                            ->label(static::SYNONYM_CONSTRAINT_LABEL)
                             ->relationship('synonyms', 'term')
                             ->nullable(),
                         TextConstraint::make('branch')->label('Branch')->nullable(),
@@ -376,11 +394,13 @@ class TaxonomyCategoryResource extends Resource
                 // Queda aparte como acceso rapido de un clic (el QueryBuilder de arriba tambien lo
                 // puede armar con "Nombre (ES) - vacio", pero este es mas directo para el caso mas
                 // comun: revisar de una todo lo que todavia no tiene traduccion).
+                static::dictionaryTermFilter(),
                 Tables\Filters\Filter::make('sin_traducir_es')
                     ->label('Sin traducir a español')
                     ->query(fn (Builder $query) => $query->whereDoesntHave('translations', fn ($q) => $q->where('locale', 'es'))),
             ])
             ->defaultSort('code')
+            ->searchPlaceholder(static::SEARCH_PLACEHOLDER)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
@@ -427,6 +447,7 @@ class TaxonomyCategoryResource extends Resource
         return [
             RelationManagers\TranslationsRelationManager::class,
             RelationManagers\SynonymsRelationManager::class,
+            RelationManagers\TermRelationsRelationManager::class,
         ];
     }
 

@@ -78,6 +78,12 @@ class TaxonomyCategory extends Model
         return $this->hasMany(EmpresaTaxonomyCategory::class, 'category_id');
     }
 
+    /** TASK-0014: relaciones término→CPV del diccionario que apuntan a esta categoría (cualquier estado). */
+    public function termRelations()
+    {
+        return $this->hasMany(TaxonomyTermCpvRelation::class, 'category_id');
+    }
+
     /**
      * Nombre traducido a un idioma, con fallback al `code` si no hay traducción cargada para ese
      * locale (no debería pasar con datos completos, pero evita romper la UI mientras la

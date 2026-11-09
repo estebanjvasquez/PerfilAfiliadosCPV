@@ -8,6 +8,7 @@ use App\Models\TaxonomyCategory;
 use App\Models\TaxonomyCategoryRequest;
 use App\Models\TaxonomySelectionSettings;
 use App\Services\TaxonomyCategoryRequestService;
+use App\Services\Taxonomy\TaxonomyLookup;
 use App\Services\TaxonomyCategorySearch;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
@@ -182,9 +183,9 @@ class TaxonomyCategoriesRelationManager extends RelationManager
                     ->getOptionLabelsUsing(fn (array $values) => TaxonomyCategory::query()
                         ->whereIn('id', $values)
                         ->get()
-                        ->mapWithKeys(fn (TaxonomyCategory $c) => [$c->id => $c->breadcrumb('es')])
+                        ->mapWithKeys(fn (TaxonomyCategory $c) => [$c->id => $c->breadcrumb('es').' · '.$c->code])
                         ->all())
-                    ->helperText('Escriba y espere un instante — los resultados aparecen solos, no hace falta apretar nada. Si el resultado es una Familia completa, no se agrega directo: se abre el listado de sus categorías para elegir las que correspondan.')
+                    ->helperText(self::BUSQUEDA_HELPER_TEXT)
                     // 2026-09-25 (pedido del cliente en reunión): antes, elegir una Familia en esta
                     // búsqueda libre la agregaba completa de un solo click - una empresa podía quedar
                     // vinculada a TODAS sus categorías hijas sin cubrir ninguna en particular
@@ -414,7 +415,13 @@ class TaxonomyCategoriesRelationManager extends RelationManager
      * reconciliar el manual - o al revés - el test falla y dice cuál. Eso reemplaza al marcador
      * provisional que TASK-0010B llevaba mientras esta tarea estaba pendiente de aceptación.
      */
-    public const SOLICITUD_ACTION_LABEL = 'No encuentro la categoría / Solicitar revisión';
+    /**
+     * TASK-0014: cada opción del buscador dice su ruta, su código y por qué apareció. La sección
+     * «Búsqueda libre» del manual explica los mismos motivos, y `UserManualContentTest` lo comprueba.
+     */
+    public const BUSQUEDA_HELPER_TEXT = 'Escriba y espere un instante — los resultados aparecen solos, no hace falta apretar nada. Cada opción muestra la ruta, el código y por qué apareció: por nombre, por código, por sinónimo, por un término aprobado del diccionario o como sugerencia por similitud, sin confirmar. «Parte de una palabra» indica que lo escrito está dentro de otra palabra y puede no ser lo que busca. Si el resultado es una Familia completa, no se agrega directo: se abre el listado de sus categorías para elegir las que correspondan.';
+
+    public const SOLICITUD_ACTION_LABEL ='No encuentro la categoría / Solicitar revisión';
 
     public const SOLICITUD_NECESIDAD_LABEL = '¿Qué producto, servicio o capacidad necesita representar?';
 
@@ -474,26 +481,46 @@ class TaxonomyCategoriesRelationManager extends RelationManager
                 ? ' — Familia completa ('.$hijosPorFamilia[$r['category_id']].' categorías más específicas debajo, ver "explorar una Familia")'
                 : '';
 
-            return [$r['category_id'] => $r['breadcrumb'].$aviso];
+            return [$r['category_id'] => TaxonomyCategorySearch::optionLabel($r).$aviso];
         })->all();
     }
 
     /**
-     * @return array<int, string>
+     * TASK-0014: mismo criterio que la búsqueda principal (`TaxonomyLookup`, alcance de la empresa):
+     * código, nombres ES/EN, sinónimos y términos aprobados del diccionario, sin distinguir tildes ni
+     * mayúsculas. Una coincidencia en una categoría lleva a su Familia, así «balancín» encuentra
+     * «Terminación de Pozos > Equipos». Antes buscaba solo por nombre de la Familia.
      *
-     * Postgres distingue tildes en ILIKE (a diferencia de MySQL) - sin `unaccent()` en ambos lados
-     * "valvulas" nunca matchea "Válvulas" en la base real. Mismo gotcha ya documentado y resuelto
-     * en `perfilafiliados-mcp/src/taxonomy-tools.ts` y en `TaxonomyCategorySearch`.
+     * @return array<int, string>
      */
     private function opcionesFamilia(string $search): array
     {
+        $matches = app(TaxonomyLookup::class)->matches($search, TaxonomyLookup::SCOPE_COMPANY, 200);
+        $padres = TaxonomyCategory::query()
+            ->whereIn('id', $matches->where('level', TaxonomyCategory::LEVEL_CATEGORY)->pluck('category_id'))
+            ->pluck('parent_id', 'id');
+
+        $porFamilia = [];
+        foreach ($matches as $match) {
+            if ($match['level'] === TaxonomyCategory::LEVEL_FAMILY) {
+                $porFamilia[$match['category_id']] ??= TaxonomyLookup::describeForCompany($match['reasons'][0]);
+            } elseif ($familiaId = $padres[$match['category_id']] ?? null) {
+                $porFamilia[$familiaId] ??= 'contiene '.$match['code'];
+            }
+        }
+
+        if ($porFamilia === []) {
+            return [];
+        }
+
         return TaxonomyCategory::query()
+            ->whereIn('id', array_keys($porFamilia))
             ->where('level', TaxonomyCategory::LEVEL_FAMILY)
             ->where('is_active', true)
-            ->whereHas('translations', fn ($q) => $q->whereRaw('unaccent(name) ilike unaccent(?)', ['%'.$search.'%']))
-            ->limit(20)
             ->get()
-            ->mapWithKeys(fn (TaxonomyCategory $c) => [$c->id => $c->breadcrumb('es')])
+            ->sortBy(fn (TaxonomyCategory $c) => array_search($c->id, array_keys($porFamilia), true))
+            ->take(20)
+            ->mapWithKeys(fn (TaxonomyCategory $c) => [$c->id => $c->breadcrumb('es').' · '.$c->code.' · '.$porFamilia[$c->id]])
             ->all();
     }
 

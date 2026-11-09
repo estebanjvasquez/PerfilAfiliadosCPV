@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\Concerns\ManagesInlineTranslations;
+use App\Filament\Resources\Concerns\SearchesTaxonomyCoherently;
 use App\Models\TaxonomyCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -31,6 +32,7 @@ use App\Filament\Resources\TaxonomyFamilyResource\Pages;
 class TaxonomyFamilyResource extends Resource
 {
     use ManagesInlineTranslations;
+    use SearchesTaxonomyCoherently;
 
     protected static ?string $model = TaxonomyCategory::class;
 
@@ -112,10 +114,9 @@ class TaxonomyFamilyResource extends Resource
                     ->label('Nombre (ES)')
                     ->getStateUsing(fn (TaxonomyCategory $record) => $record->translations->firstWhere('locale', 'es')?->name)
                     ->placeholder('— sin traducir —')
-                    ->searchable(query: fn (Builder $query, string $search) => $query->whereHas(
-                        'translations',
-                        fn ($q) => $q->where('locale', 'es')->where('name', 'like', "%{$search}%")
-                    )),
+                    // TASK-0014: criterio común de TaxonomyLookup; incluye las coincidencias de sus hijas.
+                    ->searchable(query: static::coherentSearch()),
+                static::matchReasonColumn(),
                 Tables\Columns\TextColumn::make('name_en')
                     ->label('Nombre (EN)')
                     ->getStateUsing(fn (TaxonomyCategory $record) => $record->translations->firstWhere('locale', 'en')?->name)
@@ -127,11 +128,15 @@ class TaxonomyFamilyResource extends Resource
                         : '—')
                     ->searchable(query: fn (Builder $query, string $search) => $query->whereHas(
                         'parent',
-                        fn ($q) => $q->where('code', 'like', "%{$search}%")
+                        fn ($q) => $q->where('code', 'ilike', '%'.addcslashes($search, '\%_').'%')
                     )),
                 Tables\Columns\TextColumn::make('children_count')->label('Categorías hijas'),
             ])
             ->defaultSort('code')
+            ->searchPlaceholder(static::SEARCH_PLACEHOLDER)
+            ->filters([
+                static::dictionaryTermFilter(),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
@@ -152,6 +157,7 @@ class TaxonomyFamilyResource extends Resource
     {
         return [
             RelationManagers\TranslationsRelationManager::class,
+            RelationManagers\TermRelationsRelationManager::class,
         ];
     }
 

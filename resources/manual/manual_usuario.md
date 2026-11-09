@@ -329,9 +329,17 @@ Las letras que coinciden quedan resaltadas. No importa si escribe con o sin tild
 En el campo **¿Qué ofrece su empresa? (texto libre, español o inglés)** escriba lo que su empresa ofrece, por ejemplo «mantenimiento de válvulas», «cabezales» o «perforación direccional».
 
 - Escriba y espere un instante: los resultados aparecen solos, no hace falta presionar ningún botón.
-- Puede escribir en español o en inglés, con o sin tildes.
-- Cada resultado muestra la ruta completa **Grupo > Familia > Categoría**.
+- Puede escribir en español o en inglés, con o sin tildes y en mayúsculas o minúsculas: «balancin», «Balancín» y «BALANCÍN» encuentran lo mismo. También puede escribir el código de la categoría, por ejemplo «CPV-29.04.02G».
+- Cada resultado muestra la ruta completa **Grupo > Familia > Categoría**, el código y por qué apareció:
+  - **por nombre** o **por nombre en inglés**: lo que escribió está en el nombre de la categoría;
+  - **por código**: coincide con el código;
+  - **por sinónimo**: coincide con un sinónimo que la Cámara registró para esa categoría;
+  - **término aprobado del diccionario**: coincide con un término del sector que la Cámara revisó y vinculó a esa categoría;
+  - **sugerencia por similitud, sin confirmar**: el sistema la propone porque se parece a lo que escribió. No es un vínculo revisado: confirme que la categoría describe lo que su empresa hace antes de agregarla.
+- **(parte de una palabra)** indica que lo que escribió aparece dentro de otra palabra. Por ejemplo, al escribir «balanc», «Perforación Bajobalanceada» aparece porque contiene esas letras, no porque sea un balancín. Esos resultados van al final.
 - Si un resultado termina con el aviso **Familia completa**, se trata de una Familia, no de una categoría específica (el aviso indica cuántas categorías más específicas tiene debajo).
+
+> **CONSEJO:** Mientras escribe, la lista cambia. Termine la palabra antes de elegir: con la palabra completa la lista es más corta y más precisa.
 
 > **NOTA:** Si elige un resultado que es una Familia completa, el sistema no lo agrega. Lo quita de su selección, le muestra el aviso **Elija categorías específicas, no la Familia completa** y abre abajo el listado de categorías de esa Familia para que marque las que correspondan.
 
@@ -339,7 +347,7 @@ En el campo **¿Qué ofrece su empresa? (texto libre, español o inglés)** escr
 
 Si prefiere recorrer la lista en vez de buscar:
 
-1. En **¿Prefiere explorar una Familia completa en vez de buscar?** escriba parte del nombre de la Familia y elíjala.
+1. En **¿Prefiere explorar una Familia completa en vez de buscar?** escriba parte del nombre de la Familia, o el nombre de una categoría que conozca, y elíjala. Si escribe el nombre de una categoría, aparece la Familia que la contiene con la nota **contiene** y el código de esa categoría.
 2. Aparece **Categorías de esa Familia**: marque una por una las categorías que su empresa ofrece.
 
 Puede combinar ambas formas en la misma ventana: lo que marque en la búsqueda libre y lo que marque en la Familia se guardan juntos.

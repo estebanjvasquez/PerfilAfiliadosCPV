@@ -38,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
         // se resuelve siempre desde taxonomy_intent_markers (vocabulario gobernado, sección 2/13
         // del pedido de Phase 3).
         $this->app->bind(IntentContaminationDetector::class, fn () => IntentContaminationDetector::fromGovernedVocabulary());
+
+        // TASK-0014: una instancia por petición, así los motivos de coincidencia de una página del
+        // listado se calculan una sola vez y nunca sobreviven a la petición.
+        $this->app->scoped(\App\Services\Taxonomy\TaxonomyLookup::class);
     }
 
     /**

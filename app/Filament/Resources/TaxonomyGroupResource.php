@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\Concerns\ManagesInlineTranslations;
+use App\Filament\Resources\Concerns\SearchesTaxonomyCoherently;
 use App\Models\TaxonomyCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -29,6 +30,7 @@ use App\Filament\Resources\TaxonomyGroupResource\Pages;
 class TaxonomyGroupResource extends Resource
 {
     use ManagesInlineTranslations;
+    use SearchesTaxonomyCoherently;
 
     protected static ?string $model = TaxonomyCategory::class;
 
@@ -94,10 +96,9 @@ class TaxonomyGroupResource extends Resource
                     ->label('Nombre (ES)')
                     ->getStateUsing(fn (TaxonomyCategory $record) => $record->translations->firstWhere('locale', 'es')?->name)
                     ->placeholder('— sin traducir —')
-                    ->searchable(query: fn (Builder $query, string $search) => $query->whereHas(
-                        'translations',
-                        fn ($q) => $q->where('locale', 'es')->where('name', 'like', "%{$search}%")
-                    )),
+                    // TASK-0014: criterio común de TaxonomyLookup; incluye las coincidencias de sus hijas.
+                    ->searchable(query: static::coherentSearch()),
+                static::matchReasonColumn(),
                 Tables\Columns\TextColumn::make('name_en')
                     ->label('Nombre (EN)')
                     ->getStateUsing(fn (TaxonomyCategory $record) => $record->translations->firstWhere('locale', 'en')?->name)
@@ -105,6 +106,10 @@ class TaxonomyGroupResource extends Resource
                 Tables\Columns\TextColumn::make('children_count')->label('Familias/Categorías hijas'),
             ])
             ->defaultSort('code')
+            ->searchPlaceholder(static::SEARCH_PLACEHOLDER)
+            ->filters([
+                static::dictionaryTermFilter(),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
@@ -125,6 +130,7 @@ class TaxonomyGroupResource extends Resource
     {
         return [
             RelationManagers\TranslationsRelationManager::class,
+            RelationManagers\TermRelationsRelationManager::class,
         ];
     }
 

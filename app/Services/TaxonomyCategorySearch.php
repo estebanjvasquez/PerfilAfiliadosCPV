@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\TaxonomyCategory;
 use App\Services\Taxonomy\EmbeddingClient;
+use App\Services\Taxonomy\TaxonomyLookup;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -44,9 +45,27 @@ use Illuminate\Support\Facades\DB;
  * `EmbeddingClient` y las mismas queries léxico/`pg_trgm` como primitivas propias, con su propia
  * lógica de confianza/evidencia. Mezclar ambos casos de uso en un solo método terminaría afinando
  * el autocompletado para decisiones de auto-aprobación, o al revés.
+ *
+ * TASK-0014 (Issue #2 `6736283026`): los niveles léxico y de diccionario salen ahora de
+ * `TaxonomyLookup`, el mismo criterio que usan los listados de administración. Cambios visibles:
+ * - también encuentra por código;
+ * - ordena por calidad de la coincidencia: el texto completo, luego el comienzo de una palabra, y
+ *   al final una subcadena dentro de una palabra. Con «balanc», «Balancín» queda antes que
+ *   «Perforación Bajobalanceada (UBD)»;
+ * - cada resultado trae `reasons`: todos sus motivos (nombre, sinónimo, término aprobado del
+ *   diccionario), no solo el del primer nivel que la encontró;
+ * - la similitud semántica sigue siendo de relleno y se rotula como sugerencia. No se guarda como
+ *   relación ni se presenta como prueba de capacidad.
  */
 class TaxonomyCategorySearch
 {
+    public function __construct(private readonly TaxonomyLookup $lookup)
+    {
+    }
+
+    /**
+     * @return Collection<int, array{category_id:int, code:string, level:int, breadcrumb:string, match_type:string, score:float, explanation:string, reasons:list<array>}>
+     */
     public function search(string $query, int $limit = 8): Collection
     {
         $query = trim($query);
@@ -55,118 +74,81 @@ class TaxonomyCategorySearch
             return collect();
         }
 
-        $lexical = $this->lexical($query, $limit);
-        $seen = $lexical->pluck('category_id')->all();
+        $matches = $this->lookup->matches($query, TaxonomyLookup::SCOPE_COMPANY, $limit);
+        $seen = $matches->pluck('category_id')->all();
 
-        $dictionaryRemaining = $limit - $lexical->count();
-        $dictionary = $dictionaryRemaining > 0 ? $this->dictionary($query, $dictionaryRemaining, $seen) : collect();
-        $seen = array_merge($seen, $dictionary->pluck('category_id')->all());
+        $remaining = $limit - $matches->count();
+        $semantic = $remaining > 0 ? $this->semantic($query, $remaining, $seen) : collect();
 
-        $semanticRemaining = $limit - $lexical->count() - $dictionary->count();
-        $semantic = $semanticRemaining > 0 ? $this->semantic($query, $semanticRemaining, $seen) : collect();
+        $rows = $matches->map(fn (array $match) => (object) [
+            'category_id' => $match['category_id'],
+            'code' => $match['code'],
+            'level' => $match['level'],
+            'path' => null,
+            'match_type' => $match['tier'] === 0 ? 'lexical' : 'dictionary',
+            'score' => $match['tier'] === 0 ? 1.0 : (float) ($match['dictionary_score'] ?? 0.0),
+            'explanation' => TaxonomyLookup::describeForCompany($match['reasons'][0]),
+            'reasons' => $match['reasons'],
+        ])->concat($semantic->map(function ($row) {
+            $row->reasons = [['kind' => TaxonomyLookup::KIND_SEMANTIC, 'matched' => '', 'quality' => TaxonomyLookup::QUALITY_EXACT, 'relation_status' => null]];
 
-        return $lexical->concat($dictionary)->concat($semantic)->map(function ($row) {
-            $category = TaxonomyCategory::query()->with('translations')->find($row->category_id);
+            return $row;
+        }));
 
+        $breadcrumbs = $this->breadcrumbs($rows->pluck('category_id')->all());
+
+        return $rows->map(function ($row) use ($breadcrumbs) {
             return [
                 'category_id' => (int) $row->category_id,
                 'code' => $row->code,
                 'level' => (int) $row->level,
-                'breadcrumb' => $category?->breadcrumb('es') ?? $row->path,
+                'breadcrumb' => $breadcrumbs[(int) $row->category_id] ?? $row->code,
                 'match_type' => $row->match_type,
                 'score' => $row->score,
                 'explanation' => $row->explanation,
+                'reasons' => $row->reasons,
             ];
-        });
-    }
-
-    private function lexical(string $query, int $limit): Collection
-    {
-        $like = '%'.$query.'%';
-
-        $rows = DB::connection('pgsql')->select(<<<'SQL'
-            select distinct on (tc.id)
-                tc.id as category_id, tc.code, tc.level, tc.path, 'lexical' as match_type
-            from taxonomy_categories tc
-            left join taxonomy_category_translations tt_es on tt_es.category_id = tc.id and tt_es.locale = 'es'
-            left join taxonomy_category_translations tt_en on tt_en.category_id = tc.id and tt_en.locale = 'en'
-            left join taxonomy_category_synonyms syn on syn.category_id = tc.id
-                and unaccent(syn.term) ilike unaccent(?)
-            where tc.level != 0 and tc.is_active = true
-                and (
-                    unaccent(coalesce(tt_es.name, '')) ilike unaccent(?)
-                    or unaccent(coalesce(tt_en.name, '')) ilike unaccent(?)
-                    or unaccent(coalesce(syn.term, '')) ilike unaccent(?)
-                )
-            limit ?
-        SQL, [$like, $like, $like, $like, $limit]);
-
-        return collect($rows)->map(function ($row) {
-            $row->score = 1.0;
-            $row->explanation = 'Coincidencia con el nombre o sinónimo oficial de la categoría';
-
-            return $row;
-        });
+        })->values();
     }
 
     /**
-     * TAXV2-5: matches vía el diccionario de términos V2 (`term`/`canonical_term`/alias), solo
-     * relaciones `status=approved` (ver docblock de la clase). Trae hasta 3x `$limit` candidatos
-     * (una consulta de texto libre normalmente no matchea tantos términos distintos) para poder
-     * ordenar por `score` en PHP antes de recortar a `$limit` - hacerlo en PHP en vez de en el
-     * `ORDER BY` de SQL evita repetir la fórmula de penalización (que depende de
-     * `context_required`, un booleano) dos veces.
+     * TASK-0014: la misma ruta que `TaxonomyCategory::breadcrumb('es')`, en dos consultas para todos
+     * los resultados. Antes eran dos consultas por resultado, que con la base remota sumaban segundos.
+     *
+     * @param  list<int>  $ids
+     * @return array<int, string>
      */
-    private function dictionary(string $query, int $limit, array $excludeIds): Collection
+    private function breadcrumbs(array $ids): array
     {
-        $like = '%'.$query.'%';
-        $fetchLimit = max($limit * 3, 20);
-        $placeholders = empty($excludeIds) ? '(0)' : '('.implode(',', array_fill(0, count($excludeIds), '?')).')';
+        if ($ids === []) {
+            return [];
+        }
 
-        $rows = DB::connection('pgsql')->select(<<<SQL
-            select distinct on (tc.id)
-                tc.id as category_id, tc.code, tc.level, tc.path,
-                t.term, r.weight, t.oil_gas_exclusivity, t.ambiguity_penalty, t.context_required
-            from taxonomy_term_cpv_relations r
-            join taxonomy_terms t on t.id = r.term_id
-            join taxonomy_categories tc on tc.id = r.category_id
-            left join taxonomy_term_aliases a on a.term_id = t.id
-            where r.status = 'approved'
-                and tc.level != 0 and tc.is_active = true
-                and tc.id not in {$placeholders}
-                and (
-                    unaccent(t.term) ilike unaccent(?)
-                    or unaccent(t.canonical_term) ilike unaccent(?)
-                    or unaccent(coalesce(a.alias, '')) ilike unaccent(?)
-                )
-            order by tc.id, r.weight desc
-            limit ?
-        SQL, [...$excludeIds, $like, $like, $like, $fetchLimit]);
+        $paths = TaxonomyCategory::query()->whereIn('id', $ids)->pluck('path', 'id');
+        $codes = $paths->flatMap(fn ($path) => explode('/', (string) $path))->unique()->values();
+        $nodes = TaxonomyCategory::query()->whereIn('code', $codes)->with('translations')->get()->keyBy('code');
 
-        return collect($rows)
-            ->map(function ($row) {
-                $penalty = $row->context_required ? (float) $row->ambiguity_penalty : 0.0;
-                $score = max(0.0, round(((float) $row->weight) * (float) $row->oil_gas_exclusivity - $penalty, 4));
+        return $paths->map(fn ($path) => collect(explode('/', (string) $path))
+            ->map(fn ($code) => $nodes->get($code))
+            ->filter()
+            ->map(fn (TaxonomyCategory $node) => $node->nameIn('es'))
+            ->implode(' > '))
+            ->all();
+    }
 
-                return (object) [
-                    'category_id' => $row->category_id,
-                    'code' => $row->code,
-                    'level' => $row->level,
-                    'path' => $row->path,
-                    'match_type' => 'dictionary',
-                    'score' => $score,
-                    'explanation' => sprintf(
-                        'Término del diccionario "%s" (peso %.2f × exclusividad O&G %.2f%s)',
-                        $row->term,
-                        $row->weight,
-                        $row->oil_gas_exclusivity,
-                        $penalty > 0 ? sprintf(', penalizado -%.2f por ambigüedad', $penalty) : ''
-                    ),
-                ];
-            })
-            ->sortByDesc('score')
-            ->take($limit)
-            ->values();
+    /**
+     * Etiqueta de la opción en el selector de la empresa: ruta, código y motivo. Ejemplo:
+     * «Terminación de Pozos > Equipos > Balancín · CPV-29.04.02G · por nombre».
+     */
+    public static function optionLabel(array $result): string
+    {
+        $reasons = collect($result['reasons'] ?? [])
+            ->map(fn (array $reason) => TaxonomyLookup::describeForCompany($reason))
+            ->unique()
+            ->take(2)
+            ->implode('; ');
+
+        return $result['breadcrumb'].' · '.$result['code'].($reasons !== '' ? ' · '.$reasons : '');
     }
 
     private function semantic(string $query, int $limit, array $excludeIds): Collection
