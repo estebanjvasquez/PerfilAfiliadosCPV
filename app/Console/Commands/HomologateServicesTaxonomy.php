@@ -51,7 +51,7 @@ class HomologateServicesTaxonomy extends Command
 {
     private const NOMBRES_EXCLUIDOS = ['X', 'OTROS'];
 
-    private const CODIGOS_FAMILIA_EXCLUIDOS = ['CPV-29.02', 'CPV-12.04'];
+    public const CODIGOS_FAMILIA_EXCLUIDOS = ['CPV-29.02', 'CPV-12.04'];
 
     protected $signature = 'taxonomy:homologate-services
         {--threshold=0.45 : Distancia coseno máxima para aceptar un match}

@@ -69,7 +69,15 @@ class TaxonomyGroupResource extends Resource
                         ->required()
                         ->maxLength(50)
                         ->unique(ignoreRecord: true)
-                        ->helperText('Ej. CPV-05 — sin puntos, sin sufijo G/S (eso es solo de las categorías hoja).'),
+                        // TASK-0015: al editar queda bloqueado. Cambiarlo renumera todas las familias y
+                        // categorías del grupo, así que va por «Cambiar código», que valida y pide motivo.
+                        ->regex('/^CPV-\d{2}$/')
+                        ->validationMessages(['regex' => 'El código de un Grupo es CPV- seguido de 2 dígitos, por ejemplo CPV-05.'])
+                        ->disabled(fn (string $operation) => $operation !== 'create')
+                        ->dehydrated(fn (string $operation) => $operation === 'create')
+                        ->helperText(fn (string $operation) => $operation === 'create'
+                            ? 'Ej. CPV-05 — sin puntos, sin sufijo G/S (eso es solo de las categorías hoja).'
+                            : 'Para cambiar el código use «Cambiar código» (arriba): renumera sus familias y categorías, valida y pide el motivo, que queda en la auditoría.'),
                     Forms\Components\TextInput::make('source_version')
                         ->label('Versión de origen')
                         ->disabled()

@@ -4,6 +4,8 @@ namespace Tests\Feature\Taxonomy;
 
 use App\Filament\Resources\TaxonomyCategoryResource;
 use App\Filament\Resources\TaxonomyCategoryResource\Pages\EditTaxonomyCategory;
+use App\Filament\Resources\TaxonomyFamilyResource\Pages\EditTaxonomyFamily;
+use App\Filament\Resources\TaxonomyGroupResource\Pages\EditTaxonomyGroup;
 use App\Models\TaxonomyAuditLog;
 use App\Models\TaxonomyCategory;
 use App\Models\TaxonomyTermCpvRelation;
@@ -226,5 +228,113 @@ class CategoryCodeChangeTest extends TestCase
 
         $this->expectException(AuthorizationException::class);
         $this->changer()->change($viewer->fresh(), $this->nodes['cabezal'], $this->family()->id, TaxonomyCategory::TIPO_BIEN, $this->family()->code.'.07G', 'Sin permiso no se puede');
+    }
+
+    #[Test]
+    public function changing_a_family_code_renumbers_its_categories_references_and_audit(): void
+    {
+        $user = $this->editor();
+        $this->actingAs($user);
+        $family = $this->family();
+        $group = $this->nodes['grupo'];
+        $newCode = $group->code.'.99';
+        $oldChildCodes = collect(['balancin', 'bajo', 'inactiva', 'cabezal'])->mapWithKeys(fn ($k) => [$k => $this->nodes[$k]->code]);
+
+        $result = $this->changer()->change($user, $family, $group->id, null, $newCode, 'La familia se renumera según la tabla de Lorenzo');
+
+        $this->assertSame(4, $result['descendants']);
+        $this->assertSame($newCode, $family->fresh()->code);
+        foreach ($oldChildCodes as $key => $old) {
+            $child = $this->nodes[$key]->fresh();
+            $expected = $newCode.substr($old, strlen($this->family()->code));
+            $this->assertSame($expected, $child->code, "{$key} conserva su correlativo y su letra.");
+            $this->assertSame($group->code.'/'.$newCode.'/'.$expected, $child->path);
+            $this->assertSame(TaxonomyCategory::LEVEL_CATEGORY, $child->level);
+        }
+
+        $this->assertSame($this->nodes['cabezal']->fresh()->code,
+            TaxonomyTermCpvRelation::query()->where('category_id', $this->nodes['cabezal']->id)->value('cpv_code'));
+        $this->assertSame(2, $result['term_relations'], 'Las dos relaciones del árbol (balancín y cabezal) pasan al código nuevo.');
+
+        $childLog = TaxonomyAuditLog::query()->where('entity_type', TaxonomyCategory::class)
+            ->where('entity_id', $this->nodes['balancin']->id)->where('field', 'code')->sole();
+        $this->assertSame($oldChildCodes['balancin'], $childLog->old_value);
+        $this->assertStringContainsString('La familia se renumera según la tabla de Lorenzo', $childLog->reason);
+        $this->assertStringContainsString('Renumerada por el cambio de', $childLog->reason);
+    }
+
+    #[Test]
+    public function changing_a_group_code_renumbers_families_and_categories(): void
+    {
+        $user = $this->editor();
+        $this->actingAs($user);
+        $free = collect(range(50, 99))->map(fn ($n) => "CPV-{$n}")
+            ->diff(TaxonomyCategory::query()->where('level', TaxonomyCategory::LEVEL_GROUP)->pluck('code'))
+            ->values();
+        $this->assertGreaterThanOrEqual(2, $free->count());
+
+        $group = $this->node($free[0], null, ['es' => "Grupo de dos dígitos {$this->tok}"]);
+        $family = $this->node($group->code.'.01', $group, ['es' => "Familia {$this->tok}"]);
+        $category = $this->node($family->code.'.01S', $family, ['es' => "Categoría {$this->tok}"]);
+
+        $this->assertArrayHasKey('code', $this->errorsOf(fn () => $this->changer()->change($user, $group, null, null, 'CPV-5', 'Prueba con un dígito')));
+        $this->assertArrayHasKey('code', $this->errorsOf(fn () => $this->changer()->change($user, $group, null, null, $free[1].'.01', 'Un grupo no lleva punto')));
+
+        $result = $this->changer()->change($user, $group, null, null, $free[1], 'Reordenamiento de grupos');
+
+        $this->assertSame(2, $result['descendants']);
+        $this->assertSame($free[1].'.01', $family->fresh()->code);
+        $this->assertSame($free[1].'.01.01S', $category->fresh()->code);
+        $this->assertSame($free[1].'/'.$free[1].'.01/'.$free[1].'.01.01S', $category->fresh()->path);
+    }
+
+    #[Test]
+    public function families_the_system_names_as_fixed_cannot_be_renumbered(): void
+    {
+        $user = $this->editor();
+        $protected = CategoryCodeChanger::protectedCodes()[0];
+        $groupCode = explode('.', $protected)[0];
+        $group = TaxonomyCategory::query()->where('code', $groupCode)->first() ?? $this->node($groupCode, null, ['es' => 'Grupo protegido']);
+        $family = TaxonomyCategory::query()->where('code', $protected)->first() ?? $this->node($protected, $group, ['es' => 'Familia protegida']);
+
+        $errors = $this->errorsOf(fn () => $this->changer()->change($user, $family, $group->id, null, $groupCode.'.98', 'Intento de renumerar una familia fija'));
+        $this->assertStringContainsString($protected, implode(' ', $errors['code']));
+
+        $free = collect(range(50, 99))->map(fn ($n) => "CPV-{$n}")
+            ->diff(TaxonomyCategory::query()->where('level', TaxonomyCategory::LEVEL_GROUP)->pluck('code'))->first();
+        $errors = $this->errorsOf(fn () => $this->changer()->change($user, $group, null, null, $free, 'Intento de renumerar el grupo de una familia fija'));
+        $this->assertStringContainsString($protected, implode(' ', $errors['code']), 'Tampoco por su grupo.');
+        $this->assertSame($protected, $family->fresh()->code);
+    }
+
+    #[Test]
+    public function family_and_group_forms_lock_the_code_and_the_family_action_moves_it_to_another_group(): void
+    {
+        $user = $this->editor();
+        $family = $this->family();
+        $otherGroup = $this->node('CPV-'.random_int(900, 999).'9', null, ['es' => "Otro grupo {$this->tok}"]);
+        $this->node($otherGroup->code.'.01', $otherGroup, ['es' => "Familia hermana {$this->tok}"]);
+
+        Livewire::actingAs($user)
+            ->test(EditTaxonomyFamily::class, ['record' => $family->getKey()])
+            ->assertFormFieldIsDisabled('code')
+            ->assertFormFieldIsHidden('parent_id')
+            ->assertSee(TaxonomyCategoryResource::nodeLabel($this->nodes['grupo']->fresh('translations')))
+            ->mountAction('cambiarCodigo')
+            ->setActionData(['parent_id' => $otherGroup->id])
+            ->setActionData(['modo' => EditTaxonomyFamily::MODE_AUTO])
+            ->assertActionDataSet(['code' => $otherGroup->code.'.02'])
+            ->setActionData(['reason' => 'La familia corresponde a otro grupo'])
+            ->callMountedAction()
+            ->assertHasNoActionErrors();
+
+        $this->assertSame($otherGroup->code.'.02', $family->fresh()->code);
+        $this->assertSame($otherGroup->id, $family->fresh()->parent_id);
+        $this->assertStringStartsWith($otherGroup->code.'.02.', $this->nodes['balancin']->fresh()->code);
+
+        Livewire::actingAs($user)
+            ->test(EditTaxonomyGroup::class, ['record' => $otherGroup->getKey()])
+            ->assertFormFieldIsDisabled('code')
+            ->assertActionVisible('cambiarCodigo');
     }
 }

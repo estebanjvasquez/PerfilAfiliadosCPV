@@ -69,15 +69,29 @@ class TaxonomyFamilyResource extends Resource
             Forms\Components\Section::make()
                 ->columns(2)
                 ->schema([
+                    // TASK-0015: al editar, código y Grupo quedan bloqueados. Cambiarlos renumera las
+                    // categorías de la familia, así que va por «Cambiar código o grupo», que valida y
+                    // pide motivo. Al crear se valida la forma CPV-NN.NN.
                     Forms\Components\TextInput::make('code')
                         ->label('Código (CPV)')
                         ->required()
                         ->maxLength(50)
                         ->unique(ignoreRecord: true)
-                        ->helperText('Ej. CPV-05.01 — debe empezar con el código del grupo elegido abajo.'),
+                        ->regex('/^CPV-\d{2}\.\d{2}$/')
+                        ->validationMessages(['regex' => 'El código de una Familia es CPV-<grupo>.NN, por ejemplo CPV-05.01.'])
+                        ->disabled(fn (string $operation) => $operation !== 'create')
+                        ->dehydrated(fn (string $operation) => $operation === 'create')
+                        ->helperText(fn (string $operation) => $operation === 'create'
+                            ? 'Ej. CPV-05.01 — debe empezar con el código del grupo elegido abajo.'
+                            : 'Para cambiar el código o el grupo use «Cambiar código o grupo» (arriba): renumera sus categorías, valida y pide el motivo, que queda en la auditoría.'),
+                    Forms\Components\Placeholder::make('grupo_actual')
+                        ->label('Grupo')
+                        ->visible(fn (string $operation) => $operation !== 'create')
+                        ->content(fn (?TaxonomyCategory $record) => TaxonomyCategoryResource::nodeLabel($record?->parent)),
                     Forms\Components\Select::make('parent_id')
                         ->label('Grupo')
                         ->required()
+                        ->visible(fn (string $operation) => $operation === 'create')
                         ->relationship(
                             name: 'parent',
                             titleAttribute: 'code',

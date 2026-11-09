@@ -54,7 +54,7 @@ class BuildEmpresaSearchDocuments extends Command
     // Mismas familias CPV "atractoras" excluidas del nivel semántico de taxonomía en el Worker
     // (ver GENERIC_ATTRACTOR_FAMILY_CODES en empresa-tools.ts, Fase MCP-4.x/4.6) - se excluyen acá
     // también para no propagar el mismo ruido genérico al documento unificado.
-    private const GENERIC_ATTRACTOR_FAMILY_CODES = ['CPV-29.02', 'CPV-12.04', 'CPV-48.02'];
+    public const GENERIC_ATTRACTOR_FAMILY_CODES = ['CPV-29.02', 'CPV-12.04', 'CPV-48.02'];
 
     public function handle(): int
     {
