@@ -73,6 +73,12 @@ trait TaxonomySearchFixtures
             'code' => $code,
             'parent_id' => $parent?->id,
             'is_active' => $active,
+            // Como en los datos reales: la letra final del código de una categoría dice su tipo.
+            'tipo_oferta' => match (true) {
+                (bool) preg_match('/\dG$/', $code) => TaxonomyCategory::TIPO_BIEN,
+                (bool) preg_match('/\dS$/', $code) => TaxonomyCategory::TIPO_SERVICIO,
+                default => null,
+            },
             'source_version' => 'test-task-0014',
         ]);
 

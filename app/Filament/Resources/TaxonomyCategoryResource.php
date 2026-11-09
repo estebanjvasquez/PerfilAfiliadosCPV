@@ -90,7 +90,16 @@ class TaxonomyCategoryResource extends Resource
      * ancho (2 dígitos, 3 si ya hay más de 99) se toma del código existente más largo, para no
      * "bajarle" el padding a una familia que ya viene con 3 dígitos.
      */
-    private static function buildNextCode(?int $familyId, ?string $tipoOferta): ?string
+    /** TASK-0015: ayuda de los campos bloqueados al editar. */
+    public const CODE_EDIT_HELP = 'Para cambiar el código, la familia o el tipo use «Cambiar código o familia» (arriba): valida la nomenclatura del código y pide el motivo, que queda en la auditoría.';
+
+    /** «CPV-29.04 — Equipos», o un guion si no hay nodo. */
+    public static function nodeLabel(?TaxonomyCategory $node): string
+    {
+        return $node ? "{$node->code} — {$node->displayName()}" : '—';
+    }
+
+    public static function buildNextCode(?int $familyId, ?string $tipoOferta): ?string
     {
         if (! $familyId || ! $tipoOferta) {
             return null;
@@ -149,10 +158,21 @@ class TaxonomyCategoryResource extends Resource
                     // Flujo guiado pedido el 8 sep 2026: al CREAR, el código ya no se teclea a
                     // mano (fuente real de los 12 códigos mal tipeados del Grupo 48, ver commit
                     // e904533) - se arma solo a partir de Grupo + Familia + Tipo, con el
-                    // incremental correcto según lo que ya exista en esa combinación. Al EDITAR
-                    // una categoría existente se mantiene el selector amplio de siempre (Familia
-                    // o Grupo padre, código editable a mano) - ahí el código ya existe, no hay
-                    // nada que "construir".
+                    // incremental correcto según lo que ya exista en esa combinación.
+                    //
+                    // TASK-0015 (pedido del propietario, 2026-11-09): al EDITAR, Grupo y Familia se
+                    // muestran con código y nombre, y código, familia y tipo quedan bloqueados. Antes
+                    // se podía teclear cualquier código, con la única verificación de no repetirlo.
+                    // Ahora se cambian solo con la acción «Cambiar código o familia» de la página de
+                    // edición (`CategoryCodeChanger`): valida la nomenclatura y registra el motivo.
+                    Forms\Components\Placeholder::make('grupo_actual')
+                        ->label('Grupo')
+                        ->visible(fn (string $operation) => $operation !== 'create')
+                        ->content(fn (?TaxonomyCategory $record) => static::nodeLabel($record?->parent?->parent)),
+                    Forms\Components\Placeholder::make('familia_actual')
+                        ->label('Familia')
+                        ->visible(fn (string $operation) => $operation !== 'create')
+                        ->content(fn (?TaxonomyCategory $record) => static::nodeLabel($record?->parent)),
                     Forms\Components\Select::make('group_id')
                         ->label('Grupo')
                         ->options(fn () => TaxonomyCategory::query()
@@ -170,8 +190,10 @@ class TaxonomyCategoryResource extends Resource
                         ->afterStateUpdated(fn (Forms\Set $set) => $set('parent_id', null))
                         ->required(fn (string $operation) => $operation === 'create'),
                     Forms\Components\Select::make('parent_id')
-                        ->label(fn (string $operation) => $operation === 'create' ? 'Familia' : 'Familia o Grupo padre')
+                        ->label('Familia')
                         ->required()
+                        // TASK-0015: oculto al editar, así el guardado normal nunca cambia el padre.
+                        ->visible(fn (string $operation) => $operation === 'create')
                         ->relationship(
                             // Una categoría es siempre hoja - su padre es una Familia o,
                             // directamente, un Grupo (cuando Lorenzo no definió familia para esa
@@ -217,25 +239,31 @@ class TaxonomyCategoryResource extends Resource
                         ])
                         ->native(false)
                         ->live()
+                        // TASK-0015: la letra final del código (G/S) depende del tipo, así que al editar
+                        // el tipo se cambia junto con el código, en la acción.
+                        ->disabled(fn (string $operation) => $operation !== 'create')
+                        ->dehydrated(fn (string $operation) => $operation === 'create')
                         ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, string $operation) {
                             if ($operation === 'create') {
                                 $set('code', static::buildNextCode($get('parent_id'), $get('tipo_oferta')));
                             }
                         })
-                        ->helperText('Solo aplica a categorías hoja (Goods/Services de Lorenzo).'),
+                        ->helperText(fn (string $operation) => $operation === 'create'
+                            ? 'Solo aplica a categorías hoja (Goods/Services de Lorenzo).'
+                            : self::CODE_EDIT_HELP),
                     Forms\Components\TextInput::make('code')
                         ->label('Código (CPV)')
                         ->required()
                         ->maxLength(50)
                         ->unique(ignoreRecord: true)
-                        ->disabled(fn (string $operation) => $operation === 'create')
+                        ->disabled()
                         // disabled() por si solo NO envia el valor al guardar - hace falta
                         // dehydrated() explicito para que el codigo calculado (Grupo+Familia+Tipo
-                        // +incremental) sí llegue a guardarse al crear.
-                        ->dehydrated()
+                        // +incremental) sí llegue a guardarse al crear. Al editar no se envía nunca.
+                        ->dehydrated(fn (string $operation) => $operation === 'create')
                         ->helperText(fn (string $operation) => $operation === 'create'
                             ? 'Se arma solo al elegir Grupo, Familia y Tipo — incluye el próximo incremental libre, no se puede repetir.'
-                            : 'Ej. CPV-01.01.01G — el código de Lorenzo con el prefijo CPV- agregado. No repetir.'),
+                            : self::CODE_EDIT_HELP),
                     Forms\Components\TextInput::make('source_version')
                         ->label('Versión de origen')
                         ->disabled()
