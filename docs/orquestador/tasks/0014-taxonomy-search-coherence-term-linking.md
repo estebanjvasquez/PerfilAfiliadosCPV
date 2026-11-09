@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | IN_PROGRESS (2026-11-09) |
+| Estado | IN_PROGRESS, en pausa para retomarla en una sesión nueva (2026-11-09; ver «Traspaso») |
 | Fuente | Issue #2 `6736283026` (estebanjvasquez, 2026-11-09T09:08:19Z): «[ORQUESTADOR — SOLICITUD DEL PROPIETARIO]», publicado por el orquestador a petición expresa del propietario |
 | Relación | Nueva; no modifica TASK-0013 (calibración del buscador CIRA), que conserva su identificador y propósito |
 | Código examinado | el que corre en staging: `feature/upgrade-filament-v3` (se verifica su SHA antes de concluir) |
@@ -28,14 +28,92 @@ Alcance: diagnóstico, cambio y pruebas en el entorno autorizado de desarrollo/p
 
 Autoría: comentario publicado por el orquestador a petición expresa del propietario en este chat.
 
-## Diagnóstico
+## Traspaso (2026-11-09): dónde quedó y cómo retomar
 
-_Pendiente._
+El propietario pidió llevar esta tarea a una sesión nueva y dejar la sesión anterior para TASK-0013.
+
+**Mensaje para la sesión nueva:**
+
+> Trabajá en TASK-0014. Leé `docs/orquestador/tasks/0014-taxonomy-search-coherence-term-linking.md` (tiene el comentario fuente íntegro `6736283026` y el traspaso) y seguí desde «Próximos pasos». El código va en el worktree `C:\Proyectos\GitHub\PerfilAfiliadosCPV-wt-servicios`, rama `feat/taxonomy-search-coherence`. No toques TASK-0013 ni los cambios locales del propietario en el repo principal.
+
+**Estado del código y de las ramas:**
+
+| Qué | Valor |
+|---|---|
+| Staging (`origin/feature/upgrade-filament-v3`) | `90044f3adc8b086b1582adfecba290f1781d2d2e`, verificado el 2026-11-09. Es el código que ve el propietario |
+| Rama de trabajo | `feat/taxonomy-search-coherence`, creada desde `90044f3` en el worktree `C:\Proyectos\GitHub\PerfilAfiliadosCPV-wt-servicios`. **Todavía sin cambios ni push** |
+| Repo principal | rama `fix/sec-01-r4-01-role-editor-preserve`; solo documentación. Los cambios locales del propietario (`AGENTS.md`, `CLAUDE.md`, `PROTOCOL.md`, `SESSION_RESUME.md`) no se tocan |
+| Código idéntico | `TaxonomyCategorySearch`, `EmbeddingClient` y `TaxonomyCategory` son iguales en las dos ramas, así que el bootstrap del repo principal sirve para reproducir |
+
+**Reproducción interrumpida, sin efecto:**
+- `0014-assets/balancin_probe.php` corre en solo lectura (`set transaction read only` y `rollBack`) contra la base compartida, por el puerto 6543.
+- El propietario detuvo la primera corrida, que no dejó salida ni procesos abiertos. No hubo escrituras posibles.
+- Correr:
+
+  ```bash
+  php docs/orquestador/tasks/0014-assets/balancin_probe.php > <carpeta temporal>/balancin_probe.json
+  ```
+
+  con el PHP de `ENVIRONMENT.md`. La salida tiene nombres de categorías, no de empresas.
+- **Qué devuelve:**
+  - el selector de la empresa para «balancín», «balancin», «Balancín», «BALANCIN», «balancines», «pumping unit» y «pump jack», con código, nivel, estado, ruta, fuente y explicación de cada resultado;
+  - la búsqueda por nombre ES de la administración tal como está implementada, en categorías, familias y grupos;
+  - la misma búsqueda normalizada;
+  - los sinónimos de categoría y su total;
+  - los términos del diccionario con sus alias y todas sus relaciones término→CPV, con estado, tipo, peso y origen.
+
+## Diagnóstico (solo código, a confirmar con la reproducción)
+
+1. **Selector de la empresa:** `EmpresaResource/RelationManagers/TaxonomyCategoriesRelationManager.php` llama a `opcionesBusqueda()`, que usa `TaxonomyCategorySearch::search($q, 15)`.
+   - **Tres niveles, en este orden:**
+     - `lexical`: nombre ES o EN, o `taxonomy_category_synonyms`, con `unaccent … ilike '%q%'`;
+     - `dictionary`: `taxonomy_terms.term`, `canonical_term` o `taxonomy_term_aliases`, solo con relaciones `approved`;
+     - `semantic`: embeddings de la categoría, que rellena hasta 15.
+   - Filtra `is_active = true` y `level != 0`, así que deja fuera los grupos y deja entrar familias y categorías.
+   - **Solo muestra la ruta.** `match_type` y `explanation` se calculan pero no se muestran, así que la empresa no distingue un nombre de una sugerencia semántica.
+   - **Límite:** el `limit` del nivel léxico corta antes de deduplicar por categoría.
+   - **Familias:** el explorador busca con `opcionesFamilia()` (nombre de traducción con `unaccent`, sin locale ni código) y lista sus hijas.
+2. **Administración:** `TaxonomyCategoryResource` (nivel 2), `TaxonomyFamilyResource` (nivel 1) y `TaxonomyGroupResource` (nivel 0).
+   - **Columna Código:** `searchable()` por defecto de Filament.
+   - **Columna Nombre (ES):** busca con `whereHas('translations', locale es, name like "%q%")`. En Postgres `like` **distingue mayúsculas y tildes**: «balancin» no encuentra «Balancín». No busca en EN, en sinónimos ni en el diccionario.
+   - **Filtro «Sinónimo / término local (diccionario)»:** consulta `taxonomy_category_synonyms` (pocas filas), **no** el diccionario `taxonomy_terms` ni sus relaciones término→CPV. El nombre confunde.
+   - **Búsqueda global:** solo `code`, `branch` y `subbranch`.
+   - **Familias y grupos:** verificar si su columna de padre y sus filtros usan la misma lógica.
+3. **Diccionario:**
+   - `TaxonomyTermResource` tiene relation managers de alias, relaciones CPV, servicios y fuentes.
+   - `TaxonomyTermCpvRelationResource` administra las relaciones, con estados y aprobación.
+   - **Falta en la ficha de categoría:** no muestra los términos asociados ni permite asociar uno existente. Sus relation managers son solo Traducciones y Sinónimos.
+
+## Próximos pasos
+
+1. **Reproducir** con `balancin_probe.php` y documentar aquí las dos opciones que ve la empresa: código, ruta, estado, fuente, relaciones aprobadas y si son correctas. Comparar con la administración. Si hace falta, confirmar la vista real en staging con una cuenta del propietario, solo lectura.
+2. **Diseñar un servicio común de búsqueda** (por ejemplo `TaxonomyLookup`) con un solo criterio:
+   - **Campos:** código, nombres ES/EN, sinónimos de categoría, términos, `canonical_term` y alias del diccionario.
+   - **Normalización:** `unaccent`, sin distinguir mayúsculas.
+   - **Resultado:** el motivo de cada coincidencia (nombre, sinónimo, término o alias aprobado, sugerencia semántica), el estado y la jerarquía.
+   - **Alcance de la empresa:** solo categorías activas y elegibles; lo semántico va marcado como sugerencia.
+   - **Alcance de la administración:** todos los estados visibles, sin límite de selector y sin semántica que se haga pasar por vínculo. Las relaciones no aprobadas se ven con su estado.
+   - **Usos:** las listas de categoría, familia y grupo, y el selector de la empresa.
+   - **Desde una categoría:** llegar a su familia y su grupo.
+3. **Mostrar el motivo en la interfaz:** en el selector de la empresa (etiqueta o texto bajo cada opción) y en la administración (columna o indicador). Renombrar el filtro de sinónimos para no confundirlo con el diccionario.
+4. **Ficha de categoría:** nuevo relation manager «Términos del diccionario».
+   - **Qué muestra:** los términos asociados, con el estado de cada relación.
+   - **Asociar:** un término existente, buscado sin crear duplicados.
+   - **Relaciones previas** (pendiente, rechazada, aprobada): se tratan sin duplicar.
+   - **Estado de la relación nueva:** pendiente o en revisión, según los estados que ya use `TaxonomyTermCpvRelation`.
+   - **Aprobar y publicar:** por el flujo existente, con sus permisos, motivo y auditoría (`TaxonomyAuditLog`). Revisar `TaxonomyTermCpvRelationResource` y la policy antes de diseñar.
+5. **Pruebas:** el caso «balancín», tildes y mayúsculas, ES/EN, alias, jerarquía, activa e inactiva, sinónimo frente a término, visibilidad de sugerencias, permisos y transiciones de estado. También que el id elegido por la empresa sea la misma categoría que ve el administrador.
+   - Correrlas en el runner aislado de Contabo (ver la memoria del proyecto y `ENVIRONMENT.md`). Localmente faltan `ext-intl` y `pdo_pgsql`.
+6. **Cierre:**
+   - actualizar el manual de usuario (`resources/manual/manual_usuario.md`) y la prueba de contenido del manual;
+   - entregar la evidencia y las limitaciones en este archivo;
+   - pasar a READY_FOR_REVIEW.
+   - **Despliegue a staging:** solo con autorización explícita del propietario.
 
 ## Diseño y cambios
 
-_Pendiente._
+_Pendiente (sesión nueva)._
 
 ## Evidencia y limitaciones
 
-_Pendiente._
+_Pendiente (sesión nueva)._
