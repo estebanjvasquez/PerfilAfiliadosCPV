@@ -338,3 +338,24 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
   - **Regresión congelada:** los mismos cambios que la preview, más «caballito» (0→1) y diferencias de diagnóstico en «balancín». Vienen de la expansión CPV, que ya variaba de forma intermitente, no de la regla.
   - **Staging:** `/` y `/cira-test/` responden 200.
 - **Reversión:** `wrangler versions deploy fb72aa80-bd26-4b33-b365-a5c2a931a683@100% --yes`.
+
+## Incidente: flujo de CIRA guardado desde una versión vieja (2026-11-09)
+
+- **Síntoma (lo reportó el propietario):** en staging desaparecieron los votos 👍/👎, el detalle de dónde viene cada resultado y el porcentaje.
+- **Causa:** a las 09:21 UTC se guardó «Chat CIRA V5 - MCP» desde una versión anterior a TASK-0013. Lo único que se quería cambiar era el modelo (`gpt-5.6-luna` → `gpt-6-luna`, cambio intencional del propietario). Al guardar se perdieron:
+  - los nodos de registro de la búsqueda (`Build Search Log`, `Log Search`, `Attach Log Id`);
+  - las tarjetas v3, que tenían la explicación y el porcentaje;
+  - los ajustes del prompt y de la lectura de la intención.
+- **Corrección (autorizada por el propietario en el chat):**
+  - se respaldó fuera del repo el flujo tal como estaba;
+  - se restauró la versión `v4-votos`, con el modelo `gpt-6-luna`.
+- **Metadatos:** el nodo `Build Log` tenía escrito a mano `modelo: 'Gemini-3-Flash'`, también en la v4. Ahora lee el modelo configurado en `OpenAI Chat Model`, y si no puede leerlo registra «desconocido».
+- **Verificación:** una búsqueda de prueba de «balancin» por el webhook devolvió:
+  - tarjetas con votos y su registro de búsqueda, con explicación y porcentaje;
+  - `Log Search` y `Attach Log Id` ejecutados;
+  - `metadata.modelo = gpt-6-luna`.
+- **Prevención:** recargar el editor de n8n antes de cambiar algo. Una pestaña abierta desde antes guarda la versión completa que tenía cargada.
+- **Pendiente:** con «balancin», Lukiven muestra «experiencia» aunque también coincide por la categoría CPV.
+  - **Causa:** las dos fuentes pesan igual y, en empate, el Worker muestra la primera que revisa.
+  - **Propuesta:** en empate, mostrar primero lo declarado (categoría o servicio). No cambia el puntaje ni el orden.
+  - **Estado:** espera autorización para preview.
