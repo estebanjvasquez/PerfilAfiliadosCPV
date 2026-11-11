@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-11-03, rama `fix/sec-01-r4-01-role-editor-preserve`: **TASK-0012** (recuperación de acceso por correo y RIF, Issue #2 `6602168914`) desplegada en staging por autorización del propietario; UAT y prueba de correo real pendientes ([`tasks/0012-account-recovery.md`](tasks/0012-account-recovery.md)). Staging `feature/upgrade-filament-v3` @ `06155ce` (workflow `41630703105` success; rutas de login/recuperación GET 200). TASK-0011 APPROVED (`6440840198`) y aplicada previamente en staging. Anterior, sin cambios (2026-10-21 ~16:40Z, desde `f41bcb6`): **F-SEC01-R4-01** (el editor de roles conserva lo que no muestra), lista para revisión, sin desplegar. R4 aceptado; contención verificada.
+**Checkpoint:** 2026-11-11: **TASK-0016** (análisis IA de solicitudes de categoría, Issue #2 `6791532623`) READY_FOR_REVIEW en la rama `feat/category-request-ai-analysis` (REVIEW_HEAD `2405b67`), sin desplegar y con el proveedor inactivo ([`tasks/0016-category-request-ai-analysis.md`](tasks/0016-category-request-ai-analysis.md)). TASK-0013, TASK-0014 y TASK-0015: ver `current_task.md`. Anterior: 2026-11-03, rama `fix/sec-01-r4-01-role-editor-preserve`: **TASK-0012** (recuperación de acceso por correo y RIF, Issue #2 `6602168914`) desplegada en staging por autorización del propietario; UAT y prueba de correo real pendientes ([`tasks/0012-account-recovery.md`](tasks/0012-account-recovery.md)). Staging `feature/upgrade-filament-v3` @ `06155ce` (workflow `41630703105` success; rutas de login/recuperación GET 200). TASK-0011 APPROVED (`6440840198`) y aplicada previamente en staging. Anterior, sin cambios (2026-10-21 ~16:40Z, desde `f41bcb6`): **F-SEC01-R4-01** (el editor de roles conserva lo que no muestra), lista para revisión, sin desplegar. R4 aceptado; contención verificada.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -70,7 +70,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Reanudar:** solo con una nueva asignación del propietario.
 - **Propietario:** revisar F-SEC01-R4-01 y su propuesta de recuperación; despliegue R3+R4(+R4-01); UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
 - **Propietario:** hacer UAT de recuperación; autorizar aparte, si lo desea, una prueba de correo real a su buzón de prueba.
-- **Agente:** TASK-0012 desplegada en staging; detenerse hasta nueva instrucción del propietario.
+- **Agente:** TASK-0016 en READY_FOR_REVIEW (STOP); nada más sin una instrucción nueva del Issue #2. TASK-0012 sigue desplegada en staging con la UAT pendiente.
 
 ## 4. Worktrees en uso (no tocar sin instrucción)
 

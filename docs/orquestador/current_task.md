@@ -3,12 +3,14 @@
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
-## Nueva, 2026-11-11: TASK-0016 — Análisis IA de solicitudes de categorías CPV — IN_PROGRESS (`6791532623`)
+## Nueva, 2026-11-11: TASK-0016 — Análisis IA de solicitudes de categorías CPV — READY_FOR_REVIEW (`6791532623`); sin desplegar
 
 | Campo | Valor |
 |---|---|
 | Archivo | [`tasks/0016-category-request-ai-analysis.md`](tasks/0016-category-request-ai-analysis.md) (descubrimiento, diseño, evidencia; comentario fuente íntegro) |
-| Rama de código / BASE | `feat/category-request-ai-analysis` (worktree `PerfilAfiliadosCPV-wt-ia`, sin *upstream*) / `d8e2aae` (staging) |
+| Rama de código / BASE / REVIEW_HEAD | `feat/category-request-ai-analysis` (worktree `PerfilAfiliadosCPV-wt-ia`, sin *upstream*) / `d8e2aae` (staging) / `2405b67` |
+| Pruebas | focalizadas `37dafe1`: 48 OK; suite completa `2405b67`: **705 OK** |
+| Proveedor | inactivo (`disabled`): sin adaptador real, sin gasto; elegir proveedor, clave y presupuesto es decisión del propietario; migración no aplicada |
 | Gates | sin merge, sin push a la rama que despliega, sin despliegue, sin n8n, sin cambios de taxonomía, sin gasto de API ni cambio de credenciales |
 
 TASK-0016 no cambia las tareas de abajo, que siguen en revisión.

@@ -8,7 +8,7 @@
 | Rama de código | `feat/category-request-ai-analysis`, en el worktree `C:\Proyectos\GitHub\PerfilAfiliadosCPV-wt-ia`. Parte de `origin/feature/upgrade-filament-v3` @ `d8e2aae`, que es lo que corre staging, con TASK-0014/0015. Sin *upstream*: un `git push` sin argumentos no puede llegar a la rama que despliega |
 | Registro | este archivo, `current_task.md` y el handoff, en la rama canónica `fix/sec-01-r4-01-role-editor-preserve` (mismo esquema que TASK-0014) |
 | BASE | `d8e2aae46151642f50f2f29fcc1ff546ebd76cbf` |
-| Estado | **IN_PROGRESS** (2026-11-11) |
+| Estado | **READY_FOR_REVIEW** (2026-11-11); REVIEW_HEAD `2405b67dfa696bfece88ee3256de7451f01115dc` en `feat/category-request-ai-analysis`; sin merge ni despliegue |
 | Gates | sin merge, sin push a `feature/upgrade-filament-v3` (despliega), sin despliegue, sin n8n/CIRA, sin cambios de taxonomía publicada, sin gasto de API, sin cambiar credenciales |
 
 La rama canónica tiene cambios del propietario que se conservan sin commitear: `AGENTS.md`, `CLAUDE.md`,
@@ -59,7 +59,124 @@ los estados de ninguna de las tres.
 - CIRA y n8n están fuera de alcance (`gpt-6-luna` en n8n) y no se tocan.
 - No hay ningún buscador web integrado.
 
-*(diseño, implementación y evidencia: en curso)*
+## Decisiones
+
+- **D1 — La IA asesora y no ejecuta.** El análisis solo lee la solicitud y el catálogo y escribe una fila propia.
+  - No cambia `request_status` ni ningún otro campo de la solicitud.
+  - No toca `taxonomy_categories`, sus traducciones ni `empresa_taxonomy_category`.
+  - El proveedor no recibe herramientas.
+  - La recomendación es una lista cerrada que no incluye «aprobar»: `reuse`, `clarify` y `evaluate_new`.
+- **D2 — Autorización.** Policy nueva `analyzeWithAi`: solo `super_admin`, el mismo criterio del módulo
+  (TASK-0010C).
+  - No se crea un permiso de Shield que pudiera asignarse a otros roles.
+  - El servicio vuelve a comprobarla en cada ejecución.
+- **D3 — Recuperación separada del juicio.**
+  - Las candidatas del catálogo salen de `TaxonomyCategorySearch`, el buscador del panel: activas, nunca Grupos, por
+    nombre, sinónimo, código y diccionario, y semántica solo si está configurada.
+  - Las fuentes externas salen de un `SourceRetriever` aparte.
+  - El proveedor recibe ambas cosas como datos y solo juzga.
+- **D4 — Nada inventado llega a la pantalla.** `AnalysisOutputValidator` valida la respuesta contra el esquema de
+  `AnalysisPrompt`.
+  - Una forma inválida descarta toda la respuesta y deja el análisis `failed` / `invalid_output`.
+  - Se quitan y se anotan como «Control de la respuesta»:
+    - los juicios sobre categorías no elegidas;
+    - las sugerencias que no son candidatas del catálogo;
+    - las citas a fuentes no recuperadas;
+    - las recomendaciones fuera del análisis.
+  - Las URL de las referencias vienen solo del buscador, nunca del texto del modelo, y se aceptan solo si son https a
+    un nombre público. Esto evita SSRF al comprobar el enlace con HEAD, con 5 s y sin seguir redirecciones.
+- **D5 — Prompt injection.**
+  - El texto de sistema es fijo, con versión (`v1`).
+  - La solicitud y las fuentes van en `<datos>` como JSON.
+  - La salida está acotada por el esquema, y la vista escapa todo el texto.
+- **D6 — Datos mínimos.** Al proveedor van la necesidad, el motivo, el detalle, las palabras probadas (recortados a 2000
+  caracteres) y las rutas de las categorías que la empresa tenía. Nunca van el nombre ni el RIF de la empresa, ni el
+  nombre, correo o teléfono del solicitante.
+- **D7 — Solo inserción.** Tabla nueva `taxonomy_category_request_analyses`, que guarda:
+  - las instantáneas de la solicitud, de las categorías elegidas y de las candidatas;
+  - la versión de instrucciones, el proveedor y el modelo, el estado y si fue limitado;
+  - la salida validada, las fuentes y los controles;
+  - el código de error, los tokens, el costo y las fechas.
+
+  Garantías:
+  - un trigger rechaza UPDATE y el modelo rechaza `update`/`delete`;
+  - FK con CASCADE desde la solicitud y SET NULL desde el actor;
+  - RLS explícito, como TASK-0013;
+  - la migración es aditiva y reversible y **no se aplicó** en la base compartida.
+- **D8 — Fallas y costos.**
+  - Tiempo de espera configurable (90 s), con un único reintento si la falla es transitoria.
+  - Límites de 5 análisis por hora por solicitud y 20 por hora por administrador.
+  - Tope diario de gasto opcional; con él alcanzado no se llama al proveedor.
+  - El costo se estima solo con los precios configurados.
+  - Del mensaje del proveedor **no se guarda ni se registra nada**; solo el código.
+  - Si la tabla no existe todavía, la página funciona y el análisis queda desactivado.
+- **D9 — Proveedor: inactivo, decisión pendiente.**
+  - Por defecto `CATEGORY_ANALYSIS_PROVIDER=disabled` y `CATEGORY_ANALYSIS_SOURCES=disabled`: no hay llamadas ni gasto.
+  - **No se escribió un adaptador de proveedor real.** Haría falta agregar una dependencia (el SDK oficial del
+    proveedor elegido; en este equipo no hay Composer), una clave y presupuesto, y nada de eso está autorizado. El
+    contrato (`AnalysisProvider`, `SourceRetriever`) está listo: el adaptador es una sola clase registrada en
+    `AppServiceProvider`.
+  - Propuesta al propietario: un proveedor con búsqueda web propia, cuyas URL salgan de sus bloques de resultado y
+    nunca del texto del modelo, más un tope diario.
+
+## Implementación (rama `feat/category-request-ai-analysis`)
+
+| Commit | Contenido |
+|---|---|
+| `5ca11f9` | Servicio `App\Services\CategoryAnalysis\*` (contratos, `DisabledAnalysisProvider`/`DisabledSourceRetriever`, `AnalysisPrompt`, `AnalysisOutputValidator`, `CategoryAnalysisService`), modelo `TaxonomyCategoryRequestAnalysis`, migración, `config/category_analysis.php`, policy `analyzeWithAi`, acción «Analizar con IA» y sección «Análisis con IA» en el detalle (`resources/views/filament/category-requests/analyses.blade.php`), prueba `CategoryRequestAiAnalysisTest` |
+| `37dafe1` | Pruebas: el ciclo de migración de TASK-0010A revierte primero la tabla nueva (FK), como ya hacía con la de TASK-0010C; búsqueda del catálogo por nombres reales; prueba de la migración (RLS, trigger, idempotencia) |
+| `2405b67` | Manual del administrador §11 «Solicitudes de categoría: Analizar con IA» |
+
+**Selector:** un `Select` múltiple buscable, con tope de 8, cuyas opciones son `TaxonomyCategorySearch::optionLabel`
+(ruta · código · motivo). Arriba aparecen las candidatas que el buscador encontró con el texto de la solicitud,
+marcadas «(catálogo)». Las sugerencias de la IA salen aparte en el informe, «Sugerencias de la IA (no elegidas; vienen
+del catálogo vigente)», y solo pueden ser candidatas de ese catálogo.
+
+## Pruebas (runner aislado de Contabo, PostgreSQL desechable, PHP 8.2.35)
+
+| Corrida | SHA | Resultado |
+|---|---|---|
+| Focalizada, primera | `5ca11f9` | 3 fallos: el ciclo de migración de TASK-0010A (la FK nueva impedía su `down()`) y una búsqueda de prueba mal planteada. Se corrigieron en `37dafe1` |
+| Focalizada | `37dafe1` | `CategoryRequestAiAnalysisTest` y las tres de solicitudes (`TaxonomyCategoryRequest*`): **OK (48 tests, 502 aserciones)** |
+| Suite completa | `2405b67` | **OK (705 tests, 7773 aserciones)**, run `20261111T091904Z-2405b67dfa69`; staging 200 antes y después; sin contenedores `cpvtest` restantes |
+
+**Escenarios de `CategoryRequestAiAnalysisTest`** (proveedor y buscador simulados, `Http::fake`):
+- migración aditiva, reversible, idempotente, con RLS y trigger;
+- solo `super_admin` (afiliados, lectura y reportes rechazados en el servidor);
+- desactivado por defecto: sin llamadas y con el botón deshabilitado;
+- el buscador ofrece solo categorías vigentes con su ruta, ni Grupos ni inactivas;
+- selección inválida: vacía, inactiva, Grupo, inexistente o más de 8;
+- **caso de aceptación «Ingeniería de Costos» contra «Planificación, Programación y Control de Costos de Proyectos»:**
+  - el proveedor recibe la necesidad y las dos categorías reales con su id, código, ruta y descripción;
+  - no recibe el nombre de la empresa ni el correo del solicitante;
+  - el texto de sistema exige evaluar el alcance y prohíbe porcentajes;
+  - la relación «parcial» la decide el proveedor simulado, no el código;
+  - la solicitud y la taxonomía no cambian;
+- categorías y citas inventadas descartadas; fuente no-https o con IP descartada y no comprobada;
+- sugerencias solo del catálogo;
+- fallas que nunca cambian la solicitud:
+  - timeout con un reintento;
+  - error sin reintento;
+  - JSON roto o incompleto;
+  - recomendación «approve» inexistente;
+- búsqueda externa caída: análisis limitado;
+- reanálisis sin sobrescribir; edición rechazada por el modelo y por la base;
+- límite por solicitud y tope de gasto;
+- inyección en el detalle: queda como datos y la pantalla escapa la salida;
+- ni la clave ni el texto del afiliado en logs o en el registro;
+- flujo Filament con dos categorías; el afiliado recibe 403 en el detalle.
+
+## Limitaciones y pendientes
+
+- **Sin proveedor real ni búsqueda externa real (D9):** ningún análisis real se ejecutó, ni sobre la #2 ni sobre la #3.
+  La calidad del juicio en el caso «Ingeniería de Costos» queda por comprobar con el proveedor que se autorice, sobre
+  esa misma solicitud.
+- La migración no se aplicó en la base compartida. Aplicarla es un paso de despliegue que autoriza el propietario.
+- Sin recorrido en navegador: el código no está desplegado y en este equipo las páginas de Filament no corren.
+- El buscador del catálogo no filtra por jerarquía (Grupo/Familia) como criterio propio: busca por nombre, sinónimo,
+  código y diccionario, y muestra la ruta. La semántica sigue apagada en staging.
+- **Solicitudes reales:** hay 3, no 2. Ninguna se modificó: las pruebas usan solicitudes sintéticas, y la lectura en
+  staging fue solo de agregados y textos de negocio, sin datos personales.
 
 ---
 
