@@ -8,7 +8,7 @@
 | Rama de código | `feat/category-request-ai-analysis`, en el worktree `C:\Proyectos\GitHub\PerfilAfiliadosCPV-wt-ia`. Parte de `origin/feature/upgrade-filament-v3` @ `d8e2aae`, que es lo que corre staging, con TASK-0014/0015. Sin *upstream*: un `git push` sin argumentos no puede llegar a la rama que despliega |
 | Registro | este archivo, `current_task.md` y el handoff, en la rama canónica `fix/sec-01-r4-01-role-editor-preserve` (mismo esquema que TASK-0014) |
 | BASE | `d8e2aae46151642f50f2f29fcc1ff546ebd76cbf` |
-| Estado | **READY_FOR_REVIEW** (2026-11-11); REVIEW_HEAD `2405b67dfa696bfece88ee3256de7451f01115dc` en `feat/category-request-ai-analysis`; sin merge ni despliegue |
+| Estado | **READY_FOR_REVIEW, DESPLEGADA EN STAGING** (2026-11-11). REVIEW_HEAD `893351ff2769c7186a70f46dd03b6089990c8c05` en `feat/category-request-ai-analysis`, con el addendum; antes `2405b67`. Staging `d8e2aae..893351f` (run `42999603780`), por autorización del propietario en el chat; sin merge a `main` |
 | Gates | sin merge, sin push a `feature/upgrade-filament-v3` (despliega), sin despliegue, sin n8n/CIRA, sin cambios de taxonomía publicada, sin gasto de API, sin cambiar credenciales |
 
 La rama canónica tiene cambios del propietario que se conservan sin commitear: `AGENTS.md`, `CLAUDE.md`,
@@ -177,6 +177,107 @@ del catálogo vigente)», y solo pueden ser candidatas de ese catálogo.
   código y diccionario, y muestra la ruta. La semántica sigue apagada en staging.
 - **Solicitudes reales:** hay 3, no 2. Ninguna se modificó: las pruebas usan solicitudes sintéticas, y la lectura en
   staging fue solo de agregados y textos de negocio, sin datos personales.
+
+---
+
+## Addendum 2026-11-11 — configuración en el panel, proveedores reales y despliegue (propietario, en el chat)
+
+**Pedido del propietario (literal):**
+
+> la seleccion del proveedor, colocar la api y seleccionar el modelo debe ser configurable en el panel del
+> administrador dentro del menu de taxonomia CPV, al colocar la API elsistema debe poder motrar los modelos disponibles
+> a seleccionar, al colocar la API esta debe dejar de ser visible para no poder filtrarla y se debe poder establecer un
+> presupuesto diario
+> Si esto ya esta considerado entonces autorizo el despliegue para hacer las pruebas en el navegador yo mismo con las
+> solicitudes actuales
+
+No estaba considerado, porque la configuración era solo por variables de entorno. Por eso se preguntó antes de seguir,
+y el propietario respondió:
+- **Proveedores:** «Anthropic y OpenAI».
+- **Despliegue:** «Sí, desplegar en staging» cuando esté construido y pasen las pruebas. Eso incluye llevar los commits
+  a `feature/upgrade-filament-v3` y aplicar en la base compartida las migraciones aditivas de esta tarea.
+
+**Alcance.** Es una ampliación de TASK-0016, con el mismo propósito y el mismo identificador. Cambia D9: el proveedor
+se configura en el panel y deja de ser solo una decisión pendiente.
+
+**Decisiones del addendum:**
+- **A1 — Dónde.** Una página nueva en el menú **Taxonomía CPV**, solo para `super_admin`. Desde ella se eligen el
+  proveedor (desactivado, Anthropic u OpenAI), su clave, el modelo, el presupuesto diario, los precios y si se buscan
+  fuentes externas.
+- **A2 — La clave no se puede filtrar.**
+  - Se guarda cifrada con la clave de la aplicación (cast `encrypted`).
+  - El modelo la oculta al serializarse.
+  - El formulario nunca la carga de vuelta: después de guardarla, la pantalla solo dice «clave guardada el …», sin
+    ningún fragmento.
+  - Una clave nueva la reemplaza; «Quitar la clave» la borra.
+  - La clave no viaja en el estado de Livewire después de guardar y no se registra en los logs.
+- **A3 — Modelos disponibles.** Con la clave escrita o la ya guardada, «Consultar modelos» pide la lista al proveedor:
+  Models API de Anthropic, o `GET /v1/models` de OpenAI filtrado a los modelos de texto. El administrador elige uno de
+  esa lista.
+- **A4 — Presupuesto.** El análisis solo se activa con proveedor, clave, modelo, presupuesto diario mayor que 0 y
+  precios por millón de tokens.
+  - Con el tope alcanzado no se llama al proveedor.
+  - El costo de cada análisis suma los tokens de las dos llamadas y las búsquedas web, si las hay.
+  - Los precios los escribe el administrador, porque cambian.
+- **A5 — Adaptadores.**
+  - **Anthropic:** SDK oficial `anthropic-ai/sdk` ^1.8, la primera dependencia nueva de esta tarea. Se agregaron 5
+    paquetes y no cambió ninguno: `anthropic-ai/sdk` 1.8.0, `open-telemetry/api` 1.11.0, `open-telemetry/context`
+    1.6.0, `php-http/discovery` 1.20.0 y `standard-webhooks/standard-webhooks` 1.0.2. Se resolvieron con PHP 8.2.35,
+    el de staging, usando el Composer del servidor de pruebas, porque aquí no hay.
+  - **OpenAI:** cliente HTTP de Laravel, sin dependencia nueva, porque no hay SDK oficial de OpenAI para PHP.
+  - **Fuentes externas:** búsqueda web de Anthropic (`web_search`). Las URL salen solo de sus bloques de resultado. Con
+    OpenAI no hay búsqueda externa, y el análisis sale limitado.
+  - `php-http/discovery` trae un plugin de Composer: se declaró `allow-plugins: {"php-http/discovery": false}` para que
+    el build no dependa del valor por defecto de Composer. El descubrimiento funciona igual en tiempo de ejecución.
+  - Hallazgo: el SDK 1.x envía la clave como `Authorization: Bearer`, no como `x-api-key`.
+- **A6 — Leer la configuración no escribe.** Sin fila guardada, `current()` devuelve una instancia desactivada en
+  memoria; la fila se crea al guardar. El tope se mira antes de cualquier llamada de pago, también antes de la búsqueda
+  web.
+
+**Implementación del addendum** (rama `feat/category-request-ai-analysis`):
+
+| Commit | Contenido |
+|---|---|
+| `1601ac0` | Página `CategoryAnalysisSettingsPage` y modelo `CategoryAnalysisSettings` con su migración `2026_11_11_130000`. `ProviderRegistry`, `AnthropicProvider` (+`AnthropicClientFactory`, `AnthropicErrors`, `AnthropicWebSearchRetriever`), `OpenAiProvider`. El servicio toma presupuesto y precios del panel y suma el costo de las búsquedas. Cambios en `composer.json`/`composer.lock`; prueba `CategoryAnalysisSettingsTest` |
+| `a93af1e` | Prueba: el SDK 1.x envía la clave como Bearer |
+| `893351f` | Manual del administrador §11 «Configurar el proveedor, la clave, el modelo y el presupuesto» |
+
+**Pruebas del addendum** (runner aislado):
+- **Focalizadas** `a93af1e` (`CategoryAnalysisSettingsTest`, `CategoryRequestAiAnalysisTest`, `TaxonomyCategoryRequest*`
+  y `SurfaceInventoryTest`): **OK (57 tests, 585 aserciones)**.
+- **Suite completa `893351f`: OK (713 tests, 7851 aserciones)**, run `20261111T095230Z-893351ff2769`. Staging respondió
+  200 antes y después.
+- **Escenarios:**
+  - solo `super_admin`;
+  - la clave:
+    - se guarda cifrada en la base;
+    - no aparece en el HTML, en el estado de Livewire ni en el JSON del modelo, ni después de guardar ni al volver;
+    - se conserva con el campo vacío y se quita con «Quitar la clave»;
+  - el análisis no se activa si falta algún dato;
+  - los modelos de Anthropic se listan con el SDK real sobre un transporte simulado; los de OpenAI, filtrados a texto,
+    y una clave rechazada da un aviso sin la clave;
+  - el adaptador de Anthropic envía `output_config` json_schema sin herramientas y traduce negativa y 401;
+  - la búsqueda web toma URL solo de `web_search_result` y su consumo incluye las búsquedas;
+  - el adaptador de OpenAI usa json_schema estricto y traduce negativa y 429 reintentable.
+
+**Despliegue a staging** (autorizado por el propietario en el chat):
+- Antes: `feature/upgrade-filament-v3` @ `d8e2aae`, sin migraciones pendientes, `APP_KEY` configurada, staging 200.
+- 2026-11-11: avance rápido `d8e2aae..893351f`. El workflow aplica `php artisan migrate --force`, que esta vez aplica
+  solo las dos migraciones aditivas de esta tarea.
+- **Resultado (verificado en solo lectura):**
+  - workflow `42999603780` success; staging en `893351f`;
+  - `migrate:status`: las dos migraciones `2026_11_11_*` en el lote 62;
+  - las dos tablas existen, con 0 filas y RLS activo; el trigger de solo inserción está presente;
+  - `anthropic-ai/sdk` instalado en la imagen; el proveedor resuelto es `DisabledAnalysisProvider` porque todavía no hay
+    configuración;
+  - las 3 solicitudes reales siguen igual: los mismos `request_status`, `delivery_status` y `updated_at`;
+  - HTTP: `/admin/login` 200, y `/admin/configuracion-analisis-ia` y `/admin/solicitudes-de-categoria` 302 a login sin
+    sesión.
+- **Pendiente del propietario:**
+  - UAT en el navegador: configurar el proveedor, la clave, el modelo y el presupuesto, y analizar las solicitudes #2 y
+    #3;
+  - el primer análisis real es también la primera llamada de pago;
+  - el juicio sobre «Ingeniería de Costos» se comprueba en esa UAT.
 
 ---
 

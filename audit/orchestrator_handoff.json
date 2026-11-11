@@ -3,19 +3,22 @@
     "task_id": "TASK-0016",
     "title": "AI analysis of category requests (advisory)",
     "source_comment": "6791532623",
-    "status": "READY_FOR_REVIEW",
+    "status": "READY_FOR_REVIEW, DEPLOYED_TO_STAGING (owner authorization in chat, 2026-11-11)",
     "branch": "feat/category-request-ai-analysis",
     "worktree": "PerfilAfiliadosCPV-wt-ia (no upstream; deploy branch untouched)",
     "review_base_sha": "d8e2aae46151642f50f2f29fcc1ff546ebd76cbf",
-    "review_head_sha": "2405b67dfa696bfece88ee3256de7451f01115dc",
+    "review_head_sha": "893351ff2769c7186a70f46dd03b6089990c8c05",
     "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block; see the Issue #2 delivery comment",
     "record_branch": "fix/sec-01-r4-01-role-editor-preserve",
     "tests": {
-      "focused": {
-        "sha": "37dafe1dd2b1a398e1475d252bd9c619310f36fe",
-        "result": "OK (48 tests, 502 assertions)"
-      },
       "full_suite": {
+        "sha": "893351ff2769c7186a70f46dd03b6089990c8c05",
+        "run_id": "20261111T095230Z-893351ff2769",
+        "result": "OK (713 tests, 7851 assertions)",
+        "staging_before": 200,
+        "staging_after": 200
+      },
+      "previous_full_suite": {
         "sha": "2405b67dfa696bfece88ee3256de7451f01115dc",
         "run_id": "20261111T091904Z-2405b67dfa69",
         "result": "OK (705 tests, 7773 assertions)",
@@ -23,18 +26,21 @@
         "staging_after": 200
       },
       "new_test_files": [
-        "tests/Feature/Filament/CategoryRequestAiAnalysisTest.php"
+        "tests/Feature/Filament/CategoryRequestAiAnalysisTest.php",
+        "tests/Feature/Filament/CategoryAnalysisSettingsTest.php"
       ],
       "adjusted_test_files": [
         "tests/Feature/Database/TaxonomyCategoryRequestsMigrationTest.php (reverts the new FK table first)"
       ]
     },
-    "provider": "disabled by default; no real provider adapter, no API spend; provider/key/budget pending owner authorization",
-    "migration": "2026_11_11_120000_create_taxonomy_category_request_analyses_table (additive, reversible, RLS, append-only trigger) NOT applied to the shared database",
+    "provider": "configured in the panel; no settings saved yet, so the resolved provider is disabled and no API is spent",
+    "migration": "applied on the shared database by the deploy workflow (additive, reversible)",
     "real_requests": "3 found (#1 test, #2 Ingenieria de Costos, #3 fotovoltaicos), all pending_review; read-only, unchanged",
     "database_mutations": "none; read-only queries on staging (READ ONLY transaction, rolled back)",
-    "deploy": "none",
-    "task_file": "docs/orquestador/tasks/0016-category-request-ai-analysis.md"
+    "deploy": "staging: feature/upgrade-filament-v3 d8e2aae..893351f fast-forward, workflow run 42999603780 success; migrations 2026_11_11_120000 and 2026_11_11_130000 applied by the workflow (batch 62); both tables empty with RLS; real requests unchanged",
+    "task_file": "docs/orquestador/tasks/0016-category-request-ai-analysis.md",
+    "previous_review_head_sha": "2405b67dfa696bfece88ee3256de7451f01115dc",
+    "addendum": "owner chat 2026-11-11: provider/key/model/daily budget configurable in the panel (Taxonomía CPV); models listed from the provider; key encrypted and never shown; Anthropic (official SDK anthropic-ai/sdk ^1.8, 5 new packages) and OpenAI (Laravel HTTP) adapters"
   },
   "task_0012_account_recovery": {
     "task_id": "TASK-0012",
