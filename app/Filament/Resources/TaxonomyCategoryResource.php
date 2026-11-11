@@ -90,6 +90,9 @@ class TaxonomyCategoryResource extends Resource
      * ancho (2 dígitos, 3 si ya hay más de 99) se toma del código existente más largo, para no
      * "bajarle" el padding a una familia que ya viene con 3 dígitos.
      */
+    /** Registros por página del listado; sin «Todos» (ver table()). */
+    public const PAGE_OPTIONS = [10, 25, 50, 100];
+
     /** TASK-0015: ayuda de los campos bloqueados al editar. */
     public const CODE_EDIT_HELP = 'Para cambiar el código, la familia o el tipo use «Cambiar código o familia» (arriba): valida la nomenclatura del código y pide el motivo, que queda en la auditoría.';
 
@@ -428,6 +431,10 @@ class TaxonomyCategoryResource extends Resource
                     ->query(fn (Builder $query) => $query->whereDoesntHave('translations', fn ($q) => $q->where('locale', 'es'))),
             ])
             ->defaultSort('code')
+            // Sin «Todos»: con ~3.100 categorías, pintar todas superaba los 30 s de PHP y la tabla
+            // se quedaba cargando (staging 2026-11-11). Filament descarta solo un «Todos» que haya
+            // quedado guardado en la sesión porque ya no está entre las opciones.
+            ->paginated(static::PAGE_OPTIONS)
             ->searchPlaceholder(static::SEARCH_PLACEHOLDER)
             ->actions([
                 Tables\Actions\EditAction::make(),
