@@ -337,7 +337,7 @@ de la solicitud. La decisión sigue siendo de la Cámara.
   consulta, fecha de publicación si se conoce, y si el enlace respondió.
 - **Limitaciones**, y los controles que descartaron partes de la respuesta.
 
-No hay porcentajes de confianza.
+No hay porcentajes de confianza. El costo estimado de cada análisis aparece junto a su fecha.
 
 > **IMPORTANTE:** Si el informe dice **Limitado: sin fuentes externas verificadas**, no se consultó nada fuera del
 > catálogo CPV: la comparación se basa en los textos de la solicitud y del catálogo. Si el afiliado no explicó su
@@ -359,16 +359,34 @@ No hay porcentajes de confianza.
 - **Si algo falla:** queda un análisis «Falló» con el motivo, sin el detalle técnico del proveedor. La solicitud no
   cambia.
 
-### Estado actual: desactivado
-El análisis está **desactivado** en este servidor: el botón aparece deshabilitado. No hay ningún proveedor de IA ni
-búsqueda externa configurados, y no se gasta API. Activarlo requiere que el propietario autorice:
-- el proveedor y el modelo;
-- su clave, guardada en las variables de entorno del servidor y nunca en el repositorio;
-- el presupuesto (`CATEGORY_ANALYSIS_DAILY_COST_CAP_USD` y los precios por millón de tokens);
-- la búsqueda de fuentes;
-- la migración de la tabla de análisis.
+### Configurar el proveedor, la clave, el modelo y el presupuesto {#configuracion-analisis-ia}
 
-La configuración está en `config/category_analysis.php`.
+En **Taxonomía CPV > Configuración del análisis con IA**, solo para `super_admin`:
+
+1. **Proveedor de IA:** Anthropic (Claude) u OpenAI. Con «Desactivado» no se llama a nadie.
+2. **Clave nueva:** pegue la clave de API, creada en la consola del proveedor. Use una clave propia de este sistema,
+   con su propio límite de gasto en la consola del proveedor.
+3. Presione **Consultar modelos**. El sistema pide al proveedor la lista de modelos disponibles para esa clave.
+4. Elija el **Modelo** en la lista.
+5. **Presupuesto y precios:**
+   - el presupuesto diario en USD;
+   - los precios de entrada y salida por millón de tokens del modelo elegido, copiados de la página de precios del
+     proveedor.
+6. Con Anthropic, puede activar **Buscar fuentes externas con la búsqueda web de Anthropic**. Indique cuántas
+   búsquedas por análisis y el precio de cada una. Con OpenAI no hay búsqueda externa y los informes salen limitados.
+7. Presione **Guardar**. Arriba, **Estado** dice si el análisis está activo y cuánto se gastó hoy.
+
+> **IMPORTANTE:** La clave **no se vuelve a ver**:
+> - se guarda cifrada y la pantalla solo dice cuándo se guardó;
+> - para cambiarla, escriba una nueva y guarde; dejar el campo vacío conserva la guardada;
+> - **Quitar la clave** la borra y desactiva el análisis con ese proveedor.
+
+El análisis se activa solo cuando están el proveedor, la clave, el modelo, el presupuesto y los precios. Cuando el
+gasto estimado del día llega al presupuesto, no se ejecutan más análisis hasta el día siguiente. Ninguna llamada de pago
+se hace con el tope alcanzado. El gasto es una estimación con los precios que usted escribió: la factura real está en
+la consola del proveedor.
+
+Los límites técnicos (tiempo de espera, tope de categorías, frecuencia) están en `config/category_analysis.php`.
 
 ---
 
