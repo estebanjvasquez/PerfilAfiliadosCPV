@@ -71,6 +71,8 @@ Cuando el envío de correos esté activo:
 2. El enlace vence a los 60 minutos y solo sirve para su propia cuenta.
 3. Si no lo encuentra, revise la carpeta de correo no deseado («spam»). En la pantalla de verificación puede pedir otro mensaje; el sistema admite como máximo 2 pedidos por minuto.
 
+> **NOTA:** Si la Cámara cambia el correo de su cuenta, el correo nuevo queda **sin verificar**, aunque el anterior lo estuviera: al entrar verá **Verifique su correo electrónico** y deberá verificar el nuevo. Los enlaces para elegir contraseña enviados al correo anterior dejan de servir. Si solo cambian mayúsculas o espacios, el correo sigue verificado.
+
 Verificar el correo no le da acceso a ninguna empresa: la Cámara debe asociar su usuario (ver la nota de abajo). La misma pantalla lo resume en **Próximos pasos**. Para salir de la pantalla de verificación, presione **Cerrar sesión**.
 
 > **IMPORTANTE:** Crear una cuenta no le da acceso automático a los datos de su empresa. La Cámara debe asociar su usuario con la empresa correspondiente. Después de registrarse, avise a la Cámara.
