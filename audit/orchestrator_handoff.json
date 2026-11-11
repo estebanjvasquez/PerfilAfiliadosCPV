@@ -1,4 +1,59 @@
 {
+  "task_0017_sec03_account_recovery_host_trust": {
+    "task_id": "TASK-0017",
+    "title": "SEC-03 audit: account recovery, tokens and Host/proxy trust",
+    "source_comment": "6797800863",
+    "status": "READY_FOR_REVIEW (audit only; no fixes, no deploy)",
+    "audited_target": "origin/feature/upgrade-filament-v3 b048df09b345bfefc8bbfe88ed0ca8e4ea09df33 (staging; verified by ls-remote and read-only rev-parse on the server)",
+    "branch": "audit/sec-03-account-recovery (tests only; pushed; does not deploy)",
+    "worktree": "PerfilAfiliadosCPV-wt-sec03",
+    "review_base_sha": "b048df09b345bfefc8bbfe88ed0ca8e4ea09df33",
+    "review_head_sha": "8a4ed35df5aafc853ac9e79b33d340a46ea6613c",
+    "records_commit_sha": "74703f2b5f68c2aaa1ea8b950fbd3bd83cb22c35",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha); see the Issue #2 delivery comment",
+    "record_branch": "fix/sec-01-r4-01-role-editor-preserve",
+    "tests": {
+      "focused": {
+        "sha": "8a4ed35df5aafc853ac9e79b33d340a46ea6613c",
+        "run_id": "20261111T141320Z-8a4ed35df5aa",
+        "result": "20 tests, 79 assertions: 13 controls OK, 7 open-finding oracles FAIL by design",
+        "staging_before": 200,
+        "staging_after": 200
+      },
+      "full_suite": {
+        "sha": "8a4ed35df5aafc853ac9e79b33d340a46ea6613c",
+        "run_id": "20261111T141441Z-8a4ed35df5aa",
+        "result": "736 tests, 7939 assertions, 7 failures = exactly the 7 oracles; 729 OK, no errors",
+        "staging_before": 200,
+        "staging_after": 200
+      },
+      "first_focused_run": {
+        "sha": "7f197a9eda06eef6b0495721cf56cc60ef706c39",
+        "run_id": "20261111T141101Z-7f197a9eda06",
+        "note": "one control hit the reset page 2/min limit in its positive step (security assertions passed); one Livewire Host oracle could not fail and was removed"
+      },
+      "new_test_files": [
+        "tests/Feature/Security/Sec03AccountRecoveryControlsTest.php",
+        "tests/Feature/Security/Sec03AccountRecoveryOpenFindingsTest.php"
+      ]
+    },
+    "findings": {
+      "F-SEC03-01": "CONFIRMED app-level: reset/verification link host comes from the request; external exploitation NOT VERIFIED, mitigated by tunnel ingress",
+      "F-SEC03-02": "CONFIRMED app-level: any Host accepted (TrustHosts off, no panel domain)",
+      "F-SEC03-03": "CONFIRMED on staging: all clients seen as the docker gateway IP; per-IP limits are global",
+      "F-SEC03-04": "CONFIRMED isolated: failed-Turnstile requests consume per-email and per-RIF quotas",
+      "F-SEC03-05": "CONFIRMED isolated: email change keeps email_verified_at",
+      "F-SEC03-06": "CONFIRMED on staging: HTTP served without redirect or HSTS"
+    },
+    "account_takeover": "not confirmed; token binding held in every tested path",
+    "report": "audit/SEC03_TASK0017_ACCOUNT_RECOVERY_HOST_TRUST.md",
+    "security_register": "docs/security/SECURITY_STATUS.md",
+    "task_file": "docs/orquestador/tasks/0017-sec03-account-recovery-host-trust-audit.md",
+    "database_mutations": "none (isolated runner DB only; staging probes read-only, no DB access)",
+    "mail_sent": "none",
+    "staging_requests": "read-only SSH probes; two innocuous GETs (http root and login page) without header manipulation",
+    "gates": "no functional change, deploy, merge, deploy-branch push, n8n/taxonomy, secret rotation, or active tests against real accounts; remediation P1-P5 awaits authorization"
+  },
   "task_0016_category_request_ai_analysis": {
     "task_id": "TASK-0016",
     "title": "AI analysis of category requests (advisory)",
