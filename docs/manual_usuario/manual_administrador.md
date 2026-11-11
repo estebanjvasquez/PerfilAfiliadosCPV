@@ -39,6 +39,7 @@ Versión 1 — 17 de agosto de 2026
 8. Catálogos maestros (Mantenimiento)
 9. Roles y permisos
 10. Preguntas frecuentes del administrador (incluye RIF y % de completitud)
+11. Solicitudes de categoría: «Analizar con IA»
 
 ---
 
@@ -298,6 +299,76 @@ corresponde lleva el perfil al 100 %.
 **¿Se puede recuperar una empresa eliminada?**
 No. "Eliminar" borra la empresa y sus datos propios de forma permanente (pide escribir `BORRAR`).
 Prefiera **Desactivar** si solo desea ocultarla temporalmente.
+
+---
+
+## 11. Solicitudes de categoría: «Analizar con IA» {#analizar-con-ia}
+
+**Taxonomía CPV > Solicitudes de categoría** lista las peticiones de afiliados que no encontraron una categoría. Solo
+la ve el rol `super_admin`. En el detalle de una solicitud, **Analizar con IA** compara lo que pidió el afiliado con
+categorías **vigentes** del catálogo y redacta un informe técnico (TASK-0016).
+
+**La IA asesora, no decide.** El análisis no aprueba, no publica, no crea ni vincula categorías, y no cambia el estado
+de la solicitud. La decisión sigue siendo de la Cámara.
+
+### Cómo usarlo
+1. Abra la solicitud y presione **Analizar con IA**.
+2. La ventana muestra las categorías vigentes que el buscador del catálogo encontró con el texto de la solicitud. Estas
+   aparecen marcadas «(catálogo)».
+3. En **Categorías del catálogo que quiere comparar**, busque por nombre, sinónimo o código y elija una o varias, hasta
+   8. Solo aparecen categorías vigentes; los Grupos y las categorías inactivas no aparecen.
+4. Presione **Analizar ahora**. El informe queda al final de la página, en **Análisis con IA**.
+5. Para comparar otras categorías, ejecute un análisis nuevo. Los anteriores no se borran ni se sobrescriben.
+
+### Qué contiene el informe
+- Resumen ejecutivo.
+- Interpretación técnica y alcance del servicio.
+- Una tabla por categoría con:
+  - coincidencias y diferencias;
+  - actividades que cubre y que no cubre;
+  - la relación entre lo pedido y la categoría: equivalente, coincidencia parcial, más amplia, más específica,
+    relacionada o información insuficiente.
+- Recomendación, que puede ser una de tres:
+  - reutilizar una o varias categorías;
+  - pedir aclaración al afiliado, con las preguntas sugeridas;
+  - proponer que la Cámara evalúe una categoría nueva.
+- Las **sugerencias de la IA**, separadas de su selección: son categorías vigentes del catálogo que usted no eligió.
+- **Referencias:** solo fuentes que la búsqueda externa encontró de verdad. Cada una muestra título, entidad, fecha de
+  consulta, fecha de publicación si se conoce, y si el enlace respondió.
+- **Limitaciones**, y los controles que descartaron partes de la respuesta.
+
+No hay porcentajes de confianza.
+
+> **IMPORTANTE:** Si el informe dice **Limitado: sin fuentes externas verificadas**, no se consultó nada fuera del
+> catálogo CPV: la comparación se basa en los textos de la solicitud y del catálogo. Si el afiliado no explicó su
+> alcance, por ejemplo si en «Ingeniería de Costos» no dice si hace estimación o solo control, el informe debe pedir
+> aclaración en vez de suponerlo.
+
+### Controles
+- **Lo que se envía a la IA:**
+  - la petición del afiliado (necesidad, motivo, detalle y palabras que probó) y las categorías que la empresa tenía;
+  - nunca el nombre ni el RIF de la empresa, ni datos de personas.
+  - El texto del afiliado y de las fuentes se trata como datos: una instrucción escondida en él no cambia lo que se
+    pide a la IA.
+- **Lo que se descarta:** si la IA menciona una categoría que no se le dio o una fuente que no se encontró, se quita
+  del informe y se anota en **Limitaciones**.
+- **Límites:**
+  - 5 análisis por hora por solicitud y 20 por hora por administrador;
+  - tope opcional de gasto diario;
+  - tiempo de espera, y un único reintento si la falla es transitoria.
+- **Si algo falla:** queda un análisis «Falló» con el motivo, sin el detalle técnico del proveedor. La solicitud no
+  cambia.
+
+### Estado actual: desactivado
+El análisis está **desactivado** en este servidor: el botón aparece deshabilitado. No hay ningún proveedor de IA ni
+búsqueda externa configurados, y no se gasta API. Activarlo requiere que el propietario autorice:
+- el proveedor y el modelo;
+- su clave, guardada en las variables de entorno del servidor y nunca en el repositorio;
+- el presupuesto (`CATEGORY_ANALYSIS_DAILY_COST_CAP_USD` y los precios por millón de tokens);
+- la búsqueda de fuentes;
+- la migración de la tabla de análisis.
+
+La configuración está en `config/category_analysis.php`.
 
 ---
 
