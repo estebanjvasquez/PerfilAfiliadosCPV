@@ -1,6 +1,6 @@
 # Informe acumulativo de seguridad — Perfil de Afiliados CPV
 
-**Fecha de actualización:** 2026-11-11 (SEC-03 / TASK-0017; la anterior fue 2026-10-21) (Europe/Madrid).  
+**Fecha de actualización:** 2026-11-11 (SEC-03 / TASK-0018; antes, el mismo día, TASK-0017; la anterior fue 2026-10-21) (Europe/Madrid).  
 **Estado:** revisión en curso; no constituye certificación de seguridad.  
 **Programa:** CPV-SECURITY-AND-RELIABILITY.  
 **Rama de mantenimiento inicial:** `audit/security-access-01`.  
@@ -30,6 +30,11 @@ Este registro resume cada ronda, sus hallazgos, correcciones, aceptación y desp
 
   Nada de esto se ha ejecutado: cada parte requiere materializar su tarea. Los estados de §4 no cambian. Hasta verificar
   R4-01 en staging, no guardar roles en el editor.
+- **2026-11-11, SEC-03 / TASK-0018 (`6802857575`), correcciones P1–P5 en candidato (NO desplegadas).** F-SEC03-01..06
+  corregidos en código en la rama `fix/sec-03-p1-p5` (TESTED/REVIEW `cb3fff4`): enlaces con la raíz de `APP_URL` y
+  `TrustHosts`; IP real solo desde pares de confianza, sin `X-Forwarded-Host`; Turnstile antes de los cupos; correo
+  nuevo sin verificar; HSTS de 1 día y redirección a https apagada. Suite completa 753/753. La aplicación efectiva
+  requiere despliegue autorizado y verificaciones de infraestructura (ver §5).
 - Quedan decisiones sobre permisos y asociaciones de usuarios, hipótesis por reproducir y superficies todavía no probadas.
 - La siguiente ronda asignada verifica creación/edición de cuentas, concesión de privilegios y límites de acceso a archivos.
 - Gerencia y nuevos reportes permanecen en espera del cierre acordado de seguridad.
@@ -62,6 +67,7 @@ Cada cambio de estos estados necesita SHA y fuente. No inferir despliegue a part
 | SEC-02 general | Reportes, archivos y caché | Pendiente, salvo comprobaciones acotadas activadas en R2 | No cerrado |
 | SEC-03 general | Identidad, sesiones y entradas | Pendiente, salvo comprobaciones acotadas activadas en R2 | No cerrado |
 | SEC-03 / TASK-0017 (2026-11-11) | Recuperación de cuentas (correo y RIF), tokens, Host/proxies, verificación y cambio de correo, sobre staging `b048df0` | Solo auditoría y pruebas: 13 controles descartan la toma de cuentas en el alcance probado; F-SEC03-01..06 confirmados (ver §4). BASE `b048df0`, TESTED `8a4ed35` (rama `audit/sec-03-account-recovery`) | Instrucción 6797800863; **READY_FOR_REVIEW, sin correcciones ni despliegue**. SEC-03 sigue abierto |
+| SEC-03 / TASK-0018 (2026-11-11) | Correcciones P1–P5 de F-SEC03-01..06 | Implementación y pruebas aisladas: 7 oráculos de TASK-0017 en verde sin cambiarlos, 13 controles verdes, 17 pruebas nuevas; suite completa 753 tests, 8030 aserciones, OK. BASE `b048df0` (+ pruebas `8a4ed35`), TESTED `cb3fff4`, REVIEW `cb3fff4` (rama `fix/sec-03-p1-p5`) | Instrucción 6802857575; **READY_FOR_REVIEW, corregido en candidato, sin despliegue** ni cambios de infraestructura |
 | SEC-04 | Dependencias, integraciones e infraestructura | Pendiente | No cerrado |
 | SEC-05 | Regresión consolidada y riesgos residuales | Pendiente | No cerrado |
 
@@ -94,12 +100,12 @@ Las severidades son las comunicadas por la ronda, sujetas a revisión. Una confi
 | RT-BUILD-2026-10 | Higiene de build / Alta (configuración embebida) | Sin `.dockerignore`, la imagen se construía desde el checkout del servidor e incluía archivos no versionados (`.env`, `.git`). Las imágenes anteriores conservan esa configuración en sus capas | Medido en las capas de la imagen en servicio, 2026-10-26 (solo conteos) | Rama `build/source-only-image` (base `1d3a16e`): `.dockerignore` estricto, más una guarda en el `Dockerfile` que detiene la build si entra un archivo prohibido. En la candidata, 0 nombres prohibidos y 0 valores secretos en capas; código, vendor y lock idénticos a lo desplegado. Ver `docs/deploy/IMAGEN_Y_SECRETOS.md` | **Candidato en revisión, sin desplegar** (2026-10-26). Las imágenes antiguas quedan restringidas al servidor hasta la decisión del propietario sobre su ciclo de vida |
 | RT-MAIL-TLS-2026-10 | App / Media, seguridad del transporte de correo | La configuración SMTP de la app (`config/mail.php`, `mailers.smtp.stream.ssl`) declaraba la verificación del certificado y del nombre del servidor desactivada (`verify_peer=false`, `verify_peer_name=false`, `allow_self_signed=true`) | Confirmado en el código. Con Laravel 12.69 y `symfony/mailer` 7.4.17, Laravel no pasa `stream` al transporte, así que el bloque **no tenía efecto**. Lo prueba un control negativo en local, y en vivo el transporte no tiene opciones SSL. La opción que sí desactiva la verificación (`verify_peer` en el primer nivel) nunca estuvo puesta. El relay presenta un certificado válido (TLS 1.3) | Commit `e49cbac` (rama `fix/mail-tls-verify`): quita el bloque y agrega `tests/Feature/Security/MailTransportTlsTest.php`. La prueba vigila la configuración y el transporte, e incluye un control de que detecta `verify_peer=false`. 3/3 en local; sin envío de correo | **Corregido y desplegado** el 2026-10-26 16:41Z en staging, con el workflow de despliegue (ejecución exitosa). Verificación de solo lectura posterior: app con PHP 8.2.35, `.env` ausente de la imagen, configuración en caché sin `stream` ni `verify_peer`, HTTP 200 y 0 errores nuevos. **Pruebas reales de envío con la verificación activa: 6 de 6 recibidas**, confirmadas por el propietario: 3 al buzón del sistema y 3 a buzones externos del propietario, en Gmail y dos dominios propios. **Cerrado.** Registrado por la revisión 6416153795 (repositorio privado de administración) |
 | RT-MAIL-2026-10 | Funcionalidad / Correo del sistema | El correo estaba en modo simulado (`log`): la verificación de cuentas y los avisos de solicitudes no salían | — | Activación autorizada por el propietario: transporte `smtp` global con remitente del dominio; el único cambio fue regenerar la caché de configuración (solo cambiaron claves `mail.*`) | **Activado** el 2026-10-26. Una prueba controlada fue aceptada por el proveedor y el propietario confirmó que llegó al buzón. Detalle en `docs/deploy/CORREO_DEL_SISTEMA.md` (rama `build/source-only-image`) |
-| F-SEC03-01 | SEC-03 TASK-0017 / Media (defensa en profundidad; Alta si el borde lo permitiera) | El host de los enlaces de recuperación y de verificación se toma de la petición, no de la configuración | **Confirmado en la aplicación** (oráculos aislados); explotación externa **no verificada**: el túnel solo enruta el hostname de staging y el origen no expone HTTP | Propuesta P1: raíz y esquema de URL forzados desde `APP_URL` y `TrustHosts`. Sin implementar | Abierto; decisión y autorización del propietario. **Verificar producción antes de llevar la recuperación allí** |
-| F-SEC03-02 | SEC-03 TASK-0017 / Media (misma causa que 01) | La aplicación acepta peticiones para cualquier host (`TrustHosts` desactivado, panel sin dominio) | Confirmado en la aplicación (200 con host ajeno) | P1 | Abierto |
-| F-SEC03-03 | SEC-03 TASK-0017 / Media, disponibilidad | Detrás de cloudflared y nginx, la aplicación ve a todos los clientes con la IP del gateway: los límites «por IP» de login, recuperación y reset son globales | **Confirmado en staging** (configuración, 503/503 peticiones de 24 h desde una sola dirección privada) y con un oráculo aislado; el bloqueo no se ejerció | P2: IP real desde el gateway confiable; **quitar `X-Forwarded-Host` de las cabeceras confiables** o aplicar P1 antes. Sin implementar | Abierto |
-| F-SEC03-04 | SEC-03 TASK-0017 / Baja–media, disponibilidad dirigida | Las solicitudes que no pasan Turnstile consumen igual el cupo por correo y por RIF | Confirmado en aislamiento (correo y RIF) | P3: Turnstile antes de contar los cupos por destinatario. Sin implementar | Abierto |
-| F-SEC03-05 | SEC-03 TASK-0017 / Baja | Cambiar el correo de una cuenta conserva `email_verified_at`: el buzón nuevo hereda la verificación y la elegibilidad por RIF | Confirmado en aislamiento (modelo; el escritor es la gestión de usuarios). Concreta el indicio F-SEC01-07 en esta faceta | P4: anular la verificación y los tokens pendientes al cambiar el correo. Sin implementar | Abierto |
-| F-SEC03-06 | SEC-03 TASK-0017 / Baja–media, transporte | La aplicación responde por HTTP sin redirigir a HTTPS y sin HSTS (las cookies sí llevan `Secure`) | Confirmado en staging con GET inocuos | P5: «Always Use HTTPS» y HSTS en Cloudflare, o redirección en la aplicación; decisión de infraestructura | Abierto |
+| F-SEC03-01 | SEC-03 TASK-0017 / Media (defensa en profundidad; Alta si el borde lo permitiera) | El host de los enlaces de recuperación y de verificación se toma de la petición, no de la configuración | **Confirmado en la aplicación** (oráculos aislados); explotación externa **no verificada**: el túnel solo enruta el hostname de staging y el origen no expone HTTP | Propuesta P1: raíz y esquema de URL forzados desde `APP_URL` y `TrustHosts`. Sin implementar | Abierto; decisión y autorización del propietario. **Verificar producción antes de llevar la recuperación allí** → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; P1, raíz de `APP_URL`), sin desplegar |
+| F-SEC03-02 | SEC-03 TASK-0017 / Media (misma causa que 01) | La aplicación acepta peticiones para cualquier host (`TrustHosts` desactivado, panel sin dominio) | Confirmado en la aplicación (200 con host ajeno) | P1 | Abierto → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; `TrustHosts`, hosts exactos), sin desplegar |
+| F-SEC03-03 | SEC-03 TASK-0017 / Media, disponibilidad | Detrás de cloudflared y nginx, la aplicación ve a todos los clientes con la IP del gateway: los límites «por IP» de login, recuperación y reset son globales | **Confirmado en staging** (configuración, 503/503 peticiones de 24 h desde una sola dirección privada) y con un oráculo aislado; el bloqueo no se ejerció | P2: IP real desde el gateway confiable; **quitar `X-Forwarded-Host` de las cabeceras confiables** o aplicar P1 antes. Sin implementar | Abierto → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; P2, `CF-Connecting-IP` solo desde pares de confianza, XFH descartado), sin desplegar; llegada de la cabecera por el túnel NO VERIFICADA |
+| F-SEC03-04 | SEC-03 TASK-0017 / Baja–media, disponibilidad dirigida | Las solicitudes que no pasan Turnstile consumen igual el cupo por correo y por RIF | Confirmado en aislamiento (correo y RIF) | P3: Turnstile antes de contar los cupos por destinatario. Sin implementar | Abierto → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; P3), sin desplegar |
+| F-SEC03-05 | SEC-03 TASK-0017 / Baja | Cambiar el correo de una cuenta conserva `email_verified_at`: el buzón nuevo hereda la verificación y la elegibilidad por RIF | Confirmado en aislamiento (modelo; el escritor es la gestión de usuarios). Concreta el indicio F-SEC01-07 en esta faceta | P4: anular la verificación y los tokens pendientes al cambiar el correo. Sin implementar | Abierto → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; P4), sin desplegar |
+| F-SEC03-06 | SEC-03 TASK-0017 / Baja–media, transporte | La aplicación responde por HTTP sin redirigir a HTTPS y sin HSTS (las cookies sí llevan `Secure`) | Confirmado en staging con GET inocuos | P5: «Always Use HTTPS» y HSTS en Cloudflare, o redirección en la aplicación; decisión de infraestructura | Abierto → 2026-11-11, TASK-0018: **corregido en parte en candidato** (`cb3fff4`; HSTS 1 día; redirección apagada hasta verificar el túnel), sin desplegar; «Always Use HTTPS» en Cloudflare pendiente de autorización |
 
 En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas (F-SEC01-02a). NO se estableció traversal de directorios en las superficies probadas (segmento de id numérico y `secciones` con lista blanca): resultado negativo acotado, no certificación general.
 
@@ -294,6 +300,26 @@ En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas 
 - **Despliegue:** ninguno. **Riesgos residuales:** borde de Cloudflare sin prueba activa, producción sin inspeccionar,
   sin correo real y sin medir tiempos.
 - **Informe:** [SEC03_TASK0017_ACCOUNT_RECOVERY_HOST_TRUST.md](../../audit/SEC03_TASK0017_ACCOUNT_RECOVERY_HOST_TRUST.md).
+
+### SEC-03 / TASK-0018 — correcciones P1–P5 (6802857575) — 2026-11-11
+
+- **Alcance:** P1–P5 de TASK-0017, solo en aislamiento. Tarea: [0018-sec03-p1-p5-remediation.md](../orquestador/tasks/0018-sec03-p1-p5-remediation.md) (matriz por hallazgo, configuración y plan de infraestructura).
+- **Cambios (rama `fix/sec-03-p1-p5`, `93c36f7` código + `cb3fff4` manual):**
+  - P1: `URL::formatHostUsing` con la raíz de `APP_URL` (fuera de `local`); `TrustHosts` con hosts exactos.
+  - P2: `TrustProxies` confía solo en `TRUSTED_PROXIES` (loopback y bridge de Docker por defecto, sin `*`), toma
+    `CF-Connecting-IP` desde esos pares y elimina siempre `X-Forwarded-Host`.
+  - P3: cupo por origen → Turnstile → cupo por correo o RIF.
+  - P4: un cambio real de correo anula `email_verified_at` y borra los tokens del correo anterior.
+  - P5: HSTS `max-age=86400` sin `includeSubDomains` ni `preload`; redirección a https apagada, sin bucles.
+- **Regresión antes/después:** en `8a4ed35`, 736 tests con 7 fallos (los oráculos). En `cb3fff4`, Sec03 37/37 (run
+  `20261111T180241Z-cb3fff4ebac0`) y suite completa **753 tests, 8030 aserciones, OK** (run
+  `20261111T180350Z-cb3fff4ebac0`); los oráculos no se modificaron. Staging 200 antes y después.
+- **Efectos legítimos:** un Host distinto de los configurados recibe 404; un correo nuevo debe verificarse; las
+  respuestas https llevan HSTS de 1 día.
+- **Límites de la evidencia:** sin despliegue. NO VERIFICADO en vivo: llegada de `CF-Connecting-IP` y de
+  `X-Forwarded-Proto` por el túnel, borde de Cloudflare y producción. El Host que entrega el túnel se verificó en solo
+  lectura (sin `httpHostHeader`; logs con el host canónico).
+- **Despliegue:** ninguno. Infraestructura (Cloudflare, nginx, túnel): sin cambios; plan en la tarea, §5.
 
 ## 6. Cobertura pendiente
 

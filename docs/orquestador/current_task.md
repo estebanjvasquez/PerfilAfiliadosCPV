@@ -25,6 +25,19 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## Nueva, 2026-11-11: TASK-0018 — SEC-03: correcciones P1–P5 — READY_FOR_REVIEW, SIN DESPLEGAR (`6802857575`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0018-sec03-p1-p5-remediation.md`](tasks/0018-sec03-p1-p5-remediation.md) (matriz por hallazgo, configuración, plan de infraestructura; comentario fuente íntegro) |
+| Rama / worktree | `fix/sec-03-p1-p5` (pusheada, no despliega) / `PerfilAfiliadosCPV-wt-sec03-fix` |
+| BASE / TESTED_HEAD / REVIEW_HEAD | staging `b048df0` (+ pruebas de TASK-0017 `8a4ed35`) / `cb3fff4` / `cb3fff4` |
+| Pruebas | runner aislado: Sec03 37/37; suite completa **753 tests, 8030 aserciones, OK** (run `20261111T180350Z-cb3fff4ebac0`); los 7 oráculos de TASK-0017 pasan sin cambios |
+| Resultado | F-SEC03-01..05 corregidos en candidato; F-SEC03-06 en parte (HSTS de 1 día; redirección apagada hasta verificar el túnel) |
+| Gates | sin merge, sin despliegue, sin cambios de Cloudflare, nginx ni túnel. **Siguiente paso:** revisión; después, si se autoriza, despliegue en staging y las verificaciones de la tarea, §5 |
+
+TASK-0018 no cambia TASK-0017 ni TASK-0012.
+
 ## Nueva, 2026-11-11: TASK-0017 — SEC-03: recuperación de cuentas, tokens y confianza en Host/proxies (auditoría) — READY_FOR_REVIEW (`6797800863`)
 
 | Campo | Valor |
