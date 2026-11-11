@@ -39,6 +39,15 @@ class TaxonomyCategoryRequestPolicy
         return $this->isSuperAdmin($user);
     }
 
+    /**
+     * TASK-0016: «Analizar con IA». El mismo rol que opera el módulo; ningún otro rol lo recibe por defecto. El análisis
+     * solo lee la solicitud y el catálogo: no cambia la solicitud ni la taxonomía.
+     */
+    public function analyzeWithAi(User $user, TaxonomyCategoryRequest $request): bool
+    {
+        return $this->isSuperAdmin($user);
+    }
+
     public function create(User $user): bool
     {
         return false;

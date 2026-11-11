@@ -12,6 +12,7 @@ use Filament\Actions\Action as PageAction;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -236,6 +237,14 @@ class TaxonomyCategoryRequestResource extends Resource
                             TextEntry::make('transport')->label('Modo de envío')->placeholder('no registrado'),
                         ])
                         ->placeholder('Sin intentos registrados.'),
+                ]),
+
+            // TASK-0016: informes de «Analizar con IA», cada uno tal como se generó. Solo asesoran.
+            Section::make('Análisis con IA')
+                ->description('Cada análisis queda guardado y no se sobrescribe. La IA no aprueba, no publica ni vincula categorías, y no cambia el estado de la solicitud.')
+                ->visible(fn (TaxonomyCategoryRequest $record) => Auth::user()?->can('analyzeWithAi', $record) ?? false)
+                ->schema([
+                    ViewEntry::make('analyses')->hiddenLabel()->view('filament.category-requests.analyses'),
                 ]),
         ]);
     }

@@ -109,6 +109,12 @@ class TaxonomyCategoryRequest extends Model
         return $this->hasMany(TaxonomyCategoryRequestDeliveryAttempt::class, 'request_id')->orderBy('attempt_number');
     }
 
+    /** TASK-0016: análisis con IA, el más reciente primero. Solo lectura: no cambian esta solicitud. */
+    public function analyses()
+    {
+        return $this->hasMany(TaxonomyCategoryRequestAnalysis::class, 'request_id')->orderByDesc('id');
+    }
+
     public function justificacionLabel(): string
     {
         return self::JUSTIFICACIONES[$this->justificacion] ?? $this->justificacion;
