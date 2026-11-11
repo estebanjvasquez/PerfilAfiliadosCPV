@@ -144,7 +144,9 @@ class Sec03AccountRecoveryControlsTest extends TestCase
 
         $this->assertTrue($this->passwordIs($b, 'Original-clave-1'), 'la contraseña de B no cambia con el token de A');
         $this->assertTrue($this->passwordIs($a, 'Original-clave-1'), 'tampoco cambia la de A, porque el correo no era el suyo');
-        // Y el token de A sigue sirviendo solo para A.
+        // Y el token de A sigue sirviendo solo para A. La página de Filament limita a 2 intentos por minuto y por IP
+        // (`rateLimit(2)`): se deja pasar ese minuto, dentro de la vigencia de 60 minutos del token.
+        $this->travel(2)->minutes();
         $this->reset($a->email, $tokenA);
         $this->assertTrue($this->passwordIs($a, 'Nueva-clave-2026'));
     }

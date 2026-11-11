@@ -129,16 +129,9 @@ class Sec03AccountRecoveryOpenFindingsTest extends TestCase
             'el enlace de recuperación debe usar solo el host permitido, nunca el de la petición');
     }
 
-    #[Test]
-    public function f_sec03_01_the_reset_link_from_the_real_page_keeps_the_configured_host(): void
-    {
-        $a = $this->account();
-        Livewire::withHeaders(['Host' => self::FORGED_HOST])
-            ->test(RequestPasswordReset::class)->set('data.email', $a->email)->call('request');
-        $this->app->terminate();
-
-        $this->assertSame($this->appHost(), parse_url((string) $this->sentUrl($a), PHP_URL_HOST));
-    }
+    // Nota: no hay variante con Livewire::withHeaders(['Host' => ...]): el arnés arma la petición con
+    // Request::create(<APP_URL>/livewire/update), y Symfony reemplaza HTTP_HOST por el host de la URL, así que esa
+    // prueba no podría fallar y no sería un oráculo. Se usa la petición que vería la aplicación (behindTheProxy).
 
     #[Test]
     public function f_sec03_01_the_email_verification_link_keeps_the_configured_host(): void
