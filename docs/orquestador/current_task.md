@@ -3,6 +3,18 @@
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
+## Nueva, 2026-11-11: TASK-0017 — SEC-03: recuperación de cuentas, tokens y confianza en Host/proxies (auditoría) — READY_FOR_REVIEW (`6797800863`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0017-sec03-account-recovery-host-trust-audit.md`](tasks/0017-sec03-account-recovery-host-trust-audit.md) (estado, resultado, evidencia; comentario fuente íntegro) |
+| Informe | [`audit/SEC03_TASK0017_ACCOUNT_RECOVERY_HOST_TRUST.md`](../../audit/SEC03_TASK0017_ACCOUNT_RECOVERY_HOST_TRUST.md); registro en `docs/security/SECURITY_STATUS.md` (F-SEC03-01..06) |
+| Objetivo / rama de pruebas / REVIEW_HEAD | staging `b048df0` / `audit/sec-03-account-recovery` (worktree `PerfilAfiliadosCPV-wt-sec03`, solo pruebas) / `8a4ed35` |
+| Resultado | **sin toma de cuentas confirmada**; 6 hallazgos confirmados. El de mayor riesgo, F-SEC03-01 (host de enlaces), está mitigado hoy por el ingreso del túnel. F-SEC03-03: límites por IP globales |
+| Gates | solo auditoría: sin correcciones, despliegue, merge ni cambios de infraestructura. **Siguiente paso:** revisión y, si se desea, una autorización nueva para P1–P5 |
+
+TASK-0017 no cambia las tareas de abajo.
+
 ## Nueva, 2026-11-11: TASK-0016 — Análisis IA de solicitudes de categorías CPV — READY_FOR_REVIEW, EN STAGING (`6791532623`; addendum del propietario en el chat)
 
 | Campo | Valor |

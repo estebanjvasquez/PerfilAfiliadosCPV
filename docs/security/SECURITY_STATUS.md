@@ -1,6 +1,6 @@
 # Informe acumulativo de seguridad — Perfil de Afiliados CPV
 
-**Fecha de actualización:** 2026-10-21 (Europe/Madrid).  
+**Fecha de actualización:** 2026-11-11 (SEC-03 / TASK-0017; la anterior fue 2026-10-21) (Europe/Madrid).  
 **Estado:** revisión en curso; no constituye certificación de seguridad.  
 **Programa:** CPV-SECURITY-AND-RELIABILITY.  
 **Rama de mantenimiento inicial:** `audit/security-access-01`.  
@@ -17,6 +17,11 @@ Este registro resume cada ronda, sus hallazgos, correcciones, aceptación y desp
 - **2026-10-21, R3 aceptado (NO desplegado). R4:** el propietario fijó que administrar roles es **exclusivo de super_admin**. La contención en datos vivos quedó **bloqueada** por el clasificador del ejecutor (sin cambios; **el riesgo vivo sigue**). La reparación de código está lista para revisión, sin desplegar.
 - **2026-10-21, R4 código aceptado en 6319407886 (candidato `97737ba`, NO desplegado). Contención manual: confirmada por el propietario (6319443716) y VERIFICADA en solo lectura:** 0 permisos de administración de roles fuera de super_admin, continuidad de super_admin PASS y caché coherente. **Efecto colateral (F-SEC01-R4-01):** al guardar, el editor de roles quitó además permisos que no muestra; requiere decisión del propietario.
 - **2026-10-21, F-SEC01-R4-01 (6320241495):** corrección del editor lista para revisión (TESTED `24413d5`, sin desplegar) y propuesta de recuperación de permisos **solo propuesta**: no se cambió ningún dato vivo.
+- **2026-11-11, SEC-03 / TASK-0017 (6797800863), auditoría de recuperación de cuentas, tokens y Host/proxies sobre staging
+  `b048df0`. NO se confirmó toma de cuentas:** la vinculación del token se mantiene en todo lo probado. Confirmados
+  F-SEC03-01..06 (host de enlaces tomado de la petición, mitigado por el túnel; IP de cliente colapsada en el gateway;
+  cupos consumidos sin Turnstile; verificación heredada al cambiar el correo; HTTP sin redirección ni HSTS). Sin
+  correcciones ni despliegue: la propuesta espera autorización.
 - Quedan decisiones sobre permisos y asociaciones de usuarios, hipótesis por reproducir y superficies todavía no probadas.
 - La siguiente ronda asignada verifica creación/edición de cuentas, concesión de privilegios y límites de acceso a archivos.
 - Gerencia y nuevos reportes permanecen en espera del cierre acordado de seguridad.
@@ -48,6 +53,7 @@ Cada cambio de estos estados necesita SHA y fuente. No inferir despliegue a part
 | SEC-01 R4 — administración de roles (2026-10-21) | Regla del propietario: administrar roles es exclusivo de super_admin. A) contención en datos vivos; B) reparación de código | A) ~~**BLOQUEADA**: el clasificador de permisos del ejecutor rechazó la escritura; sin cambios en vivo (alerta 6318733204)~~ → **aplicada a mano por el propietario** (confirmación 6319443716) y **verificada en solo lectura** (§5). B) `RolePolicy` + `PrivilegedRoleDefinitionGuard`; BASE `66f5ce8`, TESTED `b51fa3e` | Instrucción 6318625636; ~~código listo para revisión~~ → **código aceptado en 6319407886 (REVIEW_HEAD `97737ba`)**; **sin desplegar** |
 | SEC-02 general | Reportes, archivos y caché | Pendiente, salvo comprobaciones acotadas activadas en R2 | No cerrado |
 | SEC-03 general | Identidad, sesiones y entradas | Pendiente, salvo comprobaciones acotadas activadas en R2 | No cerrado |
+| SEC-03 / TASK-0017 (2026-11-11) | Recuperación de cuentas (correo y RIF), tokens, Host/proxies, verificación y cambio de correo, sobre staging `b048df0` | Solo auditoría y pruebas: 13 controles descartan la toma de cuentas en el alcance probado; F-SEC03-01..06 confirmados (ver §4). BASE `b048df0`, TESTED `8a4ed35` (rama `audit/sec-03-account-recovery`) | Instrucción 6797800863; **READY_FOR_REVIEW, sin correcciones ni despliegue**. SEC-03 sigue abierto |
 | SEC-04 | Dependencias, integraciones e infraestructura | Pendiente | No cerrado |
 | SEC-05 | Regresión consolidada y riesgos residuales | Pendiente | No cerrado |
 
@@ -80,6 +86,12 @@ Las severidades son las comunicadas por la ronda, sujetas a revisión. Una confi
 | RT-BUILD-2026-10 | Higiene de build / Alta (configuración embebida) | Sin `.dockerignore`, la imagen se construía desde el checkout del servidor e incluía archivos no versionados (`.env`, `.git`). Las imágenes anteriores conservan esa configuración en sus capas | Medido en las capas de la imagen en servicio, 2026-10-26 (solo conteos) | Rama `build/source-only-image` (base `1d3a16e`): `.dockerignore` estricto, más una guarda en el `Dockerfile` que detiene la build si entra un archivo prohibido. En la candidata, 0 nombres prohibidos y 0 valores secretos en capas; código, vendor y lock idénticos a lo desplegado. Ver `docs/deploy/IMAGEN_Y_SECRETOS.md` | **Candidato en revisión, sin desplegar** (2026-10-26). Las imágenes antiguas quedan restringidas al servidor hasta la decisión del propietario sobre su ciclo de vida |
 | RT-MAIL-TLS-2026-10 | App / Media, seguridad del transporte de correo | La configuración SMTP de la app (`config/mail.php`, `mailers.smtp.stream.ssl`) declaraba la verificación del certificado y del nombre del servidor desactivada (`verify_peer=false`, `verify_peer_name=false`, `allow_self_signed=true`) | Confirmado en el código. Con Laravel 12.69 y `symfony/mailer` 7.4.17, Laravel no pasa `stream` al transporte, así que el bloque **no tenía efecto**. Lo prueba un control negativo en local, y en vivo el transporte no tiene opciones SSL. La opción que sí desactiva la verificación (`verify_peer` en el primer nivel) nunca estuvo puesta. El relay presenta un certificado válido (TLS 1.3) | Commit `e49cbac` (rama `fix/mail-tls-verify`): quita el bloque y agrega `tests/Feature/Security/MailTransportTlsTest.php`. La prueba vigila la configuración y el transporte, e incluye un control de que detecta `verify_peer=false`. 3/3 en local; sin envío de correo | **Corregido y desplegado** el 2026-10-26 16:41Z en staging, con el workflow de despliegue (ejecución exitosa). Verificación de solo lectura posterior: app con PHP 8.2.35, `.env` ausente de la imagen, configuración en caché sin `stream` ni `verify_peer`, HTTP 200 y 0 errores nuevos. **Pruebas reales de envío con la verificación activa: 6 de 6 recibidas**, confirmadas por el propietario: 3 al buzón del sistema y 3 a buzones externos del propietario, en Gmail y dos dominios propios. **Cerrado.** Registrado por la revisión 6416153795 (repositorio privado de administración) |
 | RT-MAIL-2026-10 | Funcionalidad / Correo del sistema | El correo estaba en modo simulado (`log`): la verificación de cuentas y los avisos de solicitudes no salían | — | Activación autorizada por el propietario: transporte `smtp` global con remitente del dominio; el único cambio fue regenerar la caché de configuración (solo cambiaron claves `mail.*`) | **Activado** el 2026-10-26. Una prueba controlada fue aceptada por el proveedor y el propietario confirmó que llegó al buzón. Detalle en `docs/deploy/CORREO_DEL_SISTEMA.md` (rama `build/source-only-image`) |
+| F-SEC03-01 | SEC-03 TASK-0017 / Media (defensa en profundidad; Alta si el borde lo permitiera) | El host de los enlaces de recuperación y de verificación se toma de la petición, no de la configuración | **Confirmado en la aplicación** (oráculos aislados); explotación externa **no verificada**: el túnel solo enruta el hostname de staging y el origen no expone HTTP | Propuesta P1: raíz y esquema de URL forzados desde `APP_URL` y `TrustHosts`. Sin implementar | Abierto; decisión y autorización del propietario. **Verificar producción antes de llevar la recuperación allí** |
+| F-SEC03-02 | SEC-03 TASK-0017 / Media (misma causa que 01) | La aplicación acepta peticiones para cualquier host (`TrustHosts` desactivado, panel sin dominio) | Confirmado en la aplicación (200 con host ajeno) | P1 | Abierto |
+| F-SEC03-03 | SEC-03 TASK-0017 / Media, disponibilidad | Detrás de cloudflared y nginx, la aplicación ve a todos los clientes con la IP del gateway: los límites «por IP» de login, recuperación y reset son globales | **Confirmado en staging** (configuración, 503/503 peticiones de 24 h desde una sola dirección privada) y con un oráculo aislado; el bloqueo no se ejerció | P2: IP real desde el gateway confiable; **quitar `X-Forwarded-Host` de las cabeceras confiables** o aplicar P1 antes. Sin implementar | Abierto |
+| F-SEC03-04 | SEC-03 TASK-0017 / Baja–media, disponibilidad dirigida | Las solicitudes que no pasan Turnstile consumen igual el cupo por correo y por RIF | Confirmado en aislamiento (correo y RIF) | P3: Turnstile antes de contar los cupos por destinatario. Sin implementar | Abierto |
+| F-SEC03-05 | SEC-03 TASK-0017 / Baja | Cambiar el correo de una cuenta conserva `email_verified_at`: el buzón nuevo hereda la verificación y la elegibilidad por RIF | Confirmado en aislamiento (modelo; el escritor es la gestión de usuarios). Concreta el indicio F-SEC01-07 en esta faceta | P4: anular la verificación y los tokens pendientes al cambiar el correo. Sin implementar | Abierto |
+| F-SEC03-06 | SEC-03 TASK-0017 / Baja–media, transporte | La aplicación responde por HTTP sin redirigir a HTTPS y sin HSTS (las cookies sí llevan `Secure`) | Confirmado en staging con GET inocuos | P5: «Always Use HTTPS» y HSTS en Cloudflare, o redirección en la aplicación; decisión de infraestructura | Abierto |
 
 En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas (F-SEC01-02a). NO se estableció traversal de directorios en las superficies probadas (segmento de id numérico y `secciones` con lista blanca): resultado negativo acotado, no certificación general.
 
@@ -257,6 +269,23 @@ En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas 
     - Propuesta: **0 ahora**, porque no tiene usuarios. Si el rol vuelve a usarse, se decide por bloques.
   - **Requisitos de cualquier restauración:** aprobación del propietario, **después** de desplegar esta corrección (si no, el siguiente guardado lo vuelve a borrar), con un script revisado y transaccional y no con el editor, y vaciando la caché.
 - **Informe:** [security_sec01_r4_01_2026-10-21.md](../../audit/security_sec01_r4_01_2026-10-21.md).
+
+### SEC-03 / TASK-0017 — recuperación de cuentas, tokens y confianza en Host/proxies (6797800863) — 2026-11-11
+
+- **Alcance:** vinculación del token (A/B sintéticas), *Host* y cabeceras de proxy, recuperación por RIF, verificación y
+  cambio de correo, CSRF, logs y caché, y configuración real en solo lectura. Objetivo: staging `b048df0`.
+- **Método:** lectura de código y del *vendor* fijado (Laravel 12.69.0, Filament 3.3.55); sonda de configuración en el
+  contenedor (solo hosts e indicadores); conteos agregados del log de nginx; dos GET inocuos; pruebas en el runner
+  aislado. Sin peticiones manipuladas a staging, sin correo, sin cuentas reales y sin producción.
+- **Pruebas:** `tests/Feature/Security/Sec03AccountRecoveryControlsTest.php` (13 controles, verdes) y
+  `Sec03AccountRecoveryOpenFindingsTest.php` (7 oráculos, rojos en `b048df0` por diseño; pasan cuando se corrija).
+  Enfocada `8a4ed35`, run `20261111T141320Z-8a4ed35df5aa`: 20 tests, 13 OK y 7 fallos esperados. Suite completa `8a4ed35`, run
+  `20261111T141441Z-8a4ed35df5aa`: 736 tests, 7939 aserciones, solo los 7 fallos esperados.
+- **Correcciones:** ninguna. La propuesta P1–P5 está en el informe. **Atención a P2:** confiar en proxies sin quitar
+  `X-Forwarded-Host` volvería explotable F-SEC03-01.
+- **Despliegue:** ninguno. **Riesgos residuales:** borde de Cloudflare sin prueba activa, producción sin inspeccionar,
+  sin correo real y sin medir tiempos.
+- **Informe:** [SEC03_TASK0017_ACCOUNT_RECOVERY_HOST_TRUST.md](../../audit/SEC03_TASK0017_ACCOUNT_RECOVERY_HOST_TRUST.md).
 
 ## 6. Cobertura pendiente
 
