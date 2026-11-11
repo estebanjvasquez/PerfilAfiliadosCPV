@@ -61,6 +61,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // TASK-0018 / SEC-03 P1 (F-SEC03-01): los enlaces (recuperación, verificación, notificaciones, cualquier route()
+        // o url()) usan la raíz de APP_URL, nunca el Host de la petición. La configuración se lee al generar cada URL, no
+        // aquí. Fuera de APP_ENV=local; se puede apagar con APP_CANONICAL_URL=false.
+        if (! $this->app->environment('local')) {
+            \Illuminate\Support\Facades\URL::formatHostUsing(
+                fn (string $root, $route = null) => config('security.canonical_url')
+                    ? \App\Support\Http\CanonicalUrl::formatRoot($root, $route)
+                    : $root
+            );
+        }
+
         // Portado de feature/supplhi-postgres-buscador: mantiene
         // empresas.completion_percentage (cache de Empresa::completionPercentage(), ver
         // migracion 2026_09_01_130000) al dia cuando cambia cualquier dato que afecte el

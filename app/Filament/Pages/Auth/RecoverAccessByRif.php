@@ -40,11 +40,10 @@ class RecoverAccessByRif extends BaseRequestPasswordReset
         $rif = AccountRecovery::normalizeRif((string) $data['rif']);
         $limits = config('account_recovery.limits');
 
-        if (! AccountRecovery::attempt([
-            'account-recovery:rif:ip:'.request()->ip() => $limits['per_ip'],
-            'account-recovery:rif:'.$rif => $limits['per_rif'],
-        ])) {
-            Notification::make()->title(self::THROTTLED_TITLE)->body(self::THROTTLED_BODY)->danger()->send();
+        // TASK-0018 / SEC-03 P3 (F-SEC03-04): el cupo por origen se cuenta antes de Turnstile (frena bots), pero el cupo
+        // del RIF solo después de pasarlo: un pedido sin Turnstile válido ya no agota el cupo de esa empresa.
+        if (! AccountRecovery::attempt(['account-recovery:rif:ip:'.request()->ip() => $limits['per_ip']])) {
+            $this->throttled();
 
             return;
         }
@@ -58,12 +57,24 @@ class RecoverAccessByRif extends BaseRequestPasswordReset
             ]);
         }
 
+        if (! AccountRecovery::attempt(['account-recovery:rif:'.$rif => $limits['per_rif']])) {
+            $this->throttled();
+
+            return;
+        }
+
         AccountRecovery::defer(fn () => AccountRecovery::sendByRif($rif));
 
         Notification::make()->title(self::SENT_TITLE)->body(self::SENT_BODY)->success()->send();
         $this->form->fill();
         $this->ts_token = '';
         $this->dispatch('turnstile-reset');
+    }
+
+    /** Mismo aviso para cualquier límite: no dice cuál se alcanzó ni si el RIF existe. */
+    private function throttled(): void
+    {
+        Notification::make()->title(self::THROTTLED_TITLE)->body(self::THROTTLED_BODY)->danger()->send();
     }
 
     /**

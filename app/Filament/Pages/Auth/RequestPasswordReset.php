@@ -40,11 +40,10 @@ class RequestPasswordReset extends BaseRequestPasswordReset
         $email = AccountRecovery::normalizeEmail((string) $data['email']);
         $limits = config('account_recovery.limits');
 
-        if (! AccountRecovery::attempt([
-            'account-recovery:email:ip:'.request()->ip() => $limits['per_ip'],
-            'account-recovery:email:'.sha1($email) => $limits['per_email'],
-        ])) {
-            Notification::make()->title(self::THROTTLED_TITLE)->body(self::THROTTLED_BODY)->danger()->send();
+        // TASK-0018 / SEC-03 P3 (F-SEC03-04): el cupo por origen se cuenta antes de Turnstile (frena bots), pero el cupo
+        // del correo solo después de pasarlo: un pedido sin Turnstile válido ya no agota el cupo del titular.
+        if (! AccountRecovery::attempt(['account-recovery:email:ip:'.request()->ip() => $limits['per_ip']])) {
+            $this->throttled();
 
             return;
         }
@@ -58,12 +57,24 @@ class RequestPasswordReset extends BaseRequestPasswordReset
             ]);
         }
 
+        if (! AccountRecovery::attempt(['account-recovery:email:'.sha1($email) => $limits['per_email']])) {
+            $this->throttled();
+
+            return;
+        }
+
         AccountRecovery::defer(fn () => AccountRecovery::sendByEmail($email));
 
         Notification::make()->title(self::SENT_TITLE)->body(self::SENT_BODY)->success()->send();
         $this->form->fill();
         $this->ts_token = '';
         $this->dispatch('turnstile-reset');
+    }
+
+    /** Mismo aviso para cualquier límite: no dice cuál se alcanzó ni si la cuenta existe. */
+    private function throttled(): void
+    {
+        Notification::make()->title(self::THROTTLED_TITLE)->body(self::THROTTLED_BODY)->danger()->send();
     }
 
     /**

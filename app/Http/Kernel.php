@@ -14,8 +14,10 @@ class Kernel extends HttpKernel
      * @var array<int, class-string|string>
      */
     protected $middleware = [
-        // \App\Http\Middleware\TrustHosts::class,
+        // TASK-0018 / SEC-03: P1 (hosts), P2 (IP real) y P5 (https/HSTS). Ver config/security.php.
+        \App\Http\Middleware\TrustHosts::class,
         \App\Http\Middleware\TrustProxies::class,
+        \App\Http\Middleware\EnforceHttps::class,
         \Illuminate\Http\Middleware\HandleCors::class,
         \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,

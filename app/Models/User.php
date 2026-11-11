@@ -33,6 +33,43 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 
     ];
 
+    /**
+     * TASK-0018 / SEC-03 P4 (F-SEC03-05): un buzón nuevo no hereda la verificación del anterior.
+     *
+     * Si el correo cambia de verdad (no solo en mayúsculas o espacios), la cuenta queda sin verificar, aunque la misma
+     * edición intente fijar `email_verified_at`, y se borran los tokens de recuperación emitidos para el correo anterior.
+     * El panel pide la verificación del buzón nuevo en el próximo ingreso (->emailVerification()), y mientras tanto la
+     * ayuda por RIF no le escribe (AccountRecovery::eligibleForRif exige correo verificado). Si el correo no cambia, la
+     * verificación se conserva. Los enlaces de verificación viejos ya no servían: llevan el hash del correo anterior.
+     */
+    protected static function booted(): void
+    {
+        static::updating(function (User $user): void {
+            if ($user->emailReallyChanges()) {
+                $user->email_verified_at = null;
+            }
+        });
+
+        static::updated(function (User $user): void {
+            if ($user->emailReallyChanges()) {
+                $broker = (string) config('auth.defaults.passwords');
+                DB::table((string) config("auth.passwords.{$broker}.table"))
+                    ->where('email', (string) $user->getOriginal('email'))
+                    ->delete();
+            }
+        });
+    }
+
+    /** Durante updating/updated: el correo guardado cambia a otro buzón (mayúsculas y espacios no cuentan). */
+    private function emailReallyChanges(): bool
+    {
+        $normalize = fn ($email) => mb_strtolower(trim((string) $email));
+
+        return $this->isDirty('email') || $this->wasChanged('email')
+            ? $normalize($this->getOriginal('email')) !== $normalize($this->getAttribute('email'))
+            : false;
+    }
+
     public function empresas()
     {
 
