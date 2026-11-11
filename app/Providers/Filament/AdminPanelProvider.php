@@ -19,6 +19,7 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\View\View;
 use Filament\Panel;
 use Filament\PanelProvider;
+use App\Filament\Tables\PanelTable;
 use Filament\Tables\Table;
 use Filament\Widgets;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
@@ -43,6 +44,17 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 class AdminPanelProvider extends PanelProvider
 {
     /**
+     * Registros por página de TODAS las tablas del panel: los de Filament sin «Todos».
+     * Con «Todos» elegido, una tabla grande (las ~3.100 categorías, staging 2026-11-11) superaba
+     * los 30 s de PHP y se quedaba cargando; la elección queda en la sesión, así que el usuario
+     * no salía de ahí. Filament descarta solo un «Todos» guardado que ya no esté entre las
+     * opciones. Las descargas de reportes (Excel/PDF de Reportes y Catálogo) no dependen de la
+     * paginación: siguen trayendo todos los registros. La exportación por selección usa
+     * «Seleccionar todos», que también abarca todas las páginas. Lo aplica PanelTable.
+     */
+    public const TABLE_PAGE_OPTIONS = [5, 10, 25, 50, 100];
+
+    /**
      * Fase F del upgrade: aplica "esto en todo" (pedido del cliente) sin tocar los ~20
      * archivos de Resources/RelationManagers/reportes uno por uno. Table::configureUsing()
      * es un hook global de Filament (Table::make() llama a configure() -> setUp() en TODA
@@ -59,23 +71,13 @@ class AdminPanelProvider extends PanelProvider
      * Los widgets (StatsOverview, los de GerenciaDashboard) no necesitan nada aca: son lazy
      * por defecto en Filament v3 (Filament\Support\Concerns\CanBeLazy::$isLazy = true),
      * ningun widget de esta app lo desactiva.
+     *
+     * Registros por página: ver TABLE_PAGE_OPTIONS y App\Filament\Tables\PanelTable.
      */
-    /**
-     * Registros por página de TODAS las tablas del panel: los de Filament sin «Todos».
-     * Con «Todos» elegido, una tabla grande (las ~3.100 categorías, staging 2026-11-11) superaba
-     * los 30 s de PHP y se quedaba cargando; la elección queda en la sesión, así que el usuario
-     * no salía de ahí. Filament descarta solo un «Todos» guardado que ya no esté entre las
-     * opciones. Las descargas de reportes (Excel/PDF de Reportes y Catálogo) no dependen de la
-     * paginación: siguen trayendo todos los registros. La exportación por selección usa
-     * «Seleccionar todos», que también abarca todas las páginas.
-     */
-    public const TABLE_PAGE_OPTIONS = [5, 10, 25, 50, 100];
-
     public function boot(): void
     {
-        Table::configureUsing(fn (Table $table) => $table
-            ->deferLoading()
-            ->paginationPageOptions(self::TABLE_PAGE_OPTIONS));
+        Table::configureUsing(fn (Table $table) => $table->deferLoading());
+        $this->app->bind(Table::class, PanelTable::class);
 
         // Ver public/css/filament/custom/panel.css: fix puntual del Select de una sola opcion
         // con etiquetas largas (Ciudad) que se rompe visualmente en mobile.

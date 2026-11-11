@@ -4,6 +4,7 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Pages\CompletionView;
 use App\Filament\Resources\TaxonomyCategoryResource\Pages\ListTaxonomyCategories;
+use App\Filament\Tables\PanelTable;
 use App\Models\User;
 use App\Providers\Filament\AdminPanelProvider;
 use Filament\Facades\Filament;
@@ -46,6 +47,16 @@ class PanelTablePaginationTest extends TestCase
 
             $this->assertSame(AdminPanelProvider::TABLE_PAGE_OPTIONS, $options, $component);
         }
+    }
+
+    #[Test]
+    public function an_explicit_all_option_is_dropped_and_other_options_are_kept(): void
+    {
+        $table = Livewire::test(ListTaxonomyCategories::class)->instance()->getTable();
+        $this->assertInstanceOf(PanelTable::class, $table);
+
+        $this->assertSame([10, 25], $table->paginationPageOptions([10, 25, 'all'])->getPaginationPageOptions());
+        $this->assertSame(AdminPanelProvider::TABLE_PAGE_OPTIONS, $table->paginationPageOptions(['all'])->getPaginationPageOptions());
     }
 
     #[Test]
