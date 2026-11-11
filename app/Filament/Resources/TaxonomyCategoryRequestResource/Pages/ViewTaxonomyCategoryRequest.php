@@ -51,7 +51,7 @@ class ViewTaxonomyCategoryRequest extends ViewRecord
             ->color('primary')
             ->visible(fn () => Auth::user()?->can('analyzeWithAi', $this->getRecord()) ?? false)
             ->disabled(fn () => ! $service->enabled())
-            ->tooltip(fn () => $service->enabled() ? null : TaxonomyCategoryRequestAnalysis::ERRORS['provider_disabled'].' Se activa con la autorización del propietario.')
+            ->tooltip(fn () => $service->enabled() ? null : TaxonomyCategoryRequestAnalysis::ERRORS['provider_disabled'].' Se configura en «Configuración del análisis con IA».')
             ->modalHeading(fn () => 'Analizar con IA la solicitud #'.$this->getRecord()->getKey())
             ->modalDescription('La IA compara lo que pidió el afiliado con las categorías que usted elija y redacta un informe. No aprueba, no publica, no vincula categorías y no cambia el estado de la solicitud.')
             ->modalSubmitActionLabel('Analizar ahora')

@@ -50,6 +50,7 @@ class TaxonomyCategoryRequestAnalysis extends Model
         'provider_disabled' => 'El análisis con IA no está activado en este servidor.',
         'provider_timeout' => 'El proveedor de IA no respondió a tiempo.',
         'provider_error' => 'El proveedor de IA devolvió un error.',
+        'provider_auth' => 'El proveedor de IA rechazó la clave de API: revísela en «Configuración del análisis con IA».',
         'provider_refused' => 'El proveedor de IA declinó responder.',
         'invalid_output' => 'La respuesta de la IA no cumplió el formato esperado y se descartó.',
         'budget_exceeded' => 'Se alcanzó el tope de gasto diario configurado.',

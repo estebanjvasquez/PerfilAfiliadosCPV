@@ -39,15 +39,15 @@ class AppServiceProvider extends ServiceProvider
         // del pedido de Phase 3).
         $this->app->bind(IntentContaminationDetector::class, fn () => IntentContaminationDetector::fromGovernedVocabulary());
 
-        // TASK-0016: proveedor de IA y buscador de fuentes del análisis de solicitudes, por configuración. Hoy solo
-        // existe `disabled` (no llama a nadie): un proveedor real se agrega aquí cuando el propietario autorice cuál,
-        // su clave y su presupuesto. Un nombre desconocido cae a `disabled`, nunca a un servicio de pago.
-        $this->app->bind(\App\Services\CategoryAnalysis\Contracts\AnalysisProvider::class, fn () => match (config('category_analysis.provider')) {
-            default => new \App\Services\CategoryAnalysis\DisabledAnalysisProvider,
-        });
-        $this->app->bind(\App\Services\CategoryAnalysis\Contracts\SourceRetriever::class, fn () => match (config('category_analysis.sources')) {
-            default => new \App\Services\CategoryAnalysis\DisabledSourceRetriever,
-        });
+        // TASK-0016: proveedor de IA y buscador de fuentes del análisis de solicitudes. Desde el addendum del
+        // 2026-11-11 salen de la configuración del panel (CategoryAnalysisSettings, por ProviderRegistry); sin una
+        // configuración completa son los desactivados, que no llaman a nadie.
+        $this->app->bind(\App\Services\CategoryAnalysis\Anthropic\AnthropicClientFactory::class,
+            fn () => new \App\Services\CategoryAnalysis\Anthropic\AnthropicClientFactory);
+        $this->app->bind(\App\Services\CategoryAnalysis\Contracts\AnalysisProvider::class,
+            fn ($app) => $app->make(\App\Services\CategoryAnalysis\ProviderRegistry::class)->provider());
+        $this->app->bind(\App\Services\CategoryAnalysis\Contracts\SourceRetriever::class,
+            fn ($app) => $app->make(\App\Services\CategoryAnalysis\ProviderRegistry::class)->sources());
 
         // TASK-0014: una instancia por petición, así los motivos de coincidencia de una página del
         // listado se calculan una sola vez y nunca sobreviven a la petición.

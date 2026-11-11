@@ -2,11 +2,13 @@
 
 namespace App\Services\CategoryAnalysis;
 
+use App\Models\CategoryAnalysisSettings;
 use App\Models\TaxonomyCategory;
 use App\Models\TaxonomyCategoryRequest;
 use App\Models\TaxonomyCategoryRequestAnalysis;
 use App\Models\User;
 use App\Services\CategoryAnalysis\Contracts\AnalysisProvider;
+use App\Services\CategoryAnalysis\Contracts\ReportsUsage;
 use App\Services\CategoryAnalysis\Contracts\SourceRetriever;
 use App\Services\TaxonomyCategorySearch;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -31,6 +33,9 @@ use Illuminate\Support\Facades\RateLimiter;
  */
 final class CategoryAnalysisService
 {
+    /** Consumo de la búsqueda de fuentes de la ejecución en curso (se suma al costo). */
+    private array $sourceUsage = ['input_tokens' => 0, 'output_tokens' => 0, 'web_searches' => 0];
+
     public function __construct(
         private readonly AnalysisProvider $provider,
         private readonly SourceRetriever $sources,
@@ -146,8 +151,10 @@ final class CategoryAnalysisService
         $started = now();
 
         $candidates = array_values(array_filter($this->catalogCandidates($request), fn ($c) => ! in_array($c['category_id'], $ids, true)));
-        [$sources, $limited, $sourceNote] = $this->retrieveSources($request);
         $requestData = $this->requestData($request);
+        // El tope se mira ANTES de cualquier llamada de pago (también la búsqueda web).
+        $overBudget = $this->overBudget();
+        [$sources, $limited, $sourceNote] = $overBudget ? [[], true, ''] : $this->retrieveSources($request);
 
         $base = [
             'request_id' => $request->getKey(),
@@ -163,7 +170,7 @@ final class CategoryAnalysisService
             'started_at' => $started,
         ];
 
-        if ($this->overBudget()) {
+        if ($overBudget) {
             return $this->store($base + ['status' => TaxonomyCategoryRequestAnalysis::STATUS_FAILED, 'error_code' => 'budget_exceeded']);
         }
 
@@ -186,7 +193,7 @@ final class CategoryAnalysisService
                 'error_message' => $e->errorCode === 'invalid_output' ? mb_substr($e->getMessage(), 0, 300) : null,
                 'input_tokens' => $result->inputTokens ?? null,
                 'output_tokens' => $result->outputTokens ?? null,
-                'cost_usd' => isset($result) ? $this->cost($result) : null,
+                'cost_usd' => $this->cost($result ?? null),
             ]);
         }
 
@@ -232,8 +239,11 @@ final class CategoryAnalysisService
 
         try {
             $found = $this->sources->search(mb_substr((string) $request->necesidad, 0, 200), (int) config('category_analysis.max_sources'));
+            if ($this->sources instanceof ReportsUsage) {
+                $this->sourceUsage = $this->sources->lastUsage();
+            }
         } catch (\Throwable $e) {
-            Log::warning('Category analysis: source search failed ('.$e::class.').');
+            Log::warning('Category analysis: source search failed ('.class_basename($e).').');
 
             return [[], true, 'Análisis limitado: la búsqueda de fuentes externas falló; no se verificó nada fuera del catálogo CPV.'];
         }
@@ -320,10 +330,11 @@ final class CategoryAnalysisService
         }
     }
 
+    /** Gasto del día (todas las solicitudes) contra el presupuesto diario del panel. */
     private function overBudget(): bool
     {
-        $cap = config('category_analysis.daily_cost_cap_usd');
-        if ($cap === null || $cap === '') {
+        $cap = CategoryAnalysisSettings::current()->daily_budget_usd;
+        if ($cap === null) {
             return false;
         }
 
@@ -332,15 +343,26 @@ final class CategoryAnalysisService
         return $spent >= (float) $cap;
     }
 
-    private function cost(ProviderResult $result): ?float
+    /**
+     * Costo estimado con los precios del panel: tokens del juicio, más los de la búsqueda de fuentes y sus búsquedas
+     * web. null si faltan precios o el proveedor no informó tokens.
+     */
+    private function cost(?ProviderResult $result): ?float
     {
-        $in = config('category_analysis.price_per_mtok.input');
-        $out = config('category_analysis.price_per_mtok.output');
-        if ($in === null || $out === null || $result->inputTokens === null || $result->outputTokens === null) {
+        $settings = CategoryAnalysisSettings::current();
+        $in = $settings->price_input_per_mtok;
+        $out = $settings->price_output_per_mtok;
+        if ($in === null || $out === null) {
+            return null;
+        }
+        $inputTokens = ($result?->inputTokens ?? 0) + $this->sourceUsage['input_tokens'];
+        $outputTokens = ($result?->outputTokens ?? 0) + $this->sourceUsage['output_tokens'];
+        if ($result !== null && ($result->inputTokens === null || $result->outputTokens === null)) {
             return null;
         }
 
-        return round(($result->inputTokens * (float) $in + $result->outputTokens * (float) $out) / 1_000_000, 6);
+        return round(($inputTokens * $in + $outputTokens * $out) / 1_000_000
+            + $this->sourceUsage['web_searches'] * (float) ($settings->price_per_web_search ?? 0), 6);
     }
 
     private function store(array $attributes): TaxonomyCategoryRequestAnalysis

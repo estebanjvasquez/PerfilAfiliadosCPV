@@ -76,6 +76,7 @@ class CategoryRequestAiAnalysisTest extends TestCase
             (require database_path('migrations/2026_10_15_120000_add_delivery_operations_to_taxonomy_category_requests.php'))->up();
         }
         (require database_path('migrations/2026_11_11_120000_create_taxonomy_category_request_analyses_table.php'))->up();
+        (require database_path('migrations/2026_11_11_130000_create_category_analysis_settings_table.php'))->up();
         DB::connection('pgsql')->statement('CREATE EXTENSION IF NOT EXISTS unaccent');
 
         Filament::setCurrentPanel(Filament::getPanel('admin'));
@@ -232,7 +233,7 @@ class CategoryRequestAiAnalysisTest extends TestCase
         // Sin el doble: lo que resuelve la aplicación con su configuración por defecto.
         $this->app->forgetInstance(AnalysisProvider::class);
         $this->app->forgetInstance(SourceRetriever::class);
-        $this->assertSame('disabled', config('category_analysis.provider'));
+        $this->assertSame('disabled', \App\Models\CategoryAnalysisSettings::current()->provider);
         $this->assertInstanceOf(\App\Services\CategoryAnalysis\DisabledAnalysisProvider::class, app(AnalysisProvider::class));
         $this->assertFalse(app(SourceRetriever::class)->available());
         $request = $this->solicitud();
@@ -483,7 +484,7 @@ class CategoryRequestAiAnalysisTest extends TestCase
         }
 
         $other = $this->solicitud();
-        config(['category_analysis.daily_cost_cap_usd' => 0.01, 'category_analysis.price_per_mtok' => ['input' => 4, 'output' => 20]]);
+        \App\Models\CategoryAnalysisSettings::current()->fill(['daily_budget_usd' => 0.01, 'price_input_per_mtok' => 4, 'price_output_per_mtok' => 20])->save();
         $this->provider->usage = [1000, 1000];
         $paid = $this->service()->run($other, $admin, $this->ids('costos'));
         $this->assertEqualsWithDelta(0.024, $paid->cost_usd, 0.000001);
