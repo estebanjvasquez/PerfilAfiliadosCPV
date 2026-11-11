@@ -1,7 +1,29 @@
-# Tarea actual (checkpoint 2026-11-09, rama `fix/sec-01-r4-01-role-editor-preserve`)
+# Tarea actual (checkpoint 2026-11-11, rama `fix/sec-01-r4-01-role-editor-preserve`)
 
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
+
+## 2026-11-11 17:17Z: decisiones del propietario sobre la consolidación de pendientes (`6802438608`) — solo registro documental
+
+No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna implementación. El detalle está en el addendum de
+[`PENDIENTES_CONSOLIDADO_2026-11-11.md`](PENDIENTES_CONSOLIDADO_2026-11-11.md) (corte `f6e3134`).
+
+| Tarea o entrega | Declaración del propietario | Sigue pendiente |
+|---|---|---|
+| TASK-0017 (SEC-03) | Autoriza en alcance P1–P5 con pruebas aisladas, sin despliegue automático; P1 antes de P2 | Materializar la tarea de ejecución; revisión de la auditoría |
+| SEC-01 R3, R4 y R4-01 | Autoriza revisión final, integración y despliegue en staging, con respaldo, regresión y verificación de preservación de permisos; no producción ni `main` | Asignación de ejecución. Hasta verificar R4-01, no guardar roles en el editor de staging |
+| TASK-0012 | Recibió correos de verificación y recuperación; autoriza pruebas controladas en staging con cuentas y buzones de prueba | Evidencia formal de todos los flujos, incluido RIF y los controles de SEC-03 |
+| TASK-0013 | UAT declarada: explicación de coincidencias y votos. Búsqueda y ranking sin validación del cliente; mejoras adicionales a fase 2 | Validación del cliente. Pedir a la Cámara que revise sectores principales y «X» antes de cambiar datos |
+| TASK-0014 | Búsqueda probada en parte; diccionario sin probar. Pide configurar y probar la búsqueda semántica en staging | UAT del diccionario; configuración semántica (asignación) |
+| TASK-0015 | UAT declarada: cambios de código de categoría | Revisión técnica; comentario de entrega en el Issue #2 |
+| TASK-0016 | UAT declarada: configuración de IA y análisis de solicitudes | Revisión técnica |
+| *Hotfix* de paginación (`b048df0`, Issue `6794806339`) | UAT declarada: paginación sin «Todos» | No tiene archivo de tarea; aquí no se le asigna identificador |
+| Descargas (`ce70b7f`), perfil completo en PDF (`514fa6e`), secciones del PDF (`87dd997`), Inicio (`0f8bdad`) | UAT declarada | Caché de Cloudflare `/pdf/*` y `/xls/*`, sin comprobar |
+| Producción | Plan técnico comparativo, checklist y ensayo aislado; credenciales y n8n solo en planificación | Asignación del plan. Gate: seguridad crítica y alta cerrada, UAT completa, aceptación de la Cámara y autorización explícita |
+
+«UAT declarada» es la declaración del propietario en `6802438608`. No es aprobación de seguridad, integración ni despliegue, y
+ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
+pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
 ## Nueva, 2026-11-11: TASK-0017 — SEC-03: recuperación de cuentas, tokens y confianza en Host/proxies (auditoría) — READY_FOR_REVIEW (`6797800863`)
 
@@ -306,7 +328,7 @@ Gerencia (`planning/management-taxonomy`) en espera hasta aceptar la seguridad; 
 
 ## Pendientes fuera de esta ronda
 
-- correo/SMTP (sin envío, un afiliado nuevo no puede verificarse solo);
+- correo/SMTP: ~~sin envío, un afiliado nuevo no puede verificarse solo~~ → `smtp` en staging desde el 2026-10-26 y correos recibidos según el propietario (`6802438608`); falta evidencia formal de cada flujo;
 - `JoinViews`: su vista falla con empresas incompletas, y su acción Pdf no existe;
 - datos históricos de `assets` (solo propuesta);
 - el backlog de `SESSION_RESUME.md` §5.

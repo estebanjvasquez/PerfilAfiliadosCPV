@@ -160,3 +160,77 @@ Ya cerradas, como referencia: TASK-0011 APPROVED (`6440840198`); SEC-01 R1+R2 de
 | *Hotfix* de paginación | Solo en el Issue | Falta registrarlo en los archivos versionados |
 | TASK-0014 y TASK-0015 | Entregadas y en staging | Sin comentario de entrega en el Issue #2 |
 | `SESSION_RESUME.md` §1, mensaje para reiniciar | Escrito con voseo («Trabajá», «Leé», «usá») | Regla de idioma: español neutro o venezolano |
+
+---
+
+## Addendum 2026-11-11 17:17Z — decisiones del propietario (`6802438608`)
+
+Todo lo anterior es el corte original de `f6e3134` (comentario `6801807831`) y se conserva sin cambios. Esta sección registra la aprobación del propietario en `6802438608`.
+
+**Es solo un registro documental.** No asigna tareas ni autoriza implementar, desplegar, fusionar, rotar secretos, cambiar n8n o datos, ni probar en producción.
+
+Cómo leer las columnas:
+- **Declaración del propietario:** lo que el propietario decide o afirma en `6802438608`.
+- **Evidencia técnica:** lo que ya consta en los registros versionados.
+- **Pendiente de comprobación:** lo que todavía no tiene evidencia.
+
+| # | Tema | Declaración del propietario | Evidencia técnica | Pendiente de comprobación | Para ejecutarse |
+|---|---|---|---|---|---|
+| 1 | SEC-03 / TASK-0017 | Autoriza en alcance desarrollar P1–P5 y probarlas en aislamiento, sin despliegue automático. P1 (hosts y URL) va antes de confiar en cabeceras para P2 | Auditoría READY_FOR_REVIEW; 6 hallazgos abiertos (`tasks/0017`, `SECURITY_STATUS.md`) | P1–P5 sin implementar | Materializar una tarea según `PROTOCOL.md` |
+| 2 | SEC-01 R3, R4 y R4-01 | Autoriza revisión final, integración y despliegue **en staging**, con respaldo previo, regresión y verificación de preservación de permisos. No producción ni `main`. Hasta verificar R4-01, no guardar roles en el editor de staging | R3 y R4 aceptados; R4-01 READY_FOR_REVIEW; ninguno desplegado | Integración, respaldo, regresión, despliegue y verificación de permisos | Asignación de ejecución |
+| 3 | TASK-0012 y correo | Recibió correos de verificación y de recuperación. Autoriza pruebas controladas en staging con cuentas y buzones de prueba; no producción | `smtp` en staging desde el 2026-10-26 (`tasks/0012`; RT-MAIL-2026-10 y RT-MAIL-TLS-2026-10) | Evidencia formal de todos los flujos, incluido RIF y los controles de SEC-03 | Asignación de ejecución. No se vuelve a afirmar sin matiz que el correo no funciona |
+| 4 | UAT declarada (10 comprobaciones) | Ver la lista de abajo | — | No es aprobación de seguridad, integración ni despliegue | — |
+| 5 | TASK-0014 | La búsqueda de categorías se probó en parte; la gestión del diccionario no se probó. Pide configurar y probar la búsqueda semántica de categorías en staging, verificando dependencias y configuración antes de cualquier cambio | Semántica apagada en staging (falta `MCP_EMBED_URL`/`MCP_EMBED_TOKEN`, `tasks/0014`) | UAT del diccionario; configuración semántica | Asignación; no producción |
+| 6 | CIRA / TASK-0013 | Verificó la explicación de coincidencias y los votos. Búsqueda, ranking y aceptación por la Cámara siguen **sin validación del cliente**. Pedir a la Cámara que revise sectores principales y el servicio «X» **antes** de modificar datos. Las mejoras adicionales de CIRA pasan a fase 2 | Pasos 1 a 4 en vivo (`tasks/0013`) | Validación del cliente | Solicitud a la Cámara |
+| 7 | Producción | Confirma Filament v2 + MySQL. Pide primero un plan técnico comparativo de migración conjunta frente a migración por etapas. Autoriza solo planificar y preparar credenciales y n8n, sin rotar ni modificar. Pide un checklist y un ensayo aislado sin tocar producción | `docs/task.md` §4 | Plan, checklist y ensayo | Asignación del plan |
+| 8 | Deuda técnica | Antes de producción: (a) `JoinViews` (vista, PDF, UUID); (b) formularios y panel; (c) pruebas automatizadas y cobertura; (d) manuales, documentación y handoff; (e) otros defectos y mantenimiento. Todo verificando el impacto y sin cambios destructivos implícitos. **Fase 2:** revisión visual integral y en dispositivos. Las pruebas mínimas de flujos críticos siguen siendo requisito de preproducción | §7 de este informe | — | Asignación |
+
+**Gate de liberación a producción (declaración del propietario):**
+1. seguridad crítica y alta cerrada;
+2. UAT completa;
+3. aceptación de la Cámara;
+4. autorización explícita de producción.
+
+### UAT declarada por el propietario (`6802438608`)
+
+| # | Comprobación | Entrega |
+|---|---|---|
+| 1 | Perfil completo en PDF | `514fa6e` |
+| 2 | Selección de secciones del PDF | `87dd997` |
+| 3 | Exportaciones y control de acceso | `ce70b7f` |
+| 4 | Paginación sin «Todos» | *hotfix* `b048df0` |
+| 5 | Nueva página de Inicio | `0f8bdad` |
+| 6 | Cambios de códigos de categoría | TASK-0015 |
+| 7 | Configuración de IA | TASK-0016 |
+| 8 | Análisis de solicitudes | TASK-0016 |
+| 9 | Explicación de coincidencias | TASK-0013 |
+| 10 | Valoraciones y retroalimentación | TASK-0013 |
+
+Se registra como UAT declarada. Ningún estado pasa por eso a APPROVED técnico, DEPLOYED o CLOSED.
+
+Sigue pendiente de comprobación:
+- la caché de Cloudflare `/pdf/*` y `/xls/*` de las descargas;
+- TASK-0014, cuya UAT es parcial (punto 5).
+
+### Cómo quedan los urgentes del corte (§1)
+
+| Urgente | Después de `6802438608` |
+|---|---|
+| SEC-03 / TASK-0017 | Correcciones autorizadas en alcance (punto 1). Falta materializar la tarea |
+| Editor de roles (F-SEC01-R4-01) | Despliegue en staging autorizado en alcance (punto 2). El riesgo sigue hasta verificarlo: no guardar roles |
+| R3, R4 y R4-01 sin desplegar | Igual que el anterior |
+| 11 entregas sin UAT o revisión | 10 con UAT declarada. Quedan la UAT parcial de TASK-0014, la revisión técnica de cada entrega y la revisión de TASK-0017 |
+| Antes de producción | Credenciales y n8n: solo planificar. Gate de liberación definido arriba |
+
+### Qué se reconcilió y qué queda bloqueado
+
+Reconciliado en esta revisión (solo documentos):
+- `SESSION_RESUME.md`: checkpoint, SHA de staging, estado del correo, siguiente acción y mensaje de reinicio sin voseo;
+- `current_task.md`: bloque de decisiones; correo con matiz;
+- `SECURITY_STATUS.md`: decisión registrada, sin cambiar los estados de §4;
+- addenda en `tasks/0012` a `tasks/0017`, más la corrección de la cabecera de `tasks/0013` con el texto anterior tachado.
+
+No hecho:
+- `audit/orchestrator_handoff.json`: las reglas de arranque no permiten editar `audit/**`.
+- Ningún identificador de tarea nuevo. P1–P5, la integración de SEC-01, las pruebas de correo, la búsqueda semántica, el plan de producción y la deuda técnica necesitan materializarse o asignarse antes de ejecutarse.
+- *Hotfix* de paginación: sigue sin archivo de tarea. Queda registrado en `current_task.md` sin asignarle número.

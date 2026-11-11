@@ -120,3 +120,12 @@ después. `CategoryCodeChangeTest` suma 4 casos:
   el código nuevo recién al reconstruir el índice. Las empresas no se pierden porque se vinculan por id.
 - **Ediciones normales:** el resto de la ficha (nombres, relevancia) se sigue guardando sin registro en la
   auditoría, como antes.
+
+## Addendum 2026-11-11 — decisión del propietario (`6802438608`), solo registro documental
+
+
+- **UAT declarada por el propietario:** cambios de códigos de categoría. No equivale a aprobación técnica.
+- **Pendiente:**
+  - revisión técnica;
+  - esta tarea todavía no tiene comentario de entrega en el Issue #2.
+- Este addendum no cambia el propósito, el identificador ni el estado técnico de la tarea.

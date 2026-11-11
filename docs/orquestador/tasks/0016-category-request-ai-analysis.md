@@ -323,3 +323,11 @@ se configura en el panel y deja de ser solo una decisión pendiente.
 > No merge a `main`, no push que desencadene despliegue, no deploy staging/producción, no cambios a n8n, no cambios masivos/publicación de taxonomía, no operaciones destructivas ni rotación de secretos sin autorización explícita. Si un push es bloqueado por permisos, **reportar y no rodear el bloqueo**. No interrumpir revisiones de seguridad pendientes. Antes de implementar, si hay conflicto de rama/tarea, pedir resolución. Al terminar: código + tests + documentación + registro de decisiones y evidencia; actualizar handoff con `review_base_sha`, `review_head_sha` y `handoff_commit_sha` distintos según protocolo; publicar entrega en Issue #2 por canal autorizado; estado **READY_FOR_REVIEW** y STOP.
 >
 > **Respuesta esperada al recibir esta asignación:** confirmar rama/HEAD/tarea nueva materializada o indicar bloqueo preciso. **Respuesta final tras pruebas:** `READY_FOR_REVIEW / Issue #2 / HEAD <sha>`.
+
+## Addendum 2026-11-11 — decisión del propietario (`6802438608`), solo registro documental
+
+
+- **UAT declarada por el propietario:** configuración de IA y análisis de solicitudes. No equivale a aprobación técnica.
+- **Corrección del registro:** «Limitaciones y pendientes» dice que la migración no está aplicada y el código no está desplegado. El addendum del 2026-11-11 registra el despliegue a staging con migraciones.
+- **Pendiente:** revisión técnica.
+- Este addendum no cambia el propósito, el identificador ni el estado técnico de la tarea.

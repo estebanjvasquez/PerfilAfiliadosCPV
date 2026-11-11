@@ -1,6 +1,6 @@
 # CPV — Punto de reanudación (único y corto)
 
-**Checkpoint:** 2026-11-11: **TASK-0017** (SEC-03, auditoría de recuperación de cuentas, tokens y Host/proxies, Issue #2 `6797800863`) READY_FOR_REVIEW, solo auditoría, sobre staging `b048df0`. Sin toma de cuentas confirmada; hallazgos F-SEC03-01..06, sin corregir ni desplegar ([`tasks/0017-sec03-account-recovery-host-trust-audit.md`](tasks/0017-sec03-account-recovery-host-trust-audit.md)). Antes, el mismo día: **TASK-0016** (análisis IA de solicitudes de categoría, Issue #2 `6791532623`) READY_FOR_REVIEW y desplegada en staging por autorización del propietario (`feature/upgrade-filament-v3` @ `893351f`, run `42999603780`); proveedor, clave, modelo y presupuesto se configuran en el panel; UAT pendiente ([`tasks/0016-category-request-ai-analysis.md`](tasks/0016-category-request-ai-analysis.md)). TASK-0013, TASK-0014 y TASK-0015: ver `current_task.md`. Anterior: 2026-11-03, rama `fix/sec-01-r4-01-role-editor-preserve`: **TASK-0012** (recuperación de acceso por correo y RIF, Issue #2 `6602168914`) desplegada en staging por autorización del propietario; UAT y prueba de correo real pendientes ([`tasks/0012-account-recovery.md`](tasks/0012-account-recovery.md)). Staging `feature/upgrade-filament-v3` @ `06155ce` (workflow `41630703105` success; rutas de login/recuperación GET 200). TASK-0011 APPROVED (`6440840198`) y aplicada previamente en staging. Anterior, sin cambios (2026-10-21 ~16:40Z, desde `f41bcb6`): **F-SEC01-R4-01** (el editor de roles conserva lo que no muestra), lista para revisión, sin desplegar. R4 aceptado; contención verificada.
+**Checkpoint:** 2026-11-11 17:17Z: **decisiones del propietario sobre la consolidación de pendientes** (Issue #2 `6802438608`), solo registro documental: no asigna implementación, despliegue ni merge ([`PENDIENTES_CONSOLIDADO_2026-11-11.md`](PENDIENTES_CONSOLIDADO_2026-11-11.md), corte `f6e3134` y addendum). Antes, el mismo día: **TASK-0017** (SEC-03, auditoría de recuperación de cuentas, tokens y Host/proxies, Issue #2 `6797800863`) READY_FOR_REVIEW, solo auditoría, sobre staging `b048df0`. Sin toma de cuentas confirmada; hallazgos F-SEC03-01..06, sin corregir ni desplegar ([`tasks/0017-sec03-account-recovery-host-trust-audit.md`](tasks/0017-sec03-account-recovery-host-trust-audit.md)). Antes, el mismo día: **TASK-0016** (análisis IA de solicitudes de categoría, Issue #2 `6791532623`) READY_FOR_REVIEW y desplegada en staging por autorización del propietario (`feature/upgrade-filament-v3` @ `893351f`, run `42999603780`); proveedor, clave, modelo y presupuesto se configuran en el panel; UAT pendiente ([`tasks/0016-category-request-ai-analysis.md`](tasks/0016-category-request-ai-analysis.md)). TASK-0013, TASK-0014 y TASK-0015: ver `current_task.md`. Anterior: 2026-11-03, rama `fix/sec-01-r4-01-role-editor-preserve`: **TASK-0012** (recuperación de acceso por correo y RIF, Issue #2 `6602168914`) desplegada en staging por autorización del propietario; UAT y prueba de correo real pendientes ([`tasks/0012-account-recovery.md`](tasks/0012-account-recovery.md)). Staging `feature/upgrade-filament-v3` @ `06155ce` (workflow `41630703105` success; rutas de login/recuperación GET 200). TASK-0011 APPROVED (`6440840198`) y aplicada previamente en staging. Anterior, sin cambios (2026-10-21 ~16:40Z, desde `f41bcb6`): **F-SEC01-R4-01** (el editor de roles conserva lo que no muestra), lista para revisión, sin desplegar. R4 aceptado; contención verificada.
 Las versiones largas anteriores, completas y sin cambios, están en [`history/SESSION_RESUME_hasta_2026-10-16.md`](history/SESSION_RESUME_hasta_2026-10-16.md).
 El checkpoint largo de producto está en `68168129:docs/orquestador/SESSION_RESUME.md`.
 
@@ -43,12 +43,13 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 - **Otra computadora:** necesita su propio aprovisionamiento seguro de accesos (`ENVIRONMENT.md` §4). El repositorio no transfiere credenciales.
 - **Mensaje exacto para reiniciar:**
 
-  > Trabajá en la rama `fix/sec-01-r4-01-role-editor-preserve` (sin descartar cambios; si el árbol no está limpio, usá un worktree). Leé `docs/orquestador/SESSION_RESUME.md` y ejecutá solo el comentario `<id>` del Issue #2.
+  > Trabaje en la rama `fix/sec-01-r4-01-role-editor-preserve` (sin descartar cambios; si el árbol no está limpio, use un worktree). Lea `docs/orquestador/SESSION_RESUME.md` y ejecute solo el comentario `<id>` del Issue #2.
 
 ## 2. Estado, con cada SHA por separado
 
 | Hecho | Valor | Fuente y fecha |
 |---|---|---|
+| Staging en ejecución (`feature/upgrade-filament-v3`) | `b048df0` | `git rev-parse HEAD` en el servidor, solo lectura, 2026-11-11; `tasks/0017` |
 | HEAD remoto de `feature/upgrade-filament-v3` | `06155ce0579654c4c8b0d8f4dd4901d835b3dbb7` | push verificado, 2026-11-03; TASK-0012 |
 | Staging TASK-0012 | workflow `41630703105` success; `/admin/login`, `/admin/password-reset/request`, `/admin/recuperar-acceso` HTTP 200 | verificación GET, 2026-11-03; sin envío de formulario/correo |
 | Código en staging | `cf01e9c`, versionados limpios; imagen `081c35c5715d`; mantenimiento y debug apagados; sin migraciones pendientes | SSH de solo lectura, ~12:52Z |
@@ -61,17 +62,18 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 ### Anteriores
 
 - Export-access (`ce70b7f`, desplegado por el propietario), perfil completo, home branding (`0f8bdad`, UAT pendiente) y continuidad: ver [`current_task.md`](current_task.md).
-- **Correo:** sigue en `log`; activación pendiente del propietario (`docs/deploy/CORREO_DEL_SISTEMA.md`).
+- **Correo:** ~~sigue en `log`; activación pendiente del propietario~~ → `smtp` en staging desde el 2026-10-26 (`tasks/0012`; RT-MAIL-2026-10 en `SECURITY_STATUS.md`). El propietario declara haber recibido correos de verificación y recuperación (`6802438608`); falta evidencia formal de todos los flujos, incluido RIF (`docs/deploy/CORREO_DEL_SISTEMA.md`).
 
 ## 3. Siguiente acción
 
+- **Decisiones del propietario (`6802438608`, 2026-11-11):** detalle en el addendum de [`PENDIENTES_CONSOLIDADO_2026-11-11.md`](PENDIENTES_CONSOLIDADO_2026-11-11.md). Autoriza en alcance: P1–P5 de SEC-03 con pruebas aisladas (P1 antes de P2); revisión final, integración y despliegue **en staging** de R3+R4+R4-01; pruebas controladas de correo en staging; configurar y probar la búsqueda semántica en staging; un plan comparativo de producción, checklist y ensayo aislado. **Nada de eso empieza sin materializar o asignar su tarea** según `PROTOCOL.md`. UAT declarada por el propietario en 10 comprobaciones; no equivale a aprobación técnica, integración ni despliegue. Gate de producción: seguridad crítica y alta cerrada, UAT completa, aceptación de la Cámara y autorización explícita.
 - **SEC-03 / TASK-0017 (2026-11-11):** informe `audit/SEC03_TASK0017_ACCOUNT_RECOVERY_HOST_TRUST.md`. Lo más urgente para el propietario: F-SEC03-03, porque los límites por IP son globales y unas pocas peticiones bloquean el login a todos; y F-SEC03-01, que hay que verificar en producción antes de llevar la recuperación allí. Las correcciones P1–P5 esperan autorización. Si se confía en proxies, quitar `X-Forwarded-Host`.
 - **Seguridad:** registro en [`docs/security/SECURITY_STATUS.md`](../security/SECURITY_STATUS.md), plan en [`docs/plans/SECURITY_REVIEW_PLAN.md`](../plans/SECURITY_REVIEW_PLAN.md). F-01 y R2 desplegados (`cf01e9c`, UAT PASS). R3 aceptado y sin desplegar. **R4:** regla del propietario: solo super_admin administra roles. Código aceptado, sin desplegar; contención verificada. **F-SEC01-R4-01:** corrección lista para revisión; hasta desplegarla, guardar un rol en el editor vivo quita sus permisos ocultos (no guardar roles ahí). Recuperación: solo propuesta (≤1 vínculo). Pendientes: R3-02 y R3-03; 14 de 24 relation managers; 9 búsquedas; decisiones F-03/F-06. SEC-02..05 sin empezar; gerencia en espera. El análisis de visibilidad del repositorio es solo informativo, fuera del alcance de seguridad.
 - **Accesos:** cada comando que los necesite usa el bootstrap documentado ([`ENVIRONMENT.md`](ENVIRONMENT.md), [`ACCESS_BOOTSTRAP.md`](ACCESS_BOOTSTRAP.md)); cada ejecutor guarda sus credenciales fuera de git. Si faltan `gh` o `python`, no es un bloqueo: se usan los mecanismos documentados.
 - **Reanudar:** solo con una nueva asignación del propietario.
 - **Propietario:** revisar F-SEC01-R4-01 y su propuesta de recuperación; despliegue R3+R4(+R4-01); UAT de secciones/perfil (`current_task.md`); Inicio en staging; caché Cloudflare `/pdf/*` `/xls/*`; correo; solicitud #1.
 - **Propietario:** hacer UAT de recuperación; autorizar aparte, si lo desea, una prueba de correo real a su buzón de prueba.
-- **Agente:** TASK-0016 desplegada en staging, UAT del propietario pendiente (STOP); nada más sin una instrucción nueva. TASK-0012 sigue desplegada con la UAT pendiente.
+- **Agente:** sin trabajo técnico hasta una asignación nueva (STOP). TASK-0016: UAT declarada por el propietario (`6802438608`). TASK-0012: desplegada; faltan las pruebas controladas de correo y RIF.
 
 ## 4. Worktrees en uso (no tocar sin instrucción)
 
@@ -81,7 +83,7 @@ Manifiesto del arranque, con bytes: [`STARTUP_DRY_RUN.json`](STARTUP_DRY_RUN.jso
 ## 5. Pendientes conocidos (no arrancan solos)
 
 - **`JoinViews` (Cámara):** su vista falla con empresas incompletas, y su acción Pdf apunta a un método que no existe. Además usa `ExperienceView`/`PresenceView`, que pierden las experiencias con clave UUID y la experiencia internacional sin oficinas (el PDF ya las lee de los modelos).
-- **Correo:** pendiente del propietario. Sin envío, un afiliado nuevo **no** puede verificarse solo.
+- **Correo:** ~~pendiente del propietario. Sin envío, un afiliado nuevo **no** puede verificarse solo~~ → activo en staging (§2, «Anteriores»). Pendiente: evidencia formal de cada flujo con cuentas y buzones de prueba (autorizada en `6802438608`).
 - **Datos históricos (solo lectura, sin acción):**
   - 1 fila de `assets` con actor NULL;
   - 1 empresa con 2 filas de `assets` (informe §8).

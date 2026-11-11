@@ -7,7 +7,7 @@
 | Rama | `fix/sec-01-r4-01-role-editor-preserve` (rama canónica del estado vigente) |
 | BASE | `8e22d0c81c1d63da4467310ae210a28d6ea76a9f` |
 | Estado | **READY_FOR_REVIEW** (2026-11-06). Código y pruebas en `bc8212b` |
-| Gates | migración escrita y probada, **no aplicada** en la base compartida; sin editar n8n; sin cambios de ranking; sin merge a `main`; sin producción |
+| Gates | migración escrita y probada, ~~**no aplicada** en la base compartida~~ → aplicada el 2026-11-06 (sección «Migración aplicada…»); ~~sin editar n8n; sin cambios de ranking~~ → n8n y ranking cambiados con autorización en los pasos 1 a 4; sin merge a `main`; sin producción |
 
 Cambios locales del propietario en `AGENTS.md`, `CLAUDE.md`, `docs/orquestador/PROTOCOL.md` y
 `docs/orquestador/SESSION_RESUME.md`: se conservan sin commit y no se restauran ni se descartan.
@@ -398,3 +398,13 @@ Autoría: instrucción publicada por el orquestador a petición expresa del prop
     - **«balancin»:** Lukiven primera, con «Taxonomía CPV» como fuente principal, y el separador antes de las tres que coinciden solo en experiencia;
     - **«revestidor»:** muestra el aviso de que ninguna coincide en lo declarado, con Lukiven primera;
     - **en ambas:** votos y registro funcionando, y `metadata.modelo = gpt-6-luna`.
+
+## Addendum 2026-11-11 — decisión del propietario (`6802438608`), solo registro documental
+
+
+- **UAT declarada por el propietario:** la explicación de coincidencias y los votos y la retroalimentación están verificados.
+- **Sin validación del cliente:** búsqueda, ranking y aceptación por la Cámara.
+- **Datos:** pedir a la Cámara que revise los sectores principales y el servicio «X» **antes** de modificar datos.
+- **Fase 2:** las mejoras adicionales de CIRA.
+- **Corrección del registro:** la cabecera se actualizó con el texto anterior tachado; la migración se aplicó el 2026-11-06 y los pasos 1 a 4 cambiaron n8n y el ranking.
+- Este addendum no cambia el propósito, el identificador ni el estado técnico de la tarea.

@@ -304,3 +304,11 @@ de staging, en transacción `read only` revertida.
   resultados legítimos como «Válvulas» con «valv».
 - **Sin desplegar:** no hay despliegue a staging, merge ni producción. Desplegar requiere autorización explícita
   del propietario.
+
+## Addendum 2026-11-11 — decisión del propietario (`6802438608`), solo registro documental
+
+
+- **Declaración del propietario:** la búsqueda de categorías se probó en parte; la gestión del diccionario no se probó.
+- **Pide** configurar y probar en staging la búsqueda semántica de categorías, verificando dependencias y configuración antes de cualquier cambio. Requiere asignación; no autoriza producción.
+- **Corrección del registro:** «Limitaciones» dice «sin desplegar». La tarea se desplegó en staging el 2026-11-09, como indica la cabecera.
+- Este addendum no cambia el propósito, el identificador ni el estado técnico de la tarea.

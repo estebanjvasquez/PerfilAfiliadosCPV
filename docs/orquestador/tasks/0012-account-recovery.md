@@ -257,3 +257,15 @@ por correo. Las 128 empresas sin buzón elegible reciben la misma respuesta gen�
 - Verificación HTTP de solo lectura: `/admin/login`, `/admin/password-reset/request` y `/admin/recuperar-acceso` responden 200; login y formularios muestran los textos/Turnstile esperados. No se enviaron formularios ni correos.
 - Sin migraciones nuevas, cambios de cuenta o datos. SSH directo no permitió verificar el SHA del checkout por separado; la evidencia de despliegue es el workflow exitoso para el SHA exacto más las rutas vivas.
 - Pendiente: UAT del propietario y, con autorización específica, prueba de entrega a un buzón de prueba del propietario. No se hizo merge ni despliegue a producción.
+
+## Addendum 2026-11-11 — decisión del propietario (`6802438608`), solo registro documental
+
+
+- **Declaración del propietario:** recibió correos de verificación y de recuperación en staging. Autoriza pruebas controladas en staging con cuentas y buzones de prueba; no en producción.
+- **Evidencia técnica existente:** transporte `smtp` en staging desde el 2026-10-26 (bloque 3, «Correo»).
+- **Pendiente de comprobación:**
+  - evidencia formal de todos los flujos, incluido el de RIF;
+  - los controles de SEC-03 (TASK-0017).
+
+  Ejecutar esas pruebas requiere materializarlas según `PROTOCOL.md`.
+- Este addendum no cambia el propósito, el identificador ni el estado técnico de la tarea.

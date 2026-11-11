@@ -109,3 +109,10 @@ Entregar en Issue #2 mediante el mecanismo documentado (`docs/orquestador/post_i
 
 **Respuesta inicial esperada:** TASK nuevo materializado, rama, HEAD, alcance y cualquier gate bloqueante. **Respuesta final:** READY_FOR_REVIEW / Issue #2 / HEAD <sha>.
 
+## Addendum 2026-11-11 — decisión del propietario (`6802438608`), solo registro documental
+
+
+- **Declaración del propietario:** autoriza en alcance desarrollar P1–P5 y probarlas en aislamiento, sin despliegue automático. P1 protege hosts y URL antes de confiar en cabeceras para P2.
+- **Para ejecutarse:** hay que materializar o asignar una tarea según `PROTOCOL.md`; esta aprobación no inicia la implementación por sí sola.
+- Esta tarea sigue siendo solo de auditoría y está READY_FOR_REVIEW.
+- Este addendum no cambia el propósito, el identificador ni el estado técnico de la tarea.

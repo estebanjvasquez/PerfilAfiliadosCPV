@@ -22,6 +22,14 @@ Este registro resume cada ronda, sus hallazgos, correcciones, aceptación y desp
   F-SEC03-01..06 (host de enlaces tomado de la petición, mitigado por el túnel; IP de cliente colapsada en el gateway;
   cupos consumidos sin Turnstile; verificación heredada al cambiar el correo; HTTP sin redirección ni HSTS). Sin
   correcciones ni despliegue: la propuesta espera autorización.
+- **2026-11-11, decisiones del propietario (`6802438608`), solo registro.** Autoriza en alcance:
+  - desarrollar P1–P5 de SEC-03 con pruebas aisladas, sin despliegue automático. P1 protege hosts y URL antes de confiar
+    en cabeceras para P2;
+  - la revisión final, integración y despliegue **en staging** de R3+R4+R4-01, con respaldo previo, regresión y
+    verificación de preservación de permisos. No autoriza producción ni `main`.
+
+  Nada de esto se ha ejecutado: cada parte requiere materializar su tarea. Los estados de §4 no cambian. Hasta verificar
+  R4-01 en staging, no guardar roles en el editor.
 - Quedan decisiones sobre permisos y asociaciones de usuarios, hipótesis por reproducir y superficies todavía no probadas.
 - La siguiente ronda asignada verifica creación/edición de cuentas, concesión de privilegios y límites de acceso a archivos.
 - Gerencia y nuevos reportes permanecen en espera del cierre acordado de seguridad.
