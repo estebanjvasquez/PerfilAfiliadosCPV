@@ -60,9 +60,22 @@ class AdminPanelProvider extends PanelProvider
      * por defecto en Filament v3 (Filament\Support\Concerns\CanBeLazy::$isLazy = true),
      * ningun widget de esta app lo desactiva.
      */
+    /**
+     * Registros por página de TODAS las tablas del panel: los de Filament sin «Todos».
+     * Con «Todos» elegido, una tabla grande (las ~3.100 categorías, staging 2026-11-11) superaba
+     * los 30 s de PHP y se quedaba cargando; la elección queda en la sesión, así que el usuario
+     * no salía de ahí. Filament descarta solo un «Todos» guardado que ya no esté entre las
+     * opciones. Las descargas de reportes (Excel/PDF de Reportes y Catálogo) no dependen de la
+     * paginación: siguen trayendo todos los registros. La exportación por selección usa
+     * «Seleccionar todos», que también abarca todas las páginas.
+     */
+    public const TABLE_PAGE_OPTIONS = [5, 10, 25, 50, 100];
+
     public function boot(): void
     {
-        Table::configureUsing(fn (Table $table) => $table->deferLoading());
+        Table::configureUsing(fn (Table $table) => $table
+            ->deferLoading()
+            ->paginationPageOptions(self::TABLE_PAGE_OPTIONS));
 
         // Ver public/css/filament/custom/panel.css: fix puntual del Select de una sola opcion
         // con etiquetas largas (Ciudad) que se rompe visualmente en mobile.
