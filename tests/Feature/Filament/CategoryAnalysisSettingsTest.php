@@ -201,7 +201,7 @@ class CategoryAnalysisSettingsTest extends TestCase
         $this->assertSame(['claude-opus-5-5' => 'Claude Opus 5.5 (claude-opus-5-5)', 'claude-sonnet-5-5' => 'Claude Sonnet 5.5 (claude-sonnet-5-5)'], $page->get('availableModels.anthropic'));
         $request = $this->history[0]['request'];
         $this->assertStringEndsWith('/v1/models', $request->getUri()->getPath());
-        $this->assertSame(self::ANTHROPIC_KEY, $request->getHeaderLine('x-api-key'));
+        $this->assertSame('Bearer '.self::ANTHROPIC_KEY, $request->getHeaderLine('Authorization'), 'el SDK 1.x envía la clave como Bearer');
         $this->assertFalse(CategoryAnalysisSettings::current()->exists, 'consultar modelos no guarda nada');
     }
 
@@ -249,7 +249,7 @@ class CategoryAnalysisSettingsTest extends TestCase
         $this->assertSame('claude-opus-5-5', $body['model']);
         $this->assertSame('json_schema', $body['output_config']['format']['type']);
         $this->assertSame(AnalysisPrompt::outputSchema(), $body['output_config']['format']['schema']);
-        $this->assertSame(self::ANTHROPIC_KEY, $this->history[0]['request']->getHeaderLine('x-api-key'));
+        $this->assertSame('Bearer '.self::ANTHROPIC_KEY, $this->history[0]['request']->getHeaderLine('Authorization'));
         $this->assertArrayNotHasKey('tools', $body, 'el juicio no recibe herramientas');
 
         foreach (['provider_refused', 'provider_auth'] as $code) {
