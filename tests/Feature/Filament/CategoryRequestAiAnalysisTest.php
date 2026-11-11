@@ -185,6 +185,26 @@ class CategoryRequestAiAnalysisTest extends TestCase
         ];
     }
 
+    // ------------------------------------------------------------------ migración
+
+    #[Test]
+    public function the_migration_is_additive_reversible_idempotent_and_has_rls(): void
+    {
+        $db = DB::connection('pgsql');
+        $migration = require database_path('migrations/2026_11_11_120000_create_taxonomy_category_request_analyses_table.php');
+        $requests = $db->table('taxonomy_category_requests')->count();
+
+        $migration->down();
+        $this->assertFalse(Schema::connection('pgsql')->hasTable('taxonomy_category_request_analyses'));
+        $this->assertSame($requests, $db->table('taxonomy_category_requests')->count(), 'down() no toca las solicitudes');
+        $migration->up();
+        $migration->up();
+
+        $this->assertTrue(Schema::connection('pgsql')->hasTable('taxonomy_category_request_analyses'));
+        $this->assertTrue((bool) $db->selectOne("select relrowsecurity from pg_class where relname = 'taxonomy_category_request_analyses'")->relrowsecurity);
+        $this->assertSame(1, (int) $db->selectOne("select count(*) n from pg_trigger where tgname = 'taxonomy_category_request_analyses_append_only'")->n);
+    }
+
     // ------------------------------------------------------------------ autorización y configuración inactiva
 
     #[Test]
@@ -239,12 +259,11 @@ class CategoryRequestAiAnalysisTest extends TestCase
     #[Test]
     public function the_catalog_search_offers_only_current_categories_with_their_path(): void
     {
-        $options = $this->service()->searchCatalog("costos {$this->tok}");
-
+        $options = $this->service()->searchCatalog("Planificación, Programación y Control de Costos de Proyectos {$this->tok}");
         $this->assertArrayHasKey($this->nodes['costos']->id, $options);
-        $this->assertArrayHasKey($this->nodes['estimacion']->id, $options);
-        $this->assertArrayNotHasKey($this->nodes['inactiva']->id, $options);
-        $this->assertArrayNotHasKey($this->nodes['grupo']->id, $options);
+        $this->assertArrayHasKey($this->nodes['estimacion']->id, $this->service()->searchCatalog($this->nodes['estimacion']->code));
+        $this->assertArrayNotHasKey($this->nodes['inactiva']->id, $this->service()->searchCatalog("Costos Históricos {$this->tok}"));
+        $this->assertArrayNotHasKey($this->nodes['grupo']->id, $this->service()->searchCatalog("Gestión de Proyectos {$this->tok}"));
         $this->assertStringContainsString("Gestión de Proyectos {$this->tok} > Costos y Planificación {$this->tok} > Planificación", $options[$this->nodes['costos']->id]);
         $this->assertStringContainsString($this->nodes['costos']->code, $options[$this->nodes['costos']->id]);
     }

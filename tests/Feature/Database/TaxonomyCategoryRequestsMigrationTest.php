@@ -62,8 +62,14 @@ class TaxonomyCategoryRequestsMigrationTest extends TestCase
      */
     private const MIGRATION_POSTERIOR = '2026_10_15_120000_add_delivery_operations_to_taxonomy_category_requests.php';
 
+    /** TASK-0016: otra migración posterior con FK a la solicitud (los análisis con IA). Se revierte primero. */
+    private const MIGRATION_ANALISIS = '2026_11_11_120000_create_taxonomy_category_request_analyses_table.php';
+
     private function revertirPosterior(): void
     {
+        if (Schema::connection('pgsql')->hasTable('taxonomy_category_request_analyses')) {
+            (require database_path('migrations/'.self::MIGRATION_ANALISIS))->down();
+        }
         if (Schema::connection('pgsql')->hasTable('taxonomy_category_request_delivery_attempts')) {
             (require database_path('migrations/'.self::MIGRATION_POSTERIOR))->down();
         }
@@ -72,6 +78,7 @@ class TaxonomyCategoryRequestsMigrationTest extends TestCase
     private function reaplicarPosterior(): void
     {
         (require database_path('migrations/'.self::MIGRATION_POSTERIOR))->up();
+        (require database_path('migrations/'.self::MIGRATION_ANALISIS))->up();
     }
 
     private function tablaExiste(): bool
