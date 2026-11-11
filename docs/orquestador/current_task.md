@@ -3,6 +3,16 @@
 El estado general y el arranque están en [`SESSION_RESUME.md`](SESSION_RESUME.md). La historia de este archivo
 hasta hoy está en [`history/current_task_hasta_2026-10-16.md`](history/current_task_hasta_2026-10-16.md).
 
+## Nueva, 2026-11-11: TASK-0016 — Análisis IA de solicitudes de categorías CPV — IN_PROGRESS (`6791532623`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0016-category-request-ai-analysis.md`](tasks/0016-category-request-ai-analysis.md) (descubrimiento, diseño, evidencia; comentario fuente íntegro) |
+| Rama de código / BASE | `feat/category-request-ai-analysis` (worktree `PerfilAfiliadosCPV-wt-ia`, sin *upstream*) / `d8e2aae` (staging) |
+| Gates | sin merge, sin push a la rama que despliega, sin despliegue, sin n8n, sin cambios de taxonomía, sin gasto de API ni cambio de credenciales |
+
+TASK-0016 no cambia las tareas de abajo, que siguen en revisión.
+
 Hay dos tareas abiertas en sesiones separadas, por decisión del propietario (2026-11-09). En la sesión de TASK-0014
 se abrió además TASK-0015.
 
