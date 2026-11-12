@@ -5,7 +5,7 @@
 | ID | `TASK-0019` (siguiente libre: sin archivo, rama ni commit con 0019 en ninguna rama remota) |
 | Fuente | Issue #2, comentario `6820224859` (propietario, 2026-11-12 09:45Z), íntegro al final |
 | Antecedente | TASK-0018 **APPROVED** como implementación aislada (`6820214362`); no se modifica su propósito |
-| Estado | IN_PROGRESS (materializada 2026-11-12, antes del preflight de escritura y del despliegue) → **READY_FOR_REVIEW** (2026-11-12 ~10:05Z; desplegado en staging, HSTS 1 día) |
+| Estado | IN_PROGRESS (materializada 2026-11-12, antes del preflight de escritura y del despliegue) → READY_FOR_REVIEW (2026-11-12 ~10:05Z; desplegado en staging, HSTS 1 día) → **APPROVED** (`6821212610`, propietario, 2026-11-12 10:33Z; limitado a staging) |
 | Código aprobado | `fix/sec-03-p1-p5` @ `9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823` |
 | Staging vivo al empezar | `feature/upgrade-filament-v3` = `b048df09b345bfefc8bbfe88ed0ca8e4ea09df33` (remoto y servidor, árbol limpio) |
 | Límites | solo staging; sin producción, `main`, SEC-01, n8n, taxonomía, secretos ni cambios de Cloudflare de alcance de zona |
@@ -79,6 +79,25 @@ SEC-03 no se cierra globalmente; producción sin autorización.
 - Etapas siguientes de HSTS (1 semana → 6 meses), cada una con aprobación; `includeSubDomains` y `preload` con aprobación específica.
 - Dato preexistente: 2 filas huérfanas en `contact_empresa` (sin acción).
 - Producción, `main` y SEC-01: sin autorización.
+
+## Veredicto 2026-11-12: APPROVED (`6821212610`)
+
+El propietario aprobó TASK-0019, **limitada** a la integración, el despliegue y la validación controlada de SEC-03 P1–P5 en
+staging (`9d0c24d`, HSTS `max-age=86400`). Las pruebas de humo y los logs cubren una ventana corta: no prueban
+estabilidad prolongada. Siguen **abiertos** y **sin asignar**:
+
+1. SEC-03 no se cierra globalmente; F-SEC03-01..06 conservan su estado granular.
+2. Pruebas funcionales de recuperación por correo y RIF, Turnstile y cambio de correo, con cuentas y buzones sintéticos
+   autorizados: requieren asignación y autorización propias.
+3. Prueba adversarial en el borde (Host ajeno, `CF-Connecting-IP` suplantado) y separación de cupos con dos clientes:
+   requieren autorización específica.
+4. HSTS se queda en `max-age=86400`: subirlo, o activar `includeSubDomains` o `preload`, requiere autorización nueva.
+5. Riesgo de restauración por la FK preexistente (`contact_empresa_contact_id_foreign`, 2 filas huérfanas). Procedimiento:
+   restaurar los datos y crear esa FK con `NOT VALID`. No se modifican datos reales sin autorización.
+6. SEC-01 sigue detenida; producción, `main`, Cloudflare de zona, secretos, n8n, taxonomía y nuevos despliegues: sin
+   autorización.
+
+STOP: no se inicia ninguno de estos puntos sin una asignación nueva.
 
 ---
 

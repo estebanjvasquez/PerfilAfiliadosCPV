@@ -25,6 +25,18 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-12 10:33Z: TASK-0019 — **APPROVED** (`6821212610`), limitada a staging
+
+Aprobada la integración, el despliegue y la validación de SEC-03 P1–P5 en staging (`9d0c24d`, HSTS `max-age=86400`).
+**Sin tarea activa nueva.** Siguen abiertos y sin asignar:
+- las pruebas funcionales de correo/RIF, Turnstile y cambio de correo con buzones sintéticos;
+- la prueba adversarial del borde y de los cupos;
+- los aumentos de HSTS;
+- el riesgo de restauración por la FK preexistente;
+- SEC-01 y producción.
+
+Ver el veredicto en [`tasks/0019-sec03-staging-deploy.md`](tasks/0019-sec03-staging-deploy.md).
+
 ## 2026-11-12 ~10:05Z: TASK-0019 — READY_FOR_REVIEW, **DESPLEGADA EN STAGING** (`9d0c24d`)
 
 | Campo | Valor |
