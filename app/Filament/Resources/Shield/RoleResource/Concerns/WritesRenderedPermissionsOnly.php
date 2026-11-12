@@ -38,14 +38,15 @@ trait WritesRenderedPermissionsOnly
 
     /**
      * Server-side editable set: the options of the permission fields this page renders now (visible components only;
-     * a disabled tab contributes nothing). Built from the schema, never from submitted data.
+     * a disabled tab contributes nothing). Built from the schema, never from submitted data. A disabled field is shown
+     * but not editable (TASK-0022: the read-only Role section), so its names are preserved, never written.
      *
      * @return array<int, string>
      */
     protected function editablePermissionNames(): array
     {
         return collect($this->form->getFlatComponents())
-            ->filter(fn ($component) => $component instanceof CheckboxList)
+            ->filter(fn ($component) => $component instanceof CheckboxList && ! $component->isDisabled())
             ->flatMap(fn (CheckboxList $component) => array_keys($component->getOptions()))
             ->filter(fn ($name) => is_string($name) && $name !== '')
             ->unique()

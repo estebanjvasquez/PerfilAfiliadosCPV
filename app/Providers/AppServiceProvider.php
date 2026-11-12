@@ -52,6 +52,9 @@ class AppServiceProvider extends ServiceProvider
         // TASK-0014: una instancia por petición, así los motivos de coincidencia de una página del
         // listado se calculan una sola vez y nunca sobreviven a la petición.
         $this->app->scoped(\App\Services\Taxonomy\TaxonomyLookup::class);
+
+        // TASK-0022 / F-SEC01-T21-01: the role editor's Role section uses the names RolePolicy checks (`*_role`).
+        \App\Support\Security\RolePermissionIdentifier::register($this->app);
     }
 
     /**
