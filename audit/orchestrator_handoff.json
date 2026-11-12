@@ -1,4 +1,22 @@
 {
+  "task_0023_sec01_t21_01_staging_deploy": {
+      "task_id": "TASK-0023",
+      "title": "SEC-01 deploy the F-SEC01-T21-01 fix (TASK-0022) to staging only",
+      "source": "Issue #2 comment 6831152066 (owner assignment, 2026-11-12); verdict 6831144754 (TASK-0022 APPROVED, limited scope)",
+      "status": "READY_FOR_REVIEW",
+      "environment": "staging only; feature/upgrade-filament-v3 71e8a6d -> 270e07d (fast-forward, no force), workflow 43274064073 success (17:52:59-17:53:32Z)",
+      "review_base_sha": "71e8a6d2f4922253174c4ac4bd6fd39074c00555 (staging before, verified on server and remote)",
+      "review_head_sha": "270e07dcda8c61840c569b5c85cbad471ce9bf82 (tested = reviewed = deployed)",
+      "records_commit_sha": "b92e70a077f13e5a9588d403a21621dd79e44973",
+      "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha)",
+      "backup": "server /root/backups/sec01-t23-20261112T174040Z (env, pg_dump -Fc -n public sha256 verified, 88 tables/41524 rows, per-role baseline COLLATE C, totals 508/0/330/368); image tag perfilafiliados-app:pre-t23-71e8a6d",
+      "restore_rehearsal": "isolated pg17+pgvector: 0 count mismatches, role baseline identical, 133 migrations, 101 FKs, 0 invalid indexes; FK contact_empresa_contact_id_foreign recreated NOT VALID (2 pre-existing orphans untouched)",
+      "tests": "focused 93/93 (674 assertions) run 20261112T174149Z-270e07dcda8c; full suite 798/798 (8514 assertions) run 20261112T174424Z-270e07dcda8c",
+      "live_validation": "synthetic users/role in an always-rolled-back transaction: before key shield::role, 6 shield boxes; after key role, 0 shield boxes, Role section = 6 real *_role disabled, checked on super_admin; hidden kept, visible uncheck exact, forged and *_role not granted, non-super_admin refused; real roles identical",
+      "health": "server HEAD 270e07d clean tree, image a36b4647435b, env unchanged, 0 nginx 5xx, Laravel errors 81 -> 81, routes 200, HSTS max-age=86400, http 301, foreign Host 400 via nginx",
+      "db_mutations": "none persisted (rolled-back transactions only); real roles identical to the backup baseline; R1/R2 untouched; 6 inert *_shield::role rows kept",
+      "execution_incidents": "first backup aborted on COLLATE quoting (partial dir removed, rerun); first restore rehearsal hit Postgres init restart (leftover disposable container/network removed, rerun); first before-check sample included *_role (fixed, rerun); host port 80 check returned 000 (rerun inside nginx container)"
+  },
   "task_0022_sec01_t21_01_role_section_and_permission_recovery": {
       "task_id": "TASK-0022",
       "title": "SEC-01 fix F-SEC01-T21-01 (role editor Role section) and evaluate recovery of permissions lost in October 2026",
