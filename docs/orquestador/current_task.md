@@ -25,6 +25,16 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-12 ~11:25Z: TASK-0020 — SEC-03: pruebas operativas en staging — READY_FOR_REVIEW (instrucción del propietario en el chat)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0020-sec03-staging-operational-tests.md`](tasks/0020-sec03-staging-operational-tests.md) |
+| Resultado | parte 2 (adversarial) **PASS**; parte 1 (funcional, con cuentas sintéticas y Turnstile resuelto por el propietario) **PASS**, salvo abrir el enlace de verificación del buzón nuevo (no ejecutado) |
+| Datos | cuentas y empresa sintéticas creadas y borradas por id; conteos en la línea base |
+| Staging | sin cambios (`9d0c24d`, HSTS 1 día) |
+| Siguiente | revisión; cierre de SEC-03, etapas de HSTS y producción son decisiones aparte del propietario |
+
 ## 2026-11-12 10:33Z: TASK-0019 — **APPROVED** (`6821212610`), limitada a staging
 
 Aprobada la integración, el despliegue y la validación de SEC-03 P1–P5 en staging (`9d0c24d`, HSTS `max-age=86400`).

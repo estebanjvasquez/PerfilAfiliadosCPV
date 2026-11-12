@@ -5,7 +5,7 @@
 | ID | `TASK-0020` (siguiente libre: sin archivo, rama ni commit con 0020 en ninguna rama remota) |
 | Fuente | Instrucción del propietario **en el chat** de esta sesión, 2026-11-12: «1: aprobado hacer las pruebas / 2: aprobado hacer las pruebas». No hay comentario de asignación en el Issue #2 |
 | Alcance | Los pendientes 2 y 3 del veredicto `6821212610` de TASK-0019: (1) pruebas funcionales de recuperación por correo y RIF, Turnstile y cambio de correo con cuentas y buzones sintéticos; (2) prueba adversarial del borde de staging (Host ajeno, `CF-Connecting-IP` suplantado) y separación de cupos entre dos clientes |
-| Estado | **IN_PROGRESS** (2026-11-12) |
+| Estado | IN_PROGRESS (2026-11-12) → **READY_FOR_REVIEW** (2026-11-12 ~11:25Z; partes 1 y 2 ejecutadas; datos sintéticos borrados) |
 | Entorno | solo staging (`feature/upgrade-filament-v3` = `9d0c24d`, HSTS `max-age=86400`) |
 | Límites | sin despliegue, sin cambios de código, configuración, Cloudflare, nginx ni túnel; sin cuentas ni correos de clientes; bajo volumen y solo con IPs propias (el servidor y el equipo del ejecutor); sin aumentar HSTS; sin SEC-01 ni producción |
 
@@ -50,7 +50,64 @@ correo sintético no existe y Turnstile falló antes). Sin correos enviados ni c
 Riesgo aceptado (no es hallazgo nuevo): un proceso con root en el propio servidor puede conectarse a `127.0.0.1:8080` y
 fijar `CF-Connecting-IP`. Es el mismo nivel de confianza que cloudflared.
 
-### Parte 1 — funcional (correo, RIF, Turnstile, cambio de correo)
+### Parte 1 — funcional en staging (2026-11-12 10:47–11:25Z): **PASS**, con un tramo no ejecutado
 
-Pendiente de decisiones del propietario: qué buzones sintéticos usar, quién resuelve Turnstile en el navegador, y la
-creación y posterior borrado de las cuentas y la empresa sintéticas en la base de staging.
+**Decisiones del propietario (chat, 2026-11-12):**
+- buzones: alias `+cpv-sec03-N` del Gmail del propietario (la dirección no se publica aquí);
+- Turnstile: lo resuelve el propietario en su navegador; no se desactivó ni se usaron claves de prueba;
+- datos: crear y, al terminar, borrar solo las filas sintéticas.
+
+**Datos sintéticos** (creados en una transacción, 10:47Z):
+- 2 cuentas `ZZZ-SEC03 Prueba 1/2` con rol `afiliados`, verificadas, alias `+cpv-sec03-1` y `+cpv-sec03-2`;
+- la empresa `ZZZ-SEC03 EMPRESA SINTETICA`, con RIF ficticio `J-99903001-0` (libre antes de crearlo).
+
+Observación: `Empresa::create` con un usuario autenticado vinculó automáticamente a la empresa, además de la cuenta, a
+**4 usuarios del personal**. Ninguno era elegible por RIF (`eligibleForRif` = 2), así que no recibieron correo. Es
+comportamiento de la aplicación, no de SEC-03.
+
+| Paso | Quién | Evidencia | Resultado |
+|---|---|---|---|
+| 1. Recuperación por correo de la cuenta 1 | propietario (navegador + Turnstile) | El enlace del correo real empieza por `https://pruebas.camarapetrolera.app/` (confirmado por el propietario). Servidor: contraseña cambiada a las 10:50:47Z, `remember_token` rotado y token consumido | **PASS** (F-SEC03-01 con correo real) |
+| 2. Recuperación por RIF | propietario | 2 correos, uno por alias, cada uno con su usuario («Este mensaje es solo para usted…»). Servidor: 1 token por cuenta (10:52:08Z), guardados como hash bcrypt; ningún otro token en la base | **PASS** |
+| 3a. P3, pedidos sin Turnstile válido para la cuenta 2 | ejecutor (script, sin token) | 5 pedidos desde 2 IP propias: el cupo por correo de la cuenta 2 quedó en **0 intentos**; el cupo por origen sí se contó | **PASS** (F-SEC03-04) |
+| 3b. P3, pedido válido para la cuenta 2 | propietario | Servidor: token nuevo a las 11:06:57Z, que reemplazó al del RIF; cupo por correo en 1. Antes de la corrección este pedido habría sido «Demasiadas solicitudes» | **PASS** |
+| 4. P4, cambio del correo de la cuenta 1 en Usuarios (panel) | propietario | Servidor: correo `+cpv-sec03-3` a las 11:08:26Z; `email_verified_at` = **NULL**; el token pendiente del correo anterior (RIF, paso 2) se **borró** | **PASS** (F-SEC03-05) |
+| 5. Enlace del RIF del correo anterior | propietario | Error: enlace no válido, caducado o ya utilizado | **PASS** |
+| 6. Ingreso con el correo nuevo | propietario | Pantalla «Verifique su correo electrónico» para `+cpv-sec03-3`; el correo de verificación llegó con un enlace que empieza por `https://pruebas.camarapetrolera.app/` | **PASS** en la exigencia de verificar. **No ejecutado:** abrir el enlace (0 visitas a la ruta de verificación; la cuenta quedó sin verificar). Ese tramo está cubierto en aislamiento y por los controles de TASK-0017 |
+
+**Observaciones:**
+- UX: la pantalla de verificación dice «Su cuenta está creada… avise a la Cámara que se registró», texto pensado para
+  registros nuevos; confunde tras un cambio de correo. No es de seguridad.
+- El servidor sale a Cloudflare por IPv6, así que en la prueba de dos clientes de la parte 2 el cliente A era su IPv6.
+  Sigue siendo una IP propia; la conclusión no cambia.
+
+### Limpieza (2026-11-12 ~11:25Z, autorizada por el propietario)
+
+Antes, inventario de todas las filas que apuntaban a los ids sintéticos (claves foráneas reales y columnas `model_id`,
+`user_id`, `empresa_id`): solo `empresa_user` (6), `model_has_roles` (2) y `password_resets` (1). Borrado en una
+transacción, por id, con comprobación previa de nombre y RIF, que se abortaba si algún conteo difería:
+
+| Tabla | Antes | Borradas | Después = línea base |
+|---|---|---|---|
+| `users` | 370 | 2 | 368 |
+| `empresas` | 407 | 1 | 406 |
+| `empresa_user` | 2205 | 6 (2 sintéticas y 4 automáticas del personal) | 2199 |
+| `model_has_roles` | 332 | 2 | 330 |
+| `password_resets` | 1 | 1 | 0 |
+
+Sin alias ni RIF sintético restantes. Las claves del limitador de las IP de prueba vencen solas (≤15 min / 1 h). No se
+modificó ningún dato real.
+
+## Resultado
+
+| Hallazgo | Staging (TASK-0019 + TASK-0020) |
+|---|---|
+| F-SEC03-01 | **Verificado con correo real**: enlaces de recuperación y verificación con el host de staging; `X-Forwarded-Host` del cliente ignorado |
+| F-SEC03-02 | **Verificado**: el borde bloquea Hosts ajenos (403/530); tras el borde, la app los rechaza (400) |
+| F-SEC03-03 | **Verificado**: `CF-Connecting-IP` no se puede suplantar (Cloudflare 403); `X-Forwarded-For` y `True-Client-IP` falsos sin efecto; cupos separados entre dos clientes |
+| F-SEC03-04 | **Verificado**: pedidos sin Turnstile no consumen el cupo por correo; el pedido válido posterior se acepta |
+| F-SEC03-05 | **Verificado**: el cambio de correo anula la verificación, borra los tokens del correo anterior e invalida su enlace. Abrir el enlace de verificación del buzón nuevo: no ejecutado en staging |
+| F-SEC03-06 | Verificado en TASK-0019 (HTTPS en el borde; HSTS de 1 día) |
+
+Pendiente, con aprobación propia: etapas siguientes de HSTS y producción. SEC-03 no se declara cerrado aquí: el cierre
+es decisión del propietario.
