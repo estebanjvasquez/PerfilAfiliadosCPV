@@ -25,6 +25,19 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-12 ~10:05Z: TASK-0019 — READY_FOR_REVIEW, **DESPLEGADA EN STAGING** (`9d0c24d`)
+
+| Campo | Valor |
+|---|---|
+| BASE / TESTED = REVIEW = desplegado | `b048df0` / `9d0c24d` (*fast-forward*, solo SEC-03) |
+| Workflow | `43196418453` success; servidor verificado en `9d0c24d` |
+| Preflight | respaldo en el servidor (`/root/backups/sec03-20261112T095103Z`), restauración aislada con 0 diferencias de conteo, regresión 767/767 |
+| Verificado en staging | F-SEC03-03 (IP real hasta PHP, IP efectiva = cliente) y F-SEC03-06 («Always Use HTTPS»; HSTS `max-age=86400` solo en staging); P1 (enlaces con el host de staging) |
+| Sin ejercer en staging | rechazo de Host ajeno y suplantación por el borde (no autorizados); P3 y P4 (correo y escritura de cuentas) |
+| Gates | sin producción, `main` ni SEC-01; HSTS siguiente etapa, `includeSubDomains` y `preload` solo con aprobación nueva |
+
+La sección siguiente es el estado al materializar la tarea, sin cambios.
+
 ## Nueva, 2026-11-12: TASK-0019 — SEC-03: despliegue de P1–P5 solo en staging — IN_PROGRESS (`6820224859`)
 
 | Campo | Valor |
