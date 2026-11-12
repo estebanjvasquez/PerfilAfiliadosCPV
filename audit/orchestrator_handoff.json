@@ -1,4 +1,59 @@
 {
+  "task_0018_review_6819392897": {
+    "task_id": "TASK-0018",
+    "cycle": "correction cycle for review 6819392897 (CORRECTIONS_REQUIRED limited to P2, P4, P5); same task, earlier block task_0018_sec03_p1_p5_remediation kept as history",
+    "review_comment": "6819392897",
+    "previous_delivery_comment": "6803731840",
+    "status": "READY_FOR_REVIEW (implementation in isolation; not deployed; no infrastructure changes)",
+    "code_branch": "fix/sec-03-p1-p5",
+    "review_base_sha": "cb3fff4ebac09fe8faf7e656c06dbfe8de0be883",
+    "task_base_sha": "b048df09b345bfefc8bbfe88ed0ca8e4ea09df33 (+ TASK-0017 tests 8a4ed35df5aafc853ac9e79b33d340a46ea6613c)",
+    "tested_head_sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823",
+    "review_head_sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823",
+    "cycle_commits": [
+      "22800c15b35e11ee67c0c551392f4accac098716 (P2 exact proxies, P4 token cleanup before UPDATE, 14 review tests)",
+      "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823 (P5 test fix: call() ignores withHeaders)"
+    ],
+    "records_commit_sha": "6c287e81526671bb57b4649dd680454da5d9fd61",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha); see the Issue #2 delivery comment",
+    "matrix": {
+      "P2": "PASS in code; real header transit through the tunnel NOT VERIFIED (gate kept). Defect demonstrated and fixed: default 172.16.0.0/12 trusted other sites' Docker networks on the same host; now loopback + exact app-network gateway",
+      "P4": "PASS. Defect demonstrated and fixed: tokens were deleted after the UPDATE (a failed delete left the email changed with old tokens alive); now deleted in updating, rollback reverts both",
+      "P5": "PASS of code; F-SEC03-06 still partly pending (effective HTTPS at the edge). No code defect; one test bug fixed"
+    },
+    "tests": {
+      "sec03_at_22800c1": {
+        "run_id": "20261112T091141Z-22800c15b35e",
+        "result": "51 tests, 225 assertions, 1 failure (test bug: call() ignores withHeaders); fixed in 9d0c24d"
+      },
+      "defect_demo_old_code": {
+        "sha": "a45af63e14a30c10a5168941fb51d1318f224913 (temporary branch tmp/sec03-review-before, deleted)",
+        "run_id": "20261112T092358Z-a45af63e14a3",
+        "result": "10 tests, 2 expected failures (review_p2_by_default_*, review_p4_a_failed_token_cleanup_*)"
+      },
+      "sec03": {
+        "sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823",
+        "run_id": "20261112T091358Z-9d0c24d613fb",
+        "result": "OK (51 tests, 242 assertions): 13 controls + 7 unchanged TASK-0017 oracles + 31 remediation"
+      },
+      "focused": {
+        "sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823",
+        "run_id": "20261112T091515Z-9d0c24d613fb",
+        "filter": "Sec03|AccountRecovery|Auth|AccountWrite|AccountPrivilege",
+        "result": "OK (111 tests, 620 assertions)"
+      },
+      "full_suite": {
+        "sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823",
+        "run_id": "20261112T091647Z-9d0c24d613fb",
+        "result": "OK (767 tests, 8102 assertions)"
+      },
+      "staging_before_after": "200/200 in every run",
+      "cpvtest_containers_left": 0
+    },
+    "findings_status": "no finding closed by isolated tests; F-SEC03-03 pending effective header validation; F-SEC03-06 pending effective HTTPS",
+    "db_mutations": "none (disposable runner DB only)",
+    "gates": "no merge, no deploy, no Cloudflare/nginx/tunnel/n8n changes, no secrets, no production; SEC-01 not started. STOP at READY_FOR_REVIEW; APPROVED/CLOSED only by human verdict"
+  },
   "task_0018_sec03_p1_p5_remediation": {
     "task_id": "TASK-0018",
     "title": "SEC-03 remediation P1-P5: canonical origin, trusted hosts, real client IP, Turnstile before quotas, email change, HTTPS/HSTS",
