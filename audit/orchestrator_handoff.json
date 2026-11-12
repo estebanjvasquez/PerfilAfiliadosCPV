@@ -1,4 +1,47 @@
 {
+  "task_0019_sec03_staging_deploy": {
+    "task_id": "TASK-0019",
+    "title": "SEC-03 P1-P5 integration and deployment to staging only, header verification and gradual HSTS",
+    "source_comment": "6820224859",
+    "prerequisite": "TASK-0018 APPROVED as isolated implementation (6820214362)",
+    "status": "READY_FOR_REVIEW (deployed to staging; HSTS max-age=86400 on the staging hostname only)",
+    "review_base_sha": "b048df09b345bfefc8bbfe88ed0ca8e4ea09df33",
+    "tested_head_sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823",
+    "review_head_sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823",
+    "deployed_sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823",
+    "deploy": "fast-forward push b048df0..9d0c24d to feature/upgrade-filament-v3; workflow 43196418453 success 2026-11-12T10:00:08Z-10:00:49Z; server HEAD verified",
+    "records_commit_sha": "544d2199fd7a9620ad9a6bf77b5122392a60ef78",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha); see the Issue #2 delivery comment",
+    "staging_config_changes": ".env HSTS_MAX_AGE=0 before deploy, then 86400 after gates A/B (config:cache + app recreate). No Cloudflare, nginx or tunnel changes",
+    "backup": {
+      "location": "server-side, outside git and webroot (path in the task file)",
+      "contents": ".env copy, image tag perfilafiliados-app:pre-sec03-b048df0, pg_dump -Fc -n public (exit 0, sha256 recorded), 88-table row counts (41499 rows)",
+      "restore_rehearsal": "isolated pgvector pg17 container on an internal network: 88/88 tables, 41499 rows, 0 count mismatches; pre-existing FK with 2 orphan rows (contact_empresa_contact_id_foreign) not re-creatable, no action"
+    },
+    "tests": {
+      "sec03": "20261112T095028Z-9d0c24d613fb OK (51 tests, 242 assertions)",
+      "focused": "20261112T095144Z-9d0c24d613fb OK (111 tests, 620 assertions)",
+      "full_suite": "20261112T095314Z-9d0c24d613fb OK (767 tests, 8102 assertions)",
+      "staging_before_after": "200/200",
+      "cpvtest_containers_left": 0
+    },
+    "gates": {
+      "A": "PASS (Always Use HTTPS 301 one hop, path/query kept, TLS valid, no loops, no http:// refs)",
+      "B": "PASS (Cloudflare HSTS is zone-wide: not touched; app emits HSTS for the staging host only, no includeSubDomains)",
+      "C": "PASS (Strict-Transport-Security: max-age=86400 on https; none on http)",
+      "D": "PASS (10:02Z and 10:04Z: 0 5xx, 0 new log errors, routes 200; no rollback)"
+    },
+    "findings": {
+      "F-SEC03-01": "deployed and verified on staging",
+      "F-SEC03-02": "deployed; foreign-Host rejection verified only in isolation",
+      "F-SEC03-03": "deployed and verified on staging (CF-Connecting-IP transit to PHP observed; effective ip() = client)",
+      "F-SEC03-04": "deployed; not exercised on staging (Turnstile + mail)",
+      "F-SEC03-05": "deployed; not exercised on staging (would write real accounts)",
+      "F-SEC03-06": "deployed and verified on staging (Always Use HTTPS; HSTS 1 day, staging host only)"
+    },
+    "db_mutations": "none",
+    "limits": "no production, no main, no SEC-01, no n8n, no taxonomy, no secrets rotation; SEC-03 not closed globally. STOP at READY_FOR_REVIEW"
+  },
   "task_0018_review_6819392897": {
     "task_id": "TASK-0018",
     "cycle": "correction cycle for review 6819392897 (CORRECTIONS_REQUIRED limited to P2, P4, P5); same task, earlier block task_0018_sec03_p1_p5_remediation kept as history",
