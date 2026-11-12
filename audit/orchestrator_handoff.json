@@ -1,4 +1,22 @@
 {
+  "task_0022_sec01_t21_01_role_section_and_permission_recovery": {
+      "task_id": "TASK-0022",
+      "title": "SEC-01 fix F-SEC01-T21-01 (role editor Role section) and evaluate recovery of permissions lost in October 2026",
+      "source": "Issue #2 comment 6829151868 (owner assignment, 2026-11-12); decisions in verdict 6829143372 (TASK-0021 APPROVED with reservations)",
+      "status": "READY_FOR_REVIEW",
+      "environment": "isolated branch only; NOT deployed; staging unchanged at 71e8a6d; no push to feature/upgrade-filament-v3",
+      "review_base_sha": "71e8a6d2f4922253174c4ac4bd6fd39074c00555 (staging runtime, verified on the server)",
+      "tested_head_sha": "4bdec36a7828486e80840a47fab1212c7f813599 (fix/sec-01-t22-role-permission-key)",
+      "review_head_sha": "270e07dcda8c61840c569b5c85cbad471ce9bf82 (tested + admin manual only)",
+      "records_commit_sha": "2bfb092b970c423ac9cd91e25757010278edc412",
+      "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha)",
+      "fails_before": "audit/task-0022-role-section-fails-before 23b5c0d (final test on 71e8a6d): the six-boxes test fails with *_shield::role; run 20261112T164101Z-23b5c0d0450a",
+      "fix": "RolePermissionIdentifier pins the published RoleResource Shield key to role (configurePermissionIdentifierUsing, applied on every resolution of the scoped service); other resources keep the default key; Role section shows the real *_role read-only; disabled fields are not editable, so *_role are always preserved and never granted",
+      "tests": "focused 28/28 (341 assertions) run 20261112T164210Z-4bdec36a7828; full suite 798/798 (8514 assertions) run 20261112T164425Z-4bdec36a7828; baseline 71e8a6d 794",
+      "recovery_evaluation": "128 links lost in Oct (109 hidden by the defect on the role without users; 19 visible unchecked: 7 on the role with 1 user, 12 on the role without users); all still missing live; super_admin/affiliates/reportes lost nothing; 13 role-admin never restored, 42 unreferenced not restored; proposal: at most 1 link (view_any_user on the role with 1 user) by reviewed script (check mode only, to_insert=1) or manually; exact list in restricted notes",
+      "db_mutations": "none (READ ONLY transactions only; restoration script run in check mode only)",
+      "observation": "2026-11-12 16:10:32-40Z: 25 permission rows created with 0 links (6 *_shield::role, 12 *_taxonomy::category::request, 5 pages, 2 widgets); no role or account holds them; optional cleanup of the 6 needs separate authorization"
+  },
   "task_0021_sec01_r3_r4_r401_staging_deploy": {
       "task_id": "TASK-0021",
       "title": "SEC-01 final review of R4-01 and integration/deploy of R3+R4+R4-01 to staging only",
