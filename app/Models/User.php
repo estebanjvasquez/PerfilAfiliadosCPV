@@ -41,33 +41,36 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
      * El panel pide la verificación del buzón nuevo en el próximo ingreso (->emailVerification()), y mientras tanto la
      * ayuda por RIF no le escribe (AccountRecovery::eligibleForRif exige correo verificado). Si el correo no cambia, la
      * verificación se conserva. Los enlaces de verificación viejos ya no servían: llevan el hash del correo anterior.
+     *
+     * Orden (corrección de revisión 6819392897): los tokens se borran ANTES del UPDATE, en `updating`. Si el borrado
+     * falla, la excepción corta el guardado y nada cambia; si después falla el UPDATE, solo se perdieron tokens, que se
+     * pueden volver a pedir. Al revés (borrar en `updated`) un fallo dejaba el correo cambiado con los tokens del
+     * anterior vivos. Dentro de una transacción, un rollback revierte las dos cosas juntas.
+     *
+     * Solo cubre escrituras por Eloquent. Hoy el único escritor del correo de una cuenta existente es la gestión de
+     * usuarios (`UserResource` → `$record->update()`); un `DB::table('users')->update()` no pasaría por aquí.
      */
     protected static function booted(): void
     {
         static::updating(function (User $user): void {
-            if ($user->emailReallyChanges()) {
-                $user->email_verified_at = null;
+            if (! $user->emailReallyChanges()) {
+                return;
             }
-        });
-
-        static::updated(function (User $user): void {
-            if ($user->emailReallyChanges()) {
-                $broker = (string) config('auth.defaults.passwords');
-                DB::table((string) config("auth.passwords.{$broker}.table"))
-                    ->where('email', (string) $user->getOriginal('email'))
-                    ->delete();
-            }
+            $broker = (string) config('auth.defaults.passwords');
+            DB::table((string) config("auth.passwords.{$broker}.table"))
+                ->where('email', (string) $user->getOriginal('email'))
+                ->delete();
+            $user->email_verified_at = null;
         });
     }
 
-    /** Durante updating/updated: el correo guardado cambia a otro buzón (mayúsculas y espacios no cuentan). */
+    /** Durante `updating`: el correo cambia a otro buzón (mayúsculas y espacios no cuentan). */
     private function emailReallyChanges(): bool
     {
         $normalize = fn ($email) => mb_strtolower(trim((string) $email));
 
-        return $this->isDirty('email') || $this->wasChanged('email')
-            ? $normalize($this->getOriginal('email')) !== $normalize($this->getAttribute('email'))
-            : false;
+        return $this->isDirty('email')
+            && $normalize($this->getOriginal('email')) !== $normalize($this->getAttribute('email'));
     }
 
     public function empresas()

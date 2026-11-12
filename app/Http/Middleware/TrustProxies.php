@@ -13,8 +13,9 @@ use Symfony\Component\HttpFoundation\IpUtils;
  * PHP ve todas las peticiones desde el gateway de Docker. Antes no se confiaba en ningún proxy, así que todos los
  * clientes compartían esa IP y los límites «por IP» (login, recuperación, reset) eran globales.
  *
- * - Solo se confía en los pares de `security.proxies.trusted` (por defecto loopback y la red bridge de Docker), nunca en
- *   `*`. Desde cualquier otro par, las cabeceras reenviadas se ignoran, como antes.
+ * - Solo se confía en los pares de `security.proxies.trusted` (por defecto loopback y el gateway exacto de la red de la
+ *   aplicación; corrección de revisión 6819392897: antes, todo 172.16.0.0/12), nunca en `*`. Desde cualquier otro par,
+ *   las cabeceras reenviadas se ignoran, como antes.
  * - Desde un par de confianza, la IP del cliente es la de `security.proxies.client_ip_header` (CF-Connecting-IP, que
  *   Cloudflare reescribe siempre): se copia a X-Forwarded-For y se descarta lo que el cliente haya puesto ahí. Si la
  *   cabecera falta o no es una IP, la petición conserva la IP del par.

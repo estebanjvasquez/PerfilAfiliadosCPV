@@ -26,15 +26,19 @@ return [
      * P2 (F-SEC03-03): IP real del cliente.
      *
      * `trusted` son los únicos pares desde los que se acepta la IP reenviada (IPs o CIDR, separados por comas; `none`
-     * desactiva). El valor por defecto es la topología de este repositorio (docker-compose.yml): nginx solo escucha en
-     * 127.0.0.1:8080 y PHP lo ve llegar desde el gateway de la red bridge de Docker (172.16.0.0/12). `*` no se admite.
+     * desactiva; `*` no se admite). El valor por defecto es la lista EXACTA de la topología verificada en staging
+     * (solo lectura, 2026-11-12, TASK-0018): cloudflared → 127.0.0.1:8080 → docker-proxy → nginx, que PHP ve llegar
+     * siempre desde el gateway de la red `perfilafiliados_default` (172.18.0.1). No es un rango: el host tiene otras
+     * redes bridge (otros sitios) dentro de 172.16.0.0/12 cuyos contenedores no deben poder fijar su IP. Si la red se
+     * recrea con otro gateway, o en otro servidor, fijar TRUSTED_PROXIES; hasta entonces se ve la IP del gateway, como
+     * antes (sin riesgo de suplantación).
      *
      * `client_ip_header` es la cabecera con la IP del cliente que pone el borde (Cloudflare la reescribe siempre). Solo
      * se lee si el par es de confianza; si falta o no es una IP, la petición se queda con la IP del par, como antes.
      * Vacío = X-Forwarded-For estándar (para un despliegue sin Cloudflare). X-Forwarded-Host nunca se acepta.
      */
     'proxies' => [
-        'trusted' => env('TRUSTED_PROXIES', '127.0.0.1,::1,172.16.0.0/12'),
+        'trusted' => env('TRUSTED_PROXIES', '127.0.0.1,::1,172.18.0.1'),
         'client_ip_header' => env('TRUSTED_PROXY_CLIENT_IP_HEADER', 'CF-Connecting-IP'),
     ],
 
