@@ -25,6 +25,21 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-12 16:30Z: **TASK-0022** — SEC-01: corregir F-SEC01-T21-01 y evaluar la recuperación de permisos de octubre — **IN_PROGRESS** (`6829151868`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0022-sec01-t21-01-role-section-and-permission-recovery.md`](tasks/0022-sec01-t21-01-role-section-and-permission-recovery.md) |
+| Rama de trabajo | `fix/sec-01-t22-role-permission-key` (desde staging `71e8a6d`, worktree aparte) |
+| Límites | sin push a la rama runtime ni deploy; sin escrituras de permisos, membresías o datos reales; sin producción ni `main` |
+
+## 2026-11-12 16:17Z: TASK-0021 — **APPROVED con reservas** (`6829143372`)
+
+UAT visual del propietario en el navegador, sin guardar roles reales. Reservas: F-SEC01-T21-01 se corrige en tarea nueva;
+la recuperación de permisos de octubre se desea solo si coste y riesgo son bajos, sin restauración ciega ni masiva; no
+marcar las seis casillas `*_shield::role`; no restaurar administración de roles a actores distintos de `super_admin`;
+SEC-01 sigue abierta. Ambas decisiones pasan a TASK-0022.
+
 ## 2026-11-12 12:11Z: **TASK-0021** — SEC-01: revisión de R4-01 e integración/despliegue de R3+R4+R4-01 **solo en staging** — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~12:55Z, `6823247114`)
 
 | Campo | Valor |
