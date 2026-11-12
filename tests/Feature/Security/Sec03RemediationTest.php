@@ -551,12 +551,9 @@ class Sec03RemediationTest extends TestCase
         config(['security.https.redirect' => true]);
         $host = $this->appHost();
         $target = 'https://'.$host.'/admin/login?a=1&b=%C3%B1';
-        $send = function (string $method) use ($host) {
-            $this->flushHeaders();
-
-            return $this->withServerVariables(['REMOTE_ADDR' => self::GATEWAY])->withHeaders(['X-Forwarded-Proto' => 'http'])
-                ->call($method, 'http://'.$host.'/admin/login?a=1&b=%C3%B1');
-        };
+        // call() no aplica withHeaders() (solo get()/post()/…): la cabecera va como variable de servidor.
+        $send = fn (string $method) => $this->call($method, 'http://'.$host.'/admin/login?a=1&b=%C3%B1', [], [], [],
+            ['REMOTE_ADDR' => self::GATEWAY, 'HTTP_X_FORWARDED_PROTO' => 'http']);
 
         foreach (['GET' => 301, 'HEAD' => 301, 'POST' => 308, 'PUT' => 308, 'PATCH' => 308, 'DELETE' => 308] as $method => $status) {
             $response = $send($method);
