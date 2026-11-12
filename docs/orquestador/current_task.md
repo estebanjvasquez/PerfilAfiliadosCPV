@@ -25,14 +25,16 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-12 12:11Z: **TASK-0021** — SEC-01: revisión de R4-01 e integración/despliegue de R3+R4+R4-01 **solo en staging** — IN_PROGRESS (`6823247114`)
+## 2026-11-12 12:11Z: **TASK-0021** — SEC-01: revisión de R4-01 e integración/despliegue de R3+R4+R4-01 **solo en staging** — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~12:55Z, `6823247114`)
 
 | Campo | Valor |
 |---|---|
 | Archivo | [`tasks/0021-sec01-r3-r4-r401-staging-deploy.md`](tasks/0021-sec01-r3-r4-r401-staging-deploy.md) |
-| Rama de trabajo | `integrate/sec-01-r3-r4-r401-staging` (desde staging `9d0c24d`; solo los 12 commits de código y pruebas de R3/R4/R4-01) |
-| Staging vivo | `9d0c24d` (SEC-03, HSTS 1 día) |
+| Rama de trabajo | `integrate/sec-01-r3-r4-r401-staging` (desde staging `9d0c24d`; solo los 12 commits de código y pruebas de R3/R4/R4-01, más 2 de pruebas de la tarea) |
+| Staging vivo | ~~`9d0c24d`~~ → **`71e8a6d`** (workflow `43220318614`); SEC-03 intacta, HSTS 1 día |
+| Resultado | gates 1–4 PASS; suite 794/794; respaldo y restauración ensayada (FK con `NOT VALID`); validación sintética en vivo PASS; residual F-SEC01-T21-01 (Baja) |
 | Límites | sin producción, `main`, Cloudflare/HSTS, n8n, taxonomía ni cambios a roles reales; no restaurar permisos perdidos |
+| Siguiente | revisión del propietario; UAT del editor de roles (sin guardar roles reales); F-SEC01-T21-01 y la recuperación de permisos, decisiones aparte |
 
 ## 2026-11-12 11:42Z: TASK-0020 — **APPROVED con reservas** (`6822634878`)
 
