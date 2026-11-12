@@ -244,6 +244,11 @@ Menú **Roles** (Filament Shield). Permite:
 > Recomendación: otorgue **super_admin** solo al personal de confianza de la Cámara; los reportes
 > agregados y la eliminación de empresas dependen de ese rol.
 
+- **Solo un super_admin administra roles.** Al guardar un rol, el editor cambia únicamente las casillas que
+  muestra; los permisos que no tienen casilla se conservan.
+- La sección **Role** del editor muestra los permisos reales de administración de roles (`view_role`,
+  `update_role`, etc.) en **solo lectura**: no se pueden dar a otro rol ni quitar a super_admin desde aquí.
+
 ![Roles y permisos (Filament Shield)](capturas_admin/26-roles.png)
 
 ---
