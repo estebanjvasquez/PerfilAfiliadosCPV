@@ -105,7 +105,7 @@ class Sec01Task0021ReviewTest extends TestCase
     public function the_privileged_role_with_over_a_hundred_hidden_permissions_keeps_them_all(): void
     {
         $hidden = $this->hiddenNames();
-        foreach ($hidden as $name) {
+        foreach ([...$hidden, 'view_empresa'] as $name) {
             Permission::findOrCreate($name, 'web');
         }
         [$super, $admin] = $this->superAdmin([...$hidden, 'view_empresa']);

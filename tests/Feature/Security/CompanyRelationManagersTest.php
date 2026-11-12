@@ -333,7 +333,7 @@ class CompanyRelationManagersTest extends TestCase
     // ------------------------------------------------------------------ Services (legacy catalog, read only)
 
     #[Test]
-    public function services_tab_is_read_only_shows_only_the_companys_links_and_never_changes_the_catalog(): void
+    public function services_tab_shows_only_the_companys_links_never_reaches_another_company_and_never_changes_the_catalog(): void
     {
         $sector = DB::table('sectors')->insertGetId(['name' => 'ZZZSECSERV', 'created_at' => now(), 'updated_at' => now()]);
         $alfaService = DB::table('services')->insertGetId(['sectors_id' => $sector, 'name' => 'ZZZSERVALFA', 'created_at' => now(), 'updated_at' => now()]);
@@ -349,11 +349,16 @@ class CompanyRelationManagersTest extends TestCase
         $rm = $this->manager(ServicesRelationManager::class, $this->alfaUser);
         $rm->assertCanSeeTableRecords([\App\Models\Service::find($alfaService)])
             ->assertCanNotSeeTableRecords([\App\Models\Service::find($betaService)]);
-        foreach (['detach', 'delete', 'edit', 'attach', 'create', 'dissociate'] as $action) {
+        // TASK-0021 (Issue #2 `6823247114`): since the owner's decision of 2026-11-07 (TASK-0013, live in staging) the
+        // company's own services are editable again (attach/detach under the sector rule, covered by
+        // tests/Feature/Ux/CompanyServicesAndSectorsTest). What stays from R3: no catalog action exists or runs, and
+        // another company's link is never reachable from this tab.
+        foreach (['delete', 'edit', 'create', 'dissociate'] as $action) {
             $rm->assertTableActionDoesNotExist($action);
             $this->browserAction($this->manager(ServicesRelationManager::class, $this->alfaUser), $action, $alfaService);
             $this->browserAction($this->manager(ServicesRelationManager::class, $this->alfaUser), $action, $betaService);
         }
+        $this->browserAction($this->manager(ServicesRelationManager::class, $this->alfaUser), 'detach', $betaService);
 
         $this->assertEquals($catalogBefore, DB::table('services')->whereIn('id', [$alfaService, $betaService])->orderBy('id')->get()->toArray(), 'catalog unchanged');
         $this->assertEquals($linksBefore, $links(), 'links unchanged');
