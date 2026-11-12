@@ -1,4 +1,28 @@
 {
+  "task_0020_sec03_staging_operational_tests": {
+    "task_id": "TASK-0020",
+    "title": "SEC-03 operational tests on staging (adversarial edge/header/quota tests and functional recovery/Turnstile/email-change tests with synthetic accounts)",
+    "source": "owner instruction in the chat, 2026-11-12 (items 2 and 3 of 6821212610); owner choices in chat: Gmail +cpv-sec03-N aliases, owner solves Turnstile in browser, create and delete synthetic rows",
+    "status": "READY_FOR_REVIEW",
+    "environment": "staging only, feature/upgrade-filament-v3 = 9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823 (unchanged; no code or config changes)",
+    "review_base_sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823 (code under test, deployed)",
+    "review_head_sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823 (no code changes in this task)",
+    "records_commit_sha": "f9f39200b9c11b8f035b9ef7e3d13307a65bbdf0",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha)",
+    "part2_adversarial": "PASS: foreign Host blocked at edge (403/530) and rejected by app past the edge (400); client CF-Connecting-IP blocked by Cloudflare (403); spoofed X-Forwarded-For/True-Client-IP have no effect on ip(); X-Real-IP dropped; X-Forwarded-Host ignored; origin unreachable from outside; origin quota separated between two own clients",
+    "part1_functional": "PASS: real recovery mail links use the staging host; RIF sends one message per eligible mailbox; 5 requests without valid Turnstile left the email quota at 0 and the next valid request was accepted; email change via Usuarios cleared verification, deleted the old token and its link was rejected; verification prompt shown for the new mailbox. NOT EXECUTED: opening the new-mailbox verification link",
+    "db_mutations": {
+      "created": "users +2, empresas +1, empresa_user +6 (2 synthetic + 4 automatic staff links by Empresa::create), model_has_roles +2",
+      "deleted": "exactly those rows by id plus 1 pending token, in a guarded transaction",
+      "before_after": "users 368->370->368, empresas 406->407->406, empresa_user 2199->2205->2199, model_has_roles 330->332->330, password_resets 0->...->0 (baseline restored)"
+    },
+    "observations": [
+      "verification prompt copy targets new registrations, confusing after an email change (UX, not security)",
+      "Empresa::create with an authenticated user auto-links 4 staff users",
+      "server egress to Cloudflare is IPv6 by default"
+    ],
+    "limits": "no deploy, no production, no main, no SEC-01, no HSTS change, no Cloudflare/nginx/tunnel changes; SEC-03 closure is an owner decision"
+  },
   "task_0019_sec03_staging_deploy": {
     "task_id": "TASK-0019",
     "title": "SEC-03 P1-P5 integration and deployment to staging only, header verification and gradual HSTS",
