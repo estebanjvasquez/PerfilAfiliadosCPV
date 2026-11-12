@@ -25,6 +25,20 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-12 17:45Z: **TASK-0023** — SEC-01: desplegar en staging la corrección de F-SEC01-T21-01 — **IN_PROGRESS** (`6831152066`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0023-sec01-t21-01-staging-deploy.md`](tasks/0023-sec01-t21-01-staging-deploy.md) |
+| Candidato | `270e07d` (*fast-forward* de staging `71e8a6d`) |
+| Límites | solo staging; sin tocar R1/R2 ni otros permisos reales; sin borrar filas; sin producción, `main` ni HSTS |
+
+## 2026-11-12 17:36Z: TASK-0022 — **APPROVED** con alcance limitado (`6831144754`)
+
+Aprobada como entrega de código y análisis; no implica despliegue (pasa a TASK-0023). Recuperación: **sin** ejecución
+automatizada ni inserciones; R1 y R2 no se modifican; el propietario podrá restaurar `view_any_user` en R1 a mano si lo
+necesita. No borrar las 6 filas `*_shield::role` sin autorización aparte.
+
 ## 2026-11-12 16:30Z: **TASK-0022** — SEC-01: corregir F-SEC01-T21-01 y evaluar la recuperación de permisos de octubre — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~17:05Z, `6829151868`)
 
 | Campo | Valor |
