@@ -25,13 +25,15 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-12 17:45Z: **TASK-0023** — SEC-01: desplegar en staging la corrección de F-SEC01-T21-01 — **IN_PROGRESS** (`6831152066`)
+## 2026-11-12 17:45Z: **TASK-0023** — SEC-01: desplegar en staging la corrección de F-SEC01-T21-01 — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~18:00Z, `6831152066`)
 
 | Campo | Valor |
 |---|---|
 | Archivo | [`tasks/0023-sec01-t21-01-staging-deploy.md`](tasks/0023-sec01-t21-01-staging-deploy.md) |
-| Candidato | `270e07d` (*fast-forward* de staging `71e8a6d`) |
-| Límites | solo staging; sin tocar R1/R2 ni otros permisos reales; sin borrar filas; sin producción, `main` ni HSTS |
+| Staging vivo | ~~`71e8a6d`~~ → **`270e07d`** (workflow `43274064073`, *fast-forward*); HSTS 1 día |
+| Resultado | Alcance, respaldo (`sec01-t23-20261112T174040Z`), restauración aislada (FK con `NOT VALID`), regresión (93/93 y 798/798) y validación sintética en vivo: PASS. Roles reales idénticos a la línea base |
+| Límites | R1/R2 sin tocar; filas `*_shield::role` sin borrar; sin producción, `main` ni HSTS |
+| Siguiente | revisión del propietario; UAT visual opcional del editor, sin guardar roles reales |
 
 ## 2026-11-12 17:36Z: TASK-0022 — **APPROVED** con alcance limitado (`6831144754`)
 
