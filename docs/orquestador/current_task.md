@@ -25,6 +25,21 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## Nueva, 2026-11-12: TASK-0019 — SEC-03: despliegue de P1–P5 solo en staging — IN_PROGRESS (`6820224859`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0019-sec03-staging-deploy.md`](tasks/0019-sec03-staging-deploy.md) (comentario fuente íntegro) |
+| Código | `fix/sec-03-p1-p5` @ `9d0c24d` (TASK-0018, **APPROVED** como implementación aislada en `6820214362`) |
+| Staging al empezar | `b048df0` |
+| Gates | preflight (respaldo, restauración ensayada, regresión del candidato) antes de desplegar; HSTS solo tras los gates A–C; sin producción ni `main` |
+
+TASK-0019 no cambia TASK-0018.
+
+## 2026-11-12: TASK-0018 — **APPROVED** como implementación aislada (`6820214362`)
+
+El propietario aprobó el código y las pruebas aisladas de `9d0c24d`. No cierra F-SEC03-03 ni F-SEC03-06. Declara activado «Always Use HTTPS» en Cloudflare (verificado por TASK-0019).
+
 ## 2026-11-12: TASK-0018, ciclo de corrección (`6819392897`) — READY_FOR_REVIEW, SIN DESPLEGAR
 
 | Campo | Valor |

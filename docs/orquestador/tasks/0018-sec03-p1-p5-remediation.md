@@ -6,7 +6,7 @@
 | Fuente | Issue #2, comentario `6802857575` (propietario, 2026-11-11 17:36Z), íntegro al final |
 | Autorización de alcance | decisiones del propietario `6802438608`; revisión documental `6802648398`, commit `733d1e5` |
 | Relación | implementación **independiente** de la auditoría TASK-0017 (`6797800863`), que no se modifica; TASK-0012 (recuperación) tampoco |
-| Estado | **READY_FOR_REVIEW** (2026-11-11). Sin despliegue, sin merge, sin cambios de infraestructura → 2026-11-12: CORRECTIONS_REQUIRED (`6819392897`) → **READY_FOR_REVIEW** tras el ciclo de corrección (addendum al final) |
+| Estado | **READY_FOR_REVIEW** (2026-11-11). Sin despliegue, sin merge, sin cambios de infraestructura → 2026-11-12: CORRECTIONS_REQUIRED (`6819392897`) → **READY_FOR_REVIEW** tras el ciclo de corrección (addendum al final) → 2026-11-12: **APPROVED** como implementación aislada (`6820214362`, propietario); F-SEC03-03 y F-SEC03-06 siguen pendientes de verificación operativa. El despliegue es TASK-0019 |
 | Rama / worktree | `fix/sec-03-p1-p5` (pusheada; no despliega: el workflow solo corre con `feature/upgrade-filament-v3`) / `PerfilAfiliadosCPV-wt-sec03-fix` |
 | BASE | staging `b048df09b345bfefc8bbfe88ed0ca8e4ea09df33` (verificado en vivo: `ls-remote` y `git rev-parse HEAD` en el servidor, árbol limpio) + pruebas de la auditoría `8a4ed35df5aafc853ac9e79b33d340a46ea6613c` (la rama parte de ese commit, sin reescribirlo) |
 | TESTED_HEAD = REVIEW_HEAD | `cb3fff4ebac09fe8faf7e656c06dbfe8de0be883` (código `93c36f7` + manual `cb3fff4`) → tras la revisión: **`9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823`** |
