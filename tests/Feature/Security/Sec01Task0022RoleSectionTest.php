@@ -159,6 +159,7 @@ class Sec01Task0022RoleSectionTest extends TestCase
     public function another_role_never_gets_role_administration_or_forged_names_from_the_editor(): void
     {
         [, $admin] = $this->superAdmin(['view_any_user', 'view_user']);
+        Permission::findOrCreate('export_zzz_t22_kept', 'web'); // hidden: rendered by no field
         $role = Role::findOrCreate('zzz-t22-ordinary', 'web');
         $role->syncPermissions(['view_any_user', 'export_zzz_t22_kept']);
         $rows = Permission::query()->count();
