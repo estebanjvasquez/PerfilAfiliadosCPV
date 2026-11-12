@@ -1,4 +1,24 @@
 {
+  "task_0021_sec01_r3_r4_r401_staging_deploy": {
+      "task_id": "TASK-0021",
+      "title": "SEC-01 final review of R4-01 and integration/deploy of R3+R4+R4-01 to staging only",
+      "source": "Issue #2 comment 6823247114 (owner explicit assignment, 2026-11-12); initial response 6823719298",
+      "status": "READY_FOR_REVIEW",
+      "environment": "staging only; feature/upgrade-filament-v3 9d0c24d -> 71e8a6d (fast-forward), workflow 43220318614 success",
+      "review_base_sha": "9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823 (staging before; SEC-03 P1-P5)",
+      "review_head_sha": "71e8a6d2f4922253174c4ac4bd6fd39074c00555 (tested = reviewed = deployed; branch integrate/sec-01-r3-r4-r401-staging)",
+      "records_commit_sha": "9bc7f558f5a5ca1dd14b3c90c42fb7e6f73fcf81",
+      "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha)",
+      "sources": "cherry-pick -x of R3 3a3ab56 b45fd83 7cd796e c6e99ae e95169c; R4 1b47f1a 4953be6 7896bbf b51fa3e; R4-01 2ec1c6c 44da9a3 24413d5; task test commits 77f5e46, 71e8a6d",
+      "gates": "G1 R4-01 review PASS (fails-before c5a9f8e on b92dfb8); G2 scope PASS (R4/R4-01 byte-identical to 24413d5, SEC-03 untouched, no migrations/config); G3 preflight PASS; G4 deploy+validation PASS",
+      "tests": "isolated runner full suite 794/794 (8460 assertions) run 20261112T122348Z-71e8a6d2f492; baseline 9d0c24d 767/767",
+      "backup": "server /root/backups/sec01-t21-20261112T123419Z (env, pg_dump -Fc -n public sha256 verified, counts 88 tables/41499 rows, per-role permission baseline); image tag perfilafiliados-app:pre-sec01-9d0c24d",
+      "restore_rehearsal": "isolated pg17+pgvector, 0 count mismatches, permission baseline identical; FK contact_empresa_contact_id_foreign recreated NOT VALID (2 pre-existing orphans, untouched)",
+      "live_validation": "synthetic accounts/role inside an always-rolled-back transaction: hidden kept before 0/60 after 60/60; single visible uncheck exact; forged refused; non-super_admin refused; privileged identity guard; R3 11/11; real access read-only 4/4 super_admin, 0/364 others",
+      "db_mutations": "none persisted (rolled-back transactions only; totals identical before/after)",
+      "residual": "F-SEC01-T21-01 (Low): published RoleResource gets Shield entity key shield::role, Role section renders non-existent *_shield::role checkboxes; no loss or elevation; needs a separate assignment",
+      "finding_integration": "staging already had partial R3 since 7831e01 (TASK-0011, 2026-10-27): trait used by 1 of 11 components; now 11/11"
+  },
   "task_0020_sec03_staging_operational_tests": {
     "task_id": "TASK-0020",
     "title": "SEC-03 operational tests on staging (adversarial edge/header/quota tests and functional recovery/Turnstile/email-change tests with synthetic accounts)",
