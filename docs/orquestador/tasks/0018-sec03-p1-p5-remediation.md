@@ -6,10 +6,10 @@
 | Fuente | Issue #2, comentario `6802857575` (propietario, 2026-11-11 17:36Z), íntegro al final |
 | Autorización de alcance | decisiones del propietario `6802438608`; revisión documental `6802648398`, commit `733d1e5` |
 | Relación | implementación **independiente** de la auditoría TASK-0017 (`6797800863`), que no se modifica; TASK-0012 (recuperación) tampoco |
-| Estado | **READY_FOR_REVIEW** (2026-11-11). Sin despliegue, sin merge, sin cambios de infraestructura |
+| Estado | **READY_FOR_REVIEW** (2026-11-11). Sin despliegue, sin merge, sin cambios de infraestructura → 2026-11-12: CORRECTIONS_REQUIRED (`6819392897`) → **READY_FOR_REVIEW** tras el ciclo de corrección (addendum al final) |
 | Rama / worktree | `fix/sec-03-p1-p5` (pusheada; no despliega: el workflow solo corre con `feature/upgrade-filament-v3`) / `PerfilAfiliadosCPV-wt-sec03-fix` |
 | BASE | staging `b048df09b345bfefc8bbfe88ed0ca8e4ea09df33` (verificado en vivo: `ls-remote` y `git rev-parse HEAD` en el servidor, árbol limpio) + pruebas de la auditoría `8a4ed35df5aafc853ac9e79b33d340a46ea6613c` (la rama parte de ese commit, sin reescribirlo) |
-| TESTED_HEAD = REVIEW_HEAD | `cb3fff4ebac09fe8faf7e656c06dbfe8de0be883` (código `93c36f7` + manual `cb3fff4`) |
+| TESTED_HEAD = REVIEW_HEAD | `cb3fff4ebac09fe8faf7e656c06dbfe8de0be883` (código `93c36f7` + manual `cb3fff4`) → tras la revisión: **`9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823`** |
 | Pruebas | Sec03 `20261111T180241Z-cb3fff4ebac0`: **37 tests, 170 aserciones, OK**. Suite completa `20261111T180350Z-cb3fff4ebac0`: **753 tests, 8030 aserciones, OK** |
 
 ## 1. Arranque y estado vivo (2026-11-11 ~17:40Z)
@@ -183,3 +183,145 @@ verificaciones de §5.2–5.3; Cloudflare «Always Use HTTPS»; etapas de HSTS; 
 > - Al alcanzar `READY_FOR_REVIEW`: **STOP**. Esperar revisión y aprobación humana. No comenzar SEC-01 automáticamente.
 >
 > **Respuesta inicial esperada:** ID materializado, rama/worktree, HEAD y bloqueos. **Respuesta final:** `READY_FOR_REVIEW / Issue #2 / HEAD <sha>` con evidencia enlazada.
+
+## Addendum 2026-11-12: ciclo de corrección `6819392897` (CORRECTIONS_REQUIRED → READY_FOR_REVIEW)
+
+Revisión del propietario (2026-11-12 09:04Z) sobre la entrega `6803731840`: verificación y correcciones mínimas de P2,
+P4 y P5, en la misma tarea, solo en aislamiento. Lo anterior de este archivo se conserva como antecedente.
+
+| Campo | Valor |
+|---|---|
+| Estado | `READY_FOR_REVIEW` → `CORRECTIONS_REQUIRED` / `IN_PROGRESS` (`6819392897`) → **`READY_FOR_REVIEW`** (2026-11-12) |
+| Rama | `fix/sec-03-p1-p5` (misma; no despliega). Verificado al empezar: local = remoto = `cb3fff4`; `feature/upgrade-filament-v3` = `b048df0` |
+| BASE del ciclo | `cb3fff4ebac09fe8faf7e656c06dbfe8de0be883` (la entrega revisada); BASE de la tarea sin cambios: `b048df0` + `8a4ed35` |
+| Commits del ciclo | `22800c1` (correcciones P2/P4 + 14 pruebas de revisión), `9d0c24d` (arreglo de una prueba de P5) |
+| TESTED_HEAD = REVIEW_HEAD | `9d0c24d613fb32d9a0ff91c5cc9d0e4b7d036823` |
+
+### A. Matriz de la revisión
+
+| Punto | Veredicto | Defecto demostrado y corrección | Evidencia |
+|---|---|---|---|
+| **P2** | **PASS** en código; tránsito real de cabeceras **NO VERIFICADO** (gate conservado) | **Sí.** El valor por defecto `172.16.0.0/12` confiaba en las redes de otros sitios del mismo host: en solo lectura hay 4 redes bridge (`172.17`, `.18`, `.19` y `.20`, con 5 contenedores ajenos). PHP solo ve llegar el tráfico desde **un** par: el gateway de `perfilafiliados_default`. Corrección: `TRUSTED_PROXIES` por defecto = `127.0.0.1,::1,172.18.0.1` (lista exacta). Con el código anterior la prueba `review_p2_by_default_only_the_exact_gateway_*` **falla**; con la corrección, pasa | 6 pruebas `review_p2_*` (§C). Demostración con el código anterior: run `20261112T092358Z-a45af63e14a3` |
+| **P4** | **PASS** | **Sí.** Los tokens del correo anterior se borraban en `updated`, después del `UPDATE`: si el borrado fallaba fuera de una transacción, el correo quedaba cambiado y los tokens viejos vivos. Corrección: borrar en `updating`, antes del `UPDATE`, que es el orden seguro ante fallos. Un rollback revierte las dos cosas. Con el código anterior la prueba `review_p4_a_failed_token_cleanup_*` **falla** (mismo run) | 4 pruebas `review_p4_*`. Sin escritores que salten los eventos: grep de `DB::table('users')`, `saveQuietly`, `withoutEvents`, `upsert` y `->update()` sobre `User`, sin resultados; el formulario real (`EditUser`) se probó |
+| **P5** | **PASS de código**; F-SEC03-06 sigue **pendiente en parte** (HTTPS efectivo en el borde) | No se encontró defecto de código. Orden de middleware `TrustHosts` → `TrustProxies` → `EnforceHttps`; `X-Forwarded-Proto` solo cuenta desde pares de confianza, y solo con la redirección encendida. Un fallo de prueba en el ciclo fue **de la prueba**: `call()` no aplica `withHeaders()`. Se corrigió en `9d0c24d`, sin tocar el código | 4 pruebas `review_p5_*` |
+
+Ningún hallazgo se marca cerrado. F-SEC03-03 queda pendiente de validar con cabeceras reales y F-SEC03-06 de HTTPS
+efectivo; los demás, «corregido en candidato».
+
+### B. Cadena Cloudflare → cloudflared → nginx → PHP (inspección de solo lectura, 2026-11-12)
+
+| Salto | Observado | Qué llega a PHP |
+|---|---|---|
+| Cloudflare (borde) | No inspeccionado (sin acceso a la cuenta; sin pruebas activas) | Según la documentación de Cloudflare, el borde pone `CF-Connecting-IP`, añade a `X-Forwarded-For` y fija `X-Forwarded-Proto`. **NO VERIFICADO en vivo** |
+| cloudflared (systemd en el host) | Ingreso por hostname exacto → `http://localhost:8080`, *catch-all* `http_status:404`; sin `httpHostHeader` (conserva el Host original) | Las cabeceras del borde; reenvío no verificado en vivo |
+| docker-proxy | `127.0.0.1:8080` → nginx:80; `userland-proxy` por defecto | El origen TCP que ve nginx es el gateway de `perfilafiliados_default` |
+| nginx (contenedor) | `server_name _`, `fastcgi_param HTTPS on`; sin `real_ip`, `proxy_set_header` ni `fastcgi_param HTTP_*` (0 coincidencias) | `REMOTE_ADDR` = gateway; las cabeceras del cliente pasan como `HTTP_*` (por defecto en fastcgi) |
+| PHP/Laravel | `TrustHosts` → `TrustProxies` → `EnforceHttps` | Desde el gateway: `CF-Connecting-IP` → IP del cliente; `X-Forwarded-Host` descartado; `X-Forwarded-Proto` ignorado mientras la redirección esté apagada |
+
+La red `perfilafiliados_default` tiene solo 2 contenedores (app y nginx). Las otras redes del host no pueden fijar la IP.
+**Gate:** confirmar el tránsito de `CF-Connecting-IP` y `X-Forwarded-Proto` requiere desplegar y observar, o registrar
+temporalmente su presencia en nginx (infraestructura). Ambos necesitan autorización específica.
+
+### C. Pruebas nuevas de la revisión (14, en `Sec03RemediationTest`, prefijo `review_`)
+
+- P2:
+  - solo el gateway exacto es de confianza: otras redes de Docker, otro contenedor y rangos privados no lo son;
+  - un `CF-Connecting-IP` con lista, en blanco, con puerto, fuera de rango o inyectado deja la IP del par; IPv6 sí;
+  - `X-Forwarded-For` estándar se lee de derecha a izquierda, y solo desde un par de confianza;
+  - `X-Forwarded-Proto`, `-Port`, `-Prefix` y `-Host`, y `Forwarded` (RFC 7239), desde un par de confianza, no cambian
+    esquema, host, puerto, ruta base ni enlaces;
+  - desde un par no confiable ninguna cabecera cambia nada, ni con la redirección encendida;
+  - dos clientes detrás del gateway ya no comparten el cupo por origen.
+- P4:
+  - un fallo al borrar los tokens deja la cuenta intacta;
+  - un rollback restaura el correo, la verificación y los tokens;
+  - un token emitido antes del cambio no sirve ni con el correo viejo (`INVALID_USER`) ni con el nuevo (`INVALID_TOKEN`);
+  - el formulario real de Usuarios anula la verificación.
+- P5:
+  - 301 para GET y HEAD, y 308 para POST, PUT, PATCH y DELETE, conservando ruta y *query*, sin HSTS en la respuesta http;
+  - el destino es el host canónico aunque la petición venga por otro host de confianza o con `X-Forwarded-Host`;
+  - al seguir la redirección se llega a https con HSTS; un `X-Forwarded-Proto: http, https` ambiguo o de un cliente no
+    confiable no redirige ni da HSTS;
+  - `includeSubDomains` y `preload` solo aparecen si se activan a propósito.
+
+Las 17 pruebas de la entrega anterior, los 13 controles y los **7 oráculos de TASK-0017 no se modificaron**: `git diff
+cb3fff4 9d0c24d` no toca los dos archivos de TASK-0017, y en `Sec03RemediationTest` solo hay líneas añadidas.
+
+### D. Corridas (runner aislado `infra/contabo-test-runner` @ `c77f3df`, PostgreSQL desechable, PHP 8.2.35)
+
+Comando: `run_tests.sh <sha> [--filter <patrón>]`, enviado como script por `scp` y verificado con la línea `OK (N tests…)`
+de `artifacts/<run>/phpunit.txt`.
+
+| Corrida | SHA | Resultado |
+|---|---|---|
+| `Sec03` | `22800c1` | run `20261112T091141Z-22800c15b35e`: 51 tests, 225 aserciones, **1 fallo**: `review_p5_the_redirect_keeps_path_*`, porque la prueba usaba `call()` con `withHeaders()`. Corregido en la prueba |
+| Demostración con el código anterior (rama temporal `tmp/sec03-review-before` = pruebas de `9d0c24d` + `User.php` y `config/security.php` de `cb3fff4`; **borrada** después) | `a45af63` | run `20261112T092358Z-a45af63e14a3`: 10 tests, **2 fallos esperados** (`review_p2_by_default_*`, `review_p4_a_failed_token_cleanup_*`); las otras 8 pasan |
+| `Sec03` | `9d0c24d` | run `20261112T091358Z-9d0c24d613fb`: **51 tests, 242 aserciones, OK** (13 controles + 7 oráculos + 31 de remediación) |
+| Enfocada `Sec03\|AccountRecovery\|Auth\|AccountWrite\|AccountPrivilege` | `9d0c24d` | run `20261112T091515Z-9d0c24d613fb`: **111 tests, 620 aserciones, OK** |
+| **Suite completa (TESTED_HEAD)** | `9d0c24d` | run `20261112T091647Z-9d0c24d613fb`: **767 tests, 8102 aserciones, OK** (753 + 14) |
+
+En todas: staging 200 antes y después; sin contenedores `cpvtest` restantes; sin advertencias, omisiones ni errores en la
+salida de PHPUnit.
+
+### E. Diff del ciclo (`cb3fff4..9d0c24d`)
+
+`config/security.php` (lista exacta de proxies y su porqué), `app/Http/Middleware/TrustProxies.php` (comentario),
+`app/Models/User.php` (borrado de tokens en `updating`) y `tests/Feature/Security/Sec03RemediationTest.php` (+14
+pruebas). Sin cambios de infraestructura, workflows ni migraciones.
+
+### F. Riesgos residuales y gates (sin cambios de alcance)
+
+- **P2:**
+  - tránsito real de `CF-Connecting-IP`: NO VERIFICADO;
+  - si la red de Docker se recrea con otro gateway, o en otro servidor, la IP vuelve a ser la del gateway. Es seguro, pero
+    no separa a los clientes hasta fijar `TRUSTED_PROXIES`. Comprobarlo tras cada recreación de la red y en producción.
+- **P4:** un escritor futuro que salte los eventos de Eloquent no estaría cubierto; hoy no existe ninguno.
+- **P5:** HTTP sigue respondiendo hasta activar «Always Use HTTPS» en Cloudflare o la redirección, después de verificar
+  `X-Forwarded-Proto`. Revertir HSTS tarda hasta `max-age` (1 día).
+- **Gates:** revisión humana; despliegue en staging con un GET de `/admin/login` después; verificación de cabeceras;
+  Cloudflare; etapas de HSTS; producción. SEC-01 no se inició.
+
+---
+
+## Comentario de revisión `6819392897` (íntegro)
+
+> # CORRECTIONS_REQUIRED — TASK-0018 / SEC-03: revisión técnica acotada P2, P4 y P5
+>
+> **Decisión de revisión sobre la entrega** [6803731840](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6803731840): se solicita una **corrección/verificación limitada**, sin ampliar el propósito de TASK-0018. Código entregado y probado: `cb3fff4ebac09fe8faf7e656c06dbfe8de0be883`; handoff: `78e0c887ce05c37fdec4e5727882d65d49ecb4c8`. Rama `fix/sec-03-p1-p5`. La revisión previa identificó tres puntos pendientes. **Autorización explícita:** reabrir TASK-0018 de `READY_FOR_REVIEW` a `CORRECTIONS_REQUIRED` / `IN_PROGRESS` para revisión técnica y correcciones mínimas de P2/P4/P5, exclusivamente en aislamiento. No crear una tarea nueva ni cerrar TASK-0018 automáticamente. Los resultados declarados (37/37 SEC-03, 753 tests y 8030 aserciones) son antecedentes, no sustituyen esta revisión.
+>
+> ## 0. Arranque y gobierno
+> 1. Leer `AGENTS.md`, `docs/orquestador/SESSION_RESUME.md`, `docs/orquestador/PROTOCOL.md`, `docs/orquestador/current_task.md` y **solo** la tarea activa `docs/orquestador/tasks/0018-sec03-p1-p5-remediation.md` y referencias directas necesarias. Leer este comentario completo una vez, sin recorrer el hilo.
+> 2. Antes de editar: `git status -sb`, rama, HEAD y remoto. Preservar cambios locales (incluida §0 de SESSION_RESUME), sin descartes, pulls ni cambios de rama sobre árbol sucio; usar worktree aislado cuando corresponda. Confirmar que se trabaja sobre el candidato `fix/sec-03-p1-p5` y contrastar el estado real con los checkpoints.
+> 3. Mantener TASK-0018 como **misma tarea**, registrando el ciclo de corrección sin borrar la auditoría TASK-0017 ni los antecedentes. No activar SEC-01, loops, polling o agente autónomo.
+>
+> ## 1. P2 — IP real, proxy y cabeceras
+> Archivos pertinentes: `app/Http/Middleware/TrustProxies.php`, `config/security.php`, `app/Http/Kernel.php`, tests SEC-03.
+> - Verificar que `CF-Connecting-IP` solo se acepta desde un par efectivamente confiable; revisar especialmente si el CIDR por defecto `172.16.0.0/12` confía indebidamente en otros contenedores o clientes. Preferir topología y proxies explícitos verificados, sin confiar en `*`.
+> - Probar en **aislamiento** cabeceras `CF-Connecting-IP`, `X-Forwarded-For`, `X-Forwarded-Host`, `X-Forwarded-Proto`: pares confiables/no confiables, ausentes, inválidas, múltiples y suplantación. Confirmar que ninguna cabecera no confiable cambia la IP efectiva o el origen de enlaces.
+> - Reconstruir documentalmente Cloudflare → cloudflared → Nginx → PHP/Laravel, distinguiendo código de cabeceras que llegan realmente a PHP. Inspección de infraestructura **solo lectura**. Si requiere pruebas activas en staging, STOP y pedir autorización específica.
+> **PASS:** límites no compartidos por todos los clientes cuando la cadena entrega IP válida, ausencia de spoofing desde pares no confiables, lista de proxies precisa; si no puede verificarse el tránsito real, marcarlo `NO VERIFICADO` y conservar el gate.
+>
+> ## 2. P4 — cambio de correo, tokens y atomicidad
+> Archivo principal `app/Models/User.php`; rutas de edición y broker relacionados.
+> - Revisar semántica real de Eloquent `updating`/`updated`, `isDirty`/`wasChanged`/`getOriginal` y normalización del correo.
+> - Probar que cambio real invalida `email_verified_at` y tokens del correo anterior; cambio solo de mayúsculas/espacios no altera verificación; enlaces previos no sirven.
+> - Probar fallos al borrar tokens, transacciones/rollback y actualizaciones por rutas que no disparan eventos Eloquent. Evitar inconsistencias entre usuario y tokens. Corregir solo si se demuestra defecto, sin refactorización general.
+> **PASS:** invariantes de verificación y tokens, incluso ante fallo/rollback, sustentadas en tests negativos y positivos.
+>
+> ## 3. P5 — HTTPS, HSTS y proxies
+> Archivos `EnforceHttps.php`, `CanonicalUrl.php`, `config/security.php`, `TrustProxies.php`.
+> - En aislamiento, verificar HTTP→HTTPS sin bucles; conservación de ruta/query; códigos de redirección para GET/HEAD y otros métodos; destino canónico no manipulable por Host.
+> - Confirmar que `X-Forwarded-Proto` influye solo desde proxies confiables; revisar interacción de `isSecure()`, `isFromTrustedProxy()` y orden de middleware.
+> - Probar HSTS solo en respuestas HTTPS, `max-age` esperado, `includeSubDomains` y `preload` desactivados, y reversibilidad.
+> **PASS de código** no equivale a cierre operativo: F-SEC03-06 sigue parcialmente pendiente mientras no se verifiquen borde/túnel y HTTPS efectivo. No activar redirección, Cloudflare Always Use HTTPS, `includeSubDomains` ni `preload` en infraestructura.
+>
+> ## 4. Pruebas, documentación y resultado
+> - Ejecutar pruebas enfocadas P2/P4/P5, los **37 controles SEC-03** incluidos los siete oráculos originales sin alterarlos para ocultar fallos, y la **suite completa** en runner/BD aislados. Registrar comandos, SHAs, conteos, aserciones, errores, advertencias, omisiones y resultados; corregir solo defectos demostrados y repetir regresión.
+> - Entregar matriz `P2/P4/P5 = PASS / FAIL / BLOCKED`, evidencias reproducibles, diff, riesgos residuales y gates de infraestructura/staging. Mantener `F-SEC03-03` como pendiente de validación efectiva de cabeceras y `F-SEC03-06` como pendiente de HTTPS efectivo; **no marcar hallazgos como cerrados por pruebas aisladas**.
+> - Actualizar `docs/security/SECURITY_STATUS.md`, `docs/orquestador/current_task.md`, `SESSION_RESUME.md` y TASK-0018 acumulativamente, preservando historia. Handoff `audit/orchestrator_handoff.json` **solo si está permitido por reglas vigentes**, sin sortear restricciones. Diferenciar BASE, TESTED_HEAD, REVIEW_HEAD y handoff SHA.
+> - Publicar resultado en Issue #2 mediante mecanismo autorizado. Proponer `READY_FOR_REVIEW` para aprobación/cierre de la **implementación aislada** cuando las pruebas estén verdes y no queden defectos críticos/altos de código; si hay bloqueo, declararlo. **STOP** tras la entrega; no pasar a `APPROVED` ni `CLOSED` por cuenta propia. El cierre requiere veredicto humano separado.
+>
+> ## 5. Prohibiciones
+> No desplegar en staging ni producción, no merge a `main`, no push a rama con deploy automático, no modificar Cloudflare/nginx/túneles/n8n, secretos, datos reales, taxonomía ni operaciones destructivas; no enviar correos a clientes ni pruebas de cabeceras manipuladas a staging. No iniciar SEC-01. Si se descubre riesgo crítico, detener las pruebas afectadas y reportar evidencia saneada por canal privado.
+>
+> **Respuesta inicial:** estado de TASK-0018, rama, HEAD y bloqueos. **Respuesta final:** `READY_FOR_REVIEW / Issue #2 / HEAD <sha>`, con matriz P2/P4/P5 y pruebas enlazadas.

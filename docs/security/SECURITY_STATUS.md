@@ -1,6 +1,6 @@
 # Informe acumulativo de seguridad — Perfil de Afiliados CPV
 
-**Fecha de actualización:** 2026-11-11 (SEC-03 / TASK-0018; antes, el mismo día, TASK-0017; la anterior fue 2026-10-21) (Europe/Madrid).  
+**Fecha de actualización:** 2026-11-12 (SEC-03 / TASK-0018, ciclo de corrección `6819392897`; antes, 2026-11-11: TASK-0018 y TASK-0017; la anterior fue 2026-10-21) (Europe/Madrid).  
 **Estado:** revisión en curso; no constituye certificación de seguridad.  
 **Programa:** CPV-SECURITY-AND-RELIABILITY.  
 **Rama de mantenimiento inicial:** `audit/security-access-01`.  
@@ -35,6 +35,11 @@ Este registro resume cada ronda, sus hallazgos, correcciones, aceptación y desp
   `TrustHosts`; IP real solo desde pares de confianza, sin `X-Forwarded-Host`; Turnstile antes de los cupos; correo
   nuevo sin verificar; HSTS de 1 día y redirección a https apagada. Suite completa 753/753. La aplicación efectiva
   requiere despliegue autorizado y verificaciones de infraestructura (ver §5).
+- **2026-11-12, TASK-0018, ciclo de corrección (`6819392897`): P2, P4 y P5 PASS en código, sin desplegar.** Dos defectos
+  demostrados y corregidos: la confianza por defecto en `172.16.0.0/12` incluía las redes de otros sitios del mismo
+  host (ahora, el gateway exacto); y el borrado de tokens después del `UPDATE` podía dejar tokens del correo anterior
+  vivos (ahora, antes). P5 sin defecto de código. TESTED/REVIEW `9d0c24d`; suite completa 767/767. F-SEC03-03 y
+  F-SEC03-06 siguen pendientes de validación efectiva; ningún hallazgo se cierra por pruebas aisladas.
 - Quedan decisiones sobre permisos y asociaciones de usuarios, hipótesis por reproducir y superficies todavía no probadas.
 - La siguiente ronda asignada verifica creación/edición de cuentas, concesión de privilegios y límites de acceso a archivos.
 - Gerencia y nuevos reportes permanecen en espera del cierre acordado de seguridad.
@@ -68,6 +73,7 @@ Cada cambio de estos estados necesita SHA y fuente. No inferir despliegue a part
 | SEC-03 general | Identidad, sesiones y entradas | Pendiente, salvo comprobaciones acotadas activadas en R2 | No cerrado |
 | SEC-03 / TASK-0017 (2026-11-11) | Recuperación de cuentas (correo y RIF), tokens, Host/proxies, verificación y cambio de correo, sobre staging `b048df0` | Solo auditoría y pruebas: 13 controles descartan la toma de cuentas en el alcance probado; F-SEC03-01..06 confirmados (ver §4). BASE `b048df0`, TESTED `8a4ed35` (rama `audit/sec-03-account-recovery`) | Instrucción 6797800863; **READY_FOR_REVIEW, sin correcciones ni despliegue**. SEC-03 sigue abierto |
 | SEC-03 / TASK-0018 (2026-11-11) | Correcciones P1–P5 de F-SEC03-01..06 | Implementación y pruebas aisladas: 7 oráculos de TASK-0017 en verde sin cambiarlos, 13 controles verdes, 17 pruebas nuevas; suite completa 753 tests, 8030 aserciones, OK. BASE `b048df0` (+ pruebas `8a4ed35`), TESTED `cb3fff4`, REVIEW `cb3fff4` (rama `fix/sec-03-p1-p5`) | Instrucción 6802857575; **READY_FOR_REVIEW, corregido en candidato, sin despliegue** ni cambios de infraestructura |
+| SEC-03 / TASK-0018, ciclo de corrección (2026-11-12) | Revisión técnica acotada de P2, P4 y P5 | P2: lista exacta de proxies; P4: borrado de tokens antes del `UPDATE`; 14 pruebas nuevas; defectos demostrados con el código anterior (run `20261112T092358Z-a45af63e14a3`: 2 fallos esperados). Suite completa 767 tests, 8102 aserciones, OK. BASE `cb3fff4`, TESTED `9d0c24d`, REVIEW `9d0c24d` | Revisión 6819392897 (CORRECTIONS_REQUIRED) → **READY_FOR_REVIEW**, sin despliegue |
 | SEC-04 | Dependencias, integraciones e infraestructura | Pendiente | No cerrado |
 | SEC-05 | Regresión consolidada y riesgos residuales | Pendiente | No cerrado |
 
@@ -102,10 +108,10 @@ Las severidades son las comunicadas por la ronda, sujetas a revisión. Una confi
 | RT-MAIL-2026-10 | Funcionalidad / Correo del sistema | El correo estaba en modo simulado (`log`): la verificación de cuentas y los avisos de solicitudes no salían | — | Activación autorizada por el propietario: transporte `smtp` global con remitente del dominio; el único cambio fue regenerar la caché de configuración (solo cambiaron claves `mail.*`) | **Activado** el 2026-10-26. Una prueba controlada fue aceptada por el proveedor y el propietario confirmó que llegó al buzón. Detalle en `docs/deploy/CORREO_DEL_SISTEMA.md` (rama `build/source-only-image`) |
 | F-SEC03-01 | SEC-03 TASK-0017 / Media (defensa en profundidad; Alta si el borde lo permitiera) | El host de los enlaces de recuperación y de verificación se toma de la petición, no de la configuración | **Confirmado en la aplicación** (oráculos aislados); explotación externa **no verificada**: el túnel solo enruta el hostname de staging y el origen no expone HTTP | Propuesta P1: raíz y esquema de URL forzados desde `APP_URL` y `TrustHosts`. Sin implementar | Abierto; decisión y autorización del propietario. **Verificar producción antes de llevar la recuperación allí** → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; P1, raíz de `APP_URL`), sin desplegar |
 | F-SEC03-02 | SEC-03 TASK-0017 / Media (misma causa que 01) | La aplicación acepta peticiones para cualquier host (`TrustHosts` desactivado, panel sin dominio) | Confirmado en la aplicación (200 con host ajeno) | P1 | Abierto → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; `TrustHosts`, hosts exactos), sin desplegar |
-| F-SEC03-03 | SEC-03 TASK-0017 / Media, disponibilidad | Detrás de cloudflared y nginx, la aplicación ve a todos los clientes con la IP del gateway: los límites «por IP» de login, recuperación y reset son globales | **Confirmado en staging** (configuración, 503/503 peticiones de 24 h desde una sola dirección privada) y con un oráculo aislado; el bloqueo no se ejerció | P2: IP real desde el gateway confiable; **quitar `X-Forwarded-Host` de las cabeceras confiables** o aplicar P1 antes. Sin implementar | Abierto → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; P2, `CF-Connecting-IP` solo desde pares de confianza, XFH descartado), sin desplegar; llegada de la cabecera por el túnel NO VERIFICADA |
+| F-SEC03-03 | SEC-03 TASK-0017 / Media, disponibilidad | Detrás de cloudflared y nginx, la aplicación ve a todos los clientes con la IP del gateway: los límites «por IP» de login, recuperación y reset son globales | **Confirmado en staging** (configuración, 503/503 peticiones de 24 h desde una sola dirección privada) y con un oráculo aislado; el bloqueo no se ejerció | P2: IP real desde el gateway confiable; **quitar `X-Forwarded-Host` de las cabeceras confiables** o aplicar P1 antes. Sin implementar | Abierto → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; P2, `CF-Connecting-IP` solo desde pares de confianza, XFH descartado), sin desplegar; llegada de la cabecera por el túnel NO VERIFICADA → 2026-11-12, revisión 6819392897: confianza reducida al gateway exacto (antes `172.16.0.0/12`, que incluía redes de otros sitios del host); `9d0c24d`, sin desplegar; **validación efectiva pendiente** |
 | F-SEC03-04 | SEC-03 TASK-0017 / Baja–media, disponibilidad dirigida | Las solicitudes que no pasan Turnstile consumen igual el cupo por correo y por RIF | Confirmado en aislamiento (correo y RIF) | P3: Turnstile antes de contar los cupos por destinatario. Sin implementar | Abierto → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; P3), sin desplegar |
-| F-SEC03-05 | SEC-03 TASK-0017 / Baja | Cambiar el correo de una cuenta conserva `email_verified_at`: el buzón nuevo hereda la verificación y la elegibilidad por RIF | Confirmado en aislamiento (modelo; el escritor es la gestión de usuarios). Concreta el indicio F-SEC01-07 en esta faceta | P4: anular la verificación y los tokens pendientes al cambiar el correo. Sin implementar | Abierto → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; P4), sin desplegar |
-| F-SEC03-06 | SEC-03 TASK-0017 / Baja–media, transporte | La aplicación responde por HTTP sin redirigir a HTTPS y sin HSTS (las cookies sí llevan `Secure`) | Confirmado en staging con GET inocuos | P5: «Always Use HTTPS» y HSTS en Cloudflare, o redirección en la aplicación; decisión de infraestructura | Abierto → 2026-11-11, TASK-0018: **corregido en parte en candidato** (`cb3fff4`; HSTS 1 día; redirección apagada hasta verificar el túnel), sin desplegar; «Always Use HTTPS» en Cloudflare pendiente de autorización |
+| F-SEC03-05 | SEC-03 TASK-0017 / Baja | Cambiar el correo de una cuenta conserva `email_verified_at`: el buzón nuevo hereda la verificación y la elegibilidad por RIF | Confirmado en aislamiento (modelo; el escritor es la gestión de usuarios). Concreta el indicio F-SEC01-07 en esta faceta | P4: anular la verificación y los tokens pendientes al cambiar el correo. Sin implementar | Abierto → 2026-11-11, TASK-0018: **corregido en candidato** (`cb3fff4`; P4), sin desplegar → 2026-11-12, revisión 6819392897: borrado de tokens antes del `UPDATE` (orden seguro ante fallos; rollback probado); `9d0c24d`, sin desplegar |
+| F-SEC03-06 | SEC-03 TASK-0017 / Baja–media, transporte | La aplicación responde por HTTP sin redirigir a HTTPS y sin HSTS (las cookies sí llevan `Secure`) | Confirmado en staging con GET inocuos | P5: «Always Use HTTPS» y HSTS en Cloudflare, o redirección en la aplicación; decisión de infraestructura | Abierto → 2026-11-11, TASK-0018: **corregido en parte en candidato** (`cb3fff4`; HSTS 1 día; redirección apagada hasta verificar el túnel), sin desplegar; «Always Use HTTPS» en Cloudflare pendiente de autorización → 2026-11-12, revisión 6819392897: PASS de código (métodos, *query*, destino canónico, sin bucles, HSTS); **HTTPS efectivo pendiente** |
 
 En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas (F-SEC01-02a). NO se estableció traversal de directorios en las superficies probadas (segmento de id numérico y `secciones` con lista blanca): resultado negativo acotado, no certificación general.
 
@@ -320,6 +326,22 @@ En R2 SÍ se estableció y corrigió un fallo de inyección de roles en cuentas 
   `X-Forwarded-Proto` por el túnel, borde de Cloudflare y producción. El Host que entrega el túnel se verificó en solo
   lectura (sin `httpHostHeader`; logs con el host canónico).
 - **Despliegue:** ninguno. Infraestructura (Cloudflare, nginx, túnel): sin cambios; plan en la tarea, §5.
+
+### SEC-03 / TASK-0018 — ciclo de corrección P2, P4 y P5 (6819392897) — 2026-11-12
+
+- **Veredicto:** P2 **PASS** en código (tránsito real de cabeceras NO VERIFICADO; gate conservado); P4 **PASS**; P5 **PASS
+  de código** (F-SEC03-06 sigue pendiente en parte). Detalle: tarea, addendum del 2026-11-12.
+- **Defectos demostrados y corregidos (`22800c1`):**
+  - P2: el valor por defecto `172.16.0.0/12` confiaba en las redes bridge de otros sitios del host (4 redes; 5
+    contenedores ajenos, en solo lectura). Ahora es la lista exacta: loopback y el gateway de la red de la aplicación.
+  - P4: los tokens del correo anterior se borraban después del `UPDATE`. Ahora se borran antes: si falla, no cambia
+    nada.
+- **Prueba de que eran defectos:** con el código anterior, las dos pruebas nuevas correspondientes fallan (run
+  `20261112T092358Z-a45af63e14a3`, rama temporal borrada); con la corrección, pasan.
+- **Regresión:** `Sec03` 51/51 (los 7 oráculos y 13 controles de TASK-0017 sin modificar); enfocada 111/111; suite
+  completa **767 tests, 8102 aserciones, OK** (run `20261112T091647Z-9d0c24d613fb`). Staging 200 antes y después.
+- **Despliegue:** ninguno. Infraestructura: sin cambios; solo inspección de solo lectura (redes de Docker, nginx,
+  ingreso del túnel).
 
 ## 6. Cobertura pendiente
 

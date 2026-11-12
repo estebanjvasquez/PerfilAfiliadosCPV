@@ -25,6 +25,19 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-12: TASK-0018, ciclo de corrección (`6819392897`) — READY_FOR_REVIEW, SIN DESPLEGAR
+
+| Campo | Valor |
+|---|---|
+| Revisión | `6819392897` (propietario): CORRECTIONS_REQUIRED acotado a P2, P4 y P5, en la misma tarea |
+| Rama / BASE del ciclo / TESTED_HEAD = REVIEW_HEAD | `fix/sec-03-p1-p5` / `cb3fff4` / **`9d0c24d`** |
+| Matriz | P2 **PASS** en código (tránsito de cabeceras NO VERIFICADO); P4 **PASS**; P5 **PASS de código** (HTTPS efectivo pendiente) |
+| Defectos corregidos | P2: proxies de confianza reducidos al gateway exacto (antes `172.16.0.0/12`); P4: tokens borrados antes del `UPDATE`. Ambos demostrados con el código anterior |
+| Pruebas | Sec03 51/51; enfocada 111/111; suite completa **767 tests, 8102 aserciones, OK** (run `20261112T091647Z-9d0c24d613fb`) |
+| Siguiente paso | revisión humana; despliegue y verificaciones de infraestructura solo con autorización |
+
+Detalle en el addendum del 2026-11-12 de [`tasks/0018-sec03-p1-p5-remediation.md`](tasks/0018-sec03-p1-p5-remediation.md). La sección de abajo es la entrega del 2026-11-11, sin cambios.
+
 ## Nueva, 2026-11-11: TASK-0018 — SEC-03: correcciones P1–P5 — READY_FOR_REVIEW, SIN DESPLEGAR (`6802857575`)
 
 | Campo | Valor |
