@@ -1,6 +1,6 @@
 # Informe acumulativo de seguridad — Perfil de Afiliados CPV
 
-**Fecha de actualización:** 2026-11-12 (SEC-03 / TASK-0020, pruebas operativas en staging; antes, TASK-0019 APPROVED `6821212610`; despliegue en staging `6820224859`; antes, el mismo día, TASK-0018 ciclo de corrección `6819392897` y APPROVED `6820214362`; antes, 2026-11-11: TASK-0018 y TASK-0017; la anterior fue 2026-10-21) (Europe/Madrid).  
+**Fecha de actualización:** 2026-11-12 (SEC-03 / TASK-0020 APPROVED con reservas `6822634878`; pruebas operativas en staging; antes, TASK-0019 APPROVED `6821212610`; despliegue en staging `6820224859`; antes, el mismo día, TASK-0018 ciclo de corrección `6819392897` y APPROVED `6820214362`; antes, 2026-11-11: TASK-0018 y TASK-0017; la anterior fue 2026-10-21) (Europe/Madrid).  
 **Estado:** revisión en curso; no constituye certificación de seguridad.  
 **Programa:** CPV-SECURITY-AND-RELIABILITY.  
 **Rama de mantenimiento inicial:** `audit/security-access-01`.  
@@ -59,6 +59,14 @@ Este registro resume cada ronda, sus hallazgos, correcciones, aceptación y desp
     Turnstile fallido no consume el cupo por correo; el cambio de correo anula la verificación y los tokens anteriores.
   - **No ejecutado:** abrir el enlace de verificación del buzón nuevo.
   - **Datos:** los sintéticos se borraron y los conteos volvieron a la línea base.
+- **2026-11-12, TASK-0020 APPROVED con reservas (`6822634878`).** Reservas:
+  - verificación del buzón nuevo no ejecutada en staging (no cuenta como UAT);
+  - origen de la tarea: el chat, sin asignación previa en el Issue #2;
+  - deuda de UX en la pantalla de verificación (no es vulnerabilidad);
+  - vinculación automática de 4 usuarios del personal en `Empresa::create`, para revisión independiente;
+  - FK preexistente con filas huérfanas.
+
+  No autoriza cerrar todos los riesgos del proyecto ni pasar a producción.
 - Quedan decisiones sobre permisos y asociaciones de usuarios, hipótesis por reproducir y superficies todavía no probadas.
 - La siguiente ronda asignada verifica creación/edición de cuentas, concesión de privilegios y límites de acceso a archivos.
 - Gerencia y nuevos reportes permanecen en espera del cierre acordado de seguridad.
@@ -94,7 +102,7 @@ Cada cambio de estos estados necesita SHA y fuente. No inferir despliegue a part
 | SEC-03 / TASK-0018 (2026-11-11) | Correcciones P1–P5 de F-SEC03-01..06 | Implementación y pruebas aisladas: 7 oráculos de TASK-0017 en verde sin cambiarlos, 13 controles verdes, 17 pruebas nuevas; suite completa 753 tests, 8030 aserciones, OK. BASE `b048df0` (+ pruebas `8a4ed35`), TESTED `cb3fff4`, REVIEW `cb3fff4` (rama `fix/sec-03-p1-p5`) | Instrucción 6802857575; **READY_FOR_REVIEW, corregido en candidato, sin despliegue** ni cambios de infraestructura |
 | SEC-03 / TASK-0018, ciclo de corrección (2026-11-12) | Revisión técnica acotada de P2, P4 y P5 | P2: lista exacta de proxies; P4: borrado de tokens antes del `UPDATE`; 14 pruebas nuevas; defectos demostrados con el código anterior (run `20261112T092358Z-a45af63e14a3`: 2 fallos esperados). Suite completa 767 tests, 8102 aserciones, OK. BASE `cb3fff4`, TESTED `9d0c24d`, REVIEW `9d0c24d` | Revisión 6819392897 (CORRECTIONS_REQUIRED) → **READY_FOR_REVIEW**, sin despliegue |
 | SEC-03 / TASK-0019 (2026-11-12) | Integración y despliegue de P1–P5 solo en staging; verificación de cabeceras; HSTS gradual | Preflight PASS (respaldo, restauración aislada 88/88 tablas con 0 diferencias, regresión 767/767 sobre el candidato). Despliegue *fast-forward* `b048df0..9d0c24d`, workflow `43196418453` success. Gates A–D PASS; HSTS `max-age=86400` en staging. BASE `b048df0`, TESTED = REVIEW = DESPLEGADO `9d0c24d` | Instrucción 6820224859; READY_FOR_REVIEW; desplegado en staging → **APPROVED** (`6821212610`, limitado a staging); SEC-03 sigue abierto |
-| SEC-03 / TASK-0020 (2026-11-12) | Pruebas operativas en staging: adversariales (borde, cabeceras, cupos) y funcionales (correo, RIF, Turnstile, cambio de correo) con cuentas sintéticas | Parte 2 PASS; parte 1 PASS salvo abrir el enlace de verificación del buzón nuevo (no ejecutado). Datos sintéticos creados y borrados por id; línea base restaurada. Staging `9d0c24d`, sin cambios de código ni de configuración | Instrucción del propietario en el chat; **READY_FOR_REVIEW** |
+| SEC-03 / TASK-0020 (2026-11-12) | Pruebas operativas en staging: adversariales (borde, cabeceras, cupos) y funcionales (correo, RIF, Turnstile, cambio de correo) con cuentas sintéticas | Parte 2 PASS; parte 1 PASS salvo abrir el enlace de verificación del buzón nuevo (no ejecutado). Datos sintéticos creados y borrados por id; línea base restaurada. Staging `9d0c24d`, sin cambios de código ni de configuración | Instrucción del propietario en el chat; READY_FOR_REVIEW → **APPROVED con reservas** (`6822634878`) |
 | SEC-04 | Dependencias, integraciones e infraestructura | Pendiente | No cerrado |
 | SEC-05 | Regresión consolidada y riesgos residuales | Pendiente | No cerrado |
 

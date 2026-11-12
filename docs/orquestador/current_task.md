@@ -25,6 +25,18 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-12 11:42Z: TASK-0020 — **APPROVED con reservas** (`6822634878`)
+
+Aprobada la ejecución de las pruebas operativas en staging. **Sin tarea activa nueva.** Reservas:
+- verificación del buzón nuevo no ejecutada en staging (no cuenta como UAT);
+- origen de la tarea: el chat, sin comentario previo de asignación;
+- deuda de UX en la pantalla de verificación;
+- vinculación automática del personal en `Empresa::create`, para revisión independiente;
+- FK preexistente con filas huérfanas.
+
+Detalle en [`tasks/0020-sec03-staging-operational-tests.md`](tasks/0020-sec03-staging-operational-tests.md). SEC-01
+detenida; HSTS, `main` y producción sin autorización.
+
 ## 2026-11-12 ~11:25Z: TASK-0020 — SEC-03: pruebas operativas en staging — READY_FOR_REVIEW (instrucción del propietario en el chat)
 
 | Campo | Valor |

@@ -5,7 +5,7 @@
 | ID | `TASK-0020` (siguiente libre: sin archivo, rama ni commit con 0020 en ninguna rama remota) |
 | Fuente | Instrucción del propietario **en el chat** de esta sesión, 2026-11-12: «1: aprobado hacer las pruebas / 2: aprobado hacer las pruebas». No hay comentario de asignación en el Issue #2 |
 | Alcance | Los pendientes 2 y 3 del veredicto `6821212610` de TASK-0019: (1) pruebas funcionales de recuperación por correo y RIF, Turnstile y cambio de correo con cuentas y buzones sintéticos; (2) prueba adversarial del borde de staging (Host ajeno, `CF-Connecting-IP` suplantado) y separación de cupos entre dos clientes |
-| Estado | IN_PROGRESS (2026-11-12) → **READY_FOR_REVIEW** (2026-11-12 ~11:25Z; partes 1 y 2 ejecutadas; datos sintéticos borrados) |
+| Estado | IN_PROGRESS (2026-11-12) → READY_FOR_REVIEW (2026-11-12 ~11:25Z; partes 1 y 2 ejecutadas; datos sintéticos borrados) → **APPROVED con reservas** (`6822634878`, propietario, 2026-11-12 11:42Z) |
 | Entorno | solo staging (`feature/upgrade-filament-v3` = `9d0c24d`, HSTS `max-age=86400`) |
 | Límites | sin despliegue, sin cambios de código, configuración, Cloudflare, nginx ni túnel; sin cuentas ni correos de clientes; bajo volumen y solo con IPs propias (el servidor y el equipo del ejecutor); sin aumentar HSTS; sin SEC-01 ni producción |
 
@@ -111,3 +111,28 @@ modificó ningún dato real.
 
 Pendiente, con aprobación propia: etapas siguientes de HSTS y producción. SEC-03 no se declara cerrado aquí: el cierre
 es decisión del propietario.
+
+## Veredicto 2026-11-12: APPROVED con reservas (`6822634878`)
+
+El propietario aprobó la **ejecución de las pruebas operativas** de TASK-0020 (entrega `6822576777`). La aprobación **no**
+autoriza despliegues, cambios de infraestructura, ampliar HSTS ni producción. Staging sigue en `9d0c24d` con HSTS
+`max-age=86400`.
+
+Reservas y seguimiento:
+
+1. **No ejecutado en staging:** abrir el enlace de verificación del buzón nuevo y confirmar su consumo y el estado final.
+   Está cubierto en aislamiento, pero **no** cuenta como UAT completada en staging. Queda pendiente de una
+   asignación o autorización específica.
+2. **Trazabilidad:** la tarea se materializó con instrucciones explícitas del propietario en el chat (2026-11-12), sin
+   comentario previo de asignación en el Issue #2. No hay asignación retrospectiva; este veredicto acepta la entrega y
+   no cambia el origen de la autorización.
+3. **Deuda funcional (UX), no vulnerabilidad:** la pantalla «Su cuenta está creada…» confunde cuando se pide verificar
+   un correo cambiado.
+4. **Observación funcional para revisión independiente:** `Empresa::create` vinculó automáticamente a 4 usuarios del
+   personal; no recibieron correo por RIF. No se modifica la lógica ahora.
+5. Sigue el riesgo de restauración de TASK-0019: la FK `contact_empresa_contact_id_foreign` tiene 2 filas huérfanas.
+6. Los resultados sustentan la verificación operativa de F-SEC03-01..05 (F-SEC03-06, en TASK-0019, con HSTS de 1 día).
+   No autorizan cerrar todos los riesgos de seguridad del proyecto ni pasar a producción.
+
+STOP: SEC-01 sigue detenida. No se inicia ninguna tarea nueva, ni HSTS, `main` o producción, sin decisión y asignación
+independientes.
