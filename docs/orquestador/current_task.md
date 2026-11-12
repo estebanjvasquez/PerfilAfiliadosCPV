@@ -25,13 +25,15 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-12 16:30Z: **TASK-0022** — SEC-01: corregir F-SEC01-T21-01 y evaluar la recuperación de permisos de octubre — **IN_PROGRESS** (`6829151868`)
+## 2026-11-12 16:30Z: **TASK-0022** — SEC-01: corregir F-SEC01-T21-01 y evaluar la recuperación de permisos de octubre — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~17:05Z, `6829151868`)
 
 | Campo | Valor |
 |---|---|
 | Archivo | [`tasks/0022-sec01-t21-01-role-section-and-permission-recovery.md`](tasks/0022-sec01-t21-01-role-section-and-permission-recovery.md) |
-| Rama de trabajo | `fix/sec-01-t22-role-permission-key` (desde staging `71e8a6d`, worktree aparte) |
-| Límites | sin push a la rama runtime ni deploy; sin escrituras de permisos, membresías o datos reales; sin producción ni `main` |
+| Rama de trabajo | `fix/sec-01-t22-role-permission-key` (desde staging `71e8a6d`, worktree aparte): TESTED `4bdec36`, REVIEW `270e07d` |
+| Resultado | Parte A: sección «Role» con los 6 `*_role` reales en solo lectura; fails-before `23b5c0d`; enfocadas 28/28; suite 798/798. Parte B: 128 vínculos siguen faltando (109 ocultos por el defecto, 19 visibles); recomendación: como máximo 1 (R1 ← `view_any_user`), por script (i) o a mano (ii) |
+| Staging | **sin cambios** (`71e8a6d`); 0 escrituras reales |
+| Siguiente | revisión; gate de despliegue aparte; decisión sobre el vínculo de R1 |
 
 ## 2026-11-12 16:17Z: TASK-0021 — **APPROVED con reservas** (`6829143372`)
 
