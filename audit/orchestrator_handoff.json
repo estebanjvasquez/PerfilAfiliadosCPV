@@ -1,4 +1,33 @@
 {
+  "task_0027_cira_evaluation_module_staging_deploy": {
+    "task_id": "TASK-0027",
+    "title": "CIRA web evaluation module for the Cámara: staging deployment cycle (same task, no new id)",
+    "source": "Issue #2 comments 6855056483 (owner authorization of the DDL) and 6855171480 (owner's controlled exception to the TASK-0026 24 h gate, staging only); task source 6852945146; prior delivery 6854941089 (BLOCKED_PENDING_DB_GATE)",
+    "status": "DEPLOYED_AWAITING_24H",
+    "code_deployed": "yes: feature/upgrade-filament-v3 6e7f525 -> 5e6e3fc (fast-forward at 14:11:57Z, no force), workflow 43440450319 success (14:11:59-14:12:33Z); server at 5e6e3fc, clean, image aba9dea51952, .env unchanged; rollback image perfilafiliados-app:pre-t27-6e7f525",
+    "migration_executed": "yes: 2026_11_13_130000_create_cira_evaluation_tables alone in batch 64 (id 150); migrations 134 -> 135; 4 tables, 11 FKs (112 total), RLS 4/4, 0 anon/authenticated privileges (role sessions denied), keep-evidence function+trigger active",
+    "task_0026_window": "interrupted by express exception 6855171480 at 14:11:57Z (about 2 h 28 min in), NOT PASS; partial monitoring before the exception clean (0 new errors, 0 42501, 0 5xx, views 13/13, consumer smoke identical, SEC-03 intact); its SEC-01 controls continue in the TASK-0027 window; its migration rollback is now path B (DOWN_SQL + row 149) because batch 64 is later",
+    "review_base_sha": "6e7f52546a29f223fa924c0c897592223c55360c",
+    "tested_sha": "5e6e3fc0288c02798f355b25aa6a85288ddcdfdb",
+    "review_head_sha": "5e6e3fc0288c02798f355b25aa6a85288ddcdfdb",
+    "deployed_sha": "5e6e3fc0288c02798f355b25aa6a85288ddcdfdb",
+    "records_commit_sha": "b1b189a",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha)",
+    "authorization_record_commit_sha": "6afb971",
+    "preflight": {
+      "task_0026_partial_monitoring": "PASS (14:05:59Z reading)",
+      "scope": "PASS: origin/feature/upgrade-filament-v3 = 6e7f525 = server HEAD, clean; 5e6e3fc fast-forward (8 module commits); diff migrations only 2026_11_06_120000 (already batch 61) and 2026_11_13_130000; 134 migrations, last batch 63; 0 cira_eval objects; no concurrent deploy, sessions or DDL locks; last workflow success",
+      "backup": "PASS: /root/backups/cira-t27-20261113T140809Z (700/600): pg_dump -Fc -n public sha256 c2802c40... verified, 1109 TOC entries, 88 tables/41534 rows with per-table md5 fingerprints, table RLS/ACL, roles, migrations.csv (134), 13 view catalog+fingerprints, 101 FKs, ICU en-US; two earlier partial attempts aborted on a mistyped locale query and were removed",
+      "restore_and_rehearsal": "PASS: ICU clone with Supabase ACLs: 88 tables data/RLS/ACL identical to live, 101 FKs; live app image + candidate migrations against the clone: db:skip unchanged, migrate:status and --pretend only 2026_11_13_130000, migrate --force -> batch 64 alone, existing tables/ACL identical; rollback A (migrate:rollback --step=1) and rollback B (down SQL + migrations row) restore data and schema identical"
+    },
+    "post_deploy": "PASS: only the authorized migration; existing tables RLS/ACL identical; roles identical, totals 508/0/330/368; SEC-01 13 views catalog+fingerprints identical; SEC-03 intact (HSTS 86400, http 301, foreign Host 400); 0 Laravel errors, 0 nginx 5xx after deploy; panel routes 302 to login; table fingerprints vs backup: only migrations + E2E CIRA activity (cira_search_log +2, cira_search_feedback +2); n8n 13 CIRA workflows identical versions, 2 executions since deploy (E2E) success; consumer smoke identical to pre-deploy",
+    "live_e2e": "45/45 desktop + Pixel 5 (Playwright 1.49.1 on the server against https://pruebas.camarapetrolera.app): real n8n search (logs 67, 68) -> real thumbs-up -> evaluate link -> form with logged query, 20 results and own vote -> 8 tests -> draft -> double click no duplicate -> resume -> submit -> progress -> guide 8 -> IDOR refused -> evaluator 403 on panel pages; anonymous -> login. Synthetic evaluator (example.test, no role) with a server-issued session (Turnstile not disabled, no test keys; cookie never left the server and was deleted). Panel (synthetic super admin inside a rolled-back transaction): list with pseudonym, detail hash verified + HTML as text, report, explicit decision only. Stored evidence: hash ok, 20/20 results, query = log, 1 vote per log read not copied. Synthetic campaign/invitation/evaluations/account deleted with count guards; module tables 0, users 368; logs 67/68 and their 2 votes kept (TASK-0013 data from the real flow)",
+    "monitoring": "24 h window 2026-11-13T14:11:57Z -> 2026-11-14T14:11:57Z; t0 PASS; manual read-only: bash /root/backups/cira-t27-20261113T140809Z/monitor_check.sh + n8n executions GET at about T+4h, T+12h, T+24h; differentiated SEC-01 (TASK-0026) and module controls; alerts: 5xx/errors in the module, 42501, view or RLS/privilege drift, API privileges on cira_eval*, foreign migrations",
+    "rollback_plan": "DB: A php artisan migrate:rollback --step=1 --force only if batch 64 is still last, else B down SQL + delete migrations row 150 (evaluations created after the deploy are lost); code without force: revert commit on feature/upgrade-filament-v3 or image pre-t27-6e7f525 on the server, as the owner decides",
+    "execution_incidents": "unsorted UNION ALL fingerprints gave false 'no' comparisons (also explains the earlier clone run 1); first panel check aborted on a wrong column name and left 1 Laravel error at 14:20:11; in-process evaluator 403 check FAILED only when reusing one kernel after a super admin request, a fresh process and the real browser give 403 (no static cache in the code path)",
+    "not_done": "real Cámara campaign not created (owner chooses evaluators); no production, no main, no n8n changes, no CIRA algorithm/ranking/embeddings/indexes/taxonomy/company data, no global roles/permissions, no secrets, no Cloudflare/HSTS, no force-push",
+    "next": "owner: log in (Turnstile), create the real campaign, invite the Cámara accounts; executor: monitoring readings when asked; close TASK-0026 and TASK-0027 only after the 24 h window. STOP"
+  },
   "task_0027_cira_evaluation_module": {
     "task_id": "TASK-0027",
     "title": "CIRA web evaluation module for the Cámara (8 guided tests CPV-01..08, link from CIRA Test, evaluations tied to cira_search_log and existing votes, internal panel and report)",
