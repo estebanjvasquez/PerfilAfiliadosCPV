@@ -4,7 +4,7 @@
 |---|---|
 | Fuente | Issue #2, comentario [`6851565505`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6851565505) (2026-11-13 11:30Z), con la autorización expresa del propietario citada en él. Veredicto previo [`6851472706`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6851472706) (TASK-0025 APPROVED como candidato aislado) |
 | ID | TASK-0026: siguiente libre verificado (`tasks/`, `current_task.md`, ramas remotas, `git log --all`, handoff). No reabre TASK-0025 |
-| Estado | ~~IN_PROGRESS~~ (2026-11-13 ~11:40Z) → **DEPLOYED_AWAITING_24H** (~11:55Z). Código desplegado y migración ejecutada en staging; la monitorización de 24 h termina el **2026-11-14 11:43:38Z** |
+| Estado | ~~IN_PROGRESS~~ (2026-11-13 ~11:40Z) → **DEPLOYED_AWAITING_24H** (~11:55Z). Código desplegado y migración ejecutada en staging; la monitorización de 24 h terminaba el 2026-11-14 11:43:38Z; **ventana interrumpida por excepción expresa** (`6855171480`) a las 14:11:57Z por el despliegue de TASK-0027, sin PASS; sus controles siguen en la ventana nueva hasta el **2026-11-14 14:11:57Z** (§3 bis) |
 | BASE | `270e07dcda8c61840c569b5c85cbad471ce9bf82` (remoto y servidor, verificado justo antes del push) |
 | **TESTED = REVIEW = DEPLOYED** | `6e7f52546a29f223fa924c0c897592223c55360c` (*fast-forward* `270e07d..6e7f525` a las 11:43:38Z, sin *force*) |
 | Workflow | `43419358951` «Deploy a Contabo» **success** (11:43:43–11:44:15Z) |
@@ -69,6 +69,29 @@
   salud. Revertir el código solo si hace falta, después de la BD, con `git revert` y sin *force*.
 - **Límite:** es una reversión del DDL de las 13 vistas, no una recuperación integral de la BD compartida. Restaurar el
   `pg_dump` completo requeriría otra autorización y, además, la FK `NOT VALID` por las 2 huérfanas.
+
+## 3 bis. Ventana de 24 h **interrumpida por excepción expresa** (2026-11-13 14:11:57Z, `6855171480`)
+
+El propietario autorizó en [`6855171480`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6855171480)
+una excepción controlada para desplegar TASK-0027 en staging antes de que terminara esta ventana.
+
+**Esto no es un PASS de TASK-0026, ni retroactivo.** La ventana original (11:43:38Z → 2026-11-14 11:43:38Z) se interrumpió a
+las **14:11:57Z**, unas 2 h 28 min después de empezar.
+
+**Monitorización parcial previa** (lectura de 14:05:59Z): **sin anomalías**.
+- 0 errores nuevos de Laravel; el único es el conocido de `join-views`, que generé yo a las 11:45.
+- 0 errores `42501`; nginx: 55 peticiones, 0 respuestas 5xx y 0 respuestas 403.
+- Vistas: 13/13 con `security_invoker`, sin `anon` ni `authenticated`; una sesión `anon` recibe «permission denied».
+- Filas del propietario idénticas; 0 migraciones después del lote 63.
+- Smoke de consumidores idéntico al posterior al despliegue.
+- SEC-03 intacta.
+
+**Ventana nueva:** los controles de SEC-01 de esta tarea siguen en la monitorización de 24 h de TASK-0027, **desde 14:11:57Z
+hasta el 2026-11-14 14:11:57Z**, con `/root/backups/cira-t27-20261113T140809Z/monitor_check.sh`.
+- Después del despliegue de TASK-0027, el catálogo y las huellas de las 13 vistas son idénticos.
+- TASK-0026 se cierra con esa ventana, no con la original.
+- **Rollback:** la migración de esta tarea ya no está en el último lote (el 64 es de TASK-0027). Si hiciera falta revertirla,
+  se usa la vía B (`DOWN_SQL` + fila 149), no `migrate:rollback --step=1`.
 
 ## 4. Incidencias de ejecución (sin efecto en staging)
 

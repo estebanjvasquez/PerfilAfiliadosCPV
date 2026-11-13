@@ -25,7 +25,7 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-13 12:40Z: **TASK-0027** — CIRA: módulo web de evaluación institucional para la Cámara — ~~IN_PROGRESS~~ → ~~BLOCKED_PENDING_DB_GATE~~ (13:50Z) → **IN_PROGRESS: despliegue autorizado** (`6855056483` + excepción `6855171480`, ~14:10Z; fuente `6852945146`)
+## 2026-11-13 12:40Z: **TASK-0027** — CIRA: módulo web de evaluación institucional para la Cámara — ~~IN_PROGRESS~~ → ~~BLOCKED_PENDING_DB_GATE~~ (13:50Z) → ~~IN_PROGRESS: despliegue autorizado~~ (`6855056483` + excepción `6855171480`, 14:10Z) → **DEPLOYED_AWAITING_24H** (~14:40Z; fuente `6852945146`)
 
 | Campo | Valor |
 |---|---|
@@ -33,10 +33,11 @@ pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 | Autoriza | Implementación aislada; despliegue de código solo después del gate de 24 h de TASK-0026 y de un preflight PASS |
 | Gate de BD | Las tablas nuevas requieren autorización expresa aparte para ejecutarse en la BD compartida |
 | Convive con | TASK-0026 (DEPLOYED_AWAITING_24H): sin despliegues concurrentes ni mezcla de evidencia |
-| Candidato | `feat/cira-evaluation-module` @ **`5e6e3fc`** (BASE `6e7f525`), **sin desplegar**; suite 826/826, E2E escritorio y móvil 40/40, ensayo de la migración en el clon PASS |
-| Siguiente | después del PASS de T+24 h de TASK-0026, autorización expresa del propietario para la migración `2026_11_13_130000` en la BD compartida; luego *fast-forward* y verificación según el plan de la tarea |
+| Staging vivo | ~~`6e7f525`~~ → **`5e6e3fc`** (workflow `43440450319`, *fast-forward* a las 14:11:57Z); migración `2026_11_13_130000` sola en el lote 64 |
+| Resultado | Preflight reforzado (incluida la monitorización parcial de TASK-0026), respaldo, restauración y rollbacks A/B ensayados: PASS; verificación posterior PASS; E2E en vivo 45/45; datos sintéticos borrados |
+| Siguiente | lecturas manuales con `/root/backups/cira-t27-20261113T140809Z/monitor_check.sh` hacia T+4 h, T+12 h y T+24 h; cierre no antes del 2026-11-14 14:11:57Z. El propietario crea la campaña real e invita a la Cámara |
 
-## 2026-11-13 11:40Z: **TASK-0026** — SEC-01: desplegar en staging F-SEC01-T24-02 (migración en la BD compartida) — ~~IN_PROGRESS~~ → **DEPLOYED_AWAITING_24H** (~11:55Z, `6851565505`)
+## 2026-11-13 11:40Z: **TASK-0026** — SEC-01: desplegar en staging F-SEC01-T24-02 (migración en la BD compartida) — ~~IN_PROGRESS~~ → **DEPLOYED_AWAITING_24H** (~11:55Z, `6851565505`); ventana **interrumpida por excepción expresa** (`6855171480`) a las 14:11:57Z, sin PASS; sus controles siguen en la ventana de TASK-0027
 
 | Campo | Valor |
 |---|---|

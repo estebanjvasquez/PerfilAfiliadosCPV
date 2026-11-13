@@ -4,12 +4,155 @@
 |---|---|
 | Fuente | Issue #2, comentario [`6852945146`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6852945146) (2026-11-13 12:30Z), asignación expresa del propietario |
 | ID | TASK-0027: siguiente libre verificado (`tasks/`, `current_task.md`, ramas remotas, `git log --all`, handoff). No reutiliza TASK-0013 ni TASK-0026 |
-| Estado | ~~ASSIGNED~~ → ~~IN_PROGRESS~~ (12:40Z) → **BLOCKED_PENDING_DB_GATE** (~13:50Z): candidato aislado `5e6e3fc` probado, sin desplegar → **IN_PROGRESS (despliegue autorizado: `6855056483` + `6855171480`)** (~14:10Z) |
+| Estado | ~~ASSIGNED~~ → ~~IN_PROGRESS~~ (12:40Z) → ~~BLOCKED_PENDING_DB_GATE~~ (13:50Z, candidato aislado `5e6e3fc`) → ~~IN_PROGRESS (despliegue autorizado: `6855056483` + `6855171480`)~~ (14:10Z) → **DEPLOYED_AWAITING_24H** (~14:40Z): `5e6e3fc` en staging (workflow `43440450319`), migración sola en el lote 64; E2E en vivo 45/45; monitorización hasta el 2026-11-14 14:11:57Z |
 | Prioridad | Aceptación del buscador CIRA por la Cámara. Las pruebas manuales del propietario sobre cuatro empresas son paralelas y no forman parte de esta tarea |
 | Autoriza | Implementar en aislamiento el módulo (enlace desde CIRA Test, 8 pruebas guiadas, registro de evaluaciones vinculado a búsquedas y votos, panel interno, informe y pruebas). Desplegar código en staging **solo** dentro del alcance, después del gate de 24 h de TASK-0026 y con preflight PASS |
 | Gate especial de BD | Las migraciones nuevas solo se diseñan y prueban en un clon aislado. Ejecutarlas en la BD compartida requiere una autorización expresa aparte. Si el despliegue ejecutaría `migrate --force` con migraciones nuevas, **STOP antes del push** |
 | No autoriza | Algoritmo o ranking de CIRA, embeddings, índices de búsqueda, taxonomía o datos de empresas, publicación de candidatos, n8n, producción, `main`, Cloudflare, HSTS, roles o permisos globales, secretos, *force-push*, cambios de otras tareas; ejecutar la batería de las cuatro empresas |
 | Convivencia con TASK-0026 | TASK-0026 sigue DEPLOYED_AWAITING_24H (hasta el 2026-11-14 11:43:38Z): no se interrumpe su monitorización ni se mezclan commits, migraciones o evidencia. La promoción de CIRA se planifica después de su gate |
+
+## Despliegue en staging (2026-11-13 14:11:57Z): **DEPLOYED_AWAITING_24H**
+
+Autorizado por [`6855056483`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6855056483) (DDL) y [`6855171480`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6855171480) (excepción al gate de 24 h de TASK-0026). Todos los controles exigidos dieron PASS.
+
+| SHA | Valor |
+|---|---|
+| BASE | `6e7f525` (staging antes, verificado en el servidor) |
+| TESTED = REVIEW = **DEPLOY** | **`5e6e3fc`**: *fast-forward* de `feature/upgrade-filament-v3` `6e7f525` → `5e6e3fc` a las 14:11:57Z, sin force; workflow [`43440450319`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/actions/runs/43440450319) success (14:11:59–14:12:33Z) |
+| Servidor | `5e6e3fc`, árbol limpio; imagen nueva `aba9dea51952`; `.env` sin cambios; imagen de rollback `perfilafiliados-app:pre-t27-6e7f525` |
+| Migración | `2026_11_13_130000_create_cira_evaluation_tables`, **sola en el lote 64** (id 150); migraciones 134 → 135 |
+
+**1. Preflight reforzado de TASK-0026** (lectura de 14:05:59Z, T+2 h 22 min): **PASS**.
+- Desde el inicio de su ventana:
+  - 0 errores nuevos de Laravel; el único es el conocido de `join-views`, que generó mi prueba de humo a las 11:45;
+  - 0 errores `42501`;
+  - nginx: 55 peticiones, 0 respuestas 5xx y 0 respuestas 403.
+- Vistas: 13/13 con `security_invoker`, sin `anon` ni `authenticated`; una sesión `anon` recibe «permission denied».
+- Huellas del propietario idénticas.
+- Smoke de consumidores (13 modelos, 7 exportaciones, PDF y 11 páginas) idéntico al posterior al despliegue de TASK-0026.
+- SEC-03: HSTS 86400, http 301, Host ajeno 400, sin debug ni mantenimiento.
+- La ventana original de 24 h de TASK-0026 queda **interrumpida por excepción expresa**, sin PASS retroactivo.
+
+**2. Preflight de TASK-0027:** **PASS**.
+- Rama:
+  - `origin/feature/upgrade-filament-v3` = `6e7f525`;
+  - `5e6e3fc` es *fast-forward* (8 commits, solo del módulo);
+  - las únicas migraciones del diff son `2026_11_06_120000`, ya en el lote 61, y `2026_11_13_130000`.
+- BD:
+  - 134 migraciones, último lote 63;
+  - 0 objetos `cira_eval`;
+  - sin sesiones activas ajenas ni bloqueos de DDL;
+  - último workflow en success, sin despliegue concurrente.
+
+**3. Respaldo y ensayo:** **PASS**.
+- **Respaldo** `/root/backups/cira-t27-20261113T140809Z` (700/600):
+  - `pg_dump -Fc -n public` con sha256 `c2802c40…` verificado y 1109 entradas;
+  - 88 tablas y 41 534 filas con huella por tabla; RLS y ACL por tabla; roles; 134 migraciones; 13 vistas con sus huellas;
+  - 101 FK; ICU `en-US`.
+- **Restauración** en un clon ICU con los ACL de Supabase: datos de las 88 tablas, RLS y ACL idénticos al vivo; 101 FK.
+- Con la imagen viva, las migraciones candidatas y el clon como destino, la secuencia exacta del workflow da:
+  - `db:skip-mysql-only-view-migrations`: sin cambios;
+  - `migrate:status`: **solo** `2026_11_13_130000` pendiente;
+  - `migrate --pretend`: solo esa migración, 4 `CREATE TABLE` y 0 ALTER o DROP fuera de las tablas nuevas;
+  - `migrate --force`: lote 64, solo esa migración; 4 tablas, 11 FK, RLS 4/4, 0 privilegios de la API, trigger activo;
+    tablas existentes y sus ACL idénticos.
+- **Rollback A** (`migrate:rollback --step=1`) y **rollback B** (SQL de bajada + fila de `migrations`): datos y esquema
+  idénticos al estado restaurado.
+
+**4. Verificación posterior en vivo:** **PASS**.
+- Solo la migración autorizada se ejecutó: 4 tablas, 11 FK (112 en total = 101 + 11), RLS 4/4, 0 privilegios de la API,
+  función y trigger activos. Las sesiones `anon` y `authenticated` reciben «permission denied» en las tablas nuevas.
+- RLS y ACL de las 88 tablas existentes idénticos. Roles idénticos; totales 508/0/330/368.
+- SEC-01: catálogo y huellas de las 13 vistas idénticos.
+- SEC-03 intacta. 0 errores y 0 respuestas 5xx.
+- Rutas: `/cira-test/` 200 con los enlaces nuevos; las páginas del módulo y `/admin/cira-campanas`,
+  `/admin/cira-evaluaciones` responden 302 a login sin sesión.
+- Huellas de todas las tablas frente al respaldo: solo cambian `migrations` y la actividad de CIRA de la E2E
+  (`cira_search_log` +2, `cira_search_feedback` +2). Empresas, taxonomía, `users` y roles sin cambios.
+- n8n: 13 flujos CIRA con la misma versión que antes (solo `GET`); 2 ejecuciones desde el despliegue, las de la E2E, en
+  success.
+
+**5. E2E en vivo** (navegador, Playwright 1.49.1 en el servidor, contra `https://pruebas.camarapetrolera.app`): **45/45**.
+- **Cuenta sintética:**
+  - un evaluador `example.test`, verificado, **sin rol**, con contraseña aleatoria desconocida;
+  - la campaña `ZZZ-T27-E2E` y la invitación E-01.
+- **Autenticación:** el login tiene Turnstile y **no se desactivó ni se usaron claves de prueba**. Se emitió en el servidor
+  una sesión para la cuenta sintética; la cookie no salió del servidor y se borró al terminar.
+- **Escritorio y Pixel 5:**
+  - **búsqueda real** por n8n (200, 17 s y 11 s, logs 67 y 68) → **👍 real** (200);
+  - «Evaluar esta búsqueda» lleva el id del log y la sesión → formulario con la consulta registrada, 20 resultados y el
+    voto propio → 8 pruebas;
+  - borrador → doble clic sin duplicar → «Mis pruebas» → reabrir con el comentario → enviar → progreso «enviada» → guía
+    con las 8 pruebas;
+  - el id de otra búsqueda con la misma sesión se rechaza (IDOR);
+  - 403 del evaluador en `/admin/cira-evaluaciones`, `/admin/cira-campanas` y `/admin/evaluacion-cira/informe`;
+  - sin desbordamiento horizontal en el teléfono.
+- **Anónimo:** el formulario redirige a login.
+- **Evidencia guardada:** 2 evaluaciones enviadas. Hash SHA-256 verificado. Instantánea con 20 resultados, igual a los 20 del
+  log. Consulta igual a la del log. 1 voto en cada log, leído y no copiado.
+- **Panel `super_admin`** (super admin sintético dentro de una transacción revertida, por el kernel HTTP y Livewire):
+  - lista con el seudónimo E-01 y sin el correo;
+  - detalle «verificada (SHA-256)» con el HTML como texto;
+  - informe «no declara aceptado»;
+  - campañas y edición con las invitaciones;
+  - la **decisión de la Cámara** se registra solo de forma explícita (CPV-01 «Observado», con `decided_by`) y no se crea
+    ninguna para las otras pruebas.
+  - Todo revertido.
+- **Limpieza:** se borraron en una transacción, con guardas de conteo, la campaña, la invitación, las 2 evaluaciones y la
+  cuenta sintética. Las tablas del módulo quedan en 0 y los usuarios en 368.
+  - Los logs 67 y 68 y sus 2 votos se conservan: son datos de TASK-0013 escritos por el flujo real, de solo lectura para
+    el módulo.
+  - Evidencia (capturas con nombres reales de empresas): `<respaldo>/e2e/`, fuera de git.
+- **Smoke de consumidores** después de todo: idéntico al previo.
+
+**Incidencias de ejecución** (sin efecto en staging):
+- **Respaldo:** los dos primeros intentos abortaron por una consulta de *locale* mal escrita (`set -e`). Borré los
+  directorios parciales y el tercero quedó completo.
+- **Ensayo:** las comparaciones con `diff` sin ordenar daban «no» con la lista de diferencias vacía. `UNION ALL` no
+  garantiza el orden de las filas; con las huellas ordenadas, todo coincide. Es la causa del «no» sin detalle del ensayo 1
+  del ciclo anterior.
+- **Panel:** la primera ejecución del chequeo falló por un nombre de columna y dejó 1 error en el log de Laravel
+  (14:20:11, `query_text`). En la segunda, `negative.evaluator_report_403` dio FAIL porque reutilicé el mismo kernel en
+  proceso después de una petición del super admin. En un proceso nuevo, el evaluador recibe **403** en el informe y en el
+  panel, igual que en el navegador real. El código consulta los roles en cada llamada, sin caché estática; con PHP-FPM no
+  se reutiliza el estado entre peticiones.
+
+**Monitorización de 24 h (nueva ventana):** desde **2026-11-13 14:11:57Z** hasta **2026-11-14 14:11:57Z**.
+- **Lectura manual**, sin sondeo automático:
+  - `bash /root/backups/cira-t27-20261113T140809Z/monitor_check.sh`, más ejecuciones de n8n por `GET`;
+  - momentos: T+4 h (~18:12Z), T+12 h (~02:12Z) y T+24 h (≥ 14:11:57Z del 14);
+  - responsable: el ejecutor, cuando el propietario o el orquestador lo pidan.
+- **t0 (14:14:05Z):** PASS.
+- **Controles diferenciados:**
+  - SEC-01 de TASK-0026: 13/13 vistas, sesión `anon` denegada;
+  - TASK-0027: tablas, RLS, privilegios de la API, trigger, filas, errores con `cira_eval` y 5xx en `evaluacion-cira`;
+  - comunes: HEAD, mantenimiento, errores de Laravel, 5xx y 403 de nginx, SEC-03, migraciones después del lote 64.
+- **Alertas y rollback:** cualquiera de estas condiciones lleva a STOP, aviso y rollback según el procedimiento ensayado:
+  - 5xx o errores atribuibles al módulo;
+  - `42501`;
+  - deriva de las vistas o de RLS y privilegios;
+  - privilegios de la API en `cira_eval*`;
+  - migraciones ajenas;
+  - un fallo de seguridad.
+- **Procedimiento de rollback:**
+  1. BD: A, `php artisan migrate:rollback --step=1 --force`, si el lote 64 sigue siendo el último; si no, B: SQL de bajada
+     más borrar la fila 150. Se pierden las evaluaciones creadas después.
+  2. Código, sin force: un commit `revert` en `feature/upgrade-filament-v3` (workflow normal), o la imagen
+     `pre-t27-6e7f525` en el servidor, según decida el propietario.
+- No se cierran ni TASK-0026 ni TASK-0027 antes de completar sus controles.
+
+**Procedimiento para la Cámara** (sin tokens ni enlaces de invitación):
+1. El propietario, con `super_admin`, entra en Panel → CIRA → «Campañas de evaluación», crea la campaña real (por ejemplo
+   `CPV-2026-11`) y la abre.
+2. En la pestaña «Evaluadores», invita a las cuentas existentes de las personas de la Cámara (correo verificado; cada una
+   recibe un seudónimo E-NN).
+3. Cada evaluador abre `https://pruebas.camarapetrolera.app/cira-test/`, lee «Guía de evaluación» (35–50 min, puede guardar
+   por partes), busca y pulsa «Evaluar esta búsqueda». Inicia sesión con su cuenta.
+4. El seguimiento está en «Evaluaciones recibidas» y en «Informe consolidado». La decisión por prueba la registra la Cámara.
+
+No creé la campaña real porque los evaluadores y el nombre son decisión del propietario. La campaña sintética se creó y se
+borró. **Antes de invitar a la Cámara**, el propietario debería entrar con su cuenta (login con Turnstile), crear la campaña
+y abrir una vez «Mis pruebas» y el «Informe»: toma unos 5 minutos.
 
 ## Resultado (2026-11-13 ~13:50Z): **BLOCKED_PENDING_DB_GATE**: candidato aislado, **sin desplegar**
 
@@ -95,7 +238,7 @@ ni los datos de empresas):
 | 2026-11-13 13:58Z | [`6855056483`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6855056483) | **Autoriza el DDL** de `2026_11_13_130000_create_cira_evaluation_tables` en la BD compartida y el despliegue de `5e6e3fc` solo en staging. **No** levanta el gate de 24 h de TASK-0026 |
 | 2026-11-13 14:02Z | [`6855171480`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6855171480) | **Excepción controlada al gate de 24 h de TASK-0026** para desplegar hoy, solo en staging. Exige: preflight reforzado PASS (incluida la monitorización parcial de TASK-0026); respaldo restaurable; rollback probado; solo la migración `2026_11_13_130000`; pruebas posteriores; nueva monitorización de 24 h. Si falla cualquier control, STOP. Sin producción ni `main` |
 
-Estado: ~~BLOCKED_PENDING_DB_GATE~~ → **IN_PROGRESS (despliegue)**, 2026-11-13 ~14:10Z. La ventana de 24 h de TASK-0026 queda
+Estado: ~~BLOCKED_PENDING_DB_GATE~~ → ~~IN_PROGRESS (despliegue)~~ (14:10Z) → **DEPLOYED_AWAITING_24H** (ver «Despliegue en staging»). La ventana de 24 h de TASK-0026 queda
 **interrumpida por excepción expresa**, no PASS. El antecedente se conserva.
 
 <details><summary>Texto íntegro de <code>6855056483</code></summary>

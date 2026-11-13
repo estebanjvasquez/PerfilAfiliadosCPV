@@ -2,8 +2,9 @@
 
 **Fuente:** Issue #2 `6852945146`. **Rama del candidato:** `feat/cira-evaluation-module`, desde staging `6e7f525`, con
 *fast-forward* limpio.
-**Estado:** candidato aislado y probado, **sin desplegar**. Requiere el gate de BD por la migración nueva, y el gate de 24 h de
-TASK-0026 tiene que estar cerrado antes.
+**Estado:** **DEPLOYED_AWAITING_24H**. `5e6e3fc` está en staging desde el 2026-11-13 14:11:57Z (workflow `43440450319`), con la migración
+sola en el lote 64. Lo autorizaron `6855056483` (DDL) y `6855171480` (excepción al gate de 24 h de TASK-0026). La
+monitorización de 24 h termina el 2026-11-14 14:11:57Z. Ver la sección 7.
 
 ## 1. Especificación funcional
 
@@ -102,3 +103,27 @@ compartida siguen sin cambios.
 - Capturas de la E2E (datos sintéticos): `<CPV_TEST_ROOT>/artifacts/20261113T134020Z-5e6e3fc0288c/ux/`. Son
   `desktop_1..4`, `phone_1..4` y `panel_1..3`.
 - Ensayo del clon: salida en la tarea. Contenedores eliminados.
+- Despliegue: respaldo `/root/backups/cira-t27-20261113T140809Z` en el servidor (700/600), con `monitor_check.sh`,
+  `deploy_start_utc.txt` y `e2e/`. La carpeta `e2e/` guarda las capturas de la E2E en vivo, que muestran nombres reales
+  de empresas de la búsqueda real; los resultados del panel; y `seed.env` sin cookie ni id de sesión.
+
+## 7. Despliegue en staging (2026-11-13)
+
+| Paso | Resultado |
+|---|---|
+| Preflight reforzado de TASK-0026 (monitorización parcial, T+2 h 22 min) | PASS, sin anomalías. La ventana original queda **interrumpida por excepción expresa**, sin PASS |
+| Preflight de TASK-0027 | PASS: *fast-forward* `6e7f525` → `5e6e3fc`; solo las migraciones del módulo; `2026_11_06_120000` ya en el lote 61; sin despliegues concurrentes |
+| Respaldo nuevo y restauración en el clon ICU | PASS: dump con sha256 verificado; datos, RLS y ACL del clon idénticos al vivo |
+| Secuencia exacta del workflow en el clon (imagen viva + migraciones candidatas) | PASS: `db:skip` sin cambios; `migrate:status` y `--pretend` muestran **solo** `2026_11_13_130000`; `migrate --force` la deja en el lote 64; rollbacks A y B devuelven datos y esquema idénticos |
+| Despliegue | *Fast-forward* sin force; workflow `43440450319` success; migración sola en el lote 64 |
+| Verificación posterior | PASS: 4 tablas, 11 FK, RLS 4/4, 0 privilegios de la API, trigger activo; tablas, ACL y roles existentes idénticos; vistas de SEC-01 idénticas; SEC-03 intacta; 0 errores y 0 respuestas 5xx; n8n sin cambios |
+| E2E en vivo, escritorio y Pixel 5 | **45/45**: búsqueda real por n8n → 👍 real → evaluar → borrador → reanudar → enviar → guía → IDOR y 403 |
+| Panel `super_admin` en una transacción revertida | PASS: lista con seudónimo, detalle con hash verificado, informe y decisión explícita |
+| Limpieza de los datos sintéticos | Hecha: tablas del módulo en 0; usuarios en 368 |
+| Monitorización de 24 h | Desde 14:11:57Z, con lecturas manuales a T+4 h, T+12 h y T+24 h |
+
+La sesión de la cuenta sintética de evaluador se emitió en el servidor: Turnstile no se desactivó y no se usaron claves de
+prueba. El login con Turnstile lo comprueba el propietario al crear la campaña real.
+
+**Aclaración del incidente del ensayo 1:** el «no» de identidad de datos sin detalle venía de comparar con `diff` huellas
+**sin ordenar**: `UNION ALL` no garantiza el orden de las filas. Con las huellas ordenadas, las comparaciones coinciden.
