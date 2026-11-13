@@ -56,6 +56,12 @@ async function clean(page, label) {
   record(`${label}: no internal error text`, bad.length === 0, bad.join(',') || undefined);
 }
 
+// Filament's sidebar opens as an overlay on phones after login (pre-existing panel behaviour): close it, as a user would.
+async function closeSidebar(page) {
+  await page.evaluate(() => { try { window.Alpine && Alpine.store('sidebar') && Alpine.store('sidebar').close(); } catch (e) {} });
+  await page.waitForTimeout(300);
+}
+
 async function noHorizontalScroll(page, label) {
   const ok = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2);
   record(`${label}: no horizontal scroll`, ok);
@@ -105,6 +111,7 @@ for (const [vp, opts] of [['desktop', { viewport: { width: 1366, height: 900 } }
   await clean(page, `${vp} form`);
   if (vp === 'phone') { await noHorizontalScroll(page, 'phone form'); }
 
+  if (vp === 'phone') { await closeSidebar(page); }
   await page.selectOption('select[id$="test_code"]', test);
   await page.locator('label:has-text("Parcial")').first().click();
   await page.locator('input[type="checkbox"][value="' + EMPRESAS[2] + '"]').check().catch(() => {});
@@ -119,10 +126,12 @@ for (const [vp, opts] of [['desktop', { viewport: { width: 1366, height: 900 } }
   // 3. Resume from «Mis pruebas» and submit.
   await page.locator('[data-cira-eval-home]').count(); // the header link of CIRA Test points here
   await page.goto(BASE + '/admin/evaluacion-cira', { waitUntil: 'networkidle' });
+  if (vp === 'phone') { await closeSidebar(page); }
   const rows = page.locator('[data-cira-my-evaluations] tbody tr', { hasText: test });
   record(`${vp}: «Mis pruebas» lists the draft once`, (await rows.count()) === 1);
   await rows.first().locator('a', { hasText: 'Abrir' }).click();
   await page.waitForLoadState('networkidle').catch(() => {});
+  if (vp === 'phone') { await closeSidebar(page); }
   const comment = await page.inputValue('textarea[id$="comment"]').catch(() => '');
   record(`${vp}: the reopened draft keeps what was written`, comment.startsWith(`ZZZ UX ${vp}`));
   await page.click('[data-cira-submit]');
