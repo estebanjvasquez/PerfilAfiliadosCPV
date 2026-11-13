@@ -88,3 +88,11 @@ perdió la cabecera `Authorization` y se corrigió antes de ejecutarlo.
 **Orden posterior:** revisar y aprobar el candidato T24-02; solo después decidir gate de ejecución. R-06 (R3-02/R3-03) mantiene su autorización anterior para candidato independiente, pero queda en espera por esta prioridad. F-SEC01-T24-01 permanece abierta y contenida por asignación de permisos actual; R-04 pendiente de gate propio. **No iniciar tareas adicionales por iniciativa propia.**
 
 </details>
+
+## Veredicto 2026-11-13: APPROVED como candidato aislado (`6851472706`)
+
+Se aprueba sin autorización de despliegue ni de DDL en la BD compartida. La exposición efectiva con credenciales reales y los
+esquemas expuestos de la Data API siguen sin verificarse, así que no se declara fuga real. F-SEC01-T24-02 no está cerrado en
+staging. El error intermitente de `CompanyDossierPdfTest` queda como deuda técnica.
+
+El despliegue se autorizó después, en una tarea nueva: **TASK-0026** (`6851565505`). Esta tarea no se reabre.

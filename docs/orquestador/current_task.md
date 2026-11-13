@@ -25,6 +25,25 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-13 11:40Z: **TASK-0026** — SEC-01: desplegar en staging F-SEC01-T24-02 (migración en la BD compartida) — **IN_PROGRESS** (`6851565505`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0026-sec01-t24-02-staging-deploy.md`](tasks/0026-sec01-t24-02-staging-deploy.md) |
+| Autoriza | *Fast-forward* de `feature/upgrade-filament-v3` a `6e7f525` y el DDL de `2026_11_13_000001_harden_public_report_views` en la BD compartida, condicionado a un preflight PASS |
+| No autoriza | producción, `main`, otras migraciones, Data API, RLS, `service_role`, n8n, HSTS, Cloudflare/nginx |
+| Monitorización | 24 h obligatorias; sin cierre antes de completarlas |
+
+## 2026-11-13 11:26Z: TASK-0025 — **APPROVED** como candidato aislado (`6851472706`)
+
+Sin autorización de despliegue en ese comentario; el despliegue pasa a TASK-0026. El error intermitente de
+`CompanyDossierPdfTest` queda como deuda técnica.
+
+**Dato de UAT del propietario sobre Turnstile** (pendiente de UX y seguridad de acceso, sin tarea asignada ni resuelto): los
+fallos intermitentes de Cloudflare Turnstile al iniciar sesión en el móvil ocurrieron en un **Samsung Galaxy con Google
+Chrome**; hubo varios intentos fallidos y funcionó tras refrescar el navegador. Para diagnosticarlo faltan la versión de
+Android y Chrome, el mensaje o código de error, la red, y la hora o el Ray ID. No pedir secretos ni desactivar el control.
+
 ## 2026-11-13 10:55Z: **TASK-0025** — SEC-01: corrección candidata de F-SEC01-T24-02 (vistas de `public`) — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~11:25Z, `6850596236`)
 
 | Campo | Valor |
