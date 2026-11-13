@@ -1,4 +1,33 @@
 {
+  "task_0024_sec01_t23_reservations_diagnosis": {
+    "task_id": "TASK-0024",
+    "title": "SEC-01 diagnosis and closure plan for the TASK-0023 reservations (analysis only)",
+    "source": "Issue #2 comment 6848913937 (diagnosis assignment, 2026-11-13 09:14Z) updated by owner decisions 6849259532 (09:31Z); prior verdict 6848907151 (TASK-0023 APPROVED with reservations)",
+    "status": "READY_FOR_REVIEW",
+    "environment": "no deployment; staging feature/upgrade-filament-v3 = 270e07dcda8c61840c569b5c85cbad471ce9bf82 verified on server (clean) and remote; 0 staging writes",
+    "review_base_sha": "ba58c698de30042f2ff8131743f989cb2d067e18 (TASK-0023 handoff, canonical doc branch)",
+    "materialization_commit_sha": "d17f3a3c72c58afee5e99444023c42ca62b65e71",
+    "review_head_sha": "56b149b98025402ab03fb21c5a160023dd1f5b94 (records: task file, diagnosis doc, SECURITY_STATUS, current_task, SESSION_RESUME own hunks)",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of review_head_sha)",
+    "audit_test_branch": "audit/task-0024-r05-writer-paths @ 8e8b80c2b7027ab24a8bc68fad713794300712a0 (from 270e07d; tests only, never deploy)",
+    "reservations": {
+      "R-01": "CLOSED: owner-confirmed UAT on 270e07d (6849259532) + earlier UAT 6829143372 on 71e8a6d; saving real roles not claimed",
+      "R-02": "CLOSED: owner decision not to restore; read-only R1 lacks view_any_user (1 member), R2 0 members",
+      "R-03": "CLOSED: risk accepted; 6 *_shield::role rows, 0 role links, 0 direct links, no functional code reference",
+      "R-04": "remediation rehearsed in isolation, pending human gate: 2 obsolete contact_empresa rows (contacts missing; probable MySQL import residue; live FK validated, RI triggers enabled, postgres cannot set session_replication_role). Copy: guarded DELETE of exactly 2 rows, VALIDATE ok, only contact_empresa changed (540->538), view and visible links identical, re-dump restored exit 0 / 0 errors / 101 valid FKs / 88 tables identical / roles identical, rollback restores exact prior state (FK NOT VALID). Exact keys in restricted note; evidence /root/backups/sec01-t24-r04-rehearsal-20261113T094404Z",
+      "R-05": "R4 model-event guard limit (query builder, saveQuietly, withoutEvents, DB::table) confirmed as internal capability; static inventory 0 unguarded writers in app/ and routes/. New F-SEC01-T24-01 and F-SEC01-T24-02",
+      "R-06": "R3-02/R3-03 as a separate later task (isolated candidate, no deploy); rest of SEC-01 open; not materialized in this cycle"
+    },
+    "new_findings": {
+      "F-SEC01-T24-01": "Medium, latent: users list row Delete is gated only by delete_user (UserPolicy::delete has no target), so a non-super_admin can delete a super_admin account and its privileged membership; reproduced in isolation; no real non-privileged role holds view_any_user/delete_user/delete_any_user today",
+      "F-SEC01-T24-02": "High potential, read exposure: 13 owner-rights public views (postgres, BYPASSRLS, no security_invoker) readable by anon via the active Supabase Data API (401 without key); one includes contact data; tables RLS 88/88 with 0 policies; views not updatable and do not read role tables; NOT reproduced (no key used); names in restricted note"
+    },
+    "tests": "runner 20261113T100621Z-8e8b80c2b702: 6 tests/27 assertions, 5 green + 1 expected red (T24-01 reproduction); 20261113T100718Z-8e8b80c2b702: 42 tests/372 assertions (account, role, R4/R4-01, T21/T22, impersonation, surface inventory), 41 green + same expected red; staging 200 before/after; 0 leftover containers",
+    "db_mutations": "none on staging (3 READ ONLY probes, rolled back; 1 keyless GET to the Data API root). Isolated copies only, containers removed",
+    "execution_incidents": "short SHA rejected by runner (exit 2, nothing ran); 2 harness errors in new tests fixed in 58ac0e1/8e8b80c (mount refusal, multi-request fillForm after 403); a cleanup sed removed a script line, restored before running",
+    "next": "owner review; decisions on T24-01 and T24-02 and the R-04 gate; then a separate R-06 task. STOP",
+    "forbidden_respected": "no deploy, no runtime push, no main, no production, no HSTS/Cloudflare/nginx/tunnel/n8n/taxonomy, no real role/permission/user writes, inert rows kept, no data/FK/migration changes"
+  },
   "task_0023_sec01_t21_01_staging_deploy": {
       "task_id": "TASK-0023",
       "title": "SEC-01 deploy the F-SEC01-T21-01 fix (TASK-0022) to staging only",
