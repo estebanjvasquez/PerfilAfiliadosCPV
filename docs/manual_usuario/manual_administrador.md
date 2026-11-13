@@ -395,6 +395,40 @@ Los límites técnicos (tiempo de espera, tope de categorías, frecuencia) está
 
 ---
 
+## 12. Evaluación de CIRA por la Cámara {#evaluacion-cira}
+
+Sirve para que la Cámara valide el buscador CIRA con búsquedas reales. Solo lo administra el rol `super_admin`, desde el
+grupo **CIRA** del menú. No requiere roles ni permisos nuevos.
+
+1. **Crear la campaña** («Campañas de evaluación» → Nuevo):
+   - **Código** (por ejemplo `CPV-2026-11`), nombre y, si quiere, fechas de apertura y cierre.
+   - Solo una campaña **Abierta**, y dentro de sus fechas, admite evaluaciones.
+2. **Invitar evaluadores** (pestaña «Evaluadores» → «Invitar evaluador»):
+   - Elija una cuenta existente con el correo verificado.
+   - Cada persona recibe un seudónimo (E-01, E-02…), que es lo único que muestran los informes.
+   - **Revocar** corta el acceso de inmediato, incluso con la página abierta. Sus evaluaciones se conservan, y volver a
+     invitarla la reactiva con el mismo seudónimo.
+3. **Compartir la guía.** Los evaluadores entran por CIRA Test («Evaluar esta búsqueda», «Mis pruebas», «Guía de
+   evaluación»). La guía completa está en `docs/manual_usuario/guia_evaluacion_cira.md` y dentro del sistema.
+4. **Revisar** («Evaluaciones recibidas»):
+   - Cada evaluación guarda una **instantánea inmutable** de lo que CIRA devolvió (consulta, empresas, posiciones,
+     explicación y versión del motor), verificada con SHA-256.
+   - Muestra los votos 👍/👎 de esa búsqueda, leídos de CIRA Test sin duplicarlos. Si un voto no corresponde a una
+     posición de la instantánea, aparece como «no vinculado».
+   - Use «Clasificar hallazgo» (datos, taxonomía y sinónimos, indexación, orden, explicación u otros). El juicio del
+     evaluador no se edita y ninguna evaluación se borra.
+5. **Informe consolidado** («Informe de evaluación»):
+   - Muestra, por prueba, las valoraciones Correcta / Parcial / Incorrecta, las empresas señaladas como faltantes o
+     sobrantes, los votos, los hallazgos y los comentarios.
+   - La **decisión de la Cámara** por prueba (Aprobado / Observado / Rechazado) se registra a mano. El sistema nunca da
+     por aceptado el buscador.
+   - La exportación CSV es opcional.
+
+**Qué no hace:** no cambia el buscador, el orden de los resultados, los votos, n8n, la taxonomía ni los datos de las
+empresas.
+
+---
+
 ## Anexo A — Cómo generar las capturas del panel de administrador
 
 El login del panel usa **contraseña + Cloudflare Turnstile (anti-bot)**, y esa verificación **falla
