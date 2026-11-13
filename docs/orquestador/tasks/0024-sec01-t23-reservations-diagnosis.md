@@ -113,3 +113,14 @@ E. **R4 y otros SEC-01:** revisar fuentes y cobertura concreta de guardas para S
 **Objetivo de cierre:** R-01/R-02/R-03 cerradas por alcance y aceptación del propietario; R-04 remediación pendiente; R-05 verificación pendiente; R-06 primera corrección acotada autorizada solo para candidato aislado, restantes hallazgos abiertos.
 
 </details>
+
+## Veredicto 2026-11-13: APPROVED, solo diagnóstico y planificación (`6850519341`, ratificado en `6850596236`)
+
+Se aceptan los cierres acotados de R-01, R-02 y R-03. R-04 requiere un gate independiente, con respaldo nuevo, revisión de
+las claves y plan de restauración; su ejecución no está autorizada. R-05 queda verificada, con dos hallazgos abiertos. La
+prueba roja de reproducción documenta F-SEC01-T24-01 y no es PASS.
+
+F-SEC01-T24-02 es **potencial**: la clave anónima de Supabase puede ser pública, así que no es P0 por sí sola. F-SEC01-T24-01
+sigue abierta, latente y no prioritaria; `delete_user` solo está concedido a `super_admin`.
+
+La corrección de T24-02 pasa a **TASK-0025** (`6850596236`). R-06 queda en espera de esa revisión. Esta tarea no se reabre.

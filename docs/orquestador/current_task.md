@@ -25,6 +25,21 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-13 10:55Z: **TASK-0025** — SEC-01: corrección candidata de F-SEC01-T24-02 (vistas de `public`) — **IN_PROGRESS** (`6850596236`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0025-sec01-t24-02-public-views-hardening.md`](tasks/0025-sec01-t24-02-public-views-hardening.md) |
+| Autoriza | Análisis, migración versionada y pruebas en entornos desechables; **no** DDL en la BD compartida ni despliegue |
+| En espera | R-06 (R3-02/R3-03) hasta revisar esta prioridad; F-SEC01-T24-01 abierta y contenida; R-04 con su propio gate |
+| Staging vivo | `270e07d` (sin cambios) |
+
+## 2026-11-13 10:39Z: TASK-0024 — **APPROVED**, solo diagnóstico y planificación (`6850519341`, ratificado en `6850596236`)
+
+Cierres R-01/R-02/R-03 aceptados; R-04 con gate propio (no autorizado); R-05 verificada con dos hallazgos abiertos; la prueba
+roja de reproducción no es PASS. T24-02 es potencial, no P0 por sí sola, y pasa a TASK-0025. T24-01 sigue abierta y no es
+prioritaria. R-06 queda en espera.
+
 ## 2026-11-13 09:50Z: **TASK-0024** — SEC-01: diagnóstico y plan de cierre de las reservas de TASK-0023 — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~10:30Z, `6848913937` + decisiones `6849259532`)
 
 | Campo | Valor |
