@@ -152,7 +152,7 @@ class Sec01Task0024WriterPathsTest extends TestCase
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->assertFalse($this->refused($page), 'the ordinary target could be opened');
-        $page->fillForm(['name' => 'zzz-t24-renamed', 'roles' => []]);
+        $page->set('data.name', 'zzz-t24-renamed'); // one request: refusal can happen on rehydrate
         $refusedAt = 'fill (rehydrate)';
         if (! $this->refused($page)) {
             $refusedAt = 'save';
