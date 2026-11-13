@@ -1,4 +1,28 @@
 {
+  "task_0027_cira_evaluation_module": {
+    "task_id": "TASK-0027",
+    "title": "CIRA web evaluation module for the Cámara (8 guided tests CPV-01..08, link from CIRA Test, evaluations tied to cira_search_log and existing votes, internal panel and report)",
+    "source": "Issue #2 comment 6852945146 (owner authorization quoted, 2026-11-13)",
+    "status": "BLOCKED_PENDING_DB_GATE",
+    "code_deployed": "no: isolated candidate only; feature/upgrade-filament-v3 and staging remain at 6e7f525",
+    "migration_executed": "no: new migration 2026_11_13_130000_create_cira_evaluation_tables (4 tables, 1 function, 1 trigger, RLS + REVOKE to API roles) rehearsed only on an isolated ICU clone of the TASK-0026 backup; 2026_11_06_120000 (TASK-0013) is included verbatim and already recorded live in batch 61",
+    "review_base_sha": "6e7f52546a29f223fa924c0c897592223c55360c",
+    "tested_sha": "5e6e3fc0288c02798f355b25aa6a85288ddcdfdb",
+    "review_head_sha": "5e6e3fc0288c02798f355b25aa6a85288ddcdfdb",
+    "candidate_branch": "feat/cira-evaluation-module (fast-forward over 6e7f525; 36 files, +3321; no search/ranking/embeddings/index/taxonomy/company-data files)",
+    "runner_sha": "acc9da6e5be1de1342ad0bf0e341973a298dbb4a (infra/contabo-test-runner: CIRA eval UX seed/script; APP_URL + APP_TRUSTED_HOSTS for the UX server)",
+    "deployed_sha": null,
+    "records_commit_sha": "e059b03",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha)",
+    "materialization_commit_sha": "f73e501",
+    "tests": "module+SurfaceInventory OK 24/410 (20261113T134219Z-5e6e3fc0288c); full suite OK 826 tests/8969 assertions (20261113T134329Z-5e6e3fc0288c); browser E2E desktop + Pixel 5 40/40 (20261113T134020Z-5e6e3fc0288c)",
+    "clone_rehearsal": "PASS (run 3): up x2 idempotent, 4 tables, 11 FKs, RLS 4/4, 0 API privileges, trigger active; 88 existing tables identical; behaviour with real FKs OK; down -> data and schema identical; up after down OK",
+    "before_after": "13 CIRA n8n workflows identical versions (GET only); staging 200 before/after each run; shared DB unchanged",
+    "execution_incidents": "clone run 1 reported a data-identity mismatch without detail, not reproduced in runs 2-3; pg_dump 17.6 \restrict lines needed filtering; E2E found static-folder route conflict (no new public routes, links go to the panel), SEC-03 host/canonical settings for the runner UX server, and mobile sidebar overlay; all fixed before 5e6e3fc",
+    "db_gate_plan": "after TASK-0026 T+24h PASS and a separate express owner authorization: fresh backup + ICU clone restore, migrate --pretend on clone, FF feature/upgrade-filament-v3 6e7f525 -> 5e6e3fc, verify new batch contains only 2026_11_13_130000 plus RLS/REVOKE/trigger, create campaign and invite a test evaluator, monitor. Rollback: migrate:rollback --step=1 if still last batch, else rehearsed down SQL + migrations row; code reverse FF with previous image",
+    "not_done": "no deploy, no DDL on shared DB, no n8n, no CIRA algorithm/ranking/embeddings/indexes/taxonomy/company data, no production, no main, no global roles/permissions, no secrets, no four-company battery; TASK-0026 monitoring untouched",
+    "next": "owner decision on the DB gate after TASK-0026 closes. STOP"
+  },
   "task_0026_sec01_t24_02_staging_deploy": {
     "task_id": "TASK-0026",
     "title": "SEC-01 deploy the F-SEC01-T24-02 fix (TASK-0025) to staging only, including the migration on the shared Supabase database",
