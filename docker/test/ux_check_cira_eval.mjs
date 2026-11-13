@@ -166,7 +166,7 @@ for (const [vp, opts] of [['desktop', { viewport: { width: 1366, height: 900 } }
   record('panel: both evaluations listed with the pseudonym', list.includes('CPV-01') && list.includes('CPV-06') && list.includes('E-01'));
   await page.screenshot({ path: `${OUT}/panel_1_list.png`, fullPage: true });
   const viewLink = page.locator('a[href*="/admin/cira-evaluaciones/"]').first();
-  await viewLink.click();
+  await Promise.all([page.waitForURL(/\/admin\/cira-evaluaciones\/\d+/, { timeout: 15000 }).catch(() => {}), viewLink.click()]);
   await page.waitForLoadState('networkidle').catch(() => {});
   const detail = await page.content();
   record('panel: detail says the snapshot hash is verified', detail.includes('verificada (SHA-256)'), detail.includes('NO coincide') ? 'hash mismatch shown' : undefined);
