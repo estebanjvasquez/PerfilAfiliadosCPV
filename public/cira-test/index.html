@@ -106,8 +106,8 @@
     </div>
     <span id="debug-badge" class="debug-badge" hidden>DEBUG ON</span>
     <nav class="eval-links" aria-label="Evaluación de CIRA">
-      <a href="/cira-test/evaluacion/guia" data-cira-eval-guide>Guía de evaluación</a>
-      <a href="/cira-test/evaluacion/mis-pruebas" data-cira-eval-home>Mis pruebas</a>
+      <a href="/admin/evaluacion-cira/guia" data-cira-eval-guide>Guía de evaluación</a>
+      <a href="/admin/evaluacion-cira" data-cira-eval-home>Mis pruebas</a>
     </nav>
     <div class="session">sesión: <span id="sid-label">—</span></div>
     <button id="reset-btn" type="button">Nueva conversación</button>
@@ -206,7 +206,8 @@
   // Debajo de cada respuesta con resultados. El id de la búsqueda sale de las tarjetas de n8n (data-log, solo dígitos)
   // y va con la sesión de esta página (sid): el módulo solo deja evaluar una búsqueda desde la sesión que la hizo. Si la
   // respuesta no trae registro, el enlace abre la evaluación «sin registro». Se arma con DOM y textContent (sin HTML).
-  // El módulo exige iniciar sesión y una invitación vigente; no cambia la búsqueda, el ranking ni los votos.
+  // Enlaza directo a las páginas del panel (/admin/evaluacion-cira/...), que exigen iniciar sesión y una invitación
+  // vigente; no cambia la búsqueda, el ranking ni los votos.
   function addEvalLink(row){
     if(!row) return;
     var bubble = row.querySelector(".bubble");
@@ -217,7 +218,7 @@
     bar.className = "eval-bar";
     var a = document.createElement("a");
     a.setAttribute("data-cira-eval-link", logId ? "log" : "sin-registro");
-    a.href = "/cira-test/evaluacion" + (logId ? "?log=" + encodeURIComponent(logId) + "&sid=" + encodeURIComponent(sid) : "");
+    a.href = "/admin/evaluacion-cira/evaluar" + (logId ? "?log=" + encodeURIComponent(logId) + "&sid=" + encodeURIComponent(sid) : "");
     a.textContent = "Evaluar esta búsqueda";
     bar.appendChild(a);
     if(!logId){

@@ -159,15 +159,16 @@ class CiraEvaluationModuleTest extends TestCase
     // ------------------------------------------------------------------ routes and access
 
     #[Test]
-    public function the_cira_test_entry_points_redirect_to_the_panel_passing_only_well_formed_parameters(): void
+    public function cira_test_links_straight_to_the_panel_pages_and_adds_no_public_route(): void
     {
-        // A real request to these routes has no current Filament panel (found by the browser check): reproduce that.
-        Filament::setCurrentPanel(null);
-        $this->get('/cira-test/evaluacion?log=12&sid=test-abcdef12-3456&test=CPV-03')
-            ->assertRedirect(CiraEvaluationFormPage::getUrl(['log' => '12', 'sid' => 'test-abcdef12-3456', 'test' => 'CPV-03'], panel: 'admin'));
-        $this->get('/cira-test/evaluacion?log=12;drop&sid=%3Cscript%3E&test=CPV-99')->assertRedirect(CiraEvaluationFormPage::getUrl(panel: 'admin'));
-        $this->get('/cira-test/evaluacion/mis-pruebas')->assertRedirect(CiraEvaluationHomePage::getUrl(panel: 'admin'));
-        $this->get('/cira-test/evaluacion/guia')->assertRedirect(CiraEvaluationGuidePage::getUrl(panel: 'admin'));
+        $page = file_get_contents(public_path('cira-test/index.html'));
+        $path = fn (string $url) => parse_url($url, PHP_URL_PATH);
+        $this->assertStringContainsString('href="'.$path(CiraEvaluationGuidePage::getUrl()).'"', $page);
+        $this->assertStringContainsString('href="'.$path(CiraEvaluationHomePage::getUrl()).'"', $page);
+        $this->assertStringContainsString('a.href = "'.$path(CiraEvaluationFormPage::getUrl()).'"', $page);
+        foreach (app('router')->getRoutes() as $route) {
+            $this->assertFalse(str_starts_with($route->uri(), 'cira-test'), 'no Laravel route under the static /cira-test/ folder: '.$route->uri());
+        }
     }
 
     #[Test]
@@ -559,8 +560,6 @@ class CiraEvaluationModuleTest extends TestCase
         $this->assertStringContainsString('function addEvalLink(row)', $page);
         $this->assertStringContainsString("a.textContent = \"Evaluar esta búsqueda\"", $page);
         $this->assertStringContainsString('/^[0-9]{1,18}$/.test(logId)', $page);
-        $this->assertStringContainsString('href="/cira-test/evaluacion/guia"', $page);
-        $this->assertStringContainsString('href="/cira-test/evaluacion/mis-pruebas"', $page);
     }
 
     #[Test]
