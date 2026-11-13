@@ -985,7 +985,11 @@ if (class_exists(App\Models\TaxonomyCategoryRequestDeliveryAttempt::class)) {
   # CACHE_DRIVER=file too: `php artisan serve` handles each request in a new process, so the
   # compose default (`array`) forgets rate-limiter hits between clicks and a throttle could
   # never be seen in the browser.
-  compose run -d --name "$UX_SERVER" -e SESSION_DRIVER=file -e CACHE_DRIVER=file -T testapp \
+  # APP_TRUSTED_HOSTS (TASK-0027): since SEC-03 (TrustHosts, 9d0c24d) the app answers only its configured hosts, and the
+  # browser reaches this server by its container name, so every request got 400. Trust exactly that name, lowercased
+  # (browsers send it lowercase), for this disposable server only.
+  compose run -d --name "$UX_SERVER" -e SESSION_DRIVER=file -e CACHE_DRIVER=file \
+    -e APP_TRUSTED_HOSTS="$(printf '%s' "$UX_SERVER" | tr 'A-Z' 'a-z')" -T testapp \
     php artisan serve --host=0.0.0.0 --port=8000 >/dev/null 2>&1 || true
   # Wait for it, from inside the network rather than guessing with a sleep.
   UX_UP=no
