@@ -1,6 +1,6 @@
 // TASK-0027 (Issue #2 `6852945146`): end-to-end browser check of the CIRA evaluation module, desktop and phone.
 //
-// CIRA Test (/cira-test/) -> search -> 👍 -> «Evaluar esta búsqueda» -> login -> evaluate -> save draft -> reopen from
+// CIRA Test (/cira-test/) -> search -> 👍 -> «Evaluar esta búsqueda» (/admin/evaluacion-cira/evaluar) -> login -> evaluate -> save draft -> reopen from
 // «Mis pruebas» -> submit -> internal panel (evaluation, report) -> guide with the 8 tests.
 //
 // Nothing external is reached: the n8n chat webhook and the vote webhook are answered HERE (page.route), with cards
@@ -83,7 +83,7 @@ for (const [vp, opts] of [['desktop', { viewport: { width: 1366, height: 900 } }
   record(`${vp}: 👍 sent with the search id and session`, calls.votes.length === 1 && String(calls.votes[0].search_log_id) === LOG_ID && calls.votes[0].voter_ref === SID);
   const link = page.locator('[data-cira-eval-link="log"]').last();
   const href = await link.getAttribute('href').catch(() => null);
-  record(`${vp}: «Evaluar esta búsqueda» carries the search id and the session`, href === `/cira-test/evaluacion?log=${LOG_ID}&sid=${encodeURIComponent(SID)}`, href);
+  record(`${vp}: «Evaluar esta búsqueda» carries the search id and the session`, href === `/admin/evaluacion-cira/evaluar?log=${LOG_ID}&sid=${encodeURIComponent(SID)}`, href);
   await page.screenshot({ path: `${OUT}/${vp}_1_cira_test.png`, fullPage: true });
 
   // 2. Evaluate: the link goes through login (first time) and lands on the form with the search.
@@ -117,7 +117,8 @@ for (const [vp, opts] of [['desktop', { viewport: { width: 1366, height: 900 } }
   await page.screenshot({ path: `${OUT}/${vp}_2_form.png`, fullPage: true });
 
   // 3. Resume from «Mis pruebas» and submit.
-  await page.goto(BASE + '/cira-test/evaluacion/mis-pruebas', { waitUntil: 'networkidle' });
+  await page.locator('[data-cira-eval-home]').count(); // the header link of CIRA Test points here
+  await page.goto(BASE + '/admin/evaluacion-cira', { waitUntil: 'networkidle' });
   const rows = page.locator('[data-cira-my-evaluations] tbody tr', { hasText: test });
   record(`${vp}: «Mis pruebas» lists the draft once`, (await rows.count()) === 1);
   await rows.first().locator('a', { hasText: 'Abrir' }).click();
@@ -134,7 +135,7 @@ for (const [vp, opts] of [['desktop', { viewport: { width: 1366, height: 900 } }
   if (vp === 'phone') { await noHorizontalScroll(page, 'phone mis pruebas'); }
 
   // 4. The guide: 8 tests.
-  await page.goto(BASE + '/cira-test/evaluacion/guia', { waitUntil: 'networkidle' });
+  await page.goto(BASE + '/admin/evaluacion-cira/guia', { waitUntil: 'networkidle' });
   record(`${vp}: the guide lists the 8 tests`, (await page.locator('[data-cira-guide-test]').count()) === 8);
   await page.screenshot({ path: `${OUT}/${vp}_4_guia.png`, fullPage: true });
 
