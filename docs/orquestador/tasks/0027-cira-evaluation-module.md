@@ -4,7 +4,7 @@
 |---|---|
 | Fuente | Issue #2, comentario [`6852945146`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6852945146) (2026-11-13 12:30Z), asignación expresa del propietario |
 | ID | TASK-0027: siguiente libre verificado (`tasks/`, `current_task.md`, ramas remotas, `git log --all`, handoff). No reutiliza TASK-0013 ni TASK-0026 |
-| Estado | ~~ASSIGNED~~ → ~~IN_PROGRESS~~ (12:40Z) → **BLOCKED_PENDING_DB_GATE** (~13:50Z): candidato aislado `5e6e3fc` probado, sin desplegar |
+| Estado | ~~ASSIGNED~~ → ~~IN_PROGRESS~~ (12:40Z) → **BLOCKED_PENDING_DB_GATE** (~13:50Z): candidato aislado `5e6e3fc` probado, sin desplegar → **IN_PROGRESS (despliegue autorizado: `6855056483` + `6855171480`)** (~14:10Z) |
 | Prioridad | Aceptación del buscador CIRA por la Cámara. Las pruebas manuales del propietario sobre cuatro empresas son paralelas y no forman parte de esta tarea |
 | Autoriza | Implementar en aislamiento el módulo (enlace desde CIRA Test, 8 pruebas guiadas, registro de evaluaciones vinculado a búsquedas y votos, panel interno, informe y pruebas). Desplegar código en staging **solo** dentro del alcance, después del gate de 24 h de TASK-0026 y con preflight PASS |
 | Gate especial de BD | Las migraciones nuevas solo se diseñan y prueban en un clon aislado. Ejecutarlas en la BD compartida requiere una autorización expresa aparte. Si el despliegue ejecutaría `migrate --force` con migraciones nuevas, **STOP antes del push** |
@@ -87,6 +87,62 @@ ni los datos de empresas):
     tablas y de la función) más borrar su fila de `migrations`;
   - para el código, *fast-forward* inverso con la imagen previa.
   - No hay datos que perder salvo evaluaciones creadas después.
+
+## Autorizaciones posteriores a la entrega (ciclo de despliegue, misma tarea)
+
+| Fecha | Comentario | Efecto |
+|---|---|---|
+| 2026-11-13 13:58Z | [`6855056483`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6855056483) | **Autoriza el DDL** de `2026_11_13_130000_create_cira_evaluation_tables` en la BD compartida y el despliegue de `5e6e3fc` solo en staging. **No** levanta el gate de 24 h de TASK-0026 |
+| 2026-11-13 14:02Z | [`6855171480`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6855171480) | **Excepción controlada al gate de 24 h de TASK-0026** para desplegar hoy, solo en staging. Exige: preflight reforzado PASS (incluida la monitorización parcial de TASK-0026); respaldo restaurable; rollback probado; solo la migración `2026_11_13_130000`; pruebas posteriores; nueva monitorización de 24 h. Si falla cualquier control, STOP. Sin producción ni `main` |
+
+Estado: ~~BLOCKED_PENDING_DB_GATE~~ → **IN_PROGRESS (despliegue)**, 2026-11-13 ~14:10Z. La ventana de 24 h de TASK-0026 queda
+**interrumpida por excepción expresa**, no PASS. El antecedente se conserva.
+
+<details><summary>Texto íntegro de <code>6855056483</code></summary>
+
+# AUTORIZACIÓN EXPRESA DEL PROPIETARIO — TASK-0027: migración Supabase y despliegue en staging (CONDICIONADA A TASK-0026)
+
+**Fuente:** instrucción explícita del propietario del 2026-11-13: «autorizo la migracion en la base de datos en supabase y desplegar a staging la aterea de evaluacion de los resultados del buscador para poder indicar hoy miso a la camara que realice dichas pruebas».
+
+Queda **AUTORIZADA** para TASK-0027 la migración exacta `2026_11_13_130000_create_cira_evaluation_tables` sobre la BD Supabase compartida de desarrollo/staging y el despliegue exclusivo a staging del candidato `feat/cira-evaluation-module` @ `5e6e3fc`, sujeto a los controles y alcance de la entrega [6854941089](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6854941089). Esta autorización levanta **solo el gate de consentimiento de DDL** de TASK-0027.
+
+**NO SE LEVANTA el gate temporal ni de seguridad de TASK-0026.** TASK-0026 permanece `DEPLOYED_AWAITING_24H`; su T+24h no puede cerrarse antes del **2026-11-14 11:43:38Z**. La intención del propietario de invitar hoy a la Cámara no constituye por sí sola una dispensa explícita de ese gate. **PROHIBIDO desplegar TASK-0027 hoy o interrumpir/solapar la observación**, salvo nueva instrucción expresa del propietario que reevalúe ese riesgo y documente la decisión. No hay autorización para producción ni `main`.
+
+## Instrucción para ejecución posterior al gate
+1. **STOP ahora**: registrar la autorización en la fuente persistente, mantener candidato y BD sin cambios; no ejecutar DDL ni push/deploy mientras TASK-0026 no tenga PASS documentado. No iniciar polling, automatizaciones ni ejecutor autónomo.
+2. Una vez obtenido y documentado PASS real de TASK-0026 T+24h (no basta el transcurso del tiempo), comprobar rama, HEAD, estado limpio, BASE `6e7f525`, candidato `5e6e3fc` y ausencia de despliegues o migraciones concurrentes. Si cambia BASE o aparece una nueva migración, **STOP** y solicitar revisión.
+3. Respaldo nuevo de BD compartida, restauración verificada en clon, rollback ensayado y `migrate --pretend` para confirmar **solo** `2026_11_13_130000_create_cira_evaluation_tables` en lote nuevo; confirmar que migración de TASK-0013 ya figura aplicada. Si preflight no es PASS, **STOP**.
+4. Desplegar únicamente el código candidato autorizado en staging mediante fast-forward limpio, verificando que el workflow `migrate --force` ejecuta exclusivamente la migración autorizada; comprobar 4 tablas, FK, RLS/REVOKE, trigger, roles y accesos, sin alteraciones de CIRA/n8n/ranking/taxonomía ni de datos preexistentes.
+5. E2E real con evaluador de prueba: CIRA Test → búsqueda → 👍/👎 → «Evaluar esta búsqueda» → autenticación/invitación → 8 guías → guardar/reanudar → panel privado e informe; validar escritorio y móvil y registrar URL efectiva, invitación y procedimiento para la Cámara (sin publicar tokens ni datos privados). Confirmar accesibilidad antes de invitar al cliente.
+6. Documentar en `docs/orquestador/tasks/0027-cira-evaluation-module.md`, `SESSION_RESUME.md`, `current_task.md` y `audit/` el estado, BASE/TESTED/DEPLOY/HANDOFF, respaldo, resultados, regresión, monitorización y rollback. Publicar en Issue #2 `DEPLOYED` o `BLOCKED` con evidencia. STOP, sin producción ni `main`.
+
+**Prioridad de negocio:** habilitar cuanto antes la evaluación institucional de CIRA por la Cámara, pero sin presentar como disponible una función todavía no desplegada ni comprometer el gate de seguridad existente.
+
+</details>
+
+<details><summary>Texto íntegro de <code>6855171480</code></summary>
+
+# DECISIÓN EXPRESA DEL PROPIETARIO — EXCEPCIÓN CONTROLADA AL GATE T+24h DE TASK-0026 PARA DESPLEGAR TASK-0027 HOY
+
+**Autorización textual del propietario (2026-11-13):** «Autorizo expresamente la excepción al gate de observación de 24 horas de TASK-0026 para desplegar hoy TASK-0027 exclusivamente en staging. Exijo preflight reforzado PASS, respaldo restaurable, rollback probado, ejecución exclusiva de la migración 2026_11_13_130000, pruebas posteriores y nueva monitorización de 24 horas. Si falla cualquier control, STOP. No autorizo producción ni main. Publica esta decisión en Issue #2.»
+
+**Esta decisión modifica expresamente el gate temporal** de los comentarios [6855056483](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6855056483) y [6852945146](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6852945146), **sin borrar el antecedente ni declarar TASK-0026 PASS**. La excepción se limita a la convivencia de TASK-0026 y TASK-0027 en **staging**, no exime ningún otro control de seguridad. TASK-0027 tiene candidato aislado probado `feat/cira-evaluation-module` @ `5e6e3fc`, BASE staging reportada `6e7f525`, entrega [6854941089](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6854941089).
+
+## Ejecución autorizada, condicionada a gates técnicos estrictos
+1. Antes de editar o ejecutar: seguir `AGENTS.md`, `docs/orquestador/PROTOCOL.md`, `docs/orquestador/SESSION_RESUME.md`, `docs/orquestador/current_task.md`, y TASK-0027/TASK-0026 como referencias directas. Verificar `git status -sb`, rama, HEAD, worktrees, remoto, workflow, migraciones pendientes, staging real, cambios preexistentes y actividad concurrente. No reutilizar TASK-0026 ni crear otro identificador para este ciclo de despliegue de TASK-0027; registrar la nueva decisión en la tarea existente preservando historial.
+2. **Preflight reforzado TASK-0026:** capturar evidencia de la monitorización parcial hasta este momento (salud HTTP, logs, errores, ACL y `security_invoker` de 13 vistas, regresión de consumidores). Si hay error nuevo, anomalía no explicada, monitorización incompleta que impida evaluar salud o drift, **STOP**. Registrar que la ventana original T+24h quedó **interrumpida por excepción expresa**, nunca PASS retroactivo.
+3. **Preflight de TASK-0027:** verificar que `5e6e3fc` sigue siendo fast-forward limpio desde HEAD real de `feature/upgrade-filament-v3`, que el diff corresponde exclusivamente al módulo y que el lote de migración contendrá **solo** `2026_11_13_130000_create_cira_evaluation_tables`. La migración `2026_11_06_120000` de TASK-0013 debe figurar ya aplicada. Si hay otros commits/migraciones, divergencia o datos modificados de forma inesperada, **STOP** sin rebase/force ni sustituciones improvisadas.
+4. **BD Supabase compartida:** respaldo nuevo íntegro con hash verificable, restauración ensayada en clon compatible (incluyendo ICU/ACL/FK), rollback probado, conteos y huellas antes/después, `migrate --pretend`, RLS/REVOKE y trigger verificados. Solo con todos los controles PASS se autoriza el DDL exacto de TASK-0027. No alterar registros existentes ni datos de empresas.
+5. **Despliegue:** promover exclusivamente `5e6e3fc` a staging mediante fast-forward limpio; verificar que `migrate --force` ejecuta exclusivamente `2026_11_13_130000`. Validar 4 tablas, 11 FK según entrega, función/trigger, ACL, 13 vistas SEC-01, controles SEC-03, y que CIRA, n8n, ranking, embeddings, índices y taxonomía permanecen intactos. Si hay fallo, STOP, ejecutar reversión solo según procedimiento ensayado y documentar impacto real.
+6. **Pruebas posteriores y gate de apertura a la Cámara:** ejecutar regresión funcional, E2E de escritorio y móvil, búsqueda real desde CIRA Test, 👍/👎, vinculación de log, autenticación e invitación, ocho guías, borrador/reanudación, envío, panel `super_admin`, informe y pruebas negativas de permisos. Usar cuenta sintética autorizada; no publicar datos privados, credenciales ni enlaces de invitación en GitHub. **No comunicar que la campaña está disponible hasta que todo esto sea PASS**.
+7. **Nueva monitorización de 24 horas** desde la hora real de despliegue de TASK-0027: controles diferenciados para seguridad SEC-01 de TASK-0026 y funcionalidad/seguridad del módulo TASK-0027; registrar explícitamente la interrupción de la ventana anterior, nueva hora de inicio y final mínimo. No cerrar TASK-0026 ni TASK-0027 como completadas antes de cumplir controles correspondientes. Registrar alertas, criterios de rollback y responsable de seguimiento; **no reactivar el ejecutor ni polling automático**.
+8. Persistir decisión, evidencia y estados en `docs/orquestador/tasks/0026-*.md`, `docs/orquestador/tasks/0027-*.md`, `docs/orquestador/SESSION_RESUME.md`, `docs/orquestador/current_task.md`, `audit/` y handoff. Publicar en Issue #2 el resultado `DEPLOYED_AWAITING_24H` o `BLOCKED/ROLLED_BACK`, con BASE/TESTED/DEPLOY/HANDOFF, run, backup y pruebas; **STOP** al terminar.
+
+**Límites absolutos:** no producción, no `main`, no otras migraciones, no n8n, no cambios del algoritmo/ranking de CIRA, embeddings, taxonomía, permisos globales, secretos, Cloudflare/HSTS, operaciones destructivas ni force-push. Si cualquier control falla, STOP y solicitar nueva decisión; la urgencia comercial no sustituye el preflight.
+
+**Prioridad de negocio:** habilitar cuanto antes la campaña de evaluación institucional de la Cámara, sin afirmar despliegue antes de su verificación.
+
+</details>
 
 ## Anexo: texto íntegro de la fuente
 

@@ -25,7 +25,7 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-13 12:40Z: **TASK-0027** — CIRA: módulo web de evaluación institucional para la Cámara — ~~IN_PROGRESS~~ → **BLOCKED_PENDING_DB_GATE** (~13:50Z, `6852945146`)
+## 2026-11-13 12:40Z: **TASK-0027** — CIRA: módulo web de evaluación institucional para la Cámara — ~~IN_PROGRESS~~ → ~~BLOCKED_PENDING_DB_GATE~~ (13:50Z) → **IN_PROGRESS: despliegue autorizado** (`6855056483` + excepción `6855171480`, ~14:10Z; fuente `6852945146`)
 
 | Campo | Valor |
 |---|---|
