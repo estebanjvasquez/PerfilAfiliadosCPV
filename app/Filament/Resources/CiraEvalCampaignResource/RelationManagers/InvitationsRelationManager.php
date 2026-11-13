@@ -66,7 +66,12 @@ class InvitationsRelationManager extends RelationManager
                     ->action(function (array $data): void {
                         abort_unless(CiraEvaluationService::isPanelUser(Auth::user()), 403);
                         $campaign = $this->getOwnerRecord();
-                        $user = User::query()->whereKey($data['user_id'])->whereNotNull('email_verified_at')->firstOrFail();
+                        $user = User::query()->whereKey($data['user_id'])->whereNotNull('email_verified_at')->first();
+                        if ($user === null) {
+                            Notification::make()->danger()->title('No se puede invitar')->body('Solo se invitan cuentas existentes con el correo verificado.')->send();
+
+                            return;
+                        }
                         DB::connection('pgsql')->transaction(function () use ($campaign, $user, $data) {
                             $existing = CiraEvalInvitation::query()->where('campaign_id', $campaign->getKey())->where('user_id', $user->getKey())->lockForUpdate()->first();
                             if ($existing) {

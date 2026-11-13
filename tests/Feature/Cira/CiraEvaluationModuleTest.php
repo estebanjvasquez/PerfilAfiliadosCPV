@@ -122,12 +122,12 @@ class CiraEvaluationModuleTest extends TestCase
     {
         $evidence = array_map(fn ($id, $i) => ['id' => $id, 'pos' => $i + 1, 'rel' => 'declarado', 'via' => 'servicio', 'puntaje' => 0.9 - $i / 10, 'fuentes' => [['campo' => 'servicio', 'valor' => 'ZZZT27 bombas']]], $ids, array_keys($ids));
 
-        return (int) DB::table('cira_search_log')->insertGetId([
+        return (int) DB::table('cira_search_log')->insertGetId(array_merge([
             'source' => 'n8n_chat', 'session_ref' => $sid, 'user_input' => $input, 'agent_tool' => 'search_empresas',
             'agent_params' => json_encode(['query' => $input, 'explain' => true]), 'result_count' => count($ids),
             'result_empresa_ids' => '{'.implode(',', $ids).'}', 'result_evidence' => json_encode($evidence),
             'engine_version' => 'zzz-t27-engine', 'response_ms' => 850,
-        ] + $extra);
+        ], $extra));
     }
 
     private function vote(int $logId, ?int $empresaId, int $vote, string $voterRef, array $extra = []): void
@@ -224,7 +224,7 @@ class CiraEvaluationModuleTest extends TestCase
         $this->assertFalse($this->refused($page));
         $this->invitation->forceFill(['revoked_at' => now()])->save();
 
-        $page->fillForm(['test_code' => 'CPV-01', 'rating' => 'correcta']);
+        $page->set('data.rating', 'correcta'); // one request: the refusal can come on rehydrate
         if (! $this->refused($page)) {
             $page->call('submit');
             $this->assertTrue($this->refused($page), 'refused after hydrate');
@@ -547,8 +547,8 @@ class CiraEvaluationModuleTest extends TestCase
     #[Test]
     public function livewire_requests_are_csrf_protected_and_the_cira_test_page_links_safely(): void
     {
-        $route = app('router')->getRoutes()->getByName('livewire.update');
-        $this->assertNotNull($route);
+        $route = collect(app('router')->getRoutes()->getRoutes())->first(fn ($r) => in_array('POST', $r->methods(), true) && str_ends_with($r->uri(), 'livewire/update'));
+        $this->assertNotNull($route, 'the Livewire update endpoint');
         $this->assertContains('web', $route->gatherMiddleware());
         $web = app(\Illuminate\Contracts\Http\Kernel::class)->getMiddlewareGroups()['web'] ?? [];
         $this->assertTrue(collect($web)->contains(fn ($m) => is_string($m) && (str_contains($m, 'VerifyCsrfToken') || str_contains($m, 'ValidateCsrfToken'))), 'CSRF middleware in the web group');
