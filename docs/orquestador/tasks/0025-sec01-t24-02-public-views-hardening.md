@@ -4,7 +4,7 @@
 |---|---|
 | Fuente | Issue #2, comentario [`6850596236`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6850596236) (2026-11-13 10:43Z): veredicto de TASK-0024 y asignación prioritaria. Veredicto previo [`6850519341`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6850519341) |
 | ID | TASK-0025: siguiente libre verificado (`tasks/`, `current_task.md`, ramas remotas, `git log --all`, handoff). No reutiliza TASK-0024 |
-| Estado | **IN_PROGRESS** (2026-11-13 ~10:55Z) |
+| Estado | ~~IN_PROGRESS~~ (2026-11-13 ~10:55Z) → **READY_FOR_REVIEW** (~11:25Z) |
 | Autoriza | Análisis, código y migración versionada, y pruebas en entornos desechables |
 | No autoriza | Aplicar DDL a la BD compartida o a staging, desplegar, cambiar la Data API, RLS, grants reales, credenciales o n8n, producción, `main`, *force-push*, HSTS, Cloudflare, nginx, túnel, taxonomía, roles reales ni las filas huérfanas. Usar claves reales o leer datos reales por la API requiere gate |
 | Rama | Código y pruebas aislados en una rama propia desde staging `270e07d`; la rama de runtime (`feature/upgrade-filament-v3`) y `main` no se tocan. Registros en `fix/sec-01-r4-01-role-editor-preserve` |
@@ -27,6 +27,31 @@
 7. Matriz por vista, exposición demostrada frente a potencial, TESTED_HEAD, REVIEW_HEAD, evidencia y procedimiento de
    despliegue (respaldo, rollback, verificación, conteos y monitorización).
 8. READY_FOR_REVIEW o BLOCKED y STOP.
+
+## Resultado (2026-11-13)
+
+Detalle, matriz de las 13 vistas y procedimiento de despliegue:
+[`docs/security/SEC01_TASK0025_VISTAS_PUBLIC.md`](../../security/SEC01_TASK0025_VISTAS_PUBLIC.md).
+
+| Campo | Valor |
+|---|---|
+| BASE | `270e07dcda8c61840c569b5c85cbad471ce9bf82` (staging; verificado en servidor y remoto, árbol limpio) |
+| Fails-before | `56375f5f21edc1fdeed405278545f8a678d459a0` (prueba + fixture): run `20261113T105506Z-56375f5f21ed`, **5/5 en rojo** por la razón correcta |
+| **TESTED_HEAD = REVIEW_HEAD** | `6e7f52546a29f223fa924c0c897592223c55360c` (`fix/sec-01-t25-public-views-hardening`; *fast-forward* de `270e07d`; 3 archivos: migración, prueba y fixture) |
+| Pruebas del candidato | run `20261113T105643Z-6e7f52546a29`: **OK (5 tests, 48 assertions)** |
+| Suite completa | run `20261113T110734Z-6e7f52546a29`: **OK (803 tests, 8562 assertions)**. La primera pasada (`20261113T105754Z`) tuvo 1 error ajeno: `CompanyDossierPdfTest` usa un código aleatorio `CPV-9xx` que chocó con el fixture |
+| Clon REST aislado | `/root/backups/sec01-t25-rest-clone-20261113T111025Z`: antes, `anon` lee por REST filas sintéticas de 6 vistas (incluido el contacto); después, 401/403 en las 13; `service_role` y la huella del propietario sin cambios; `down()` restaura exactamente |
+| BD compartida / staging | **sin cambios**: solo lecturas de catálogo en transacción `READ ONLY` |
+| Consumidores | solo Laravel (como propietario); n8n no usa estas vistas en Supabase (lectura `GET` de 49 flujos) |
+
+**Gate:** el despliegue normal ejecuta `php artisan migrate --force`, así que integrar `6e7f525` en la rama de runtime aplica
+el DDL a la BD compartida. Requiere autorización explícita.
+
+**Incidencias de ejecución** (scripts del ejecutor, sin efecto en staging): la extracción del SQL de la migración con una
+expresión regular en línea falló por el escapado y se rehízo con un script; en el script del clon, una sustitución automática
+perdió la cabecera `Authorization` y se corrigió antes de ejecutarlo.
+
+**STOP:** R-06 en espera; F-SEC01-T24-01 abierta y contenida; R-04 con su propio gate.
 
 ## Anexo: texto íntegro de la fuente
 

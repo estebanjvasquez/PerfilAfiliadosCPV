@@ -25,11 +25,13 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-13 10:55Z: **TASK-0025** — SEC-01: corrección candidata de F-SEC01-T24-02 (vistas de `public`) — **IN_PROGRESS** (`6850596236`)
+## 2026-11-13 10:55Z: **TASK-0025** — SEC-01: corrección candidata de F-SEC01-T24-02 (vistas de `public`) — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~11:25Z, `6850596236`)
 
 | Campo | Valor |
 |---|---|
-| Archivo | [`tasks/0025-sec01-t24-02-public-views-hardening.md`](tasks/0025-sec01-t24-02-public-views-hardening.md) |
+| Archivo | [`tasks/0025-sec01-t24-02-public-views-hardening.md`](tasks/0025-sec01-t24-02-public-views-hardening.md); detalle en [`../security/SEC01_TASK0025_VISTAS_PUBLIC.md`](../security/SEC01_TASK0025_VISTAS_PUBLIC.md) |
+| Candidato | `fix/sec-01-t25-public-views-hardening`: fails-before `56375f5` (5/5 en rojo), TESTED/REVIEW `6e7f525` (5/5 en verde); clon REST aislado PASS |
+| Gate | aplicar la migración = desplegar (el workflow ejecuta `migrate --force` sobre la BD compartida); requiere autorización explícita |
 | Autoriza | Análisis, migración versionada y pruebas en entornos desechables; **no** DDL en la BD compartida ni despliegue |
 | En espera | R-06 (R3-02/R3-03) hasta revisar esta prioridad; F-SEC01-T24-01 abierta y contenida; R-04 con su propio gate |
 | Staging vivo | `270e07d` (sin cambios) |
