@@ -10,6 +10,9 @@ class ListCiraEvalCampaigns extends ListRecords
 {
     protected static string $resource = CiraEvalCampaignResource::class;
 
+    // Without this Filament title-cases every word («Evaluaciones De CIRA»).
+    protected static ?string $title = 'Campañas de evaluación';
+
     protected function getHeaderActions(): array
     {
         return [
