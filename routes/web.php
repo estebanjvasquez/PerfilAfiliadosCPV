@@ -51,10 +51,10 @@ Route::get('cira-test/evaluacion', function (\Illuminate\Http\Request $request) 
         'test' => in_array($request->query('test'), \App\Services\CiraEvaluation\CiraEvaluationService::testCodes(), true) ? (string) $request->query('test') : null,
     ]);
 
-    return redirect()->to(\App\Filament\Pages\CiraEvaluationFormPage::getUrl($params));
+    return redirect()->to(\App\Filament\Pages\CiraEvaluationFormPage::getUrl($params, panel: 'admin'));
 })->name('cira-eval.evaluate');
-Route::get('cira-test/evaluacion/mis-pruebas', fn () => redirect()->to(\App\Filament\Pages\CiraEvaluationHomePage::getUrl()))->name('cira-eval.home');
-Route::get('cira-test/evaluacion/guia', fn () => redirect()->to(\App\Filament\Pages\CiraEvaluationGuidePage::getUrl()))->name('cira-eval.guide');
+Route::get('cira-test/evaluacion/mis-pruebas', fn () => redirect()->to(\App\Filament\Pages\CiraEvaluationHomePage::getUrl(panel: 'admin')))->name('cira-eval.home');
+Route::get('cira-test/evaluacion/guia', fn () => redirect()->to(\App\Filament\Pages\CiraEvaluationGuidePage::getUrl(panel: 'admin')))->name('cira-eval.guide');
 
 
 /* Route::get('/gen-catalog/exportxls', [GenCatalog::class, 'exportAllCatalogXls'])->name('gen-catalog.exportxls');

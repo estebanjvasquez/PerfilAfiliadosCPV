@@ -161,11 +161,13 @@ class CiraEvaluationModuleTest extends TestCase
     #[Test]
     public function the_cira_test_entry_points_redirect_to_the_panel_passing_only_well_formed_parameters(): void
     {
+        // A real request to these routes has no current Filament panel (found by the browser check): reproduce that.
+        Filament::setCurrentPanel(null);
         $this->get('/cira-test/evaluacion?log=12&sid=test-abcdef12-3456&test=CPV-03')
-            ->assertRedirect(CiraEvaluationFormPage::getUrl(['log' => '12', 'sid' => 'test-abcdef12-3456', 'test' => 'CPV-03']));
-        $this->get('/cira-test/evaluacion?log=12;drop&sid=%3Cscript%3E&test=CPV-99')->assertRedirect(CiraEvaluationFormPage::getUrl());
-        $this->get('/cira-test/evaluacion/mis-pruebas')->assertRedirect(CiraEvaluationHomePage::getUrl());
-        $this->get('/cira-test/evaluacion/guia')->assertRedirect(CiraEvaluationGuidePage::getUrl());
+            ->assertRedirect(CiraEvaluationFormPage::getUrl(['log' => '12', 'sid' => 'test-abcdef12-3456', 'test' => 'CPV-03'], panel: 'admin'));
+        $this->get('/cira-test/evaluacion?log=12;drop&sid=%3Cscript%3E&test=CPV-99')->assertRedirect(CiraEvaluationFormPage::getUrl(panel: 'admin'));
+        $this->get('/cira-test/evaluacion/mis-pruebas')->assertRedirect(CiraEvaluationHomePage::getUrl(panel: 'admin'));
+        $this->get('/cira-test/evaluacion/guia')->assertRedirect(CiraEvaluationGuidePage::getUrl(panel: 'admin'));
     }
 
     #[Test]
