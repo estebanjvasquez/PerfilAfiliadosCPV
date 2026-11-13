@@ -151,7 +151,7 @@ class CiraEvaluationFormPage extends Page implements HasForms
                     ->label('Prueba')
                     ->options(collect(config('cira_evaluation.tests'))->mapWithKeys(fn ($t, $code) => [$code => $code.' · '.$t['title']])->all())
                     ->required()
-                    ->native(false)
+                    ->native() // plain <select>: accessible on phones, keyboard and screen readers
                     ->disabled(fn () => $this->evaluationId !== null)
                     ->dehydrated()
                     ->helperText(fn () => $this->evaluationId !== null ? 'La prueba de una evaluación guardada no se cambia.' : 'Elija a cuál de las 8 pruebas corresponde esta búsqueda.'),
@@ -185,7 +185,7 @@ class CiraEvaluationFormPage extends Page implements HasForms
                 Select::make('reason')
                     ->label('Motivo principal')
                     ->options(config('cira_evaluation.reasons'))
-                    ->native(false),
+                    ->native(),
                 Textarea::make('comment')
                     ->label('Comentario')
                     ->helperText('Qué esperaba y qué vio. Por ejemplo: «Esperaba ver primero a las empresas de transporte pesado; la tercera es de alimentos».')
