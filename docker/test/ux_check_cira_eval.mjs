@@ -92,7 +92,10 @@ for (const [vp, opts] of [['desktop', { viewport: { width: 1366, height: 900 } }
   if (page.url().includes('/login')) { await login(page, EVALUATOR); }
   if (!page.url().includes('/admin/')) {
     const txt = await page.evaluate(() => document.body.innerText).catch(() => '');
-    record(`${vp}: diagnostic of the unexpected page`, false, `${await page.title()} | ${(txt.match(/SQLSTATE[^\n]{0,400}/) || [''])[0]} | ${(txt.match(/[A-Za-z\\]+Exception[^\n]{0,200}/g) || []).slice(0, 4).join(' || ')}`);
+    const html = await page.content();
+    const msgs = [...html.matchAll(/"(?:message|class)":"((?:[^"\\]|\\.){0,300})"/g)].map((m) => m[1]).filter((v, i, a) => a.indexOf(v) === i).slice(0, 8);
+    const login = await page.request.get(BASE + '/admin/login').then((r) => r.status()).catch((e) => 'err ' + e.message);
+    record(`${vp}: diagnostic of the unexpected page`, false, `${await page.title()} | /admin/login=${login} | ${msgs.join(' || ')}`);
   }
   record(`${vp}: landed on the evaluation form after login`, page.url().includes('/admin/evaluacion-cira/evaluar') && page.url().includes(`log=${LOG_ID}`), page.url().replace(BASE, ''));
   const snap = await page.locator('[data-cira-snapshot]').innerText().catch(() => '');
