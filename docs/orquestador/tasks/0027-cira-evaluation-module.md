@@ -4,12 +4,89 @@
 |---|---|
 | Fuente | Issue #2, comentario [`6852945146`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6852945146) (2026-11-13 12:30Z), asignación expresa del propietario |
 | ID | TASK-0027: siguiente libre verificado (`tasks/`, `current_task.md`, ramas remotas, `git log --all`, handoff). No reutiliza TASK-0013 ni TASK-0026 |
-| Estado | ~~ASSIGNED~~ → **IN_PROGRESS** (2026-11-13 ~12:40Z) |
+| Estado | ~~ASSIGNED~~ → ~~IN_PROGRESS~~ (12:40Z) → **BLOCKED_PENDING_DB_GATE** (~13:50Z): candidato aislado `5e6e3fc` probado, sin desplegar |
 | Prioridad | Aceptación del buscador CIRA por la Cámara. Las pruebas manuales del propietario sobre cuatro empresas son paralelas y no forman parte de esta tarea |
 | Autoriza | Implementar en aislamiento el módulo (enlace desde CIRA Test, 8 pruebas guiadas, registro de evaluaciones vinculado a búsquedas y votos, panel interno, informe y pruebas). Desplegar código en staging **solo** dentro del alcance, después del gate de 24 h de TASK-0026 y con preflight PASS |
 | Gate especial de BD | Las migraciones nuevas solo se diseñan y prueban en un clon aislado. Ejecutarlas en la BD compartida requiere una autorización expresa aparte. Si el despliegue ejecutaría `migrate --force` con migraciones nuevas, **STOP antes del push** |
 | No autoriza | Algoritmo o ranking de CIRA, embeddings, índices de búsqueda, taxonomía o datos de empresas, publicación de candidatos, n8n, producción, `main`, Cloudflare, HSTS, roles o permisos globales, secretos, *force-push*, cambios de otras tareas; ejecutar la batería de las cuatro empresas |
 | Convivencia con TASK-0026 | TASK-0026 sigue DEPLOYED_AWAITING_24H (hasta el 2026-11-14 11:43:38Z): no se interrumpe su monitorización ni se mezclan commits, migraciones o evidencia. La promoción de CIRA se planifica después de su gate |
+
+## Resultado (2026-11-13 ~13:50Z): **BLOCKED_PENDING_DB_GATE**: candidato aislado, **sin desplegar**
+
+El candidato está terminado y probado. Para desplegarlo hacen falta dos cosas: que cierre el gate de 24 h de TASK-0026 y una
+**autorización expresa aparte del propietario** para ejecutar la migración nueva en la BD compartida (el workflow ejecuta
+`php artisan migrate --force`). No se hizo push a `feature/upgrade-filament-v3` ni se desplegó nada.
+
+| SHA | Valor |
+|---|---|
+| BASE | `6e7f525` (staging vivo, TASK-0026) |
+| TESTED = REVIEW | **`5e6e3fc`**, rama `feat/cira-evaluation-module` (*fast-forward* limpio sobre `6e7f525`) |
+| Runner | `acc9da6` (`infra/contabo-test-runner`): guion y semilla de la E2E; `APP_URL` y `APP_TRUSTED_HOSTS` del servidor de la E2E (SEC-03) |
+| DEPLOY | ninguno |
+
+**Cambios exactos** (36 archivos, +3321, solo del módulo; no toca el buscador, el ranking, embeddings, índices, la taxonomía
+ni los datos de empresas):
+- **Migración nueva** `2026_11_13_130000_create_cira_evaluation_tables`:
+  - tablas `cira_eval_campaigns`, `cira_eval_invitations`, `cira_evaluations` y `cira_eval_test_decisions`;
+  - FK, CHECK y unicidad, y el trigger `cira_evaluations_keep_evidence` que vuelve inmutable la instantánea;
+  - RLS activado y REVOKE a los roles de la API.
+- **Migración de TASK-0013** `2026_11_06_120000_create_cira_search_log_and_feedback_tables`: copia exacta, porque ya está
+  registrada en la BD compartida (lote 61). `migrate` la omite.
+- **Configuración** `config/cira_evaluation.php`: las 8 pruebas CPV-01..08 y los catálogos.
+- **Código:**
+  - modelos `App\Models\Cira\*` (los de log y votos, de solo lectura) y el cast `PgBigintArray`;
+  - el servicio `CiraEvaluationService`;
+  - el trait `AuthorizesCiraEvaluator`;
+  - las páginas Filament `evaluacion-cira`, `/evaluar`, `/guia` e `/informe`;
+  - los recursos `CiraEvalCampaignResource` (con invitaciones) y `CiraEvaluationResource`;
+  - la política `CiraEvaluationPanelPolicy`, con exclusión de Shield.
+- **CIRA Test** (`public/cira-test/index.html`): enlace «Evaluar esta búsqueda» por respuesta y enlaces a la guía y a «Mis
+  pruebas». Sin cambios en el webhook ni en los votos.
+- **Pruebas:** `tests/Feature/Cira/CiraEvaluationModuleTest.php` (23).
+- **Guías:** `docs/manual_usuario/guia_evaluacion_cira.md` para la Cámara (35–50 min, permite guardar por partes) y
+  `manual_administrador.md` §12.
+- **Especificación, decisiones de UX y modelo de datos:** [`audit/TASK0027_CIRA_EVALUATION_MODULE.md`](../../../audit/TASK0027_CIRA_EVALUATION_MODULE.md).
+
+**Pruebas:**
+
+| Prueba | Resultado |
+|---|---|
+| Módulo + inventario de superficie (`5e6e3fc`) | OK, 24 pruebas y 410 aserciones (`20261113T134219Z-5e6e3fc0288c`) |
+| Suite completa (`5e6e3fc`) | **OK, 826 pruebas y 8969 aserciones** (`20261113T134329Z-5e6e3fc0288c`), incluidas SEC-01 y SEC-03 |
+| E2E de escritorio y Pixel 5 (`5e6e3fc`) | **40/40** (`20261113T134020Z-5e6e3fc0288c`). Recorrido: CIRA Test → búsqueda → 👍 → evaluar → login → borrador → doble clic → reabrir → enviar → guía con 8 pruebas → 403 del evaluador en el panel → panel (seudónimo, hash verificado, HTML como texto) → informe |
+| Ensayo de la migración en el clon de la BD compartida (respaldo de TASK-0026, ICU `en-US`, ACL de Supabase) | Subida ×2 idempotente: 4 tablas, 11 FK, RLS 4/4, 0 privilegios de la API, trigger activo; 88 tablas existentes idénticas; comportamiento correcto con FK reales; bajada → datos y esquema idénticos; nueva subida OK |
+| Antes y después | 13 flujos CIRA de n8n con la misma versión (solo `GET`); staging en `6e7f525`, 200 antes y después; BD compartida sin cambios |
+
+**Incidentes de ejecución (sin efecto en staging ni en la BD compartida):**
+- La primera ejecución del ensayo en el clon dio «no» en la identidad de datos sin detalle, y no se reprodujo en las
+  ejecuciones 2 y 3.
+- La diferencia de esquema se debía solo a las líneas `\restrict` de `pg_dump` 17.6; se corrigió el filtro.
+- La E2E destapó tres cosas:
+  - la ruta sugerida `/cira-test/evaluacion` choca con la carpeta estática, así que no hay rutas públicas nuevas y se enlaza
+    directo al panel;
+  - el servidor de la E2E del runner necesitaba `APP_URL` y `APP_TRUSTED_HOSTS` por SEC-03;
+  - la barra lateral tapaba el teléfono.
+  Todo se corrigió antes de `5e6e3fc`.
+
+**Gate de BD pendiente (requiere autorización expresa aparte):**
+- **Diff:** solo la migración `2026_11_13_130000`, sola en un lote nuevo. `2026_11_06_120000` ya está en el lote 61.
+  - Crea 4 tablas vacías, 1 función y 1 trigger.
+  - No toca tablas existentes, salvo las FK entrantes hacia `cira_search_log` (ON DELETE SET NULL), `users` (SET NULL) y las
+    tablas nuevas.
+- **Impacto:** sin escrituras en datos existentes; bloqueo breve de DDL. Las tablas no quedan expuestas en la API REST (RLS +
+  REVOKE).
+- **Plan de despliegue**, después del PASS de T+24 h de TASK-0026:
+  1. respaldo lógico nuevo y restauración ensayada en un clon ICU;
+  2. `migrate --pretend` en el clon;
+  3. *fast-forward* de `feature/upgrade-filament-v3` `6e7f525` → `5e6e3fc` y el workflow;
+  4. verificar que el lote nuevo contiene solo `2026_11_13_130000`, más RLS, REVOKE y el trigger;
+  5. crear la campaña e invitar a un evaluador de prueba;
+  6. monitorizar.
+- **Rollback:**
+  - `migrate:rollback --step=1`, si ese lote sigue siendo el último, o si no, el SQL de bajada ensayado (DROP de las 4
+    tablas y de la función) más borrar su fila de `migrations`;
+  - para el código, *fast-forward* inverso con la imagen previa.
+  - No hay datos que perder salvo evaluaciones creadas después.
 
 ## Anexo: texto íntegro de la fuente
 
