@@ -17,6 +17,10 @@ class AuthServiceProvider extends ServiceProvider
         // TASK-0010C: explícita para no depender del descubrimiento automático en algo que protege
         // datos de otras empresas.
         'App\Models\TaxonomyCategoryRequest' => 'App\Policies\TaxonomyCategoryRequestPolicy',
+        // TASK-0027: internal panel of the CIRA evaluation, privileged role only.
+        'App\Models\Cira\CiraEvalCampaign' => 'App\Policies\CiraEvaluationPanelPolicy',
+        'App\Models\Cira\CiraEvalInvitation' => 'App\Policies\CiraEvaluationPanelPolicy',
+        'App\Models\Cira\CiraEvaluation' => 'App\Policies\CiraEvaluationPanelPolicy',
     ];
 
     /**

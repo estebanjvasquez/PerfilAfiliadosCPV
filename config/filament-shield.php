@@ -68,15 +68,19 @@ return [
     'exclude' => [
         'enabled' => true,
 
+        // TASK-0027: the CIRA evaluation pages and resources are governed by invitation / privileged-role checks
+        // (CiraEvaluationPanelPolicy, AuthorizesCiraEvaluator), not by permissions. Excluding them keeps the role
+        // editor and the permission catalogue exactly as they are.
         'pages' => [
             'Dashboard',
+            'CiraEvaluationHomePage', 'CiraEvaluationFormPage', 'CiraEvaluationGuidePage', 'CiraEvaluationReportPage',
         ],
 
         'widgets' => [
             'AccountWidget', 'FilamentInfoWidget',
         ],
 
-        'resources' => [],
+        'resources' => ['CiraEvalCampaignResource', 'CiraEvaluationResource'],
     ],
 
     'discovery' => [

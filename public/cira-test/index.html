@@ -26,6 +26,12 @@
   header .title{ font-weight:700; font-size:15px; }
   header .sub{ font-size:11px; color:#888; }
   header .session{ margin-left:auto; font-size:11px; color:#999; text-align:right; }
+  header .eval-links{ font-size:12px; display:flex; gap:10px; flex-wrap:wrap; }
+  header .eval-links a{ color:#1a4f8b; }
+  .eval-bar{ margin-top:10px; padding-top:8px; border-top:1px dashed #ddd; font-size:13px; }
+  .eval-bar a{ display:inline-block; padding:6px 12px; border-radius:16px; background:#1a4f8b; color:#fff; text-decoration:none; }
+  .eval-bar a:focus{ outline:2px solid #f2b705; outline-offset:2px; }
+  .eval-bar .eval-note{ color:#777; font-size:11px; margin-left:6px; }
   header button{
     margin-left:12px; border:1px solid #ddd; background:#fff; border-radius:20px;
     padding:6px 12px; font-size:12px; cursor:pointer; color:#444;
@@ -99,6 +105,10 @@
       <div class="sub">Entorno de pruebas MCP</div>
     </div>
     <span id="debug-badge" class="debug-badge" hidden>DEBUG ON</span>
+    <nav class="eval-links" aria-label="Evaluación de CIRA">
+      <a href="/cira-test/evaluacion/guia" data-cira-eval-guide>Guía de evaluación</a>
+      <a href="/cira-test/evaluacion/mis-pruebas" data-cira-eval-home>Mis pruebas</a>
+    </nav>
     <div class="session">sesión: <span id="sid-label">—</span></div>
     <button id="reset-btn" type="button">Nueva conversación</button>
   </header>
@@ -189,6 +199,34 @@
       '<div class="bubble">' + tag + linkify(html) + '</div>';
     msgs.appendChild(row);
     msgs.scrollTop = msgs.scrollHeight;
+    return row;
+  }
+
+  // ---- TASK-0027: «Evaluar esta búsqueda» (módulo de evaluación de la Cámara) ----
+  // Debajo de cada respuesta con resultados. El id de la búsqueda sale de las tarjetas de n8n (data-log, solo dígitos)
+  // y va con la sesión de esta página (sid): el módulo solo deja evaluar una búsqueda desde la sesión que la hizo. Si la
+  // respuesta no trae registro, el enlace abre la evaluación «sin registro». Se arma con DOM y textContent (sin HTML).
+  // El módulo exige iniciar sesión y una invitación vigente; no cambia la búsqueda, el ranking ni los votos.
+  function addEvalLink(row){
+    if(!row) return;
+    var bubble = row.querySelector(".bubble");
+    var voteBox = row.querySelector(".cira-vote[data-log]");
+    var logId = voteBox ? String(voteBox.getAttribute("data-log") || "") : "";
+    if(!/^[0-9]{1,18}$/.test(logId)) logId = "";
+    var bar = document.createElement("div");
+    bar.className = "eval-bar";
+    var a = document.createElement("a");
+    a.setAttribute("data-cira-eval-link", logId ? "log" : "sin-registro");
+    a.href = "/cira-test/evaluacion" + (logId ? "?log=" + encodeURIComponent(logId) + "&sid=" + encodeURIComponent(sid) : "");
+    a.textContent = "Evaluar esta búsqueda";
+    bar.appendChild(a);
+    if(!logId){
+      var note = document.createElement("span");
+      note.className = "eval-note";
+      note.textContent = "(esta respuesta no trae registro de búsqueda: se evaluará sin registro)";
+      bar.appendChild(note);
+    }
+    bubble.appendChild(bar);
   }
 
   function addLoader(){
@@ -485,7 +523,8 @@
       var data = await parseJsonResponseOrThrow(r);
       var item = Array.isArray(data) ? data[0] : data;
       var reply = item && (item.output || item.text);
-      addBot(reply || "Sin respuesta.", (item && item.type) ? item.type + " · " + elapsed + "ms" : elapsed + "ms");
+      var botRow = addBot(reply || "Sin respuesta.", (item && item.type) ? item.type + " · " + elapsed + "ms" : elapsed + "ms");
+      if(reply) addEvalLink(botRow);
 
       // Fase 23B: llamada APARTE, de solo lectura, nunca reemplaza ni modifica lo que CIRA ya
       // respondió arriba - si falla, la respuesta normal ya se mostró igual.
