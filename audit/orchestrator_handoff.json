@@ -1,4 +1,27 @@
 {
+  "task_0025_sec01_t24_02_public_views_hardening": {
+    "task_id": "TASK-0025",
+    "title": "SEC-01 candidate fix for F-SEC01-T24-02 (13 public report views with owner rights readable by Supabase API roles)",
+    "source": "Issue #2 comment 6850596236 (TASK-0024 verdict + priority assignment, 2026-11-13 10:43Z); prior verdict 6850519341 (TASK-0024 APPROVED)",
+    "status": "READY_FOR_REVIEW",
+    "environment": "no deployment, no DDL/grants on the shared database; staging feature/upgrade-filament-v3 = 270e07dcda8c61840c569b5c85cbad471ce9bf82 verified (server clean, remote)",
+    "review_base_sha": "270e07dcda8c61840c569b5c85cbad471ce9bf82 (runtime base of the candidate)",
+    "fails_before_sha": "56375f5f21edc1fdeed405278545f8a678d459a0 (test + fixture only; run 20261113T105506Z-56375f5f21ed: 5/5 red for the right reason)",
+    "review_head_sha": "6e7f52546a29f223fa924c0c897592223c55360c (TESTED = REVIEW; fix/sec-01-t25-public-views-hardening; FF from 270e07d; 3 files: migration, test, fixture)",
+    "records_commit_sha": "dc58778f0770d8d6b765ceddf16dbfd8c48afa45",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha)",
+    "materialization_commit_sha": "43df6e4",
+    "change": "migration 2026_11_13_000001_harden_public_report_views: ALTER VIEW ... SET (security_invoker = true) + REVOKE ALL FROM anon, authenticated on the 13 views; idempotent; no-op without views/roles/pgsql; down() restores option unset + GRANT ALL (observed live state). No base-table privilege, RLS, policy or other role touched",
+    "inventory": "13 views owned by postgres, no reloptions, anon/authenticated/service_role ALL privileges; no nested views, no functions, not updatable; 21 base tables RLS on, 0 policies; pg_graphql absent (REST only); only catalogoView has personal data (contacts); sole consumer Laravel as owner; n8n: 49 workflows read via GET, none reads these views in Supabase (capacityView only in 3 inactive MySQL-tool flows)",
+    "tests": "candidate run 20261113T105643Z-6e7f52546a29 OK (5 tests, 48 assertions); full suite 20261113T110734Z-6e7f52546a29 OK (803 tests, 8562 assertions); first full pass 20261113T105754Z had 1 unrelated flaky error (CompanyDossierPdfTest random CPV-9xx code collision); staging 200 before/after; 0 leftover containers",
+    "rest_clone": "/root/backups/sec01-t25-rest-clone-20261113T111025Z: schema-only restore (0 real rows), Supabase-like roles with random synthetic secrets, non-superuser BYPASSRLS owner, PostgREST v12.2.3 + curl on --internal network. Before: anon reads synthetic rows of 6 views via REST incl. the contact in catalogoView while /contacts returns []. After: 401 anon / 403 authenticated on all 13; service_role and owner fingerprint (cd2549a99278) unchanged; up x2 idempotent; down restores exactly",
+    "exposure": "demonstrated in isolation; live = potential (exposed schemas live in the Supabase dashboard; no real key used, no live API data read)",
+    "db_mutations": "none on the shared database or staging (catalog reads in READ ONLY transactions); disposable containers only, removed",
+    "gate": "deploy workflow runs php artisan migrate --force, so fast-forwarding feature/upgrade-filament-v3 to 6e7f525 applies the DDL to the shared DB (local dev + staging): needs explicit owner authorization; procedure in docs/security/SEC01_TASK0025_VISTAS_PUBLIC.md section 7",
+    "execution_incidents": "inline regex SQL extraction failed on escaping (redone with a script); an automated edit dropped the Authorization header in the clone script, fixed before running",
+    "on_hold": "R-06 (R3-02/R3-03) until this review; F-SEC01-T24-01 open and contained (no delete_user/delete_any_user outside super_admin); R-04 own gate",
+    "next": "owner review of the candidate; then a separate deploy gate. STOP"
+  },
   "task_0024_sec01_t23_reservations_diagnosis": {
     "task_id": "TASK-0024",
     "title": "SEC-01 diagnosis and closure plan for the TASK-0023 reservations (analysis only)",
