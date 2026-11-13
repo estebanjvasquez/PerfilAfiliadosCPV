@@ -25,6 +25,15 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-13 12:40Z: **TASK-0027** — CIRA: módulo web de evaluación institucional para la Cámara — **IN_PROGRESS** (`6852945146`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0027-cira-evaluation-module.md`](tasks/0027-cira-evaluation-module.md) |
+| Autoriza | Implementación aislada; despliegue de código solo después del gate de 24 h de TASK-0026 y de un preflight PASS |
+| Gate de BD | Las tablas nuevas requieren autorización expresa aparte para ejecutarse en la BD compartida |
+| Convive con | TASK-0026 (DEPLOYED_AWAITING_24H): sin despliegues concurrentes ni mezcla de evidencia |
+
 ## 2026-11-13 11:40Z: **TASK-0026** — SEC-01: desplegar en staging F-SEC01-T24-02 (migración en la BD compartida) — ~~IN_PROGRESS~~ → **DEPLOYED_AWAITING_24H** (~11:55Z, `6851565505`)
 
 | Campo | Valor |
