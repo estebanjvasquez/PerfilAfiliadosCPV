@@ -169,7 +169,8 @@ for (const [vp, opts] of [['desktop', { viewport: { width: 1366, height: 900 } }
   await viewLink.click();
   await page.waitForLoadState('networkidle').catch(() => {});
   const detail = await page.content();
-  record('panel: detail shows the immutable snapshot verified and the comment as text', detail.includes('verificada (SHA-256)') && detail.includes('&lt;b&gt;no es html&lt;/b&gt;') && !detail.includes('<b>no es html</b>'));
+  record('panel: detail says the snapshot hash is verified', detail.includes('verificada (SHA-256)'), detail.includes('NO coincide') ? 'hash mismatch shown' : undefined);
+  record('panel: the HTML typed in the comment is shown as text', detail.includes('&lt;b&gt;no es html&lt;/b&gt;') && !detail.includes('<b>no es html</b>'), (detail.match(/ZZZ UX (desktop|phone):[^<]{0,80}/) || [''])[0]);
   await clean(page, 'panel detail');
   await page.screenshot({ path: `${OUT}/panel_2_detail.png`, fullPage: true });
   await page.goto(BASE + '/admin/evaluacion-cira/informe', { waitUntil: 'networkidle' });
