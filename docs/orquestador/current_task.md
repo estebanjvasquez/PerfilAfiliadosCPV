@@ -25,14 +25,16 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-13 09:50Z: **TASK-0024** — SEC-01: diagnóstico y plan de cierre de las reservas de TASK-0023 — **IN_PROGRESS** (`6848913937` + decisiones `6849259532`)
+## 2026-11-13 09:50Z: **TASK-0024** — SEC-01: diagnóstico y plan de cierre de las reservas de TASK-0023 — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~10:30Z, `6848913937` + decisiones `6849259532`)
 
 | Campo | Valor |
 |---|---|
-| Archivo | [`tasks/0024-sec01-t23-reservations-diagnosis.md`](tasks/0024-sec01-t23-reservations-diagnosis.md) |
+| Archivo | [`tasks/0024-sec01-t23-reservations-diagnosis.md`](tasks/0024-sec01-t23-reservations-diagnosis.md); diagnóstico en [`../security/SEC01_TASK0024_DIAGNOSTICO_RESERVAS.md`](../security/SEC01_TASK0024_DIAGNOSTICO_RESERVAS.md) |
 | Tipo | Solo análisis y pruebas aisladas: sin escrituras reales, despliegue, migraciones ni cambios de FK en staging |
 | Decisiones vigentes | R-01 UAT confirmada por el propietario; R-02 no restaurar; R-03 conservar las filas inertes (riesgo aceptado); R-04 remediar con plan revisado y gate aparte; R-05 verificar; R-06 R3-02/R3-03 en tarea independiente posterior |
+| Resultado | R-01/R-02/R-03 cerradas. R-04 demostrada en copia aislada (restauración limpia, rollback exacto), pendiente de gate. R-05: límite de R4 interno (0 escritores sin guarda); hallazgos nuevos F-SEC01-T24-01 (borrado de una cuenta `super_admin` desde la lista; latente) y F-SEC01-T24-02 (vistas legibles por `anon` en la Data API; no reproducido). Pruebas en `audit/task-0024-r05-writer-paths` @ `8e8b80c` |
 | Staging vivo | `270e07d` (sin cambios) |
+| Siguiente | revisión; decisiones sobre T24-01/T24-02 y el gate de R-04; después, tarea independiente de R-06 |
 
 ## 2026-11-13 09:14Z: TASK-0023 — **APPROVED con reservas** (`6848907151`)
 

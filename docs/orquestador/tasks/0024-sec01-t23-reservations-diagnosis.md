@@ -4,7 +4,9 @@
 |---|---|
 | Fuente | Issue #2, asignación [`6848913937`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6848913937) (2026-11-13 09:14Z), actualizada por las decisiones del propietario en [`6849259532`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6849259532) (09:31Z). Veredicto previo: [`6848907151`](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2#issuecomment-6848907151) (TASK-0023 APPROVED con reservas) |
 | ID | TASK-0024: siguiente libre verificado (`tasks/`, `current_task.md`, ramas remotas, `git log --all`, handoff). `6848913937` no estaba materializada; `6849259532` pide no duplicarla, así que es **una sola tarea** |
-| Estado | **IN_PROGRESS** (2026-11-13 ~09:50Z) |
+| Estado | ~~IN_PROGRESS~~ (2026-11-13 ~09:50Z) → **READY_FOR_REVIEW** (~10:30Z) |
+| Documento | [`docs/security/SEC01_TASK0024_DIAGNOSTICO_RESERVAS.md`](../../security/SEC01_TASK0024_DIAGNOSTICO_RESERVAS.md) |
+| Pruebas aisladas | `audit/task-0024-r05-writer-paths` @ `8e8b80c2b7027ab24a8bc68fad713794300712a0` (desde `270e07d`; solo pruebas, nunca para desplegar) |
 | Tipo | Diagnóstico y propuesta. **No** asigna implementación, limpieza de BD ni despliegue. No reabre TASK-0023 |
 | Rama | `fix/sec-01-r4-01-role-editor-preserve` (documental). Pruebas aisladas en rama `audit/` aparte si hacen falta; nunca en la rama de runtime |
 | Staging (runtime) | `270e07dcda8c61840c569b5c85cbad471ce9bf82`, a verificar en remoto y servidor por lectura |
@@ -27,6 +29,32 @@ datos, FK, constraints o migraciones en staging, y pruebas que alteren el estado
 **Entrega:** matriz de reservas (evidencia, severidad, impacto, probabilidad, cierre, dependencias, coste, riesgos, plan
 mínimo, pruebas de aceptación, gate humano), prioridades P0/P1/P2, plan por fases, qué no hacer y la autorización concreta
 que necesita cada cambio posterior. READY_FOR_REVIEW o BLOCKED; STOP.
+
+## Resultado (2026-11-13)
+
+El detalle y la evidencia están en el documento de diagnóstico. Staging se verificó en `270e07d` (servidor y remoto, árbol
+limpio) y **no se escribió nada en él**: tres sondas de solo lectura en transacción `READ ONLY` y una petición sin clave a la
+raíz de la Data API.
+
+| Reserva | Cierre propuesto | Evidencia clave | Gate para cualquier cambio |
+|---|---|---|---|
+| R-01 | **Cerrada** (confirmación del propietario sobre `270e07d`; UAT previa `6829143372` sobre `71e8a6d`), sin afirmar guardado de roles reales | `6849259532`, `6829143372` | — |
+| R-02 | **Cerrada** (no restaurar) | R1 sin `view_any_user`, 1 miembro; R2 con 0 miembros | Autorización nueva si se necesitara |
+| R-03 | **Cerrada** (riesgo aceptado) | 6 filas, 0 vínculos, 0 referencias funcionales en el código | Autorización para cualquier borrado |
+| R-04 | Remediación **demostrada en copia aislada**, pendiente de gate | 2 filas obsoletas (contactos inexistentes; residuo de importación); FK viva validada y triggers activos. En la copia: borrado de 2 filas, FK validada, segunda restauración con exit 0 y 0 errores (101 FK válidas), 87 tablas intactas, rollback exacto | Autorización que nombre las 2 filas (nota restringida) y la operación; sin DDL en vivo |
+| R-05 | Límite de R4 confirmado como **capacidad interna** (0 escritores sin guarda en `app/` y `routes/`). Hallazgos nuevos **F-SEC01-T24-01** (borrado de una cuenta `super_admin` desde la lista de usuarios con `delete_user`; reproducido; latente) y **F-SEC01-T24-02** (13 vistas con derechos del propietario legibles por `anon` en la Data API; RLS 88/88 sin políticas; no reproducido) | Runs `20261113T100621Z-8e8b80c2b702` (6: 5 verdes y 1 roja esperada) y `20261113T100718Z-8e8b80c2b702` (42: 41 verdes y la misma roja); catálogo de BD | Asignación de corrección para cada hallazgo; T24-02 toca la BD compartida |
+| R-06 | R3-02 y R3-03 en tarea independiente posterior (candidato aislado, sin desplegar); el resto de SEC-01, abierto | Registro | Ya autorizado como candidato; materializar tras revisar esta entrega |
+
+**Prioridades:** P0 ninguno (salvo que la clave anónima se haya compartido fuera del equipo: entonces T24-02 pasa a P0).
+P1: T24-02, R-06 y T24-01. P2: R-04 y mínimo privilegio en BD.
+
+**Incidencias de ejecución** (en scripts y pruebas del ejecutor, sin efecto en staging):
+1. Primeros runs con SHA corto: el runner exige 40 caracteres (exit 2, nada se ejecutó).
+2. Dos pruebas nuevas fallaron por el arnés, no por seguridad: la página rechazada en mount y un `fillForm` de varias
+   peticiones tras un 403. Se corrigieron en `58ac0e1` y `8e8b80c`.
+3. En el script de ensayo, un `sed` de limpieza borró la línea que generaba `b_tables.txt`. Se restauró antes de ejecutar.
+
+**STOP:** no se inicia R-06 ni ninguna remediación en este ciclo.
 
 ## Anexo: texto íntegro de la fuente
 
