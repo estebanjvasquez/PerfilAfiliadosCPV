@@ -162,3 +162,9 @@ Qué cubren las 5 pruebas, con roles y datos sintéticos dentro de una transacci
 6. **Rollback:** `php artisan migrate:rollback --step=1` en el contenedor, o el `DOWN_SQL` de la migración. Restaura el estado
    exacto, demostrado en el clon y en la prueba 3. Si además hace falta revertir el código, primero el rollback de la migración
    y luego `git revert`, sin *force*.
+
+## Addendum 2026-11-13: despliegue en staging (TASK-0026)
+
+El candidato `6e7f525` se desplegó en staging con la autorización de `6851565505`: workflow `43419358951`, migración sola en
+el lote 63 y verificación posterior PASS. La monitorización de 24 h sigue en curso. Detalle en
+[`tasks/0026-sec01-t24-02-staging-deploy.md`](../orquestador/tasks/0026-sec01-t24-02-staging-deploy.md).

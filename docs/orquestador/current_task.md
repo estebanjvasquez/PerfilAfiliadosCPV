@@ -25,11 +25,14 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-13 11:40Z: **TASK-0026** — SEC-01: desplegar en staging F-SEC01-T24-02 (migración en la BD compartida) — **IN_PROGRESS** (`6851565505`)
+## 2026-11-13 11:40Z: **TASK-0026** — SEC-01: desplegar en staging F-SEC01-T24-02 (migración en la BD compartida) — ~~IN_PROGRESS~~ → **DEPLOYED_AWAITING_24H** (~11:55Z, `6851565505`)
 
 | Campo | Valor |
 |---|---|
 | Archivo | [`tasks/0026-sec01-t24-02-staging-deploy.md`](tasks/0026-sec01-t24-02-staging-deploy.md) |
+| Staging vivo | ~~`270e07d`~~ → **`6e7f525`** (workflow `43419358951`); migración en el lote 63, sola |
+| Resultado | Preflight 5/5 gates PASS; verificación posterior PASS; lectura t0 PASS |
+| Siguiente | lecturas manuales hacia T+4 h, T+12 h y T+24 h con `monitor_check.sh`; cierre no antes del 2026-11-14 11:43:38Z |
 | Autoriza | *Fast-forward* de `feature/upgrade-filament-v3` a `6e7f525` y el DDL de `2026_11_13_000001_harden_public_report_views` en la BD compartida, condicionado a un preflight PASS |
 | No autoriza | producción, `main`, otras migraciones, Data API, RLS, `service_role`, n8n, HSTS, Cloudflare/nginx |
 | Monitorización | 24 h obligatorias; sin cierre antes de completarlas |
