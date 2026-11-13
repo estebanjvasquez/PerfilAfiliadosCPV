@@ -69,6 +69,21 @@ class Sec01Task0024WriterPathsTest extends TestCase
         }
     }
 
+    /** The harness lost the component: the server refused the request. It must be a denial status, never an error. */
+    private function refused($component): bool
+    {
+        if ($component->instance() !== null) {
+            return false;
+        }
+        try {
+            $component->assertForbidden();
+        } catch (\PHPUnit\Framework\AssertionFailedError) {
+            $component->assertNotFound();
+        }
+
+        return true;
+    }
+
     private function privilegedMembershipExists(User $user): bool
     {
         return DB::table('model_has_roles')
@@ -118,7 +133,8 @@ class Sec01Task0024WriterPathsTest extends TestCase
         $manager = $this->user(['view_any_user', 'view_user', 'update_user', 'delete_user']);
         $admin = $this->user(roles: [$this->super]);
 
-        $this->attempt(fn () => Livewire::actingAs($manager)->test(EditUser::class, ['record' => $admin->getKey()])->callAction('delete'));
+        $page = Livewire::actingAs($manager)->test(EditUser::class, ['record' => $admin->getKey()]);
+        $this->assertTrue($this->refused($page), 'the edit page (and its delete action) is refused at mount');
 
         $this->assertNotNull(User::find($admin->getKey()));
         $this->assertTrue($this->privilegedMembershipExists($admin));
@@ -135,7 +151,15 @@ class Sec01Task0024WriterPathsTest extends TestCase
         $target->assignRole($this->super); // concurrent promotion by a super admin
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $this->attempt(fn () => $page->fillForm(['name' => 'zzz-t24-renamed', 'roles' => []])->call('save'));
+        $this->assertFalse($this->refused($page), 'the ordinary target could be opened');
+        $page->fillForm(['name' => 'zzz-t24-renamed', 'roles' => []]);
+        $refusedAt = 'fill (rehydrate)';
+        if (! $this->refused($page)) {
+            $refusedAt = 'save';
+            $this->attempt(fn () => $page->call('save'));
+            $this->assertTrue($this->refused($page), 'save is refused once the target is privileged');
+        }
+        fwrite(STDERR, "[T24] promoted-after-mount refused at: {$refusedAt}\n");
 
         $this->assertTrue($this->privilegedMembershipExists($target), 'the privileged role was not removed');
         $this->assertNotSame('zzz-t24-renamed', User::find($target->getKey())->name, 'the privileged account was not modified');
