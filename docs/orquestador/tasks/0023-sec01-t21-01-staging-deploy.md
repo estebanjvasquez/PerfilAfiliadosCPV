@@ -118,3 +118,14 @@ borraron.
 - Sin UAT de navegador de esta versión: el propietario puede abrir Roles → editar y comprobar la sección «Role», sin guardar
   roles reales.
 - SEC-01 sigue abierto (R3-02, R3-03, relation managers y búsquedas restantes, F-03/F-06). Producción y `main`, sin autorización.
+
+## Veredicto 2026-11-13: APPROVED con reservas (`6848907151`)
+
+Se aprueba TASK-0023 en su alcance: despliegue en staging de `270e07d` (workflow `43274064073`). No cierra SEC-01 ni
+autoriza producción o `main`. La aprobación se basa en la evidencia documentada, no en una UAT independiente de navegador.
+
+Reservas: (1) UAT visual de la sección «Role», pendiente y no bloqueante; (2) R1 `view_any_user` sin restauración
+automatizada y R2 sin tocar; (3) no borrar las 6 filas `*_shield::role` sin evaluación y autorización; (4) las 2 huérfanas
+de `contact_empresa` son deuda de integridad preexistente; (5) límites de R4 como riesgo residual, no atribuible a esta
+tarea; (6) SEC-01 sigue abierta. Su diagnóstico pasa a **TASK-0024** (`6848913937`, decisiones `6849259532`). Esta tarea
+no se reabre.
