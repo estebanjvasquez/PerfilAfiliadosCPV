@@ -40,6 +40,11 @@ class SurfaceInventoryTest extends TestCase
         'GET|HEAD admin/password-reset/reset' => 'password reset form (signed)',
         'GET|HEAD admin/recuperar-acceso' => 'TASK-0012: access help by company RIF (Turnstile, limits, generic answer)',
         'GET|HEAD filament-impersonate/leave' => 'ends an impersonation held in the session; without one it only redirects',
+        // TASK-0027: entry points from the static CIRA Test page. Redirect only (well-formed parameters passed on, nothing
+        // looked up) to the evaluation pages of the panel, which require a session and an active invitation.
+        'GET|HEAD cira-test/evaluacion' => 'TASK-0027: redirect only to the CIRA evaluation form (panel, invitation required)',
+        'GET|HEAD cira-test/evaluacion/mis-pruebas' => 'TASK-0027: redirect only to «Mis pruebas» (panel, invitation required)',
+        'GET|HEAD cira-test/evaluacion/guia' => 'TASK-0027: redirect only to the evaluation guide (panel, invitation or privileged role)',
     ];
 
     /** Framework entrypoints with their own protection (signature, checksum, CSRF, signed temporary URLs). */
