@@ -1,4 +1,33 @@
 {
+  "task_0026_sec01_t24_02_staging_deploy": {
+    "task_id": "TASK-0026",
+    "title": "SEC-01 deploy the F-SEC01-T24-02 fix (TASK-0025) to staging only, including the migration on the shared Supabase database",
+    "source": "Issue #2 comment 6851565505 (owner authorization quoted, 2026-11-13 11:30Z); prior verdict 6851472706 (TASK-0025 APPROVED as isolated candidate)",
+    "status": "DEPLOYED_AWAITING_24H",
+    "code_deployed": "yes: feature/upgrade-filament-v3 270e07d -> 6e7f525 (fast-forward at 11:43:38Z, no force), workflow 43419358951 success (11:43:43-11:44:15Z); server at 6e7f525, clean, image d13539844c83, .env unchanged",
+    "migration_executed": "yes: 2026_11_13_000001_harden_public_report_views alone in batch 63 (id 149); migrations 133 -> 134; no other mutation (88 table counts identical except migrations +1; roles identical; totals 508/0/330/368)",
+    "monitoring_completed": "no: 24 h window 2026-11-13T11:43:38Z -> 2026-11-14T11:43:38Z; t0 reading PASS; manual read-only procedure: bash /root/backups/sec01-t26-20261113T113455Z/monitor_check.sh + n8n executions GET, at about T+4h, T+12h, T+24h",
+    "review_base_sha": "270e07dcda8c61840c569b5c85cbad471ce9bf82",
+    "tested_sha": "6e7f52546a29f223fa924c0c897592223c55360c",
+    "review_head_sha": "6e7f52546a29f223fa924c0c897592223c55360c",
+    "deployed_sha": "6e7f52546a29f223fa924c0c897592223c55360c",
+    "records_commit_sha": "9c4dd851dcb23ddbda6867cc5030a1eac8bb6d54",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of records_commit_sha)",
+    "materialization_commit_sha": "a43ac43",
+    "preflight": {
+      "scope": "PASS: remote/server 270e07d clean; last workflow 43274064073 success; PG 17.6; 0 pending migrations, last batch 62; db:skip list 15/15 already recorded; candidate FF, 2 commits, 3 files, 1 migration",
+      "topology": "PASS: TASK-0025 inventory re-run, 0 differing lines (views, owners, reloptions, definition md5, ACL, columns, deps, RLS 21/21 without policies, extensions); row counts identical",
+      "backup": "PASS: /root/backups/sec01-t26-20261113T113455Z (700/600): pg_dump -Fc -n public sha256 9608dcda... verified, 1109 TOC entries, 88 tables/41524 rows; migrations.csv (133); roles baseline + totals; views catalog/DDL/fingerprints; env sha; image tag pre-t26-270e07d",
+      "restore_and_rollback": "PASS: isolated pgvector pg17 clone with ICU en-US (as live) and ACLs restored: 0 count mismatches, roles identical, 133 migrations, 101 FKs, FK contact_empresa_contact_id_foreign NOT VALID (2 orphans untouched); views catalog and fingerprints identical to live; UP x2 hardened 13/13 with identical fingerprints; DOWN restored catalog and fingerprints identical to live",
+      "tests": "PASS: run 20261113T113423Z-6e7f52546a29 OK (5 tests, 48 assertions); run 20261113T113533Z-6e7f52546a29 OK (803 tests, 8562 assertions)"
+    },
+    "post_deploy": "PASS: 13/13 security_invoker; anon/authenticated no privileges and permission denied in SQL role sessions; service_role 406 = owner; owner and definitions identical; owner fingerprints identical to baseline; base-table RLS unchanged; Laravel consumer smoke (13 models, 7 exports, dossier PDF html, 11 report pages) identical to baseline (join-views 500 pre-existing); Laravel 42501 count 0; nginx 5xx 0; routes 200, HSTS max-age=86400, http 301, foreign Host 400, debug/maintenance off; n8n 9 active workflows, 0 executions/errors since start",
+    "rollback_plan": "A: php artisan migrate:rollback --step=1 --force only if batch 63 is still the last; B otherwise: run the migration DOWN_SQL + delete migrations row 149; then verify catalog/fingerprints against the backup; code revert after DB, no force. Limit: DDL reversal of 13 views, not full shared-DB recovery",
+    "execution_incidents": "first restore rehearsal used a libc-collation clone, fingerprints differed (view ORDER BY uses DB collation); redone with ICU en-US and matched. My read-only probes left Laravel log entries (TASK-0024 ambiguous-operator query 10:10Z; join-views smoke requests 11:40Z/11:45Z, known page defect)",
+    "not_done": "no production, no main, no Data API/exposed schemas, no base tables/RLS/policies/service_role, no credentials, no n8n changes, no HSTS/Cloudflare/nginx/tunnel, no REST with real keys; F-SEC01-T24-02 not closed before 24 h PASS",
+    "on_hold": "R-06 (R3-02/R3-03); F-SEC01-T24-01 open and contained; R-04 own gate; Turnstile UAT datum recorded without task",
+    "next": "complete the 24 h readings and verdict; then READY_FOR_REVIEW or rollback. STOP"
+  },
   "task_0025_sec01_t24_02_public_views_hardening": {
     "task_id": "TASK-0025",
     "title": "SEC-01 candidate fix for F-SEC01-T24-02 (13 public report views with owner rights readable by Supabase API roles)",
