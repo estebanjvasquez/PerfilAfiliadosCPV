@@ -4,12 +4,12 @@
     "title": "CIRA: V1b to staging (phase A); company-detail incident for empresa 177 (phase B); W1 not authorized (phase C)",
     "source": "Issue #2 comment 6924316065 (owner, 2026-11-16T17:46:09Z) + coordination addendum 6924366566 (owner, 17:48:14Z)",
     "predecessors": "TASK-0031 READY_FOR_REVIEW SIN DEPLOY (6923744831, handoff e751c89) keeps its status; TASK-0030 partial UX acceptance only",
-    "status": "PHASE_A_DEPLOYED_FOR_REVIEW (phase B: diagnosis done, fix prepared, not deployed)",
+    "status": "PHASE_A_DEPLOYED_FOR_REVIEW + PHASE_B_DEPLOYED_FOR_REVIEW (staging only); phase C (W1) not authorized",
     "code_deployed": true,
     "migration_executed": false,
     "review_base_sha": "e751c89",
     "materialization_commit_sha": "0b4177b",
-    "review_head_sha": "72f03cf84a405a9f036ed7d9b13d7d0028e66a01",
+    "review_head_sha": "1b6172627756b86c2454bed7dcf764e0e0a30d2d",
     "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block",
     "phase_a": {
       "deploy": {
@@ -37,16 +37,46 @@
       },
       "rollback": "PUT %USERPROFILE%/.cpv/n8n_backups/zbVLoCdR09IA9yQK_2026-11-16_pre-t32_ROLLBACK_body.json (7feb48bc); PUT publishes",
       "report": "audit/CIRA_TASK0032_FASE_A_V1B.md",
-      "evidence": "docs/cira/task0032/"
+      "evidence": "docs/cira/task0032/",
+      "issue_comment": "6925761178",
+      "review_head_sha": "72f03cf84a405a9f036ed7d9b13d7d0028e66a01",
+      "handoff_commit_sha": "fbd50eab94ade7617a245b078e45bd124f8f24ee"
     },
     "phase_b": {
       "root_cause": "card click sends company NAME; agent applied acronym rule and sent get_empresa {nombre:\"ioed\"} (executions 22716/22717); Worker ilike %ioed% and word_similarity (0.2) miss \"I.O.E.D\"; 0 rows -> Code in JavaScript1 renders Empresa no afiliada. chamber_empresa not involved anywhere",
       "membership_criterion": "empresas.status_id = 1 (Filament Activo); all 406 are 1",
-      "fix_prepared": "Worker branch fix/t32-get-empresa-id from 1ea9175 (get_empresa optional id with priority; punctuation-insensitive name fallback only when zero rows) + n8n build_detail.mjs (card sends [ID n]; Parse Intent forces get_empresa {id}); not deployed"
+      "deploy": {
+        "worker": {
+          "before": "8796f292-5ee5-446b-98ce-7ae36099dde9 (code 1ea9175)",
+          "after": "8ce4e0ff-c7fd-4c7f-b566-0bdea179dd2e (code 4599217, perfilafiliados-mcp branch fix/t32-get-empresa-id, no W1)",
+          "at": "2026-11-16T19:06:54Z",
+          "change": "get_empresa: optional id with priority (status_id=1 and id); punctuation-insensitive name fallback only when zero rows"
+        },
+        "n8n": {
+          "before": "c6c70402-8af5-4427-851f-d08617c5d82d",
+          "after": "2d0a1ee8-5a7f-4c7a-bcfd-8404b3e04fbb",
+          "at": "2026-11-16T19:12:49Z",
+          "nodes_changed": [
+            "Format Cards2 (card sends [ID n])",
+            "Parse Intent JSON3 ([ID n] -> get_empresa {id})",
+            "Build Search Log (revision T32-ficha-id)"
+          ],
+          "connections_changed": false
+        }
+      },
+      "isolation": "Worker: only staging flows call it in n8n; main (production base) has no reference; staging Laravel uses /embed only; get_empresa only called by CIRA Test",
+      "tests": {
+        "get_empresa_regression": "full names 406/406 identical; acronyms 33: live 30, candidate 31, 0 lost; by id 314/314 companies without chamber_empresa",
+        "search_empresas": "110/110 identical (candidate preview and live after deploy)",
+        "isolated_copy": "d8BbBdTzk8WzZhzv 11/11; rollback rehearsed; deleted",
+        "e2e_staging": "PASS desktop+Pixel5: card 177 opens profile; logs 127-140 get_empresa {id}; chamber_empresa 173 rows unchanged; evaluations 0"
+      },
+      "rollback": "n8n first: PUT %USERPROFILE%/.cpv/n8n_backups/zbVLoCdR09IA9yQK_2026-11-16_pre-t32b_ROLLBACK_body.json (c6c70402); then Worker: wrangler versions deploy 8796f292-5ee5-446b-98ce-7ae36099dde9@100%",
+      "report": "audit/CIRA_TASK0032_FASE_B_FICHA_EMPRESA.md"
     },
     "phase_c": "W1 NOT authorized; Worker stays 8796f292; no model change",
-    "db_mutations": "none beyond normal E2E usage (cira_search_log 111-126, votes 37-38, chat memory of test sessions)",
-    "next": "Publish PHASE_A_DEPLOYED_FOR_REVIEW on Issue #2; then phase B gate (isolation + exact-change coverage) before any deploy"
+    "db_mutations": "none beyond normal E2E usage (cira_search_log 111-140, votes 37-40, chat memory of test sessions); chamber_empresa and company data untouched",
+    "next": "Publish PHASE_B_DEPLOYED_FOR_REVIEW on Issue #2; STOP for owner manual UAT. W1 and production not authorized."
   },
   "task_0031_cira_latency_benchmark": {
     "task_id": "TASK-0031",
