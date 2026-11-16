@@ -25,6 +25,18 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-16 15:40Z: **TASK-0031** — CIRA: diagnóstico y benchmark aislado de latencia (sin deploy) — **IN_PROGRESS** (fuente `6920929114`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0031-cira-latency-benchmark.md`](tasks/0031-cira-latency-benchmark.md) |
+| Autoriza | Lectura, benchmarks acotados y pruebas en copias realmente aisladas; documentación |
+| No autoriza | Staging, producción, editar el flujo n8n activo, el Worker vivo o el modelo o prompt en vivo; `main`; DDL; escrituras masivas; logs, votos o evaluaciones reales |
+| BASE | `96943d3` |
+| Siguiente | Línea base viva y medición por tramo |
+
+TASK-0030: aceptación parcial de UX del propietario (`6920929114`: vistas excluyentes y estado vacío de «macolla»); **no es APPROVED global ni autoriza producción**.
+
 ## 2026-11-16 15:00Z: **TASK-0030** — CIRA: correcciones de la UAT de TASK-0029 (vistas excluyentes y diagnóstico de latencia), solo staging — ~~IN_PROGRESS~~ → **DEPLOYED_FOR_OWNER_UAT** (~15:15Z; fuente `6919847012`)
 
 | Campo | Valor |
