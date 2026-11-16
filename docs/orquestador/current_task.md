@@ -25,6 +25,17 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-16 10:50Z: **TASK-0029** — CIRA: implementar la alternativa B (capacidades / experiencias) y desplegarla en staging para UAT del propietario — **IN_PROGRESS** (fuente `6914028986`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0029-cira-alternative-b-staging.md`](tasks/0029-cira-alternative-b-staging.md) |
+| Autoriza | Implementar B; editar de forma controlada el flujo n8n de CIRA Test y el Worker; desplegar **solo en staging** tras los gates |
+| No autoriza | Producción, `main`, taxonomía, roles, datos de empresas, credenciales; regeneración masiva de `empresa_search_documents`, DDL o escrituras masivas en la BD compartida |
+| BASE | `d628d2f` |
+| Vivo al arrancar | Laravel staging `5e6e3fc`; Worker `1005d61f` (código `77ce273`); n8n `zbVLoCdR09IA9yQK` `bafd597a` |
+| Siguiente | Worker en rama propia con modo opcional de dos grupos, pruebas aisladas, versión de vista previa, luego n8n |
+
 ## 2026-11-16 10:10Z: **TASK-0028** — CIRA: auditoría de fuentes, ranking y separación de capacidades y experiencias — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~10:35Z; fuente `6913187637`)
 
 | Campo | Valor |
