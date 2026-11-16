@@ -25,6 +25,19 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-16 15:00Z: **TASK-0030** — CIRA: correcciones de la UAT de TASK-0029 (vistas excluyentes y diagnóstico de latencia), solo staging — **IN_PROGRESS** (fuente `6919847012`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0030-cira-t29-uat-corrections.md`](tasks/0030-cira-t29-uat-corrections.md) |
+| Autoriza | Corregir la presentación del flujo n8n de CIRA Test; ajustes compatibles del Worker solo si son necesarios y con aislamiento verificado; desplegar solo en staging tras preflight, respaldo, diff mínimo y rollback ensayado |
+| No autoriza | Producción, `main`, DDL, regeneración de `empresa_search_documents`, escrituras masivas, taxonomía, roles, datos de empresas, credenciales, kiosco, cambios de modelo o prompt |
+| BASE | `ac93eb6` |
+| Vivo al arrancar | Worker `8796f292`; n8n `d2f8efb5`; Laravel `5e6e3fc` |
+| Siguiente | Medir la latencia por tramo antes de cambiar nada |
+
+TASK-0029 queda en DEPLOYED_FOR_OWNER_UAT con CORRECTIONS_REQUIRED (`6919847012`); **no aprobada para producción**.
+
 ## 2026-11-16 10:50Z: **TASK-0029** — CIRA: implementar la alternativa B (capacidades / experiencias) y desplegarla en staging para UAT del propietario — ~~IN_PROGRESS~~ → **DEPLOYED_FOR_OWNER_UAT** (~11:30Z; fuente `6914028986`)
 
 | Campo | Valor |
