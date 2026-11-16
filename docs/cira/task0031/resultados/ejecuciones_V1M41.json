@@ -1,0 +1,8143 @@
+[
+ {
+  "id": "U01",
+  "input": "empresas de perforacion",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U01-r1-1794846335459",
+  "client_ms": 6576,
+  "status": 200,
+  "type": "results",
+  "output_len": 167083,
+  "error": null,
+  "at": "2026-11-16T16:25:35.459Z",
+  "exec": {
+   "execution": "22512",
+   "status": "success",
+   "total_ms": 6358,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 12,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 142,
+    "Build System Prompt": 13,
+    "Postgres Memory Intent3": 281,
+    "OpenAI Chat Model": 1879,
+    "Interactive Intent Agent3": 2453,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 3443,
+    "Unwrap MCP Result": 29,
+    "Build Search Log": 43,
+    "Log Search": 0,
+    "Attach Log Id": 51,
+    "If2": 1,
+    "Format Cards2": 50,
+    "Final Respond3": 1,
+    "Build Log": 50
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 52,
+    "total": 5038
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "perforacion",
+    "resolvedPhrases": [
+     "perforación"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 77,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 133,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 138,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 79,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 152,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 173,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 428,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 458,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 528,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 383,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 331,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 185,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 536,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 85,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 91,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 184,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U02",
+  "input": "balancin",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U02-r1-1794846342047",
+  "client_ms": 4921,
+  "status": 200,
+  "type": "results",
+  "output_len": 23524,
+  "error": null,
+  "at": "2026-11-16T16:25:42.047Z",
+  "exec": {
+   "execution": "22513",
+   "status": "success",
+   "total_ms": 4831,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 17,
+    "Admin Password": 1,
+    "Detect Command": 18,
+    "Is Command?": 1,
+    "Load Learnings": 31,
+    "Build System Prompt": 14,
+    "Postgres Memory Intent3": 138,
+    "OpenAI Chat Model": 1791,
+    "Interactive Intent Agent3": 2323,
+    "Parse Intent JSON3": 17,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2289,
+    "Unwrap MCP Result": 17,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 15,
+    "If2": 1,
+    "Format Cards2": 18,
+    "Final Respond3": 1,
+    "Build Log": 18
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 47,
+    "total": 5030
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "balancin",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 91,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U03",
+  "input": "macolla",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U03-r1-1794846346968",
+  "client_ms": 5681,
+  "status": 200,
+  "type": "results",
+  "output_len": 58971,
+  "error": null,
+  "at": "2026-11-16T16:25:46.968Z",
+  "exec": {
+   "execution": "22514",
+   "status": "success",
+   "total_ms": 5602,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 16,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 31,
+    "Build System Prompt": 12,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 2431,
+    "Interactive Intent Agent3": 3154,
+    "Parse Intent JSON3": 15,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2187,
+    "Unwrap MCP Result": 19,
+    "Build Search Log": 20,
+    "Log Search": 1,
+    "Attach Log Id": 27,
+    "If2": 4,
+    "Format Cards2": 34,
+    "Final Respond3": 2,
+    "Build Log": 32
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 5032,
+    "completion": 47,
+    "total": 5079
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "macolla",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 155,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 171,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 1,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 72,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 76,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 83,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 78,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 77,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 115,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 317,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 159,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 489,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 536,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U04",
+  "input": "gandola",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U04-r1-1794846352650",
+  "client_ms": 5856,
+  "status": 200,
+  "type": "results",
+  "output_len": 27328,
+  "error": null,
+  "at": "2026-11-16T16:25:52.650Z",
+  "exec": {
+   "execution": "22515",
+   "status": "success",
+   "total_ms": 5769,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 28,
+    "Admin Password": 3,
+    "Detect Command": 16,
+    "Is Command?": 2,
+    "Load Learnings": 31,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 134,
+    "OpenAI Chat Model": 2215,
+    "Interactive Intent Agent3": 2734,
+    "Parse Intent JSON3": 17,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2788,
+    "Unwrap MCP Result": 17,
+    "Build Search Log": 16,
+    "Log Search": 1,
+    "Attach Log Id": 18,
+    "If2": 1,
+    "Format Cards2": 29,
+    "Final Respond3": 2,
+    "Build Log": 20
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 53,
+    "total": 5037
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "gandola",
+    "resolvedPhrases": [
+     "gándola"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 165,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 204,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 426,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 452,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 563,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U01",
+  "input": "empresas de perforacion",
+  "rep": 2,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U01-r2-1794846358506",
+  "client_ms": 6613,
+  "status": 200,
+  "type": "results",
+  "output_len": 167083,
+  "error": null,
+  "at": "2026-11-16T16:25:58.506Z",
+  "exec": {
+   "execution": "22516",
+   "status": "success",
+   "total_ms": 6583,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 18,
+    "Is Command?": 2,
+    "Load Learnings": 37,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 165,
+    "OpenAI Chat Model": 2358,
+    "Interactive Intent Agent3": 2865,
+    "Parse Intent JSON3": 21,
+    "Is Search Ready?3": 4,
+    "Call MCP Empresas": 3248,
+    "Unwrap MCP Result": 46,
+    "Build Search Log": 39,
+    "Log Search": 1,
+    "Attach Log Id": 47,
+    "If2": 1,
+    "Format Cards2": 74,
+    "Final Respond3": 2,
+    "Build Log": 86
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 52,
+    "total": 5038
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "perforacion",
+    "resolvedPhrases": [
+     "perforación"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 77,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 133,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 138,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 79,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 152,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 173,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 428,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 458,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 528,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 383,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 331,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 185,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 536,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 85,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 91,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 184,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U02",
+  "input": "balancin",
+  "rep": 2,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U02-r2-1794846365119",
+  "client_ms": 4538,
+  "status": 200,
+  "type": "results",
+  "output_len": 23512,
+  "error": null,
+  "at": "2026-11-16T16:26:05.119Z",
+  "exec": {
+   "execution": "22517",
+   "status": "success",
+   "total_ms": 4318,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 41,
+    "Admin Password": 1,
+    "Detect Command": 37,
+    "Is Command?": 3,
+    "Load Learnings": 33,
+    "Build System Prompt": 171,
+    "Postgres Memory Intent3": 138,
+    "OpenAI Chat Model": 2277,
+    "Interactive Intent Agent3": 2857,
+    "Parse Intent JSON3": 25,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 805,
+    "Unwrap MCP Result": 17,
+    "Build Search Log": 24,
+    "Log Search": 0,
+    "Attach Log Id": 19,
+    "If2": 1,
+    "Format Cards2": 34,
+    "Final Respond3": 2,
+    "Build Log": 29
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 46,
+    "total": 5029
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "balancin",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 91,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U03",
+  "input": "macolla",
+  "rep": 2,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U03-r2-1794846369658",
+  "client_ms": 3755,
+  "status": 200,
+  "type": "results",
+  "output_len": 58925,
+  "error": null,
+  "at": "2026-11-16T16:26:09.658Z",
+  "exec": {
+   "execution": "22518",
+   "status": "success",
+   "total_ms": 3656,
+   "nodos_ms": {
+    "Webhook1": 2,
+    "Pre-Procesing3": 22,
+    "Admin Password": 1,
+    "Detect Command": 18,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 1845,
+    "Interactive Intent Agent3": 2303,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1093,
+    "Unwrap MCP Result": 15,
+    "Build Search Log": 18,
+    "Log Search": 1,
+    "Attach Log Id": 20,
+    "If2": 2,
+    "Format Cards2": 23,
+    "Final Respond3": 1,
+    "Build Log": 22
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 40,
+    "total": 5023
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "macolla",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 155,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 171,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 1,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 72,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 76,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 83,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 78,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 77,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 115,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 317,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 159,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 489,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 536,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U04",
+  "input": "gandola",
+  "rep": 2,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U04-r2-1794846373414",
+  "client_ms": 5173,
+  "status": 200,
+  "type": "results",
+  "output_len": 27314,
+  "error": null,
+  "at": "2026-11-16T16:26:13.414Z",
+  "exec": {
+   "execution": "22519",
+   "status": "success",
+   "total_ms": 5090,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 11,
+    "Admin Password": 1,
+    "Detect Command": 10,
+    "Is Command?": 0,
+    "Load Learnings": 29,
+    "Build System Prompt": 13,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 3567,
+    "Interactive Intent Agent3": 3857,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1033,
+    "Unwrap MCP Result": 15,
+    "Build Search Log": 14,
+    "Log Search": 0,
+    "Attach Log Id": 15,
+    "If2": 1,
+    "Format Cards2": 21,
+    "Final Respond3": 2,
+    "Build Log": 20
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 52,
+    "total": 5036
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "gandola",
+    "resolvedPhrases": [
+     "gándola"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 165,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 204,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 426,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 452,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 563,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U01",
+  "input": "empresas de perforacion",
+  "rep": 3,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U01-r3-1794846378587",
+  "client_ms": 4438,
+  "status": 200,
+  "type": "results",
+  "output_len": 167083,
+  "error": null,
+  "at": "2026-11-16T16:26:18.587Z",
+  "exec": {
+   "execution": "22520",
+   "status": "success",
+   "total_ms": 4355,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 12,
+    "Is Command?": 2,
+    "Load Learnings": 30,
+    "Build System Prompt": 16,
+    "Postgres Memory Intent3": 136,
+    "OpenAI Chat Model": 1920,
+    "Interactive Intent Agent3": 2540,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1439,
+    "Unwrap MCP Result": 27,
+    "Build Search Log": 37,
+    "Log Search": 0,
+    "Attach Log Id": 48,
+    "If2": 4,
+    "Format Cards2": 53,
+    "Final Respond3": 5,
+    "Build Log": 73
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 52,
+    "total": 5038
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "perforacion",
+    "resolvedPhrases": [
+     "perforación"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 77,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 133,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 138,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 79,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 152,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 173,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 428,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 458,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 528,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 383,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 331,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 185,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 536,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 85,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 91,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 184,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U02",
+  "input": "balancin",
+  "rep": 3,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U02-r3-1794846383025",
+  "client_ms": 3992,
+  "status": 200,
+  "type": "results",
+  "output_len": 23524,
+  "error": null,
+  "at": "2026-11-16T16:26:23.025Z",
+  "exec": {
+   "execution": "22521",
+   "status": "success",
+   "total_ms": 3874,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 15,
+    "Admin Password": 1,
+    "Detect Command": 16,
+    "Is Command?": 1,
+    "Load Learnings": 28,
+    "Build System Prompt": 32,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 2355,
+    "Interactive Intent Agent3": 3112,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 527,
+    "Unwrap MCP Result": 13,
+    "Build Search Log": 14,
+    "Log Search": 0,
+    "Attach Log Id": 16,
+    "If2": 1,
+    "Format Cards2": 19,
+    "Final Respond3": 1,
+    "Build Log": 20
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 47,
+    "total": 5030
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "balancin",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 91,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U03",
+  "input": "macolla",
+  "rep": 3,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U03-r3-1794846387018",
+  "client_ms": 3728,
+  "status": 200,
+  "type": "results",
+  "output_len": 58965,
+  "error": null,
+  "at": "2026-11-16T16:26:27.018Z",
+  "exec": {
+   "execution": "22522",
+   "status": "success",
+   "total_ms": 3643,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 11,
+    "Admin Password": 1,
+    "Detect Command": 15,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 132,
+    "OpenAI Chat Model": 2545,
+    "Interactive Intent Agent3": 2954,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 474,
+    "Unwrap MCP Result": 14,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 17,
+    "If2": 1,
+    "Format Cards2": 24,
+    "Final Respond3": 1,
+    "Build Log": 25
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 46,
+    "total": 5029
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "macolla",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 155,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 171,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 1,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 72,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 76,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 83,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 78,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 77,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 115,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 317,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 159,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 489,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 536,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "U04",
+  "input": "gandola",
+  "rep": 3,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-U04-r3-1794846390746",
+  "client_ms": 4111,
+  "status": 200,
+  "type": "results",
+  "output_len": 27328,
+  "error": null,
+  "at": "2026-11-16T16:26:30.746Z",
+  "exec": {
+   "execution": "22523",
+   "status": "success",
+   "total_ms": 4028,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 14,
+    "Admin Password": 0,
+    "Detect Command": 14,
+    "Is Command?": 1,
+    "Load Learnings": 28,
+    "Build System Prompt": 14,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 1645,
+    "Interactive Intent Agent3": 2016,
+    "Parse Intent JSON3": 17,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1797,
+    "Unwrap MCP Result": 18,
+    "Build Search Log": 19,
+    "Log Search": 1,
+    "Attach Log Id": 15,
+    "If2": 2,
+    "Format Cards2": 21,
+    "Final Respond3": 1,
+    "Build Log": 22
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 53,
+    "total": 5037
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "gandola",
+    "resolvedPhrases": [
+     "gandola"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 165,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 204,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 426,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 452,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 563,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L007",
+  "input": "operadores",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L007-r1-1794846394857",
+  "client_ms": 5086,
+  "status": 200,
+  "type": "results",
+  "output_len": 111969,
+  "error": null,
+  "at": "2026-11-16T16:26:34.857Z",
+  "exec": {
+   "execution": "22524",
+   "status": "success",
+   "total_ms": 5009,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 16,
+    "Is Command?": 2,
+    "Load Learnings": 29,
+    "Build System Prompt": 14,
+    "Postgres Memory Intent3": 131,
+    "OpenAI Chat Model": 1869,
+    "Interactive Intent Agent3": 2221,
+    "Parse Intent JSON3": 18,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2536,
+    "Unwrap MCP Result": 20,
+    "Build Search Log": 16,
+    "Log Search": 1,
+    "Attach Log Id": 24,
+    "If2": 1,
+    "Format Cards2": 31,
+    "Final Respond3": 2,
+    "Build Log": 28
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 45,
+    "total": 5028
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "operadores",
+    "queryIntent": "SECTOR",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 146,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 218,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 240,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 124,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 326,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 571,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 367,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 325,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 177,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 494,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 451,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 418,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 72,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 523,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 204,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 100,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 164,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 171,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 202,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 159,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 179,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 96,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 90,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L009",
+  "input": "tratamiento de aguas de perforación",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L009-r1-1794846399943",
+  "client_ms": 6118,
+  "status": 200,
+  "type": "results",
+  "output_len": 56834,
+  "error": null,
+  "at": "2026-11-16T16:26:39.943Z",
+  "exec": {
+   "execution": "22525",
+   "status": "success",
+   "total_ms": 6037,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 15,
+    "Is Command?": 1,
+    "Load Learnings": 28,
+    "Build System Prompt": 13,
+    "Postgres Memory Intent3": 132,
+    "OpenAI Chat Model": 2298,
+    "Interactive Intent Agent3": 3048,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2769,
+    "Unwrap MCP Result": 15,
+    "Build Search Log": 17,
+    "Log Search": 2,
+    "Attach Log Id": 22,
+    "If2": 1,
+    "Format Cards2": 24,
+    "Final Respond3": 2,
+    "Build Log": 26
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4988,
+    "completion": 62,
+    "total": 5050
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tratamiento de aguas de perforacion",
+    "resolvedPhrases": [
+     "tratamiento de aguas de perforación"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 79,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 77,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 152,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L010",
+  "input": "fabricantes de balancines",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L010-r1-1794846406061",
+  "client_ms": 4504,
+  "status": 200,
+  "type": "results",
+  "output_len": 9205,
+  "error": null,
+  "at": "2026-11-16T16:26:46.061Z",
+  "exec": {
+   "execution": "22526",
+   "status": "success",
+   "total_ms": 4408,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 12,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 28,
+    "Build System Prompt": 18,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 1905,
+    "Interactive Intent Agent3": 2334,
+    "Parse Intent JSON3": 20,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1861,
+    "Unwrap MCP Result": 15,
+    "Build Search Log": 19,
+    "Log Search": 0,
+    "Attach Log Id": 15,
+    "If2": 1,
+    "Format Cards2": 19,
+    "Final Respond3": 1,
+    "Build Log": 19
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4987,
+    "completion": 59,
+    "total": 5046
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "fabricantes de balancines",
+    "resolvedPhrases": [
+     "fabricantes de balancines"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L013",
+  "input": "levantamiento artificial",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L013-r1-1794846410565",
+  "client_ms": 5760,
+  "status": 200,
+  "type": "results",
+  "output_len": 19270,
+  "error": null,
+  "at": "2026-11-16T16:26:50.565Z",
+  "exec": {
+   "execution": "22527",
+   "status": "success",
+   "total_ms": 5678,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 17,
+    "Is Command?": 1,
+    "Load Learnings": 29,
+    "Build System Prompt": 16,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 2129,
+    "Interactive Intent Agent3": 2739,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2665,
+    "Unwrap MCP Result": 21,
+    "Build Search Log": 25,
+    "Log Search": 1,
+    "Attach Log Id": 30,
+    "If2": 8,
+    "Format Cards2": 30,
+    "Final Respond3": 2,
+    "Build Log": 27
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 52,
+    "total": 5036
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "levantamiento artificial",
+    "resolvedPhrases": [
+     "levantamiento artificial"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 383,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 276,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L014",
+  "input": "revestidor",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L014-r1-1794846416325",
+  "client_ms": 5305,
+  "status": 200,
+  "type": "results",
+  "output_len": 43466,
+  "error": null,
+  "at": "2026-11-16T16:26:56.325Z",
+  "exec": {
+   "execution": "22528",
+   "status": "success",
+   "total_ms": 5304,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 27,
+    "Admin Password": 0,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 28,
+    "Postgres Memory Intent3": 136,
+    "OpenAI Chat Model": 2244,
+    "Interactive Intent Agent3": 2704,
+    "Parse Intent JSON3": 17,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2169,
+    "Unwrap MCP Result": 19,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 18,
+    "If2": 1,
+    "Format Cards2": 25,
+    "Final Respond3": 2,
+    "Build Log": 181
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 55,
+    "total": 5039
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "revestidor",
+    "resolvedPhrases": [
+     "revestidor"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 317,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 145,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 141,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 91,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 81,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L015",
+  "input": "mecha",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L015-r1-1794846421630",
+  "client_ms": 5207,
+  "status": 200,
+  "type": "results",
+  "output_len": 78935,
+  "error": null,
+  "at": "2026-11-16T16:27:01.630Z",
+  "exec": {
+   "execution": "22529",
+   "status": "success",
+   "total_ms": 4621,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 21,
+    "Admin Password": 3,
+    "Detect Command": 24,
+    "Is Command?": 2,
+    "Load Learnings": 29,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 154,
+    "OpenAI Chat Model": 1546,
+    "Interactive Intent Agent3": 2140,
+    "Parse Intent JSON3": 23,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2169,
+    "Unwrap MCP Result": 27,
+    "Build Search Log": 21,
+    "Log Search": 0,
+    "Attach Log Id": 26,
+    "If2": 2,
+    "Format Cards2": 34,
+    "Final Respond3": 2,
+    "Build Log": 27
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 45,
+    "total": 5028
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "mecha",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 1,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 73,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 74,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 75,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 78,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 83,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 94,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 137,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 140,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 155,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 208,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 214,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 229,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 305,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 311,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 467,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 524,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 525,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 561,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L016",
+  "input": "cabria",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L016-r1-1794846426837",
+  "client_ms": 4845,
+  "status": 200,
+  "type": "results",
+  "output_len": 26899,
+  "error": null,
+  "at": "2026-11-16T16:27:06.837Z",
+  "exec": {
+   "execution": "22530",
+   "status": "success",
+   "total_ms": 4753,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 16,
+    "Admin Password": 1,
+    "Detect Command": 25,
+    "Is Command?": 1,
+    "Load Learnings": 31,
+    "Build System Prompt": 21,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 1672,
+    "Interactive Intent Agent3": 2092,
+    "Parse Intent JSON3": 15,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2409,
+    "Unwrap MCP Result": 14,
+    "Build Search Log": 18,
+    "Log Search": 0,
+    "Attach Log Id": 17,
+    "If2": 2,
+    "Format Cards2": 21,
+    "Final Respond3": 1,
+    "Build Log": 21
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 45,
+    "total": 5028
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "cabria",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 138,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 428,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L017",
+  "input": "cabrias",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L017-r1-1794846431682",
+  "client_ms": 4830,
+  "status": 200,
+  "type": "results",
+  "output_len": 26872,
+  "error": null,
+  "at": "2026-11-16T16:27:11.682Z",
+  "exec": {
+   "execution": "22531",
+   "status": "success",
+   "total_ms": 4731,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 15,
+    "Admin Password": 3,
+    "Detect Command": 29,
+    "Is Command?": 1,
+    "Load Learnings": 33,
+    "Build System Prompt": 21,
+    "Postgres Memory Intent3": 139,
+    "OpenAI Chat Model": 1995,
+    "Interactive Intent Agent3": 2603,
+    "Parse Intent JSON3": 19,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 1872,
+    "Unwrap MCP Result": 18,
+    "Build Search Log": 18,
+    "Log Search": 0,
+    "Attach Log Id": 17,
+    "If2": 2,
+    "Format Cards2": 20,
+    "Final Respond3": 2,
+    "Build Log": 19
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 42,
+    "total": 5025
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "cabrias",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 138,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 428,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L018",
+  "input": "mechurrio",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L018-r1-1794846436513",
+  "client_ms": 5308,
+  "status": 200,
+  "type": "results",
+  "output_len": 13963,
+  "error": null,
+  "at": "2026-11-16T16:27:16.513Z",
+  "exec": {
+   "execution": "22532",
+   "status": "success",
+   "total_ms": 5208,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 17,
+    "Admin Password": 1,
+    "Detect Command": 17,
+    "Is Command?": 2,
+    "Load Learnings": 31,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 2138,
+    "Interactive Intent Agent3": 2702,
+    "Parse Intent JSON3": 17,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2293,
+    "Unwrap MCP Result": 9,
+    "Build Search Log": 13,
+    "Log Search": 1,
+    "Attach Log Id": 17,
+    "If2": 1,
+    "Format Cards2": 21,
+    "Final Respond3": 1,
+    "Build Log": 16
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4985,
+    "completion": 46,
+    "total": 5031
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "mechurrio",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 140,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L019",
+  "input": "macolla",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L019-r1-1794846441821",
+  "client_ms": 5176,
+  "status": 200,
+  "type": "results",
+  "output_len": 58959,
+  "error": null,
+  "at": "2026-11-16T16:27:21.821Z",
+  "exec": {
+   "execution": "22533",
+   "status": "success",
+   "total_ms": 5099,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 0,
+    "Detect Command": 12,
+    "Is Command?": 0,
+    "Load Learnings": 28,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 138,
+    "OpenAI Chat Model": 1819,
+    "Interactive Intent Agent3": 2507,
+    "Parse Intent JSON3": 21,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2376,
+    "Unwrap MCP Result": 14,
+    "Build Search Log": 14,
+    "Log Search": 0,
+    "Attach Log Id": 17,
+    "If2": 1,
+    "Format Cards2": 22,
+    "Final Respond3": 2,
+    "Build Log": 25
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 46,
+    "total": 5029
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "macolla",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 155,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 171,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 1,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 72,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 76,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 83,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 78,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 77,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 115,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 317,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 159,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 489,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 536,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L020",
+  "input": "guaya fina",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L020-r1-1794846446997",
+  "client_ms": 5587,
+  "status": 200,
+  "type": "results",
+  "output_len": 17413,
+  "error": null,
+  "at": "2026-11-16T16:27:26.997Z",
+  "exec": {
+   "execution": "22534",
+   "status": "success",
+   "total_ms": 5492,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 12,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 29,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 132,
+    "OpenAI Chat Model": 1369,
+    "Interactive Intent Agent3": 1766,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 3519,
+    "Unwrap MCP Result": 13,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 15,
+    "If2": 1,
+    "Format Cards2": 18,
+    "Final Respond3": 1,
+    "Build Log": 21
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 53,
+    "total": 5037
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "guaya fina",
+    "resolvedPhrases": [
+     "guaya fina"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 458,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 198,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L021",
+  "input": "guaya eléctrica",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L021-r1-1794846452585",
+  "client_ms": 4666,
+  "status": 200,
+  "type": "results",
+  "output_len": 10023,
+  "error": null,
+  "at": "2026-11-16T16:27:32.585Z",
+  "exec": {
+   "execution": "22535",
+   "status": "success",
+   "total_ms": 4577,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 10,
+    "Admin Password": 1,
+    "Detect Command": 15,
+    "Is Command?": 1,
+    "Load Learnings": 27,
+    "Build System Prompt": 13,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 1675,
+    "Interactive Intent Agent3": 2186,
+    "Parse Intent JSON3": 22,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2197,
+    "Unwrap MCP Result": 12,
+    "Build Search Log": 13,
+    "Log Search": 0,
+    "Attach Log Id": 12,
+    "If2": 1,
+    "Format Cards2": 18,
+    "Final Respond3": 1,
+    "Build Log": 15
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 54,
+    "total": 5038
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "guaya electrica",
+    "resolvedPhrases": [
+     "guaya eléctrica"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 79,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L022",
+  "input": "balancín",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L022-r1-1794846457251",
+  "client_ms": 6161,
+  "status": 200,
+  "type": "results",
+  "output_len": 23511,
+  "error": null,
+  "at": "2026-11-16T16:27:37.251Z",
+  "exec": {
+   "execution": "22536",
+   "status": "success",
+   "total_ms": 6095,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 14,
+    "Is Command?": 1,
+    "Load Learnings": 28,
+    "Build System Prompt": 18,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 2844,
+    "Interactive Intent Agent3": 3274,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2608,
+    "Unwrap MCP Result": 15,
+    "Build Search Log": 19,
+    "Log Search": 0,
+    "Attach Log Id": 16,
+    "If2": 2,
+    "Format Cards2": 23,
+    "Final Respond3": 1,
+    "Build Log": 22
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 5033,
+    "completion": 47,
+    "total": 5080
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "balancin",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 91,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L023",
+  "input": "camión chupón",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L023-r1-1794846463412",
+  "client_ms": 5583,
+  "status": 200,
+  "type": "results",
+  "output_len": 8574,
+  "error": null,
+  "at": "2026-11-16T16:27:43.412Z",
+  "exec": {
+   "execution": "22537",
+   "status": "success",
+   "total_ms": 5489,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 12,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 31,
+    "Build System Prompt": 14,
+    "Postgres Memory Intent3": 134,
+    "OpenAI Chat Model": 2900,
+    "Interactive Intent Agent3": 3503,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1769,
+    "Unwrap MCP Result": 16,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 14,
+    "If2": 2,
+    "Format Cards2": 35,
+    "Final Respond3": 1,
+    "Build Log": 17
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 5046,
+    "completion": 55,
+    "total": 5101
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "camion chupon",
+    "resolvedPhrases": [
+     "camión chupón"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L024",
+  "input": "gandola",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L024-r1-1794846468995",
+  "client_ms": 4940,
+  "status": 200,
+  "type": "results",
+  "output_len": 27350,
+  "error": null,
+  "at": "2026-11-16T16:27:48.995Z",
+  "exec": {
+   "execution": "22538",
+   "status": "success",
+   "total_ms": 4850,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 11,
+    "Admin Password": 0,
+    "Detect Command": 14,
+    "Is Command?": 1,
+    "Load Learnings": 28,
+    "Build System Prompt": 14,
+    "Postgres Memory Intent3": 142,
+    "OpenAI Chat Model": 1666,
+    "Interactive Intent Agent3": 2094,
+    "Parse Intent JSON3": 15,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2531,
+    "Unwrap MCP Result": 16,
+    "Build Search Log": 23,
+    "Log Search": 0,
+    "Attach Log Id": 23,
+    "If2": 1,
+    "Format Cards2": 27,
+    "Final Respond3": 2,
+    "Build Log": 18
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 56,
+    "total": 5040
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "gandola",
+    "resolvedPhrases": [
+     "gándola"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 165,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 204,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 426,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 452,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 563,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L025",
+  "input": "mantenimiento de cabrias",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L025-r1-1794846473935",
+  "client_ms": 6493,
+  "status": 200,
+  "type": "results",
+  "output_len": 40171,
+  "error": null,
+  "at": "2026-11-16T16:27:53.935Z",
+  "exec": {
+   "execution": "22539",
+   "status": "success",
+   "total_ms": 6304,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 16,
+    "Admin Password": 1,
+    "Detect Command": 20,
+    "Is Command?": 1,
+    "Load Learnings": 33,
+    "Build System Prompt": 26,
+    "Postgres Memory Intent3": 136,
+    "OpenAI Chat Model": 2114,
+    "Interactive Intent Agent3": 2548,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 3264,
+    "Unwrap MCP Result": 35,
+    "Build Search Log": 38,
+    "Log Search": 1,
+    "Attach Log Id": 25,
+    "If2": 4,
+    "Format Cards2": 185,
+    "Final Respond3": 2,
+    "Build Log": 36
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 57,
+    "total": 5043
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "mantenimiento de cabrias",
+    "resolvedPhrases": [
+     "mantenimiento de cabrías"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 78,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 138,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 428,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L026",
+  "input": "fabricantes de cabrias",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L026-r1-1794846480428",
+  "client_ms": 4986,
+  "status": 200,
+  "type": "results",
+  "output_len": 28822,
+  "error": null,
+  "at": "2026-11-16T16:28:00.428Z",
+  "exec": {
+   "execution": "22540",
+   "status": "success",
+   "total_ms": 4918,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 35,
+    "Admin Password": 1,
+    "Detect Command": 30,
+    "Is Command?": 2,
+    "Load Learnings": 30,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 141,
+    "OpenAI Chat Model": 1847,
+    "Interactive Intent Agent3": 2338,
+    "Parse Intent JSON3": 38,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2151,
+    "Unwrap MCP Result": 21,
+    "Build Search Log": 19,
+    "Log Search": 0,
+    "Attach Log Id": 38,
+    "If2": 3,
+    "Format Cards2": 30,
+    "Final Respond3": 5,
+    "Build Log": 68
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 57,
+    "total": 5043
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "fabricantes de cabrias",
+    "resolvedPhrases": [
+     "fabricantes de cabrías"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 138,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 428,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L027",
+  "input": "transporte de gandolas",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L027-r1-1794846485414",
+  "client_ms": 5122,
+  "status": 200,
+  "type": "results",
+  "output_len": 23303,
+  "error": null,
+  "at": "2026-11-16T16:28:05.414Z",
+  "exec": {
+   "execution": "22541",
+   "status": "success",
+   "total_ms": 4965,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 45,
+    "Admin Password": 1,
+    "Detect Command": 24,
+    "Is Command?": 15,
+    "Load Learnings": 32,
+    "Build System Prompt": 20,
+    "Postgres Memory Intent3": 139,
+    "OpenAI Chat Model": 2634,
+    "Interactive Intent Agent3": 3146,
+    "Parse Intent JSON3": 18,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1441,
+    "Unwrap MCP Result": 28,
+    "Build Search Log": 25,
+    "Log Search": 0,
+    "Attach Log Id": 16,
+    "If2": 1,
+    "Format Cards2": 24,
+    "Final Respond3": 1,
+    "Build Log": 24
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 56,
+    "total": 5042
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "transporte de gandolas",
+    "resolvedPhrases": [
+     "transporte de gandolas"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 165,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 204,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 426,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 452,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 563,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L028",
+  "input": "alquiler de gandolas",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L028-r1-1794846490536",
+  "client_ms": 5077,
+  "status": 200,
+  "type": "results",
+  "output_len": 31450,
+  "error": null,
+  "at": "2026-11-16T16:28:10.536Z",
+  "exec": {
+   "execution": "22542",
+   "status": "success",
+   "total_ms": 4991,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 21,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 134,
+    "OpenAI Chat Model": 2343,
+    "Interactive Intent Agent3": 2846,
+    "Parse Intent JSON3": 12,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1891,
+    "Unwrap MCP Result": 15,
+    "Build Search Log": 19,
+    "Log Search": 1,
+    "Attach Log Id": 20,
+    "If2": 3,
+    "Format Cards2": 29,
+    "Final Respond3": 3,
+    "Build Log": 25
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 56,
+    "total": 5042
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "alquiler de gandolas",
+    "resolvedPhrases": [
+     "alquiler de gandolas"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 165,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 204,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 426,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 452,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 563,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 75,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 184,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L029",
+  "input": "mantenimiento de levantamiento artificial",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L029-r1-1794846495613",
+  "client_ms": 5045,
+  "status": 200,
+  "type": "results",
+  "output_len": 22375,
+  "error": null,
+  "at": "2026-11-16T16:28:15.613Z",
+  "exec": {
+   "execution": "22543",
+   "status": "success",
+   "total_ms": 4972,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 14,
+    "Is Command?": 1,
+    "Load Learnings": 29,
+    "Build System Prompt": 12,
+    "Postgres Memory Intent3": 134,
+    "OpenAI Chat Model": 1716,
+    "Interactive Intent Agent3": 2358,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2382,
+    "Unwrap MCP Result": 17,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 24,
+    "If2": 0,
+    "Format Cards2": 23,
+    "Final Respond3": 2,
+    "Build Log": 30
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4987,
+    "completion": 59,
+    "total": 5046
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "mantenimiento de levantamiento artificial",
+    "resolvedPhrases": [
+     "mantenimiento de levantamiento artificial"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 78,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 72,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L031",
+  "input": "servicios petroleros",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L031-r1-1794846500658",
+  "client_ms": 5414,
+  "status": 200,
+  "type": "results",
+  "output_len": 124147,
+  "error": null,
+  "at": "2026-11-16T16:28:20.658Z",
+  "exec": {
+   "execution": "22544",
+   "status": "success",
+   "total_ms": 5342,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 15,
+    "Is Command?": 1,
+    "Load Learnings": 29,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 2176,
+    "Interactive Intent Agent3": 2641,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2432,
+    "Unwrap MCP Result": 18,
+    "Build Search Log": 19,
+    "Log Search": 0,
+    "Attach Log Id": 31,
+    "If2": 1,
+    "Format Cards2": 34,
+    "Final Respond3": 1,
+    "Build Log": 34
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4985,
+    "completion": 52,
+    "total": 5037
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "servicios petroleros",
+    "resolvedPhrases": [
+     "servicios petroleros"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 207,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 276,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 110,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 355,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 451,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 298,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 536,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 508,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 152,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 198,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 85,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 178,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 204,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 361,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 164,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 82,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 155,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 78,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 177,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L032",
+  "input": "construcción",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L032-r1-1794846506072",
+  "client_ms": 6125,
+  "status": 200,
+  "type": "results",
+  "output_len": 416702,
+  "error": null,
+  "at": "2026-11-16T16:28:26.072Z",
+  "exec": {
+   "execution": "22545",
+   "status": "success",
+   "total_ms": 5993,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 12,
+    "Is Command?": 3,
+    "Load Learnings": 31,
+    "Build System Prompt": 22,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 1937,
+    "Interactive Intent Agent3": 2426,
+    "Parse Intent JSON3": 17,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 3177,
+    "Unwrap MCP Result": 37,
+    "Build Search Log": 32,
+    "Log Search": 0,
+    "Attach Log Id": 58,
+    "If2": 1,
+    "Format Cards2": 64,
+    "Final Respond3": 1,
+    "Build Log": 60
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 51,
+    "total": 5035
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "construccion",
+    "resolvedPhrases": [
+     "construcción"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 74,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 1,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 140,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 75,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 184,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 185,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 94,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 214,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 155,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 561,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 229,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 305,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 311,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 518,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 183,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 211,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 425,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 224,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 524,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 495,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 141,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 497,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 73,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 467,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 482,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 208,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 486,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 226,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 253,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 254,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 255,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 259,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 541,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 292,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 568,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 339,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 375,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 434,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 138,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 437,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 465,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 85,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 557,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 331,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 143,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 433,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 209,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 247,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 260,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 269,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 279,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 315,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 321,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 324,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 344,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 366,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 376,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 414,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 489,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 354,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 496,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 420,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 455,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 525,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 126,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 475,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 446,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 90,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 82,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 536,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 570,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 78,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 407,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 83,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 137,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 451,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 202,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L033",
+  "input": "tratamiento de aguas de perforación en el lago",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L033-r1-1794846512197",
+  "client_ms": 6750,
+  "status": 200,
+  "type": null,
+  "output_len": 0,
+  "error": null,
+  "at": "2026-11-16T16:28:32.198Z",
+  "exec": {
+   "execution": "22546",
+   "status": "success",
+   "total_ms": 6646,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 14,
+    "Admin Password": 0,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 29,
+    "Build System Prompt": 13,
+    "Postgres Memory Intent3": 132,
+    "OpenAI Chat Model": 3583,
+    "Interactive Intent Agent3": 4034,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2431,
+    "Unwrap MCP Result": 13,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 12,
+    "If2": 1,
+    "Code in JavaScript1": 14,
+    "Respond Conversation6": 0,
+    "Build Log": 16
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 5064,
+    "completion": 67,
+    "total": 5131
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tratamiento de aguas de perforacion",
+    "ciudad": "lago",
+    "resolvedPhrases": [
+     "tratamiento de aguas de perforación"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [],
+   "error": null
+  }
+ },
+ {
+  "id": "L034",
+  "input": "empresas que fabriquen y mantengan balancines",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L034-r1-1794846518948",
+  "client_ms": 4862,
+  "status": 200,
+  "type": "results",
+  "output_len": 9394,
+  "error": null,
+  "at": "2026-11-16T16:28:38.948Z",
+  "exec": {
+   "execution": "22547",
+   "status": "success",
+   "total_ms": 4776,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 0,
+    "Detect Command": 11,
+    "Is Command?": 1,
+    "Load Learnings": 29,
+    "Build System Prompt": 12,
+    "Postgres Memory Intent3": 134,
+    "OpenAI Chat Model": 2681,
+    "Interactive Intent Agent3": 3147,
+    "Parse Intent JSON3": 11,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1444,
+    "Unwrap MCP Result": 14,
+    "Build Search Log": 13,
+    "Log Search": 1,
+    "Attach Log Id": 14,
+    "If2": 1,
+    "Format Cards2": 17,
+    "Final Respond3": 1,
+    "Build Log": 16
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4992,
+    "completion": 70,
+    "total": 5062
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "que fabriquen y mantengan balancines",
+    "resolvedPhrases": [
+     "que fabriquen y mantengan balancines"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L035",
+  "input": "inspección y mantenimiento de guaya eléctrica",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L035-r1-1794846523810",
+  "client_ms": 5435,
+  "status": 200,
+  "type": "results",
+  "output_len": 27725,
+  "error": null,
+  "at": "2026-11-16T16:28:43.810Z",
+  "exec": {
+   "execution": "22548",
+   "status": "success",
+   "total_ms": 5353,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 10,
+    "Admin Password": 1,
+    "Detect Command": 12,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 134,
+    "OpenAI Chat Model": 2000,
+    "Interactive Intent Agent3": 2461,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2674,
+    "Unwrap MCP Result": 22,
+    "Build Search Log": 18,
+    "Log Search": 0,
+    "Attach Log Id": 22,
+    "If2": 2,
+    "Format Cards2": 24,
+    "Final Respond3": 1,
+    "Build Log": 23
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4990,
+    "completion": 69,
+    "total": 5059
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "inspeccion y mantenimiento de guaya electrica",
+    "resolvedPhrases": [
+     "inspección y mantenimiento de guaya eléctrica"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 78,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 74,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 193,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L036",
+  "input": "transporte de crudo por gandola",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L036-r1-1794846529245",
+  "client_ms": 4601,
+  "status": 200,
+  "type": "results",
+  "output_len": 9415,
+  "error": null,
+  "at": "2026-11-16T16:28:49.245Z",
+  "exec": {
+   "execution": "22549",
+   "status": "success",
+   "total_ms": 4517,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 16,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 2,
+    "Load Learnings": 28,
+    "Build System Prompt": 23,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 2029,
+    "Interactive Intent Agent3": 2494,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1805,
+    "Unwrap MCP Result": 16,
+    "Build Search Log": 15,
+    "Log Search": 1,
+    "Attach Log Id": 12,
+    "If2": 1,
+    "Format Cards2": 19,
+    "Final Respond3": 1,
+    "Build Log": 21
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4989,
+    "completion": 65,
+    "total": 5054
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "transporte de crudo por gandola",
+    "resolvedPhrases": [
+     "transporte de crudo por gandola"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 185,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L037",
+  "input": "pipeline",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L037-r1-1794846533846",
+  "client_ms": 4573,
+  "status": 200,
+  "type": "results",
+  "output_len": 71306,
+  "error": null,
+  "at": "2026-11-16T16:28:53.846Z",
+  "exec": {
+   "execution": "22550",
+   "status": "success",
+   "total_ms": 4511,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 2,
+    "Load Learnings": 37,
+    "Build System Prompt": 24,
+    "Postgres Memory Intent3": 132,
+    "OpenAI Chat Model": 1494,
+    "Interactive Intent Agent3": 2025,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2238,
+    "Unwrap MCP Result": 17,
+    "Build Search Log": 18,
+    "Log Search": 0,
+    "Attach Log Id": 19,
+    "If2": 1,
+    "Format Cards2": 27,
+    "Final Respond3": 1,
+    "Build Log": 29
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4982,
+    "completion": 42,
+    "total": 5024
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "pipeline",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 141,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 151,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 80,
+     "grupo": "capacidad",
+     "origen": "validated"
+    },
+    {
+     "id": 82,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 91,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 207,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 177,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 407,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 483,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 1,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L038",
+  "input": "refinery",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L038-r1-1794846538419",
+  "client_ms": 4751,
+  "status": 200,
+  "type": "results",
+  "output_len": 14390,
+  "error": null,
+  "at": "2026-11-16T16:28:58.419Z",
+  "exec": {
+   "execution": "22551",
+   "status": "success",
+   "total_ms": 4695,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 11,
+    "Admin Password": 0,
+    "Detect Command": 15,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 12,
+    "Postgres Memory Intent3": 195,
+    "OpenAI Chat Model": 1684,
+    "Interactive Intent Agent3": 2201,
+    "Parse Intent JSON3": 26,
+    "Is Search Ready?3": 4,
+    "Call MCP Empresas": 2108,
+    "Unwrap MCP Result": 30,
+    "Build Search Log": 29,
+    "Log Search": 1,
+    "Attach Log Id": 22,
+    "If2": 1,
+    "Format Cards2": 97,
+    "Final Respond3": 5,
+    "Build Log": 65
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 52,
+    "total": 5035
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "refinery",
+    "resolvedPhrases": [
+     "refinery"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L039",
+  "input": "refinería",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L039-r1-1794846543170",
+  "client_ms": 10652,
+  "status": 200,
+  "type": "results",
+  "output_len": 76134,
+  "error": null,
+  "at": "2026-11-16T16:29:03.170Z",
+  "exec": {
+   "execution": "22552",
+   "status": "success",
+   "total_ms": 10483,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 34,
+    "Admin Password": 58,
+    "Detect Command": 35,
+    "Is Command?": 1,
+    "Load Learnings": 37,
+    "Build System Prompt": 20,
+    "Postgres Memory Intent3": 190,
+    "OpenAI Chat Model": 2183,
+    "Interactive Intent Agent3": 2829,
+    "Parse Intent JSON3": 20,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 7267,
+    "Unwrap MCP Result": 20,
+    "Build Search Log": 15,
+    "Log Search": 1,
+    "Attach Log Id": 24,
+    "If2": 1,
+    "Format Cards2": 28,
+    "Final Respond3": 1,
+    "Build Log": 27
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 54,
+    "total": 5038
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "refineria",
+    "resolvedPhrases": [
+     "refinería"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 85,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 83,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 90,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 523,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 480,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 140,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 159,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 125,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 96,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 202,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 91,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 134,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 78,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 157,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 155,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 487,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L040",
+  "input": "drilling",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L040-r1-1794846553822",
+  "client_ms": 5619,
+  "status": 200,
+  "type": "results",
+  "output_len": 138747,
+  "error": null,
+  "at": "2026-11-16T16:29:13.822Z",
+  "exec": {
+   "execution": "22553",
+   "status": "success",
+   "total_ms": 5551,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 10,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 144,
+    "Build System Prompt": 22,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 2054,
+    "Interactive Intent Agent3": 2447,
+    "Parse Intent JSON3": 17,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2727,
+    "Unwrap MCP Result": 20,
+    "Build Search Log": 20,
+    "Log Search": 0,
+    "Attach Log Id": 25,
+    "If2": 1,
+    "Format Cards2": 33,
+    "Final Respond3": 1,
+    "Build Log": 40
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4983,
+    "completion": 49,
+    "total": 5032
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "drilling",
+    "resolvedPhrases": [
+     "drilling"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 138,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 428,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 77,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 79,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 133,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 173,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 152,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 528,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 331,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 458,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 383,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 140,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 229,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 193,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L041",
+  "input": "necesito arbolitos para pozos petroleros",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L041-r1-1794846559441",
+  "client_ms": 4601,
+  "status": 200,
+  "type": "results",
+  "output_len": 9374,
+  "error": null,
+  "at": "2026-11-16T16:29:19.441Z",
+  "exec": {
+   "execution": "22554",
+   "status": "success",
+   "total_ms": 4511,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 10,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 12,
+    "Postgres Memory Intent3": 131,
+    "OpenAI Chat Model": 2120,
+    "Interactive Intent Agent3": 2557,
+    "Parse Intent JSON3": 11,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1751,
+    "Unwrap MCP Result": 15,
+    "Build Search Log": 22,
+    "Log Search": 0,
+    "Attach Log Id": 12,
+    "If2": 1,
+    "Format Cards2": 18,
+    "Final Respond3": 1,
+    "Build Log": 24
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4992,
+    "completion": 70,
+    "total": 5062
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "arbolitos para pozos petroleros",
+    "resolvedPhrases": [
+     "arbolitos para pozos petroleros"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L042",
+  "input": "venta de zapatos",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L042-r1-1794846564042",
+  "client_ms": 4201,
+  "status": 200,
+  "type": null,
+  "output_len": 0,
+  "error": null,
+  "at": "2026-11-16T16:29:24.042Z",
+  "exec": {
+   "execution": "22555",
+   "status": "success",
+   "total_ms": 4117,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 31,
+    "Build System Prompt": 14,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 1809,
+    "Interactive Intent Agent3": 2306,
+    "Parse Intent JSON3": 11,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1640,
+    "Unwrap MCP Result": 11,
+    "Build Search Log": 12,
+    "Log Search": 0,
+    "Attach Log Id": 11,
+    "If2": 1,
+    "Code in JavaScript1": 12,
+    "Respond Conversation6": 1,
+    "Build Log": 13
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 50,
+    "total": 5034
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "venta de zapatos",
+    "resolvedPhrases": [
+     "venta de zapatos"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [],
+   "error": null
+  }
+ },
+ {
+  "id": "L053",
+  "input": "gandolas",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L053-r1-1794846568243",
+  "client_ms": 6183,
+  "status": 200,
+  "type": "results",
+  "output_len": 27275,
+  "error": null,
+  "at": "2026-11-16T16:29:28.243Z",
+  "exec": {
+   "execution": "22556",
+   "status": "success",
+   "total_ms": 6103,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 9,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 138,
+    "OpenAI Chat Model": 2546,
+    "Interactive Intent Agent3": 2945,
+    "Parse Intent JSON3": 15,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2939,
+    "Unwrap MCP Result": 16,
+    "Build Search Log": 23,
+    "Log Search": 0,
+    "Attach Log Id": 17,
+    "If2": 1,
+    "Format Cards2": 21,
+    "Final Respond3": 1,
+    "Build Log": 25
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 52,
+    "total": 5036
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "gandolas",
+    "resolvedPhrases": [
+     "gándolas"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 165,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 204,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 426,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 452,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 563,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L054",
+  "input": "servicios de pozos",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L054-r1-1794846574426",
+  "client_ms": 5031,
+  "status": 200,
+  "type": "results",
+  "output_len": 138465,
+  "error": null,
+  "at": "2026-11-16T16:29:34.426Z",
+  "exec": {
+   "execution": "22557",
+   "status": "success",
+   "total_ms": 4960,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 14,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 132,
+    "OpenAI Chat Model": 2020,
+    "Interactive Intent Agent3": 2509,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2155,
+    "Unwrap MCP Result": 26,
+    "Build Search Log": 20,
+    "Log Search": 0,
+    "Attach Log Id": 35,
+    "If2": 1,
+    "Format Cards2": 45,
+    "Final Respond3": 2,
+    "Build Log": 43
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 57,
+    "total": 5043
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "servicios de pozos",
+    "resolvedPhrases": [
+     "servicios de pozos"
+    ],
+    "queryIntent": "SECTOR",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 152,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 133,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 528,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 79,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 77,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 178,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 128,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 313,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 383,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 276,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 451,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 472,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 296,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 371,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 389,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 490,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 435,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 386,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 413,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 307,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 484,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 285,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 408,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 533,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 355,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 492,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 173,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L056",
+  "input": "Servicios a Pozos",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L056-r1-1794846579457",
+  "client_ms": 5558,
+  "status": 200,
+  "type": "results",
+  "output_len": 245828,
+  "error": null,
+  "at": "2026-11-16T16:29:39.457Z",
+  "exec": {
+   "execution": "22558",
+   "status": "success",
+   "total_ms": 5429,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 16,
+    "Admin Password": 0,
+    "Detect Command": 18,
+    "Is Command?": 1,
+    "Load Learnings": 31,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 134,
+    "OpenAI Chat Model": 1853,
+    "Interactive Intent Agent3": 2402,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2706,
+    "Unwrap MCP Result": 24,
+    "Build Search Log": 25,
+    "Log Search": 0,
+    "Attach Log Id": 42,
+    "If2": 1,
+    "Format Cards2": 45,
+    "Final Respond3": 2,
+    "Build Log": 43
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4985,
+    "completion": 47,
+    "total": 5032
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "servicios a pozos",
+    "queryIntent": "SECTOR",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 528,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 133,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 178,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 79,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 371,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 152,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 386,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 472,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 435,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 408,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 533,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 296,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 77,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 285,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 389,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 307,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 413,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 198,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 490,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 484,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 372,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 492,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 458,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 523,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 547,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 549,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 536,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 173,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 405,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 483,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 128,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 276,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 383,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 313,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 451,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 355,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 110,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 207,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 494,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L058",
+  "input": "sistemas fotovoltaicos",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L058-r1-1794846585016",
+  "client_ms": 5917,
+  "status": 200,
+  "type": "results",
+  "output_len": 19042,
+  "error": null,
+  "at": "2026-11-16T16:29:45.016Z",
+  "exec": {
+   "execution": "22559",
+   "status": "success",
+   "total_ms": 5823,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 12,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 35,
+    "Postgres Memory Intent3": 131,
+    "OpenAI Chat Model": 2695,
+    "Interactive Intent Agent3": 3153,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2452,
+    "Unwrap MCP Result": 15,
+    "Build Search Log": 11,
+    "Log Search": 0,
+    "Attach Log Id": 14,
+    "If2": 1,
+    "Format Cards2": 17,
+    "Final Respond3": 1,
+    "Build Log": 17
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 59,
+    "total": 5045
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "sistemas fotovoltaicos",
+    "resolvedPhrases": [
+     "sistemas fotovoltaicos"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 82,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 126,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L059",
+  "input": "Expansores",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L059-r1-1794846590933",
+  "client_ms": 10373,
+  "status": 200,
+  "type": "results",
+  "output_len": 101353,
+  "error": null,
+  "at": "2026-11-16T16:29:50.933Z",
+  "exec": {
+   "execution": "22560",
+   "status": "success",
+   "total_ms": 10766,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 12,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 29,
+    "Build System Prompt": 12,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 2788,
+    "Interactive Intent Agent3": 3206,
+    "Parse Intent JSON3": 26,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 6757,
+    "Unwrap MCP Result": 55,
+    "Build Search Log": 34,
+    "Log Search": 0,
+    "Attach Log Id": 34,
+    "If2": 2,
+    "Format Cards2": 47,
+    "Final Respond3": 2,
+    "Build Log": 456
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 53,
+    "total": 5037
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "expansores",
+    "resolvedPhrases": [
+     "expansores"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 86,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 81,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 91,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 88,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 134,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 112,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 141,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 249,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 194,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 207,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 300,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 332,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 193,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 317,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L060",
+  "input": "Partes y Repuestos de Compresores",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L060-r1-1794846601306",
+  "client_ms": 9509,
+  "status": 200,
+  "type": "results",
+  "output_len": 165465,
+  "error": null,
+  "at": "2026-11-16T16:30:01.306Z",
+  "exec": {
+   "execution": "22561",
+   "status": "success",
+   "total_ms": 8029,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 41,
+    "Admin Password": 1,
+    "Detect Command": 49,
+    "Is Command?": 2,
+    "Load Learnings": 157,
+    "Build System Prompt": 19,
+    "Postgres Memory Intent3": 182,
+    "OpenAI Chat Model": 2296,
+    "Interactive Intent Agent3": 3652,
+    "Parse Intent JSON3": 104,
+    "Is Search Ready?3": 4,
+    "Call MCP Empresas": 3440,
+    "Unwrap MCP Result": 38,
+    "Build Search Log": 60,
+    "Log Search": 0,
+    "Attach Log Id": 75,
+    "If2": 3,
+    "Format Cards2": 114,
+    "Final Respond3": 4,
+    "Build Log": 173
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4990,
+    "completion": 68,
+    "total": 5058
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "partes y repuestos de compresores",
+    "resolvedPhrases": [
+     "Partes y Repuestos de Compresores"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 112,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 110,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 83,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 88,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 78,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 82,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "validated"
+    },
+    {
+     "id": 134,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 141,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 166,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 332,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 137,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 300,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 494,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 194,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 525,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 401,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 313,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 193,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 317,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 480,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 80,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 163,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 213,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L061",
+  "input": "Empresas que realizan ingeniería FEED",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L061-r1-1794846610815",
+  "client_ms": 5635,
+  "status": 200,
+  "type": "results",
+  "output_len": 10774,
+  "error": null,
+  "at": "2026-11-16T16:30:10.815Z",
+  "exec": {
+   "execution": "22562",
+   "status": "success",
+   "total_ms": 5524,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 234,
+    "Admin Password": 0,
+    "Detect Command": 169,
+    "Is Command?": 1,
+    "Load Learnings": 77,
+    "Build System Prompt": 29,
+    "Postgres Memory Intent3": 275,
+    "OpenAI Chat Model": 1885,
+    "Interactive Intent Agent3": 2628,
+    "Parse Intent JSON3": 20,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 1977,
+    "Unwrap MCP Result": 22,
+    "Build Search Log": 25,
+    "Log Search": 0,
+    "Attach Log Id": 20,
+    "If2": 1,
+    "Format Cards2": 27,
+    "Final Respond3": 2,
+    "Build Log": 43
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4988,
+    "completion": 56,
+    "total": 5044
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "ingenieria feed",
+    "resolvedPhrases": [
+     "ingeniería FEED"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L062",
+  "input": "ingenieria de procesos",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L062-r1-1794846616450",
+  "client_ms": 7537,
+  "status": 200,
+  "type": "results",
+  "output_len": 113145,
+  "error": null,
+  "at": "2026-11-16T16:30:16.450Z",
+  "exec": {
+   "execution": "22563",
+   "status": "success",
+   "total_ms": 7443,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 17,
+    "Admin Password": 3,
+    "Detect Command": 22,
+    "Is Command?": 2,
+    "Load Learnings": 32,
+    "Build System Prompt": 39,
+    "Postgres Memory Intent3": 159,
+    "OpenAI Chat Model": 1975,
+    "Interactive Intent Agent3": 2892,
+    "Parse Intent JSON3": 29,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 4074,
+    "Unwrap MCP Result": 37,
+    "Build Search Log": 49,
+    "Log Search": 1,
+    "Attach Log Id": 90,
+    "If2": 1,
+    "Format Cards2": 45,
+    "Final Respond3": 2,
+    "Build Log": 55
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 56,
+    "total": 5042
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "ingenieria de procesos",
+    "resolvedPhrases": [
+     "ingeniería de procesos"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 94,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 480,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 359,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 110,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 112,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 159,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 560,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 166,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 137,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 134,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 483,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 561,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 74,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 383,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 313,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 90,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 523,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 487,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 163,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L063",
+  "input": "IPC",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L063-r1-1794846623987",
+  "client_ms": 5757,
+  "status": 200,
+  "type": "results",
+  "output_len": 116700,
+  "error": null,
+  "at": "2026-11-16T16:30:23.987Z",
+  "exec": {
+   "execution": "22564",
+   "status": "success",
+   "total_ms": 5599,
+   "nodos_ms": {
+    "Webhook1": 2,
+    "Pre-Procesing3": 26,
+    "Admin Password": 1,
+    "Detect Command": 15,
+    "Is Command?": 2,
+    "Load Learnings": 31,
+    "Build System Prompt": 19,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 1860,
+    "Interactive Intent Agent3": 2404,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2802,
+    "Unwrap MCP Result": 26,
+    "Build Search Log": 25,
+    "Log Search": 14,
+    "Attach Log Id": 44,
+    "If2": 2,
+    "Format Cards2": 41,
+    "Final Respond3": 3,
+    "Build Log": 45
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4982,
+    "completion": 48,
+    "total": 5030
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "ipc",
+    "resolvedPhrases": [
+     "IPC"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 288,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 354,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 526,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 433,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 90,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 82,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 73,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 94,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 75,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 525,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 407,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 229,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 560,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 140,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 137,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 177,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 214,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 171,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L064",
+  "input": "mechas de perforacion",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L064-r1-1794846629744",
+  "client_ms": 5442,
+  "status": 200,
+  "type": "results",
+  "output_len": 21742,
+  "error": null,
+  "at": "2026-11-16T16:30:29.744Z",
+  "exec": {
+   "execution": "22565",
+   "status": "success",
+   "total_ms": 5324,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 19,
+    "Is Command?": 1,
+    "Load Learnings": 33,
+    "Build System Prompt": 22,
+    "Postgres Memory Intent3": 134,
+    "OpenAI Chat Model": 2087,
+    "Interactive Intent Agent3": 2627,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2463,
+    "Unwrap MCP Result": 12,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 16,
+    "If2": 1,
+    "Format Cards2": 24,
+    "Final Respond3": 1,
+    "Build Log": 18
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 56,
+    "total": 5042
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "mechas de perforacion",
+    "resolvedPhrases": [
+     "mechas de perforación"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 138,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L067",
+  "input": "empresas de mantenimiento de bombas",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L067-r1-1794846635187",
+  "client_ms": 5733,
+  "status": 200,
+  "type": "results",
+  "output_len": 93227,
+  "error": null,
+  "at": "2026-11-16T16:30:35.187Z",
+  "exec": {
+   "execution": "22566",
+   "status": "success",
+   "total_ms": 5642,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 15,
+    "Admin Password": 1,
+    "Detect Command": 15,
+    "Is Command?": 1,
+    "Load Learnings": 31,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 2477,
+    "Interactive Intent Agent3": 3004,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2352,
+    "Unwrap MCP Result": 18,
+    "Build Search Log": 20,
+    "Log Search": 0,
+    "Attach Log Id": 32,
+    "If2": 1,
+    "Format Cards2": 37,
+    "Final Respond3": 1,
+    "Build Log": 33
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4987,
+    "completion": 55,
+    "total": 5042
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "mantenimiento de bombas",
+    "resolvedPhrases": [
+     "mantenimiento de bombas"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 73,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 94,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 78,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 75,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 74,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 140,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 155,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 382,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 480,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 487,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 433,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 177,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 317,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 126,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 76,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L068",
+  "input": "servicios de perforación de pozos",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L068-r1-1794846640920",
+  "client_ms": 6195,
+  "status": 200,
+  "type": "results",
+  "output_len": 103276,
+  "error": null,
+  "at": "2026-11-16T16:30:40.920Z",
+  "exec": {
+   "execution": "22567",
+   "status": "success",
+   "total_ms": 6107,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 15,
+    "Admin Password": 1,
+    "Detect Command": 16,
+    "Is Command?": 2,
+    "Load Learnings": 32,
+    "Build System Prompt": 20,
+    "Postgres Memory Intent3": 143,
+    "OpenAI Chat Model": 1965,
+    "Interactive Intent Agent3": 2471,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 3346,
+    "Unwrap MCP Result": 25,
+    "Build Search Log": 21,
+    "Log Search": 0,
+    "Attach Log Id": 24,
+    "If2": 1,
+    "Format Cards2": 36,
+    "Final Respond3": 2,
+    "Build Log": 43
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4989,
+    "completion": 64,
+    "total": 5053
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "servicios de perforacion de pozos",
+    "resolvedPhrases": [
+     "servicios de perforación de pozos"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 152,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 133,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 77,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 458,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 528,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 312,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 79,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 173,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 383,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 85,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 536,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L069",
+  "input": "manejo de fuidos de perforacion",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L069-r1-1794846647115",
+  "client_ms": 5840,
+  "status": 200,
+  "type": "results",
+  "output_len": 70259,
+  "error": null,
+  "at": "2026-11-16T16:30:47.115Z",
+  "exec": {
+   "execution": "22568",
+   "status": "success",
+   "total_ms": 5741,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 11,
+    "Admin Password": 0,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 32,
+    "Build System Prompt": 20,
+    "Postgres Memory Intent3": 138,
+    "OpenAI Chat Model": 2347,
+    "Interactive Intent Agent3": 2811,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2698,
+    "Unwrap MCP Result": 17,
+    "Build Search Log": 19,
+    "Log Search": 1,
+    "Attach Log Id": 19,
+    "If2": 1,
+    "Format Cards2": 25,
+    "Final Respond3": 1,
+    "Build Log": 23
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4989,
+    "completion": 66,
+    "total": 5055
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "manejo de fuidos de perforacion",
+    "resolvedPhrases": [
+     "manejo de fluidos de perforacion"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 173,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 182,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 79,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 170,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 77,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 91,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L070",
+  "input": "manejo de aguas residuales",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L070-r1-1794846652955",
+  "client_ms": 5084,
+  "status": 200,
+  "type": "results",
+  "output_len": 48998,
+  "error": null,
+  "at": "2026-11-16T16:30:52.955Z",
+  "exec": {
+   "execution": "22569",
+   "status": "success",
+   "total_ms": 4998,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 136,
+    "OpenAI Chat Model": 1636,
+    "Interactive Intent Agent3": 2127,
+    "Parse Intent JSON3": 15,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2638,
+    "Unwrap MCP Result": 18,
+    "Build Search Log": 22,
+    "Log Search": 0,
+    "Attach Log Id": 20,
+    "If2": 2,
+    "Format Cards2": 24,
+    "Final Respond3": 1,
+    "Build Log": 22
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4987,
+    "completion": 60,
+    "total": 5047
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "manejo de aguas residuales",
+    "resolvedPhrases": [
+     "manejo de aguas residuales"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 72,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 331,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 96,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 313,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 179,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 173,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 74,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L071",
+  "input": "Tuberia octg",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L071-r1-1794846658039",
+  "client_ms": 7035,
+  "status": 200,
+  "type": "results",
+  "output_len": 7308,
+  "error": null,
+  "at": "2026-11-16T16:30:58.039Z",
+  "exec": {
+   "execution": "22570",
+   "status": "success",
+   "total_ms": 6953,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 18,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 313,
+    "OpenAI Chat Model": 3337,
+    "Interactive Intent Agent3": 4044,
+    "Parse Intent JSON3": 43,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2645,
+    "Unwrap MCP Result": 14,
+    "Build Search Log": 17,
+    "Log Search": 0,
+    "Attach Log Id": 15,
+    "If2": 2,
+    "Format Cards2": 21,
+    "Final Respond3": 2,
+    "Build Log": 32
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 59,
+    "total": 5045
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tuberia octg",
+    "resolvedPhrases": [
+     "tubería octg"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L072",
+  "input": "Valvulas de bola",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L072-r1-1794846665074",
+  "client_ms": 5117,
+  "status": 200,
+  "type": "results",
+  "output_len": 31037,
+  "error": null,
+  "at": "2026-11-16T16:31:05.074Z",
+  "exec": {
+   "execution": "22571",
+   "status": "success",
+   "total_ms": 5020,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 14,
+    "Is Command?": 1,
+    "Load Learnings": 50,
+    "Build System Prompt": 20,
+    "Postgres Memory Intent3": 168,
+    "OpenAI Chat Model": 1611,
+    "Interactive Intent Agent3": 2202,
+    "Parse Intent JSON3": 22,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2553,
+    "Unwrap MCP Result": 15,
+    "Build Search Log": 18,
+    "Log Search": 0,
+    "Attach Log Id": 20,
+    "If2": 3,
+    "Format Cards2": 24,
+    "Final Respond3": 1,
+    "Build Log": 24
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 59,
+    "total": 5045
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "valvulas de bola",
+    "resolvedPhrases": [
+     "válvulas de bola"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 573,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 80,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 560,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 487,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "L073",
+  "input": "balacines",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-L073-r1-1794846670192",
+  "client_ms": 11114,
+  "status": 200,
+  "type": "results",
+  "output_len": 22819,
+  "error": null,
+  "at": "2026-11-16T16:31:10.192Z",
+  "exec": {
+   "execution": "22572",
+   "status": "success",
+   "total_ms": 11037,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 30,
+    "Is Command?": 1,
+    "Load Learnings": 33,
+    "Build System Prompt": 42,
+    "Postgres Memory Intent3": 136,
+    "OpenAI Chat Model": 1898,
+    "Interactive Intent Agent3": 3203,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 7496,
+    "Unwrap MCP Result": 20,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 22,
+    "If2": 2,
+    "Format Cards2": 55,
+    "Final Respond3": 1,
+    "Build Log": 42
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4984,
+    "completion": 54,
+    "total": 5038
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "balacines",
+    "resolvedPhrases": [
+     "balancines"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 91,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "S001",
+  "input": "venta de balancines",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-S001-r1-1794846681306",
+  "client_ms": 7838,
+  "status": 200,
+  "type": "results",
+  "output_len": 12716,
+  "error": null,
+  "at": "2026-11-16T16:31:21.306Z",
+  "exec": {
+   "execution": "22573",
+   "status": "success",
+   "total_ms": 7631,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 20,
+    "Admin Password": 1,
+    "Detect Command": 17,
+    "Is Command?": 1,
+    "Load Learnings": 153,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 134,
+    "OpenAI Chat Model": 2067,
+    "Interactive Intent Agent3": 3849,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 3415,
+    "Unwrap MCP Result": 14,
+    "Build Search Log": 17,
+    "Log Search": 0,
+    "Attach Log Id": 16,
+    "If2": 1,
+    "Format Cards2": 19,
+    "Final Respond3": 1,
+    "Build Log": 28
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4986,
+    "completion": 56,
+    "total": 5042
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "venta de balancines",
+    "resolvedPhrases": [
+     "venta de balancines"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "S002",
+  "input": "mantenimiento de balancines",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-S002-r1-1794846689144",
+  "client_ms": 10370,
+  "status": 200,
+  "type": "results",
+  "output_len": 56309,
+  "error": null,
+  "at": "2026-11-16T16:31:29.144Z",
+  "exec": {
+   "execution": "22574",
+   "status": "success",
+   "total_ms": 10265,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 20,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 2,
+    "Load Learnings": 34,
+    "Build System Prompt": 42,
+    "Postgres Memory Intent3": 132,
+    "OpenAI Chat Model": 3149,
+    "Interactive Intent Agent3": 5220,
+    "Parse Intent JSON3": 23,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 4766,
+    "Unwrap MCP Result": 18,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 18,
+    "If2": 0,
+    "Format Cards2": 25,
+    "Final Respond3": 1,
+    "Build Log": 25
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4987,
+    "completion": 61,
+    "total": 5048
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "mantenimiento de balancines",
+    "resolvedPhrases": [
+     "mantenimiento de balancines"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    },
+    {
+     "id": 74,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 73,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 94,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 75,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 78,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "S003",
+  "input": "sellado de fluidos en balancines",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-S003-r1-1794846699515",
+  "client_ms": 7858,
+  "status": 200,
+  "type": "results",
+  "output_len": 14033,
+  "error": null,
+  "at": "2026-11-16T16:31:39.515Z",
+  "exec": {
+   "execution": "22575",
+   "status": "success",
+   "total_ms": 7774,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 15,
+    "Admin Password": 2,
+    "Detect Command": 14,
+    "Is Command?": 2,
+    "Load Learnings": 137,
+    "Build System Prompt": 14,
+    "Postgres Memory Intent3": 137,
+    "OpenAI Chat Model": 2171,
+    "Interactive Intent Agent3": 3802,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 3599,
+    "Unwrap MCP Result": 13,
+    "Build Search Log": 25,
+    "Log Search": 0,
+    "Attach Log Id": 34,
+    "If2": 1,
+    "Format Cards2": 42,
+    "Final Respond3": 1,
+    "Build Log": 25
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4990,
+    "completion": 70,
+    "total": 5060
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "sellado de fluidos en balancines",
+    "resolvedPhrases": [
+     "sellado de fluidos en balancines"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 91,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "S004",
+  "input": "limpieza de balancines",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-S004-r1-1794846707373",
+  "client_ms": 7484,
+  "status": 200,
+  "type": "results",
+  "output_len": 17131,
+  "error": null,
+  "at": "2026-11-16T16:31:47.373Z",
+  "exec": {
+   "execution": "22576",
+   "status": "success",
+   "total_ms": 7398,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 16,
+    "Admin Password": 1,
+    "Detect Command": 15,
+    "Is Command?": 3,
+    "Load Learnings": 34,
+    "Build System Prompt": 21,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 2286,
+    "Interactive Intent Agent3": 3336,
+    "Parse Intent JSON3": 12,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 3836,
+    "Unwrap MCP Result": 14,
+    "Build Search Log": 18,
+    "Log Search": 0,
+    "Attach Log Id": 15,
+    "If2": 2,
+    "Format Cards2": 20,
+    "Final Respond3": 1,
+    "Build Log": 19
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4987,
+    "completion": 60,
+    "total": 5047
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "limpieza de balancines",
+    "resolvedPhrases": [
+     "limpieza de balancines"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 391,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 523,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "S005",
+  "input": "fabricacion de valvulas industriales",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-S005-r1-1794846714858",
+  "client_ms": 5952,
+  "status": 200,
+  "type": "results",
+  "output_len": 66238,
+  "error": null,
+  "at": "2026-11-16T16:31:54.858Z",
+  "exec": {
+   "execution": "22577",
+   "status": "success",
+   "total_ms": 5884,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 15,
+    "Is Command?": 2,
+    "Load Learnings": 29,
+    "Build System Prompt": 16,
+    "Postgres Memory Intent3": 137,
+    "OpenAI Chat Model": 2226,
+    "Interactive Intent Agent3": 2719,
+    "Parse Intent JSON3": 20,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2780,
+    "Unwrap MCP Result": 38,
+    "Build Search Log": 58,
+    "Log Search": 0,
+    "Attach Log Id": 30,
+    "If2": 2,
+    "Format Cards2": 57,
+    "Final Respond3": 8,
+    "Build Log": 44
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4988,
+    "completion": 62,
+    "total": 5050
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "fabricacion de valvulas industriales",
+    "resolvedPhrases": [
+     "fabricación de válvulas industriales"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 560,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 100,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 141,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 563,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 126,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 83,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 487,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 480,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 75,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 177,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "S006",
+  "input": "mantenimiento de valvulas industriales",
+  "rep": 1,
+  "variant": "V1M41",
+  "sessionId": "t31-V1M41-S006-r1-1794846720810",
+  "client_ms": 8355,
+  "status": 200,
+  "type": "results",
+  "output_len": 60640,
+  "error": null,
+  "at": "2026-11-16T16:32:00.810Z",
+  "exec": {
+   "execution": "22578",
+   "status": "success",
+   "total_ms": 8224,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 23,
+    "Admin Password": 1,
+    "Detect Command": 25,
+    "Is Command?": 2,
+    "Load Learnings": 32,
+    "Build System Prompt": 26,
+    "Postgres Memory Intent3": 138,
+    "OpenAI Chat Model": 1804,
+    "Interactive Intent Agent3": 4978,
+    "Parse Intent JSON3": 15,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2842,
+    "Unwrap MCP Result": 30,
+    "Build Search Log": 28,
+    "Log Search": 0,
+    "Attach Log Id": 52,
+    "If2": 1,
+    "Format Cards2": 69,
+    "Final Respond3": 2,
+    "Build Log": 35
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4988,
+    "completion": 62,
+    "total": 5050
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "mantenimiento de valvulas industriales",
+    "resolvedPhrases": [
+     "mantenimiento de válvulas industriales"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 194,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 78,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 75,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 140,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    },
+    {
+     "id": 560,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 333,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 480,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 391,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 487,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 179,
+     "grupo": "experiencia",
+     "origen": null
+    },
+    {
+     "id": 177,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ }
+]

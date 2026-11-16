@@ -1,0 +1,1028 @@
+{
+ "casos": 55,
+ "fallos": [
+  {
+   "url": "8796f292",
+   "query": "MaCoLlA",
+   "error": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)"
+  },
+  {
+   "url": "3539deec",
+   "query": "servicios a pozos",
+   "error": "fetch failed"
+  },
+  {
+   "url": "3539deec",
+   "query": "sElLaDo dE FlUiDoS En bAlAnCiNeS",
+   "error": "Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)"
+  }
+ ],
+ "equivalencia": {
+  "defecto": 55,
+  "grupos": 54
+ },
+ "frio_grupos_ms": {
+  "base": {
+   "p50": 1960,
+   "p95": 3136,
+   "n": 110
+  },
+  "w1": {
+   "p50": 1582,
+   "p95": 2378,
+   "n": 110
+  }
+ },
+ "por_consulta": [
+  {
+   "id": "L007",
+   "query": "operadores",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2177,
+     2980
+    ],
+    "w1": [
+     1895,
+     1799
+    ]
+   }
+  },
+  {
+   "id": "L009",
+   "query": "tratamiento de aguas de perforacion",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1974,
+     2177
+    ],
+    "w1": [
+     1022,
+     2189
+    ]
+   }
+  },
+  {
+   "id": "L010",
+   "query": "fabricantes de balancines",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1761,
+     1376
+    ],
+    "w1": [
+     1696,
+     1204
+    ]
+   }
+  },
+  {
+   "id": "L013",
+   "query": "levantamiento artificial",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1443,
+     1796
+    ],
+    "w1": [
+     1180,
+     2301
+    ]
+   }
+  },
+  {
+   "id": "L014",
+   "query": "revestidor",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1266,
+     1822
+    ],
+    "w1": [
+     893,
+     1295
+    ]
+   }
+  },
+  {
+   "id": "L015",
+   "query": "mecha",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1351,
+     892
+    ],
+    "w1": [
+     672,
+     2968
+    ]
+   }
+  },
+  {
+   "id": "L016",
+   "query": "cabria",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1055,
+     1205
+    ],
+    "w1": [
+     1524,
+     716
+    ]
+   }
+  },
+  {
+   "id": "L017",
+   "query": "cabrias",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     897,
+     1114
+    ],
+    "w1": [
+     529,
+     580
+    ]
+   }
+  },
+  {
+   "id": "L018",
+   "query": "mechurrio",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1379,
+     1498
+    ],
+    "w1": [
+     791,
+     796
+    ]
+   }
+  },
+  {
+   "id": "L019",
+   "query": "macolla",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1911,
+     2993
+    ],
+    "w1": [
+     1042,
+     1122
+    ]
+   }
+  },
+  {
+   "id": "L020",
+   "query": "guaya fina",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1785,
+     1832
+    ],
+    "w1": [
+     1913,
+     2771
+    ]
+   }
+  },
+  {
+   "id": "L021",
+   "query": "guaya electrica",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1903,
+     2442
+    ],
+    "w1": [
+     1456,
+     1812
+    ]
+   }
+  },
+  {
+   "id": "L022",
+   "query": "balancin",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1624,
+     1806
+    ],
+    "w1": [
+     1772,
+     1140
+    ]
+   }
+  },
+  {
+   "id": "L023",
+   "query": "camion chupon",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1384,
+     1571
+    ],
+    "w1": [
+     1136,
+     1183
+    ]
+   }
+  },
+  {
+   "id": "L024",
+   "query": "gandola",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2152,
+     2443
+    ],
+    "w1": [
+     1108,
+     1332
+    ]
+   }
+  },
+  {
+   "id": "L025",
+   "query": "mantenimiento de cabrias",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2160,
+     1762
+    ],
+    "w1": [
+     1121,
+     2177
+    ]
+   }
+  },
+  {
+   "id": "L026",
+   "query": "fabricantes de cabrias",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1462,
+     1722
+    ],
+    "w1": [
+     2063,
+     1526
+    ]
+   }
+  },
+  {
+   "id": "L027",
+   "query": "transporte de gandolas",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1250,
+     1632
+    ],
+    "w1": [
+     1604,
+     1382
+    ]
+   }
+  },
+  {
+   "id": "L028",
+   "query": "alquiler de gandolas",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1814,
+     1763
+    ],
+    "w1": [
+     1993,
+     1825
+    ]
+   }
+  },
+  {
+   "id": "L029",
+   "query": "mantenimiento de levantamiento artificial",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1786,
+     2224
+    ],
+    "w1": [
+     1446,
+     1951
+    ]
+   }
+  },
+  {
+   "id": "L031",
+   "query": "servicios petroleros",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2061,
+     2486
+    ],
+    "w1": [
+     1493,
+     2091
+    ]
+   }
+  },
+  {
+   "id": "L032",
+   "query": "construccion",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2287,
+     2363
+    ],
+    "w1": [
+     1609,
+     2003
+    ]
+   }
+  },
+  {
+   "id": "L033",
+   "query": "tratamiento de aguas de perforacion",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1992,
+     2323
+    ],
+    "w1": [
+     2378,
+     2380
+    ]
+   }
+  },
+  {
+   "id": "L034",
+   "query": "fabriquen y mantengan balancines",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2539,
+     3880
+    ],
+    "w1": [
+     2167,
+     3189
+    ]
+   }
+  },
+  {
+   "id": "L035",
+   "query": "inspeccion y mantenimiento de guaya electrica",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1134,
+     2368
+    ],
+    "w1": [
+     969,
+     1664
+    ]
+   }
+  },
+  {
+   "id": "L036",
+   "query": "transporte de crudo por gandola",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1416,
+     1760
+    ],
+    "w1": [
+     1209,
+     1730
+    ]
+   }
+  },
+  {
+   "id": "L037",
+   "query": "pipeline",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1924,
+     2627
+    ],
+    "w1": [
+     1241,
+     1365
+    ]
+   }
+  },
+  {
+   "id": "L038",
+   "query": "refinery",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1352,
+     1764
+    ],
+    "w1": [
+     1597,
+     1673
+    ]
+   }
+  },
+  {
+   "id": "L039",
+   "query": "refineria",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2215,
+     2052
+    ],
+    "w1": [
+     1857,
+     1909
+    ]
+   }
+  },
+  {
+   "id": "L040",
+   "query": "drilling",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2875,
+     2251
+    ],
+    "w1": [
+     1488,
+     2159
+    ]
+   }
+  },
+  {
+   "id": "L041",
+   "query": "arbolitos para pozos petroleros",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1299,
+     1774
+    ],
+    "w1": [
+     1713,
+     1392
+    ]
+   }
+  },
+  {
+   "id": "L042",
+   "query": "venta de zapatos",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2276,
+     1274
+    ],
+    "w1": [
+     1026,
+     979
+    ]
+   }
+  },
+  {
+   "id": "L053",
+   "query": "gandolas",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1741,
+     2290
+    ],
+    "w1": [
+     1803,
+     1082
+    ]
+   }
+  },
+  {
+   "id": "L054",
+   "query": "servicios de pozos",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2215,
+     2259
+    ],
+    "w1": [
+     1603,
+     1610
+    ]
+   }
+  },
+  {
+   "id": "L056",
+   "query": "servicios a pozos",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2592,
+     3136
+    ],
+    "w1": [
+     3027,
+     2109
+    ]
+   }
+  },
+  {
+   "id": "L058",
+   "query": "sistemas fotovoltaicos",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1551,
+     1679
+    ],
+    "w1": [
+     1054,
+     1800
+    ]
+   }
+  },
+  {
+   "id": "L059",
+   "query": "expansores",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     13265,
+     1937
+    ],
+    "w1": [
+     1747,
+     1861
+    ]
+   }
+  },
+  {
+   "id": "L060",
+   "query": "partes y repuestos de compresores",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1844,
+     2045
+    ],
+    "w1": [
+     1343,
+     1945
+    ]
+   }
+  },
+  {
+   "id": "L061",
+   "query": "ingenieria feed",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2650,
+     2193
+    ],
+    "w1": [
+     1403,
+     953
+    ]
+   }
+  },
+  {
+   "id": "L062",
+   "query": "ingenieria de procesos",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2972,
+     2927
+    ],
+    "w1": [
+     1096,
+     1589
+    ]
+   }
+  },
+  {
+   "id": "L063",
+   "query": "ipc",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2005,
+     1529
+    ],
+    "w1": [
+     2231,
+     1081
+    ]
+   }
+  },
+  {
+   "id": "L064",
+   "query": "mechas de perforacion",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2660,
+     2414
+    ],
+    "w1": [
+     1402,
+     2175
+    ]
+   }
+  },
+  {
+   "id": "L067",
+   "query": "mantenimiento de bombas",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1537,
+     2523
+    ],
+    "w1": [
+     1647,
+     1412
+    ]
+   }
+  },
+  {
+   "id": "L068",
+   "query": "servicios de perforacion de pozos",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1829,
+     1973
+    ],
+    "w1": [
+     1267,
+     1745
+    ]
+   }
+  },
+  {
+   "id": "L069",
+   "query": "manejo de fluidos de perforacion",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2313,
+     3155
+    ],
+    "w1": [
+     1569,
+     2124
+    ]
+   }
+  },
+  {
+   "id": "L070",
+   "query": "manejo de aguas residuales",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1355,
+     1960
+    ],
+    "w1": [
+     1007,
+     866
+    ]
+   }
+  },
+  {
+   "id": "L071",
+   "query": "tuberia octg",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1750,
+     2070
+    ],
+    "w1": [
+     1197,
+     2185
+    ]
+   }
+  },
+  {
+   "id": "L072",
+   "query": "valvulas de bola",
+   "equivalente": {
+    "defecto": true,
+    "grupos": false
+   },
+   "frio_ms": {
+    "base": [
+     2457,
+     1913
+    ],
+    "w1": [
+     1614,
+     1665
+    ]
+   }
+  },
+  {
+   "id": "L073",
+   "query": "balacines",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2835,
+     2617
+    ],
+    "w1": [
+     2354,
+     1694
+    ]
+   }
+  },
+  {
+   "id": "S001",
+   "query": "venta de balancines",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1609,
+     1599
+    ],
+    "w1": [
+     794,
+     1523
+    ]
+   }
+  },
+  {
+   "id": "S002",
+   "query": "mantenimiento de balancines",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1887,
+     2093
+    ],
+    "w1": [
+     1656,
+     1496
+    ]
+   }
+  },
+  {
+   "id": "S003",
+   "query": "sellado de fluidos en balancines",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2449,
+     3416
+    ],
+    "w1": [
+     1364,
+     2181
+    ]
+   }
+  },
+  {
+   "id": "S004",
+   "query": "limpieza de balancines",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1949,
+     3299
+    ],
+    "w1": [
+     1573,
+     1530
+    ]
+   }
+  },
+  {
+   "id": "S005",
+   "query": "fabricacion de valvulas industriales",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     1890,
+     2442
+    ],
+    "w1": [
+     1370,
+     1576
+    ]
+   }
+  },
+  {
+   "id": "S006",
+   "query": "mantenimiento de valvulas industriales",
+   "equivalente": {
+    "defecto": true,
+    "grupos": true
+   },
+   "frio_ms": {
+    "base": [
+     2232,
+     2254
+    ],
+    "w1": [
+     2199,
+     1582
+    ]
+   }
+  }
+ ]
+}

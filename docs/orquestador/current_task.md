@@ -25,7 +25,7 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-16 15:40Z: **TASK-0031** — CIRA: diagnóstico y benchmark aislado de latencia (sin deploy) — **IN_PROGRESS** (fuente `6920929114`)
+## 2026-11-16 15:40Z: **TASK-0031** — CIRA: diagnóstico y benchmark aislado de latencia (sin deploy) — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW — SIN DEPLOY** (~17:30Z; fuente `6920929114`)
 
 | Campo | Valor |
 |---|---|
@@ -33,7 +33,9 @@ pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 | Autoriza | Lectura, benchmarks acotados y pruebas en copias realmente aisladas; documentación |
 | No autoriza | Staging, producción, editar el flujo n8n activo, el Worker vivo o el modelo o prompt en vivo; `main`; DDL; escrituras masivas; logs, votos o evaluaciones reales |
 | BASE | `96943d3` |
-| Siguiente | Línea base viva y medición por tramo |
+| Resultado | 501 búsquedas en copias aisladas. **V1b** (sin `resolve_search_intent`, mismo `gpt-6-luna`): p50 de 10,2 a 7,0 s (corpus) y a 6,2 s (UAT), calidad igual a V0, menos costo. W1 en el Worker: −0,4 s p50 en frío, resultados idénticos. Cambiar de modelo: no recomendado. Informe [`../../audit/CIRA_TASK0031_BENCHMARK_LATENCIA.md`](../../audit/CIRA_TASK0031_BENCHMARK_LATENCIA.md) |
+| Vivo | Sin cambios: n8n `7feb48bc`, Worker `8796f292` |
+| Siguiente | Decisión del propietario: autorizar V1b (n8n) y, aparte, W1 (Worker), solo staging |
 
 TASK-0030: aceptación parcial de UX del propietario (`6920929114`: vistas excluyentes y estado vacío de «macolla»); **no es APPROVED global ni autoriza producción**.
 

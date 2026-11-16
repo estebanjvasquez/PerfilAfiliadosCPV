@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | **IN_PROGRESS** (2026-11-16) |
+| Estado | ~~IN_PROGRESS~~ → **READY_FOR_REVIEW — SIN DEPLOY** (2026-11-16 ~17:30Z) |
 | Fuente | Issue #2 `6920929114` (estebanjvasquez, 2026-11-16T15:34:05Z): «UAT DEL PROPIETARIO — TASK-0030 + NUEVA ASIGNACIÓN: diagnóstico y comparación de rendimiento de CIRA (SIN DEPLOY)» |
 | Antecedentes | TASK-0030 (entrega `6920381900`, HANDOFF `96943d3`): **aceptación parcial de UX**, no APPROVED global; TASK-0029 (`6915259431`). Ambas conservan su estado |
 | Tipo | Análisis y experimentos aislados. **Sin deploy** |
@@ -44,3 +44,7 @@
 ## Avance
 
 - 2026-11-16 ~15:40Z: tarea materializada. Siguiente: congelar la línea base viva.
+- ~15:45Z: línea base viva: n8n `7feb48bc`, Worker `8796f292`, agente `gpt-6-luna`; `resolve_search_intent` llama a `gpt-5.6-luna` en el Worker (3 llamadas a modelos por búsqueda).
+- 15:50–17:20Z: 10 copias aisladas de n8n (registro desactivado, borradas al terminar) con 501 búsquedas: V0 ×2, V1, V1b, M41, M54, V1M41 (55 corpus + UAT), más la UAT limpia de V0 y V1b. Worker W1 (`988f87f`, vista previa sin tráfico `3539deec`): equivalente 55/55 por defecto; en frío p50 −0,38 s y p95 −0,76 s.
+- Resultado: V1b (sin `resolve_search_intent`, mismo modelo) reduce el p50 de 10,2 a 7,0 s en el corpus y de 10,2 a 6,2 s en la UAT, con la calidad igual a V0 y menos costo. Cambiar de modelo rinde menos y baja la calidad.
+- **READY_FOR_REVIEW — SIN DEPLOY**: [`../../../audit/CIRA_TASK0031_BENCHMARK_LATENCIA.md`](../../../audit/CIRA_TASK0031_BENCHMARK_LATENCIA.md). STOP: queda a la espera de la autorización del propietario.

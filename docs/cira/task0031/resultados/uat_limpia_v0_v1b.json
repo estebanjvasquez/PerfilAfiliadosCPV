@@ -1,0 +1,168 @@
+{
+ "referencia": "V0_uat",
+ "variantes": {
+  "V0_uat": {
+   "ejecuciones": 16,
+   "latencia_corpus": {
+    "n": 0,
+    "total_p50": null,
+    "total_p95": null,
+    "cliente_p50": null,
+    "cliente_p95": null,
+    "agente_p50": null,
+    "modelo_p50": null,
+    "herramienta_mcp_p50": null,
+    "worker_p50": null,
+    "tarjetas_p50": null,
+    "learnings_p50": null,
+    "memoria_p50": null,
+    "registro_p50": null
+   },
+   "latencia_uat": {
+    "n": 16,
+    "total_p50": 10217,
+    "total_p95": 13665,
+    "cliente_p50": 10306,
+    "cliente_p95": 13827,
+    "agente_p50": 7026,
+    "modelo_p50": 4269,
+    "herramienta_mcp_p50": 2028,
+    "worker_p50": 2854,
+    "tarjetas_p50": 30,
+    "learnings_p50": 136,
+    "memoria_p50": 141,
+    "registro_p50": 1
+   },
+   "latencia_uat_por_consulta": {
+    "empresas de perforacion": [
+     12237,
+     10119,
+     10531,
+     10676
+    ],
+    "balancin": [
+     13665,
+     7571,
+     11961,
+     8478
+    ],
+    "macolla": [
+     9685,
+     7856,
+     10217,
+     9969
+    ],
+    "gandola": [
+     10620,
+     11476,
+     9831,
+     8314
+    ]
+   },
+   "llamadas_modelo_media": 2,
+   "llamadas_herramienta_mcp_media": 1,
+   "tokens_media": {
+    "prompt": 10162,
+    "completion": 134
+   },
+   "calidad_corpus": {
+    "rel_top5_g1": 0,
+    "norel_top5_g1": 0,
+    "sin_juicio_top5_g1": 0,
+    "rel_cobertura": 0,
+    "rel_etiquetadas": 0,
+    "vacias": 0,
+    "sin_busqueda": [],
+    "errores": [],
+    "precision_juzgada_g1": null
+   },
+   "coincidencia_con_referencia": {
+    "comparables": 0,
+    "mismos_parametros": 0,
+    "mismo_top5_por_grupo": 0
+   }
+  },
+  "V1b_uat": {
+   "ejecuciones": 16,
+   "latencia_corpus": {
+    "n": 0,
+    "total_p50": null,
+    "total_p95": null,
+    "cliente_p50": null,
+    "cliente_p95": null,
+    "agente_p50": null,
+    "modelo_p50": null,
+    "herramienta_mcp_p50": null,
+    "worker_p50": null,
+    "tarjetas_p50": null,
+    "learnings_p50": null,
+    "memoria_p50": null,
+    "registro_p50": null
+   },
+   "latencia_uat": {
+    "n": 16,
+    "total_p50": 6246,
+    "total_p95": 11293,
+    "cliente_p50": 5836,
+    "cliente_p95": 12509,
+    "agente_p50": 3295,
+    "modelo_p50": 2669,
+    "herramienta_mcp_p50": null,
+    "worker_p50": 2240,
+    "tarjetas_p50": 37,
+    "learnings_p50": 31,
+    "memoria_p50": 143,
+    "registro_p50": 0
+   },
+   "latencia_uat_por_consulta": {
+    "empresas de perforacion": [
+     6988,
+     11293,
+     5089,
+     8799
+    ],
+    "balancin": [
+     6599,
+     4405,
+     7629,
+     7724
+    ],
+    "macolla": [
+     6675,
+     5588,
+     4177,
+     5185
+    ],
+    "gandola": [
+     6246,
+     5133,
+     4818,
+     5231
+    ]
+   },
+   "llamadas_modelo_media": 1,
+   "llamadas_herramienta_mcp_media": 0,
+   "tokens_media": {
+    "prompt": 5086,
+    "completion": 122
+   },
+   "calidad_corpus": {
+    "rel_top5_g1": 0,
+    "norel_top5_g1": 0,
+    "sin_juicio_top5_g1": 0,
+    "rel_cobertura": 0,
+    "rel_etiquetadas": 0,
+    "vacias": 0,
+    "sin_busqueda": [],
+    "errores": [],
+    "precision_juzgada_g1": null
+   },
+   "coincidencia_con_referencia": {
+    "comparables": 0,
+    "mismos_parametros": 0,
+    "mismo_top5_por_grupo": 0
+   }
+  }
+ },
+ "por_consulta": {}
+}

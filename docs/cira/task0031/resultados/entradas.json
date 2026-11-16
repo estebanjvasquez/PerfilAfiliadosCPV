@@ -1,0 +1,579 @@
+{
+ "corpus": [
+  {
+   "id": "L007",
+   "input": "operadores",
+   "golden": {
+    "test_id": "G4-01",
+    "rel": [
+     146,
+     177,
+     325,
+     218
+    ],
+    "norel": [
+     124,
+     326,
+     107
+    ]
+   }
+  },
+  {
+   "id": "L009",
+   "input": "tratamiento de aguas de perforación",
+   "golden": {
+    "test_id": "G1-01",
+    "rel": [
+     96,
+     152,
+     179,
+     79,
+     115
+    ],
+    "norel": []
+   }
+  },
+  {
+   "id": "L010",
+   "input": "fabricantes de balancines",
+   "golden": null
+  },
+  {
+   "id": "L013",
+   "input": "levantamiento artificial",
+   "golden": {
+    "test_id": "G1-02",
+    "rel": [
+     276,
+     383
+    ],
+    "norel": [
+     72,
+     257,
+     187
+    ]
+   }
+  },
+  {
+   "id": "L014",
+   "input": "revestidor",
+   "golden": {
+    "test_id": "G1-03",
+    "rel": [
+     157
+    ],
+    "norel": [
+     91,
+     312,
+     317,
+     145
+    ]
+   }
+  },
+  {
+   "id": "L015",
+   "input": "mecha",
+   "golden": {
+    "test_id": "G1-04",
+    "rel": [],
+    "norel": [
+     140,
+     1,
+     73,
+     74
+    ]
+   }
+  },
+  {
+   "id": "L016",
+   "input": "cabria",
+   "golden": {
+    "test_id": "G2-01",
+    "rel": [],
+    "norel": [
+     138,
+     86,
+     157,
+     170
+    ]
+   }
+  },
+  {
+   "id": "L017",
+   "input": "cabrias",
+   "golden": {
+    "test_id": "G2-02",
+    "rel": [],
+    "norel": [
+     138,
+     86,
+     157,
+     170
+    ]
+   }
+  },
+  {
+   "id": "L018",
+   "input": "mechurrio",
+   "golden": {
+    "test_id": "G2-03",
+    "rel": [
+     140
+    ],
+    "norel": [
+     391
+    ]
+   }
+  },
+  {
+   "id": "L019",
+   "input": "macolla",
+   "golden": {
+    "test_id": "G2-04",
+    "rel": [
+     155,
+     171,
+     1,
+     76
+    ],
+    "norel": [
+     72
+    ]
+   }
+  },
+  {
+   "id": "L020",
+   "input": "guaya fina",
+   "golden": {
+    "test_id": "G2-05",
+    "rel": [
+     182,
+     458
+    ],
+    "norel": [
+     198,
+     128
+    ]
+   }
+  },
+  {
+   "id": "L021",
+   "input": "guaya eléctrica",
+   "golden": {
+    "test_id": "G2-06",
+    "rel": [
+     79
+    ],
+    "norel": [
+     72,
+     213,
+     83,
+     141
+    ]
+   }
+  },
+  {
+   "id": "L022",
+   "input": "balancín",
+   "golden": {
+    "test_id": "G2-07",
+    "rel": [
+     157
+    ],
+    "norel": [
+     91,
+     333,
+     391
+    ]
+   }
+  },
+  {
+   "id": "L023",
+   "input": "camión chupón",
+   "golden": {
+    "test_id": "G2-09",
+    "rel": [
+     391
+    ],
+    "norel": []
+   }
+  },
+  {
+   "id": "L024",
+   "input": "gandola",
+   "golden": {
+    "test_id": "G2-10",
+    "rel": [
+     165,
+     204
+    ],
+    "norel": [
+     433,
+     187,
+     563
+    ]
+   }
+  },
+  {
+   "id": "L025",
+   "input": "mantenimiento de cabrias",
+   "golden": {
+    "test_id": "G3-01",
+    "rel": [
+     173,
+     115,
+     179,
+     96
+    ],
+    "norel": [
+     257
+    ]
+   }
+  },
+  {
+   "id": "L026",
+   "input": "fabricantes de cabrias",
+   "golden": {
+    "test_id": "G3-02",
+    "rel": [
+     173,
+     115,
+     179,
+     96
+    ],
+    "norel": [
+     257
+    ]
+   }
+  },
+  {
+   "id": "L027",
+   "input": "transporte de gandolas",
+   "golden": {
+    "test_id": "G3-03",
+    "rel": [
+     204,
+     452,
+     426
+    ],
+    "norel": [
+     187
+    ]
+   }
+  },
+  {
+   "id": "L028",
+   "input": "alquiler de gandolas",
+   "golden": {
+    "test_id": "G3-04",
+    "rel": [
+     165,
+     204,
+     426
+    ],
+    "norel": [
+     187,
+     563
+    ]
+   }
+  },
+  {
+   "id": "L029",
+   "input": "mantenimiento de levantamiento artificial",
+   "golden": {
+    "test_id": "G3-05",
+    "rel": [],
+    "norel": [
+     107,
+     78,
+     72,
+     94
+    ]
+   }
+  },
+  {
+   "id": "L031",
+   "input": "servicios petroleros",
+   "golden": {
+    "test_id": "G4-03",
+    "rel": [],
+    "norel": []
+   }
+  },
+  {
+   "id": "L032",
+   "input": "construcción",
+   "golden": {
+    "test_id": "G4-04",
+    "rel": [],
+    "norel": []
+   }
+  },
+  {
+   "id": "L033",
+   "input": "tratamiento de aguas de perforación en el lago",
+   "golden": {
+    "test_id": "G5-01",
+    "rel": [
+     115
+    ],
+    "norel": [
+     391,
+     257,
+     74,
+     137
+    ]
+   }
+  },
+  {
+   "id": "L034",
+   "input": "empresas que fabriquen y mantengan balancines",
+   "golden": {
+    "test_id": "G5-02",
+    "rel": [
+     157
+    ],
+    "norel": [
+     333,
+     391,
+     107,
+     83
+    ]
+   }
+  },
+  {
+   "id": "L035",
+   "input": "inspección y mantenimiento de guaya eléctrica",
+   "golden": {
+    "test_id": "G5-03",
+    "rel": [],
+    "norel": []
+   }
+  },
+  {
+   "id": "L036",
+   "input": "transporte de crudo por gandola",
+   "golden": {
+    "test_id": "G5-04",
+    "rel": [],
+    "norel": []
+   }
+  },
+  {
+   "id": "L037",
+   "input": "pipeline",
+   "golden": {
+    "test_id": "G6-01",
+    "rel": [
+     157
+    ],
+    "norel": [
+     141
+    ]
+   }
+  },
+  {
+   "id": "L038",
+   "input": "refinery",
+   "golden": {
+    "test_id": "G6-02",
+    "rel": [],
+    "norel": [
+     157,
+     85,
+     187,
+     125,
+     149
+    ]
+   }
+  },
+  {
+   "id": "L039",
+   "input": "refinería",
+   "golden": {
+    "test_id": "G6-03",
+    "rel": [],
+    "norel": []
+   }
+  },
+  {
+   "id": "L040",
+   "input": "drilling",
+   "golden": {
+    "test_id": "G6-04",
+    "rel": [
+     115,
+     79,
+     152,
+     96,
+     77,
+     133,
+     157
+    ],
+    "norel": [
+     86,
+     170,
+     391,
+     187
+    ]
+   }
+  },
+  {
+   "id": "L041",
+   "input": "necesito arbolitos para pozos petroleros",
+   "golden": {
+    "test_id": "G7-02",
+    "rel": [
+     179
+    ],
+    "norel": [
+     207,
+     112,
+     80
+    ]
+   }
+  },
+  {
+   "id": "L042",
+   "input": "venta de zapatos",
+   "golden": {
+    "test_id": "G7-03",
+    "rel": [],
+    "norel": []
+   }
+  },
+  {
+   "id": "L053",
+   "input": "gandolas",
+   "golden": null
+  },
+  {
+   "id": "L054",
+   "input": "servicios de pozos",
+   "golden": null
+  },
+  {
+   "id": "L056",
+   "input": "Servicios a Pozos",
+   "golden": null
+  },
+  {
+   "id": "L058",
+   "input": "sistemas fotovoltaicos",
+   "golden": null
+  },
+  {
+   "id": "L059",
+   "input": "Expansores",
+   "golden": null
+  },
+  {
+   "id": "L060",
+   "input": "Partes y Repuestos de Compresores",
+   "golden": null
+  },
+  {
+   "id": "L061",
+   "input": "Empresas que realizan ingeniería FEED",
+   "golden": null
+  },
+  {
+   "id": "L062",
+   "input": "ingenieria de procesos",
+   "golden": null
+  },
+  {
+   "id": "L063",
+   "input": "IPC",
+   "golden": null
+  },
+  {
+   "id": "L064",
+   "input": "mechas de perforacion",
+   "golden": null
+  },
+  {
+   "id": "L067",
+   "input": "empresas de mantenimiento de bombas",
+   "golden": null
+  },
+  {
+   "id": "L068",
+   "input": "servicios de perforación de pozos",
+   "golden": null
+  },
+  {
+   "id": "L069",
+   "input": "manejo de fuidos de perforacion",
+   "golden": null
+  },
+  {
+   "id": "L070",
+   "input": "manejo de aguas residuales",
+   "golden": null
+  },
+  {
+   "id": "L071",
+   "input": "Tuberia octg",
+   "golden": null
+  },
+  {
+   "id": "L072",
+   "input": "Valvulas de bola",
+   "golden": null
+  },
+  {
+   "id": "L073",
+   "input": "balacines",
+   "golden": null
+  },
+  {
+   "id": "S001",
+   "input": "venta de balancines",
+   "golden": null
+  },
+  {
+   "id": "S002",
+   "input": "mantenimiento de balancines",
+   "golden": null
+  },
+  {
+   "id": "S003",
+   "input": "sellado de fluidos en balancines",
+   "golden": null
+  },
+  {
+   "id": "S004",
+   "input": "limpieza de balancines",
+   "golden": null
+  },
+  {
+   "id": "S005",
+   "input": "fabricacion de valvulas industriales",
+   "golden": null
+  },
+  {
+   "id": "S006",
+   "input": "mantenimiento de valvulas industriales",
+   "golden": null
+  }
+ ],
+ "uat": [
+  {
+   "id": "U01",
+   "input": "empresas de perforacion"
+  },
+  {
+   "id": "U02",
+   "input": "balancin"
+  },
+  {
+   "id": "U03",
+   "input": "macolla"
+  },
+  {
+   "id": "U04",
+   "input": "gandola"
+  }
+ ]
+}
