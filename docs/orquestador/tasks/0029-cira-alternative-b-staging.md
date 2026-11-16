@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | **IN_PROGRESS** (2026-11-16) |
+| Estado | ~~IN_PROGRESS~~ → **DEPLOYED_FOR_OWNER_UAT** (2026-11-16 ~11:30Z) |
 | Fuente | Issue #2 `6914028986` (estebanjvasquez, 2026-11-16T10:36:06Z): «AUTORIZACIÓN EXPRESA DEL PROPIETARIO — IMPLEMENTAR ALTERNATIVA B DE CIRA Y DESPLEGAR A STAGING PARA UAT MANUAL» |
 | Tipo | Implementación y despliegue **solo en staging**, con gates |
 | Antecedente | TASK-0028 (auditoría `6913187637`, entrega `6913769146`), que conserva su identificador, su historia y su estado |
@@ -64,3 +64,9 @@
 ## Avance
 
 - 2026-11-16 ~10:50Z: tarea materializada (este archivo, `current_task.md`, `SESSION_RESUME.md`). Siguiente: implementación del Worker en rama propia y pruebas aisladas.
+- 2026-11-16 ~11:00Z: Worker en `feat/cira-two-groups` (`57db8a1`): modo opcional `grupos`. Prueba de punta a punta con `wrangler dev` sobre una copia aislada de la BD (dump `cira-t29-20261116T104910Z`). Vista previa `3b7a6238` (sin tráfico).
+- ~11:05Z: copia de prueba de n8n `ANvAvXQGAKrISrNu` (desactivada, otro webhook, sin registro, Worker de vista previa): 7 consultas OK. Se desactivó y después se borró.
+- ~11:10Z: corrección r2 (`1ea9175`, vista previa `8796f292`): compuerta «similar a» sobre todas las listas y listas vectoriales por variante. 55 consultas: ruido top 5 38 → 27, cobertura 39/49, 2 vacías; modo por defecto 55/55 igual al vivo; regresión congelada 32/32.
+- 11:17:40Z: Worker `8796f292` al 100 % (antes `1005d61f`); regresión congelada en vivo 32/32. 11:18:47Z: n8n `zbVLoCdR09IA9yQK` `bafd597a` → `d2f8efb5` (3 nodos).
+- 11:19–11:27Z: E2E en staging, escritorio y Pixel 5: PASS (logs 74–84, voto 35, sin evaluaciones). Laravel sin cambios (`5e6e3fc`).
+- **DEPLOYED_FOR_OWNER_UAT**: informe [`../../../audit/CIRA_TASK0029_ALTERNATIVA_B_STAGING.md`](../../../audit/CIRA_TASK0029_ALTERNATIVA_B_STAGING.md). STOP: queda a la espera del veredicto del propietario.

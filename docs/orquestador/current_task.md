@@ -25,7 +25,7 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-16 10:50Z: **TASK-0029** — CIRA: implementar la alternativa B (capacidades / experiencias) y desplegarla en staging para UAT del propietario — **IN_PROGRESS** (fuente `6914028986`)
+## 2026-11-16 10:50Z: **TASK-0029** — CIRA: implementar la alternativa B (capacidades / experiencias) y desplegarla en staging para UAT del propietario — ~~IN_PROGRESS~~ → **DEPLOYED_FOR_OWNER_UAT** (~11:30Z; fuente `6914028986`)
 
 | Campo | Valor |
 |---|---|
@@ -34,7 +34,10 @@ pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 | No autoriza | Producción, `main`, taxonomía, roles, datos de empresas, credenciales; regeneración masiva de `empresa_search_documents`, DDL o escrituras masivas en la BD compartida |
 | BASE | `d628d2f` |
 | Vivo al arrancar | Laravel staging `5e6e3fc`; Worker `1005d61f` (código `77ce273`); n8n `zbVLoCdR09IA9yQK` `bafd597a` |
-| Siguiente | Worker en rama propia con modo opcional de dos grupos, pruebas aisladas, versión de vista previa, luego n8n |
+| Desplegado | Worker **`8796f292`** (código `1ea9175`, `feat/cira-two-groups`) a las 11:17:40Z; n8n **`d2f8efb5`** (3 nodos) a las 11:18:47Z; Laravel sin cambios |
+| Resultado | 55 consultas: ruido top 5 38 → 27, cobertura 39/49, 2 vacías; camino de siempre sin cambios (32/32 y 55/55); E2E escritorio y móvil PASS. Informe [`../../audit/CIRA_TASK0029_ALTERNATIVA_B_STAGING.md`](../../audit/CIRA_TASK0029_ALTERNATIVA_B_STAGING.md) |
+| Rollback | Worker `wrangler versions deploy 1005d61f…@100%`; n8n `PUT` del respaldo `bafd597a` (fuera del repo). Cada mitad es compatible con la otra |
+| Siguiente | UAT manual del propietario y su veredicto. Sin producción ni Cámara |
 
 ## 2026-11-16 10:10Z: **TASK-0028** — CIRA: auditoría de fuentes, ranking y separación de capacidades y experiencias — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~10:35Z; fuente `6913187637`)
 
