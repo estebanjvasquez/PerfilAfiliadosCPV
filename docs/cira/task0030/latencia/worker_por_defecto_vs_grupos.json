@@ -1,0 +1,110 @@
+[
+ {
+  "consulta": "empresas de perforacion",
+  "por_defecto_ms": [
+   4470,
+   399,
+   275,
+   276,
+   880
+  ],
+  "grupos_ms": [
+   3818,
+   246,
+   212,
+   194,
+   213
+  ],
+  "mediana_por_defecto": 399,
+  "mediana_grupos": 213,
+  "resultados": {
+   "por_defecto": 23,
+   "grupos": 29
+  },
+  "bytes": {
+   "por_defecto": 89808,
+   "grupos": 133659
+  }
+ },
+ {
+  "consulta": "balancin",
+  "por_defecto_ms": [
+   1986,
+   419,
+   230,
+   259,
+   886
+  ],
+  "grupos_ms": [
+   2267,
+   256,
+   245,
+   218,
+   211
+  ],
+  "mediana_por_defecto": 419,
+  "mediana_grupos": 245,
+  "resultados": {
+   "por_defecto": 4,
+   "grupos": 4
+  },
+  "bytes": {
+   "por_defecto": 17460,
+   "grupos": 13405
+  }
+ },
+ {
+  "consulta": "macolla",
+  "por_defecto_ms": [
+   1629,
+   203,
+   182,
+   171,
+   196
+  ],
+  "grupos_ms": [
+   1916,
+   121,
+   163,
+   202,
+   122
+  ],
+  "mediana_por_defecto": 196,
+  "mediana_grupos": 163,
+  "resultados": {
+   "por_defecto": 13,
+   "grupos": 13
+  },
+  "bytes": {
+   "por_defecto": 30189,
+   "grupos": 38718
+  }
+ },
+ {
+  "consulta": "gandola",
+  "por_defecto_ms": [
+   1742,
+   201,
+   471,
+   161,
+   193
+  ],
+  "grupos_ms": [
+   1924,
+   374,
+   174,
+   156,
+   543
+  ],
+  "mediana_por_defecto": 201,
+  "mediana_grupos": 374,
+  "resultados": {
+   "por_defecto": 7,
+   "grupos": 7
+  },
+  "bytes": {
+   "por_defecto": 11496,
+   "grupos": 17320
+  }
+ }
+]

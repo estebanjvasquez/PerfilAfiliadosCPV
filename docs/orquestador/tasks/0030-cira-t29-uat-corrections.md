@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | **IN_PROGRESS** (2026-11-16) |
+| Estado | ~~IN_PROGRESS~~ → **DEPLOYED_FOR_OWNER_UAT** (2026-11-16 ~15:15Z) |
 | Fuente | Issue #2 `6919847012` (estebanjvasquez, 2026-11-16T14:52:14Z): «CORRECTIONS_REQUIRED — TASK-0029 UAT» |
 | Antecedente | TASK-0029 (entrega `6915259431`, HANDOFF `ac93eb6`), que conserva su identificador y su historia. **TASK-0029 no está aprobada para producción** |
 | Rama de documentación | `fix/sec-01-r4-01-role-editor-preserve`, BASE `ac93eb6` |
@@ -48,3 +48,8 @@ Se **autoriza expresamente** corregir la presentación del flujo CIRA Test en n8
 ## Avance
 
 - 2026-11-16 ~15:00Z: tarea materializada. Siguiente: medición de latencia antes de cambiar nada.
+- ~15:00Z: medición de latencia por nodo en n8n (63 ejecuciones desde el 9 nov), Worker directo y `/debug-search`. El cuello de botella es el agente (64–65 %); TASK-0029 no agregó latencia; no se despliega ninguna optimización (fuera de alcance o ganancia mínima).
+- Vistas excluyentes en `Format Cards2`: vista previa con respuestas reales y Playwright PASS; copia aislada `0XoZhWg5oG9hwm3u` con rollback ensayado (T30 → T29 → T30), después borrada.
+- 15:01:54Z: n8n `d2f8efb5` → **`7feb48bc`** (2 nodos). Worker sin cambios (`8796f292`).
+- 15:02–15:05Z: E2E en staging, escritorio y Pixel 5: PASS (logs 88–98, voto 36, sin evaluaciones). 55 consultas: B idéntico a TASK-0029.
+- **DEPLOYED_FOR_OWNER_UAT**: [`../../../audit/CIRA_TASK0030_CORRECCIONES_UAT.md`](../../../audit/CIRA_TASK0030_CORRECCIONES_UAT.md). STOP: queda a la espera de la revisión manual del propietario.

@@ -1,0 +1,1943 @@
+{
+ "casos": 55,
+ "errores": [],
+ "por_defecto_igual_al_vivo": {
+  "mismo_orden": 55,
+  "mismo_top5": 55,
+  "distintos": []
+ },
+ "actual": {
+  "rel_top5": 34,
+  "norel_top5": 38,
+  "sinjuicio_top5": 50,
+  "rel_top10": 39,
+  "vacias": 2,
+  "total": 668,
+  "precision_juzgada": 47.2
+ },
+ "b": {
+  "rel_top5_g1": 23,
+  "norel_top5_g1": 27,
+  "sinjuicio_top5_g1": 53,
+  "rel_cobertura": 39,
+  "vacias": 2,
+  "g1_vacio": 6,
+  "total_g1": 567,
+  "total_g2": 119,
+  "precision_juzgada_g1": 46
+ },
+ "rel_etiquetadas": 49,
+ "consultas_etiquetadas": 31,
+ "invariantes": {
+  "duplicados_entre_grupos": [],
+  "rol_no_nulo": [],
+  "frases_repetidas": [],
+  "g2_antes_que_g1": []
+ },
+ "origen_capacidad": {
+  "perfil": 341,
+  "self_declared": 17,
+  "suggested": 207,
+  "validated": 2
+ },
+ "tipo_capacidad": {
+  "sector/directa": 104,
+  "servicio/parecida": 99,
+  "categoria_cpv/parecida": 44,
+  "categoria_cpv/directa": 155,
+  "categoria_cpv/relacionada": 27,
+  "servicio/directa": 27,
+  "texto_perfil/directa": 93,
+  "nombre/directa": 18
+ },
+ "omisiones_b_vs_actual": [
+  {
+   "id": "L009",
+   "query": "tratamiento de aguas de perforacion",
+   "perdidas": [
+    173,
+    133
+   ],
+   "posiciones_en_actual": [
+    9,
+    13
+   ]
+  },
+  {
+   "id": "S005",
+   "query": "fabricacion de valvulas industriales",
+   "perdidas": [
+    138
+   ],
+   "posiciones_en_actual": [
+    15
+   ]
+  }
+ ],
+ "latencia_ms": {
+  "vivo_por_defecto_mediana": 1770,
+  "local_por_defecto_mediana": 1770,
+  "b_mediana": 1861
+ },
+ "por_consulta": [
+  {
+   "id": "L007",
+   "query": "operadores",
+   "actual_top5": [
+    146,
+    218,
+    240,
+    124,
+    326
+   ],
+   "g1_top5": [
+    146,
+    218,
+    240,
+    124,
+    326
+   ],
+   "g2_top5": [
+    418,
+    333,
+    72,
+    523,
+    204
+   ],
+   "n_actual": 13,
+   "n_g1": 13,
+   "n_g2": 14,
+   "test_id": "G4-01",
+   "rel": [
+    146,
+    177,
+    325,
+    218
+   ],
+   "norel": [
+    124,
+    326,
+    107
+   ],
+   "actual_juicio_top5": {
+    "rel": 2,
+    "norel": 2,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 2,
+    "norel": 2,
+    "sin": 1
+   },
+   "rel_en_cobertura_b": [
+    146,
+    177,
+    325,
+    218
+   ]
+  },
+  {
+   "id": "L009",
+   "query": "tratamiento de aguas de perforacion",
+   "actual_top5": [
+    96,
+    115,
+    333,
+    179,
+    152
+   ],
+   "g1_top5": [
+    79,
+    77,
+    115,
+    152,
+    179
+   ],
+   "g2_top5": [
+    333
+   ],
+   "n_actual": 13,
+   "n_g1": 10,
+   "n_g2": 1,
+   "test_id": "G1-01",
+   "rel": [
+    96,
+    152,
+    179,
+    79,
+    115
+   ],
+   "norel": [],
+   "actual_juicio_top5": {
+    "rel": 4,
+    "norel": 0,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 4,
+    "norel": 0,
+    "sin": 1
+   },
+   "rel_en_cobertura_b": [
+    96,
+    152,
+    179,
+    79,
+    115
+   ]
+  },
+  {
+   "id": "L010",
+   "query": "fabricantes de balancines",
+   "actual_top5": [
+    157
+   ],
+   "g1_top5": [
+    157
+   ],
+   "g2_top5": [],
+   "n_actual": 1,
+   "n_g1": 1,
+   "n_g2": 0
+  },
+  {
+   "id": "L013",
+   "query": "levantamiento artificial",
+   "actual_top5": [
+    276,
+    72,
+    383
+   ],
+   "g1_top5": [
+    383,
+    72
+   ],
+   "g2_top5": [
+    276
+   ],
+   "n_actual": 3,
+   "n_g1": 2,
+   "n_g2": 1,
+   "test_id": "G1-02",
+   "rel": [
+    276,
+    383
+   ],
+   "norel": [
+    72,
+    257,
+    187
+   ],
+   "actual_juicio_top5": {
+    "rel": 2,
+    "norel": 1,
+    "sin": 0
+   },
+   "b_juicio_top5_g1": {
+    "rel": 1,
+    "norel": 1,
+    "sin": 0
+   },
+   "rel_en_cobertura_b": [
+    276,
+    383
+   ]
+  },
+  {
+   "id": "L014",
+   "query": "revestidor",
+   "actual_top5": [
+    157,
+    91,
+    312,
+    317,
+    145
+   ],
+   "g1_top5": [
+    312,
+    317,
+    145,
+    86,
+    141
+   ],
+   "g2_top5": [
+    157
+   ],
+   "n_actual": 9,
+   "n_g1": 8,
+   "n_g2": 1,
+   "test_id": "G1-03",
+   "rel": [
+    157
+   ],
+   "norel": [
+    91,
+    312,
+    317,
+    145
+   ],
+   "actual_juicio_top5": {
+    "rel": 1,
+    "norel": 4,
+    "sin": 0
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 3,
+    "sin": 2
+   },
+   "rel_en_cobertura_b": [
+    157
+   ]
+  },
+  {
+   "id": "L015",
+   "query": "mecha",
+   "actual_top5": [
+    140,
+    1,
+    73,
+    74,
+    75
+   ],
+   "g1_top5": [
+    1,
+    73,
+    74,
+    75,
+    76
+   ],
+   "g2_top5": [],
+   "n_actual": 23,
+   "n_g1": 23,
+   "n_g2": 0,
+   "test_id": "G1-04",
+   "rel": [],
+   "norel": [
+    140,
+    1,
+    73,
+    74
+   ],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 4,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 3,
+    "sin": 2
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L016",
+   "query": "cabria",
+   "actual_top5": [
+    86,
+    138,
+    157,
+    170,
+    179
+   ],
+   "g1_top5": [
+    86,
+    138,
+    157,
+    170,
+    179
+   ],
+   "g2_top5": [],
+   "n_actual": 7,
+   "n_g1": 7,
+   "n_g2": 0,
+   "test_id": "G2-01",
+   "rel": [],
+   "norel": [
+    138,
+    86,
+    157,
+    170
+   ],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 4,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 4,
+    "sin": 1
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L017",
+   "query": "cabrias",
+   "actual_top5": [
+    86,
+    138,
+    157,
+    170,
+    179
+   ],
+   "g1_top5": [
+    86,
+    138,
+    157,
+    170,
+    179
+   ],
+   "g2_top5": [],
+   "n_actual": 7,
+   "n_g1": 7,
+   "n_g2": 0,
+   "test_id": "G2-02",
+   "rel": [],
+   "norel": [
+    138,
+    86,
+    157,
+    170
+   ],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 4,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 4,
+    "sin": 1
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L018",
+   "query": "mechurrio",
+   "actual_top5": [
+    140,
+    391
+   ],
+   "g1_top5": [],
+   "g2_top5": [
+    140,
+    391
+   ],
+   "n_actual": 2,
+   "n_g1": 0,
+   "n_g2": 2,
+   "test_id": "G2-03",
+   "rel": [
+    140
+   ],
+   "norel": [
+    391
+   ],
+   "actual_juicio_top5": {
+    "rel": 1,
+    "norel": 1,
+    "sin": 0
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 0
+   },
+   "rel_en_cobertura_b": [
+    140
+   ]
+  },
+  {
+   "id": "L019",
+   "query": "macolla",
+   "actual_top5": [
+    155,
+    171,
+    1,
+    72,
+    76
+   ],
+   "g1_top5": [],
+   "g2_top5": [
+    155,
+    171,
+    1,
+    72,
+    76
+   ],
+   "n_actual": 13,
+   "n_g1": 0,
+   "n_g2": 13,
+   "test_id": "G2-04",
+   "rel": [
+    155,
+    171,
+    1,
+    76
+   ],
+   "norel": [
+    72
+   ],
+   "actual_juicio_top5": {
+    "rel": 4,
+    "norel": 1,
+    "sin": 0
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 0
+   },
+   "rel_en_cobertura_b": [
+    155,
+    171,
+    1,
+    76
+   ]
+  },
+  {
+   "id": "L020",
+   "query": "guaya fina",
+   "actual_top5": [
+    458,
+    182,
+    198
+   ],
+   "g1_top5": [
+    458,
+    182
+   ],
+   "g2_top5": [
+    198
+   ],
+   "n_actual": 3,
+   "n_g1": 2,
+   "n_g2": 1,
+   "test_id": "G2-05",
+   "rel": [
+    182,
+    458
+   ],
+   "norel": [
+    198,
+    128
+   ],
+   "actual_juicio_top5": {
+    "rel": 2,
+    "norel": 1,
+    "sin": 0
+   },
+   "b_juicio_top5_g1": {
+    "rel": 2,
+    "norel": 0,
+    "sin": 0
+   },
+   "rel_en_cobertura_b": [
+    182,
+    458
+   ]
+  },
+  {
+   "id": "L021",
+   "query": "guaya electrica",
+   "actual_top5": [
+    79
+   ],
+   "g1_top5": [],
+   "g2_top5": [
+    79
+   ],
+   "n_actual": 1,
+   "n_g1": 0,
+   "n_g2": 1,
+   "test_id": "G2-06",
+   "rel": [
+    79
+   ],
+   "norel": [
+    72,
+    213,
+    83,
+    141
+   ],
+   "actual_juicio_top5": {
+    "rel": 1,
+    "norel": 0,
+    "sin": 0
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 0
+   },
+   "rel_en_cobertura_b": [
+    79
+   ]
+  },
+  {
+   "id": "L022",
+   "query": "balancin",
+   "actual_top5": [
+    157,
+    91,
+    333,
+    391
+   ],
+   "g1_top5": [
+    157
+   ],
+   "g2_top5": [
+    91,
+    333,
+    391
+   ],
+   "n_actual": 4,
+   "n_g1": 1,
+   "n_g2": 3,
+   "test_id": "G2-07",
+   "rel": [
+    157
+   ],
+   "norel": [
+    91,
+    333,
+    391
+   ],
+   "actual_juicio_top5": {
+    "rel": 1,
+    "norel": 3,
+    "sin": 0
+   },
+   "b_juicio_top5_g1": {
+    "rel": 1,
+    "norel": 0,
+    "sin": 0
+   },
+   "rel_en_cobertura_b": [
+    157
+   ]
+  },
+  {
+   "id": "L023",
+   "query": "camion chupon",
+   "actual_top5": [
+    391
+   ],
+   "g1_top5": [],
+   "g2_top5": [
+    391
+   ],
+   "n_actual": 1,
+   "n_g1": 0,
+   "n_g2": 1,
+   "test_id": "G2-09",
+   "rel": [
+    391
+   ],
+   "norel": [],
+   "actual_juicio_top5": {
+    "rel": 1,
+    "norel": 0,
+    "sin": 0
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 0
+   },
+   "rel_en_cobertura_b": [
+    391
+   ]
+  },
+  {
+   "id": "L024",
+   "query": "gandola",
+   "actual_top5": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "g1_top5": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "g2_top5": [
+    433
+   ],
+   "n_actual": 7,
+   "n_g1": 6,
+   "n_g2": 1,
+   "test_id": "G2-10",
+   "rel": [
+    165,
+    204
+   ],
+   "norel": [
+    433,
+    187,
+    563
+   ],
+   "actual_juicio_top5": {
+    "rel": 2,
+    "norel": 1,
+    "sin": 2
+   },
+   "b_juicio_top5_g1": {
+    "rel": 2,
+    "norel": 1,
+    "sin": 2
+   },
+   "rel_en_cobertura_b": [
+    165,
+    204
+   ]
+  },
+  {
+   "id": "L025",
+   "query": "mantenimiento de cabrias",
+   "actual_top5": [
+    78,
+    107,
+    157,
+    86,
+    138
+   ],
+   "g1_top5": [
+    78,
+    107,
+    86,
+    138,
+    157
+   ],
+   "g2_top5": [],
+   "n_actual": 9,
+   "n_g1": 9,
+   "n_g2": 0,
+   "test_id": "G3-01",
+   "rel": [
+    173,
+    115,
+    179,
+    96
+   ],
+   "norel": [
+    257
+   ],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 5
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 5
+   },
+   "rel_en_cobertura_b": [
+    179
+   ]
+  },
+  {
+   "id": "L026",
+   "query": "fabricantes de cabrias",
+   "actual_top5": [
+    157,
+    86,
+    138,
+    170,
+    179
+   ],
+   "g1_top5": [
+    157,
+    86,
+    138,
+    170,
+    179
+   ],
+   "g2_top5": [],
+   "n_actual": 7,
+   "n_g1": 7,
+   "n_g2": 0,
+   "test_id": "G3-02",
+   "rel": [
+    173,
+    115,
+    179,
+    96
+   ],
+   "norel": [
+    257
+   ],
+   "actual_juicio_top5": {
+    "rel": 1,
+    "norel": 0,
+    "sin": 4
+   },
+   "b_juicio_top5_g1": {
+    "rel": 1,
+    "norel": 0,
+    "sin": 4
+   },
+   "rel_en_cobertura_b": [
+    179
+   ]
+  },
+  {
+   "id": "L027",
+   "query": "transporte de gandolas",
+   "actual_top5": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "g1_top5": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "g2_top5": [],
+   "n_actual": 6,
+   "n_g1": 6,
+   "n_g2": 0,
+   "test_id": "G3-03",
+   "rel": [
+    204,
+    452,
+    426
+   ],
+   "norel": [
+    187
+   ],
+   "actual_juicio_top5": {
+    "rel": 3,
+    "norel": 1,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 3,
+    "norel": 1,
+    "sin": 1
+   },
+   "rel_en_cobertura_b": [
+    204,
+    452,
+    426
+   ]
+  },
+  {
+   "id": "L028",
+   "query": "alquiler de gandolas",
+   "actual_top5": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "g1_top5": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "g2_top5": [],
+   "n_actual": 8,
+   "n_g1": 8,
+   "n_g2": 0,
+   "test_id": "G3-04",
+   "rel": [
+    165,
+    204,
+    426
+   ],
+   "norel": [
+    187,
+    563
+   ],
+   "actual_juicio_top5": {
+    "rel": 3,
+    "norel": 1,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 3,
+    "norel": 1,
+    "sin": 1
+   },
+   "rel_en_cobertura_b": [
+    165,
+    204,
+    426
+   ]
+  },
+  {
+   "id": "L029",
+   "query": "mantenimiento de levantamiento artificial",
+   "actual_top5": [
+    107,
+    78,
+    72,
+    122
+   ],
+   "g1_top5": [
+    107,
+    122,
+    78
+   ],
+   "g2_top5": [
+    72
+   ],
+   "n_actual": 4,
+   "n_g1": 3,
+   "n_g2": 1,
+   "test_id": "G3-05",
+   "rel": [],
+   "norel": [
+    107,
+    78,
+    72,
+    94
+   ],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 3,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 2,
+    "sin": 1
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L031",
+   "query": "servicios petroleros",
+   "actual_top5": [
+    96,
+    198,
+    85,
+    179,
+    157
+   ],
+   "g1_top5": [
+    96,
+    179,
+    207,
+    276,
+    182
+   ],
+   "g2_top5": [
+    198,
+    85,
+    178,
+    204,
+    361
+   ],
+   "n_actual": 29,
+   "n_g1": 18,
+   "n_g2": 11,
+   "test_id": "G4-03",
+   "rel": [],
+   "norel": [],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 5
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 5
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L032",
+   "query": "construccion",
+   "actual_top5": [
+    74,
+    1,
+    140,
+    75,
+    115
+   ],
+   "g1_top5": [
+    74,
+    1,
+    140,
+    75,
+    115
+   ],
+   "g2_top5": [
+    202,
+    333
+   ],
+   "n_actual": 85,
+   "n_g1": 85,
+   "n_g2": 2,
+   "test_id": "G4-04",
+   "rel": [],
+   "norel": [],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 5
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 5
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L033",
+   "query": "tratamiento de aguas de perforacion",
+   "actual_top5": [
+    96,
+    179,
+    115,
+    333,
+    173
+   ],
+   "g1_top5": [
+    179,
+    115,
+    96,
+    79,
+    152
+   ],
+   "g2_top5": [
+    333
+   ],
+   "n_actual": 10,
+   "n_g1": 9,
+   "n_g2": 1,
+   "test_id": "G5-01",
+   "rel": [
+    115
+   ],
+   "norel": [
+    391,
+    257,
+    74,
+    137
+   ],
+   "actual_juicio_top5": {
+    "rel": 1,
+    "norel": 0,
+    "sin": 4
+   },
+   "b_juicio_top5_g1": {
+    "rel": 1,
+    "norel": 0,
+    "sin": 4
+   },
+   "rel_en_cobertura_b": [
+    115
+   ]
+  },
+  {
+   "id": "L034",
+   "query": "fabriquen y mantengan balancines",
+   "actual_top5": [
+    157,
+    333,
+    107,
+    391,
+    138
+   ],
+   "g1_top5": [
+    157,
+    107,
+    138,
+    74,
+    94
+   ],
+   "g2_top5": [
+    333,
+    391
+   ],
+   "n_actual": 18,
+   "n_g1": 16,
+   "n_g2": 2,
+   "test_id": "G5-02",
+   "rel": [
+    157
+   ],
+   "norel": [
+    333,
+    391,
+    107,
+    83
+   ],
+   "actual_juicio_top5": {
+    "rel": 1,
+    "norel": 3,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 1,
+    "norel": 1,
+    "sin": 3
+   },
+   "rel_en_cobertura_b": [
+    157
+   ]
+  },
+  {
+   "id": "L035",
+   "query": "inspeccion y mantenimiento de guaya electrica",
+   "actual_top5": [
+    78,
+    74,
+    107,
+    193,
+    122
+   ],
+   "g1_top5": [
+    107,
+    122,
+    78,
+    74,
+    193
+   ],
+   "g2_top5": [],
+   "n_actual": 5,
+   "n_g1": 5,
+   "n_g2": 0,
+   "test_id": "G5-03",
+   "rel": [],
+   "norel": [],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 5
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 5
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L036",
+   "query": "transporte de crudo por gandola",
+   "actual_top5": [
+    185
+   ],
+   "g1_top5": [
+    185
+   ],
+   "g2_top5": [],
+   "n_actual": 1,
+   "n_g1": 1,
+   "n_g2": 0,
+   "test_id": "G5-04",
+   "rel": [],
+   "norel": [],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 1
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L037",
+   "query": "pipeline",
+   "actual_top5": [
+    157,
+    141,
+    151,
+    86,
+    80
+   ],
+   "g1_top5": [
+    141,
+    151,
+    157,
+    86,
+    80
+   ],
+   "g2_top5": [
+    1
+   ],
+   "n_actual": 13,
+   "n_g1": 13,
+   "n_g2": 1,
+   "test_id": "G6-01",
+   "rel": [
+    157
+   ],
+   "norel": [
+    141
+   ],
+   "actual_juicio_top5": {
+    "rel": 1,
+    "norel": 1,
+    "sin": 3
+   },
+   "b_juicio_top5_g1": {
+    "rel": 1,
+    "norel": 1,
+    "sin": 3
+   },
+   "rel_en_cobertura_b": [
+    157
+   ]
+  },
+  {
+   "id": "L038",
+   "query": "refinery",
+   "actual_top5": [
+    157,
+    76
+   ],
+   "g1_top5": [
+    157,
+    76
+   ],
+   "g2_top5": [],
+   "n_actual": 2,
+   "n_g1": 2,
+   "n_g2": 0,
+   "test_id": "G6-02",
+   "rel": [],
+   "norel": [
+    157,
+    85,
+    187,
+    125,
+    149
+   ],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 1,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 1,
+    "sin": 1
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L039",
+   "query": "refineria",
+   "actual_top5": [
+    76,
+    85,
+    83,
+    90,
+    523
+   ],
+   "g1_top5": [
+    76
+   ],
+   "g2_top5": [
+    85,
+    83,
+    90,
+    523,
+    480
+   ],
+   "n_actual": 18,
+   "n_g1": 1,
+   "n_g2": 17,
+   "test_id": "G6-03",
+   "rel": [],
+   "norel": [],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 5
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 1
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L040",
+   "query": "drilling",
+   "actual_top5": [
+    157,
+    96,
+    179,
+    86,
+    170
+   ],
+   "g1_top5": [
+    86,
+    170,
+    138,
+    182,
+    179
+   ],
+   "g2_top5": [
+    193
+   ],
+   "n_actual": 24,
+   "n_g1": 24,
+   "n_g2": 1,
+   "test_id": "G6-04",
+   "rel": [
+    115,
+    79,
+    152,
+    96,
+    77,
+    133,
+    157
+   ],
+   "norel": [
+    86,
+    170,
+    391,
+    187
+   ],
+   "actual_juicio_top5": {
+    "rel": 2,
+    "norel": 2,
+    "sin": 1
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 2,
+    "sin": 3
+   },
+   "rel_en_cobertura_b": [
+    115,
+    77,
+    157
+   ]
+  },
+  {
+   "id": "L041",
+   "query": "arbolitos para pozos petroleros",
+   "actual_top5": [
+    179
+   ],
+   "g1_top5": [
+    179
+   ],
+   "g2_top5": [],
+   "n_actual": 1,
+   "n_g1": 1,
+   "n_g2": 0,
+   "test_id": "G7-02",
+   "rel": [
+    179
+   ],
+   "norel": [
+    207,
+    112,
+    80
+   ],
+   "actual_juicio_top5": {
+    "rel": 1,
+    "norel": 0,
+    "sin": 0
+   },
+   "b_juicio_top5_g1": {
+    "rel": 1,
+    "norel": 0,
+    "sin": 0
+   },
+   "rel_en_cobertura_b": [
+    179
+   ]
+  },
+  {
+   "id": "L042",
+   "query": "venta de zapatos",
+   "actual_top5": [],
+   "g1_top5": [],
+   "g2_top5": [],
+   "n_actual": 0,
+   "n_g1": 0,
+   "n_g2": 0,
+   "test_id": "G7-03",
+   "rel": [],
+   "norel": [],
+   "actual_juicio_top5": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 0
+   },
+   "b_juicio_top5_g1": {
+    "rel": 0,
+    "norel": 0,
+    "sin": 0
+   },
+   "rel_en_cobertura_b": []
+  },
+  {
+   "id": "L053",
+   "query": "gandolas",
+   "actual_top5": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "g1_top5": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "g2_top5": [
+    433
+   ],
+   "n_actual": 7,
+   "n_g1": 6,
+   "n_g2": 1
+  },
+  {
+   "id": "L054",
+   "query": "servicios de pozos",
+   "actual_top5": [
+    152,
+    179,
+    133,
+    96,
+    79
+   ],
+   "g1_top5": [
+    152,
+    133,
+    179,
+    528,
+    312
+   ],
+   "g2_top5": [],
+   "n_actual": 33,
+   "n_g1": 33,
+   "n_g2": 0
+  },
+  {
+   "id": "L056",
+   "query": "servicios a pozos",
+   "actual_top5": [
+    178,
+    79,
+    152,
+    179,
+    528
+   ],
+   "g1_top5": [
+    528,
+    133,
+    178,
+    79,
+    371
+   ],
+   "g2_top5": [],
+   "n_actual": 49,
+   "n_g1": 49,
+   "n_g2": 0
+  },
+  {
+   "id": "L058",
+   "query": "sistemas fotovoltaicos",
+   "actual_top5": [
+    82,
+    126,
+    76
+   ],
+   "g1_top5": [
+    82,
+    126,
+    76
+   ],
+   "g2_top5": [],
+   "n_actual": 3,
+   "n_g1": 3,
+   "n_g2": 0
+  },
+  {
+   "id": "L059",
+   "query": "expansores",
+   "actual_top5": [
+    86,
+    81,
+    107,
+    91,
+    179
+   ],
+   "g1_top5": [
+    86,
+    81,
+    107,
+    91,
+    179
+   ],
+   "g2_top5": [],
+   "n_actual": 21,
+   "n_g1": 21,
+   "n_g2": 0
+  },
+  {
+   "id": "L060",
+   "query": "partes y repuestos de compresores",
+   "actual_top5": [
+    112,
+    179,
+    78,
+    82,
+    107
+   ],
+   "g1_top5": [
+    82,
+    112,
+    92,
+    122,
+    182
+   ],
+   "g2_top5": [
+    213
+   ],
+   "n_actual": 30,
+   "n_g1": 30,
+   "n_g2": 1
+  },
+  {
+   "id": "L061",
+   "query": "ingenieria feed",
+   "actual_top5": [
+    76
+   ],
+   "g1_top5": [
+    76
+   ],
+   "g2_top5": [],
+   "n_actual": 1,
+   "n_g1": 1,
+   "n_g2": 0
+  },
+  {
+   "id": "L062",
+   "query": "ingenieria de procesos",
+   "actual_top5": [
+    90,
+    76,
+    433,
+    112,
+    107
+   ],
+   "g1_top5": [
+    107,
+    94,
+    92,
+    480,
+    359
+   ],
+   "g2_top5": [
+    433,
+    523,
+    487,
+    163
+   ],
+   "n_actual": 31,
+   "n_g1": 27,
+   "n_g2": 4
+  },
+  {
+   "id": "L063",
+   "query": "ipc",
+   "actual_top5": [
+    433,
+    76,
+    82,
+    229,
+    140
+   ],
+   "g1_top5": [
+    288,
+    354,
+    526,
+    433,
+    76
+   ],
+   "g2_top5": [
+    171
+   ],
+   "n_actual": 23,
+   "n_g1": 23,
+   "n_g2": 1
+  },
+  {
+   "id": "L064",
+   "query": "mechas de perforacion",
+   "actual_top5": [
+    72,
+    138,
+    157,
+    170
+   ],
+   "g1_top5": [
+    138,
+    170,
+    157,
+    72
+   ],
+   "g2_top5": [],
+   "n_actual": 4,
+   "n_g1": 4,
+   "n_g2": 0
+  },
+  {
+   "id": "L067",
+   "query": "mantenimiento de bombas",
+   "actual_top5": [
+    157,
+    333,
+    382,
+    480,
+    78
+   ],
+   "g1_top5": [
+    73,
+    107,
+    94,
+    78,
+    75
+   ],
+   "g2_top5": [
+    157,
+    333,
+    382,
+    480,
+    391
+   ],
+   "n_actual": 20,
+   "n_g1": 10,
+   "n_g2": 11
+  },
+  {
+   "id": "L068",
+   "query": "servicios de perforacion de pozos",
+   "actual_top5": [
+    152,
+    179,
+    77,
+    115,
+    133
+   ],
+   "g1_top5": [
+    152,
+    133,
+    77,
+    179,
+    115
+   ],
+   "g2_top5": [
+    85,
+    333,
+    536
+   ],
+   "n_actual": 20,
+   "n_g1": 17,
+   "n_g2": 3
+  },
+  {
+   "id": "L069",
+   "query": "manejo de fluidos de perforacion",
+   "actual_top5": [
+    179,
+    96,
+    173,
+    391,
+    182
+   ],
+   "g1_top5": [
+    182,
+    179,
+    96,
+    173,
+    391
+   ],
+   "g2_top5": [
+    91
+   ],
+   "n_actual": 12,
+   "n_g1": 11,
+   "n_g2": 1
+  },
+  {
+   "id": "L070",
+   "query": "manejo de aguas residuales",
+   "actual_top5": [
+    96,
+    72,
+    173,
+    391,
+    179
+   ],
+   "g1_top5": [
+    72,
+    331,
+    96,
+    313,
+    179
+   ],
+   "g2_top5": [],
+   "n_actual": 9,
+   "n_g1": 9,
+   "n_g2": 0
+  },
+  {
+   "id": "L071",
+   "query": "tuberia octg",
+   "actual_top5": [],
+   "g1_top5": [],
+   "g2_top5": [],
+   "n_actual": 0,
+   "n_g1": 0,
+   "n_g2": 0
+  },
+  {
+   "id": "L072",
+   "query": "valvulas de bola",
+   "actual_top5": [
+    80,
+    560,
+    487,
+    573,
+    107
+   ],
+   "g1_top5": [
+    573,
+    80,
+    107,
+    157
+   ],
+   "g2_top5": [
+    560,
+    487
+   ],
+   "n_actual": 6,
+   "n_g1": 4,
+   "n_g2": 2
+  },
+  {
+   "id": "L073",
+   "query": "balacines",
+   "actual_top5": [
+    157,
+    91,
+    333,
+    391
+   ],
+   "g1_top5": [
+    157
+   ],
+   "g2_top5": [
+    91,
+    333,
+    391
+   ],
+   "n_actual": 4,
+   "n_g1": 1,
+   "n_g2": 3
+  },
+  {
+   "id": "S001",
+   "query": "venta de balancines",
+   "actual_top5": [
+    157,
+    333
+   ],
+   "g1_top5": [
+    157
+   ],
+   "g2_top5": [
+    333
+   ],
+   "n_actual": 2,
+   "n_g1": 1,
+   "n_g2": 1
+  },
+  {
+   "id": "S002",
+   "query": "mantenimiento de balancines",
+   "actual_top5": [
+    157,
+    333,
+    391,
+    74,
+    487
+   ],
+   "g1_top5": [
+    157,
+    74,
+    107,
+    73,
+    94
+   ],
+   "g2_top5": [
+    333,
+    391
+   ],
+   "n_actual": 12,
+   "n_g1": 10,
+   "n_g2": 2
+  },
+  {
+   "id": "S003",
+   "query": "sellado de fluidos en balancines",
+   "actual_top5": [
+    91,
+    487
+   ],
+   "g1_top5": [
+    487,
+    91
+   ],
+   "g2_top5": [],
+   "n_actual": 2,
+   "n_g1": 2,
+   "n_g2": 0
+  },
+  {
+   "id": "S004",
+   "query": "limpieza de balancines",
+   "actual_top5": [
+    391,
+    523,
+    333
+   ],
+   "g1_top5": [
+    391,
+    523
+   ],
+   "g2_top5": [
+    333
+   ],
+   "n_actual": 3,
+   "n_g1": 2,
+   "n_g2": 1
+  },
+  {
+   "id": "S005",
+   "query": "fabricacion de valvulas industriales",
+   "actual_top5": [
+    560,
+    487,
+    480,
+    75,
+    563
+   ],
+   "g1_top5": [
+    560,
+    187,
+    100,
+    141,
+    563
+   ],
+   "g2_top5": [
+    487,
+    480,
+    333,
+    75,
+    391
+   ],
+   "n_actual": 16,
+   "n_g1": 9,
+   "n_g2": 6
+  },
+  {
+   "id": "S006",
+   "query": "mantenimiento de valvulas industriales",
+   "actual_top5": [
+    560,
+    107,
+    333,
+    480,
+    391
+   ],
+   "g1_top5": [
+    122,
+    107,
+    194,
+    78,
+    75
+   ],
+   "g2_top5": [
+    560,
+    333,
+    480,
+    391,
+    487
+   ],
+   "n_actual": 13,
+   "n_g1": 6,
+   "n_g2": 7
+  }
+ ],
+ "casos_fijados": {
+  "balancin": {
+   "cap": [
+    157
+   ],
+   "exp": [
+    91,
+    333,
+    391
+   ],
+   "lukiven_157_en_capacidades": true,
+   "disteinsa_ogs_totalclean_en_experiencias": true
+  },
+  "macolla": {
+   "cap": [],
+   "exp": [
+    155,
+    171,
+    1,
+    72,
+    76,
+    83,
+    78,
+    77,
+    115,
+    317,
+    159,
+    489,
+    536
+   ],
+   "conserva_resultados_en_secundario": true,
+   "relevantes_cliente_en_secundario": [
+    155,
+    171,
+    1,
+    76
+   ]
+  }
+ }
+}
