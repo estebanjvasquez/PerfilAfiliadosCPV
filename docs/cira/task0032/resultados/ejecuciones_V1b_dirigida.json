@@ -1,0 +1,1171 @@
+[
+ {
+  "id": "D01",
+  "input": "IPC",
+  "rep": 1,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D01-r1-1794853603544",
+  "client_ms": 6090,
+  "status": 200,
+  "type": "conversation",
+  "output_len": 70,
+  "error": null,
+  "at": "2026-11-16T18:26:43.544Z",
+  "exec": {
+   "execution": "22966",
+   "status": "success",
+   "total_ms": 5573,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 35,
+    "Admin Password": 1,
+    "Detect Command": 26,
+    "Is Command?": 2,
+    "Load Learnings": 235,
+    "Build System Prompt": 30,
+    "Postgres Memory Intent3": 323,
+    "OpenAI Chat Model": 4369,
+    "Interactive Intent Agent3": 5168,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 1,
+    "Respond Conversation5": 1,
+    "Build Log": 16
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4858,
+    "completion": 174,
+    "total": 5032
+   },
+   "tool": null,
+   "params": null,
+   "search_ready": "false",
+   "rows": null,
+   "error": null
+  }
+ },
+ {
+  "id": "D02",
+  "input": "Tuberia octg",
+  "rep": 1,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D02-r1-1794853609659",
+  "client_ms": 7048,
+  "status": 200,
+  "type": "results",
+  "output_len": 7266,
+  "error": null,
+  "at": "2026-11-16T18:26:49.659Z",
+  "exec": {
+   "execution": "22967",
+   "status": "success",
+   "total_ms": 6840,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 15,
+    "Admin Password": 2,
+    "Detect Command": 15,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 12,
+    "Postgres Memory Intent3": 131,
+    "OpenAI Chat Model": 3348,
+    "Interactive Intent Agent3": 3740,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2888,
+    "Unwrap MCP Result": 14,
+    "Build Search Log": 13,
+    "Log Search": 1,
+    "Attach Log Id": 13,
+    "If2": 1,
+    "Format Cards2": 22,
+    "Final Respond3": 2,
+    "Build Log": 19
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4862,
+    "completion": 112,
+    "total": 4974
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tuberia octg",
+    "resolvedPhrases": [
+     "tubería octg"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "D03",
+  "input": "tratamiento de aguas de perforación en el lago",
+  "rep": 1,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D03-r1-1794853616708",
+  "client_ms": 10194,
+  "status": 200,
+  "type": null,
+  "output_len": 0,
+  "error": null,
+  "at": "2026-11-16T18:26:56.708Z",
+  "exec": {
+   "execution": "22968",
+   "status": "success",
+   "total_ms": 10012,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 12,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 31,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 7172,
+    "Interactive Intent Agent3": 7655,
+    "Parse Intent JSON3": 15,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2122,
+    "Unwrap MCP Result": 16,
+    "Build Search Log": 20,
+    "Log Search": 0,
+    "Attach Log Id": 27,
+    "If2": 2,
+    "Code in JavaScript1": 23,
+    "Respond Conversation6": 2,
+    "Build Log": 25
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4867,
+    "completion": 363,
+    "total": 5230
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tratamiento de aguas de perforacion",
+    "ciudad": "lago",
+    "resolvedPhrases": [
+     "tratamiento de aguas de perforación"
+    ],
+    "queryIntent": "MIXED",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [],
+   "error": null
+  }
+ },
+ {
+  "id": "D01",
+  "input": "IPC",
+  "rep": 2,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D01-r2-1794853626902",
+  "client_ms": 6105,
+  "status": 200,
+  "type": "conversation",
+  "output_len": 29,
+  "error": null,
+  "at": "2026-11-16T18:27:06.902Z",
+  "exec": {
+   "execution": "22969",
+   "status": "success",
+   "total_ms": 5990,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 18,
+    "Admin Password": 1,
+    "Detect Command": 16,
+    "Is Command?": 1,
+    "Load Learnings": 148,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 135,
+    "OpenAI Chat Model": 5098,
+    "Interactive Intent Agent3": 5717,
+    "Parse Intent JSON3": 16,
+    "Is Search Ready?3": 2,
+    "Respond Conversation5": 1,
+    "Build Log": 16
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4858,
+    "completion": 165,
+    "total": 5023
+   },
+   "tool": null,
+   "params": null,
+   "search_ready": "false",
+   "rows": null,
+   "error": null
+  }
+ },
+ {
+  "id": "D02",
+  "input": "Tuberia octg",
+  "rep": 2,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D02-r2-1794853633008",
+  "client_ms": 9724,
+  "status": 200,
+  "type": "results",
+  "output_len": 7266,
+  "error": null,
+  "at": "2026-11-16T18:27:13.008Z",
+  "exec": {
+   "execution": "22970",
+   "status": "success",
+   "total_ms": 9534,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 23,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 30,
+    "Build System Prompt": 16,
+    "Postgres Memory Intent3": 132,
+    "OpenAI Chat Model": 5888,
+    "MCP Perfil Afiliados CPV": 2118,
+    "Interactive Intent Agent3": 8495,
+    "Parse Intent JSON3": 12,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 807,
+    "Unwrap MCP Result": 12,
+    "Build Search Log": 13,
+    "Log Search": 0,
+    "Attach Log Id": 12,
+    "If2": 1,
+    "Format Cards2": 32,
+    "Final Respond3": 1,
+    "Build Log": 31
+   },
+   "llamadas_modelo": 2,
+   "llamadas_herramienta_mcp": 1,
+   "tokens": {
+    "prompt": 10317,
+    "completion": 148,
+    "total": 10465
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tuberia octg",
+    "resolvedPhrases": [
+     "tubería octg"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "D03",
+  "input": "tratamiento de aguas de perforación en el lago",
+  "rep": 2,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D03-r2-1794853642732",
+  "client_ms": 12063,
+  "status": 200,
+  "type": null,
+  "output_len": 0,
+  "error": null,
+  "at": "2026-11-16T18:27:22.732Z",
+  "exec": {
+   "execution": "22971",
+   "status": "success",
+   "total_ms": 11880,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 12,
+    "Is Command?": 1,
+    "Load Learnings": 33,
+    "Build System Prompt": 22,
+    "Postgres Memory Intent3": 238,
+    "OpenAI Chat Model": 10555,
+    "Interactive Intent Agent3": 11107,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 573,
+    "Unwrap MCP Result": 12,
+    "Build Search Log": 14,
+    "Log Search": 1,
+    "Attach Log Id": 13,
+    "If2": 1,
+    "Code in JavaScript1": 15,
+    "Respond Conversation6": 1,
+    "Build Log": 15
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4867,
+    "completion": 658,
+    "total": 5525
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tratamiento de aguas de perforacion",
+    "ciudad": "lago",
+    "resolvedPhrases": [
+     "tratamiento de aguas de perforación"
+    ],
+    "queryIntent": "MIXED",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [],
+   "error": null
+  }
+ },
+ {
+  "id": "D01",
+  "input": "IPC",
+  "rep": 3,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D01-r3-1794853654795",
+  "client_ms": 5456,
+  "status": 200,
+  "type": "conversation",
+  "output_len": 98,
+  "error": null,
+  "at": "2026-11-16T18:27:34.795Z",
+  "exec": {
+   "execution": "22972",
+   "status": "success",
+   "total_ms": 5383,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 10,
+    "Admin Password": 1,
+    "Detect Command": 13,
+    "Is Command?": 1,
+    "Load Learnings": 140,
+    "Build System Prompt": 15,
+    "Postgres Memory Intent3": 133,
+    "OpenAI Chat Model": 4722,
+    "Interactive Intent Agent3": 5146,
+    "Parse Intent JSON3": 12,
+    "Is Search Ready?3": 1,
+    "Respond Conversation5": 1,
+    "Build Log": 20
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4858,
+    "completion": 148,
+    "total": 5006
+   },
+   "tool": null,
+   "params": null,
+   "search_ready": "false",
+   "rows": null,
+   "error": null
+  }
+ },
+ {
+  "id": "D02",
+  "input": "Tuberia octg",
+  "rep": 3,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D02-r3-1794853660251",
+  "client_ms": 8212,
+  "status": 200,
+  "type": "results",
+  "output_len": 7266,
+  "error": null,
+  "at": "2026-11-16T18:27:40.251Z",
+  "exec": {
+   "execution": "22973",
+   "status": "success",
+   "total_ms": 8022,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 12,
+    "Is Command?": 1,
+    "Load Learnings": 29,
+    "Build System Prompt": 19,
+    "Postgres Memory Intent3": 129,
+    "OpenAI Chat Model": 5826,
+    "MCP Perfil Afiliados CPV": 1035,
+    "Interactive Intent Agent3": 7314,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 501,
+    "Unwrap MCP Result": 15,
+    "Build Search Log": 21,
+    "Log Search": 0,
+    "Attach Log Id": 13,
+    "If2": 2,
+    "Format Cards2": 20,
+    "Final Respond3": 2,
+    "Build Log": 18
+   },
+   "llamadas_modelo": 2,
+   "llamadas_herramienta_mcp": 1,
+   "tokens": {
+    "prompt": 10645,
+    "completion": 140,
+    "total": 10785
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tuberia octg",
+    "resolvedPhrases": [
+     "tubería octg"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "D03",
+  "input": "tratamiento de aguas de perforación en el lago",
+  "rep": 3,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D03-r3-1794853668464",
+  "client_ms": 20551,
+  "status": 200,
+  "type": "results",
+  "output_len": 15008,
+  "error": null,
+  "at": "2026-11-16T18:27:48.464Z",
+  "exec": {
+   "execution": "22974",
+   "status": "success",
+   "total_ms": 20362,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 18,
+    "Admin Password": 1,
+    "Detect Command": 16,
+    "Is Command?": 2,
+    "Load Learnings": 30,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 249,
+    "OpenAI Chat Model": 17507,
+    "Interactive Intent Agent3": 18203,
+    "Parse Intent JSON3": 32,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1829,
+    "Unwrap MCP Result": 30,
+    "Build Search Log": 27,
+    "Log Search": 1,
+    "Attach Log Id": 43,
+    "If2": 2,
+    "Format Cards2": 37,
+    "Final Respond3": 1,
+    "Build Log": 28
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4867,
+    "completion": 1088,
+    "total": 5955
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tratamiento de aguas de perforacion",
+    "ciudad": "maracaibo",
+    "resolvedPhrases": [
+     "tratamiento de aguas de perforación"
+    ],
+    "queryIntent": "MIXED",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "D01",
+  "input": "IPC",
+  "rep": 4,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D01-r4-1794853689015",
+  "client_ms": 9030,
+  "status": 200,
+  "type": "results",
+  "output_len": 116700,
+  "error": null,
+  "at": "2026-11-16T18:28:09.015Z",
+  "exec": {
+   "execution": "22975",
+   "status": "success",
+   "total_ms": 8826,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 24,
+    "Admin Password": 2,
+    "Detect Command": 17,
+    "Is Command?": 1,
+    "Load Learnings": 144,
+    "Build System Prompt": 18,
+    "Postgres Memory Intent3": 132,
+    "OpenAI Chat Model": 4725,
+    "Interactive Intent Agent3": 5384,
+    "Parse Intent JSON3": 14,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 3002,
+    "Unwrap MCP Result": 27,
+    "Build Search Log": 27,
+    "Log Search": 0,
+    "Attach Log Id": 25,
+    "If2": 1,
+    "Format Cards2": 30,
+    "Final Respond3": 1,
+    "Build Log": 37
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4858,
+    "completion": 161,
+    "total": 5019
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "ipc",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 288,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 354,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 526,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 433,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 90,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 82,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 73,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 94,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 75,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 525,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 407,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 229,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 560,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 140,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 137,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 177,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 214,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 171,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "D02",
+  "input": "Tuberia octg",
+  "rep": 4,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D02-r4-1794853698045",
+  "client_ms": 9841,
+  "status": 200,
+  "type": "results",
+  "output_len": 7266,
+  "error": null,
+  "at": "2026-11-16T18:28:18.045Z",
+  "exec": {
+   "execution": "22976",
+   "status": "success",
+   "total_ms": 9729,
+   "nodos_ms": {
+    "Webhook1": 1,
+    "Pre-Procesing3": 13,
+    "Admin Password": 1,
+    "Detect Command": 16,
+    "Is Command?": 1,
+    "Load Learnings": 29,
+    "Build System Prompt": 19,
+    "Postgres Memory Intent3": 131,
+    "OpenAI Chat Model": 6134,
+    "Interactive Intent Agent3": 6575,
+    "Parse Intent JSON3": 17,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 2944,
+    "Unwrap MCP Result": 12,
+    "Build Search Log": 12,
+    "Log Search": 0,
+    "Attach Log Id": 11,
+    "If2": 1,
+    "Format Cards2": 20,
+    "Final Respond3": 1,
+    "Build Log": 18
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4862,
+    "completion": 113,
+    "total": 4975
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tuberia octg",
+    "resolvedPhrases": [
+     "tubería octg"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "D03",
+  "input": "tratamiento de aguas de perforación en el lago",
+  "rep": 4,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D03-r4-1794853707886",
+  "client_ms": 12708,
+  "status": 200,
+  "type": "results",
+  "output_len": 15021,
+  "error": null,
+  "at": "2026-11-16T18:28:27.886Z",
+  "exec": {
+   "execution": "22977",
+   "status": "success",
+   "total_ms": 12630,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 12,
+    "Is Command?": 0,
+    "Load Learnings": 29,
+    "Build System Prompt": 11,
+    "Postgres Memory Intent3": 143,
+    "OpenAI Chat Model": 9758,
+    "Interactive Intent Agent3": 10359,
+    "Parse Intent JSON3": 20,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 2053,
+    "Unwrap MCP Result": 18,
+    "Build Search Log": 15,
+    "Log Search": 0,
+    "Attach Log Id": 17,
+    "If2": 1,
+    "Format Cards2": 26,
+    "Final Respond3": 2,
+    "Build Log": 24
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4867,
+    "completion": 526,
+    "total": 5393
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tratamiento de aguas de perforacion",
+    "ciudad": "maracaibo",
+    "resolvedPhrases": [
+     "tratamiento de aguas de perforación"
+    ],
+    "queryIntent": "MIXED",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "D01",
+  "input": "IPC",
+  "rep": 5,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D01-r5-1794853720594",
+  "client_ms": 9294,
+  "status": 200,
+  "type": "results",
+  "output_len": 116686,
+  "error": null,
+  "at": "2026-11-16T18:28:40.594Z",
+  "exec": {
+   "execution": "22978",
+   "status": "success",
+   "total_ms": 9198,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 17,
+    "Admin Password": 0,
+    "Detect Command": 17,
+    "Is Command?": 1,
+    "Load Learnings": 147,
+    "Build System Prompt": 17,
+    "Postgres Memory Intent3": 131,
+    "OpenAI Chat Model": 5991,
+    "Interactive Intent Agent3": 6880,
+    "Parse Intent JSON3": 15,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 1931,
+    "Unwrap MCP Result": 19,
+    "Build Search Log": 18,
+    "Log Search": 0,
+    "Attach Log Id": 23,
+    "If2": 1,
+    "Format Cards2": 31,
+    "Final Respond3": 2,
+    "Build Log": 42
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4858,
+    "completion": 221,
+    "total": 5079
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "ipc",
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 288,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 354,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 526,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 433,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 90,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 82,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 73,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 94,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 75,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 107,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 92,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 525,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 407,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 229,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 560,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 140,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 137,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 187,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 177,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 214,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 122,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 487,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 171,
+     "grupo": "experiencia",
+     "origen": null
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "D02",
+  "input": "Tuberia octg",
+  "rep": 5,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D02-r5-1794853729888",
+  "client_ms": 5917,
+  "status": 200,
+  "type": "results",
+  "output_len": 7266,
+  "error": null,
+  "at": "2026-11-16T18:28:49.888Z",
+  "exec": {
+   "execution": "22979",
+   "status": "success",
+   "total_ms": 5813,
+   "nodos_ms": {
+    "Webhook1": 0,
+    "Pre-Procesing3": 14,
+    "Admin Password": 1,
+    "Detect Command": 12,
+    "Is Command?": 1,
+    "Load Learnings": 31,
+    "Build System Prompt": 18,
+    "Postgres Memory Intent3": 131,
+    "OpenAI Chat Model": 2989,
+    "Interactive Intent Agent3": 3621,
+    "Parse Intent JSON3": 13,
+    "Is Search Ready?3": 2,
+    "Call MCP Empresas": 1983,
+    "Unwrap MCP Result": 13,
+    "Build Search Log": 16,
+    "Log Search": 0,
+    "Attach Log Id": 16,
+    "If2": 1,
+    "Format Cards2": 16,
+    "Final Respond3": 1,
+    "Build Log": 16
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4862,
+    "completion": 104,
+    "total": 4966
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tuberia octg",
+    "resolvedPhrases": [
+     "tubería octg"
+    ],
+    "queryIntent": "SERVICE",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 76,
+     "grupo": "capacidad",
+     "origen": "self_declared"
+    }
+   ],
+   "error": null
+  }
+ },
+ {
+  "id": "D03",
+  "input": "tratamiento de aguas de perforación en el lago",
+  "rep": 5,
+  "variant": "t32V1b_dirigida",
+  "sessionId": "t31-t32V1b_dirigida-D03-r5-1794853735805",
+  "client_ms": 8822,
+  "status": 200,
+  "type": "results",
+  "output_len": 19796,
+  "error": null,
+  "at": "2026-11-16T18:28:55.805Z",
+  "exec": {
+   "execution": "22980",
+   "status": "success",
+   "total_ms": 8715,
+   "nodos_ms": {
+    "Webhook1": 2,
+    "Pre-Procesing3": 23,
+    "Admin Password": 1,
+    "Detect Command": 20,
+    "Is Command?": 1,
+    "Load Learnings": 32,
+    "Build System Prompt": 20,
+    "Postgres Memory Intent3": 141,
+    "OpenAI Chat Model": 6259,
+    "Interactive Intent Agent3": 7036,
+    "Parse Intent JSON3": 15,
+    "Is Search Ready?3": 1,
+    "Call MCP Empresas": 1400,
+    "Unwrap MCP Result": 25,
+    "Build Search Log": 20,
+    "Log Search": 0,
+    "Attach Log Id": 23,
+    "If2": 2,
+    "Format Cards2": 26,
+    "Final Respond3": 1,
+    "Build Log": 21
+   },
+   "llamadas_modelo": 1,
+   "llamadas_herramienta_mcp": 0,
+   "tokens": {
+    "prompt": 4867,
+    "completion": 359,
+    "total": 5226
+   },
+   "tool": "search_empresas",
+   "params": {
+    "query": "tratamiento de aguas de perforacion",
+    "ciudad": "zulia",
+    "resolvedPhrases": [
+     "tratamiento de aguas de perforación"
+    ],
+    "queryIntent": "MIXED",
+    "explain": true
+   },
+   "search_ready": "true",
+   "rows": [
+    {
+     "id": 115,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 152,
+     "grupo": "capacidad",
+     "origen": "perfil"
+    },
+    {
+     "id": 157,
+     "grupo": "capacidad",
+     "origen": "suggested"
+    }
+   ],
+   "error": null
+  }
+ }
+]

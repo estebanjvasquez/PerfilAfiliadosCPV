@@ -1,0 +1,5232 @@
+{
+ "referencia": "V0",
+ "variantes": {
+  "V0": {
+   "ejecuciones": 72,
+   "latencia_corpus": {
+    "n": 55,
+    "total_p50": 10396,
+    "total_p95": 14227,
+    "cliente_p50": 10623,
+    "cliente_p95": 14314,
+    "agente_p50": 7253,
+    "modelo_p50": 4494,
+    "herramienta_mcp_p50": 1742,
+    "worker_p50": 2685,
+    "tarjetas_p50": 32,
+    "learnings_p50": 137,
+    "memoria_p50": 140,
+    "registro_p50": 0
+   },
+   "latencia_uat": {
+    "n": 12,
+    "total_p50": 11846,
+    "total_p95": 15627,
+    "cliente_p50": 11958,
+    "cliente_p95": 15938,
+    "agente_p50": 8952,
+    "modelo_p50": 4678,
+    "herramienta_mcp_p50": 2519,
+    "worker_p50": 3260,
+    "tarjetas_p50": 35,
+    "learnings_p50": 145,
+    "memoria_p50": 143,
+    "registro_p50": 0
+   },
+   "latencia_uat_por_consulta": {
+    "empresas de perforacion": [
+     15627,
+     10561,
+     15576
+    ],
+    "balancin": [
+     11379,
+     10228,
+     11846
+    ],
+    "macolla": [
+     11712,
+     9518,
+     12770
+    ],
+    "gandola": [
+     15003,
+     10451,
+     11912
+    ]
+   },
+   "llamadas_modelo_media": 2,
+   "llamadas_herramienta_mcp_media": 1,
+   "tokens_media": {
+    "prompt": 9942,
+    "completion": 139
+   },
+   "calidad_corpus": {
+    "rel_top5_g1": 22,
+    "norel_top5_g1": 27,
+    "sin_juicio_top5_g1": 52,
+    "rel_cobertura": 38,
+    "rel_etiquetadas": 49,
+    "vacias": 2,
+    "sin_busqueda": [
+     "L022"
+    ],
+    "errores": [],
+    "precision_juzgada_g1": 44.9
+   },
+   "coincidencia_con_referencia": {
+    "comparables": 55,
+    "mismos_parametros": 55,
+    "mismo_top5_por_grupo": 55
+   }
+  },
+  "V1b_r1": {
+   "ejecuciones": 72,
+   "latencia_corpus": {
+    "n": 55,
+    "total_p50": 6043,
+    "total_p95": 7557,
+    "cliente_p50": 6138,
+    "cliente_p95": 7715,
+    "agente_p50": 3300,
+    "modelo_p50": 2750,
+    "herramienta_mcp_p50": null,
+    "worker_p50": 2308,
+    "tarjetas_p50": 33,
+    "learnings_p50": 31,
+    "memoria_p50": 136,
+    "registro_p50": 0
+   },
+   "latencia_uat": {
+    "n": 12,
+    "total_p50": 6543,
+    "total_p95": 13261,
+    "cliente_p50": 6622,
+    "cliente_p95": 13445,
+    "agente_p50": 4089,
+    "modelo_p50": 3625,
+    "herramienta_mcp_p50": null,
+    "worker_p50": 2363,
+    "tarjetas_p50": 39,
+    "learnings_p50": 34,
+    "memoria_p50": 142,
+    "registro_p50": 0
+   },
+   "latencia_uat_por_consulta": {
+    "empresas de perforacion": [
+     13261,
+     6707,
+     5667
+    ],
+    "balancin": [
+     12273,
+     11376,
+     7391
+    ],
+    "macolla": [
+     6281,
+     3622,
+     4722
+    ],
+    "gandola": [
+     6543,
+     4699,
+     5583
+    ]
+   },
+   "llamadas_modelo_media": 1,
+   "llamadas_herramienta_mcp_media": 0,
+   "tokens_media": {
+    "prompt": 4817,
+    "completion": 129
+   },
+   "calidad_corpus": {
+    "rel_top5_g1": 22,
+    "norel_top5_g1": 27,
+    "sin_juicio_top5_g1": 49,
+    "rel_cobertura": 38,
+    "rel_etiquetadas": 49,
+    "vacias": 3,
+    "sin_busqueda": [],
+    "errores": [],
+    "precision_juzgada_g1": 44.9
+   },
+   "coincidencia_con_referencia": {
+    "comparables": 55,
+    "mismos_parametros": 21,
+    "mismo_top5_por_grupo": 51
+   }
+  },
+  "V1b_r2": {
+   "ejecuciones": 72,
+   "latencia_corpus": {
+    "n": 55,
+    "total_p50": 6573,
+    "total_p95": 10754,
+    "cliente_p50": 6745,
+    "cliente_p95": 10840,
+    "agente_p50": 4012,
+    "modelo_p50": 3484,
+    "herramienta_mcp_p50": 2187,
+    "worker_p50": 2312,
+    "tarjetas_p50": 24,
+    "learnings_p50": 31,
+    "memoria_p50": 132,
+    "registro_p50": 0
+   },
+   "latencia_uat": {
+    "n": 12,
+    "total_p50": 4346,
+    "total_p95": 9686,
+    "cliente_p50": 4458,
+    "cliente_p95": 9960,
+    "agente_p50": 3332,
+    "modelo_p50": 2785,
+    "herramienta_mcp_p50": null,
+    "worker_p50": 823,
+    "tarjetas_p50": 35,
+    "learnings_p50": 30,
+    "memoria_p50": 132,
+    "registro_p50": 0
+   },
+   "latencia_uat_por_consulta": {
+    "empresas de perforacion": [
+     9686,
+     4182,
+     6359
+    ],
+    "balancin": [
+     6634,
+     4346,
+     3926
+    ],
+    "macolla": [
+     5923,
+     3636,
+     3299
+    ],
+    "gandola": [
+     6545,
+     3909,
+     3836
+    ]
+   },
+   "llamadas_modelo_media": 1,
+   "llamadas_herramienta_mcp_media": 0,
+   "tokens_media": {
+    "prompt": 5101,
+    "completion": 136
+   },
+   "calidad_corpus": {
+    "rel_top5_g1": 23,
+    "norel_top5_g1": 27,
+    "sin_juicio_top5_g1": 50,
+    "rel_cobertura": 39,
+    "rel_etiquetadas": 49,
+    "vacias": 2,
+    "sin_busqueda": [
+     "L042",
+     "L063"
+    ],
+    "errores": [],
+    "precision_juzgada_g1": 46
+   },
+   "coincidencia_con_referencia": {
+    "comparables": 55,
+    "mismos_parametros": 21,
+    "mismo_top5_por_grupo": 52
+   }
+  },
+  "V1b_r3": {
+   "ejecuciones": 72,
+   "latencia_corpus": {
+    "n": 55,
+    "total_p50": 6107,
+    "total_p95": 8089,
+    "cliente_p50": 6193,
+    "cliente_p95": 8152,
+    "agente_p50": 3393,
+    "modelo_p50": 2914,
+    "herramienta_mcp_p50": null,
+    "worker_p50": 2261,
+    "tarjetas_p50": 28,
+    "learnings_p50": 32,
+    "memoria_p50": 141,
+    "registro_p50": 0
+   },
+   "latencia_uat": {
+    "n": 12,
+    "total_p50": 6371,
+    "total_p95": 8379,
+    "cliente_p50": 6446,
+    "cliente_p95": 8454,
+    "agente_p50": 3548,
+    "modelo_p50": 3016,
+    "herramienta_mcp_p50": null,
+    "worker_p50": 2411,
+    "tarjetas_p50": 23,
+    "learnings_p50": 32,
+    "memoria_p50": 138,
+    "registro_p50": 0
+   },
+   "latencia_uat_por_consulta": {
+    "empresas de perforacion": [
+     7153,
+     6487,
+     8379
+    ],
+    "balancin": [
+     6575,
+     3920,
+     5032
+    ],
+    "macolla": [
+     6709,
+     4013,
+     4386
+    ],
+    "gandola": [
+     5897,
+     6371,
+     5080
+    ]
+   },
+   "llamadas_modelo_media": 1,
+   "llamadas_herramienta_mcp_media": 0,
+   "tokens_media": {
+    "prompt": 4950,
+    "completion": 131
+   },
+   "calidad_corpus": {
+    "rel_top5_g1": 23,
+    "norel_top5_g1": 27,
+    "sin_juicio_top5_g1": 50,
+    "rel_cobertura": 39,
+    "rel_etiquetadas": 49,
+    "vacias": 1,
+    "sin_busqueda": [],
+    "errores": [],
+    "precision_juzgada_g1": 46
+   },
+   "coincidencia_con_referencia": {
+    "comparables": 55,
+    "mismos_parametros": 25,
+    "mismo_top5_por_grupo": 50
+   }
+  }
+ },
+ "por_consulta": {
+  "L007": {
+   "input": "operadores",
+   "golden": {
+    "test_id": "G4-01",
+    "rel": [
+     146,
+     177,
+     325,
+     218
+    ],
+    "norel": [
+     124,
+     326,
+     107
+    ]
+   },
+   "V0": {
+    "ms": 12794,
+    "params": {
+     "query": "operadores",
+     "resolvedPhrases": [
+      "operadores"
+     ],
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     146,
+     218,
+     240,
+     124,
+     326
+    ],
+    "g2_top5": [
+     418,
+     333,
+     72,
+     523,
+     204
+    ],
+    "n": 27
+   },
+   "V1b_r1": {
+    "ms": 6501,
+    "params": {
+     "query": "operadores",
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     146,
+     218,
+     240,
+     124,
+     326
+    ],
+    "g2_top5": [
+     418,
+     333,
+     72,
+     523,
+     204
+    ],
+    "n": 27
+   },
+   "V1b_r2": {
+    "ms": 5729,
+    "params": {
+     "query": "operadores",
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     146,
+     218,
+     240,
+     124,
+     326
+    ],
+    "g2_top5": [
+     418,
+     333,
+     72,
+     523,
+     204
+    ],
+    "n": 27
+   },
+   "V1b_r3": {
+    "ms": 8089,
+    "params": {
+     "query": "operadores",
+     "resolvedPhrases": [
+      "operadores",
+      "operador"
+     ],
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     146,
+     218,
+     240,
+     124,
+     326
+    ],
+    "g2_top5": [
+     418,
+     72,
+     333,
+     523,
+     204
+    ],
+    "n": 28
+   }
+  },
+  "L009": {
+   "input": "tratamiento de aguas de perforación",
+   "golden": {
+    "test_id": "G1-01",
+    "rel": [
+     96,
+     152,
+     179,
+     79,
+     115
+    ],
+    "norel": []
+   },
+   "V0": {
+    "ms": 11994,
+    "params": {
+     "query": "tratamiento de aguas de perforacion",
+     "resolvedPhrases": [
+      "tratamiento de aguas de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     79,
+     77,
+     115,
+     152,
+     179
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 11
+   },
+   "V1b_r1": {
+    "ms": 6605,
+    "params": {
+     "query": "tratamiento de aguas de perforacion",
+     "resolvedPhrases": [
+      "tratamiento de aguas de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     79,
+     77,
+     115,
+     152,
+     179
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 11
+   },
+   "V1b_r2": {
+    "ms": 10754,
+    "params": {
+     "query": "tratamiento de aguas de perforacion",
+     "resolvedPhrases": [
+      "tratamiento de aguas de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     79,
+     77,
+     115,
+     152,
+     179
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 11
+   },
+   "V1b_r3": {
+    "ms": 9441,
+    "params": {
+     "query": "tratamiento de aguas de perforacion",
+     "resolvedPhrases": [
+      "tratamiento de aguas de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     79,
+     77,
+     115,
+     152,
+     179
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 11
+   }
+  },
+  "L010": {
+   "input": "fabricantes de balancines",
+   "golden": null,
+   "V0": {
+    "ms": 11619,
+    "params": {
+     "query": "fabricantes de balancines",
+     "resolvedPhrases": [
+      "fabricantes de balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r1": {
+    "ms": 6473,
+    "params": {
+     "query": "fabricantes de balancines",
+     "queryIntent": "MIXED",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r2": {
+    "ms": 7282,
+    "params": {
+     "query": "fabricantes de balancines",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r3": {
+    "ms": 5896,
+    "params": {
+     "query": "fabricantes de balancines",
+     "queryIntent": "MIXED",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [],
+    "n": 1
+   }
+  },
+  "L013": {
+   "input": "levantamiento artificial",
+   "golden": {
+    "test_id": "G1-02",
+    "rel": [
+     276,
+     383
+    ],
+    "norel": [
+     72,
+     257,
+     187
+    ]
+   },
+   "V0": {
+    "ms": 13547,
+    "params": {
+     "query": "levantamiento artificial",
+     "resolvedPhrases": [
+      "levantamiento artificial"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     383,
+     72
+    ],
+    "g2_top5": [
+     276
+    ],
+    "n": 3
+   },
+   "V1b_r1": {
+    "ms": 5978,
+    "params": {
+     "query": "levantamiento artificial",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     383,
+     72
+    ],
+    "g2_top5": [
+     276
+    ],
+    "n": 3
+   },
+   "V1b_r2": {
+    "ms": 5876,
+    "params": {
+     "query": "levantamiento artificial",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     383,
+     72
+    ],
+    "g2_top5": [
+     276
+    ],
+    "n": 3
+   },
+   "V1b_r3": {
+    "ms": 6493,
+    "params": {
+     "query": "levantamiento artificial",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     383,
+     72
+    ],
+    "g2_top5": [
+     276
+    ],
+    "n": 3
+   }
+  },
+  "L014": {
+   "input": "revestidor",
+   "golden": {
+    "test_id": "G1-03",
+    "rel": [
+     157
+    ],
+    "norel": [
+     91,
+     312,
+     317,
+     145
+    ]
+   },
+   "V0": {
+    "ms": 11627,
+    "params": {
+     "query": "revestidor",
+     "resolvedPhrases": [
+      "revestidor"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     312,
+     317,
+     145,
+     86,
+     141
+    ],
+    "g2_top5": [
+     157
+    ],
+    "n": 9
+   },
+   "V1b_r1": {
+    "ms": 5520,
+    "params": {
+     "query": "revestidor",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     312,
+     317,
+     145,
+     86,
+     141
+    ],
+    "g2_top5": [
+     157
+    ],
+    "n": 9
+   },
+   "V1b_r2": {
+    "ms": 6468,
+    "params": {
+     "query": "revestidor",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     312,
+     317,
+     145,
+     86,
+     141
+    ],
+    "g2_top5": [
+     157
+    ],
+    "n": 9
+   },
+   "V1b_r3": {
+    "ms": 5959,
+    "params": {
+     "query": "revestidor",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     312,
+     317,
+     145,
+     86,
+     141
+    ],
+    "g2_top5": [
+     157
+    ],
+    "n": 9
+   }
+  },
+  "L015": {
+   "input": "mecha",
+   "golden": {
+    "test_id": "G1-04",
+    "rel": [],
+    "norel": [
+     140,
+     1,
+     73,
+     74
+    ]
+   },
+   "V0": {
+    "ms": 12938,
+    "params": {
+     "query": "mecha",
+     "resolvedPhrases": [
+      "mecha"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     1,
+     73,
+     74,
+     75,
+     76
+    ],
+    "g2_top5": [],
+    "n": 23
+   },
+   "V1b_r1": {
+    "ms": 5975,
+    "params": {
+     "query": "mecha",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     1,
+     73,
+     74,
+     75,
+     76
+    ],
+    "g2_top5": [],
+    "n": 23
+   },
+   "V1b_r2": {
+    "ms": 5363,
+    "params": {
+     "query": "mecha",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     1,
+     73,
+     74,
+     75,
+     76
+    ],
+    "g2_top5": [],
+    "n": 23
+   },
+   "V1b_r3": {
+    "ms": 5114,
+    "params": {
+     "query": "mecha",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     1,
+     73,
+     74,
+     75,
+     76
+    ],
+    "g2_top5": [],
+    "n": 23
+   }
+  },
+  "L016": {
+   "input": "cabria",
+   "golden": {
+    "test_id": "G2-01",
+    "rel": [],
+    "norel": [
+     138,
+     86,
+     157,
+     170
+    ]
+   },
+   "V0": {
+    "ms": 12826,
+    "params": {
+     "query": "cabria",
+     "resolvedPhrases": [
+      "cabria"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     138,
+     157,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   },
+   "V1b_r1": {
+    "ms": 5900,
+    "params": {
+     "query": "cabria",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     138,
+     157,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   },
+   "V1b_r2": {
+    "ms": 5425,
+    "params": {
+     "query": "cabria",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     138,
+     157,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   },
+   "V1b_r3": {
+    "ms": 5267,
+    "params": {
+     "query": "cabria",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     138,
+     157,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   }
+  },
+  "L017": {
+   "input": "cabrias",
+   "golden": {
+    "test_id": "G2-02",
+    "rel": [],
+    "norel": [
+     138,
+     86,
+     157,
+     170
+    ]
+   },
+   "V0": {
+    "ms": 12374,
+    "params": {
+     "query": "cabrias",
+     "resolvedPhrases": [
+      "cabrias"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     138,
+     157,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   },
+   "V1b_r1": {
+    "ms": 5807,
+    "params": {
+     "query": "cabrias",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     138,
+     157,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   },
+   "V1b_r2": {
+    "ms": 5971,
+    "params": {
+     "query": "cabrias",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     138,
+     157,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   },
+   "V1b_r3": {
+    "ms": 5882,
+    "params": {
+     "query": "cabrias",
+     "resolvedPhrases": [
+      "cabrias",
+      "cabria"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     138,
+     157,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   }
+  },
+  "L018": {
+   "input": "mechurrio",
+   "golden": {
+    "test_id": "G2-03",
+    "rel": [
+     140
+    ],
+    "norel": [
+     391
+    ]
+   },
+   "V0": {
+    "ms": 11901,
+    "params": {
+     "query": "mechurrio",
+     "resolvedPhrases": [
+      "mechurrio"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     140,
+     391
+    ],
+    "n": 2
+   },
+   "V1b_r1": {
+    "ms": 5315,
+    "params": {
+     "query": "mechurrio",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     140,
+     391
+    ],
+    "n": 2
+   },
+   "V1b_r2": {
+    "ms": 6327,
+    "params": {
+     "query": "mechurrio",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     140,
+     391
+    ],
+    "n": 2
+   },
+   "V1b_r3": {
+    "ms": 5674,
+    "params": {
+     "query": "mechurrio",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     140,
+     391
+    ],
+    "n": 2
+   }
+  },
+  "L019": {
+   "input": "macolla",
+   "golden": {
+    "test_id": "G2-04",
+    "rel": [
+     155,
+     171,
+     1,
+     76
+    ],
+    "norel": [
+     72
+    ]
+   },
+   "V0": {
+    "ms": 14481,
+    "params": {
+     "query": "macolla",
+     "resolvedPhrases": [
+      "macolla"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     155,
+     171,
+     1,
+     72,
+     76
+    ],
+    "n": 13
+   },
+   "V1b_r1": {
+    "ms": 5074,
+    "params": {
+     "query": "macolla",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     155,
+     171,
+     1,
+     72,
+     76
+    ],
+    "n": 13
+   },
+   "V1b_r2": {
+    "ms": 4967,
+    "params": {
+     "query": "macolla",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     155,
+     171,
+     1,
+     72,
+     76
+    ],
+    "n": 13
+   },
+   "V1b_r3": {
+    "ms": 5276,
+    "params": {
+     "query": "macolla",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     155,
+     171,
+     1,
+     72,
+     76
+    ],
+    "n": 13
+   }
+  },
+  "L020": {
+   "input": "guaya fina",
+   "golden": {
+    "test_id": "G2-05",
+    "rel": [
+     182,
+     458
+    ],
+    "norel": [
+     198,
+     128
+    ]
+   },
+   "V0": {
+    "ms": 13752,
+    "params": {
+     "query": "guaya fina",
+     "resolvedPhrases": [
+      "guaya fina"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     458,
+     182
+    ],
+    "g2_top5": [
+     198
+    ],
+    "n": 3
+   },
+   "V1b_r1": {
+    "ms": 5845,
+    "params": {
+     "query": "guaya fina",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     458,
+     182
+    ],
+    "g2_top5": [
+     198
+    ],
+    "n": 3
+   },
+   "V1b_r2": {
+    "ms": 14416,
+    "params": {
+     "query": "guaya fina",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     458,
+     182
+    ],
+    "g2_top5": [
+     198
+    ],
+    "n": 3
+   },
+   "V1b_r3": {
+    "ms": 6276,
+    "params": {
+     "query": "guaya fina",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     458,
+     182
+    ],
+    "g2_top5": [
+     198
+    ],
+    "n": 3
+   }
+  },
+  "L021": {
+   "input": "guaya eléctrica",
+   "golden": {
+    "test_id": "G2-06",
+    "rel": [
+     79
+    ],
+    "norel": [
+     72,
+     213,
+     83,
+     141
+    ]
+   },
+   "V0": {
+    "ms": 11830,
+    "params": {
+     "query": "guaya electrica",
+     "resolvedPhrases": [
+      "guaya eléctrica"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     79
+    ],
+    "n": 1
+   },
+   "V1b_r1": {
+    "ms": 4993,
+    "params": {
+     "query": "guaya electrica",
+     "resolvedPhrases": [
+      "guaya eléctrica"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     79
+    ],
+    "n": 1
+   },
+   "V1b_r2": {
+    "ms": 6714,
+    "params": {
+     "query": "guaya electrica",
+     "resolvedPhrases": [
+      "guaya eléctrica"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     79
+    ],
+    "n": 1
+   },
+   "V1b_r3": {
+    "ms": 6499,
+    "params": {
+     "query": "guaya electrica",
+     "resolvedPhrases": [
+      "guaya eléctrica"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     79
+    ],
+    "n": 1
+   }
+  },
+  "L022": {
+   "input": "balancín",
+   "golden": {
+    "test_id": "G2-07",
+    "rel": [
+     157
+    ],
+    "norel": [
+     91,
+     333,
+     391
+    ]
+   },
+   "V0": {
+    "ms": 12255,
+    "params": null,
+    "tipo": "conversation",
+    "g1_top5": [],
+    "g2_top5": [],
+    "n": 0
+   },
+   "V1b_r1": {
+    "ms": 6546,
+    "params": {
+     "query": "balancin",
+     "resolvedPhrases": [
+      "balancín"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     91,
+     333,
+     391
+    ],
+    "n": 4
+   },
+   "V1b_r2": {
+    "ms": 6986,
+    "params": {
+     "query": "balancin",
+     "resolvedPhrases": [
+      "balancín"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     91,
+     333,
+     391
+    ],
+    "n": 4
+   },
+   "V1b_r3": {
+    "ms": 7686,
+    "params": {
+     "query": "balancin",
+     "resolvedPhrases": [
+      "balancín"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     91,
+     333,
+     391
+    ],
+    "n": 4
+   }
+  },
+  "L023": {
+   "input": "camión chupón",
+   "golden": {
+    "test_id": "G2-09",
+    "rel": [
+     391
+    ],
+    "norel": []
+   },
+   "V0": {
+    "ms": 10306,
+    "params": {
+     "query": "camion chupon",
+     "resolvedPhrases": [
+      "camión chupón"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     391
+    ],
+    "n": 1
+   },
+   "V1b_r1": {
+    "ms": 5984,
+    "params": {
+     "query": "camion chupon",
+     "resolvedPhrases": [
+      "camión chupón"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     391
+    ],
+    "n": 1
+   },
+   "V1b_r2": {
+    "ms": 6172,
+    "params": {
+     "query": "camion chupon",
+     "resolvedPhrases": [
+      "camión chupón"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     391
+    ],
+    "n": 1
+   },
+   "V1b_r3": {
+    "ms": 4573,
+    "params": {
+     "query": "camion chupon",
+     "resolvedPhrases": [
+      "camión chupón"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [],
+    "g2_top5": [
+     391
+    ],
+    "n": 1
+   }
+  },
+  "L024": {
+   "input": "gandola",
+   "golden": {
+    "test_id": "G2-10",
+    "rel": [
+     165,
+     204
+    ],
+    "norel": [
+     433,
+     187,
+     563
+    ]
+   },
+   "V0": {
+    "ms": 10274,
+    "params": {
+     "query": "gandola",
+     "resolvedPhrases": [
+      "gandola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [
+     433
+    ],
+    "n": 7
+   },
+   "V1b_r1": {
+    "ms": 5329,
+    "params": {
+     "query": "gandola",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [
+     433
+    ],
+    "n": 7
+   },
+   "V1b_r2": {
+    "ms": 5980,
+    "params": {
+     "query": "gandola",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [
+     433
+    ],
+    "n": 7
+   },
+   "V1b_r3": {
+    "ms": 4773,
+    "params": {
+     "query": "gandola",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [
+     433
+    ],
+    "n": 7
+   }
+  },
+  "L025": {
+   "input": "mantenimiento de cabrias",
+   "golden": {
+    "test_id": "G3-01",
+    "rel": [
+     173,
+     115,
+     179,
+     96
+    ],
+    "norel": [
+     257
+    ]
+   },
+   "V0": {
+    "ms": 14017,
+    "params": {
+     "query": "mantenimiento de cabrias",
+     "resolvedPhrases": [
+      "mantenimiento de cabrias"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     78,
+     107,
+     86,
+     138,
+     157
+    ],
+    "g2_top5": [],
+    "n": 9
+   },
+   "V1b_r1": {
+    "ms": 5929,
+    "params": {
+     "query": "mantenimiento de cabrias",
+     "resolvedPhrases": [
+      "mantenimiento de cabrías"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     78,
+     86,
+     138,
+     157
+    ],
+    "g2_top5": [],
+    "n": 9
+   },
+   "V1b_r2": {
+    "ms": 8321,
+    "params": {
+     "query": "mantenimiento de cabrias",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     78,
+     107,
+     86,
+     138,
+     157
+    ],
+    "g2_top5": [],
+    "n": 9
+   },
+   "V1b_r3": {
+    "ms": 6393,
+    "params": {
+     "query": "mantenimiento de cabrias",
+     "resolvedPhrases": [
+      "mantenimiento de cabrías"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     78,
+     86,
+     138,
+     157
+    ],
+    "g2_top5": [],
+    "n": 9
+   }
+  },
+  "L026": {
+   "input": "fabricantes de cabrias",
+   "golden": {
+    "test_id": "G3-02",
+    "rel": [
+     173,
+     115,
+     179,
+     96
+    ],
+    "norel": [
+     257
+    ]
+   },
+   "V0": {
+    "ms": 11885,
+    "params": {
+     "query": "fabricantes de cabrias",
+     "resolvedPhrases": [
+      "fabricantes de cabrias"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     86,
+     138,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   },
+   "V1b_r1": {
+    "ms": 6671,
+    "params": {
+     "query": "fabricantes de cabrias",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     86,
+     138,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   },
+   "V1b_r2": {
+    "ms": 6720,
+    "params": {
+     "query": "fabricantes de cabrias",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     86,
+     138,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   },
+   "V1b_r3": {
+    "ms": 7129,
+    "params": {
+     "query": "fabricantes de cabrias",
+     "queryIntent": "MIXED",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     86,
+     138,
+     170,
+     179
+    ],
+    "g2_top5": [],
+    "n": 7
+   }
+  },
+  "L027": {
+   "input": "transporte de gandolas",
+   "golden": {
+    "test_id": "G3-03",
+    "rel": [
+     204,
+     452,
+     426
+    ],
+    "norel": [
+     187
+    ]
+   },
+   "V0": {
+    "ms": 11501,
+    "params": {
+     "query": "transporte de gandolas",
+     "resolvedPhrases": [
+      "transporte de gandolas"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [],
+    "n": 6
+   },
+   "V1b_r1": {
+    "ms": 6313,
+    "params": {
+     "query": "transporte de gandolas",
+     "resolvedPhrases": [
+      "transporte de gandolas"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [],
+    "n": 6
+   },
+   "V1b_r2": {
+    "ms": 5229,
+    "params": {
+     "query": "transporte de gandolas",
+     "resolvedPhrases": [
+      "transporte de gandolas"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [],
+    "n": 6
+   },
+   "V1b_r3": {
+    "ms": 5675,
+    "params": {
+     "query": "transporte de gandolas",
+     "resolvedPhrases": [
+      "transporte de gandolas"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [],
+    "n": 6
+   }
+  },
+  "L028": {
+   "input": "alquiler de gandolas",
+   "golden": {
+    "test_id": "G3-04",
+    "rel": [
+     165,
+     204,
+     426
+    ],
+    "norel": [
+     187,
+     563
+    ]
+   },
+   "V0": {
+    "ms": 10238,
+    "params": {
+     "query": "alquiler de gandolas",
+     "resolvedPhrases": [
+      "alquiler de gandolas"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [],
+    "n": 8
+   },
+   "V1b_r1": {
+    "ms": 6738,
+    "params": {
+     "query": "alquiler de gandolas",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [],
+    "n": 8
+   },
+   "V1b_r2": {
+    "ms": 6277,
+    "params": {
+     "query": "alquiler de gandolas",
+     "resolvedPhrases": [
+      "alquiler de gandolas"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [],
+    "n": 8
+   },
+   "V1b_r3": {
+    "ms": 6624,
+    "params": {
+     "query": "alquiler de gandolas",
+     "resolvedPhrases": [
+      "alquiler de gandolas"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [],
+    "n": 8
+   }
+  },
+  "L029": {
+   "input": "mantenimiento de levantamiento artificial",
+   "golden": {
+    "test_id": "G3-05",
+    "rel": [],
+    "norel": [
+     107,
+     78,
+     72,
+     94
+    ]
+   },
+   "V0": {
+    "ms": 11933,
+    "params": {
+     "query": "mantenimiento de levantamiento artificial",
+     "resolvedPhrases": [
+      "mantenimiento de levantamiento artificial"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     122,
+     78
+    ],
+    "g2_top5": [
+     72
+    ],
+    "n": 4
+   },
+   "V1b_r1": {
+    "ms": 6834,
+    "params": {
+     "query": "mantenimiento de levantamiento artificial",
+     "resolvedPhrases": [
+      "mantenimiento de levantamiento artificial"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     122,
+     78
+    ],
+    "g2_top5": [
+     72
+    ],
+    "n": 4
+   },
+   "V1b_r2": {
+    "ms": 6078,
+    "params": {
+     "query": "mantenimiento de levantamiento artificial",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     122,
+     78
+    ],
+    "g2_top5": [
+     72
+    ],
+    "n": 4
+   },
+   "V1b_r3": {
+    "ms": 5704,
+    "params": {
+     "query": "mantenimiento de levantamiento artificial",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     122,
+     78
+    ],
+    "g2_top5": [
+     72
+    ],
+    "n": 4
+   }
+  },
+  "L031": {
+   "input": "servicios petroleros",
+   "golden": {
+    "test_id": "G4-03",
+    "rel": [],
+    "norel": []
+   },
+   "V0": {
+    "ms": 9300,
+    "params": {
+     "query": "servicios petroleros",
+     "resolvedPhrases": [
+      "servicios petroleros"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     96,
+     179,
+     207,
+     276,
+     182
+    ],
+    "g2_top5": [
+     198,
+     85,
+     178,
+     204,
+     361
+    ],
+    "n": 29
+   },
+   "V1b_r1": {
+    "ms": 5930,
+    "params": {
+     "query": "servicios petroleros",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     96,
+     179,
+     207,
+     276,
+     182
+    ],
+    "g2_top5": [
+     198,
+     85,
+     178,
+     204,
+     361
+    ],
+    "n": 29
+   },
+   "V1b_r2": {
+    "ms": 6348,
+    "params": {
+     "query": "servicios petroleros",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     96,
+     179,
+     207,
+     276,
+     182
+    ],
+    "g2_top5": [
+     198,
+     85,
+     178,
+     204,
+     361
+    ],
+    "n": 29
+   },
+   "V1b_r3": {
+    "ms": 5720,
+    "params": {
+     "query": "servicios petroleros",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     96,
+     179,
+     207,
+     276,
+     182
+    ],
+    "g2_top5": [
+     198,
+     85,
+     178,
+     204,
+     361
+    ],
+    "n": 29
+   }
+  },
+  "L032": {
+   "input": "construcción",
+   "golden": {
+    "test_id": "G4-04",
+    "rel": [],
+    "norel": []
+   },
+   "V0": {
+    "ms": 13003,
+    "params": {
+     "query": "construccion",
+     "resolvedPhrases": [
+      "construcción"
+     ],
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     74,
+     1,
+     140,
+     75,
+     115
+    ],
+    "g2_top5": [
+     202,
+     333
+    ],
+    "n": 87
+   },
+   "V1b_r1": {
+    "ms": 5861,
+    "params": {
+     "query": "construccion",
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     74,
+     1,
+     140,
+     75,
+     115
+    ],
+    "g2_top5": [
+     202,
+     333
+    ],
+    "n": 87
+   },
+   "V1b_r2": {
+    "ms": 6602,
+    "params": {
+     "query": "construccion",
+     "resolvedPhrases": [
+      "construcción"
+     ],
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     74,
+     1,
+     140,
+     75,
+     115
+    ],
+    "g2_top5": [
+     202,
+     333
+    ],
+    "n": 87
+   },
+   "V1b_r3": {
+    "ms": 6666,
+    "params": {
+     "query": "construccion",
+     "resolvedPhrases": [
+      "construcción"
+     ],
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     74,
+     1,
+     140,
+     75,
+     115
+    ],
+    "g2_top5": [
+     202,
+     333
+    ],
+    "n": 87
+   }
+  },
+  "L033": {
+   "input": "tratamiento de aguas de perforación en el lago",
+   "golden": {
+    "test_id": "G5-01",
+    "rel": [
+     115
+    ],
+    "norel": [
+     391,
+     257,
+     74,
+     137
+    ]
+   },
+   "V0": {
+    "ms": 15469,
+    "params": {
+     "query": "tratamiento de aguas de perforacion",
+     "ciudad": "zulia",
+     "resolvedPhrases": [
+      "tratamiento de aguas de perforación en el lago"
+     ],
+     "queryIntent": "MIXED",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     115,
+     152,
+     173,
+     157
+    ],
+    "g2_top5": [],
+    "n": 4
+   },
+   "V1b_r1": {
+    "ms": 6967,
+    "params": {
+     "query": "tratamiento de aguas de perforacion",
+     "ciudad": "lago",
+     "resolvedPhrases": [
+      "tratamiento de aguas de perforación"
+     ],
+     "queryIntent": "MIXED",
+     "explain": true
+    },
+    "tipo": null,
+    "g1_top5": [],
+    "g2_top5": [],
+    "n": 0
+   },
+   "V1b_r2": {
+    "ms": 9759,
+    "params": {
+     "query": "tratamiento de aguas de perforacion",
+     "ciudad": "maracaibo",
+     "resolvedPhrases": [
+      "tratamiento de aguas de perforación"
+     ],
+     "queryIntent": "MIXED",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     115,
+     157
+    ],
+    "g2_top5": [],
+    "n": 2
+   },
+   "V1b_r3": {
+    "ms": 9855,
+    "params": {
+     "query": "tratamiento de aguas de perforacion",
+     "ciudad": "maracaibo",
+     "resolvedPhrases": [
+      "tratamiento de aguas de perforación"
+     ],
+     "queryIntent": "MIXED",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     115,
+     157
+    ],
+    "g2_top5": [],
+    "n": 2
+   }
+  },
+  "L034": {
+   "input": "empresas que fabriquen y mantengan balancines",
+   "golden": {
+    "test_id": "G5-02",
+    "rel": [
+     157
+    ],
+    "norel": [
+     333,
+     391,
+     107,
+     83
+    ]
+   },
+   "V0": {
+    "ms": 11245,
+    "params": {
+     "query": "fabriquen y mantengan balancines",
+     "resolvedPhrases": [
+      "fabricación de balancines",
+      "mantenimiento de balancines"
+     ],
+     "queryIntent": "MIXED",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     107,
+     138,
+     74,
+     94
+    ],
+    "g2_top5": [
+     333,
+     391
+    ],
+    "n": 18
+   },
+   "V1b_r1": {
+    "ms": 8679,
+    "params": {
+     "query": "fabriquen y mantengan balancines",
+     "resolvedPhrases": [
+      "fabricación de balancines",
+      "mantenimiento de balancines"
+     ],
+     "queryIntent": "MIXED",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     107,
+     138,
+     74,
+     94
+    ],
+    "g2_top5": [
+     333,
+     391
+    ],
+    "n": 18
+   },
+   "V1b_r2": {
+    "ms": 9268,
+    "params": {
+     "query": "fabriquen y mantengan balancines",
+     "resolvedPhrases": [
+      "fabricacion de balancines",
+      "mantenimiento de balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     107,
+     138,
+     74,
+     94
+    ],
+    "g2_top5": [
+     333,
+     391
+    ],
+    "n": 18
+   },
+   "V1b_r3": {
+    "ms": 7555,
+    "params": {
+     "query": "fabriquen y mantengan balancines",
+     "resolvedPhrases": [
+      "fabriquen balancines",
+      "mantengan balancines"
+     ],
+     "queryIntent": "MIXED",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     138,
+     157,
+     560,
+     494,
+     107
+    ],
+    "g2_top5": [
+     487
+    ],
+    "n": 10
+   }
+  },
+  "L035": {
+   "input": "inspección y mantenimiento de guaya eléctrica",
+   "golden": {
+    "test_id": "G5-03",
+    "rel": [],
+    "norel": []
+   },
+   "V0": {
+    "ms": 10396,
+    "params": {
+     "query": "inspeccion y mantenimiento de guaya electrica",
+     "resolvedPhrases": [
+      "inspección y mantenimiento de guaya eléctrica"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     122,
+     78,
+     74,
+     193
+    ],
+    "g2_top5": [],
+    "n": 5
+   },
+   "V1b_r1": {
+    "ms": 6681,
+    "params": {
+     "query": "inspeccion y mantenimiento de guaya electrica",
+     "resolvedPhrases": [
+      "inspección y mantenimiento de guaya eléctrica"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     122,
+     78,
+     74,
+     193
+    ],
+    "g2_top5": [],
+    "n": 5
+   },
+   "V1b_r2": {
+    "ms": 6275,
+    "params": {
+     "query": "inspeccion y mantenimiento de guaya electrica",
+     "resolvedPhrases": [
+      "inspección y mantenimiento de guaya eléctrica"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     122,
+     78,
+     74,
+     193
+    ],
+    "g2_top5": [],
+    "n": 5
+   },
+   "V1b_r3": {
+    "ms": 6026,
+    "params": {
+     "query": "inspeccion y mantenimiento de guaya electrica",
+     "resolvedPhrases": [
+      "inspección y mantenimiento de guaya eléctrica"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     122,
+     78,
+     74,
+     193
+    ],
+    "g2_top5": [],
+    "n": 5
+   }
+  },
+  "L036": {
+   "input": "transporte de crudo por gandola",
+   "golden": {
+    "test_id": "G5-04",
+    "rel": [],
+    "norel": []
+   },
+   "V0": {
+    "ms": 10913,
+    "params": {
+     "query": "transporte de crudo por gandola",
+     "resolvedPhrases": [
+      "transporte de crudo por gandola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     185
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r1": {
+    "ms": 5732,
+    "params": {
+     "query": "transporte de crudo por gandola",
+     "resolvedPhrases": [
+      "transporte de crudo por gandola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     185
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r2": {
+    "ms": 7117,
+    "params": {
+     "query": "transporte de crudo por gandola",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     185
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r3": {
+    "ms": 6633,
+    "params": {
+     "query": "transporte de crudo por gandola",
+     "resolvedPhrases": [
+      "transporte de crudo por gandola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     185
+    ],
+    "g2_top5": [],
+    "n": 1
+   }
+  },
+  "L037": {
+   "input": "pipeline",
+   "golden": {
+    "test_id": "G6-01",
+    "rel": [
+     157
+    ],
+    "norel": [
+     141
+    ]
+   },
+   "V0": {
+    "ms": 9399,
+    "params": {
+     "query": "pipeline",
+     "resolvedPhrases": [
+      "pipeline"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     141,
+     151,
+     157,
+     86,
+     80
+    ],
+    "g2_top5": [
+     1
+    ],
+    "n": 14
+   },
+   "V1b_r1": {
+    "ms": 7557,
+    "params": {
+     "query": "pipeline",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     141,
+     151,
+     157,
+     86,
+     80
+    ],
+    "g2_top5": [
+     1
+    ],
+    "n": 14
+   },
+   "V1b_r2": {
+    "ms": 7072,
+    "params": {
+     "query": "pipeline",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     141,
+     151,
+     157,
+     86,
+     80
+    ],
+    "g2_top5": [
+     1
+    ],
+    "n": 14
+   },
+   "V1b_r3": {
+    "ms": 6847,
+    "params": {
+     "query": "pipeline",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     141,
+     151,
+     157,
+     86,
+     80
+    ],
+    "g2_top5": [
+     1
+    ],
+    "n": 14
+   }
+  },
+  "L038": {
+   "input": "refinery",
+   "golden": {
+    "test_id": "G6-02",
+    "rel": [],
+    "norel": [
+     157,
+     85,
+     187,
+     125,
+     149
+    ]
+   },
+   "V0": {
+    "ms": 10186,
+    "params": {
+     "query": "refinery",
+     "resolvedPhrases": [
+      "refinery"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     76
+    ],
+    "g2_top5": [],
+    "n": 2
+   },
+   "V1b_r1": {
+    "ms": 4813,
+    "params": {
+     "query": "refinery",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     76
+    ],
+    "g2_top5": [],
+    "n": 2
+   },
+   "V1b_r2": {
+    "ms": 6573,
+    "params": {
+     "query": "refinery",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     76
+    ],
+    "g2_top5": [],
+    "n": 2
+   },
+   "V1b_r3": {
+    "ms": 6222,
+    "params": {
+     "query": "refinery",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     76
+    ],
+    "g2_top5": [],
+    "n": 2
+   }
+  },
+  "L039": {
+   "input": "refinería",
+   "golden": {
+    "test_id": "G6-03",
+    "rel": [],
+    "norel": []
+   },
+   "V0": {
+    "ms": 9243,
+    "params": {
+     "query": "refineria",
+     "resolvedPhrases": [
+      "refinería"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [
+     85,
+     83,
+     90,
+     523,
+     480
+    ],
+    "n": 18
+   },
+   "V1b_r1": {
+    "ms": 6854,
+    "params": {
+     "query": "refineria",
+     "resolvedPhrases": [
+      "refinería"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [
+     85,
+     83,
+     90,
+     523,
+     480
+    ],
+    "n": 18
+   },
+   "V1b_r2": {
+    "ms": 7011,
+    "params": {
+     "query": "refineria",
+     "resolvedPhrases": [
+      "refinería"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [
+     85,
+     83,
+     90,
+     523,
+     480
+    ],
+    "n": 18
+   },
+   "V1b_r3": {
+    "ms": 6461,
+    "params": {
+     "query": "refineria",
+     "resolvedPhrases": [
+      "refinería"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [
+     85,
+     83,
+     90,
+     523,
+     480
+    ],
+    "n": 18
+   }
+  },
+  "L040": {
+   "input": "drilling",
+   "golden": {
+    "test_id": "G6-04",
+    "rel": [
+     115,
+     79,
+     152,
+     96,
+     77,
+     133,
+     157
+    ],
+    "norel": [
+     86,
+     170,
+     391,
+     187
+    ]
+   },
+   "V0": {
+    "ms": 8554,
+    "params": {
+     "query": "drilling",
+     "resolvedPhrases": [
+      "drilling"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     170,
+     138,
+     182,
+     179
+    ],
+    "g2_top5": [
+     193
+    ],
+    "n": 25
+   },
+   "V1b_r1": {
+    "ms": 6002,
+    "params": {
+     "query": "drilling",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     170,
+     138,
+     182,
+     179
+    ],
+    "g2_top5": [
+     193
+    ],
+    "n": 25
+   },
+   "V1b_r2": {
+    "ms": 8764,
+    "params": {
+     "query": "drilling",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     170,
+     138,
+     182,
+     179
+    ],
+    "g2_top5": [
+     193
+    ],
+    "n": 25
+   },
+   "V1b_r3": {
+    "ms": 6809,
+    "params": {
+     "query": "drilling",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     170,
+     138,
+     182,
+     179
+    ],
+    "g2_top5": [
+     193
+    ],
+    "n": 25
+   }
+  },
+  "L041": {
+   "input": "necesito arbolitos para pozos petroleros",
+   "golden": {
+    "test_id": "G7-02",
+    "rel": [
+     179
+    ],
+    "norel": [
+     207,
+     112,
+     80
+    ]
+   },
+   "V0": {
+    "ms": 8951,
+    "params": {
+     "query": "arbolitos para pozos petroleros",
+     "resolvedPhrases": [
+      "arbolitos para pozos petroleros"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     179
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r1": {
+    "ms": 4923,
+    "params": {
+     "query": "arbolitos para pozos petroleros",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     179
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r2": {
+    "ms": 5017,
+    "params": {
+     "query": "arbolitos para pozos petroleros",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     179
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r3": {
+    "ms": 5173,
+    "params": {
+     "query": "arbolitos para pozos petroleros",
+     "resolvedPhrases": [
+      "arbolitos para pozos petroleros"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     179
+    ],
+    "g2_top5": [],
+    "n": 1
+   }
+  },
+  "L042": {
+   "input": "venta de zapatos",
+   "golden": {
+    "test_id": "G7-03",
+    "rel": [],
+    "norel": []
+   },
+   "V0": {
+    "ms": 8959,
+    "params": {
+     "query": "venta de zapatos",
+     "resolvedPhrases": [
+      "venta de zapatos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": null,
+    "g1_top5": [],
+    "g2_top5": [],
+    "n": 0
+   },
+   "V1b_r1": {
+    "ms": 5914,
+    "params": {
+     "query": "venta de zapatos",
+     "resolvedPhrases": [
+      "venta de zapatos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": null,
+    "g1_top5": [],
+    "g2_top5": [],
+    "n": 0
+   },
+   "V1b_r2": {
+    "ms": 3968,
+    "params": null,
+    "tipo": "conversation",
+    "g1_top5": [],
+    "g2_top5": [],
+    "n": 0
+   },
+   "V1b_r3": {
+    "ms": 4961,
+    "params": {
+     "query": "venta de zapatos",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": null,
+    "g1_top5": [],
+    "g2_top5": [],
+    "n": 0
+   }
+  },
+  "L053": {
+   "input": "gandolas",
+   "golden": null,
+   "V0": {
+    "ms": 14227,
+    "params": {
+     "query": "gandolas",
+     "resolvedPhrases": [
+      "gándolas"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [
+     433
+    ],
+    "n": 7
+   },
+   "V1b_r1": {
+    "ms": 6856,
+    "params": {
+     "query": "gandolas",
+     "resolvedPhrases": [
+      "gandolas",
+      "gandola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [
+     433
+    ],
+    "n": 7
+   },
+   "V1b_r2": {
+    "ms": 6522,
+    "params": {
+     "query": "gandolas",
+     "resolvedPhrases": [
+      "gandolas",
+      "gandola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [
+     433
+    ],
+    "n": 7
+   },
+   "V1b_r3": {
+    "ms": 6057,
+    "params": {
+     "query": "gandolas",
+     "resolvedPhrases": [
+      "gandolas",
+      "gandola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     165,
+     187,
+     204,
+     426,
+     452
+    ],
+    "g2_top5": [
+     433
+    ],
+    "n": 7
+   }
+  },
+  "L054": {
+   "input": "servicios de pozos",
+   "golden": null,
+   "V0": {
+    "ms": 9984,
+    "params": {
+     "query": "servicios de pozos",
+     "resolvedPhrases": [
+      "servicios de pozos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     152,
+     133,
+     179,
+     528,
+     312
+    ],
+    "g2_top5": [],
+    "n": 33
+   },
+   "V1b_r1": {
+    "ms": 6343,
+    "params": {
+     "query": "servicios de pozos",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     152,
+     133,
+     179,
+     528,
+     312
+    ],
+    "g2_top5": [],
+    "n": 33
+   },
+   "V1b_r2": {
+    "ms": 7684,
+    "params": {
+     "query": "servicios de pozos",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     152,
+     133,
+     179,
+     528,
+     312
+    ],
+    "g2_top5": [],
+    "n": 33
+   },
+   "V1b_r3": {
+    "ms": 6440,
+    "params": {
+     "query": "servicios de pozos",
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     152,
+     133,
+     179,
+     528,
+     312
+    ],
+    "g2_top5": [],
+    "n": 33
+   }
+  },
+  "L056": {
+   "input": "Servicios a Pozos",
+   "golden": null,
+   "V0": {
+    "ms": 9639,
+    "params": {
+     "query": "servicios a pozos",
+     "resolvedPhrases": [
+      "servicios a pozos"
+     ],
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     528,
+     133,
+     178,
+     79,
+     371
+    ],
+    "g2_top5": [],
+    "n": 49
+   },
+   "V1b_r1": {
+    "ms": 5822,
+    "params": {
+     "query": "servicios a pozos",
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     528,
+     133,
+     178,
+     79,
+     371
+    ],
+    "g2_top5": [],
+    "n": 49
+   },
+   "V1b_r2": {
+    "ms": 7497,
+    "params": {
+     "query": "servicios a pozos",
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     528,
+     133,
+     178,
+     79,
+     371
+    ],
+    "g2_top5": [],
+    "n": 49
+   },
+   "V1b_r3": {
+    "ms": 6356,
+    "params": {
+     "query": "servicios a pozos",
+     "queryIntent": "SECTOR",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     528,
+     133,
+     178,
+     79,
+     371
+    ],
+    "g2_top5": [],
+    "n": 49
+   }
+  },
+  "L058": {
+   "input": "sistemas fotovoltaicos",
+   "golden": null,
+   "V0": {
+    "ms": 8973,
+    "params": {
+     "query": "sistemas fotovoltaicos",
+     "resolvedPhrases": [
+      "sistemas fotovoltaicos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     82,
+     126,
+     76
+    ],
+    "g2_top5": [],
+    "n": 3
+   },
+   "V1b_r1": {
+    "ms": 5428,
+    "params": {
+     "query": "sistemas fotovoltaicos",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     82,
+     126,
+     76
+    ],
+    "g2_top5": [],
+    "n": 3
+   },
+   "V1b_r2": {
+    "ms": 6901,
+    "params": {
+     "query": "sistemas fotovoltaicos",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     82,
+     126,
+     76
+    ],
+    "g2_top5": [],
+    "n": 3
+   },
+   "V1b_r3": {
+    "ms": 5548,
+    "params": {
+     "query": "sistemas fotovoltaicos",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     82,
+     126,
+     76
+    ],
+    "g2_top5": [],
+    "n": 3
+   }
+  },
+  "L059": {
+   "input": "Expansores",
+   "golden": null,
+   "V0": {
+    "ms": 12201,
+    "params": {
+     "query": "expansores",
+     "resolvedPhrases": [
+      "expansores",
+      "expansor"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     81,
+     107,
+     91,
+     179
+    ],
+    "g2_top5": [],
+    "n": 21
+   },
+   "V1b_r1": {
+    "ms": 7139,
+    "params": {
+     "query": "expansores",
+     "resolvedPhrases": [
+      "expansores",
+      "expansor"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     81,
+     107,
+     91,
+     179
+    ],
+    "g2_top5": [],
+    "n": 21
+   },
+   "V1b_r2": {
+    "ms": 8358,
+    "params": {
+     "query": "expansores",
+     "resolvedPhrases": [
+      "expansores",
+      "expansor"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     81,
+     107,
+     91,
+     179
+    ],
+    "g2_top5": [],
+    "n": 21
+   },
+   "V1b_r3": {
+    "ms": 6024,
+    "params": {
+     "query": "expansores",
+     "resolvedPhrases": [
+      "expansores",
+      "expansor"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     86,
+     81,
+     107,
+     91,
+     179
+    ],
+    "g2_top5": [],
+    "n": 21
+   }
+  },
+  "L060": {
+   "input": "Partes y Repuestos de Compresores",
+   "golden": null,
+   "V0": {
+    "ms": 9433,
+    "params": {
+     "query": "partes y repuestos de compresores",
+     "resolvedPhrases": [
+      "partes y repuestos de compresores"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     82,
+     112,
+     92,
+     122,
+     182
+    ],
+    "g2_top5": [
+     213
+    ],
+    "n": 31
+   },
+   "V1b_r1": {
+    "ms": 6114,
+    "params": {
+     "query": "partes y repuestos de compresores",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     82,
+     112,
+     92,
+     122,
+     182
+    ],
+    "g2_top5": [
+     213
+    ],
+    "n": 31
+   },
+   "V1b_r2": {
+    "ms": 6465,
+    "params": {
+     "query": "partes y repuestos de compresores",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     82,
+     112,
+     92,
+     122,
+     182
+    ],
+    "g2_top5": [
+     213
+    ],
+    "n": 31
+   },
+   "V1b_r3": {
+    "ms": 5990,
+    "params": {
+     "query": "partes y repuestos de compresores",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     82,
+     112,
+     92,
+     122,
+     182
+    ],
+    "g2_top5": [
+     213
+    ],
+    "n": 31
+   }
+  },
+  "L061": {
+   "input": "Empresas que realizan ingeniería FEED",
+   "golden": null,
+   "V0": {
+    "ms": 9295,
+    "params": {
+     "query": "ingenieria feed",
+     "resolvedPhrases": [
+      "ingeniería FEED"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r1": {
+    "ms": 6555,
+    "params": {
+     "query": "ingenieria feed",
+     "resolvedPhrases": [
+      "ingeniería FEED"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r2": {
+    "ms": 13877,
+    "params": {
+     "query": "ingenieria feed",
+     "resolvedPhrases": [
+      "ingeniería FEED"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r3": {
+    "ms": 7136,
+    "params": {
+     "query": "ingenieria feed",
+     "resolvedPhrases": [
+      "ingeniería FEED"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [],
+    "n": 1
+   }
+  },
+  "L062": {
+   "input": "ingenieria de procesos",
+   "golden": null,
+   "V0": {
+    "ms": 9725,
+    "params": {
+     "query": "ingenieria de procesos",
+     "resolvedPhrases": [
+      "ingeniería de procesos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     94,
+     92,
+     480,
+     359
+    ],
+    "g2_top5": [
+     433,
+     523,
+     487,
+     163
+    ],
+    "n": 31
+   },
+   "V1b_r1": {
+    "ms": 5939,
+    "params": {
+     "query": "ingenieria de procesos",
+     "resolvedPhrases": [
+      "ingeniería de procesos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     94,
+     92,
+     480,
+     359
+    ],
+    "g2_top5": [
+     433,
+     523,
+     487,
+     163
+    ],
+    "n": 31
+   },
+   "V1b_r2": {
+    "ms": 7598,
+    "params": {
+     "query": "ingenieria de procesos",
+     "resolvedPhrases": [
+      "ingeniería de procesos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     94,
+     92,
+     480,
+     359
+    ],
+    "g2_top5": [
+     433,
+     523,
+     487,
+     163
+    ],
+    "n": 31
+   },
+   "V1b_r3": {
+    "ms": 5999,
+    "params": {
+     "query": "ingenieria de procesos",
+     "resolvedPhrases": [
+      "ingeniería de procesos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     107,
+     94,
+     92,
+     480,
+     359
+    ],
+    "g2_top5": [
+     433,
+     523,
+     487,
+     163
+    ],
+    "n": 31
+   }
+  },
+  "L063": {
+   "input": "IPC",
+   "golden": null,
+   "V0": {
+    "ms": 8649,
+    "params": {
+     "query": "ipc",
+     "resolvedPhrases": [
+      "ipc"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     288,
+     354,
+     526,
+     433,
+     76
+    ],
+    "g2_top5": [
+     171
+    ],
+    "n": 24
+   },
+   "V1b_r1": {
+    "ms": 6665,
+    "params": {
+     "query": "ipc",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     288,
+     354,
+     526,
+     433,
+     76
+    ],
+    "g2_top5": [
+     171
+    ],
+    "n": 24
+   },
+   "V1b_r2": {
+    "ms": 8673,
+    "params": null,
+    "tipo": "conversation",
+    "g1_top5": [],
+    "g2_top5": [],
+    "n": 0
+   },
+   "V1b_r3": {
+    "ms": 5757,
+    "params": {
+     "query": "ipc",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     288,
+     354,
+     526,
+     433,
+     76
+    ],
+    "g2_top5": [
+     171
+    ],
+    "n": 24
+   }
+  },
+  "L064": {
+   "input": "mechas de perforacion",
+   "golden": null,
+   "V0": {
+    "ms": 9223,
+    "params": {
+     "query": "mechas de perforacion",
+     "resolvedPhrases": [
+      "mechas de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     138,
+     170,
+     157,
+     72
+    ],
+    "g2_top5": [],
+    "n": 4
+   },
+   "V1b_r1": {
+    "ms": 6539,
+    "params": {
+     "query": "mechas de perforacion",
+     "resolvedPhrases": [
+      "mechas de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     138,
+     170,
+     157,
+     72
+    ],
+    "g2_top5": [],
+    "n": 4
+   },
+   "V1b_r2": {
+    "ms": 6937,
+    "params": {
+     "query": "mechas de perforacion",
+     "resolvedPhrases": [
+      "mechas de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     138,
+     170,
+     157,
+     72
+    ],
+    "g2_top5": [],
+    "n": 4
+   },
+   "V1b_r3": {
+    "ms": 4978,
+    "params": {
+     "query": "mechas de perforacion",
+     "resolvedPhrases": [
+      "mechas de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     138,
+     170,
+     157,
+     72
+    ],
+    "g2_top5": [],
+    "n": 4
+   }
+  },
+  "L067": {
+   "input": "empresas de mantenimiento de bombas",
+   "golden": null,
+   "V0": {
+    "ms": 10238,
+    "params": {
+     "query": "mantenimiento de bombas",
+     "resolvedPhrases": [
+      "mantenimiento de bombas"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     73,
+     107,
+     94,
+     78,
+     75
+    ],
+    "g2_top5": [
+     157,
+     333,
+     382,
+     480,
+     391
+    ],
+    "n": 21
+   },
+   "V1b_r1": {
+    "ms": 5505,
+    "params": {
+     "query": "mantenimiento de bombas",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     73,
+     107,
+     94,
+     78,
+     75
+    ],
+    "g2_top5": [
+     157,
+     333,
+     382,
+     480,
+     391
+    ],
+    "n": 21
+   },
+   "V1b_r2": {
+    "ms": 5934,
+    "params": {
+     "query": "mantenimiento de bombas",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     73,
+     107,
+     94,
+     78,
+     75
+    ],
+    "g2_top5": [
+     157,
+     333,
+     382,
+     480,
+     391
+    ],
+    "n": 21
+   },
+   "V1b_r3": {
+    "ms": 5463,
+    "params": {
+     "query": "mantenimiento de bombas",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     73,
+     107,
+     94,
+     78,
+     75
+    ],
+    "g2_top5": [
+     157,
+     333,
+     382,
+     480,
+     391
+    ],
+    "n": 21
+   }
+  },
+  "L068": {
+   "input": "servicios de perforación de pozos",
+   "golden": null,
+   "V0": {
+    "ms": 10541,
+    "params": {
+     "query": "servicios de perforacion de pozos",
+     "resolvedPhrases": [
+      "servicios de perforación de pozos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     152,
+     133,
+     77,
+     179,
+     115
+    ],
+    "g2_top5": [
+     85,
+     333,
+     536
+    ],
+    "n": 20
+   },
+   "V1b_r1": {
+    "ms": 5583,
+    "params": {
+     "query": "servicios de perforacion de pozos",
+     "resolvedPhrases": [
+      "servicios de perforación de pozos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     152,
+     133,
+     77,
+     179,
+     115
+    ],
+    "g2_top5": [
+     85,
+     333,
+     536
+    ],
+    "n": 20
+   },
+   "V1b_r2": {
+    "ms": 7604,
+    "params": {
+     "query": "servicios de perforacion de pozos",
+     "resolvedPhrases": [
+      "servicios de perforación de pozos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     152,
+     133,
+     77,
+     179,
+     115
+    ],
+    "g2_top5": [
+     85,
+     333,
+     536
+    ],
+    "n": 20
+   },
+   "V1b_r3": {
+    "ms": 5606,
+    "params": {
+     "query": "servicios de perforacion de pozos",
+     "resolvedPhrases": [
+      "servicios de perforación de pozos"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     152,
+     133,
+     77,
+     179,
+     115
+    ],
+    "g2_top5": [
+     85,
+     333,
+     536
+    ],
+    "n": 20
+   }
+  },
+  "L069": {
+   "input": "manejo de fuidos de perforacion",
+   "golden": null,
+   "V0": {
+    "ms": 12630,
+    "params": {
+     "query": "manejo de fuidos de perforacion",
+     "resolvedPhrases": [
+      "manejo de fluidos de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     179,
+     173,
+     182,
+     96,
+     391
+    ],
+    "g2_top5": [
+     91
+    ],
+    "n": 12
+   },
+   "V1b_r1": {
+    "ms": 7064,
+    "params": {
+     "query": "manejo de fuidos de perforacion",
+     "resolvedPhrases": [
+      "manejo de fluidos de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     179,
+     173,
+     182,
+     96,
+     391
+    ],
+    "g2_top5": [
+     91
+    ],
+    "n": 12
+   },
+   "V1b_r2": {
+    "ms": 6590,
+    "params": {
+     "query": "manejo de fuidos de perforacion",
+     "resolvedPhrases": [
+      "manejo de fluidos de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     179,
+     173,
+     182,
+     96,
+     391
+    ],
+    "g2_top5": [
+     91
+    ],
+    "n": 12
+   },
+   "V1b_r3": {
+    "ms": 6186,
+    "params": {
+     "query": "manejo de fuidos de perforacion",
+     "resolvedPhrases": [
+      "manejo de fluidos de perforación"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     179,
+     173,
+     182,
+     96,
+     391
+    ],
+    "g2_top5": [
+     91
+    ],
+    "n": 12
+   }
+  },
+  "L070": {
+   "input": "manejo de aguas residuales",
+   "golden": null,
+   "V0": {
+    "ms": 8249,
+    "params": {
+     "query": "manejo de aguas residuales",
+     "resolvedPhrases": [
+      "manejo de aguas residuales"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     72,
+     331,
+     96,
+     313,
+     179
+    ],
+    "g2_top5": [],
+    "n": 9
+   },
+   "V1b_r1": {
+    "ms": 7002,
+    "params": {
+     "query": "manejo de aguas residuales",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     72,
+     331,
+     96,
+     313,
+     179
+    ],
+    "g2_top5": [],
+    "n": 9
+   },
+   "V1b_r2": {
+    "ms": 6454,
+    "params": {
+     "query": "manejo de aguas residuales",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     72,
+     331,
+     96,
+     313,
+     179
+    ],
+    "g2_top5": [],
+    "n": 9
+   },
+   "V1b_r3": {
+    "ms": 6305,
+    "params": {
+     "query": "manejo de aguas residuales",
+     "resolvedPhrases": [
+      "manejo de aguas residuales"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     72,
+     331,
+     96,
+     313,
+     179
+    ],
+    "g2_top5": [],
+    "n": 9
+   }
+  },
+  "L071": {
+   "input": "Tuberia octg",
+   "golden": null,
+   "V0": {
+    "ms": 8965,
+    "params": {
+     "query": "tuberia octg",
+     "resolvedPhrases": [
+      "tubería octg"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r1": {
+    "ms": 5726,
+    "params": {
+     "query": "tuberia octg",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": null,
+    "g1_top5": [],
+    "g2_top5": [],
+    "n": 0
+   },
+   "V1b_r2": {
+    "ms": 6373,
+    "params": {
+     "query": "tuberia octg",
+     "resolvedPhrases": [
+      "tubería octg"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [],
+    "n": 1
+   },
+   "V1b_r3": {
+    "ms": 4859,
+    "params": {
+     "query": "tuberia octg",
+     "resolvedPhrases": [
+      "tubería octg"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     76
+    ],
+    "g2_top5": [],
+    "n": 1
+   }
+  },
+  "L072": {
+   "input": "Valvulas de bola",
+   "golden": null,
+   "V0": {
+    "ms": 11727,
+    "params": {
+     "query": "valvulas de bola",
+     "resolvedPhrases": [
+      "válvulas de bola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     573,
+     80,
+     107,
+     157
+    ],
+    "g2_top5": [
+     560,
+     487
+    ],
+    "n": 6
+   },
+   "V1b_r1": {
+    "ms": 6043,
+    "params": {
+     "query": "valvulas de bola",
+     "resolvedPhrases": [
+      "válvulas de bola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     573,
+     80,
+     107,
+     157
+    ],
+    "g2_top5": [
+     560,
+     487
+    ],
+    "n": 6
+   },
+   "V1b_r2": {
+    "ms": 6015,
+    "params": {
+     "query": "valvulas de bola",
+     "resolvedPhrases": [
+      "válvulas de bola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     573,
+     80,
+     107,
+     157
+    ],
+    "g2_top5": [
+     560,
+     487
+    ],
+    "n": 6
+   },
+   "V1b_r3": {
+    "ms": 6183,
+    "params": {
+     "query": "valvulas de bola",
+     "resolvedPhrases": [
+      "válvulas de bola"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     573,
+     80,
+     107,
+     157
+    ],
+    "g2_top5": [
+     560,
+     487
+    ],
+    "n": 6
+   }
+  },
+  "L073": {
+   "input": "balacines",
+   "golden": null,
+   "V0": {
+    "ms": 11157,
+    "params": {
+     "query": "balacines",
+     "resolvedPhrases": [
+      "balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     91,
+     333,
+     391
+    ],
+    "n": 4
+   },
+   "V1b_r1": {
+    "ms": 5681,
+    "params": {
+     "query": "balacines",
+     "resolvedPhrases": [
+      "balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     91,
+     333,
+     391
+    ],
+    "n": 4
+   },
+   "V1b_r2": {
+    "ms": 6447,
+    "params": {
+     "query": "balacines",
+     "resolvedPhrases": [
+      "balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     91,
+     333,
+     391
+    ],
+    "n": 4
+   },
+   "V1b_r3": {
+    "ms": 5513,
+    "params": {
+     "query": "balacines",
+     "resolvedPhrases": [
+      "balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     91,
+     333,
+     391
+    ],
+    "n": 4
+   }
+  },
+  "S001": {
+   "input": "venta de balancines",
+   "golden": null,
+   "V0": {
+    "ms": 8168,
+    "params": {
+     "query": "venta de balancines",
+     "resolvedPhrases": [
+      "venta de balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 2
+   },
+   "V1b_r1": {
+    "ms": 7086,
+    "params": {
+     "query": "venta de balancines",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 2
+   },
+   "V1b_r2": {
+    "ms": 6964,
+    "params": {
+     "query": "venta de balancines",
+     "resolvedPhrases": [
+      "venta de balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 2
+   },
+   "V1b_r3": {
+    "ms": 7357,
+    "params": {
+     "query": "venta de balancines",
+     "resolvedPhrases": [
+      "venta de balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 2
+   }
+  },
+  "S002": {
+   "input": "mantenimiento de balancines",
+   "golden": null,
+   "V0": {
+    "ms": 8700,
+    "params": {
+     "query": "mantenimiento de balancines",
+     "resolvedPhrases": [
+      "mantenimiento de balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     74,
+     107,
+     73,
+     94
+    ],
+    "g2_top5": [
+     333,
+     391
+    ],
+    "n": 12
+   },
+   "V1b_r1": {
+    "ms": 6713,
+    "params": {
+     "query": "mantenimiento de balancines",
+     "resolvedPhrases": [
+      "mantenimiento de balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     74,
+     107,
+     73,
+     94
+    ],
+    "g2_top5": [
+     333,
+     391
+    ],
+    "n": 12
+   },
+   "V1b_r2": {
+    "ms": 4949,
+    "params": {
+     "query": "mantenimiento de balancines",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     74,
+     107,
+     73,
+     94
+    ],
+    "g2_top5": [
+     333,
+     391
+    ],
+    "n": 12
+   },
+   "V1b_r3": {
+    "ms": 6867,
+    "params": {
+     "query": "mantenimiento de balancines",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     157,
+     74,
+     107,
+     73,
+     94
+    ],
+    "g2_top5": [
+     333,
+     391
+    ],
+    "n": 12
+   }
+  },
+  "S003": {
+   "input": "sellado de fluidos en balancines",
+   "golden": null,
+   "V0": {
+    "ms": 9138,
+    "params": {
+     "query": "sellado de fluidos en balancines",
+     "resolvedPhrases": [
+      "sellado de fluidos en balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     487,
+     91
+    ],
+    "g2_top5": [],
+    "n": 2
+   },
+   "V1b_r1": {
+    "ms": 5295,
+    "params": {
+     "query": "sellado de fluidos en balancines",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     487,
+     91
+    ],
+    "g2_top5": [],
+    "n": 2
+   },
+   "V1b_r2": {
+    "ms": 6141,
+    "params": {
+     "query": "sellado de fluidos en balancines",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     487,
+     91
+    ],
+    "g2_top5": [],
+    "n": 2
+   },
+   "V1b_r3": {
+    "ms": 5644,
+    "params": {
+     "query": "sellado de fluidos en balancines",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     487,
+     91
+    ],
+    "g2_top5": [],
+    "n": 2
+   }
+  },
+  "S004": {
+   "input": "limpieza de balancines",
+   "golden": null,
+   "V0": {
+    "ms": 9521,
+    "params": {
+     "query": "limpieza de balancines",
+     "resolvedPhrases": [
+      "limpieza de balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     391,
+     523
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 3
+   },
+   "V1b_r1": {
+    "ms": 7437,
+    "params": {
+     "query": "limpieza de balancines",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     391,
+     523
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 3
+   },
+   "V1b_r2": {
+    "ms": 7260,
+    "params": {
+     "query": "limpieza de balancines",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     391,
+     523
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 3
+   },
+   "V1b_r3": {
+    "ms": 6107,
+    "params": {
+     "query": "limpieza de balancines",
+     "resolvedPhrases": [
+      "limpieza de balancines"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     391,
+     523
+    ],
+    "g2_top5": [
+     333
+    ],
+    "n": 3
+   }
+  },
+  "S005": {
+   "input": "fabricacion de valvulas industriales",
+   "golden": null,
+   "V0": {
+    "ms": 9322,
+    "params": {
+     "query": "fabricacion de valvulas industriales",
+     "resolvedPhrases": [
+      "fabricación de válvulas industriales"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     560,
+     187,
+     100,
+     141,
+     563
+    ],
+    "g2_top5": [
+     487,
+     480,
+     333,
+     75,
+     391
+    ],
+    "n": 15
+   },
+   "V1b_r1": {
+    "ms": 6908,
+    "params": {
+     "query": "fabricacion de valvulas industriales",
+     "resolvedPhrases": [
+      "fabricación de válvulas industriales"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     560,
+     187,
+     100,
+     141,
+     563
+    ],
+    "g2_top5": [
+     487,
+     480,
+     333,
+     75,
+     391
+    ],
+    "n": 15
+   },
+   "V1b_r2": {
+    "ms": 7195,
+    "params": {
+     "query": "fabricacion de valvulas industriales",
+     "resolvedPhrases": [
+      "fabricación de válvulas industriales"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     560,
+     187,
+     100,
+     141,
+     563
+    ],
+    "g2_top5": [
+     487,
+     480,
+     333,
+     75,
+     391
+    ],
+    "n": 15
+   },
+   "V1b_r3": {
+    "ms": 6401,
+    "params": {
+     "query": "fabricacion de valvulas industriales",
+     "resolvedPhrases": [
+      "fabricación de válvulas industriales"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     560,
+     187,
+     100,
+     141,
+     563
+    ],
+    "g2_top5": [
+     487,
+     480,
+     333,
+     75,
+     391
+    ],
+    "n": 15
+   }
+  },
+  "S006": {
+   "input": "mantenimiento de valvulas industriales",
+   "golden": null,
+   "V0": {
+    "ms": 8725,
+    "params": {
+     "query": "mantenimiento de valvulas industriales",
+     "resolvedPhrases": [
+      "mantenimiento de valvulas industriales"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     122,
+     107,
+     194,
+     78,
+     75
+    ],
+    "g2_top5": [
+     560,
+     333,
+     480,
+     391,
+     487
+    ],
+    "n": 13
+   },
+   "V1b_r1": {
+    "ms": 7615,
+    "params": {
+     "query": "mantenimiento de valvulas industriales",
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     122,
+     107,
+     194,
+     78,
+     75
+    ],
+    "g2_top5": [
+     560,
+     333,
+     480,
+     391,
+     487
+    ],
+    "n": 13
+   },
+   "V1b_r2": {
+    "ms": 5900,
+    "params": {
+     "query": "mantenimiento de valvulas industriales",
+     "resolvedPhrases": [
+      "mantenimiento de válvulas industriales"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     122,
+     107,
+     194,
+     78,
+     75
+    ],
+    "g2_top5": [
+     560,
+     333,
+     480,
+     391,
+     487
+    ],
+    "n": 13
+   },
+   "V1b_r3": {
+    "ms": 7848,
+    "params": {
+     "query": "mantenimiento de valvulas industriales",
+     "resolvedPhrases": [
+      "mantenimiento de válvulas industriales"
+     ],
+     "queryIntent": "SERVICE",
+     "explain": true
+    },
+    "tipo": "results",
+    "g1_top5": [
+     122,
+     107,
+     194,
+     78,
+     75
+    ],
+    "g2_top5": [
+     560,
+     333,
+     480,
+     391,
+     487
+    ],
+    "n": 13
+   }
+  }
+ }
+}

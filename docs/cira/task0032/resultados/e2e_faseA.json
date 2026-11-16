@@ -1,0 +1,288 @@
+[
+ {
+  "dev": "desktop",
+  "q": "empresas de perforacion",
+  "errors": [],
+  "navegador_ms": 24663,
+  "tipo": "type: results · 12386ms",
+  "texto": "TYPE: RESULTS · 12386MS ✅ Para Empresas de perforación: 22 empresa(s) que ofrecen productos o servicios relacionados y 13 con experiencias relacionadas. Haz cli",
+  "ini": {
+   "cap": 22,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 13,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 22,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=111&sid=test-68d4eb76-fa70-498b-a347-1eb2590c496f",
+  "voto_emp": "170",
+  "voto": "✓ gracias",
+  "perfil_ms": 5101,
+  "perfil_pedido": "dame información sobre la empresa INDUSTRIAS METAL MECANICA MERIDA, C.A",
+  "perfil": "TYPE: RESULTS · 5016MS ✅ Información de INDUSTRIAS METAL MECANICA MERIDA, C.A: 🏢 INDUSTRIAS METAL MECANICA MERIDA, C.A FABRICANTESINGENIERÍ",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "desktop",
+  "q": "balancin",
+  "errors": [],
+  "navegador_ms": 8767,
+  "tipo": "type: results · 8515ms",
+  "texto": "TYPE: RESULTS · 8515MS ✅ Para Balancín (equipo de bombeo): 1 empresa(s) que ofrecen productos o servicios relacionados y 4 con experiencias relacionadas. Haz cl",
+  "ini": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 4,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=113&sid=test-fa1fb6dd-b0a0-4581-9eb5-22ba022ef824",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "desktop",
+  "q": "macolla",
+  "errors": [],
+  "navegador_ms": 6275,
+  "tipo": "type: results · 6184ms",
+  "texto": "TYPE: RESULTS · 6184MS ✅ Para Macolla: 0 empresa(s) que ofrecen productos o servicios relacionados y 13 con experiencias relacionadas. Haz clic en una empresa p",
+  "ini": {
+   "cap": 0,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 13,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 0,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=114&sid=test-e9367561-b3ae-45cd-9612-aaafc077f4ce",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "desktop",
+  "q": "gandola",
+  "errors": [],
+  "navegador_ms": 6627,
+  "tipo": "type: results · 6367ms",
+  "texto": "TYPE: RESULTS · 6367MS ✅ Para Empresas relacionadas con gandolas: 6 empresa(s) que ofrecen productos o servicios relacionados y 1 con experiencias relacionadas.",
+  "ini": {
+   "cap": 6,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 1,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 6,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=115&sid=test-b33bb0ad-676a-45ae-97a8-bfe7f54d062a",
+  "perfil_ms": 4326,
+  "perfil_pedido": "dame información sobre la empresa OEG INTERNACIONAL SERVICE, C.A.",
+  "perfil": "TYPE: RESULTS · 4238MS ✅ Información de OEG INTERNACIONAL SERVICE, C.A.: 🏢 OEG INTERNACIONAL SERVICE, C.A. SERVICIOS ASOCIADOS SERVICIOS LO",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "desktop",
+  "q": "balacines",
+  "errors": [],
+  "navegador_ms": 6266,
+  "tipo": "type: results · 6082ms",
+  "texto": "TYPE: RESULTS · 6082MS ✅ Para Balancines: 1 empresa(s) que ofrecen productos o servicios relacionados y 4 con experiencias relacionadas. Haz clic en una empresa",
+  "ini": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 4,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=117&sid=test-03f71c58-85bb-451c-82a8-a6bb34515041",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "desktop",
+  "q": "venta de zapatos",
+  "errors": [],
+  "navegador_ms": 5861,
+  "tipo": "type: conversation · 5698ms",
+  "texto": "TYPE: CONVERSATION · 5698MS 🔍 No encontramos resultados No encontramos empresas afiliadas que coincidan con su búsqueda. Intente con otro sector, servicio o ci",
+  "eval": "/admin/evaluacion-cira/evaluar",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "mobile",
+  "q": "empresas de perforacion",
+  "errors": [],
+  "navegador_ms": 5980,
+  "tipo": "type: results · 5557ms",
+  "texto": "TYPE: RESULTS · 5557MS ✅ Para Empresas de perforación: 22 empresa(s) que ofrecen productos o servicios relacionados y 13 con experiencias relacionadas. Haz clic",
+  "ini": {
+   "cap": 22,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 13,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 22,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=119&sid=test-99754967-4ff0-4150-a13e-9831f25ed7d0",
+  "voto_emp": "170",
+  "voto": "✓ gracias",
+  "perfil_ms": 4802,
+  "perfil_pedido": "dame información sobre la empresa INDUSTRIAS METAL MECANICA MERIDA, C.A",
+  "perfil": "TYPE: RESULTS · 4711MS ✅ Información de INDUSTRIAS METAL MECANICA MERIDA, C.A: 🏢 INDUSTRIAS METAL MECANICA MERIDA, C.A FABRICANTESINGENIERÍ",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "mobile",
+  "q": "balancin",
+  "errors": [],
+  "navegador_ms": 7442,
+  "tipo": "type: results · 7007ms",
+  "texto": "TYPE: RESULTS · 7007MS ✅ Para Balancín petrolero: 1 empresa(s) que ofrecen productos o servicios relacionados y 4 con experiencias relacionadas. Haz clic en una",
+  "ini": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 4,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=121&sid=test-252323ed-871f-48cb-8919-03d8f83f8a76",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "mobile",
+  "q": "macolla",
+  "errors": [],
+  "navegador_ms": 4696,
+  "tipo": "type: results · 4276ms",
+  "texto": "TYPE: RESULTS · 4276MS ✅ Para Macolla: 0 empresa(s) que ofrecen productos o servicios relacionados y 13 con experiencias relacionadas. Haz clic en una empresa p",
+  "ini": {
+   "cap": 0,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 13,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 0,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=122&sid=test-9fccfd12-f106-48ca-b1c8-0d79a60c20d4",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "mobile",
+  "q": "gandola",
+  "errors": [],
+  "navegador_ms": 4691,
+  "tipo": "type: results · 4373ms",
+  "texto": "TYPE: RESULTS · 4373MS ✅ Para Gandola: 6 empresa(s) que ofrecen productos o servicios relacionados y 1 con experiencias relacionadas. Haz clic en una empresa pa",
+  "ini": {
+   "cap": 6,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 1,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 6,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=123&sid=test-50adf97f-20fb-42a0-b45e-b65efc629abd",
+  "perfil_ms": 3806,
+  "perfil_pedido": "dame información sobre la empresa OEG INTERNACIONAL SERVICE, C.A.",
+  "perfil": "TYPE: RESULTS · 3664MS ✅ Información de OEG INTERNACIONAL SERVICE, C.A.: 🏢 OEG INTERNACIONAL SERVICE, C.A. SERVICIOS ASOCIADOS SERVICIOS LO",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "mobile",
+  "q": "balacines",
+  "errors": [],
+  "navegador_ms": 7133,
+  "tipo": "type: results · 6172ms",
+  "texto": "TYPE: RESULTS · 6172MS ✅ Para Balancines: 1 empresa(s) que ofrecen productos o servicios relacionados y 4 con experiencias relacionadas. Haz clic en una empresa",
+  "ini": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 4,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=125&sid=test-e03e1371-404a-440c-a61f-8077fdbf49ab",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "mobile",
+  "q": "venta de zapatos",
+  "errors": [],
+  "navegador_ms": 7308,
+  "tipo": "type: conversation · 7142ms",
+  "texto": "TYPE: CONVERSATION · 7142MS 🔍 No encontramos resultados No encontramos empresas afiliadas que coincidan con su búsqueda. Intente con otro sector, servicio o ci",
+  "eval": "/admin/evaluacion-cira/evaluar",
+  "scroll_horizontal": false
+ }
+]

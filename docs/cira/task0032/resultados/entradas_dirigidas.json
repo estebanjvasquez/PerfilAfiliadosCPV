@@ -1,0 +1,17 @@
+{
+ "corpus": [],
+ "uat": [
+  {
+   "id": "D01",
+   "input": "IPC"
+  },
+  {
+   "id": "D02",
+   "input": "Tuberia octg"
+  },
+  {
+   "id": "D03",
+   "input": "tratamiento de aguas de perforación en el lago"
+  }
+ ]
+}

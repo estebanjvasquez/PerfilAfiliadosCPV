@@ -1,0 +1,289 @@
+{
+ "corpus": [
+  {
+   "id": "L007",
+   "input": "operadores"
+  },
+  {
+   "id": "L009",
+   "input": "tratamiento de aguas de perforación"
+  },
+  {
+   "id": "L010",
+   "input": "fabricantes de balancines"
+  },
+  {
+   "id": "L013",
+   "input": "levantamiento artificial"
+  },
+  {
+   "id": "L014",
+   "input": "revestidor"
+  },
+  {
+   "id": "L015",
+   "input": "mecha"
+  },
+  {
+   "id": "L016",
+   "input": "cabria"
+  },
+  {
+   "id": "L017",
+   "input": "cabrias"
+  },
+  {
+   "id": "L018",
+   "input": "mechurrio"
+  },
+  {
+   "id": "L019",
+   "input": "macolla"
+  },
+  {
+   "id": "L020",
+   "input": "guaya fina"
+  },
+  {
+   "id": "L021",
+   "input": "guaya eléctrica"
+  },
+  {
+   "id": "L022",
+   "input": "balancín"
+  },
+  {
+   "id": "L023",
+   "input": "camión chupón"
+  },
+  {
+   "id": "L024",
+   "input": "gandola"
+  },
+  {
+   "id": "L025",
+   "input": "mantenimiento de cabrias"
+  },
+  {
+   "id": "L026",
+   "input": "fabricantes de cabrias"
+  },
+  {
+   "id": "L027",
+   "input": "transporte de gandolas"
+  },
+  {
+   "id": "L028",
+   "input": "alquiler de gandolas"
+  },
+  {
+   "id": "L029",
+   "input": "mantenimiento de levantamiento artificial"
+  },
+  {
+   "id": "L031",
+   "input": "servicios petroleros"
+  },
+  {
+   "id": "L032",
+   "input": "construcción"
+  },
+  {
+   "id": "L033",
+   "input": "tratamiento de aguas de perforación en el lago"
+  },
+  {
+   "id": "L034",
+   "input": "empresas que fabriquen y mantengan balancines"
+  },
+  {
+   "id": "L035",
+   "input": "inspección y mantenimiento de guaya eléctrica"
+  },
+  {
+   "id": "L036",
+   "input": "transporte de crudo por gandola"
+  },
+  {
+   "id": "L037",
+   "input": "pipeline"
+  },
+  {
+   "id": "L038",
+   "input": "refinery"
+  },
+  {
+   "id": "L039",
+   "input": "refinería"
+  },
+  {
+   "id": "L040",
+   "input": "drilling"
+  },
+  {
+   "id": "L041",
+   "input": "necesito arbolitos para pozos petroleros"
+  },
+  {
+   "id": "L042",
+   "input": "venta de zapatos"
+  },
+  {
+   "id": "L053",
+   "input": "gandolas"
+  },
+  {
+   "id": "L054",
+   "input": "servicios de pozos"
+  },
+  {
+   "id": "L056",
+   "input": "Servicios a Pozos"
+  },
+  {
+   "id": "L058",
+   "input": "sistemas fotovoltaicos"
+  },
+  {
+   "id": "L059",
+   "input": "Expansores"
+  },
+  {
+   "id": "L060",
+   "input": "Partes y Repuestos de Compresores"
+  },
+  {
+   "id": "L061",
+   "input": "Empresas que realizan ingeniería FEED"
+  },
+  {
+   "id": "L062",
+   "input": "ingenieria de procesos"
+  },
+  {
+   "id": "L063",
+   "input": "IPC"
+  },
+  {
+   "id": "L064",
+   "input": "mechas de perforacion"
+  },
+  {
+   "id": "L067",
+   "input": "empresas de mantenimiento de bombas"
+  },
+  {
+   "id": "L068",
+   "input": "servicios de perforación de pozos"
+  },
+  {
+   "id": "L069",
+   "input": "manejo de fuidos de perforacion"
+  },
+  {
+   "id": "L070",
+   "input": "manejo de aguas residuales"
+  },
+  {
+   "id": "L071",
+   "input": "Tuberia octg"
+  },
+  {
+   "id": "L072",
+   "input": "Valvulas de bola"
+  },
+  {
+   "id": "L073",
+   "input": "balacines"
+  },
+  {
+   "id": "S001",
+   "input": "venta de balancines"
+  },
+  {
+   "id": "S002",
+   "input": "mantenimiento de balancines"
+  },
+  {
+   "id": "S003",
+   "input": "sellado de fluidos en balancines"
+  },
+  {
+   "id": "S004",
+   "input": "limpieza de balancines"
+  },
+  {
+   "id": "S005",
+   "input": "fabricacion de valvulas industriales"
+  },
+  {
+   "id": "S006",
+   "input": "mantenimiento de valvulas industriales"
+  },
+  {
+   "id": "X01",
+   "input": "como estara el clima manana en caracas"
+  },
+  {
+   "id": "X02",
+   "input": "hola"
+  },
+  {
+   "id": "X03",
+   "input": "transporte de gandolas y alquiler de gruas"
+  },
+  {
+   "id": "X04",
+   "input": "dame informacion sobre la empresa TIERRA ALTA SISTEMAS DE PRODUCCION (TASPSA)"
+  },
+  {
+   "id": "X05",
+   "input": "busca la empresa con rif J070093501"
+  }
+ ],
+ "uat": [
+  {
+   "id": "U01",
+   "input": "empresas de perforacion"
+  },
+  {
+   "id": "U02",
+   "input": "balancin"
+  },
+  {
+   "id": "U03",
+   "input": "macolla"
+  },
+  {
+   "id": "U04",
+   "input": "gandola"
+  }
+ ],
+ "extras": [
+  {
+   "id": "X01",
+   "input": "como estara el clima manana en caracas",
+   "espera": "declinar sin busqueda"
+  },
+  {
+   "id": "X02",
+   "input": "hola",
+   "espera": "saludo sin busqueda"
+  },
+  {
+   "id": "X03",
+   "input": "transporte de gandolas y alquiler de gruas",
+   "espera": "busqueda con una frase por concepto"
+  },
+  {
+   "id": "X04",
+   "input": "dame informacion sobre la empresa TIERRA ALTA SISTEMAS DE PRODUCCION (TASPSA)",
+   "espera": "get_empresa (CASO B)"
+  },
+  {
+   "id": "X05",
+   "input": "busca la empresa con rif J070093501",
+   "espera": "get_empresa por rif"
+  }
+ ]
+}

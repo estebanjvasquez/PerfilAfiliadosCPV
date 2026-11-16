@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | **IN_PROGRESS** — fase A (2026-11-16 ~18:00Z) |
+| Estado | Fase A: ~~IN_PROGRESS~~ → **PHASE_A_DEPLOYED_FOR_REVIEW** (2026-11-16 ~18:45Z, n8n `c6c70402`). Fase B: diagnóstico hecho; pendiente de gate |
 | Fuente | Issue #2 `6924316065` (estebanjvasquez, 2026-11-16T17:46:09Z): decisión del propietario sobre TASK-0031 + `6924366566` (estebanjvasquez, 17:48:14Z): adenda de coordinación asíncrona, que sustituye el mecanismo de handoff y fija la ejecución secuencial |
 | Antecedentes | TASK-0031 (entrega `6923744831`, HANDOFF `e751c89`): READY_FOR_REVIEW — SIN DEPLOY, conserva su estado. TASK-0030: **aceptación parcial de UX**, no APPROVED global. TASK-0029: sin aprobación para producción |
 | Rama de documentación | `fix/sec-01-r4-01-role-editor-preserve`, BASE `e751c89` |
@@ -59,3 +59,24 @@ Solo staging y pruebas aisladas; nada en producción, `main`, DDL, regeneración
 - 2026-11-16 ~17:55Z: arranque. Rama `fix/sec-01-r4-01-role-editor-preserve`, HEAD `e751c89` = `origin`. Cambios ajenos sin commitear en `AGENTS.md`, `CLAUDE.md`, `PROTOCOL.md` y `SESSION_RESUME.md` (edición de arranque del 2026-10-27): no se tocan ni se commitean. Issue #2 sin comentarios posteriores a `6924366566` (sin STOP/HOLD). `TASK-0032` libre en el repo.
 - Preflight fase A (solo lectura): n8n `zbVLoCdR09IA9yQK` «Chat CIRA V5 - MCP» activo, `versionId` = `activeVersionId` = `7feb48bc` (actualizado 15:01:54Z, TASK-0030). Herramientas MCP del agente: `resolve_search_intent`, `search_taxonomy`.
 - Aislamiento fase A: de 49 flujos (9 activos), solo dos activos usan el Worker: este y «CIRA votos (staging)» `iVDEEo0oaEHDOvlp`; ningún otro flujo referencia este flujo ni su webhook. El webhook está en `public/cira-test/index.html`. Últimas 100 ejecuciones (2026-11-09 → 2026-11-16): 70 con `origin` `https://pruebas.camarapetrolera.app` (staging) y 30 de nuestros scripts de evaluación del 2026-11-09 (`user-agent: node`, sesiones `eval-*`/`test-*`). Ningún otro origen.
+- Fase A, ~18:10Z: respaldo del flujo vivo fuera del repo (`zbVLoCdR09IA9yQK_2026-11-16_pre-t32_live.json`, `7feb48bc`, sha256 `E1CECF31…`). Variante definitiva [`docs/cira/task0032/n8n/build_v1b.mjs`](../../cira/task0032/n8n/build_v1b.mjs): cambian solo `MCP Perfil Afiliados CPV` (`includeTools` = `search_taxonomy`) y `Build System Prompt` (reglas de tipeo, varios conceptos y alcance integradas en la sección «ENTENDER LA INTENCION»; 0 menciones a la tool retirada; `promptVersion` `…+T32-v1b`); conexiones iguales. Benchmark aislado V0 frente a V1b (copias sin registro, en serie).
+- Fase B, diagnóstico de solo lectura (en paralelo, como permite la adenda):
+  - Ejecución real: `cira_search_log` 108 = ejecución n8n `22715` (sesión `test-18313ca8…`), resultado `{177,333}`. Pedido de ficha: ejecuciones `22716` y `22717`, con la entrada «dame información sobre la empresa INTERNATIONAL OFFSHORE … I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)», que es el texto que envía la tarjeta (`Format Cards2`, `sendPrompt` con el nombre y sin id).
+  - El agente emitió `get_empresa {"nombre":"ioed"}`: aplicó la regla del prompt «si el nombre trae siglas entre paréntesis, usa las siglas» y quitó los puntos.
+  - Worker `get_empresa` (código `1ea9175`, desplegado `8796f292`): `status_id = 1 and unaccent(name) ilike '%ioed%'` da 0 filas; el respaldo `word_similarity('ioed', name) > 0.5` da 0,2 (máximo entre todas). `ilike '%i.o.e.d%'` y la comparación sin puntuación encuentran la 177.
+  - Con 0 filas, `If2` lleva a `Code in JavaScript1`, que con intención COMPANY pinta «Empresa no afiliada».
+  - **`chamber_empresa` no interviene en ningún punto** (ni en el Worker ni en n8n). La 177 tiene 0 filas allí y 314 de las 406 activas tampoco tienen; la 157 tiene 2.
+  - Criterio de pertenencia en el código: `empresas.status_id = 1` (columna «Activo» de Filament; el índice `BuildEmpresaSearchDocuments` usa el mismo filtro). Las 406 empresas tienen `status_id = 1`.
+  - Consultas en transacción `READ ONLY` con rollback.
+- Fase B, corrección preparada (sin desplegar):
+  - Worker, rama `fix/t32-get-empresa-id` desde `1ea9175` (no incluye W1): `get_empresa` acepta un `id` opcional, que tiene prioridad (`status_id = 1 and id = …`). Además, un tercer respaldo compara nombre y término sin puntuación, y solo actúa si las búsquedas anteriores no encontraron nada.
+  - n8n [`build_detail.mjs`](../../cira/task0032/n8n/build_detail.mjs): el clic envía `[ID n]`; `Parse Intent JSON3` fija `get_empresa {id}`; se agrega la revisión en `Build Search Log`.
+- Fase A, 18:00–18:38Z: 7 copias aisladas (borradas). V0 frente a V1b r1, r2 y r3, más dos pruebas dirigidas. r1 perdió la variante con tilde («Tuberia octg»); r2 la corrigió, pero «IPC» pidió aclaración 3 de 5 veces. **r3** (sigla o término suelto nunca es ambiguo) queda así:
+  - latencia del corpus p50/p95: 10,4/14,2 → **6,1/8,1 s**; UAT: 11,8/15,6 → **6,4/8,4 s**;
+  - una llamada al modelo y la mitad de tokens;
+  - ruido 27 = 27, relevantes 22 → 23, cobertura 38 → 39/49, vacías 2 → 1.
+  - El rollback se ensayó en la copia `UuL3qipNmibULIQX`: PASS.
+- **Fase A desplegada** a las 18:40:06Z (Issue #2 revisado a las 18:39:46Z, sin STOP/HOLD). Vivo `7feb48bc` = respaldo; `PUT` → **`c6c70402`**; diff de 2 nodos, conexiones iguales.
+  - E2E en escritorio y Pixel 5: 12/12 PASS (vistas, voto 37/38, ficha, evaluación, sin desbordamiento ni errores).
+  - Registros 111–126 con `+T32-v1b`; 0 evaluaciones nuevas.
+  - Informe: [`audit/CIRA_TASK0032_FASE_A_V1B.md`](../../../audit/CIRA_TASK0032_FASE_A_V1B.md). Siguiente: publicar `PHASE_A_DEPLOYED_FOR_REVIEW` y, después, el gate de la fase B.
