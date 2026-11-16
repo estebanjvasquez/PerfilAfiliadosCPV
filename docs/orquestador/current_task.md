@@ -25,6 +25,16 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-16 17:55Z: **TASK-0032** — CIRA: V1b en staging (fase A) e incidencia de detalle de la empresa 177 (fase B); W1 no autorizado — **IN_PROGRESS** (fuente `6924316065` + adenda `6924366566`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0032-cira-v1b-and-company-detail.md`](tasks/0032-cira-v1b-and-company-detail.md) |
+| Autoriza | Fase A: V1b en n8n `zbVLoCdR09IA9yQK` tras copia aislada, respaldo, rollback ensayado y E2E, **solo staging**. Fase B: diagnóstico y, si el componente está aislado y cubierto, corrección mínima en staging |
+| No autoriza | Producción, `main`, DDL, escrituras masivas, datos de empresas, `chamber_empresa`, taxonomía, roles, credenciales, kiosco, W1, cambio de modelo, loops |
+| BASE | `e751c89` |
+| Coordinación | Secuencial; reporte en Issue #2 tras cada fase (`PHASE_A_DEPLOYED_FOR_REVIEW`, `PHASE_B_DEPLOYED_FOR_REVIEW` o `BLOCKED`); revisar Issue #2 antes de cada escritura o despliegue |
+
 ## 2026-11-16 15:40Z: **TASK-0031** — CIRA: diagnóstico y benchmark aislado de latencia (sin deploy) — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW — SIN DEPLOY** (~17:30Z; fuente `6920929114`)
 
 | Campo | Valor |
