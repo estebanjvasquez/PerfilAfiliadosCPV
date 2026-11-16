@@ -1,4 +1,67 @@
 {
+  "task_0031_cira_latency_benchmark": {
+    "task_id": "TASK-0031",
+    "title": "CIRA: isolated latency diagnosis and benchmark (no deploy)",
+    "source": "Issue #2 comment 6920929114 (owner, 2026-11-16T15:34:05Z)",
+    "predecessors": "TASK-0030 partial UX acceptance (not APPROVED global); TASK-0029",
+    "status": "READY_FOR_REVIEW_NO_DEPLOY",
+    "code_deployed": false,
+    "migration_executed": false,
+    "review_base_sha": "96943d3",
+    "materialization_commit_sha": "1a92cc4",
+    "tested_head_sha": "15d35e798a496c1bd2a2c5083fd854c333570114 (bench scripts); Worker W1 perf/t31-worker-parallel 988f87f (preview 3539deec, no traffic)",
+    "review_head_sha": "15d35e798a496c1bd2a2c5083fd854c333570114",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block",
+    "live_unchanged": {
+      "n8n": "zbVLoCdR09IA9yQK 7feb48bc",
+      "worker": "8796f292 100%",
+      "model": "gpt-6-luna",
+      "isolated_copies": "10 created and deleted (logging disabled) + 1 temporary model-list flow deleted"
+    },
+    "runs": "501 agent searches: V0 x2, V1, V1b, M41, M54, V1M41 (55 corpus + 4 UAT x3) + clean UAT V0/V1b (4x4)",
+    "results": {
+      "V0": {
+        "corpus_p50_ms": 10175,
+        "uat_clean_p50_ms": 10217,
+        "noise_top5": 27,
+        "rel_top5": 23,
+        "coverage": "39/49",
+        "llm_calls": "2 + 1 in Worker"
+      },
+      "V1b": {
+        "corpus_p50_ms": 6991,
+        "uat_clean_p50_ms": 6246,
+        "noise_top5": 27,
+        "rel_top5": 23,
+        "coverage": "39/49",
+        "llm_calls": 1
+      },
+      "M41": {
+        "corpus_p50_ms": 9319,
+        "rel_top5": 22,
+        "coverage": "38/49"
+      },
+      "M54": {
+        "corpus_p50_ms": 9064,
+        "rel_top5": 21,
+        "coverage": "37/49"
+      },
+      "V1M41": {
+        "corpus_p50_ms": 5489,
+        "rel_top5": 22,
+        "coverage": "38/49"
+      },
+      "W1_worker": {
+        "equivalence": "55/55 default; grupos 54/55 (L072 transient, 3 repeats identical)",
+        "cold_p50_ms": "1960 -> 1582",
+        "cold_p95_ms": "3136 -> 2378"
+      }
+    },
+    "recommendation": "Adopt V1b (remove resolve_search_intent from agent tools, rewrite intent section of prompt, keep gpt-6-luna) in staging after authorization; optionally W1 Worker separately; do not change model",
+    "report": "audit/CIRA_TASK0031_BENCHMARK_LATENCIA.md",
+    "evidence": "docs/cira/task0031/",
+    "next": "STOP. Owner authorization required before any implementation."
+  },
   "task_0030_cira_t29_uat_corrections": {
     "task_id": "TASK-0030",
     "title": "CIRA: TASK-0029 UAT corrections (mutually exclusive views; measured latency diagnosis), staging only",
