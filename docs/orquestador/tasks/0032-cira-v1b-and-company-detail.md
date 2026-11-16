@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | Fase A: ~~IN_PROGRESS~~ → **PHASE_A_DEPLOYED_FOR_REVIEW** (2026-11-16 ~18:45Z, n8n `c6c70402`). Fase B: diagnóstico hecho; pendiente de gate |
+| Estado | Fase A: ~~IN_PROGRESS~~ → **PHASE_A_DEPLOYED_FOR_REVIEW** (2026-11-16 ~18:45Z, n8n `c6c70402`). Fase B: ~~diagnóstico~~ → **PHASE_B_DEPLOYED_FOR_REVIEW** (~19:20Z, Worker `8ce4e0ff`, n8n `2d0a1ee8`). Fase C (W1): no autorizada |
 | Fuente | Issue #2 `6924316065` (estebanjvasquez, 2026-11-16T17:46:09Z): decisión del propietario sobre TASK-0031 + `6924366566` (estebanjvasquez, 17:48:14Z): adenda de coordinación asíncrona, que sustituye el mecanismo de handoff y fija la ejecución secuencial |
 | Antecedentes | TASK-0031 (entrega `6923744831`, HANDOFF `e751c89`): READY_FOR_REVIEW — SIN DEPLOY, conserva su estado. TASK-0030: **aceptación parcial de UX**, no APPROVED global. TASK-0029: sin aprobación para producción |
 | Rama de documentación | `fix/sec-01-r4-01-role-editor-preserve`, BASE `e751c89` |
@@ -80,3 +80,12 @@ Solo staging y pruebas aisladas; nada en producción, `main`, DDL, regeneración
   - E2E en escritorio y Pixel 5: 12/12 PASS (vistas, voto 37/38, ficha, evaluación, sin desbordamiento ni errores).
   - Registros 111–126 con `+T32-v1b`; 0 evaluaciones nuevas.
   - Informe: [`audit/CIRA_TASK0032_FASE_A_V1B.md`](../../../audit/CIRA_TASK0032_FASE_A_V1B.md). Siguiente: publicar `PHASE_A_DEPLOYED_FOR_REVIEW` y, después, el gate de la fase B.
+- Fase A publicada en el Issue #2: `6925761178` (18:47:18Z).
+- Fase B, 18:48–19:20Z:
+  - **Gate de aislamiento del Worker:** `main` (producción) no lo referencia; Laravel de staging solo usa `/embed`; `get_empresa` solo lo llama CIRA Test.
+  - **Candidato:** commit `4599217` (desde `1ea9175`, sin W1), vista previa `8ce4e0ff`.
+  - **Regresión:** `get_empresa` 406/406 idénticas por nombre completo; siglas 31 frente a 30, sin pérdidas; 314/314 empresas sin `chamber_empresa` encontradas por id; `search_empresas` 110/110 idénticas.
+  - **Copia aislada de n8n `d8BbBdTzk8WzZhzv`:** 11/11; rollback ensayado y copia borrada.
+  - **Despliegue:** Issue #2 revisado a las 19:06:22Z, sin STOP/HOLD. Worker `8796f292` → **`8ce4e0ff`** (19:06:54Z); n8n `c6c70402` → **`2d0a1ee8`** (19:12:49Z).
+  - **E2E en escritorio y Pixel 5:** la ficha de la 177 abre desde su tarjeta; registros 127–140 con `get_empresa {id}`; `chamber_empresa` sin cambios (173 filas).
+  - **Informe:** [`audit/CIRA_TASK0032_FASE_B_FICHA_EMPRESA.md`](../../../audit/CIRA_TASK0032_FASE_B_FICHA_EMPRESA.md). STOP para la UAT del propietario.

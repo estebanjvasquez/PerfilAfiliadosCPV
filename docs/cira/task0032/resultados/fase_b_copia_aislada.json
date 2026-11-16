@@ -1,0 +1,285 @@
+[
+ {
+  "id": "B01",
+  "input": "camiones de transporte de maquinaria pesada",
+  "espera": "busqueda; tarjetas con [ID n], incluida la 177",
+  "sessionId": "t32b-B01-1794855871546",
+  "ms": 11909,
+  "status": 200,
+  "type": "results",
+  "no_afiliada": false,
+  "informacion_de": false,
+  "marcadores_id": [
+   177,
+   177,
+   333,
+   333
+  ],
+  "execution": "23093",
+  "tool": "search_empresas",
+  "params": {
+   "query": "camiones de transporte de maquinaria pesada",
+   "resolvedPhrases": [
+    "camiones de transporte de maquinaria pesada"
+   ],
+   "queryIntent": "SERVICE",
+   "explain": true
+  },
+  "filas": [
+   177,
+   333
+  ],
+  "nodos": [
+   "Format Cards2"
+  ]
+ },
+ {
+  "id": "B02",
+  "input": "dame información sobre la empresa <nombre de la empresa 177> [ID 177]",
+  "espera": "ficha 177 por id",
+  "sessionId": "t32b-B02-1794855883457",
+  "ms": 5516,
+  "status": 200,
+  "type": "results",
+  "no_afiliada": false,
+  "informacion_de": true,
+  "marcadores_id": [],
+  "execution": "23094",
+  "tool": "get_empresa",
+  "params": {
+   "id": 177
+  },
+  "filas": [
+   177
+  ],
+  "nodos": [
+   "Format Cards2"
+  ]
+ },
+ {
+  "id": "B03",
+  "input": "dame información sobre la empresa <nombre de la empresa 157> [ID 157]",
+  "espera": "ficha 157 por id (tiene chamber_empresa)",
+  "sessionId": "t32b-B03-1794855888974",
+  "ms": 4889,
+  "status": 200,
+  "type": "results",
+  "no_afiliada": false,
+  "informacion_de": true,
+  "marcadores_id": [],
+  "execution": "23095",
+  "tool": "get_empresa",
+  "params": {
+   "id": 157
+  },
+  "filas": [
+   157
+  ],
+  "nodos": [
+   "Format Cards2"
+  ]
+ },
+ {
+  "id": "B04",
+  "input": "dame información sobre la empresa <nombre de la empresa 143> [ID 143]",
+  "espera": "ficha por id, sin chamber_empresa, nombre con parentesis (143)",
+  "sessionId": "t32b-B04-1794855893864",
+  "ms": 4346,
+  "status": 200,
+  "type": "results",
+  "no_afiliada": false,
+  "informacion_de": true,
+  "marcadores_id": [],
+  "execution": "23096",
+  "tool": "get_empresa",
+  "params": {
+   "id": 143
+  },
+  "filas": [
+   143
+  ],
+  "nodos": [
+   "Format Cards2"
+  ]
+ },
+ {
+  "id": "B05",
+  "input": "dame información sobre la empresa <nombre de la empresa 150> [ID 150]",
+  "espera": "ficha por id, sin chamber_empresa, nombre con parentesis (150)",
+  "sessionId": "t32b-B05-1794855898210",
+  "ms": 4698,
+  "status": 200,
+  "type": "results",
+  "no_afiliada": false,
+  "informacion_de": true,
+  "marcadores_id": [],
+  "execution": "23097",
+  "tool": "get_empresa",
+  "params": {
+   "id": 150
+  },
+  "filas": [
+   150
+  ],
+  "nodos": [
+   "Format Cards2"
+  ]
+ },
+ {
+  "id": "B06",
+  "input": "dame información sobre la empresa <nombre de la empresa 317> [ID 317]",
+  "espera": "ficha por id, nombre con apostrofe (317)",
+  "sessionId": "t32b-B06-1794855902908",
+  "ms": 5311,
+  "status": 200,
+  "type": "results",
+  "no_afiliada": false,
+  "informacion_de": true,
+  "marcadores_id": [],
+  "execution": "23098",
+  "tool": "get_empresa",
+  "params": {
+   "id": 317
+  },
+  "filas": [
+   317
+  ],
+  "nodos": [
+   "Format Cards2"
+  ]
+ },
+ {
+  "id": "B07",
+  "input": "dame informacion sobre la empresa I.O.E.D COMPANY",
+  "espera": "texto libre: 177 por nombre",
+  "sessionId": "t32b-B07-1794855908219",
+  "ms": 9053,
+  "status": 200,
+  "type": "results",
+  "no_afiliada": false,
+  "informacion_de": true,
+  "marcadores_id": [],
+  "execution": "23099",
+  "tool": "get_empresa",
+  "params": {
+   "nombre": "ioed"
+  },
+  "filas": [
+   177
+  ],
+  "nodos": [
+   "Format Cards2"
+  ]
+ },
+ {
+  "id": "B08",
+  "input": "dame informacion sobre la empresa INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.)",
+  "espera": "texto libre, nombre completo sin id: 177",
+  "sessionId": "t32b-B08-1794855917272",
+  "ms": 6854,
+  "status": 200,
+  "type": "results",
+  "no_afiliada": false,
+  "informacion_de": true,
+  "marcadores_id": [],
+  "execution": "23100",
+  "tool": "get_empresa",
+  "params": {
+   "nombre": "ioed"
+  },
+  "filas": [
+   177
+  ],
+  "nodos": [
+   "Format Cards2"
+  ]
+ },
+ {
+  "id": "B09",
+  "input": "dame informacion sobre la empresa ZAPATERIA LA BOTA, C.A.",
+  "espera": "negativo: no figura (mensaje de siempre)",
+  "sessionId": "t32b-B09-1794855924126",
+  "ms": 5363,
+  "status": 200,
+  "type": null,
+  "no_afiliada": false,
+  "informacion_de": false,
+  "marcadores_id": [],
+  "execution": "23101",
+  "tool": "get_empresa",
+  "params": {
+   "nombre": "zapateria la bota"
+  },
+  "filas": [],
+  "nodos": [
+   "Code in JavaScript1"
+  ]
+ },
+ {
+  "id": "B10",
+  "input": "dame información sobre la empresa <nombre de la empresa 999999> [ID 999999]",
+  "espera": "id inexistente: no figura, sin caer a otro criterio",
+  "sessionId": "t32b-B10-1794855929490",
+  "ms": 4429,
+  "status": 200,
+  "type": null,
+  "no_afiliada": false,
+  "informacion_de": false,
+  "marcadores_id": [],
+  "execution": "23102",
+  "tool": "get_empresa",
+  "params": {
+   "id": 999999
+  },
+  "filas": [],
+  "nodos": [
+   "Code in JavaScript1"
+  ]
+ },
+ {
+  "id": "B11",
+  "input": "gandola",
+  "espera": "busqueda normal con grupos",
+  "sessionId": "t32b-B11-1794855933919",
+  "ms": 7243,
+  "status": 200,
+  "type": "results",
+  "no_afiliada": false,
+  "informacion_de": false,
+  "marcadores_id": [
+   165,
+   165,
+   187,
+   187,
+   204,
+   204,
+   426,
+   426,
+   452,
+   452,
+   563,
+   563,
+   433,
+   433
+  ],
+  "execution": "23103",
+  "tool": "search_empresas",
+  "params": {
+   "query": "gandola",
+   "queryIntent": "SERVICE",
+   "explain": true
+  },
+  "filas": [
+   165,
+   187,
+   204,
+   426,
+   452,
+   563,
+   433
+  ],
+  "nodos": [
+   "Format Cards2"
+  ]
+ }
+]

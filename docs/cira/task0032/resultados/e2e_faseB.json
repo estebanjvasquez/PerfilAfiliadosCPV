@@ -1,0 +1,224 @@
+[
+ {
+  "dev": "desktop",
+  "q": "camiones de transporte de maquinaria pesada",
+  "errors": [],
+  "navegador_ms": 10265,
+  "tipo": "type: results · 10000ms",
+  "texto": "TYPE: RESULTS · 10000MS ✅ Para Transporte de maquinaria pesada en camiones: 1 empresa(s) que ofrecen productos o servicios relacionados y 1 con experiencias rel",
+  "ini": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 1,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=127&sid=test-d15cb984-0315-48c8-9d65-247b9cce93cf",
+  "voto_emp": "177",
+  "voto": "✓ gracias",
+  "perfil_ms": 7180,
+  "perfil_pedido": "dame información sobre la empresa INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.) [ID 177]",
+  "perfil": "TYPE: RESULTS · 7100MS ✅ Información de INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.): 🏢 I",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "desktop",
+  "q": "lukiven",
+  "errors": [],
+  "navegador_ms": 9691,
+  "tipo": "type: results · 9454ms",
+  "texto": "TYPE: RESULTS · 9454MS ✅ Para Búsqueda de Lukiven: 1 empresa(s) que ofrecen productos o servicios relacionados y 1 con experiencias relacionadas. Haz clic en un",
+  "ini": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 1,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=129&sid=test-a6ffaa13-40fa-4b56-8325-ef427b482c89",
+  "perfil_ms": 4613,
+  "perfil_pedido": "dame información sobre la empresa LUKIVEN, S.A. [ID 157]",
+  "perfil": "TYPE: RESULTS · 4531MS ✅ Información de LUKIVEN, S.A. : 🏢 LUKIVEN, S.A. CONSTRUCCIÓNFABRICANTESSERVICIOS A POZOSSUPLIDORES MAQUINARIAS Y EQ",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "desktop",
+  "q": "gandola",
+  "errors": [],
+  "navegador_ms": 7479,
+  "tipo": "type: results · 7306ms",
+  "texto": "TYPE: RESULTS · 7306MS ✅ Para Gandolas: 6 empresa(s) que ofrecen productos o servicios relacionados y 1 con experiencias relacionadas. Haz clic en una empresa p",
+  "ini": {
+   "cap": 6,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 1,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 6,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=131&sid=test-0f127524-627a-42df-83a7-e72a9db4327f",
+  "perfil_ms": 4561,
+  "perfil_pedido": "dame información sobre la empresa OEG INTERNACIONAL SERVICE, C.A. [ID 165]",
+  "perfil": "TYPE: RESULTS · 4458MS ✅ Información de OEG INTERNACIONAL SERVICE, C.A.: 🏢 OEG INTERNACIONAL SERVICE, C.A. SERVICIOS ASOCIADOS SERVICIOS LO",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "desktop",
+  "q": "macolla",
+  "errors": [],
+  "navegador_ms": 5961,
+  "tipo": "type: results · 5828ms",
+  "texto": "TYPE: RESULTS · 5828MS ✅ Para Macolla: 0 empresa(s) que ofrecen productos o servicios relacionados y 13 con experiencias relacionadas. Haz clic en una empresa p",
+  "ini": {
+   "cap": 0,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 13,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 0,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=133&sid=test-72ae94de-88dd-4b35-9335-26933edd14ef",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "mobile",
+  "q": "camiones de transporte de maquinaria pesada",
+  "errors": [],
+  "navegador_ms": 7858,
+  "tipo": "type: results · 7658ms",
+  "texto": "TYPE: RESULTS · 7658MS ✅ Para Camiones de transporte de maquinaria pesada: 1 empresa(s) que ofrecen productos o servicios relacionados y 1 con experiencias rela",
+  "ini": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 1,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=134&sid=test-571aec6a-2a33-404a-b6f1-9e8a16da1523",
+  "voto_emp": "177",
+  "voto": "✓ gracias",
+  "perfil_ms": 5619,
+  "perfil_pedido": "dame información sobre la empresa INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.) [ID 177]",
+  "perfil": "TYPE: RESULTS · 5553MS ✅ Información de INTERNATIONAL OFFSHORE ENGINEERING AND DEVELOPMENT I.O.E.D COMPANY, C.A (I.O.E.D COMPANY C.A.): 🏢 I",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "mobile",
+  "q": "lukiven",
+  "errors": [],
+  "navegador_ms": 6819,
+  "tipo": "type: results · 6600ms",
+  "texto": "TYPE: RESULTS · 6600MS ✅ Para Búsqueda de Lukiven: 1 empresa(s) que ofrecen productos o servicios relacionados y 1 con experiencias relacionadas. Haz clic en un",
+  "ini": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 1,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 1,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=136&sid=test-02784fc9-794a-4936-a8d9-28a7c9b08646",
+  "perfil_ms": 3881,
+  "perfil_pedido": "dame información sobre la empresa LUKIVEN, S.A. [ID 157]",
+  "perfil": "TYPE: RESULTS · 3790MS ✅ Información de LUKIVEN, S.A. : 🏢 LUKIVEN, S.A. CONSTRUCCIÓNFABRICANTESSERVICIOS A POZOSSUPLIDORES MAQUINARIAS Y EQ",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "mobile",
+  "q": "gandola",
+  "errors": [],
+  "navegador_ms": 4868,
+  "tipo": "type: results · 4681ms",
+  "texto": "TYPE: RESULTS · 4681MS ✅ Para Gandola: 6 empresa(s) que ofrecen productos o servicios relacionados y 1 con experiencias relacionadas. Haz clic en una empresa pa",
+  "ini": {
+   "cap": 6,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 1,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 6,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=138&sid=test-0159b55b-513b-4b22-9886-fcd5687e315a",
+  "perfil_ms": 5220,
+  "perfil_pedido": "dame información sobre la empresa OEG INTERNACIONAL SERVICE, C.A. [ID 165]",
+  "perfil": "TYPE: RESULTS · 5157MS ✅ Información de OEG INTERNACIONAL SERVICE, C.A.: 🏢 OEG INTERNACIONAL SERVICE, C.A. SERVICIOS ASOCIADOS SERVICIOS LO",
+  "scroll_horizontal": false
+ },
+ {
+  "dev": "mobile",
+  "q": "macolla",
+  "errors": [],
+  "navegador_ms": 5132,
+  "tipo": "type: results · 4936ms",
+  "texto": "TYPE: RESULTS · 4936MS ✅ Para Macolla: 0 empresa(s) que ofrecen productos o servicios relacionados y 13 con experiencias relacionadas. Haz clic en una empresa p",
+  "ini": {
+   "cap": 0,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "exp": {
+   "cap": 0,
+   "exp": 13,
+   "pressed": "false/true"
+  },
+  "cap": {
+   "cap": 0,
+   "exp": 0,
+   "pressed": "true/false"
+  },
+  "eval": "/admin/evaluacion-cira/evaluar?log=140&sid=test-c43a00b7-f794-4fca-b5c9-ac98dfba12bb",
+  "scroll_horizontal": false
+ }
+]

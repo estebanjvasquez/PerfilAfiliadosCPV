@@ -25,7 +25,7 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-16 17:55Z: **TASK-0032** — CIRA: V1b en staging (fase A) e incidencia de detalle de la empresa 177 (fase B); W1 no autorizado — fase A **PHASE_A_DEPLOYED_FOR_REVIEW** (~18:45Z, n8n `c6c70402`); fase B en diagnóstico (fuente `6924316065` + adenda `6924366566`)
+## 2026-11-16 17:55Z: **TASK-0032** — CIRA: V1b en staging (fase A) e incidencia de detalle de la empresa 177 (fase B); W1 no autorizado — fase A **PHASE_A_DEPLOYED_FOR_REVIEW** (~18:45Z, n8n `c6c70402`, `6925761178`); fase B **PHASE_B_DEPLOYED_FOR_REVIEW** (~19:20Z, Worker `8ce4e0ff`, n8n `2d0a1ee8`); W1 no autorizado (fuente `6924316065` + adenda `6924366566`)
 
 | Campo | Valor |
 |---|---|
@@ -34,6 +34,7 @@ pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 | No autoriza | Producción, `main`, DDL, escrituras masivas, datos de empresas, `chamber_empresa`, taxonomía, roles, credenciales, kiosco, W1, cambio de modelo, loops |
 | BASE | `e751c89` |
 | Fase A | n8n `zbVLoCdR09IA9yQK` `7feb48bc` → **`c6c70402`** (18:40:06Z); Worker `8796f292` y modelo sin cambios. Corpus p50 10,4 → 6,1 s, calidad igual o mejor (ruido 27, cobertura 39/49). Rollback: `PUT` del respaldo `…_pre-t32_live.json`. Informe [`../../audit/CIRA_TASK0032_FASE_A_V1B.md`](../../audit/CIRA_TASK0032_FASE_A_V1B.md) |
+| Fase B | Causa: la tarjeta pedía la ficha por nombre; el agente lo reescribía (`"ioed"`) y `get_empresa` no encontraba «I.O.E.D»; `chamber_empresa` no interviene. Corrección: la tarjeta envía `[ID n]`, que lleva a `get_empresa {id}`, y el Worker añade un respaldo sin puntuación. Worker `8796f292` → **`8ce4e0ff`** (código `4599217`, sin W1); n8n `c6c70402` → **`2d0a1ee8`**. Rollback: n8n primero (`…_pre-t32b_ROLLBACK_body.json`) y después el Worker a `8796f292`. Informe [`../../audit/CIRA_TASK0032_FASE_B_FICHA_EMPRESA.md`](../../audit/CIRA_TASK0032_FASE_B_FICHA_EMPRESA.md) |
 | Coordinación | Secuencial; reporte en Issue #2 tras cada fase (`PHASE_A_DEPLOYED_FOR_REVIEW`, `PHASE_B_DEPLOYED_FOR_REVIEW` o `BLOCKED`); revisar Issue #2 antes de cada escritura o despliegue |
 
 ## 2026-11-16 15:40Z: **TASK-0031** — CIRA: diagnóstico y benchmark aislado de latencia (sin deploy) — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW — SIN DEPLOY** (~17:30Z; fuente `6920929114`)

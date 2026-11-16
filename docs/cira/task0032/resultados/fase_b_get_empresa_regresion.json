@@ -1,0 +1,590 @@
+{
+ "fijos": [
+  {
+   "caso": "id 177",
+   "vivo": {
+    "found": false,
+    "error": "Debe indicar rif o nombre."
+   },
+   "candidata": {
+    "ids": [
+     177
+    ]
+   },
+   "ok": true
+  },
+  {
+   "caso": "id 157",
+   "vivo": {
+    "found": false,
+    "error": "Debe indicar rif o nombre."
+   },
+   "candidata": {
+    "ids": [
+     157
+    ]
+   },
+   "ok": true
+  },
+  {
+   "caso": "id inexistente",
+   "vivo": {
+    "found": false,
+    "error": "Debe indicar rif o nombre."
+   },
+   "candidata": {
+    "found": false,
+    "error": null
+   },
+   "ok": true
+  },
+  {
+   "caso": "id 177 con nombre distinto (id manda)",
+   "vivo": {
+    "ids": [
+     157
+    ]
+   },
+   "candidata": {
+    "ids": [
+     177
+    ]
+   },
+   "ok": true
+  },
+  {
+   "caso": "nombre \"ioed\" (lo que mandó el agente)",
+   "vivo": {
+    "found": false,
+    "error": null
+   },
+   "candidata": {
+    "ids": [
+     177
+    ]
+   },
+   "ok": true
+  },
+  {
+   "caso": "nombre \"i.o.e.d\"",
+   "vivo": {
+    "ids": [
+     177
+    ]
+   },
+   "candidata": {
+    "ids": [
+     177
+    ]
+   },
+   "ok": true
+  },
+  {
+   "caso": "nombre \"ioed company\"",
+   "vivo": {
+    "ids": [
+     218,
+     177
+    ]
+   },
+   "candidata": {
+    "ids": [
+     218,
+     177
+    ]
+   },
+   "ok": true
+  },
+  {
+   "caso": "nombre completo 177",
+   "vivo": {
+    "ids": [
+     177
+    ]
+   },
+   "candidata": {
+    "ids": [
+     177
+    ]
+   },
+   "ok": true
+  },
+  {
+   "caso": "nombre parcial largo 177",
+   "vivo": {
+    "ids": [
+     177
+    ]
+   },
+   "candidata": {
+    "ids": [
+     177
+    ]
+   },
+   "ok": true
+  },
+  {
+   "caso": "nombre \"lukiven\"",
+   "vivo": {
+    "ids": [
+     157
+    ]
+   },
+   "candidata": {
+    "ids": [
+     157
+    ]
+   },
+   "ok": true
+  },
+  {
+   "caso": "nombre \"taspsa\"",
+   "vivo": {
+    "ids": [
+     276
+    ]
+   },
+   "candidata": {
+    "ids": [
+     276
+    ]
+   },
+   "ok": null
+  },
+  {
+   "caso": "nombre \"kala\"",
+   "vivo": {
+    "ids": [
+     317
+    ]
+   },
+   "candidata": {
+    "ids": [
+     317
+    ]
+   },
+   "ok": null
+  },
+  {
+   "caso": "nombre \"n&v\"",
+   "vivo": {
+    "ids": [
+     73
+    ]
+   },
+   "candidata": {
+    "ids": [
+     73
+    ]
+   },
+   "ok": null
+  },
+  {
+   "caso": "rif J070093501",
+   "vivo": {
+    "ids": [
+     75
+    ]
+   },
+   "candidata": {
+    "ids": [
+     75
+    ]
+   },
+   "ok": null
+  },
+  {
+   "caso": "negativo: \"zapateria la bota\"",
+   "vivo": {
+    "found": false,
+    "error": null
+   },
+   "candidata": {
+    "found": false,
+    "error": null
+   },
+   "ok": true
+  },
+  {
+   "caso": "negativo: \"petroleos de venezuela\"",
+   "vivo": {
+    "ids": [
+     169,
+     384,
+     451,
+     243,
+     372
+    ]
+   },
+   "candidata": {
+    "ids": [
+     169,
+     384,
+     451,
+     243,
+     372
+    ]
+   },
+   "ok": null
+  },
+  {
+   "caso": "negativo corto: \"xq\" (sin respaldo nuevo, < 3)",
+   "vivo": {
+    "found": false,
+    "error": null
+   },
+   "candidata": {
+    "found": false,
+    "error": null
+   },
+   "ok": null
+  },
+  {
+   "caso": "sin parámetros",
+   "vivo": {
+    "found": false,
+    "error": "Debe indicar rif o nombre."
+   },
+   "candidata": {
+    "found": false,
+    "error": "Debe indicar id, rif o nombre."
+   },
+   "ok": null
+  }
+ ],
+ "nombre": {
+  "total": 406,
+  "iguales": 406,
+  "distintos": []
+ },
+ "siglas": {
+  "total": 33,
+  "vivo_encuentra": 30,
+  "candidata_encuentra": 31,
+  "perdidas": [],
+  "filas": [
+   {
+    "id": 74,
+    "vivo": [
+     183,
+     211,
+     541,
+     495,
+     140
+    ],
+    "candidata": [
+     183,
+     211,
+     541,
+     495,
+     140
+    ]
+   },
+   {
+    "id": 75,
+    "vivo": [
+     75
+    ],
+    "candidata": [
+     75
+    ]
+   },
+   {
+    "id": 85,
+    "vivo": [
+     85
+    ],
+    "candidata": [
+     85
+    ]
+   },
+   {
+    "id": 94,
+    "vivo": [
+     94
+    ],
+    "candidata": [
+     94
+    ]
+   },
+   {
+    "id": 143,
+    "vivo": [
+     143
+    ],
+    "candidata": [
+     143
+    ]
+   },
+   {
+    "id": 150,
+    "vivo": [
+     150
+    ],
+    "candidata": [
+     150
+    ]
+   },
+   {
+    "id": 173,
+    "vivo": [
+     173
+    ],
+    "candidata": [
+     173
+    ]
+   },
+   {
+    "id": 175,
+    "vivo": [
+     175
+    ],
+    "candidata": [
+     175
+    ]
+   },
+   {
+    "id": 177,
+    "vivo": [
+     218,
+     177
+    ],
+    "candidata": [
+     218,
+     177
+    ]
+   },
+   {
+    "id": 180,
+    "vivo": [
+     180
+    ],
+    "candidata": [
+     180
+    ]
+   },
+   {
+    "id": 182,
+    "vivo": [
+     465,
+     541,
+     487,
+     379,
+     486
+    ],
+    "candidata": [
+     465,
+     541,
+     487,
+     379,
+     486
+    ]
+   },
+   {
+    "id": 185,
+    "vivo": [
+     185
+    ],
+    "candidata": [
+     185
+    ]
+   },
+   {
+    "id": 208,
+    "vivo": [
+     209,
+     208
+    ],
+    "candidata": [
+     209,
+     208
+    ]
+   },
+   {
+    "id": 253,
+    "vivo": [
+     253
+    ],
+    "candidata": [
+     253
+    ]
+   },
+   {
+    "id": 254,
+    "vivo": [
+     254
+    ],
+    "candidata": [
+     254
+    ]
+   },
+   {
+    "id": 255,
+    "vivo": [
+     255
+    ],
+    "candidata": [
+     255
+    ]
+   },
+   {
+    "id": 257,
+    "vivo": [
+     257
+    ],
+    "candidata": [
+     257
+    ]
+   },
+   {
+    "id": 276,
+    "vivo": [
+     276
+    ],
+    "candidata": [
+     276
+    ]
+   },
+   {
+    "id": 322,
+    "vivo": [
+     322
+    ],
+    "candidata": [
+     322
+    ]
+   },
+   {
+    "id": 323,
+    "vivo": {
+     "found": false,
+     "error": null
+    },
+    "candidata": [
+     323
+    ]
+   },
+   {
+    "id": 372,
+    "vivo": [
+     372
+    ],
+    "candidata": [
+     372
+    ]
+   },
+   {
+    "id": 382,
+    "vivo": [
+     382
+    ],
+    "candidata": [
+     382
+    ]
+   },
+   {
+    "id": 420,
+    "vivo": [
+     420
+    ],
+    "candidata": [
+     420
+    ]
+   },
+   {
+    "id": 455,
+    "vivo": [
+     455
+    ],
+    "candidata": [
+     455
+    ]
+   },
+   {
+    "id": 473,
+    "vivo": [
+     473
+    ],
+    "candidata": [
+     473
+    ]
+   },
+   {
+    "id": 486,
+    "vivo": [
+     486
+    ],
+    "candidata": [
+     486
+    ]
+   },
+   {
+    "id": 492,
+    "vivo": [
+     492
+    ],
+    "candidata": [
+     492
+    ]
+   },
+   {
+    "id": 506,
+    "vivo": [
+     506
+    ],
+    "candidata": [
+     506
+    ]
+   },
+   {
+    "id": 523,
+    "vivo": [
+     523
+    ],
+    "candidata": [
+     523
+    ]
+   },
+   {
+    "id": 530,
+    "vivo": [
+     530
+    ],
+    "candidata": [
+     530
+    ]
+   },
+   {
+    "id": 543,
+    "vivo": [
+     543
+    ],
+    "candidata": [
+     543
+    ]
+   },
+   {
+    "id": 545,
+    "vivo": [
+     545
+    ],
+    "candidata": [
+     545
+    ]
+   },
+   {
+    "id": 556,
+    "vivo": [
+     556
+    ],
+    "candidata": [
+     556
+    ]
+   }
+  ]
+ },
+ "sin_chamber": {
+  "total": 314,
+  "encontradas_por_id": 314
+ }
+}
