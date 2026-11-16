@@ -1,4 +1,53 @@
 {
+  "task_0032_cira_v1b_and_company_detail": {
+    "task_id": "TASK-0032",
+    "title": "CIRA: V1b to staging (phase A); company-detail incident for empresa 177 (phase B); W1 not authorized (phase C)",
+    "source": "Issue #2 comment 6924316065 (owner, 2026-11-16T17:46:09Z) + coordination addendum 6924366566 (owner, 17:48:14Z)",
+    "predecessors": "TASK-0031 READY_FOR_REVIEW SIN DEPLOY (6923744831, handoff e751c89) keeps its status; TASK-0030 partial UX acceptance only",
+    "status": "PHASE_A_DEPLOYED_FOR_REVIEW (phase B: diagnosis done, fix prepared, not deployed)",
+    "code_deployed": true,
+    "migration_executed": false,
+    "review_base_sha": "e751c89",
+    "materialization_commit_sha": "0b4177b",
+    "review_head_sha": "72f03cf84a405a9f036ed7d9b13d7d0028e66a01",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block",
+    "phase_a": {
+      "deploy": {
+        "n8n": {
+          "workflow": "zbVLoCdR09IA9yQK",
+          "before": "7feb48bc-218d-4c4e-af19-8a471b7512bc",
+          "after": "c6c70402-8af5-4427-851f-d08617c5d82d",
+          "at": "2026-11-16T18:40:06Z",
+          "nodes_changed": [
+            "Build System Prompt",
+            "MCP Perfil Afiliados CPV (includeTools)"
+          ],
+          "connections_changed": false
+        },
+        "worker": "8796f292 unchanged",
+        "model": "gpt-6-luna unchanged",
+        "laravel": "unchanged"
+      },
+      "isolation": "only 2 active flows use the Worker, both staging; webhook only in public/cira-test; last 100 executions: 70 origin pruebas.camarapetrolera.app + 30 own node scripts",
+      "tests": {
+        "isolated_corpus": "V0 vs V1b r3 (55 corpus + UAT x3 + 5 control): p50/p95 10396/14227 -> 6107/8089 ms; UAT 11846/15627 -> 6371/8379; noise 27=27, relevant 22->23, coverage 38->39/49, empty 2->1; tokens 9942/139 -> 4950/131",
+        "iterations": "r1 lost accent variant (tuberia octg); r2 IPC asked clarification 3/5; r3 fixes both (5/5)",
+        "rollback_rehearsal": "PASS on isolated copy UuL3qipNmibULIQX (deleted)",
+        "e2e_staging": "PASS desktop+Pixel5 12/12; logs 111-126 (+T32-v1b), votes 37-38, evaluations 0"
+      },
+      "rollback": "PUT %USERPROFILE%/.cpv/n8n_backups/zbVLoCdR09IA9yQK_2026-11-16_pre-t32_ROLLBACK_body.json (7feb48bc); PUT publishes",
+      "report": "audit/CIRA_TASK0032_FASE_A_V1B.md",
+      "evidence": "docs/cira/task0032/"
+    },
+    "phase_b": {
+      "root_cause": "card click sends company NAME; agent applied acronym rule and sent get_empresa {nombre:\"ioed\"} (executions 22716/22717); Worker ilike %ioed% and word_similarity (0.2) miss \"I.O.E.D\"; 0 rows -> Code in JavaScript1 renders Empresa no afiliada. chamber_empresa not involved anywhere",
+      "membership_criterion": "empresas.status_id = 1 (Filament Activo); all 406 are 1",
+      "fix_prepared": "Worker branch fix/t32-get-empresa-id from 1ea9175 (get_empresa optional id with priority; punctuation-insensitive name fallback only when zero rows) + n8n build_detail.mjs (card sends [ID n]; Parse Intent forces get_empresa {id}); not deployed"
+    },
+    "phase_c": "W1 NOT authorized; Worker stays 8796f292; no model change",
+    "db_mutations": "none beyond normal E2E usage (cira_search_log 111-126, votes 37-38, chat memory of test sessions)",
+    "next": "Publish PHASE_A_DEPLOYED_FOR_REVIEW on Issue #2; then phase B gate (isolation + exact-change coverage) before any deploy"
+  },
   "task_0031_cira_latency_benchmark": {
     "task_id": "TASK-0031",
     "title": "CIRA: isolated latency diagnosis and benchmark (no deploy)",
