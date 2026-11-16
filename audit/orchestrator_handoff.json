@@ -1,4 +1,72 @@
 {
+  "task_0028_cira_sources_ranking_audit": {
+    "task_id": "TASK-0028",
+    "title": "CIRA: audit of sources, ranking and separation of capabilities vs experiences (audit only)",
+    "source": "Issue #2 comment 6913187637 (owner assignment, 2026-11-16T09:57:03Z)",
+    "status": "READY_FOR_REVIEW",
+    "code_deployed": false,
+    "migration_executed": false,
+    "review_base_sha": "f080daa491e75f3907c8f8e2d441ae2e1b18d3de",
+    "materialization_commit_sha": "566ae72",
+    "review_head_sha": "3011acc1badb1ce051da3f6dd9afb7cbb67db69f",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block (child of review_head_sha)",
+    "report": "audit/CIRA_TASK0028_FUENTES_RANKING_CAPACIDADES.md",
+    "artifacts": "docs/cira/task0028/ (sanitized n8n flow bafd597a, isolated harness and data with company ids only, static two-group mockup)",
+    "engine_audited": {
+      "n8n_workflow": "zbVLoCdR09IA9yQK versionId bafd597a-49a9-49c1-bc65-b8b8c1396a6b updatedAt 2026-11-09T16:11:20.166Z",
+      "worker_code": "perfilafiliados-mcp 77ce273 (feat/declared-first, promoted as version 1005d61f on 2026-11-09; live version not readable via API: no Cloudflare credential)",
+      "cira_search_log_engine_version": "static string, does not identify flow or Worker versions (67 rows share it)"
+    },
+    "findings": [
+      "balancin: 91/333/391 get 100 % of their score from experiences (lexical_experiencia + fulltext whose document is 64 % experience text); 157 gets 50 %; client labels G2-07 mark only 157 relevant",
+      "double counting: accent variants (query unaccented + resolvedPhrases accented) are scored as two phrases; uniform x2, top 5 unchanged in 55/55 queries; explanation lists each source twice",
+      "lexical_experiencia uses limit 20 without ORDER BY (non-deterministic positions)",
+      "empresa_search_documents built once 2026-09-18 19:41:03 and never refreshed",
+      "detected_intent (manufacturing/maintenance/supply) is diagnostic only, not used in ranking; no role field exists; 742/937 company-category links are suggested",
+      "four QA companies (573-576) active in the shared DB; 573 appears in live results",
+      "kiosk flow Z2OvMPk0zj2MSYwL (MySQL tools) is active and was modified 2026-11-15; out of scope"
+    ],
+    "experiments": {
+      "method": "Worker 77ce273 code bundled with esbuild over an isolated restore of pg_dump -Fc -n public (2026-11-16 10:09:21Z, sha256 5f6d39e3...); vector contributions injected from live /debug-search (read-only, no logging)",
+      "fidelity": "52/55 identical order vs live, 55/55 identical top 5",
+      "cases": "55 (49 real agent params from cira_search_log, 6 synthetic intent queries); 31 with client labels (lote 001)",
+      "labeled_metrics": {
+        "actual": {
+          "norel_top5": 38,
+          "rel_top5": 34,
+          "judged_precision": 0.472,
+          "rel_top10": "39/49",
+          "empty_queries": 2
+        },
+        "A_no_experiences": {
+          "norel_top5": 27,
+          "rel_top5": 24,
+          "judged_precision": 0.471,
+          "rel_top10": "30/49",
+          "empty_queries": 6
+        },
+        "B_two_groups": {
+          "norel_top5_primary": 27,
+          "rel_top5_primary": 24,
+          "rel_top10_both_groups": "39/49",
+          "empty_queries": 2
+        }
+      },
+      "A_omissions": "12 client-relevant companies in 7 queries leave the top 10 (macolla loses all 4); B recovers 11 in group 2, the other stays in group 1 at rank 15"
+    },
+    "recommendation": "A as control only; B as destination in phases without asserting roles until a confirmed role datum exists; phase 0 (phrase dedup, deterministic ORDER BY) first",
+    "tests": "no code changes; experiment harness run on isolated clone; no PHPUnit run (nothing to test)",
+    "before_after": {
+      "n8n_versionId": "bafd597a... before and after",
+      "cira_search_log_rows": "67 before and after",
+      "empresa_search_documents": "406 rows, updated_at 2026-09-18 unchanged",
+      "esd_noexp_in_live_db": 0,
+      "staging_head": "5e6e3fc unchanged, HTTP 200",
+      "clone": "container cpvt28-db and network removed; dump kept at /root/backups/cira-t28-20261116T100911Z (outside git, 700)"
+    },
+    "not_done": "no n8n edit, no Worker deploy, no migration, no shared-DB write, no taxonomy change, no merge",
+    "next": "owner review; any plan phase needs a new explicit authorization and a new task"
+  },
   "task_0027_cira_evaluation_module_staging_deploy": {
     "task_id": "TASK-0027",
     "title": "CIRA web evaluation module for the Cámara: staging deployment cycle (same task, no new id)",
