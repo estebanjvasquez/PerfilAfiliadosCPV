@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | **IN_PROGRESS** (2026-11-16) |
+| Estado | ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (2026-11-16) |
 | Fuente | Issue #2 `6913187637` (estebanjvasquez, 2026-11-16T09:57:03Z): «ASIGNACIÓN DEL PROPIETARIO — CIRA: auditoría de fuentes, ranking y separación de capacidades/experiencias» |
 | Tipo | **Auditoría.** No es una asignación de implementación |
 | Rama de documentación | `fix/sec-01-r4-01-role-editor-preserve`, BASE `f080daa` |
@@ -65,6 +65,39 @@ Recomendar **A como experimento de control**; recomendar **B como destino** solo
 
 **Estado:** asignación de auditoría exclusivamente. Esperar revisión del propietario antes de implementación.
 
-## Avance
+## Avance (2026-11-16)
 
-_En curso._
+**Estado:** READY_FOR_REVIEW. Auditoría, experimentos aislados y propuesta terminados; nada implementado ni desplegado.
+
+**Entregables:**
+
+| # | Entregable | Dónde |
+|---|---|---|
+| 1 | Informe fuente-primero, con evidencia y limitaciones | [`audit/CIRA_TASK0028_FUENTES_RANKING_CAPACIDADES.md`](../../../audit/CIRA_TASK0028_FUENTES_RANKING_CAPACIDADES.md) |
+| 2 | Diagrama del flujo n8n real y matriz fuente → consulta → ranking | Informe §1.2 y §2.1; copia sanitizada en [`docs/cira/task0028/n8n/`](../../cira/task0028/n8n/) |
+| 3 | Reproducción de «balancin», aportes y doble cómputo | Informe §3 |
+| 4 | Matriz Actual / A / B con métricas y regresiones | Informe §4; datos en [`docs/cira/task0028/experimentos/`](../../cira/task0028/experimentos/) |
+| 5 | Mockup de dos grupos y contrato de datos | [`docs/cira/task0028/mockup/cira_test_dos_grupos.html`](../../cira/task0028/mockup/cira_test_dos_grupos.html); informe §5 |
+| 6 | Riesgos, compatibilidad, plan por fases, rollback y decisión | Informe §6–§9 |
+
+**Resultados principales:**
+- **DISTEINSA, CONSORCIO OGS y TOTAL CLEAN:** el 100 % de su puntaje para «balancin» viene de experiencias. Llegan por `lexical_experiencia` y por un `fulltext` cuyo documento es en un 64 % texto de experiencias. Lukiven tiene un 50 % de experiencias en su puntaje.
+- **Doble cómputo real:** `balancin` y `balancín` cuentan como dos frases. Es uniforme: no cambió el top 5 de ninguna de las 55 consultas.
+- **Métricas con etiquetas del cliente** (31 consultas):
+
+  | Variante | No relevantes en el top 5 | Precisión sobre lo juzgado | Relevantes en el top 10 | Consultas vacías |
+  |---|---|---|---|---|
+  | Actual | 38 | 47 % | 39/49 | 2 |
+  | A | 27 | 47 % | 30/49 | 6 |
+  | B | 27 | 47 % | 39/49 | 2 |
+
+- **Rol de fabricante o vendedor:** no se puede acreditar con los datos actuales. El 79 % de los vínculos empresa–categoría son `suggested` y la intención detectada no entra en el ranking.
+- **Recomendación:** A como control y B como destino por fases, sin afirmar roles hasta tener un dato confirmado.
+
+**Cero mutaciones** (verificado al cerrar, 2026-11-16 ~10:21Z):
+- **n8n:** `zbVLoCdR09IA9yQK` sigue en `versionId bafd597a…` y `updatedAt 2026-11-09T16:11:20.166Z`.
+- **BD compartida:** `cira_search_log` tenía 67 filas antes y después; `empresa_search_documents` no cambió y `esd_noexp` no existe en vivo.
+- **Staging:** sigue en `5e6e3fc` y responde 200.
+- **Copia aislada:** se retiró. El volcado queda en `/root/backups/cira-t28-20261116T100911Z` (fuera de git, 700).
+
+**Gates pendientes:** cualquier fase del plan (§6 del informe) requiere una nueva autorización del propietario y una tarea nueva.

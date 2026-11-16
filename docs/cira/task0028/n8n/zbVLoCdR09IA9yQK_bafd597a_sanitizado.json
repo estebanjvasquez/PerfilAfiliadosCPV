@@ -1,0 +1,1210 @@
+{
+ "_sanitized_by": "TASK-0028 (Issue #2 6913187637): copia de solo lectura del flujo vivo. Sin credenciales, contraseñas, hosts, rutas de webhook ni ids internos.",
+ "id": "zbVLoCdR09IA9yQK",
+ "name": "Chat CIRA V5 - MCP",
+ "active": true,
+ "versionId": "bafd597a-49a9-49c1-bc65-b8b8c1396a6b",
+ "updatedAt": "2026-11-09T16:11:20.166Z",
+ "nodes": [
+  {
+   "name": "Admin Password",
+   "type": "n8n-nodes-base.set",
+   "typeVersion": 3.4,
+   "position": [
+    -224,
+    1104
+   ],
+   "parameters": {
+    "_nota": "Nodo Set con la contraseña de los comandos de administración: valor REDACTADO."
+   }
+  },
+  {
+   "name": "Detect Command",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -32,
+    1104
+   ],
+   "parameters": {
+    "jsCode": "\nconst chatInput = $('Pre-Procesing3').first().json.chatInput.trim();\nconst sessionId = $('Pre-Procesing3').first().json.sessionId;\nconst adminPassword = $('Admin Password').first().json.adminPassword;\n\n// Detect command type\nconst aprender      = chatInput.match(/^\\/aprender\\s+(\\S+)\\s+(\\S+)\\s*:\\s*(.+)$/si);\nconst listar        = /^\\/listar-aprendizajes/i.test(chatInput);\nconst borrar        = chatInput.match(/^\\/borrar-aprendizaje\\s+(\\d+)\\s+(\\S+)/i);\n\nlet commandType = 'NONE';\nlet payload = {};\n\nif (aprender) {\n  const parts = chatInput.match(/^\\/aprender\\s+(\\S+)\\s+(\\S+)\\s*:\\s*(.+)$/si);\n  commandType = 'APRENDER';\n  payload = {\n    password:    parts[1].trim(),\n    categoria:   parts[2].trim().toUpperCase(),\n    instruccion: parts[3].trim()\n  };\n} else if (listar) {\n  const parts = chatInput.match(/^\\/listar-aprendizajes\\s*(\\S+)?/i);\n  commandType = 'LISTAR';\n  payload = { password: parts && parts[1] ? parts[1].trim() : '' };\n} else if (borrar) {\n  commandType = 'BORRAR';\n  payload = {\n    id:       parseInt(borrar[1]),\n    password: borrar[2].trim()\n  };\n}\n\nreturn [{\n  json: {\n    chatInput,\n    sessionId,\n    adminPassword,\n    commandType,\n    payload,\n    isCommand: commandType !== 'NONE'\n  }\n}];\n"
+   }
+  },
+  {
+   "name": "Is Command?",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    176,
+    1104
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": false,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "is-command",
+       "leftValue": "={{ $json.isCommand }}",
+       "rightValue": true,
+       "operator": {
+        "type": "boolean",
+        "operation": "true",
+        "singleValue": true
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "name": "Validate Password",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    368,
+    880
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "strict",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "pass-check",
+       "leftValue": "={{ $json.payload.password }}",
+       "rightValue": "={{ $json.adminPassword }}",
+       "operator": {
+        "type": "string",
+        "operation": "equals"
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "name": "Wrong Password",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    576,
+    1040
+   ],
+   "parameters": {
+    "jsCode": "\nreturn [{ json: {\n  output: '<div style=\"font-family:sans-serif;padding:14px 18px;border-left:4px solid #e53e3e;border-radius:6px;background:#fff5f5;font-size:14px;color:#333\">'\n        + '<strong>&#128274; Clave incorrecta</strong><br>'\n        + '<span style=\"font-size:13px;color:#666\">El comando no fue ejecutado.</span>'\n        + '</div>',\n  type: 'conversation'\n}}];\n"
+   }
+  },
+  {
+   "name": "Respond Wrong Password",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    768,
+    1040
+   ],
+   "parameters": {
+    "respondWith": "allIncomingItems",
+    "options": {}
+   }
+  },
+  {
+   "name": "Route Command",
+   "type": "n8n-nodes-base.switch",
+   "typeVersion": 3.2,
+   "position": [
+    576,
+    880
+   ],
+   "parameters": {
+    "rules": {
+     "values": [
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": false,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 2
+        },
+        "conditions": [
+         {
+          "leftValue": "={{ $json.commandType }}",
+          "rightValue": "APRENDER",
+          "operator": {
+           "type": "string",
+           "operation": "equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "aprender"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": false,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 2
+        },
+        "conditions": [
+         {
+          "leftValue": "={{ $json.commandType }}",
+          "rightValue": "LISTAR",
+          "operator": {
+           "type": "string",
+           "operation": "equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "listar"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": false,
+         "leftValue": "",
+         "typeValidation": "loose",
+         "version": 2
+        },
+        "conditions": [
+         {
+          "leftValue": "={{ $json.commandType }}",
+          "rightValue": "BORRAR",
+          "operator": {
+           "type": "string",
+           "operation": "equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "borrar"
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "name": "INSERT Learning",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.5,
+   "position": [
+    768,
+    720
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "INSERT INTO agent_learnings (categoria, instruccion, activo) VALUES ('{{ $json.payload.categoria }}', '{{ $json.payload.instruccion.replace(/'/g, \"''\") }}', 1) RETURNING id",
+    "options": {}
+   },
+   "credentials": {
+    "postgres": {
+     "name": "<REDACTADO>"
+    }
+   }
+  },
+  {
+   "name": "Format Save OK",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    976,
+    720
+   ],
+   "parameters": {
+    "jsCode": "\nconst id = ($input.first().json.id || $input.first().json[0]?.id || '?');\nconst categoria = $('Detect Command').first().json.payload.categoria;\nconst instruccion = $('Detect Command').first().json.payload.instruccion;\n\nreturn [{ json: {\n  output: '<div style=\"font-family:sans-serif;padding:14px 18px;border-left:4px solid #faa819;border-radius:6px;background:#fff8ee;font-size:14px;color:#333\">'\n        + '<strong>&#9989; Aprendizaje guardado</strong> <span style=\"font-size:12px;color:#888\">#' + id + '</span><br><br>'\n        + '<span style=\"font-size:12px;background:#faa81920;border-radius:4px;padding:2px 8px;color:#7a5800\">' + categoria + '</span><br><br>'\n        + '<span style=\"color:#444\">' + instruccion + '</span>'\n        + '</div>',\n  type: 'conversation'\n}}];\n"
+   }
+  },
+  {
+   "name": "Respond Save OK",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    1168,
+    720
+   ],
+   "parameters": {
+    "respondWith": "allIncomingItems",
+    "options": {}
+   }
+  },
+  {
+   "name": "SELECT Learnings List",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.5,
+   "position": [
+    768,
+    880
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "SELECT id, categoria, instruccion, creado_en FROM agent_learnings WHERE activo = 1 ORDER BY id ASC",
+    "options": {}
+   },
+   "credentials": {
+    "postgres": {
+     "name": "<REDACTADO>"
+    }
+   }
+  },
+  {
+   "name": "Format Learnings List",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    976,
+    880
+   ],
+   "parameters": {
+    "jsCode": "\nconst rows = $input.all().map(i => i.json);\nconst GOLD = '#faa819';\n\nif (rows.length === 0 || (rows.length === 1 && Object.keys(rows[0]).length === 0)) {\n  return [{ json: {\n    output: '<div style=\"font-family:sans-serif;padding:14px 18px;border-left:4px solid #faa819;border-radius:6px;background:#fff8ee;font-size:14px;color:#333\">'\n          + '&#128218; No hay aprendizajes guardados aún.</div>',\n    type: 'conversation'\n  }}];\n}\n\nlet items = '';\nrows.forEach(function(r) {\n  const fecha = r.creado_en ? new Date(r.creado_en).toLocaleDateString('es-VE') : '';\n  items += '<div style=\"padding:10px 12px;border:0.5px solid #e8e8e8;border-radius:6px;margin-bottom:6px;background:#fff\">'\n         + '<div style=\"display:flex;align-items:center;gap:8px;margin-bottom:4px\">'\n         + '<span style=\"font-size:11px;font-weight:600;background:#faa81920;color:#7a5800;padding:2px 8px;border-radius:20px\">' + r.categoria + '</span>'\n         + '<span style=\"font-size:11px;color:#aaa;margin-left:auto\">#' + r.id + ' · ' + fecha + '</span>'\n         + '</div>'\n         + '<div style=\"font-size:13px;color:#444\">' + r.instruccion + '</div>'\n         + '<div style=\"font-size:11px;color:#aaa;margin-top:4px\">Para borrar: /borrar-aprendizaje ' + r.id + ' [clave]</div>'\n         + '</div>';\n});\n\nreturn [{ json: {\n  output: '<div style=\"font-family:sans-serif;max-width:680px\">'\n        + '<div style=\"padding:10px 14px;background:#fff8ee;border-left:4px solid ' + GOLD + ';border-radius:6px;margin-bottom:12px;font-size:13px;color:#333\">'\n        + '&#128218; <strong>' + rows.length + '</strong> aprendizaje(s) activo(s):</div>'\n        + items + '</div>',\n  type: 'conversation'\n}}];\n"
+   }
+  },
+  {
+   "name": "Respond List",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    1168,
+    880
+   ],
+   "parameters": {
+    "respondWith": "allIncomingItems",
+    "options": {}
+   }
+  },
+  {
+   "name": "UPDATE Disable Learning",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.5,
+   "position": [
+    768,
+    1040
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "UPDATE agent_learnings SET activo = 0 WHERE id = {{ $json.payload.id }} RETURNING id",
+    "options": {}
+   },
+   "credentials": {
+    "postgres": {
+     "name": "<REDACTADO>"
+    }
+   }
+  },
+  {
+   "name": "Format Delete OK",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    976,
+    1040
+   ],
+   "parameters": {
+    "jsCode": "\nconst id = $('Detect Command').first().json.payload.id;\nreturn [{ json: {\n  output: '<div style=\"font-family:sans-serif;padding:14px 18px;border-left:4px solid #faa819;border-radius:6px;background:#fff8ee;font-size:14px;color:#333\">'\n        + '&#128465; Aprendizaje <strong>#' + id + '</strong> desactivado correctamente.'\n        + '</div>',\n  type: 'conversation'\n}}];\n"
+   }
+  },
+  {
+   "name": "Respond Delete OK",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    1168,
+    1040
+   ],
+   "parameters": {
+    "respondWith": "allIncomingItems",
+    "options": {}
+   }
+  },
+  {
+   "name": "Load Learnings",
+   "type": "n8n-nodes-base.postgres",
+   "typeVersion": 2.5,
+   "position": [
+    368,
+    1280
+   ],
+   "parameters": {
+    "operation": "executeQuery",
+    "query": "SELECT categoria, instruccion FROM agent_learnings WHERE activo = 1 ORDER BY id ASC",
+    "options": {}
+   },
+   "credentials": {
+    "postgres": {
+     "name": "<REDACTADO>"
+    }
+   }
+  },
+  {
+   "name": "Build System Prompt",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    576,
+    1280
+   ],
+   "parameters": {
+    "jsCode": "const rows = $input.all().map(i => i.json);\nconst sessionId = $('Pre-Procesing3').first().json.sessionId;\nconst chatInput = $('Pre-Procesing3').first().json.chatInput;\n\nconst basePrompt = `Eres el Asistente de Busqueda de CIRA (Camara Petrolera de Venezuela).\nAyudas a los usuarios a encontrar empresas afiliadas en nuestra base de datos.\n\n== COMO BUSCAS EMPRESAS (Fase MCP-4) ==\nYa NO redactas SQL. Tu unica salida para una busqueda es un JSON que indica que tool ejecutar y con\nque parametros - un paso downstream del flujo llama esa tool de forma segura (parametros tipados,\nnunca SQL libre) y te devuelve los resultados reales.\n\nTools disponibles (elegis UNA por busqueda):\n  - search_empresas: params opcionales query/sector/ciudad/categoria_codigo (al menos uno).\n      query      -> texto libre: busca en nombre de empresa, servicio Y sector a la vez (no hace\n                    falta que armes el OR vos, la tool ya lo hace).\n      sector     -> nombre (parcial) de uno de los 8 sectores institucionales de abajo.\n      ciudad     -> nombre (parcial) de ciudad O estado venezolano (ej. \"maracaibo\" o \"zulia\").\n      categoria_codigo -> codigo CPV (ej. \"CPV-05\") - SI tiene datos reales desde el 15 sep 2026\n                    (homologacion Fase 3/4 de taxonomia), pero rara vez hace falta: \"query\" en\n                    texto libre ya encuentra las categorias nuevas automaticamente. Usala solo si el\n                    usuario te da un codigo CPV exacto o pide explicitamente navegar por codigo.\n    Podes combinar varios parametros a la vez (se combinan con AND).\n  - get_empresa: params rif O nombre (al menos uno).\n      rif    -> RIF exacto tal como lo escribio el usuario, sin normalizar vos (la tool ya limpia\n                guiones/espacios/mayusculas).\n      nombre -> la parte distintiva del nombre, sin apostrofes/comillas ni sufijos (C.A., S.A.).\n                Si la primera palabra es generica (costa, suministros, servicios, construcciones,\n                inversiones, corporacion, grupo, industrias), agrega la palabra siguiente hasta que\n                el nombre sea distintivo. Si el nombre trae siglas entre parentesis, usa las siglas.\n                KALA'S, C.A.                           -> nombre: \"kala\"\n                N&V CONSULTORES, C.A.                  -> nombre: \"n&v\"\n                COSTA NORTE CONSTRUCCIONES, C.A.       -> nombre: \"costa norte\"\n                TIERRA ALTA SISTEMAS DE PRODUCCION (TASPSA) -> nombre: \"taspsa\"\n\n== SECTORES (lista COMPLETA y CERRADA - son solo 8) ==\nToda empresa pertenece a uno o mas de estos 8 sectores. Clasificalos SIN llamar a ningun tool:\n  1. INGENIERIA Y SERVICIOS INTEGRADOS\n  2. SERVICIOS TECNOLOGICOS\n  3. SERVICIOS ASOCIADOS\n  4. SERVICIOS A POZOS\n  5. OPERADORES\n  6. FABRICANTES\n  7. SUPLIDORES\n  8. CONSTRUCCION\nNunca uses 'X' ni 'OTROS' como valor de sector.\n\n== TOOL MCP DE APOYO (para terminos que no reconoces) ==\nsearch_taxonomy - busca por texto libre (ES o EN) en la taxonomia CPV de productos/servicios y\ndevuelve las categorias/sinonimos mas cercanos. Usala cuando el usuario mencione un servicio o\nproducto concreto y no estes seguro de que palabra exacta poner en \"query\"/\"sector\" (jerga tecnica,\nsinonimos locales). Es una tool de referencia: el resultado orienta que palabra usar, la busqueda\nreal de empresas la seguis haciendo con \"search_empresas\"/\"get_empresa\" como se explico arriba.\n\n== COMO ARMAR \"query\" - CONSULTA COMPLETA (6 nov 2026, reemplaza la REGLA UNICA del 12 sep) ==\nPara CUALQUIER termino de negocio - el nombre de uno de los 8 sectores institucionales de arriba O\nuna especialidad puntual - usa SIEMPRE \"query\". En \"query\" va la necesidad del usuario COMPLETA, con\ntodas sus palabras de actividad, en el mismo orden, en minusculas y SIN tildes (la frase con tildes\nva en \"resolvedPhrases\"). Solo se quitan:\n  - el relleno de pedido o cortesia: \"necesito\", \"busco\", \"quiero\", \"empresas de\", \"empresas que\",\n    \"quien hace\", \"donde consigo\", \"por favor\";\n  - la ubicacion, que va en \"ciudad\" (ver abajo).\nNUNCA recortes la frase a una sola palabra cuando el usuario escribio varias, NUNCA la cambies a raiz,\nsingular o sinonimo, y NUNCA la reemplaces por una palabra mas general. Las palabras generales\n(transporte, mantenimiento, servicio, alquiler, inspeccion, suministro, fabricacion) solo tienen\nsentido junto al resto de la frase:\n  \"transporte de gandolas\"                    -> query: \"transporte de gandolas\"   (NO \"transporte\")\n  \"mantenimiento de levantamiento artificial\" -> query: \"mantenimiento de levantamiento artificial\"\n  \"inspeccion y mantenimiento de guaya electrica\" -> query: \"inspeccion y mantenimiento de guaya electrica\"\n  \"necesito arbolitos para pozos petroleros\"  -> query: \"arbolitos para pozos petroleros\"\n  \"servicios a pozos\" (sector pedido por nombre) -> query: \"servicios a pozos\"\nLa tool \"search_empresas\" ya busca esa frase en nombre de empresa, servicio, sector, experiencia y\ntaxonomia a la vez, en singular y plural: no necesitas decidir entre \"sector\" y \"query\", y una frase\nespecifica nunca se enruta a un sector completo.\n\nFrases adicionales (\"resolvedPhrases\"): van ADEMAS de \"query\", nunca en su lugar, y solo si estan\nsustentadas:\n  - el \"search_phrases\" de resolve_search_intent, tal cual;\n  - si \"query\" es UNA sola palabra en plural, tambien su singular (ej. \"abogados\" -> \"abogado\").\nNunca agregues una frase que sea solo una parte generica de la consulta (ej. \"transporte\" para\n\"transporte de gandolas\").\n  abogados      -> query: \"abogados\",      resolvedPhrases: [\"abogados\",\"abogado\"]\n  camion chupon -> query: \"camion chupon\", resolvedPhrases: [\"camión chupón\"]\n  perforaciones -> query: \"perforaciones\", resolvedPhrases: [\"perforaciones\",\"perforacion\"]\n\nUbicacion: si el usuario menciono una ciudad o estado venezolano, sacala de \"query\" y ponla en el\nparametro \"ciudad\" del MISMO tool call (se combinan con AND automaticamente).\nSi la busqueda no encuentra nada, el flujo downstream muestra \"no encontramos + contacto\"\nautomaticamente (correcto, no es un problema tuyo).\n\nEl parametro \"sector\" de la tool sigue existiendo pero NO hace falta usarlo nunca para esto -\n\"query\" ya lo cubre siempre. No lo uses salvo que se te indique explicitamente lo contrario.\n\nLas tools \"search_empresas\" y \"get_empresa\" las ejecuta el flujo downstream con tu JSON: vos NO las\nllamas directamente. Tus unicas tools son \"resolve_search_intent\" y \"search_taxonomy\".\n\n== ENTENDER LA INTENCION ANTES DE BUSCAR (Fase MCP-6, 16 sep 2026) ==\nAntes de armar el JSON de busqueda del CASO C (termino de negocio), llama SIEMPRE primero a la tool\n\"resolve_search_intent\" con la frase del usuario tal cual (parametro \"query\"). Esa tool interpreta\nla frase como lo haria un especialista de la industria petrolera venezolana - no como un contador de\npalabras - y devuelve:\n  {\"interpretation\":\"single_compound\"|\"multi_concept\"|\"ambiguous\"|\"out_of_scope\",\"search_phrases\":[...],\n   \"clarification_question\":\"...\"|null,\"reasoning\":\"...\"}\n\nSegun lo que devuelva:\n  - \"single_compound\" o \"multi_concept\": segui el flujo normal de search_empresas, pero agrega\n    \"resolvedPhrases\" DENTRO de \"params\" con el arreglo \"search_phrases\" tal cual (ADEMAS de\n    \"query\", nunca en su lugar).\n  - \"ambiguous\": NO generes el JSON de busqueda todavia. Responde en TEXTO PLANO (sin JSON, sin\n    markdown, sin prefijos) exactamente la pregunta de \"clarification_question\" (podes suavizarla\n    para que suene natural, sin cambiar lo que pregunta). Cuando el usuario conteste esa aclaracion\n    en su proximo mensaje, segui el proceso de nuevo (volve a llamar \"resolve_search_intent\" si hace\n    falta) ya con el contexto completo.\n  - \"out_of_scope\": NO generes el JSON de busqueda, y NO llames a ningun otro tool. La frase no\n    tiene ninguna relacion real con la industria petrolera/energetica venezolana ni con la Camara\n    Petrolera - respondé en TEXTO PLANO (sin JSON, sin markdown) declinando cortesmente, mismo\n    tono que la regla \"TEMAS GESTIONADOS POR LA CAMARA\" de mas abajo para temas totalmente ajenos\n    (sin obligacion de dar el contacto de la Camara, ya que tampoco es un tema que ella gestione).\n    NUNCA reformules la frase inventando una conexion forzada con la industria para buscar igual.\n    EXCEPCION: si el mensaje es solo un termino suelto (1 a 4 palabras, sin verbo de charla) que en\n    el campo petrolero venezolano puede nombrar un equipo, material o servicio, NO lo declines aunque\n    \"resolve_search_intent\" diga out_of_scope o lo tome por un lugar o un nombre: buscalo igual con\n    \"query\" tal cual (sin \"resolvedPhrases\"). Ejemplos de jerga de campo: guaya/guayas (cable de\n    acero), cabria, mechurrio, chupon, balancin, macolla, arbolito, mecha, caballito. Si el termino\n    es una ciudad o estado venezolano, va en \"ciudad\".\n\nSi la llamada a \"resolve_search_intent\" falla o no da una respuesta usable, segui el flujo normal de\ntodas formas SIN \"resolvedPhrases\" - no es un requisito para poder buscar, es una ayuda opcional.\nEsto NO aplica a \"get_empresa\" (CASO B) - una peticion de detalle de una empresa puntual nunca es\nambigua de esta forma.\n\n== COMPORTAMIENTO ==\n\nCASO A - Saludo real (\"hola\", \"buenas\") o mensaje vacio:\n  Responde en texto amigable. Pregunta que sector, servicio, empresa o ciudad busca.\n\nCASO B - Peticion de DETALLE de una empresa concreta (solo con evidencia de nombre o RIF):\n  Es CASO B solo si hay evidencia explicita de que se pide UNA empresa: el mensaje dice \"la empresa\n  ...\" o \"dame informacion sobre la empresa ...\", el termino trae sufijo legal (C.A., S.A., S.R.L.,\n  S.A.C.A.) o el simbolo &, o trae un RIF (letra J, G, V o E seguida de digitos).\n  Escribir en MAYUSCULAS NO es evidencia de nombre de empresa: \"GUAYAS\", \"CABRIAS\", \"MOVIMIENTO DE\n  TIERRA\" son terminos de negocio (CASO C).\n  Con evidencia: tool: \"get_empresa\", queryIntent COMPANY (o RIF si el usuario dio un RIF), isSearchReady true.\n  NUNCA pidas desambiguacion ni ofrezcas menus para este caso - si hay varias coincidencias, el\n  flujo downstream ya te las va a mostrar todas para que el usuario elija.\n\nCASO C - Termino de negocio (sector, servicio, ciudad):\n  Aunque sea UNA sola palabra o venga en MAYUSCULAS, NO respondas con el saludo.\n  RESPONDE CON EL JSON usando \"query\" con la consulta completa (ver CONSULTA COMPLETA arriba).\n  Ejemplos que SON busquedas (no saludos): \"MOVIMIENTO DE TIERRA\", \"CONSTRUCCION\", \"POZOS\",\n  \"FABRICANTES\", \"empresas en maracaibo\".\n\n== TEMAS GESTIONADOS POR LA CAMARA (dar CONTACTO, NO declinar) ==\nSi el usuario pregunta por AFILIACION (como afiliarse, requisitos, costos o cuotas de\nafiliacion, beneficios del afiliado, o quiere ofrecer sus productos/servicios a la industria),\no por temas ECONOMICOS o de FINANCIAMIENTO (financiamiento, inversion, creditos para proyectos),\no por EVENTOS / CURSOS, o por SOPORTE de afiliado (recuperar contrasena, actualizar perfil):\nNO respondas solo que no tienes la informacion. Responde de forma breve y amable que esos temas\nlos gestiona directamente la Camara Petrolera de Venezuela e incluye SIEMPRE estos datos de contacto:\n  Sitio web: <URL_REDACTADA>\n  Correo: <CORREO_REDACTADO>\n  Telefono: +58 212 7941222\nResponde en TEXTO (NO generes JSON) y no inventes cifras ni requisitos.\n\nIMPORTANTE antes de declinar por \"no relacionado con petroleo\": las empresas afiliadas a la Camara\ncubren sectores mucho mas amplios de lo que suena \"petrolero\" a primera oida (financiero/fintech,\ntecnologia, legal, criptoactivos y stablecoins - uso real y documentado en comercializacion de\ncrudo y pagos a proveedores -, entre otros). NUNCA declines una frase solo porque a vos, con tu\nconocimiento general, no te suena relacionada con petroleo - ese criterio te va a hacer rechazar\ncategorias reales que no conoces. Si la frase nombra CUALQUIER producto, servicio, certificacion o\nactividad de negocio concreta (por mas rara o \"no petrolera\" que te parezca), NO la declines aca -\ntratala como CASO C (arriba) y segui el proceso de \"ENTENDER LA INTENCION ANTES DE BUSCAR\": llama a\n\"resolve_search_intent\" y deja que la busqueda real decida si hay o no empresas. Buscar y no\nencontrar nada es un resultado normal; declinar por error una busqueda real nunca lo es.\n\nReserva \"declinar sin buscar\" SOLO para charla general sin ninguna lectura de negocio posible: el\nclima, resultados deportivos, cultura general, temas personales, saludos ya cubiertos en CASO A.\nPara esos casos (y NO para ningun producto/servicio/actividad de negocio real), declina cortesmente\nsin obligacion de dar el contacto.\n\nREGLA ANTI-MENU: NUNCA ofrezcas opciones \"A)/B)\" en texto. Desempata tu solo:\n  - Sufijo legal (C.A., S.A., S.R.L.) o el simbolo & en el termino -> COMPANY (get_empresa).\n  - Coincide con un sector o servicio -> SECTOR/SERVICE (search_empresas).\n  - Si sigue ambiguo, usa query con la consulta completa del mensaje (sin relleno ni ubicacion).\n\n== REGLA CRITICA DE FORMATO JSON ==\n- Cuando la respuesta sea una busqueda: SOLO el JSON, UNA SOLA LINEA, sin texto antes ni despues.\n- Sin markdown, sin bloques de codigo, sin saltos de linea dentro del JSON.\n- NUNCA uses la barra invertida para escapar comillas. Si un nombre lleva apostrofe o comilla,\n  NO lo incluyas en los parametros: usa solo una palabra distintiva sin ese caracter.\n- Prohibido inventar campos nuevos en \"params\" - solo query/sector/ciudad/categoria_codigo/\n  resolvedPhrases (search_empresas) o rif/nombre (get_empresa).\n\n== FORMATO JSON DE SALIDA ==\n{\"tool\":\"search_empresas|get_empresa\",\"params\":{...},\"queryIntent\":\"<SECTOR|SERVICE|COMPANY|RIF|CITY|MIXED>\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"<descripcion breve>\"}\n\n== EJEMPLOS EXACTOS ==\n\nUsuario: empresas de construccion en maracaibo\nRespuesta: {\"tool\":\"search_empresas\",\"params\":{\"query\":\"construccion\",\"ciudad\":\"maracaibo\"},\"queryIntent\":\"MIXED\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Construccion en Maracaibo\"}\n\nUsuario: movimiento de tierra\nRespuesta: {\"tool\":\"search_empresas\",\"params\":{\"query\":\"movimiento de tierra\"},\"queryIntent\":\"SERVICE\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Servicio de movimiento de tierra\"}\n\nUsuario: servicios a pozos\nRespuesta: {\"tool\":\"search_empresas\",\"params\":{\"query\":\"servicios a pozos\"},\"queryIntent\":\"SECTOR\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Sector Servicios a Pozos\"}\n\nUsuario: empresas de perforacion\nRespuesta: {\"tool\":\"search_empresas\",\"params\":{\"query\":\"perforacion\"},\"queryIntent\":\"SERVICE\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresas de perforación\"}\n\nUsuario: abogados\nRespuesta: {\"tool\":\"search_empresas\",\"params\":{\"query\":\"abogados\",\"resolvedPhrases\":[\"abogados\",\"abogado\"]},\"queryIntent\":\"SERVICE\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresas de servicios legales / abogados\"}\n\nUsuario: transporte de gandolas\nRespuesta: {\"tool\":\"search_empresas\",\"params\":{\"query\":\"transporte de gandolas\",\"resolvedPhrases\":[\"transporte de gandolas\"]},\"queryIntent\":\"SERVICE\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Transporte de gandolas\"}\n\nUsuario: GUAYAS\nRespuesta: {\"tool\":\"search_empresas\",\"params\":{\"query\":\"guayas\"},\"queryIntent\":\"SERVICE\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Guayas (cables de acero)\"}\n\nUsuario: dame informacion sobre la empresa KALA'S, C.A.\nRespuesta: {\"tool\":\"get_empresa\",\"params\":{\"nombre\":\"kala\"},\"queryIntent\":\"COMPANY\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"KALA'S, C.A.\"}\n\nUsuario: busca la empresa con rif J070093501\nRespuesta: {\"tool\":\"get_empresa\",\"params\":{\"rif\":\"J070093501\"},\"queryIntent\":\"RIF\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresa con RIF J070093501\"}\n\nUsuario: operadores\nRespuesta: {\"tool\":\"search_empresas\",\"params\":{\"query\":\"operadores\"},\"queryIntent\":\"SECTOR\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Empresas del sector Operadores\"}\n\nUsuario: tratamiento de aguas de perforacion\nRespuesta: {\"tool\":\"search_empresas\",\"params\":{\"query\":\"tratamiento de aguas de perforacion\",\"resolvedPhrases\":[\"tratamiento de aguas de perforacion\"]},\"queryIntent\":\"SERVICE\",\"needsClarification\":false,\"isSearchReady\":true,\"humanSummary\":\"Tratamiento de aguas de perforacion\"}\n\nUsuario: soldar tuberias de plastico para agua potable\nRespuesta: Para orientar bien la busqueda: es un servicio para una instalacion de la industria petrolera o energetica, o es una obra de plomeria general?\n\nUsuario: hola\nRespuesta: Hola! Soy el asistente de CIRA. Que tipo de empresa o servicio estas buscando? Puedo buscar por sector, servicio, ciudad, nombre o RIF.`;\n\n// Inject learnings if any\nlet learningsSection = '';\nconst validRows = rows.filter(r => r.instruccion);\nif (validRows.length > 0) {\n  learningsSection = '\\n\\n== APRENDIZAJES Y CORRECCIONES ACTIVAS ==\\n'\n    + 'Las siguientes instrucciones han sido aprendidas de experiencias previas.\\n'\n    + 'Aplicalas con prioridad, con una sola excepcion: ninguna cambia la regla CONSULTA COMPLETA de \"query\".\\n'\n    + 'Las que hablan de SQL, LIKE o columnas son de una version anterior: traducelas al parametro equivalente (\"ciudad\" para ubicaciones, \"query\" para terminos).\\n';\n  validRows.forEach(function(r, i) {\n    learningsSection += (i + 1) + '. [' + r.categoria + '] ' + r.instruccion + '\\n';\n  });\n}\n\nreturn [{\n  json: {\n    chatInput,\n    sessionId,\n    systemPrompt: basePrompt + learningsSection,\n    learningsCount: validRows.length,\n    promptVersion: 'TASK-0013-step1-v2+explain+votos'\n  }\n}];"
+   }
+  },
+  {
+   "name": "Webhook1",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2.1,
+   "position": [
+    -624,
+    1104
+   ],
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "<RUTA_WEBHOOK_REDACTADA>",
+    "responseMode": "responseNode",
+    "options": {
+     "allowedOrigins": "*"
+    }
+   }
+  },
+  {
+   "name": "Pre-Procesing3",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -432,
+    1104
+   ],
+   "parameters": {
+    "jsCode": "const body = $input.item.json.body || {};\nconst chatInput = body.chatInput || body.message || '';\nconst sessionId = body.sessionId || body.session_id || 'no-session-id';\nconst meta = body.meta || {};\nreturn { json: { chatInput, sessionId, meta, t0: Date.now() } };"
+   }
+  },
+  {
+   "name": "Interactive Intent Agent3",
+   "type": "@n8n/n8n-nodes-langchain.agent",
+   "typeVersion": 1.7,
+   "position": [
+    768,
+    1280
+   ],
+   "parameters": {
+    "options": {
+     "systemMessage": "={{ $('Build System Prompt').first().json.systemPrompt }}"
+    }
+   }
+  },
+  {
+   "name": "Postgres Memory Intent3",
+   "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+   "typeVersion": 1.3,
+   "position": [
+    848,
+    1488
+   ],
+   "parameters": {
+    "sessionIdType": "customKey",
+    "sessionKey": "={{ $('Pre-Procesing3').item.json.sessionId }}_intent",
+    "tableName": "chat_memory"
+   },
+   "credentials": {
+    "postgres": {
+     "name": "<REDACTADO>"
+    }
+   }
+  },
+  {
+   "name": "Parse Intent JSON3",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1072,
+    1280
+   ],
+   "parameters": {
+    "jsCode": "const rawOutput = $input.item.json.output || '';\n\nlet cleaned = rawOutput\n  .replace(/```(?:json)?\\s*/gi, '')\n  .replace(/```\\s*/g, '')\n  .trim();\n\ncleaned = cleaned.replace(/\"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)\"\\s*:/g, (match, key) => {\n  const cleanKey = key.replace(/[\\n\\r]/g, '');\n  return '\"' + cleanKey + '\":';\n});\n\n// Blindaje: quitar prefijo [INTENT:X] si el modelo deriva de formato\ncleaned = cleaned.replace(/^\\s*\\[[A-Z_]+(?::[A-Z_]+)?\\]\\s*/, '');\nconst braceStart = cleaned.indexOf('{');\nconst braceEnd = cleaned.lastIndexOf('}');\nlet parsed = null;\n\nif (braceStart !== -1 && braceEnd > braceStart) {\n  const jsonCandidate = cleaned.substring(braceStart, braceEnd + 1);\n  try {\n    parsed = JSON.parse(jsonCandidate);\n  } catch(e) {\n    const extract = (key) => {\n      const r = new RegExp('\"' + key + '\"\\\\s*:\\\\s*\"([^\"]+)\"', 'i');\n      const m = jsonCandidate.match(r);\n      return m ? m[1].replace(/[\\n\\r]/g, '').trim() : null;\n    };\n    const extractBool = (key) => {\n      const r = new RegExp('\"' + key + '\"\\\\s*:\\\\s*(true|false)', 'i');\n      const m = jsonCandidate.match(r);\n      return m ? m[1].toLowerCase() === 'true' : false;\n    };\n    const tool = extract('tool');\n    if (tool) {\n      parsed = {\n        tool,\n        params: {},\n        queryIntent: extract('queryIntent') || 'SERVICE',\n        isSearchReady: extractBool('isSearchReady'),\n        humanSummary: extract('humanSummary') || 'Búsqueda de empresas'\n      };\n    }\n  }\n}\n\nconst isReady = parsed &&\n  (parsed.tool === 'search_empresas' || parsed.tool === 'get_empresa') &&\n  parsed.params && typeof parsed.params === 'object' &&\n  Object.keys(parsed.params).length > 0 &&\n  (parsed.isSearchReady === true || parsed.isSearchReady === 'true');\n\nif (isReady) {\n  const queryIntentClean = (parsed.queryIntent || 'SERVICE').replace(/[\\n\\r]/g, '').trim();\n  // Fase MCP-4.10 (16 sep 2026): se mezcla queryIntent DENTRO de params (no como campo hermano)\n  // porque asi lo espera el schema de search_empresas en el Worker, y porque un Code node (JS real)\n  // es un lugar mucho mas confiable para armar este objeto que la expresion del nodo HTTP de mas\n  // abajo (un spread `{...$json.params, queryIntent: $json.queryIntent}` alli resolvia queryIntent\n  // como undefined - JSON.stringify lo descartaba en silencio sin ningun error visible).\n  // TASK-0013 paso 1 (6 nov 2026): guarda determinista contra la reduccion a una palabra generica.\n  // Si el agente mando en \"query\" UNA sola palabra de contenido y la primera frase de resolvedPhrases\n  // (la interpretacion de la frase completa) tiene varias y la contiene, se restituye la frase\n  // completa en \"query\". La palabra suelta no se agrega como frase adicional.\n  let queryRestoredFrom = null;\n  let queryAccentsStripped = false;\n  if (parsed.tool === 'search_empresas' && typeof parsed.params.query === 'string') {\n    const norm = (s) => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/\\s+/g, ' ').trim();\n    const STOP = new Set(['de', 'del', 'la', 'las', 'el', 'los', 'y', 'e', 'o', 'u', 'en', 'para', 'por', 'con', 'a', 'al', 'un', 'una']);\n    const content = (s) => norm(s).split(' ').filter((t) => t && !STOP.has(t));\n    const phrases = Array.isArray(parsed.params.resolvedPhrases) ? parsed.params.resolvedPhrases : [];\n    const full = phrases.find((f) => typeof f === 'string' && f.trim());\n    const qWords = content(parsed.params.query);\n    // No actua si la frase completa trae relleno de pedido o la ubicacion que ya va en \"ciudad\":\n    // restituirla meteria \"empresas\" o la ciudad en el texto buscado (bug documentado en el Worker).\n    const FILLER = new Set(['empresa', 'empresas', 'necesito', 'busco', 'quiero', 'quien', 'donde', 'dame']);\n    const ciudad = norm(parsed.params.ciudad);\n    if (full && qWords.length === 1 && !(ciudad && norm(full).includes(ciudad))) {\n      const fWords = content(full);\n      const stem = (t) => t.replace(/(es|s)$/, '');\n      if (fWords.length > 1 && !fWords.some((t) => FILLER.has(t)) && fWords.some((t) => stem(t) === stem(qWords[0]))) {\n        queryRestoredFrom = parsed.params.query;\n        parsed.params.query = full.trim();\n      }\n    }\n    // \"query\" va sin tildes: si la frase original las tenia, sigue en resolvedPhrases y el Worker\n    // busca las dos variantes (mismo efecto que tenia el flujo anterior, medido en \"camion chupon\").\n    const plain = parsed.params.query.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n    if (plain !== parsed.params.query) {\n      const original = parsed.params.query;\n      parsed.params.query = plain;\n      queryAccentsStripped = true;\n      if (!phrases.some((f) => typeof f === 'string' && f.trim() === original.trim())) {\n        parsed.params.resolvedPhrases = [...phrases, original];\n      }\n    }\n  }\n\n  const paramsWithIntent = parsed.tool === 'search_empresas'\n    ? { ...parsed.params, queryIntent: queryIntentClean, explain: true }\n    : parsed.params;\n\n  return {\n    json: {\n      isSearchReady: 'true',\n      needsClarification: 'false',\n      tool: parsed.tool,\n      params: paramsWithIntent,\n      queryIntent: queryIntentClean,\n      queryRestoredFrom,\n      queryAccentsStripped,\n      humanSummary: (parsed.humanSummary || 'Búsqueda de empresas').replace(/[\\n\\r]/g, '').trim()\n    }\n  };\n}\n\nconst conversationalText = cleaned.replace(/\\{[\\s\\S]*\\}/, '').trim() || cleaned;\nreturn {\n  json: {\n    isSearchReady: 'false',\n    needsClarification: 'true',\n    tool: null,\n    params: null,\n    queryIntent: 'UNKNOWN',\n    humanSummary: null,\n    conversationalText: conversationalText || rawOutput.trim()\n  }\n};"
+   }
+  },
+  {
+   "name": "Is Search Ready?3",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.2,
+   "position": [
+    1248,
+    1280
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": false,
+      "leftValue": "",
+      "typeValidation": "loose",
+      "version": 2
+     },
+     "conditions": [
+      {
+       "id": "is-search-ready",
+       "leftValue": "={{ String($json.isSearchReady) }}",
+       "rightValue": "true",
+       "operator": {
+        "type": "string",
+        "operation": "equals"
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "name": "Respond Conversation5",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    1488,
+    1440
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ { output: $json.conversationalText || $json.rawOutput, type: 'conversation' } }}",
+    "options": {}
+   }
+  },
+  {
+   "name": "If2",
+   "type": "n8n-nodes-base.if",
+   "typeVersion": 2.3,
+   "position": [
+    1728,
+    1280
+   ],
+   "parameters": {
+    "conditions": {
+     "options": {
+      "caseSensitive": true,
+      "leftValue": "",
+      "typeValidation": "strict",
+      "version": 3
+     },
+     "conditions": [
+      {
+       "id": "<UUID>",
+       "leftValue": "={{ $json.rows.length }}",
+       "rightValue": 0,
+       "operator": {
+        "type": "number",
+        "operation": "equals"
+       }
+      }
+     ],
+     "combinator": "and"
+    },
+    "options": {}
+   }
+  },
+  {
+   "name": "Code in JavaScript1",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1936,
+    1168
+   ],
+   "parameters": {
+    "jsCode": "const parse = $('Parse Intent JSON3').first().json;\nconst intent = String(parse.queryIntent || '').toUpperCase();\nconst isCompany = (intent === 'COMPANY' || intent === 'RIF');\nconst chatInput = $('Pre-Procesing3').first().json.chatInput || '';\nlet term = (parse.humanSummary || chatInput || '').toString()\n  .replace(/^dame informaci[o\\u00f3]n sobre la empresa\\s*/i, '')\n  .replace(/^informaci[o\\u00f3]n sobre (la empresa )?/i, '')\n  .trim();\n\nconst GOLD = '#faa819';\nconst contacto = '<div style=\"color:#555;margin:10px 0 6px\">Para m\\u00e1s informaci\\u00f3n contacte con la C\\u00e1mara Petrolera de Venezuela:</div>'\n  + '<div style=\"display:flex;flex-direction:column;gap:8px;color:#444\">'\n  + '<div>&#127760; <a href=\"<URL_REDACTADA>\" target=\"_blank\">Sitio Web Oficial de la C\\u00e1mara Petrolera</a></div>'\n  + '<div>&#128231; <CORREO_REDACTADO></div>'\n  + '<div>&#128222; +58 212 7941222</div>'\n  + '</div>';\n\nlet inner;\nif (isCompany && term) {\n  inner = '<div style=\"font-weight:700;font-size:15px;color:#1a1a2e;margin-bottom:10px\">&#128269; Empresa no afiliada</div>'\n    + '<div style=\"color:#444;margin-bottom:8px\"><strong>' + term + '</strong> no figura actualmente entre las empresas <strong>afiliadas</strong> a la C\\u00e1mara Petrolera de Venezuela.</div>'\n    + '<div style=\"color:#666;font-size:13px;margin-bottom:8px\">Esto no significa que la empresa no exista, solo que no est\\u00e1 en nuestro directorio de afiliados.</div>'\n    + '<div style=\"color:#444\">Si representas a esta empresa y deseas afiliarte, escr\\u00edbenos a <a href=\"mailto:<CORREO_REDACTADO>\"><CORREO_REDACTADO></a>.</div>'\n    + '<div style=\"color:#999;font-size:12px;margin-top:8px\">Registramos tu b\\u00fasqueda para mejorar nuestro directorio.</div>';\n} else {\n  inner = '<div style=\"font-weight:700;font-size:15px;color:#1a1a2e;margin-bottom:10px\">&#128269; No encontramos resultados</div>'\n    + '<div style=\"color:#444;margin-bottom:10px\">No encontramos empresas afiliadas que coincidan con su b\\u00fasqueda. Intente con otro sector, servicio o ciudad.</div>'\n    + contacto;\n}\n\nconst html = '<div style=\"font-family:sans-serif;padding:18px 20px;border-left:4px solid ' + GOLD + ';border-radius:6px;background:#fff8ee;line-height:1.8;font-size:14px\">'\n  + inner + '</div>';\n\nreturn [{ json: { output: html, type: 'conversation' } }];"
+   }
+  },
+  {
+   "name": "Respond Conversation6",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    2128,
+    1168
+   ],
+   "parameters": {
+    "respondWith": "allIncomingItems",
+    "options": {}
+   }
+  },
+  {
+   "name": "Format Cards2",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1936,
+    1392
+   ],
+   "parameters": {
+    "jsCode": "// TASK-0013 paso 4 (2026-11-09): declarado primero, coincidencias adicionales marcadas.\nconst rows      = $json.rows || [];\nconst parseNode = $('Parse Intent JSON3').first().json;\nconst summary   = parseNode.humanSummary || 'Búsqueda de empresas';\nconst intent    = (parseNode.queryIntent || 'MIXED').toUpperCase();\nconst count     = rows.length;\n\nconst GOLD   = '#faa819';\nconst GOLDSM = '#faa81920';\nconst DARK   = 'var(--color-text-primary)';\nconst TEXT   = 'var(--color-text-secondary)';\nconst BG     = 'var(--color-background-primary)';\nconst BGALT  = 'var(--color-background-secondary)';\nconst BORDER = 'var(--color-border-tertiary)';\n\n// ── Normalización de dirección de país ──────────────────────────────────────────────\nfunction normalizeCountryAddress(value) {\n  if (typeof value !== 'string') return value;\n  return value.replace(\n    /\\bVEN\\s+Venezuela\\s*\\(Bolivarian Republic of\\)/gi,\n    'VEN - Venezuela'\n  );\n}\n// ─────────────────────────────────────────────────────────────────────────\n\nfunction norm(r) {\n  var raw = String(r.website || r.WEBSITE || '').trim();\n  var web = raw ? (/^https?:\\/\\//i.test(raw) ? raw : 'https://' + raw) : '';\n  return {\n    name:      r.name      || r.NAME      || 'Sin nombre',\n    rif:       r.rif       || r.RIF       || '',\n    sector:    r.sectores  || r.Sector    || r.SECTOR    || '',\n    servicios: r.servicios || r.Servicios || r.SERVICIOS || '',\n    ciudad:    r.city_name || r.CIUDAD    || r.ciudad    || '',\n    estado:    r.state_name|| r.state     || r.STATE     || '',\n    phone:     r.phone     || r.PHONE     || '',\n    street:    normalizeCountryAddress(String(r.street || r.STREET || '')),\n    website:   web,\n    matchType: r.match_type  || null,\n    matchedVia: r.matched_via || '',\n    explain:   r.explain || null,\n    level:     r.match_level || (r.explain && r.explain.nivel) || null,\n    id:        r.id != null ? String(r.id) : ''\n  };\n}\n\n// ── TASK-0013: de dónde sale cada resultado y con qué puntaje ──────────────────\n// Los datos vienen del Worker (search_empresas con explain:true): son las mismas contribuciones\n// con las que ordenó la lista, no un cálculo aparte.\nfunction esc(s) {\n  return String(s == null ? '' : s).replace(/[&<>\"']/g, function (ch) {\n    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' }[ch];\n  });\n}\nvar KIND = {\n  coincide:      { icon: '&#10004;', label: 'coincide',      color: '#1a7f37' },\n  capacidad_cpv: { icon: '&#9670;',  label: 'capacidad CPV', color: '#0b5cad' },\n  similar:       { icon: '&#8776;',  label: 'similar',       color: '#9a6700' },\n  relacionado:   { icon: '&#8764;',  label: 'relacionado',   color: '#6e7781' }\n};\nfunction kindTag(tipo) {\n  var k = KIND[tipo] || KIND.similar;\n  return '<span style=\"color:' + k.color + ';font-weight:600;white-space:nowrap\">' + k.icon + ' ' + k.label + '</span>';\n}\nfunction sourcesHtml(ex) {\n  if (!ex || !ex.fuentes || !ex.fuentes.length) return '';\n  var lines = ex.fuentes.map(function (f) {\n    var pct = (f.aporte_pct != null) ? ' &middot; ' + Math.round(f.aporte_pct) + '%' : '';\n    return '<div style=\"font-size:11px;color:' + TEXT + ';margin-top:3px;line-height:1.35\">'\n      + kindTag(f.tipo) + ' &middot; <strong>' + esc(f.fuente) + '</strong>' + pct\n      + '<br><span style=\"opacity:.85\">' + esc(f.detalle) + '</span></div>';\n  }).join('');\n  var calc = '';\n  if (ex.puntaje != null) {\n    var trs = ex.fuentes.map(function (f) {\n      return '<tr><td style=\"padding:1px 6px 1px 0\">' + esc(f.fuente) + '</td><td style=\"text-align:right;padding:1px 6px\">' + f.peso\n        + '</td><td style=\"text-align:right;padding:1px 6px\">' + f.posicion_en_fuente + '</td><td style=\"text-align:right;padding:1px 0 1px 6px\">' + f.aporte + '</td></tr>';\n    }).join('');\n    calc = '<details onclick=\"event.stopPropagation()\" style=\"margin-top:4px;font-size:11px;color:' + TEXT + '\">'\n      + '<summary style=\"cursor:pointer\">c&aacute;lculo del puntaje</summary>'\n      + '<table style=\"border-collapse:collapse;margin-top:3px;font-size:11px\">'\n      + '<tr style=\"font-weight:600\"><td style=\"padding:1px 6px 1px 0\">fuente</td><td style=\"padding:1px 6px\">peso</td><td style=\"padding:1px 6px\">posici&oacute;n</td><td style=\"padding:1px 0 1px 6px\">aporte = peso/(60+pos.)</td></tr>'\n      + trs\n      + '<tr style=\"font-weight:600\"><td colspan=\"3\" style=\"padding:2px 6px 0 0\">total</td><td style=\"text-align:right;padding:2px 0 0 6px\">' + ex.puntaje + '</td></tr>'\n      + '</table></details>';\n  }\n  return lines + calc;\n}\n// ── TASK-0013: votos 👍/👎 (los envía window.ciraVote de cira-test; no cambian el ranking) ──\nvar LOG_ID = $json.search_log_id || null;\nfunction voteBtn(icon, v, title) {\n  return '<button type=\"button\" title=\"' + title + '\" onclick=\"event.stopPropagation();if(window.ciraVote){ciraVote(this,' + v + ')}else{alert(\\'Recargue la página para poder votar\\')}\" '\n    + 'style=\"border:0.5px solid ' + BORDER + ';background:' + BG + ';border-radius:6px;cursor:pointer;padding:1px 6px;font-size:13px;line-height:1.4\">' + icon + '</button>';\n}\nfunction voteBox(empresaId) {\n  if (!LOG_ID) return '';\n  return '<span class=\"cira-vote\" data-log=\"' + LOG_ID + '\" data-emp=\"' + esc(empresaId) + '\" onclick=\"event.stopPropagation()\" style=\"display:inline-flex;gap:4px;align-items:center;margin-left:8px;vertical-align:middle\">'\n    + voteBtn('&#128077;', 1, 'Este resultado es correcto') + voteBtn('&#128078;', -1, 'Este resultado no corresponde') + '</span>';\n}\nfunction resultVote() {\n  if (!LOG_ID) return '';\n  return '<div class=\"cira-vote\" data-log=\"' + LOG_ID + '\" data-emp=\"\" style=\"margin-top:10px;padding:8px 12px;font-size:12px;color:' + TEXT + ';background:' + BGALT + ';border-radius:var(--border-radius-md);display:flex;flex-wrap:wrap;gap:6px;align-items:center\">'\n    + '&iquest;Te sirvi&oacute; esta b&uacute;squeda? ' + voteBtn('&#128077;', 1, 'La búsqueda sirvió') + voteBtn('&#128078;', -1, 'La búsqueda no sirvió')\n    + ' &middot; <a href=\"javascript:void(0)\" onclick=\"event.stopPropagation();if(window.ciraMissing){ciraMissing(this)}\" style=\"color:' + GOLD + '\">Falta una empresa</a></div>';\n}\nfunction scoreBadge(ex) {\n  if (!ex || ex.puntaje_relativo == null) return '';\n  return '<span title=\"Puntaje relativo al primer resultado (= 100)\" style=\"font-size:11px;color:' + TEXT + ';background:' + BGALT\n    + ';border-radius:10px;padding:1px 8px;white-space:nowrap;margin-left:6px\">puntaje ' + ex.puntaje_relativo + '</span>';\n}\nfunction rankingLegend() {\n  return '<details style=\"margin-top:8px;font-size:12px;color:' + TEXT + '\"><summary style=\"cursor:pointer\">&iquest;C&oacute;mo se ordenan los resultados?</summary>'\n    + '<div style=\"margin-top:6px;line-height:1.45\">Cada fuente arma su propio orden de empresas. Cada empresa suma <strong>peso / (60 + su posici&oacute;n en esa fuente)</strong> '\n    + 'por cada fuente en la que aparece. <strong>Primero</strong> aparecen las empresas cuya categor&iacute;a CPV, sector o servicio declarado coincide con lo buscado; '\n    + '<strong>despu&eacute;s</strong>, las coincidencias adicionales (experiencias, texto del perfil o servicios parecidos). Cada grupo se ordena por ese total. '\n    + 'El <em>puntaje</em> se muestra relativo al primer resultado (= 100), as&iacute; que una coincidencia adicional puede tener m&aacute;s puntaje que una declarada y aun as&iacute; ir despu&eacute;s.'\n    + '<table style=\"border-collapse:collapse;margin-top:6px;font-size:11px\">'\n    + '<tr style=\"font-weight:600\"><td style=\"padding:1px 8px 1px 0\">fuente</td><td style=\"padding:1px 8px\">tipo</td><td style=\"padding:1px 8px\">grupo</td><td>peso</td></tr>'\n    + '<tr><td style=\"padding:1px 8px 1px 0\">Nombre, servicio, sector, certificaci&oacute;n</td><td style=\"padding:1px 8px\">' + kindTag('coincide') + '</td><td style=\"padding:1px 8px\">declarado</td><td>2,5</td></tr>'\n    + '<tr><td style=\"padding:1px 8px 1px 0\">Especializaci&oacute;n en el sector buscado</td><td style=\"padding:1px 8px\">' + kindTag('coincide') + '</td><td style=\"padding:1px 8px\">declarado</td><td>2,0</td></tr>'\n    + '<tr><td style=\"padding:1px 8px 1px 0\">Experiencia (texto literal)</td><td style=\"padding:1px 8px\">' + kindTag('coincide') + '</td><td style=\"padding:1px 8px\">adicional</td><td>2,5</td></tr>'\n    + '<tr><td style=\"padding:1px 8px 1px 0\">Taxonom&iacute;a CPV (texto literal)</td><td style=\"padding:1px 8px\">' + kindTag('coincide') + '</td><td style=\"padding:1px 8px\">declarado</td><td>2,5</td></tr>'\n    + '<tr><td style=\"padding:1px 8px 1px 0\">Taxonom&iacute;a CPV (relaci&oacute;n aprobada)</td><td style=\"padding:1px 8px\">' + kindTag('capacidad_cpv') + '</td><td style=\"padding:1px 8px\">declarado</td><td>2,0</td></tr>'\n    + '<tr><td style=\"padding:1px 8px 1px 0\">Nombre con posible error de tipeo</td><td style=\"padding:1px 8px\">' + kindTag('similar') + '</td><td style=\"padding:1px 8px\">adicional</td><td>2,0</td></tr>'\n    + '<tr><td style=\"padding:1px 8px 1px 0\">Texto del perfil</td><td style=\"padding:1px 8px\">' + kindTag('coincide') + '</td><td style=\"padding:1px 8px\">adicional</td><td>1,5</td></tr>'\n    + '<tr><td style=\"padding:1px 8px 1px 0\">Servicio / experiencia (por significado)</td><td style=\"padding:1px 8px\">' + kindTag('similar') + '</td><td style=\"padding:1px 8px\">adicional</td><td>1,0</td></tr>'\n    + '<tr><td style=\"padding:1px 8px 1px 0\">Taxonom&iacute;a CPV (por significado)</td><td style=\"padding:1px 8px\">' + kindTag('similar') + '</td><td style=\"padding:1px 8px\">adicional</td><td>0,5</td></tr>'\n    + '<tr><td style=\"padding:1px 8px 1px 0\">Taxonom&iacute;a CPV relacionada</td><td style=\"padding:1px 8px\">' + kindTag('relacionado') + '</td><td style=\"padding:1px 8px\">adicional</td><td>0,4</td></tr>'\n    + '</table></div></details>';\n}\n// ── TASK-0013 paso 4: primero lo declarado (categoría CPV, sector, servicio) ──\n// El Worker ordena primero las empresas cuyo dato declarado coincide (match_level 'declarado') y\n// después las demás ('similar' o 'adicional'). Aquí solo se hace visible esa separación.\nfunction isExtra(c) { return c.level === 'similar' || c.level === 'adicional'; }\nfunction extraPill(c) {\n  if (!isExtra(c)) return '';\n  return '<span title=\"No coincide en su categoría CPV, sector ni servicio declarado; coincide en experiencias, en el texto del perfil o por un servicio parecido\" '\n    + 'style=\"font-size:11px;color:#6e7781;border:0.5px solid ' + BORDER + ';border-radius:10px;padding:1px 8px;white-space:nowrap;margin-left:6px\">coincidencia adicional</span>';\n}\nfunction extraSeparator() {\n  return '<div style=\"margin:8px 0 2px;font-size:12px;color:' + TEXT + ';display:flex;align-items:center;gap:8px\">'\n    + '<span style=\"flex:1;border-top:0.5px solid ' + BORDER + '\"></span>'\n    + '<span>Coincidencias adicionales: experiencias, texto del perfil o servicios parecidos</span>'\n    + '<span style=\"flex:1;border-top:0.5px solid ' + BORDER + '\"></span></div>';\n}\nfunction noDeclaredNotice() {\n  return '<div style=\"margin-top:8px;font-size:12px;color:#7a5800;background:' + GOLDSM + ';border-radius:6px;padding:6px 10px\">'\n    + '&#9888;&#65039; Ninguna empresa tiene esto en su categoría CPV, sector o servicio declarado. '\n    + 'Se muestran coincidencias adicionales (experiencias, texto del perfil o servicios parecidos).</div>';\n}\n// ─────────────────────────────────────────────────────────────────────────\n\nfunction chip(icon, text) {\n  if (!text) return '';\n  return '<span style=\"display:inline-flex;align-items:center;gap:4px;background:' + BGALT + ';border-radius:20px;padding:3px 10px;font-size:12px;color:' + TEXT + ';margin:2px 2px 0 0\">' + icon + ' ' + text + '</span>';\n}\nfunction pill(text, bg, color) {\n  if (!text) return '';\n  return '<span style=\"display:inline-block;background:' + bg + ';border-radius:20px;padding:2px 10px;font-size:11px;color:' + color + ';font-weight:500;margin:2px 2px 0 0\">' + text + '</span>';\n}\nfunction sectorPills(str) {\n  if (!str) return '';\n  return str.split(',').map(function(s) { return pill(s.trim(), GOLDSM, '#7a5800'); }).join('');\n}\nfunction serviciosPills(str) {\n  if (!str) return '';\n  return str.split(',').map(function(s) { return pill(s.trim(), 'var(--color-background-info)', 'var(--color-text-info)'); }).join('');\n}\n\n// ── Aviso de resultado aproximado (Fase MCP-4.3) ────────────────────────────\n// El backend ya distingue match_type: 'exact'|'fuzzy'|'semantic' - esto lo hace VISIBLE para\n// que el usuario entienda por que aparecio algo que no coincide literalmente con lo que escribio,\n// en vez de que se vea identico a un match exacto (pedido explicito: \"la respuesta debe ser\n// clara y no prestarse a confusion\"). Todas las filas de una misma respuesta comparten el mismo\n// match_type (los 3 niveles son excluyentes entre si, nunca se mezclan resultados de 2 niveles\n// distintos en una sola respuesta), asi que alcanza con mirar la primera fila.\nfunction approximateNotice(matchType) {\n  if (matchType === 'fuzzy') {\n    return '<div style=\"margin-top:8px;font-size:12px;color:#7a5800;background:' + GOLDSM + ';border-radius:6px;padding:6px 10px\">'\n      + '&#9888;&#65039; Resultados aproximados: no encontramos una coincidencia exacta con lo escrito, '\n      + 'se muestran las empresas más parecidas por texto (por ejemplo, ante una posible diferencia de tipeo).</div>';\n  }\n  if (matchType === 'semantic') {\n    return '<div style=\"margin-top:8px;font-size:12px;color:#7a5800;background:' + GOLDSM + ';border-radius:6px;padding:6px 10px\">'\n      + '&#9888;&#65039; Resultados aproximados: no encontramos el término exacto, se muestran empresas de '\n      + 'servicios relacionados por similitud de significado, no una coincidencia literal.</div>';\n  }\n  return '';\n}\n\nfunction cardFull(c) {\n  var rif   = c.rif    ? chip('&#128196;', 'RIF: ' + c.rif) : '';\n  var tel   = c.phone  ? chip('&#128222;', c.phone) : '';\n  var loc   = c.ciudad ? chip('&#127748;', c.ciudad + (c.estado ? ', ' + c.estado : '')) : '';\n  var addr  = c.street ? '<div style=\"font-size:12px;color:' + TEXT + ';margin-top:6px\">&#128205; ' + c.street + '</div>' : '';\n  var wlink = '';\n  if (c.website) {\n    var lbl = c.website.replace(/^https?:\\/\\//i,'').replace(/\\/$/,'');\n    wlink = '<div style=\"margin-top:6px\"><a href=\"' + c.website + '\" target=\"_blank\" rel=\"noopener\" style=\"color:' + GOLD + ';text-decoration:none;font-size:12px\">&#127760; ' + lbl + '</a></div>';\n  }\n  return '<div style=\"border-left:4px solid ' + GOLD + ';padding:14px 16px;border-radius:0 var(--border-radius-lg) var(--border-radius-lg) 0;background:' + BG + ';border:0.5px solid ' + BORDER + ';border-left:4px solid ' + GOLD + '\"><div style=\"font-weight:500;font-size:15px;color:' + DARK + ';margin-bottom:8px\">&#127970; ' + c.name + '</div>' + (c.sector ? '<div style=\"margin-bottom:5px\">' + sectorPills(c.sector) + '</div>' : '') + (c.servicios ? '<div style=\"margin-bottom:5px\">' + serviciosPills(c.servicios) + '</div>' : '') + '<div style=\"margin-top:6px\">' + loc + tel + rif + '</div>' + addr + wlink + '</div>';\n}\n\nfunction listRow(c, idx) {\n  var safeNameJs = c.name.replace(/'/g, \"\\\\'\").replace(/\"/g, '&quot;');\n  var onclick = \"sendPrompt('dame información sobre la empresa \" + safeNameJs + \"')\";\n  // Referencia de \"por que aparecio esto\" en TODAS las filas, no solo aproximadas - pedido\n  // explicito del usuario tras ver un sector amplio (servicios a pozos) sin forma de saber si\n  // cada empresa realmente calzaba con lo buscado (perforacion) o solo compartia el sector.\n  var conceptCaption = c.explain\n    ? sourcesHtml(c.explain)\n    : (c.matchedVia ? '<div style=\"font-size:11px;color:' + TEXT + ';margin-top:2px\">&#128161; ' + c.matchedVia + '</div>' : '');\n  return '<div onclick=\"' + onclick + '\" style=\"display:flex;align-items:center;gap:12px;padding:10px 14px;background:' + BG + ';border:0.5px solid ' + BORDER + ';border-radius:var(--border-radius-md);cursor:pointer;transition:background 0.15s\" onmouseover=\"this.style.background=\\'var(--color-background-secondary)\\';this.style.borderColor=\\'#faa819\\'\" onmouseout=\"this.style.background=\\'var(--color-background-primary)\\';this.style.borderColor=\\'var(--color-border-tertiary)\\'\">'\n    + '<span style=\"font-size:12px;color:' + TEXT + ';min-width:20px;text-align:right\">' + (idx+1) + '</span>'\n    + '<span style=\"flex:1;min-width:0\">'\n      + '<span style=\"font-size:14px;color:' + DARK + ';font-weight:500\">&#127970; ' + c.name + '</span>' + scoreBadge(c.explain) + extraPill(c) + voteBox(c.id)\n      + conceptCaption\n    + '</span>'\n    + '<span style=\"font-size:12px;color:' + GOLD + ';font-weight:500;white-space:nowrap\">ver detalle &#8250;</span>'\n    + '</div>';\n}\n\nfunction header(html) {\n  return '<div style=\"margin-bottom:12px;font-size:13px;color:' + TEXT + ';padding:10px 14px;background:' + BGALT + ';border-radius:var(--border-radius-md)\">' + html + '</div>';\n}\n\nvar output = '';\nvar companies  = rows.map(norm);\nvar isFullCard = (intent === 'COMPANY' || intent === 'RIF');\nvar matchType  = companies.length > 0 ? companies[0].matchType : null;\n\nif (isFullCard) {\n  var headerHtml = (count === 1)\n    ? '&#9989; Información de <strong>' + companies[0].name + '</strong>:'\n    : '&#128269; Encontré <strong>' + count + '</strong> empresa(s) cuyo nombre se aproxima a <strong>\"' + summary + '\"</strong>. ¿Te refieres a alguna de estas?';\n  headerHtml += approximateNotice(matchType);\n  var cardsHtml  = companies.map(cardFull).join('<div style=\"height:8px\"></div>');\n  output = '<div style=\"font-family:var(--font-sans);max-width:680px\">' + header(headerHtml) + cardsHtml + '</div>';\n} else {\n  var hint = count >= 10 ? ' <span style=\"font-size:11px;color:' + TEXT + '\">(mostrando los primeros ' + count + ')</span>' : '';\n  var headerHtml = '&#9989; Encontré <strong>' + count + '</strong> empresa(s) para <em>' + summary + '</em>' + hint + '.<br><span style=\"font-size:12px;color:' + TEXT + '\">Haz clic en una empresa para ver su información completa.</span>';\n  headerHtml += approximateNotice(matchType);\n  if (companies.some(function (x) { return x.explain && x.explain.puntaje != null; })) headerHtml += rankingLegend();\n  var hasLevels = companies.some(function (x) { return !!x.level; });\n  var anyDeclared = companies.some(function (x) { return x.level === 'declarado'; });\n  if (hasLevels && companies.length && !anyDeclared) headerHtml += noDeclaredNotice();\n  var rowsHtml = '';\n  var sepShown = false;\n  companies.forEach(function (c, i) {\n    if (hasLevels && anyDeclared && !sepShown && isExtra(c)) { rowsHtml += extraSeparator(); sepShown = true; }\n    rowsHtml += listRow(c, i);\n  });\n  output = '<div style=\"font-family:var(--font-sans);max-width:680px\">' + header(headerHtml) + '<div style=\"display:flex;flex-direction:column;gap:6px\">' + rowsHtml + '</div>' + resultVote() + '</div>';\n}\n\nreturn [{ json: { output } }];\n"
+   }
+  },
+  {
+   "name": "Final Respond3",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1.1,
+   "position": [
+    2128,
+    1392
+   ],
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ { output: $json.output, type: 'results' } }}",
+    "options": {}
+   }
+  },
+  {
+   "name": "Call 'CIRA_log'",
+   "type": "n8n-nodes-base.executeWorkflow",
+   "typeVersion": 1.3,
+   "position": [
+    2496,
+    1392
+   ],
+   "parameters": {
+    "workflowId": {
+     "__rl": true,
+     "value": "TwCZ9EawQGayFxlS",
+     "mode": "list",
+     "cachedResultUrl": "/workflow/TwCZ9EawQGayFxlS",
+     "cachedResultName": "CIRA_log"
+    },
+    "workflowInputs": {
+     "mappingMode": "defineBelow",
+     "value": {},
+     "matchingColumns": [],
+     "schema": [],
+     "attemptToConvertTypes": false,
+     "convertFieldsToString": true
+    },
+    "options": {
+     "waitForSubWorkflow": false
+    }
+   }
+  },
+  {
+   "name": "Build Log",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    2320,
+    1392
+   ],
+   "parameters": {
+    "jsCode": "\nfunction safe(fn, def){ try { var v = fn(); return (v === undefined ? def : v); } catch(e){ return def; } }\n\nvar wh    = safe(function(){ return $('Webhook1').first().json; }, {});\nvar hdr   = wh.headers || {};\nvar body  = wh.body || {};\nvar pre   = safe(function(){ return $('Pre-Procesing3').first().json; }, {});\nvar parse = safe(function(){ return $('Parse Intent JSON3').first().json; }, {});\nvar agent = safe(function(){ return $('Interactive Intent Agent3').first().json; }, {});\n\n// filas reales devueltas por el MCP (Fase MCP-4) - antes venian de MySQL Query3\nvar rows = safe(function(){ return $('Unwrap MCP Result').first().json.rows || []; }, []);\nvar nResultados = rows.length;\n\nvar isCommand   = safe(function(){ return $('Detect Command').first().json.isCommand; }, false);\nvar wrongPw     = safe(function(){ return !!$('Wrong Password').first().json; }, false);\nvar searchReady = String(parse.isSearchReady) === 'true';\n\n// --- estado de parseo del JSON del agente (observabilidad, obs. 3) ---\n//  no_json  = respuesta conversacional legitima (sin JSON)\n//  ok       = el modelo emitio JSON limpio\n//  recovered= JSON malformado pero rescatado por Parse Intent JSON3\n//  failed   = habia JSON pero no se pudo parsear ni rescatar\nvar agentRaw = agent.output || '';\nvar bStart = agentRaw.indexOf('{');\nvar bEnd = agentRaw.lastIndexOf('}');\nvar parse_status;\nif (bStart === -1 || bEnd <= bStart) {\n  parse_status = 'no_json';\n} else {\n  var okClean = false;\n  try { JSON.parse(agentRaw.substring(bStart, bEnd + 1)); okClean = true; } catch(e) {}\n  if (okClean) parse_status = 'ok';\n  else if (searchReady) parse_status = 'recovered';\n  else parse_status = 'failed';\n}\nvar parse_ok = (parse_status === 'ok' || parse_status === 'no_json');\nvar error_log_val = (parse_status === 'failed') ? 'json_parse_failed' : null;\n\n// --- inferir resultado_tipo por el camino ejecutado ---\nvar resultado_tipo;\nif (isCommand)          resultado_tipo = wrongPw ? 'comando_error' : 'comando';\nelse if (!searchReady)  resultado_tipo = 'conversation';\nelse if (nResultados === 0) resultado_tipo = 'sin_resultados';\nelse                    resultado_tipo = 'results';\n\nvar meta = body.meta || pre.meta || {};\nvar wp   = meta.wp || {};\n\nvar t0 = pre.t0 || null;\nvar tiempo_respuesta_ms = t0 ? (Date.now() - t0) : null;\n\nvar respuesta_ia = agent.output || parse.conversationalText || null;\n\nvar output = safe(function(){ return $json.output; }, null)\n          || safe(function(){ return $('Format Cards2').first().json.output; }, null)\n          || safe(function(){ return $('Code in JavaScript1').first().json.output; }, null)\n          || null;\n\nvar tokens = 0;\ntry { tokens = agent.response_metadata.tokenUsage.totalTokens; }\ncatch(e){ tokens = respuesta_ia ? Math.ceil(String(respuesta_ia).length / 4) : 0; }\n\nvar exec = null; try { exec = $execution.id; } catch(e){}\n\nreturn [{ json: {\n  session_id:       pre.sessionId || body.sessionId || 'sin-id',\n  pregunta_usuario: pre.chatInput || body.chatInput || '',\n  respuesta_ia:     respuesta_ia,\n  output:           output,\n  tokens_usados:    tokens,\n  error_log:        error_log_val,\n  metadata: {\n    modelo: (() => { try { const m = $('OpenAI Chat Model').params.model; return (m && (m.value || m)) || 'desconocido'; } catch (e) { return 'desconocido'; } })(),\n    // --- outcome ---\n    resultado_tipo: resultado_tipo,\n    parse_status: parse_status,\n    parse_ok: parse_ok,\n    query_intent: parse.queryIntent || null,\n    needs_clarification: (parse.needsClarification === true || parse.needsClarification === 'true'),\n    mcp_tool: parse.tool || null,\n    mcp_params: parse.params ? JSON.stringify(parse.params) : null,\n    resultados_encontrados: isCommand ? null : nResultados,\n    tiempo_respuesta_ms: tiempo_respuesta_ms,\n    longitud_caracteres: respuesta_ia ? String(respuesta_ia).length : 0,\n    ejecucion_id: exec,\n    // --- headers crudos (Cloudflare deriva geo/UA) ---\n    ip: hdr['x-forwarded-for'] || null,\n    user_agent: hdr['user-agent'] || null,\n    accept_language: hdr['accept-language'] || null,\n    sec_ch_ua_platform: hdr['sec-ch-ua-platform'] || null,\n    sec_ch_ua_mobile: hdr['sec-ch-ua-mobile'] || null,\n    origin: hdr['origin'] || null,\n    referer: hdr['referer'] || null,\n    // --- meta del widget ---\n    page_url: meta.page_url || null,\n    page_title: meta.page_title || null,\n    referrer: meta.referrer || null,\n    utm_source: meta.utm_source || null,\n    utm_medium: meta.utm_medium || null,\n    utm_campaign: meta.utm_campaign || null,\n    visitor_id: meta.visitor_id || null,\n    msg_index: meta.msg_index || null,\n    widget_mode: meta.widget_mode || null,\n    screen: meta.screen || null,\n    viewport: meta.viewport || null,\n    timezone: meta.timezone || null,\n    connection: meta.connection || null,\n    dpr: meta.dpr || null,\n    ms_since_load: meta.ms_since_load || null,\n    client_ts: meta.client_ts || null,\n    ua_hints: meta.ua_hints || null,\n    wp_user_id: wp.user_id != null ? wp.user_id : null,\n    wp_user_role: wp.user_role || null,\n    wp_page_id: wp.page_id != null ? wp.page_id : null\n  }\n} }];\n"
+   }
+  },
+  {
+   "name": "MCP Perfil Afiliados CPV",
+   "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+   "typeVersion": 1.4,
+   "position": [
+    1008,
+    1552
+   ],
+   "parameters": {
+    "endpointUrl": "<URL_REDACTADA>",
+    "authentication": "bearerAuth",
+    "options": {},
+    "include": "selected",
+    "includeTools": [
+     "resolve_search_intent",
+     "search_taxonomy"
+    ]
+   },
+   "credentials": {
+    "httpBearerAuth": {
+     "name": "<REDACTADO>"
+    }
+   }
+  },
+  {
+   "name": "OpenAI Chat Model",
+   "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+   "typeVersion": 1.3,
+   "position": [
+    656,
+    1504
+   ],
+   "parameters": {
+    "model": {
+     "__rl": true,
+     "value": "gpt-6-luna",
+     "mode": "list",
+     "cachedResultName": "gpt-6-luna"
+    },
+    "builtInTools": {},
+    "options": {}
+   },
+   "credentials": {
+    "openAiApi": {
+     "name": "<REDACTADO>"
+    }
+   }
+  },
+  {
+   "name": "Call MCP Empresas",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    1488,
+    1200
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "<URL_REDACTADA>",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpBearerAuth",
+    "sendHeaders": true,
+    "specifyHeaders": "json",
+    "jsonHeaders": "{\"Content-Type\": \"application/json\", \"Accept\": \"application/json, text/event-stream\"}",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ jsonrpc: \"2.0\", id: 1, method: \"tools/call\", params: { name: $json.tool, arguments: $json.params } }) }}",
+    "options": {
+     "response": {
+      "response": {
+       "responseFormat": "text"
+      }
+     }
+    }
+   },
+   "credentials": {
+    "httpBearerAuth": {
+     "name": "<REDACTADO>"
+    }
+   }
+  },
+  {
+   "name": "Unwrap MCP Result",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1488,
+    1360
+   ],
+   "parameters": {
+    "jsCode": "const raw = $json.data;\nconst text = typeof raw === 'string' ? raw : JSON.stringify(raw);\n\n// El Worker responde en formato SSE: \"event: message\\ndata: {...}\\n\\n\"\nconst match = text.match(/data:\\s*(\\{[\\s\\S]*\\})/);\nlet jsonRpc;\ntry {\n  jsonRpc = match ? JSON.parse(match[1]) : JSON.parse(text);\n} catch (e) {\n  return [{ json: { rows: [], toolError: 'No se pudo parsear la respuesta del MCP: ' + e.message } }];\n}\n\nlet rows = [];\nlet toolError = null;\n\nif (jsonRpc.error) {\n  toolError = jsonRpc.error.message || 'Error MCP';\n} else {\n  const contentText = jsonRpc.result && jsonRpc.result.content && jsonRpc.result.content[0] && jsonRpc.result.content[0].text;\n  let parsed = [];\n  try {\n    parsed = contentText ? JSON.parse(contentText) : [];\n  } catch (e) {\n    toolError = 'Respuesta de la tool no es JSON valido';\n  }\n\n  if (Array.isArray(parsed)) {\n    rows = parsed;\n  } else if (parsed && (parsed.error || parsed.found === false)) {\n    toolError = parsed.error || parsed.message || null;\n  }\n}\n\nreturn [{ json: { rows, toolError } }];\n"
+   }
+  },
+  {
+   "name": "Build Search Log",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1568,
+    1560
+   ],
+   "parameters": {
+    "jsCode": "// TASK-0013: una fila por búsqueda en cira_search_log (vía Worker /search-log).\nconst u = $input.first().json;\nconst pre = $('Pre-Procesing3').first().json;\nconst p = $('Parse Intent JSON3').first().json;\nconst bsp = $('Build System Prompt').first().json;\nconst rows = u.rows || [];\nconst evidence = rows.map(function (r, i) {\n  var ex = r.explain;\n  return {\n    id: Number(r.id), pos: i + 1,\n    puntaje: ex ? ex.puntaje : null, rel: ex ? ex.puntaje_relativo : null,\n    fuentes: ex && ex.fuentes ? ex.fuentes.map(function (f) { return { lista: f.lista, tipo: f.tipo, aporte: f.aporte, pct: f.aporte_pct }; }) : null,\n    via: r.matched_via || null\n  };\n});\nreturn [{ json: {\n  source: 'n8n_chat',\n  session_ref: pre.sessionId,\n  n8n_execution_id: String($execution.id),\n  user_input: String(pre.chatInput || '').slice(0, 2000) || '(vacio)',\n  agent_tool: p.tool,\n  agent_params: p.params,\n  result_empresa_ids: rows.map(function (r) { return Number(r.id); }),\n  result_evidence: evidence,\n  engine_version: 'flow ' + $workflow.id + ' ' + (bsp.promptVersion || ''),\n  response_ms: Math.max(0, Date.now() - (pre.t0 || Date.now())),\n  error: u.toolError || null\n} }];"
+   }
+  },
+  {
+   "name": "Log Search",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.4,
+   "position": [
+    1768,
+    1560
+   ],
+   "parameters": {
+    "method": "POST",
+    "url": "<URL_REDACTADA>",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpBearerAuth",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify($json) }}",
+    "options": {
+     "timeout": 8000
+    }
+   },
+   "credentials": {
+    "httpBearerAuth": {
+     "name": "<REDACTADO>"
+    }
+   }
+  },
+  {
+   "name": "Attach Log Id",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1968,
+    1560
+   ],
+   "parameters": {
+    "jsCode": "// TASK-0013: si el registro falla, la búsqueda sigue igual, solo que sin botones de voto.\nconst u = $('Unwrap MCP Result').first().json;\nconst r = $input.first().json || {};\nreturn [{ json: Object.assign({}, u, { search_log_id: (r && r.ok && r.id) ? r.id : null }) }];"
+   }
+  }
+ ],
+ "connections": {
+  "Admin Password": {
+   "main": [
+    [
+     {
+      "node": "Detect Command",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Detect Command": {
+   "main": [
+    [
+     {
+      "node": "Is Command?",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Is Command?": {
+   "main": [
+    [
+     {
+      "node": "Validate Password",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Load Learnings",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Validate Password": {
+   "main": [
+    [
+     {
+      "node": "Route Command",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Wrong Password",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Wrong Password": {
+   "main": [
+    [
+     {
+      "node": "Respond Wrong Password",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Route Command": {
+   "main": [
+    [
+     {
+      "node": "INSERT Learning",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "SELECT Learnings List",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "UPDATE Disable Learning",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "INSERT Learning": {
+   "main": [
+    [
+     {
+      "node": "Format Save OK",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Format Save OK": {
+   "main": [
+    [
+     {
+      "node": "Respond Save OK",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "SELECT Learnings List": {
+   "main": [
+    [
+     {
+      "node": "Format Learnings List",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Format Learnings List": {
+   "main": [
+    [
+     {
+      "node": "Respond List",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "UPDATE Disable Learning": {
+   "main": [
+    [
+     {
+      "node": "Format Delete OK",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Format Delete OK": {
+   "main": [
+    [
+     {
+      "node": "Respond Delete OK",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Load Learnings": {
+   "main": [
+    [
+     {
+      "node": "Build System Prompt",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Build System Prompt": {
+   "main": [
+    [
+     {
+      "node": "Interactive Intent Agent3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Webhook1": {
+   "main": [
+    [
+     {
+      "node": "Pre-Procesing3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Pre-Procesing3": {
+   "main": [
+    [
+     {
+      "node": "Admin Password",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Interactive Intent Agent3": {
+   "main": [
+    [
+     {
+      "node": "Parse Intent JSON3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Postgres Memory Intent3": {
+   "ai_memory": [
+    [
+     {
+      "node": "Interactive Intent Agent3",
+      "type": "ai_memory",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Parse Intent JSON3": {
+   "main": [
+    [
+     {
+      "node": "Is Search Ready?3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Is Search Ready?3": {
+   "main": [
+    [
+     {
+      "node": "Call MCP Empresas",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Respond Conversation5",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "If2": {
+   "main": [
+    [
+     {
+      "node": "Code in JavaScript1",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Format Cards2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Code in JavaScript1": {
+   "main": [
+    [
+     {
+      "node": "Respond Conversation6",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Respond Conversation6": {
+   "main": [
+    [
+     {
+      "node": "Build Log",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Format Cards2": {
+   "main": [
+    [
+     {
+      "node": "Final Respond3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Final Respond3": {
+   "main": [
+    [
+     {
+      "node": "Build Log",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Respond Conversation5": {
+   "main": [
+    [
+     {
+      "node": "Build Log",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Respond Wrong Password": {
+   "main": [
+    [
+     {
+      "node": "Build Log",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Respond Save OK": {
+   "main": [
+    [
+     {
+      "node": "Build Log",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Respond List": {
+   "main": [
+    [
+     {
+      "node": "Build Log",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Respond Delete OK": {
+   "main": [
+    [
+     {
+      "node": "Build Log",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "MCP Perfil Afiliados CPV": {
+   "ai_tool": [
+    [
+     {
+      "node": "Interactive Intent Agent3",
+      "type": "ai_tool",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "OpenAI Chat Model": {
+   "ai_languageModel": [
+    [
+     {
+      "node": "Interactive Intent Agent3",
+      "type": "ai_languageModel",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Call MCP Empresas": {
+   "main": [
+    [
+     {
+      "node": "Unwrap MCP Result",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Unwrap MCP Result": {
+   "main": [
+    [
+     {
+      "node": "Build Search Log",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Build Search Log": {
+   "main": [
+    [
+     {
+      "node": "Log Search",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Log Search": {
+   "main": [
+    [
+     {
+      "node": "Attach Log Id",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Attach Log Id": {
+   "main": [
+    [
+     {
+      "node": "If2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ }
+}

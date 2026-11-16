@@ -25,14 +25,17 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
-## 2026-11-16 10:10Z: **TASK-0028** — CIRA: auditoría de fuentes, ranking y separación de capacidades y experiencias — **IN_PROGRESS** (fuente `6913187637`)
+## 2026-11-16 10:10Z: **TASK-0028** — CIRA: auditoría de fuentes, ranking y separación de capacidades y experiencias — ~~IN_PROGRESS~~ → **READY_FOR_REVIEW** (~10:35Z; fuente `6913187637`)
 
 | Campo | Valor |
 |---|---|
 | Archivo | [`tasks/0028-cira-sources-ranking-capabilities-experiences-audit.md`](tasks/0028-cira-sources-ranking-capabilities-experiences-audit.md) |
+| Informe | [`../../audit/CIRA_TASK0028_FUENTES_RANKING_CAPACIDADES.md`](../../audit/CIRA_TASK0028_FUENTES_RANKING_CAPACIDADES.md); artefactos en [`../cira/task0028/`](../cira/task0028/) |
 | Autoriza | Solo auditoría: lectura de n8n, Supabase y código; experimentos aislados; propuesta UX y plan |
 | No autoriza | Cambios en el flujo n8n activo, la BD compartida, el ranking vivo o la taxonomía; despliegues; merge a `main` |
 | BASE | `f080daa` |
+| Resultado | Causa de «balancin»: experiencias (100 % del puntaje de 91/333/391). A = control (pierde 12 relevantes del cliente); B = destino por fases sin afirmar roles. Cero mutaciones verificadas |
+| Siguiente | Revisión del propietario. Cualquier fase del plan requiere nueva autorización y tarea nueva |
 
 ## 2026-11-13 12:40Z: **TASK-0027** — CIRA: módulo web de evaluación institucional para la Cámara — ~~IN_PROGRESS~~ → ~~BLOCKED_PENDING_DB_GATE~~ (13:50Z) → ~~IN_PROGRESS: despliegue autorizado~~ (`6855056483` + excepción `6855171480`, 14:10Z) → **DEPLOYED_AWAITING_24H** (~14:40Z; fuente `6852945146`)
 

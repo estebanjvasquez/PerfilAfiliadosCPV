@@ -1,0 +1,756 @@
+[
+ {
+  "id": "L007",
+  "query": "operadores",
+  "phrases": [
+   "operadores"
+  ],
+  "source": "real (cira_search_log id 7, 5 vez/veces)",
+  "golden": {
+   "test_id": "G4-01",
+   "rel": [
+    146,
+    177,
+    325,
+    218
+   ],
+   "norel": [
+    124,
+    326,
+    107
+   ]
+  }
+ },
+ {
+  "id": "L009",
+  "query": "tratamiento de aguas de perforacion",
+  "phrases": [
+   "tratamiento de aguas de perforación"
+  ],
+  "source": "real (cira_search_log id 9, 2 vez/veces)",
+  "golden": {
+   "test_id": "G1-01",
+   "rel": [
+    96,
+    152,
+    179,
+    79,
+    115
+   ],
+   "norel": []
+  }
+ },
+ {
+  "id": "L010",
+  "query": "fabricantes de balancines",
+  "phrases": [
+   "fabricantes de balancines"
+  ],
+  "source": "real (cira_search_log id 10, 2 vez/veces)"
+ },
+ {
+  "id": "L013",
+  "query": "levantamiento artificial",
+  "phrases": [
+   "levantamiento artificial"
+  ],
+  "source": "real (cira_search_log id 13, 1 vez/veces)",
+  "golden": {
+   "test_id": "G1-02",
+   "rel": [
+    276,
+    383
+   ],
+   "norel": [
+    72,
+    257,
+    187
+   ]
+  }
+ },
+ {
+  "id": "L014",
+  "query": "revestidor",
+  "phrases": [
+   "revestidor"
+  ],
+  "source": "real (cira_search_log id 14, 2 vez/veces)",
+  "golden": {
+   "test_id": "G1-03",
+   "rel": [
+    157
+   ],
+   "norel": [
+    91,
+    312,
+    317,
+    145
+   ]
+  }
+ },
+ {
+  "id": "L015",
+  "query": "mecha",
+  "phrases": [
+   "mecha"
+  ],
+  "source": "real (cira_search_log id 15, 1 vez/veces)",
+  "golden": {
+   "test_id": "G1-04",
+   "rel": [],
+   "norel": [
+    140,
+    1,
+    73,
+    74
+   ]
+  }
+ },
+ {
+  "id": "L016",
+  "query": "cabria",
+  "phrases": [
+   "cabria"
+  ],
+  "source": "real (cira_search_log id 16, 1 vez/veces)",
+  "golden": {
+   "test_id": "G2-01",
+   "rel": [],
+   "norel": [
+    138,
+    86,
+    157,
+    170
+   ]
+  }
+ },
+ {
+  "id": "L017",
+  "query": "cabrias",
+  "phrases": [
+   "cabrias"
+  ],
+  "source": "real (cira_search_log id 17, 1 vez/veces)",
+  "golden": {
+   "test_id": "G2-02",
+   "rel": [],
+   "norel": [
+    138,
+    86,
+    157,
+    170
+   ]
+  }
+ },
+ {
+  "id": "L018",
+  "query": "mechurrio",
+  "phrases": [
+   "mechurrio"
+  ],
+  "source": "real (cira_search_log id 18, 1 vez/veces)",
+  "golden": {
+   "test_id": "G2-03",
+   "rel": [
+    140
+   ],
+   "norel": [
+    391
+   ]
+  }
+ },
+ {
+  "id": "L019",
+  "query": "macolla",
+  "phrases": [
+   "macolla"
+  ],
+  "source": "real (cira_search_log id 19, 1 vez/veces)",
+  "golden": {
+   "test_id": "G2-04",
+   "rel": [
+    155,
+    171,
+    1,
+    76
+   ],
+   "norel": [
+    72
+   ]
+  }
+ },
+ {
+  "id": "L020",
+  "query": "guaya fina",
+  "phrases": [
+   "guaya fina"
+  ],
+  "source": "real (cira_search_log id 20, 1 vez/veces)",
+  "golden": {
+   "test_id": "G2-05",
+   "rel": [
+    182,
+    458
+   ],
+   "norel": [
+    198,
+    128
+   ]
+  }
+ },
+ {
+  "id": "L021",
+  "query": "guaya electrica",
+  "phrases": [
+   "guaya eléctrica"
+  ],
+  "source": "real (cira_search_log id 21, 1 vez/veces)",
+  "golden": {
+   "test_id": "G2-06",
+   "rel": [
+    79
+   ],
+   "norel": [
+    72,
+    213,
+    83,
+    141
+   ]
+  }
+ },
+ {
+  "id": "L022",
+  "query": "balancin",
+  "phrases": [
+   "balancín"
+  ],
+  "source": "real (cira_search_log id 22, 8 vez/veces)",
+  "golden": {
+   "test_id": "G2-07",
+   "rel": [
+    157
+   ],
+   "norel": [
+    91,
+    333,
+    391
+   ]
+  }
+ },
+ {
+  "id": "L023",
+  "query": "camion chupon",
+  "phrases": [
+   "camión chupón"
+  ],
+  "source": "real (cira_search_log id 23, 1 vez/veces)",
+  "golden": {
+   "test_id": "G2-09",
+   "rel": [
+    391
+   ],
+   "norel": []
+  }
+ },
+ {
+  "id": "L024",
+  "query": "gandola",
+  "phrases": [
+   "gándola"
+  ],
+  "source": "real (cira_search_log id 24, 1 vez/veces)",
+  "golden": {
+   "test_id": "G2-10",
+   "rel": [
+    165,
+    204
+   ],
+   "norel": [
+    433,
+    187,
+    563
+   ]
+  }
+ },
+ {
+  "id": "L025",
+  "query": "mantenimiento de cabrias",
+  "phrases": [
+   "mantenimiento de cabrias"
+  ],
+  "source": "real (cira_search_log id 25, 1 vez/veces)",
+  "golden": {
+   "test_id": "G3-01",
+   "rel": [
+    173,
+    115,
+    179,
+    96
+   ],
+   "norel": [
+    257
+   ]
+  }
+ },
+ {
+  "id": "L026",
+  "query": "fabricantes de cabrias",
+  "phrases": [
+   "fabricantes de cabrias"
+  ],
+  "source": "real (cira_search_log id 26, 1 vez/veces)",
+  "golden": {
+   "test_id": "G3-02",
+   "rel": [
+    173,
+    115,
+    179,
+    96
+   ],
+   "norel": [
+    257
+   ]
+  }
+ },
+ {
+  "id": "L027",
+  "query": "transporte de gandolas",
+  "phrases": [
+   "transporte de gandolas"
+  ],
+  "source": "real (cira_search_log id 27, 1 vez/veces)",
+  "golden": {
+   "test_id": "G3-03",
+   "rel": [
+    204,
+    452,
+    426
+   ],
+   "norel": [
+    187
+   ]
+  }
+ },
+ {
+  "id": "L028",
+  "query": "alquiler de gandolas",
+  "phrases": [
+   "alquiler de gandolas"
+  ],
+  "source": "real (cira_search_log id 28, 1 vez/veces)",
+  "golden": {
+   "test_id": "G3-04",
+   "rel": [
+    165,
+    204,
+    426
+   ],
+   "norel": [
+    187,
+    563
+   ]
+  }
+ },
+ {
+  "id": "L029",
+  "query": "mantenimiento de levantamiento artificial",
+  "phrases": [
+   "mantenimiento de levantamiento artificial"
+  ],
+  "source": "real (cira_search_log id 29, 1 vez/veces)",
+  "golden": {
+   "test_id": "G3-05",
+   "rel": [],
+   "norel": [
+    107,
+    78,
+    72,
+    94
+   ]
+  }
+ },
+ {
+  "id": "L031",
+  "query": "servicios petroleros",
+  "phrases": [
+   "servicios petroleros"
+  ],
+  "source": "real (cira_search_log id 31, 1 vez/veces)",
+  "golden": {
+   "test_id": "G4-03",
+   "rel": [],
+   "norel": []
+  }
+ },
+ {
+  "id": "L032",
+  "query": "construccion",
+  "phrases": [
+   "construcción"
+  ],
+  "source": "real (cira_search_log id 32, 1 vez/veces)",
+  "golden": {
+   "test_id": "G4-04",
+   "rel": [],
+   "norel": []
+  }
+ },
+ {
+  "id": "L033",
+  "query": "tratamiento de aguas de perforacion",
+  "phrases": [
+   "tratamiento de aguas de perforación en el lago"
+  ],
+  "source": "real (cira_search_log id 33, 1 vez/veces)",
+  "golden": {
+   "test_id": "G5-01",
+   "rel": [
+    115
+   ],
+   "norel": [
+    391,
+    257,
+    74,
+    137
+   ]
+  }
+ },
+ {
+  "id": "L034",
+  "query": "fabriquen y mantengan balancines",
+  "phrases": [
+   "fabricación de balancines",
+   "mantenimiento de balancines"
+  ],
+  "source": "real (cira_search_log id 34, 1 vez/veces)",
+  "golden": {
+   "test_id": "G5-02",
+   "rel": [
+    157
+   ],
+   "norel": [
+    333,
+    391,
+    107,
+    83
+   ]
+  }
+ },
+ {
+  "id": "L035",
+  "query": "inspeccion y mantenimiento de guaya electrica",
+  "phrases": [
+   "inspección y mantenimiento de guaya eléctrica"
+  ],
+  "source": "real (cira_search_log id 35, 1 vez/veces)",
+  "golden": {
+   "test_id": "G5-03",
+   "rel": [],
+   "norel": []
+  }
+ },
+ {
+  "id": "L036",
+  "query": "transporte de crudo por gandola",
+  "phrases": [
+   "transporte de crudo por gandola"
+  ],
+  "source": "real (cira_search_log id 36, 1 vez/veces)",
+  "golden": {
+   "test_id": "G5-04",
+   "rel": [],
+   "norel": []
+  }
+ },
+ {
+  "id": "L037",
+  "query": "pipeline",
+  "phrases": [
+   "pipeline"
+  ],
+  "source": "real (cira_search_log id 37, 1 vez/veces)",
+  "golden": {
+   "test_id": "G6-01",
+   "rel": [
+    157
+   ],
+   "norel": [
+    141
+   ]
+  }
+ },
+ {
+  "id": "L038",
+  "query": "refinery",
+  "phrases": [
+   "refinery"
+  ],
+  "source": "real (cira_search_log id 38, 1 vez/veces)",
+  "golden": {
+   "test_id": "G6-02",
+   "rel": [],
+   "norel": [
+    157,
+    85,
+    187,
+    125,
+    149
+   ]
+  }
+ },
+ {
+  "id": "L039",
+  "query": "refineria",
+  "phrases": [
+   "refinería"
+  ],
+  "source": "real (cira_search_log id 39, 1 vez/veces)",
+  "golden": {
+   "test_id": "G6-03",
+   "rel": [],
+   "norel": []
+  }
+ },
+ {
+  "id": "L040",
+  "query": "drilling",
+  "phrases": [
+   "drilling"
+  ],
+  "source": "real (cira_search_log id 40, 2 vez/veces)",
+  "golden": {
+   "test_id": "G6-04",
+   "rel": [
+    115,
+    79,
+    152,
+    96,
+    77,
+    133,
+    157
+   ],
+   "norel": [
+    86,
+    170,
+    391,
+    187
+   ]
+  }
+ },
+ {
+  "id": "L041",
+  "query": "arbolitos para pozos petroleros",
+  "phrases": [
+   "arbolitos para pozos petroleros"
+  ],
+  "source": "real (cira_search_log id 41, 1 vez/veces)",
+  "golden": {
+   "test_id": "G7-02",
+   "rel": [
+    179
+   ],
+   "norel": [
+    207,
+    112,
+    80
+   ]
+  }
+ },
+ {
+  "id": "L042",
+  "query": "venta de zapatos",
+  "phrases": [
+   "venta de zapatos"
+  ],
+  "source": "real (cira_search_log id 42, 1 vez/veces)",
+  "golden": {
+   "test_id": "G7-03",
+   "rel": [],
+   "norel": []
+  }
+ },
+ {
+  "id": "L053",
+  "query": "gandolas",
+  "phrases": [
+   "gandolas"
+  ],
+  "source": "real (cira_search_log id 53, 1 vez/veces)"
+ },
+ {
+  "id": "L054",
+  "query": "servicios de pozos",
+  "phrases": [
+   "servicios de pozos"
+  ],
+  "source": "real (cira_search_log id 54, 2 vez/veces)"
+ },
+ {
+  "id": "L056",
+  "query": "servicios a pozos",
+  "phrases": [
+   "servicios a pozos"
+  ],
+  "source": "real (cira_search_log id 56, 2 vez/veces)"
+ },
+ {
+  "id": "L058",
+  "query": "sistemas fotovoltaicos",
+  "phrases": [
+   "sistemas fotovoltaicos"
+  ],
+  "source": "real (cira_search_log id 58, 1 vez/veces)"
+ },
+ {
+  "id": "L059",
+  "query": "expansores",
+  "phrases": [
+   "expansores"
+  ],
+  "source": "real (cira_search_log id 59, 1 vez/veces)"
+ },
+ {
+  "id": "L060",
+  "query": "partes y repuestos de compresores",
+  "phrases": [
+   "partes y repuestos de compresores"
+  ],
+  "source": "real (cira_search_log id 60, 1 vez/veces)"
+ },
+ {
+  "id": "L061",
+  "query": "ingenieria feed",
+  "phrases": [
+   "ingeniería feed"
+  ],
+  "source": "real (cira_search_log id 61, 1 vez/veces)"
+ },
+ {
+  "id": "L062",
+  "query": "ingenieria de procesos",
+  "phrases": [
+   "ingeniería de procesos"
+  ],
+  "source": "real (cira_search_log id 62, 1 vez/veces)"
+ },
+ {
+  "id": "L063",
+  "query": "ipc",
+  "phrases": [
+   "ipc"
+  ],
+  "source": "real (cira_search_log id 63, 1 vez/veces)"
+ },
+ {
+  "id": "L064",
+  "query": "mechas de perforacion",
+  "phrases": [
+   "mechas de perforación"
+  ],
+  "source": "real (cira_search_log id 64, 2 vez/veces)"
+ },
+ {
+  "id": "L067",
+  "query": "mantenimiento de bombas",
+  "phrases": [
+   "mantenimiento de bombas"
+  ],
+  "source": "real (cira_search_log id 67, 1 vez/veces)"
+ },
+ {
+  "id": "L068",
+  "query": "servicios de perforacion de pozos",
+  "phrases": [
+   "servicios de perforación de pozos"
+  ],
+  "source": "real (cira_search_log id 68, 1 vez/veces)"
+ },
+ {
+  "id": "L069",
+  "query": "manejo de fluidos de perforacion",
+  "phrases": [
+   "manejo de fluidos de perforación"
+  ],
+  "source": "real (cira_search_log id 69, 1 vez/veces)"
+ },
+ {
+  "id": "L070",
+  "query": "manejo de aguas residuales",
+  "phrases": [
+   "manejo de aguas residuales"
+  ],
+  "source": "real (cira_search_log id 70, 1 vez/veces)"
+ },
+ {
+  "id": "L071",
+  "query": "tuberia octg",
+  "phrases": [
+   "tuberia octg"
+  ],
+  "source": "real (cira_search_log id 71, 1 vez/veces)"
+ },
+ {
+  "id": "L072",
+  "query": "valvulas de bola",
+  "phrases": [
+   "válvulas de bola"
+  ],
+  "source": "real (cira_search_log id 72, 1 vez/veces)"
+ },
+ {
+  "id": "L073",
+  "query": "balacines",
+  "phrases": [
+   "balancines"
+  ],
+  "source": "real (cira_search_log id 73, 1 vez/veces)"
+ },
+ {
+  "id": "S001",
+  "query": "venta de balancines",
+  "phrases": [
+   "venta de balancines"
+  ],
+  "source": "sintética (regla de Parse Intent JSON3, sin agente)"
+ },
+ {
+  "id": "S002",
+  "query": "mantenimiento de balancines",
+  "phrases": [
+   "mantenimiento de balancines"
+  ],
+  "source": "sintética (regla de Parse Intent JSON3, sin agente)"
+ },
+ {
+  "id": "S003",
+  "query": "sellado de fluidos en balancines",
+  "phrases": [
+   "sellado de fluidos en balancines"
+  ],
+  "source": "sintética (regla de Parse Intent JSON3, sin agente)"
+ },
+ {
+  "id": "S004",
+  "query": "limpieza de balancines",
+  "phrases": [
+   "limpieza de balancines"
+  ],
+  "source": "sintética (regla de Parse Intent JSON3, sin agente)"
+ },
+ {
+  "id": "S005",
+  "query": "fabricacion de valvulas industriales",
+  "phrases": [
+   "fabricación de válvulas industriales"
+  ],
+  "source": "sintética (regla de Parse Intent JSON3, sin agente)"
+ },
+ {
+  "id": "S006",
+  "query": "mantenimiento de valvulas industriales",
+  "phrases": [
+   "mantenimiento de válvulas industriales"
+  ],
+  "source": "sintética (regla de Parse Intent JSON3, sin agente)"
+ }
+]

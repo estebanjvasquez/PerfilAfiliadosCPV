@@ -1,0 +1,2828 @@
+{
+ "agg": {
+  "cases": 55,
+  "golden": 31,
+  "fidelity_same_order": 52,
+  "fidelity_same_top5": 55,
+  "duplicated_phrase_cases": 16,
+  "dedup_top5_changed": 0
+ },
+ "sum": {
+  "actual": {
+   "rel5": 34,
+   "norel5": 38,
+   "unk5": 50,
+   "relTop10": 39,
+   "relTotal": 49,
+   "results": 668,
+   "empty": 2
+  },
+  "A": {
+   "rel5": 24,
+   "norel5": 27,
+   "unk5": 53,
+   "relTop10": 30,
+   "relTotal": 49,
+   "results": 543,
+   "empty": 6
+  },
+  "Btotal": {
+   "rel5": 24,
+   "norel5": 27,
+   "unk5": 53,
+   "relTop10": 39,
+   "relTotal": 49,
+   "results": 670,
+   "empty": 2
+  }
+ },
+ "expOnlyTop5": 46,
+ "top5Count": 217,
+ "omissions": [
+  {
+   "id": "L013",
+   "golden": "G1-02",
+   "query": "levantamiento artificial",
+   "lost": [
+    276
+   ],
+   "recovered_in_B2": [
+    276
+   ]
+  },
+  {
+   "id": "L014",
+   "golden": "G1-03",
+   "query": "revestidor",
+   "lost": [
+    157
+   ],
+   "recovered_in_B2": [
+    157
+   ]
+  },
+  {
+   "id": "L018",
+   "golden": "G2-03",
+   "query": "mechurrio",
+   "lost": [
+    140
+   ],
+   "recovered_in_B2": [
+    140
+   ]
+  },
+  {
+   "id": "L019",
+   "golden": "G2-04",
+   "query": "macolla",
+   "lost": [
+    155,
+    171,
+    1,
+    76
+   ],
+   "recovered_in_B2": [
+    155,
+    171,
+    1,
+    76
+   ]
+  },
+  {
+   "id": "L021",
+   "golden": "G2-06",
+   "query": "guaya electrica",
+   "lost": [
+    79
+   ],
+   "recovered_in_B2": [
+    79
+   ]
+  },
+  {
+   "id": "L023",
+   "golden": "G2-09",
+   "query": "camion chupon",
+   "lost": [
+    391
+   ],
+   "recovered_in_B2": [
+    391
+   ]
+  },
+  {
+   "id": "L040",
+   "golden": "G6-04",
+   "query": "drilling",
+   "lost": [
+    96
+   ],
+   "recovered_in_B2": []
+  }
+ ],
+ "rows": [
+  {
+   "id": "L007",
+   "query": "operadores",
+   "phrases": 1,
+   "golden": "G4-01",
+   "intent": "generic",
+   "n_actual": 13,
+   "n_A": 13,
+   "n_B1": 13,
+   "n_B2": 10,
+   "top5_actual": [
+    146,
+    218,
+    240,
+    124,
+    326
+   ],
+   "top5_A": [
+    146,
+    218,
+    240,
+    124,
+    326
+   ],
+   "top5_B2": [
+    418,
+    333,
+    72,
+    523,
+    204
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "146:0%",
+    "218:0%",
+    "240:0%",
+    "124:0%",
+    "326:0%"
+   ],
+   "live_ms": 2087,
+   "clone_ms": {
+    "actual_clone": 70,
+    "A_clone": 82,
+    "B_clone_total": 107
+   },
+   "judged_actual": {
+    "rel": 2,
+    "norel": 2,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 2,
+    "norel": 2,
+    "unk": 1
+   },
+   "judged_Btotal": {
+    "rel": 2,
+    "norel": 2,
+    "unk": 1
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L009",
+   "query": "tratamiento de aguas de perforacion",
+   "phrases": 2,
+   "golden": "G1-01",
+   "intent": "generic",
+   "n_actual": 13,
+   "n_A": 12,
+   "n_B1": 12,
+   "n_B2": 1,
+   "top5_actual": [
+    96,
+    115,
+    333,
+    179,
+    152
+   ],
+   "top5_A": [
+    115,
+    79,
+    179,
+    152,
+    77
+   ],
+   "top5_B2": [
+    333
+   ],
+   "exp_only_in_actual_top5": [
+    333
+   ],
+   "exp_share_top5": [
+    "96:84%",
+    "115:40%",
+    "333:100%",
+    "179:45%",
+    "152:44%"
+   ],
+   "live_ms": 1328,
+   "clone_ms": {
+    "actual_clone": 64,
+    "A_clone": 65,
+    "B_clone_total": 89
+   },
+   "judged_actual": {
+    "rel": 4,
+    "norel": 0,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 4,
+    "norel": 0,
+    "unk": 1
+   },
+   "judged_Btotal": {
+    "rel": 4,
+    "norel": 0,
+    "unk": 1
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L010",
+   "query": "fabricantes de balancines",
+   "phrases": 1,
+   "golden": "",
+   "intent": "manufacturing",
+   "n_actual": 1,
+   "n_A": 1,
+   "n_B1": 1,
+   "n_B2": 0,
+   "top5_actual": [
+    157
+   ],
+   "top5_A": [
+    157
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "157:56%"
+   ],
+   "live_ms": 1542,
+   "clone_ms": {
+    "actual_clone": 45,
+    "A_clone": 46,
+    "B_clone_total": 53
+   }
+  },
+  {
+   "id": "L013",
+   "query": "levantamiento artificial",
+   "phrases": 1,
+   "golden": "G1-02",
+   "intent": "generic",
+   "n_actual": 3,
+   "n_A": 2,
+   "n_B1": 2,
+   "n_B2": 1,
+   "top5_actual": [
+    276,
+    72,
+    383
+   ],
+   "top5_A": [
+    383,
+    72
+   ],
+   "top5_B2": [
+    276
+   ],
+   "exp_only_in_actual_top5": [
+    276
+   ],
+   "exp_share_top5": [
+    "276:100%",
+    "72:71%",
+    "383:49%"
+   ],
+   "live_ms": 1637,
+   "clone_ms": {
+    "actual_clone": 27,
+    "A_clone": 29,
+    "B_clone_total": 38
+   },
+   "judged_actual": {
+    "rel": 2,
+    "norel": 1,
+    "unk": 0
+   },
+   "judged_A": {
+    "rel": 1,
+    "norel": 1,
+    "unk": 0
+   },
+   "judged_Btotal": {
+    "rel": 1,
+    "norel": 1,
+    "unk": 0
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L014",
+   "query": "revestidor",
+   "phrases": 1,
+   "golden": "G1-03",
+   "intent": "generic",
+   "n_actual": 9,
+   "n_A": 8,
+   "n_B1": 8,
+   "n_B2": 1,
+   "top5_actual": [
+    157,
+    91,
+    312,
+    317,
+    145
+   ],
+   "top5_A": [
+    312,
+    317,
+    145,
+    86,
+    141
+   ],
+   "top5_B2": [
+    157
+   ],
+   "exp_only_in_actual_top5": [
+    157
+   ],
+   "exp_share_top5": [
+    "157:100%",
+    "91:42%",
+    "312:0%",
+    "317:0%",
+    "145:0%"
+   ],
+   "live_ms": 1078,
+   "clone_ms": {
+    "actual_clone": 23,
+    "A_clone": 24,
+    "B_clone_total": 34
+   },
+   "judged_actual": {
+    "rel": 1,
+    "norel": 4,
+    "unk": 0
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 3,
+    "unk": 2
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 3,
+    "unk": 2
+   },
+   "norel_removed_by_A": [
+    91
+   ]
+  },
+  {
+   "id": "L015",
+   "query": "mecha",
+   "phrases": 1,
+   "golden": "G1-04",
+   "intent": "generic",
+   "n_actual": 23,
+   "n_A": 23,
+   "n_B1": 23,
+   "n_B2": 0,
+   "top5_actual": [
+    140,
+    1,
+    73,
+    74,
+    75
+   ],
+   "top5_A": [
+    1,
+    73,
+    74,
+    75,
+    76
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "140:54%",
+    "1:0%",
+    "73:0%",
+    "74:0%",
+    "75:0%"
+   ],
+   "live_ms": 1312,
+   "clone_ms": {
+    "actual_clone": 38,
+    "A_clone": 39,
+    "B_clone_total": 49
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 4,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 3,
+    "unk": 2
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 3,
+    "unk": 2
+   },
+   "norel_removed_by_A": [
+    140
+   ]
+  },
+  {
+   "id": "L016",
+   "query": "cabria",
+   "phrases": 1,
+   "golden": "G2-01",
+   "intent": "generic",
+   "n_actual": 7,
+   "n_A": 7,
+   "n_B1": 7,
+   "n_B2": 0,
+   "top5_actual": [
+    86,
+    138,
+    157,
+    170,
+    179
+   ],
+   "top5_A": [
+    86,
+    138,
+    157,
+    170,
+    179
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "86:0%",
+    "138:0%",
+    "157:0%",
+    "170:0%",
+    "179:0%"
+   ],
+   "live_ms": 1457,
+   "clone_ms": {
+    "actual_clone": 29,
+    "A_clone": 30,
+    "B_clone_total": 40
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 4,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 4,
+    "unk": 1
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 4,
+    "unk": 1
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L017",
+   "query": "cabrias",
+   "phrases": 1,
+   "golden": "G2-02",
+   "intent": "generic",
+   "n_actual": 7,
+   "n_A": 7,
+   "n_B1": 7,
+   "n_B2": 0,
+   "top5_actual": [
+    86,
+    138,
+    157,
+    170,
+    179
+   ],
+   "top5_A": [
+    86,
+    138,
+    157,
+    170,
+    179
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "86:0%",
+    "138:0%",
+    "157:0%",
+    "170:0%",
+    "179:0%"
+   ],
+   "live_ms": 831,
+   "clone_ms": {
+    "actual_clone": 25,
+    "A_clone": 26,
+    "B_clone_total": 35
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 4,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 4,
+    "unk": 1
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 4,
+    "unk": 1
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L018",
+   "query": "mechurrio",
+   "phrases": 1,
+   "golden": "G2-03",
+   "intent": "generic",
+   "n_actual": 2,
+   "n_A": 0,
+   "n_B1": 0,
+   "n_B2": 2,
+   "top5_actual": [
+    140,
+    391
+   ],
+   "top5_A": [],
+   "top5_B2": [
+    140,
+    391
+   ],
+   "exp_only_in_actual_top5": [
+    140,
+    391
+   ],
+   "exp_share_top5": [
+    "140:100%",
+    "391:100%"
+   ],
+   "live_ms": 1301,
+   "clone_ms": {
+    "actual_clone": 21,
+    "A_clone": 22,
+    "B_clone_total": 31
+   },
+   "judged_actual": {
+    "rel": 1,
+    "norel": 1,
+    "unk": 0
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "norel_removed_by_A": [
+    391
+   ]
+  },
+  {
+   "id": "L019",
+   "query": "macolla",
+   "phrases": 1,
+   "golden": "G2-04",
+   "intent": "generic",
+   "n_actual": 13,
+   "n_A": 0,
+   "n_B1": 0,
+   "n_B2": 10,
+   "top5_actual": [
+    155,
+    171,
+    1,
+    72,
+    76
+   ],
+   "top5_A": [],
+   "top5_B2": [
+    155,
+    171,
+    1,
+    72,
+    76
+   ],
+   "exp_only_in_actual_top5": [
+    155,
+    171,
+    1,
+    72,
+    76
+   ],
+   "exp_share_top5": [
+    "155:100%",
+    "171:100%",
+    "1:100%",
+    "72:100%",
+    "76:100%"
+   ],
+   "live_ms": 929,
+   "clone_ms": {
+    "actual_clone": 18,
+    "A_clone": 19,
+    "B_clone_total": 28
+   },
+   "judged_actual": {
+    "rel": 4,
+    "norel": 1,
+    "unk": 0
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "norel_removed_by_A": [
+    72
+   ]
+  },
+  {
+   "id": "L020",
+   "query": "guaya fina",
+   "phrases": 1,
+   "golden": "G2-05",
+   "intent": "generic",
+   "n_actual": 3,
+   "n_A": 2,
+   "n_B1": 2,
+   "n_B2": 1,
+   "top5_actual": [
+    458,
+    182,
+    198
+   ],
+   "top5_A": [
+    458,
+    182
+   ],
+   "top5_B2": [
+    198
+   ],
+   "exp_only_in_actual_top5": [
+    198
+   ],
+   "exp_share_top5": [
+    "458:0%",
+    "182:0%",
+    "198:100%"
+   ],
+   "live_ms": 1449,
+   "clone_ms": {
+    "actual_clone": 23,
+    "A_clone": 24,
+    "B_clone_total": 33
+   },
+   "judged_actual": {
+    "rel": 2,
+    "norel": 1,
+    "unk": 0
+   },
+   "judged_A": {
+    "rel": 2,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_Btotal": {
+    "rel": 2,
+    "norel": 0,
+    "unk": 0
+   },
+   "norel_removed_by_A": [
+    198
+   ]
+  },
+  {
+   "id": "L021",
+   "query": "guaya electrica",
+   "phrases": 2,
+   "golden": "G2-06",
+   "intent": "generic",
+   "n_actual": 1,
+   "n_A": 0,
+   "n_B1": 0,
+   "n_B2": 1,
+   "top5_actual": [
+    79
+   ],
+   "top5_A": [],
+   "top5_B2": [
+    79
+   ],
+   "exp_only_in_actual_top5": [
+    79
+   ],
+   "exp_share_top5": [
+    "79:100%"
+   ],
+   "live_ms": 1182,
+   "clone_ms": {
+    "actual_clone": 44,
+    "A_clone": 46,
+    "B_clone_total": 64
+   },
+   "judged_actual": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L022",
+   "query": "balancin",
+   "phrases": 2,
+   "golden": "G2-07",
+   "intent": "generic",
+   "n_actual": 4,
+   "n_A": 1,
+   "n_B1": 1,
+   "n_B2": 3,
+   "top5_actual": [
+    157,
+    91,
+    333,
+    391
+   ],
+   "top5_A": [
+    157
+   ],
+   "top5_B2": [
+    91,
+    333,
+    391
+   ],
+   "exp_only_in_actual_top5": [
+    91,
+    333,
+    391
+   ],
+   "exp_share_top5": [
+    "157:50%",
+    "91:100%",
+    "333:100%",
+    "391:100%"
+   ],
+   "live_ms": 1553,
+   "clone_ms": {
+    "actual_clone": 34,
+    "A_clone": 37,
+    "B_clone_total": 54
+   },
+   "judged_actual": {
+    "rel": 1,
+    "norel": 3,
+    "unk": 0
+   },
+   "judged_A": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_Btotal": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 0
+   },
+   "norel_removed_by_A": [
+    91,
+    333,
+    391
+   ]
+  },
+  {
+   "id": "L023",
+   "query": "camion chupon",
+   "phrases": 2,
+   "golden": "G2-09",
+   "intent": "generic",
+   "n_actual": 1,
+   "n_A": 0,
+   "n_B1": 0,
+   "n_B2": 1,
+   "top5_actual": [
+    391
+   ],
+   "top5_A": [],
+   "top5_B2": [
+    391
+   ],
+   "exp_only_in_actual_top5": [
+    391
+   ],
+   "exp_share_top5": [
+    "391:100%"
+   ],
+   "live_ms": 1489,
+   "clone_ms": {
+    "actual_clone": 25,
+    "A_clone": 26,
+    "B_clone_total": 44
+   },
+   "judged_actual": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L024",
+   "query": "gandola",
+   "phrases": 2,
+   "golden": "G2-10",
+   "intent": "generic",
+   "n_actual": 7,
+   "n_A": 6,
+   "n_B1": 6,
+   "n_B2": 1,
+   "top5_actual": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "top5_A": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "top5_B2": [
+    433
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "165:0%",
+    "187:0%",
+    "204:0%",
+    "426:0%",
+    "452:0%"
+   ],
+   "live_ms": 1463,
+   "clone_ms": {
+    "actual_clone": 34,
+    "A_clone": 35,
+    "B_clone_total": 49
+   },
+   "judged_actual": {
+    "rel": 2,
+    "norel": 1,
+    "unk": 2
+   },
+   "judged_A": {
+    "rel": 2,
+    "norel": 1,
+    "unk": 2
+   },
+   "judged_Btotal": {
+    "rel": 2,
+    "norel": 1,
+    "unk": 2
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L025",
+   "query": "mantenimiento de cabrias",
+   "phrases": 1,
+   "golden": "G3-01",
+   "intent": "maintenance",
+   "n_actual": 9,
+   "n_A": 7,
+   "n_B1": 7,
+   "n_B2": 2,
+   "top5_actual": [
+    78,
+    107,
+    157,
+    86,
+    138
+   ],
+   "top5_A": [
+    86,
+    138,
+    157,
+    170,
+    179
+   ],
+   "top5_B2": [
+    107,
+    78
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "78:49%",
+    "107:50%",
+    "157:72%",
+    "86:0%",
+    "138:0%"
+   ],
+   "live_ms": 969,
+   "clone_ms": {
+    "actual_clone": 21,
+    "A_clone": 21,
+    "B_clone_total": 29
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "judged_A": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 4
+   },
+   "judged_Btotal": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 4
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L026",
+   "query": "fabricantes de cabrias",
+   "phrases": 1,
+   "golden": "G3-02",
+   "intent": "manufacturing",
+   "n_actual": 7,
+   "n_A": 7,
+   "n_B1": 7,
+   "n_B2": 0,
+   "top5_actual": [
+    157,
+    86,
+    138,
+    170,
+    179
+   ],
+   "top5_A": [
+    157,
+    86,
+    138,
+    170,
+    179
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "157:0%",
+    "86:0%",
+    "138:0%",
+    "170:0%",
+    "179:0%"
+   ],
+   "live_ms": 940,
+   "clone_ms": {
+    "actual_clone": 16,
+    "A_clone": 17,
+    "B_clone_total": 25
+   },
+   "judged_actual": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 4
+   },
+   "judged_A": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 4
+   },
+   "judged_Btotal": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 4
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L027",
+   "query": "transporte de gandolas",
+   "phrases": 1,
+   "golden": "G3-03",
+   "intent": "generic",
+   "n_actual": 6,
+   "n_A": 6,
+   "n_B1": 6,
+   "n_B2": 0,
+   "top5_actual": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "top5_A": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "165:0%",
+    "187:0%",
+    "204:0%",
+    "426:0%",
+    "452:0%"
+   ],
+   "live_ms": 1121,
+   "clone_ms": {
+    "actual_clone": 29,
+    "A_clone": 29,
+    "B_clone_total": 39
+   },
+   "judged_actual": {
+    "rel": 3,
+    "norel": 1,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 3,
+    "norel": 1,
+    "unk": 1
+   },
+   "judged_Btotal": {
+    "rel": 3,
+    "norel": 1,
+    "unk": 1
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L028",
+   "query": "alquiler de gandolas",
+   "phrases": 1,
+   "golden": "G3-04",
+   "intent": "rental",
+   "n_actual": 8,
+   "n_A": 8,
+   "n_B1": 8,
+   "n_B2": 0,
+   "top5_actual": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "top5_A": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "165:0%",
+    "187:0%",
+    "204:0%",
+    "426:0%",
+    "452:0%"
+   ],
+   "live_ms": 1276,
+   "clone_ms": {
+    "actual_clone": 25,
+    "A_clone": 25,
+    "B_clone_total": 34
+   },
+   "judged_actual": {
+    "rel": 3,
+    "norel": 1,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 3,
+    "norel": 1,
+    "unk": 1
+   },
+   "judged_Btotal": {
+    "rel": 3,
+    "norel": 1,
+    "unk": 1
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L029",
+   "query": "mantenimiento de levantamiento artificial",
+   "phrases": 1,
+   "golden": "G3-05",
+   "intent": "maintenance",
+   "n_actual": 4,
+   "n_A": 3,
+   "n_B1": 3,
+   "n_B2": 1,
+   "top5_actual": [
+    107,
+    78,
+    72,
+    122
+   ],
+   "top5_A": [
+    107,
+    122,
+    78
+   ],
+   "top5_B2": [
+    72
+   ],
+   "exp_only_in_actual_top5": [
+    72
+   ],
+   "exp_share_top5": [
+    "107:40%",
+    "78:50%",
+    "72:100%",
+    "122:0%"
+   ],
+   "live_ms": 965,
+   "clone_ms": {
+    "actual_clone": 30,
+    "A_clone": 31,
+    "B_clone_total": 39
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 3,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 2,
+    "unk": 1
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 2,
+    "unk": 1
+   },
+   "norel_removed_by_A": [
+    72
+   ]
+  },
+  {
+   "id": "L031",
+   "query": "servicios petroleros",
+   "phrases": 1,
+   "golden": "G4-03",
+   "intent": "generic",
+   "n_actual": 29,
+   "n_A": 14,
+   "n_B1": 14,
+   "n_B2": 10,
+   "top5_actual": [
+    96,
+    198,
+    85,
+    179,
+    157
+   ],
+   "top5_A": [
+    96,
+    179,
+    207,
+    276,
+    182
+   ],
+   "top5_B2": [
+    198,
+    85,
+    115,
+    178,
+    204
+   ],
+   "exp_only_in_actual_top5": [
+    198,
+    85
+   ],
+   "exp_share_top5": [
+    "96:54%",
+    "198:100%",
+    "85:100%",
+    "179:27%",
+    "157:31%"
+   ],
+   "live_ms": 1143,
+   "clone_ms": {
+    "actual_clone": 15,
+    "A_clone": 15,
+    "B_clone_total": 24
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L032",
+   "query": "construccion",
+   "phrases": 2,
+   "golden": "G4-04",
+   "intent": "generic",
+   "n_actual": 85,
+   "n_A": 85,
+   "n_B1": 85,
+   "n_B2": 2,
+   "top5_actual": [
+    74,
+    1,
+    140,
+    75,
+    115
+   ],
+   "top5_A": [
+    1,
+    74,
+    140,
+    75,
+    115
+   ],
+   "top5_B2": [
+    202,
+    333
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "74:27%",
+    "1:27%",
+    "140:10%",
+    "75:11%",
+    "115:11%"
+   ],
+   "live_ms": 1482,
+   "clone_ms": {
+    "actual_clone": 25,
+    "A_clone": 28,
+    "B_clone_total": 42
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L033",
+   "query": "tratamiento de aguas de perforacion",
+   "phrases": 2,
+   "golden": "G5-01",
+   "intent": "generic",
+   "n_actual": 10,
+   "n_A": 9,
+   "n_B1": 9,
+   "n_B2": 1,
+   "top5_actual": [
+    96,
+    179,
+    115,
+    333,
+    173
+   ],
+   "top5_A": [
+    179,
+    115,
+    96,
+    79,
+    173
+   ],
+   "top5_B2": [
+    333
+   ],
+   "exp_only_in_actual_top5": [
+    333
+   ],
+   "exp_share_top5": [
+    "96:70%",
+    "179:45%",
+    "115:45%",
+    "333:100%",
+    "173:50%"
+   ],
+   "live_ms": 1051,
+   "clone_ms": {
+    "actual_clone": 41,
+    "A_clone": 44,
+    "B_clone_total": 62
+   },
+   "judged_actual": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 4
+   },
+   "judged_A": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 4
+   },
+   "judged_Btotal": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 4
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L034",
+   "query": "fabriquen y mantengan balancines",
+   "phrases": 3,
+   "golden": "G5-02",
+   "intent": "generic",
+   "n_actual": 18,
+   "n_A": 12,
+   "n_B1": 12,
+   "n_B2": 4,
+   "top5_actual": [
+    157,
+    333,
+    107,
+    391,
+    138
+   ],
+   "top5_A": [
+    157,
+    107,
+    138,
+    74,
+    94
+   ],
+   "top5_B2": [
+    333,
+    391,
+    487,
+    83
+   ],
+   "exp_only_in_actual_top5": [
+    333,
+    391
+   ],
+   "exp_share_top5": [
+    "157:77%",
+    "333:100%",
+    "107:0%",
+    "391:100%",
+    "138:0%"
+   ],
+   "live_ms": 2692,
+   "clone_ms": {
+    "actual_clone": 41,
+    "A_clone": 44,
+    "B_clone_total": 77
+   },
+   "judged_actual": {
+    "rel": 1,
+    "norel": 3,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 1,
+    "norel": 1,
+    "unk": 3
+   },
+   "judged_Btotal": {
+    "rel": 1,
+    "norel": 1,
+    "unk": 3
+   },
+   "norel_removed_by_A": [
+    333,
+    391
+   ]
+  },
+  {
+   "id": "L035",
+   "query": "inspeccion y mantenimiento de guaya electrica",
+   "phrases": 2,
+   "golden": "G5-03",
+   "intent": "maintenance",
+   "n_actual": 5,
+   "n_A": 5,
+   "n_B1": 5,
+   "n_B2": 0,
+   "top5_actual": [
+    78,
+    74,
+    107,
+    193,
+    122
+   ],
+   "top5_A": [
+    107,
+    122,
+    78,
+    74,
+    193
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "78:50%",
+    "74:50%",
+    "107:0%",
+    "193:67%",
+    "122:0%"
+   ],
+   "live_ms": 1557,
+   "clone_ms": {
+    "actual_clone": 33,
+    "A_clone": 34,
+    "B_clone_total": 53
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L036",
+   "query": "transporte de crudo por gandola",
+   "phrases": 1,
+   "golden": "G5-04",
+   "intent": "generic",
+   "n_actual": 1,
+   "n_A": 1,
+   "n_B1": 1,
+   "n_B2": 0,
+   "top5_actual": [
+    185
+   ],
+   "top5_A": [
+    185
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "185:50%"
+   ],
+   "live_ms": 1122,
+   "clone_ms": {
+    "actual_clone": 18,
+    "A_clone": 19,
+    "B_clone_total": 31
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 1
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 1
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L037",
+   "query": "pipeline",
+   "phrases": 1,
+   "golden": "G6-01",
+   "intent": "generic",
+   "n_actual": 13,
+   "n_A": 13,
+   "n_B1": 13,
+   "n_B2": 1,
+   "top5_actual": [
+    157,
+    141,
+    151,
+    86,
+    80
+   ],
+   "top5_A": [
+    151,
+    141,
+    157,
+    80,
+    86
+   ],
+   "top5_B2": [
+    1
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "157:17%",
+    "141:0%",
+    "151:0%",
+    "86:0%",
+    "80:0%"
+   ],
+   "live_ms": 1119,
+   "clone_ms": {
+    "actual_clone": 23,
+    "A_clone": 24,
+    "B_clone_total": 35
+   },
+   "judged_actual": {
+    "rel": 1,
+    "norel": 1,
+    "unk": 3
+   },
+   "judged_A": {
+    "rel": 1,
+    "norel": 1,
+    "unk": 3
+   },
+   "judged_Btotal": {
+    "rel": 1,
+    "norel": 1,
+    "unk": 3
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L038",
+   "query": "refinery",
+   "phrases": 1,
+   "golden": "G6-02",
+   "intent": "generic",
+   "n_actual": 2,
+   "n_A": 2,
+   "n_B1": 2,
+   "n_B2": 0,
+   "top5_actual": [
+    157,
+    76
+   ],
+   "top5_A": [
+    157,
+    76
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "157:50%",
+    "76:67%"
+   ],
+   "live_ms": 1270,
+   "clone_ms": {
+    "actual_clone": 16,
+    "A_clone": 17,
+    "B_clone_total": 26
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 1,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 1,
+    "unk": 1
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 1,
+    "unk": 1
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L039",
+   "query": "refineria",
+   "phrases": 2,
+   "golden": "G6-03",
+   "intent": "generic",
+   "n_actual": 18,
+   "n_A": 2,
+   "n_B1": 2,
+   "n_B2": 10,
+   "top5_actual": [
+    76,
+    85,
+    83,
+    90,
+    523
+   ],
+   "top5_A": [
+    76,
+    157
+   ],
+   "top5_B2": [
+    85,
+    83,
+    90,
+    523,
+    140
+   ],
+   "exp_only_in_actual_top5": [
+    85,
+    83,
+    90,
+    523
+   ],
+   "exp_share_top5": [
+    "76:91%",
+    "85:100%",
+    "83:100%",
+    "90:100%",
+    "523:100%"
+   ],
+   "live_ms": 1327,
+   "clone_ms": {
+    "actual_clone": 26,
+    "A_clone": 27,
+    "B_clone_total": 49
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 5
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 2
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 2
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L040",
+   "query": "drilling",
+   "phrases": 1,
+   "golden": "G6-04",
+   "intent": "generic",
+   "n_actual": 24,
+   "n_A": 22,
+   "n_B1": 22,
+   "n_B2": 3,
+   "top5_actual": [
+    157,
+    96,
+    179,
+    86,
+    170
+   ],
+   "top5_A": [
+    86,
+    170,
+    138,
+    179,
+    182
+   ],
+   "top5_B2": [
+    193,
+    140,
+    229
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "157:37%",
+    "96:68%",
+    "179:14%",
+    "86:0%",
+    "170:0%"
+   ],
+   "live_ms": 1620,
+   "clone_ms": {
+    "actual_clone": 28,
+    "A_clone": 29,
+    "B_clone_total": 38
+   },
+   "judged_actual": {
+    "rel": 2,
+    "norel": 2,
+    "unk": 1
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 2,
+    "unk": 3
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 2,
+    "unk": 3
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L041",
+   "query": "arbolitos para pozos petroleros",
+   "phrases": 1,
+   "golden": "G7-02",
+   "intent": "generic",
+   "n_actual": 1,
+   "n_A": 1,
+   "n_B1": 1,
+   "n_B2": 0,
+   "top5_actual": [
+    179
+   ],
+   "top5_A": [
+    179
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "179:50%"
+   ],
+   "live_ms": 1047,
+   "clone_ms": {
+    "actual_clone": 18,
+    "A_clone": 19,
+    "B_clone_total": 29
+   },
+   "judged_actual": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_A": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_Btotal": {
+    "rel": 1,
+    "norel": 0,
+    "unk": 0
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L042",
+   "query": "venta de zapatos",
+   "phrases": 1,
+   "golden": "G7-03",
+   "intent": "supply",
+   "n_actual": 0,
+   "n_A": 0,
+   "n_B1": 0,
+   "n_B2": 0,
+   "top5_actual": [],
+   "top5_A": [],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [],
+   "live_ms": 1168,
+   "clone_ms": {
+    "actual_clone": 18,
+    "A_clone": 19,
+    "B_clone_total": 29
+   },
+   "judged_actual": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_A": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "judged_Btotal": {
+    "rel": 0,
+    "norel": 0,
+    "unk": 0
+   },
+   "norel_removed_by_A": []
+  },
+  {
+   "id": "L053",
+   "query": "gandolas",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 7,
+   "n_A": 6,
+   "n_B1": 6,
+   "n_B2": 1,
+   "top5_actual": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "top5_A": [
+    165,
+    187,
+    204,
+    426,
+    452
+   ],
+   "top5_B2": [
+    433
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "165:0%",
+    "187:0%",
+    "204:0%",
+    "426:0%",
+    "452:0%"
+   ],
+   "live_ms": 829,
+   "clone_ms": {
+    "actual_clone": 16,
+    "A_clone": 16,
+    "B_clone_total": 24
+   }
+  },
+  {
+   "id": "L054",
+   "query": "servicios de pozos",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 33,
+   "n_A": 34,
+   "n_B1": 34,
+   "n_B2": 3,
+   "top5_actual": [
+    152,
+    179,
+    133,
+    96,
+    79
+   ],
+   "top5_A": [
+    133,
+    528,
+    312,
+    96,
+    128
+   ],
+   "top5_B2": [
+    178,
+    79,
+    173
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "152:63%",
+    "179:59%",
+    "133:0%",
+    "96:33%",
+    "79:82%"
+   ],
+   "live_ms": 1316,
+   "clone_ms": {
+    "actual_clone": 13,
+    "A_clone": 14,
+    "B_clone_total": 23
+   }
+  },
+  {
+   "id": "L056",
+   "query": "servicios a pozos",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 49,
+   "n_A": 49,
+   "n_B1": 49,
+   "n_B2": 0,
+   "top5_actual": [
+    178,
+    79,
+    152,
+    179,
+    528
+   ],
+   "top5_A": [
+    528,
+    133,
+    371,
+    435,
+    386
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "178:35%",
+    "79:33%",
+    "152:39%",
+    "179:34%",
+    "528:0%"
+   ],
+   "live_ms": 1141,
+   "clone_ms": {
+    "actual_clone": 13,
+    "A_clone": 15,
+    "B_clone_total": 25
+   }
+  },
+  {
+   "id": "L058",
+   "query": "sistemas fotovoltaicos",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 3,
+   "n_A": 3,
+   "n_B1": 3,
+   "n_B2": 0,
+   "top5_actual": [
+    82,
+    126,
+    76
+   ],
+   "top5_A": [
+    82,
+    126,
+    76
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "82:50%",
+    "126:50%",
+    "76:66%"
+   ],
+   "live_ms": 963,
+   "clone_ms": {
+    "actual_clone": 18,
+    "A_clone": 19,
+    "B_clone_total": 27
+   }
+  },
+  {
+   "id": "L059",
+   "query": "expansores",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 21,
+   "n_A": 21,
+   "n_B1": 21,
+   "n_B2": 0,
+   "top5_actual": [
+    86,
+    81,
+    107,
+    91,
+    179
+   ],
+   "top5_A": [
+    81,
+    86,
+    91,
+    107,
+    179
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "86:0%",
+    "81:0%",
+    "107:0%",
+    "91:0%",
+    "179:0%"
+   ],
+   "live_ms": 1102,
+   "clone_ms": {
+    "actual_clone": 13,
+    "A_clone": 14,
+    "B_clone_total": 24
+   }
+  },
+  {
+   "id": "L060",
+   "query": "partes y repuestos de compresores",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 30,
+   "n_A": 29,
+   "n_B1": 29,
+   "n_B2": 1,
+   "top5_actual": [
+    112,
+    179,
+    78,
+    82,
+    107
+   ],
+   "top5_A": [
+    112,
+    82,
+    83,
+    92,
+    122
+   ],
+   "top5_B2": [
+    80
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "112:16%",
+    "179:40%",
+    "78:19%",
+    "82:0%",
+    "107:42%"
+   ],
+   "live_ms": 1227,
+   "clone_ms": {
+    "actual_clone": 14,
+    "A_clone": 16,
+    "B_clone_total": 26
+   }
+  },
+  {
+   "id": "L061",
+   "query": "ingenieria feed",
+   "phrases": 2,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 1,
+   "n_A": 1,
+   "n_B1": 1,
+   "n_B2": 0,
+   "top5_actual": [
+    76
+   ],
+   "top5_A": [
+    76
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "76:62%"
+   ],
+   "live_ms": 1317,
+   "clone_ms": {
+    "actual_clone": 24,
+    "A_clone": 26,
+    "B_clone_total": 45
+   }
+  },
+  {
+   "id": "L062",
+   "query": "ingenieria de procesos",
+   "phrases": 2,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 31,
+   "n_A": 26,
+   "n_B1": 26,
+   "n_B2": 5,
+   "top5_actual": [
+    90,
+    76,
+    433,
+    112,
+    107
+   ],
+   "top5_A": [
+    107,
+    94,
+    92,
+    480,
+    359
+   ],
+   "top5_B2": [
+    433,
+    90,
+    523,
+    487,
+    163
+   ],
+   "exp_only_in_actual_top5": [
+    433
+   ],
+   "exp_share_top5": [
+    "90:71%",
+    "76:40%",
+    "433:100%",
+    "112:41%",
+    "107:0%"
+   ],
+   "live_ms": 1538,
+   "clone_ms": {
+    "actual_clone": 21,
+    "A_clone": 23,
+    "B_clone_total": 42
+   }
+  },
+  {
+   "id": "L063",
+   "query": "ipc",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 23,
+   "n_A": 23,
+   "n_B1": 23,
+   "n_B2": 1,
+   "top5_actual": [
+    433,
+    76,
+    82,
+    229,
+    140
+   ],
+   "top5_A": [
+    354,
+    288,
+    526,
+    433,
+    90
+   ],
+   "top5_B2": [
+    171
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "433:30%",
+    "76:35%",
+    "82:35%",
+    "229:70%",
+    "140:72%"
+   ],
+   "live_ms": 790,
+   "clone_ms": {
+    "actual_clone": 12,
+    "A_clone": 13,
+    "B_clone_total": 23
+   }
+  },
+  {
+   "id": "L064",
+   "query": "mechas de perforacion",
+   "phrases": 2,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 4,
+   "n_A": 4,
+   "n_B1": 4,
+   "n_B2": 0,
+   "top5_actual": [
+    72,
+    138,
+    157,
+    170
+   ],
+   "top5_A": [
+    138,
+    157,
+    170,
+    72
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "72:51%",
+    "138:0%",
+    "157:0%",
+    "170:0%"
+   ],
+   "live_ms": 1395,
+   "clone_ms": {
+    "actual_clone": 26,
+    "A_clone": 28,
+    "B_clone_total": 49
+   }
+  },
+  {
+   "id": "L067",
+   "query": "mantenimiento de bombas",
+   "phrases": 1,
+   "golden": "",
+   "intent": "maintenance",
+   "n_actual": 20,
+   "n_A": 10,
+   "n_B1": 10,
+   "n_B2": 10,
+   "top5_actual": [
+    157,
+    333,
+    382,
+    480,
+    78
+   ],
+   "top5_A": [
+    73,
+    107,
+    94,
+    78,
+    75
+   ],
+   "top5_B2": [
+    157,
+    333,
+    382,
+    480,
+    391
+   ],
+   "exp_only_in_actual_top5": [
+    157,
+    333,
+    382,
+    480
+   ],
+   "exp_share_top5": [
+    "157:100%",
+    "333:100%",
+    "382:100%",
+    "480:100%",
+    "78:39%"
+   ],
+   "live_ms": 981,
+   "clone_ms": {
+    "actual_clone": 17,
+    "A_clone": 18,
+    "B_clone_total": 29
+   }
+  },
+  {
+   "id": "L068",
+   "query": "servicios de perforacion de pozos",
+   "phrases": 2,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 20,
+   "n_A": 16,
+   "n_B1": 16,
+   "n_B2": 4,
+   "top5_actual": [
+    152,
+    179,
+    77,
+    115,
+    133
+   ],
+   "top5_A": [
+    133,
+    152,
+    77,
+    179,
+    115
+   ],
+   "top5_B2": [
+    72,
+    85,
+    333,
+    536
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "152:55%",
+    "179:26%",
+    "77:24%",
+    "115:27%",
+    "133:0%"
+   ],
+   "live_ms": 1482,
+   "clone_ms": {
+    "actual_clone": 26,
+    "A_clone": 28,
+    "B_clone_total": 47
+   }
+  },
+  {
+   "id": "L069",
+   "query": "manejo de fluidos de perforacion",
+   "phrases": 2,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 12,
+   "n_A": 6,
+   "n_B1": 6,
+   "n_B2": 6,
+   "top5_actual": [
+    179,
+    96,
+    173,
+    391,
+    182
+   ],
+   "top5_A": [
+    179,
+    182,
+    96,
+    173,
+    391
+   ],
+   "top5_B2": [
+    91,
+    115,
+    157,
+    76,
+    77
+   ],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "179:25%",
+    "96:25%",
+    "173:29%",
+    "391:28%",
+    "182:0%"
+   ],
+   "live_ms": 1532,
+   "clone_ms": {
+    "actual_clone": 20,
+    "A_clone": 22,
+    "B_clone_total": 41
+   }
+  },
+  {
+   "id": "L070",
+   "query": "manejo de aguas residuales",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 9,
+   "n_A": 9,
+   "n_B1": 9,
+   "n_B2": 0,
+   "top5_actual": [
+    96,
+    72,
+    173,
+    391,
+    179
+   ],
+   "top5_A": [
+    72,
+    96,
+    331,
+    313,
+    179
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "96:41%",
+    "72:38%",
+    "173:51%",
+    "391:52%",
+    "179:50%"
+   ],
+   "live_ms": 1218,
+   "clone_ms": {
+    "actual_clone": 19,
+    "A_clone": 20,
+    "B_clone_total": 27
+   }
+  },
+  {
+   "id": "L071",
+   "query": "tuberia octg",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 0,
+   "n_A": 0,
+   "n_B1": 0,
+   "n_B2": 0,
+   "top5_actual": [],
+   "top5_A": [],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [],
+   "live_ms": 1013,
+   "clone_ms": {
+    "actual_clone": 13,
+    "A_clone": 13,
+    "B_clone_total": 22
+   }
+  },
+  {
+   "id": "L072",
+   "query": "valvulas de bola",
+   "phrases": 2,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 6,
+   "n_A": 1,
+   "n_B1": 1,
+   "n_B2": 5,
+   "top5_actual": [
+    80,
+    560,
+    487,
+    573,
+    107
+   ],
+   "top5_A": [
+    573
+   ],
+   "top5_B2": [
+    80,
+    560,
+    487,
+    107,
+    157
+   ],
+   "exp_only_in_actual_top5": [
+    560,
+    487
+   ],
+   "exp_share_top5": [
+    "80:91%",
+    "560:100%",
+    "487:100%",
+    "573:0%",
+    "107:66%"
+   ],
+   "live_ms": 1337,
+   "clone_ms": {
+    "actual_clone": 26,
+    "A_clone": 27,
+    "B_clone_total": 44
+   }
+  },
+  {
+   "id": "L073",
+   "query": "balacines",
+   "phrases": 2,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 4,
+   "n_A": 1,
+   "n_B1": 1,
+   "n_B2": 3,
+   "top5_actual": [
+    157,
+    91,
+    333,
+    391
+   ],
+   "top5_A": [
+    157
+   ],
+   "top5_B2": [
+    91,
+    333,
+    391
+   ],
+   "exp_only_in_actual_top5": [
+    91,
+    333,
+    391
+   ],
+   "exp_share_top5": [
+    "157:70%",
+    "91:100%",
+    "333:100%",
+    "391:100%"
+   ],
+   "live_ms": 1183,
+   "clone_ms": {
+    "actual_clone": 24,
+    "A_clone": 25,
+    "B_clone_total": 40
+   }
+  },
+  {
+   "id": "S001",
+   "query": "venta de balancines",
+   "phrases": 1,
+   "golden": "",
+   "intent": "supply",
+   "n_actual": 2,
+   "n_A": 1,
+   "n_B1": 1,
+   "n_B2": 1,
+   "top5_actual": [
+    157,
+    333
+   ],
+   "top5_A": [
+    157
+   ],
+   "top5_B2": [
+    333
+   ],
+   "exp_only_in_actual_top5": [
+    333
+   ],
+   "exp_share_top5": [
+    "157:29%",
+    "333:100%"
+   ],
+   "live_ms": 1159,
+   "clone_ms": {
+    "actual_clone": 16,
+    "A_clone": 16,
+    "B_clone_total": 26
+   }
+  },
+  {
+   "id": "S002",
+   "query": "mantenimiento de balancines",
+   "phrases": 1,
+   "golden": "",
+   "intent": "maintenance",
+   "n_actual": 12,
+   "n_A": 9,
+   "n_B1": 9,
+   "n_B2": 3,
+   "top5_actual": [
+    157,
+    333,
+    391,
+    74,
+    487
+   ],
+   "top5_A": [
+    157,
+    74,
+    107,
+    73,
+    94
+   ],
+   "top5_B2": [
+    333,
+    391,
+    487
+   ],
+   "exp_only_in_actual_top5": [
+    333,
+    391
+   ],
+   "exp_share_top5": [
+    "157:55%",
+    "333:100%",
+    "391:100%",
+    "74:0%",
+    "487:67%"
+   ],
+   "live_ms": 475,
+   "clone_ms": {
+    "actual_clone": 19,
+    "A_clone": 20,
+    "B_clone_total": 29
+   }
+  },
+  {
+   "id": "S003",
+   "query": "sellado de fluidos en balancines",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 2,
+   "n_A": 2,
+   "n_B1": 2,
+   "n_B2": 0,
+   "top5_actual": [
+    91,
+    487
+   ],
+   "top5_A": [
+    487,
+    91
+   ],
+   "top5_B2": [],
+   "exp_only_in_actual_top5": [],
+   "exp_share_top5": [
+    "91:72%",
+    "487:50%"
+   ],
+   "live_ms": 1090,
+   "clone_ms": {
+    "actual_clone": 16,
+    "A_clone": 17,
+    "B_clone_total": 25
+   }
+  },
+  {
+   "id": "S004",
+   "query": "limpieza de balancines",
+   "phrases": 1,
+   "golden": "",
+   "intent": "generic",
+   "n_actual": 3,
+   "n_A": 2,
+   "n_B1": 2,
+   "n_B2": 1,
+   "top5_actual": [
+    391,
+    523,
+    333
+   ],
+   "top5_A": [
+    391,
+    523
+   ],
+   "top5_B2": [
+    333
+   ],
+   "exp_only_in_actual_top5": [
+    333
+   ],
+   "exp_share_top5": [
+    "391:71%",
+    "523:50%",
+    "333:100%"
+   ],
+   "live_ms": 985,
+   "clone_ms": {
+    "actual_clone": 16,
+    "A_clone": 17,
+    "B_clone_total": 26
+   }
+  },
+  {
+   "id": "S005",
+   "query": "fabricacion de valvulas industriales",
+   "phrases": 2,
+   "golden": "",
+   "intent": "manufacturing",
+   "n_actual": 16,
+   "n_A": 5,
+   "n_B1": 5,
+   "n_B2": 10,
+   "top5_actual": [
+    560,
+    487,
+    480,
+    75,
+    563
+   ],
+   "top5_A": [
+    560,
+    100,
+    187,
+    138,
+    141
+   ],
+   "top5_B2": [
+    487,
+    480,
+    333,
+    75,
+    391
+   ],
+   "exp_only_in_actual_top5": [
+    487,
+    480
+   ],
+   "exp_share_top5": [
+    "560:40%",
+    "487:100%",
+    "480:100%",
+    "75:75%",
+    "563:48%"
+   ],
+   "live_ms": 1551,
+   "clone_ms": {
+    "actual_clone": 25,
+    "A_clone": 27,
+    "B_clone_total": 46
+   }
+  },
+  {
+   "id": "S006",
+   "query": "mantenimiento de valvulas industriales",
+   "phrases": 2,
+   "golden": "",
+   "intent": "maintenance",
+   "n_actual": 13,
+   "n_A": 6,
+   "n_B1": 6,
+   "n_B2": 7,
+   "top5_actual": [
+    560,
+    107,
+    333,
+    480,
+    391
+   ],
+   "top5_A": [
+    122,
+    107,
+    194,
+    75,
+    78
+   ],
+   "top5_B2": [
+    560,
+    333,
+    480,
+    391,
+    487
+   ],
+   "exp_only_in_actual_top5": [
+    560,
+    333,
+    480,
+    391
+   ],
+   "exp_share_top5": [
+    "560:100%",
+    "107:40%",
+    "333:100%",
+    "480:100%",
+    "391:100%"
+   ],
+   "live_ms": 1420,
+   "clone_ms": {
+    "actual_clone": 26,
+    "A_clone": 27,
+    "B_clone_total": 43
+   }
+  }
+ ]
+}
