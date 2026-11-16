@@ -1,4 +1,67 @@
 {
+  "task_0030_cira_t29_uat_corrections": {
+    "task_id": "TASK-0030",
+    "title": "CIRA: TASK-0029 UAT corrections (mutually exclusive views; measured latency diagnosis), staging only",
+    "source": "Issue #2 comment 6919847012 (owner CORRECTIONS_REQUIRED, 2026-11-16T14:52:14Z)",
+    "predecessor": "TASK-0029 (delivery 6915259431, handoff ac93eb6), not approved for production",
+    "status": "DEPLOYED_FOR_OWNER_UAT",
+    "code_deployed": true,
+    "migration_executed": false,
+    "review_base_sha": "ac93eb6",
+    "materialization_commit_sha": "3b4ccba",
+    "tested_head_sha": "5f89385b809ae73c21882deb4377a11d06454a03 (n8n code under docs/cira/task0030/n8n)",
+    "review_head_sha": "5f89385b809ae73c21882deb4377a11d06454a03",
+    "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block",
+    "deploy": {
+      "n8n": {
+        "workflow": "zbVLoCdR09IA9yQK",
+        "before": "d2f8efb5-f3ac-417c-ab3d-df2d4ee12465",
+        "after": "7feb48bc-218d-4c4e-af19-8a471b7512bc",
+        "at": "2026-11-16T15:01:54Z",
+        "nodes_changed": [
+          "Format Cards2",
+          "Build Search Log (revision only)"
+        ],
+        "connections_changed": false
+      },
+      "worker": "8796f292 unchanged",
+      "laravel": "5e6e3fc unchanged"
+    },
+    "latency": {
+      "method": "n8n per-node executionTime (63 executions), direct Worker cold/warm, debug-search, browser E2E",
+      "medians_ms": {
+        "before_T29": {
+          "total": 13559,
+          "agent": 8622,
+          "worker": 3069
+        },
+        "T29": {
+          "total": 12125,
+          "agent": 7873,
+          "worker": 3094
+        },
+        "T30": {
+          "total": 11974,
+          "agent": 7693,
+          "worker": 2557
+        }
+      },
+      "bottleneck": "n8n agent (gpt-6-luna + MCP resolve_search_intent) 64-65 %",
+      "optimizations_deployed": "none (main lever out of scope: model/prompt; Worker structuredList parallel ~0.3 s left as option)"
+    },
+    "tests": {
+      "preview_views": "PASS desktop+Pixel5 (exclusive panels, aria-pressed, keyboard, empty states, no auto-switch)",
+      "isolated_copy": "0XoZhWg5oG9hwm3u PASS; rollback rehearsed T30->T29->T30; deleted",
+      "battery_55": "B identical to TASK-0029 55/55; default 55/55",
+      "e2e_staging": "PASS desktop+Pixel5; logs 88-98, vote 36, evaluations 0"
+    },
+    "rollback": {
+      "n8n": "PUT backup zbVLoCdR09IA9yQK_2026-11-16_pre-t30_live.json (d2f8efb5), outside repo; PUT publishes"
+    },
+    "report": "audit/CIRA_TASK0030_CORRECCIONES_UAT.md",
+    "evidence": "docs/cira/task0030/",
+    "next": "STOP. Owner manual review. No production."
+  },
   "task_0029_cira_alternative_b_staging": {
     "task_id": "TASK-0029",
     "title": "CIRA: implement alternative B (capabilities / experiences groups) and deploy to staging for owner UAT",
