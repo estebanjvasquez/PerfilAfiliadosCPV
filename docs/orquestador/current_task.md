@@ -25,6 +25,17 @@ No cambia la tarea activa ni el propósito de ninguna tarea, y no asigna impleme
 ningún estado de abajo pasa por eso a APPROVED, DEPLOYED o CLOSED. El bloque de TASK-0013 de abajo es del 2026-11-06: los
 pasos 2 a 4 cambiaron después el ranking y están en vivo (`tasks/0013`).
 
+## 2026-11-17 11:00Z: **TASK-0033** — Preparación pre-UAT institucional de CPV (solo análisis, pruebas aisladas y documentación) — **IN_PROGRESS** (fuente `6945631895`)
+
+| Campo | Valor |
+|---|---|
+| Archivo | [`tasks/0033-pre-uat-institutional-readiness.md`](tasks/0033-pre-uat-institutional-readiness.md) |
+| Autoriza | Lectura de código y documentos, SELECT de solo lectura, inspección de logs y configuración sin secretos, análisis, pruebas aisladas inocuas y documentación versionada |
+| No autoriza | Deploy en staging o producción, `main`, edición de n8n o Worker, prompt/modelo, W1, DDL, escrituras en BD, taxonomía, roles, empresas, credenciales, caché, kiosco, tráfico de producción, loops |
+| BASE | `2cdb53d` |
+| Entregables | E1–E6 enlazados desde un índice pre-UAT |
+| Antecedente | TASK-0032: aceptación funcional del propietario en staging con reserva de rendimiento y de relevancia (`6945403230`); no se reabre |
+
 ## 2026-11-16 17:55Z: **TASK-0032** — CIRA: V1b en staging (fase A) e incidencia de detalle de la empresa 177 (fase B); W1 no autorizado — fase A **PHASE_A_DEPLOYED_FOR_REVIEW** (~18:45Z, n8n `c6c70402`, `6925761178`); fase B **PHASE_B_DEPLOYED_FOR_REVIEW** (~19:20Z, Worker `8ce4e0ff`, n8n `2d0a1ee8`); W1 no autorizado (fuente `6924316065` + adenda `6924366566`)
 
 | Campo | Valor |
