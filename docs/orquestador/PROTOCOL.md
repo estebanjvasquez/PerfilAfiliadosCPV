@@ -3,7 +3,16 @@
 **Efectivo desde:** 2026-09-28
 **Reemplaza:** la conversación de Claude Code como fuente de tareas. GitHub es la fuente de verdad.
 
+## Nota operativa vigente — 2026-11-17
+
+Las descripciones de acceso solo-lectura y traslado manual en §0 son **antecedentes históricos**, no un mandato vigente. La capacidad de escritura se verifica en cada sesión: cuando la conexión y la autorización lo permitan, el orquestador **debe publicar directamente** en Issue #2 las instrucciones, revisiones, correcciones y decisiones dirigidas al desarrollador, comprobar la respuesta de GitHub y entregar el enlace al propietario. Si falla, informar el error y preparar un respaldo manual; no afirmar entrega sin confirmación.
+
+El arranque es acotado: `AGENTS.md`/`CLAUDE.md` → `SESSION_RESUME.md` → estado vivo de rama/HEAD/tarea → `PROTOCOL.md`/`current_task.md` según necesidad → **solo el comentario asignado** y referencias directas. No leer todo el hilo ni recorrer referencias recursivamente. Los SHAs del checkpoint son históricos hasta su verificación.
+
+**Separación de responsabilidades:** el propietario autoriza; el orquestador coordina y revisa; el desarrollador implementa y documenta; GitHub persiste. Una recomendación no crea tarea. `READY_FOR_REVIEW` exige revisión independiente y veredicto o limitación documentada; no autoriza una tarea siguiente, excepto fases expresamente asignadas con gates. No hay autorización implícita para producción, merges, taxonomía, permisos, credenciales ni operaciones destructivas. El protocolo autónomo/loops permanece suspendido salvo autorización específica. El comentario publicado no prueba que el desarrollador lo haya leído o ejecutado.
+
 ---
+
 
 ## 0. Por qué existe este archivo
 
