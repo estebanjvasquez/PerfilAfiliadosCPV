@@ -21,3 +21,7 @@ Estos archivos de arranque viven en la rama de la tarea en curso (y en `docs/ses
 - descubrir el entorno más allá de lo que la tarea necesite.
 
 El protocolo autónomo está suspendido. El repo es **público**: aquí no se escribe ningún secreto.
+
+## Canal de coordinación
+
+Aplicar también `AGENTS.md` (sección «Coordinación y comunicación») y `docs/orquestador/PROTOCOL.md`. Toda asignación autorizada, entrega, revisión, corrección o decisión dirigida al desarrollador se registra preferentemente en [Issue #2](https://github.com/estebanjvasquez/PerfilAfiliadosCPV/issues/2), con confirmación del enlace. No pedir al propietario que traslade mensajes si el orquestador puede publicarlos. Ninguna publicación equivale a ejecución ni habilita por sí sola una tarea posterior. Mantener el arranque acotado y los gates existentes.
