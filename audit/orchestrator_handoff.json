@@ -1,4 +1,56 @@
 {
+  "task_0033_pre_uat_institutional_readiness": {
+      "task_id": "TASK-0033",
+      "title": "Pre-UAT institutional readiness of CPV: analysis, isolated read-only checks and documentation (six deliverables E1-E6)",
+      "source": "Issue #2 comment 6945631895 (owner, 2026-11-17T10:37:07Z); direct reference 6945403230 (owner UAT of TASK-0032 phases A/B, functional acceptance in staging with performance and relevance reservations)",
+      "predecessors": "TASK-0032 keeps its owner functional acceptance with reservations (6945403230) and is not reopened; TASK-0030 partial UX acceptance only; PENDIENTES_CONSOLIDADO_2026-11-11 treated as historical cut",
+      "later_comment_not_applied": "6945848443 (protocol documentation proposal on branch docs/orchestrator-communication-protocol-20261117 @ b3e6dfb): not STOP/HOLD, not integrated, no branch switch",
+      "status": "READY_FOR_REVIEW - SIN DEPLOY",
+      "code_deployed": false,
+      "migration_executed": false,
+      "review_base_sha": "2cdb53dd199b0c2e3a783754b46a54da4f56668b",
+      "materialization_commit_sha": "539cdf0",
+      "review_head_sha": "164d8c4f40fa8da02d8073a7ad61d6a3adc5874e",
+      "handoff_commit_sha": "the commit on fix/sec-01-r4-01-role-editor-preserve that adds this block",
+      "deliverables": {
+        "index": "docs/preuat/00_INDICE.md",
+        "E1": "docs/preuat/E1_INVENTARIO_PENDIENTES.md",
+        "E2": "docs/preuat/E2_MATRIZ_SEGURIDAD_PREPRODUCCION.md",
+        "E3": "docs/preuat/E3_PAQUETE_UAT_INSTITUCIONAL.md + docs/preuat/formatos/E3_hoja_de_resultados.csv",
+        "E4": "docs/preuat/E4_DIAGNOSTICO_LATENCIA_CIRA.md (scripts docs/cira/task0033/latencia, results docs/cira/task0033/resultados)",
+        "E5": "docs/preuat/E5_DECISIONES_DE_LA_CAMARA.md + docs/preuat/formatos/E5_*.csv (ids only; named versions only in gitignored docs/uat/privado/2026-11-17_preuat/)",
+        "E6": "docs/preuat/E6_INFORME_EJECUTIVO_Y_PLAN.md",
+        "audit_summary": "audit/TASK0033_PRE_UAT_INSTITUCIONAL.md"
+      },
+      "live_state_verified_2026_11_17": {
+        "staging_head": "5e6e3fc0288c02798f355b25aa6a85288ddcdfdb (= origin/feature/upgrade-filament-v3), 0 tracked changes, migrations 135, last batch 64",
+        "main_head": "73853cd (2026-09-09), nothing from TASK-0011..0033 merged",
+        "n8n": "zbVLoCdR09IA9yQK versionId 2d0a1ee8-5a7f-4c7a-bcfd-8404b3e04fbb active",
+        "worker": "8ce4e0ff-c7fd-4c7f-b566-0bdea179dd2e at 100%; deployed code 4599217 only on branch fix/t32-get-empresa-id, NOT in worker master (29de993, never deployed)",
+        "hyperdrive": "caching enabled, origin_connection_limit 8",
+        "laravel_config": "staging, debug false, mail smtp, MCP_EMBED_URL/TOKEN empty (semantic search off), Turnstile configured"
+      },
+      "key_findings": {
+        "latency": "browser = n8n + 0.48-0.85 s; owner UAT 2026-11-17 n8n p50 9.97 s (model 4.19 s, Worker 3.83 s uncached DB queries, log 0.56 s); Hyperdrive ~60 s cache speeds up only repeats and biased T31/T32 benchmarks; prompt stable ~4950 tokens (memory hypothesis rejected); card detail still calls the model",
+        "relevance_ioed_geohidra": "execution 23163: name query routed as service search; 177 literal name match, 72 semantic match offshore~costa afuera; both have 1 related experience so they appear in both views; not a confirmed defect, Camara decision",
+        "security": "no technical blocker for institutional UAT (conditions C1-C5); 13/13 views security_invoker, anon denied; RLS 92/92 tables, 0 policies; delete_user only super_admin; *_shield::role 0 links; contact_empresa orphans 2; /pdf /xls unauth cf-cache-status DYNAMIC; HSTS 86400; hardening headers absent (OBS-T33-01); 24 h monitoring readings of TASK-0026/0027 not recorded (OBS-T33-02), snapshot today PASS",
+        "data_for_camara": "191 active companies without main sector (103 only with X); X 249 links / 235 companies, high priority 119 / 109; Camara itself is active company 451; 3 category requests pending_review (request 1 mail failed); balancin aliases absent",
+        "go_no_go_institutional_uat": "NO-GO on 2026-11-17 pending G4-G9 (owner preparations and decisions; no technical work)"
+      },
+      "tests_and_queries": [
+        "SQL read-only probes in READ ONLY transactions with rollback (docs/cira/task0033/bd/*.php) via SSH docker exec",
+        "monitor_check.sh (cira-t27 backup) once; git rev-parse/status on server",
+        "n8n API GET: workflow + 22 executions with data, 14 token reads, 1 group read",
+        "wrangler deployments status; wrangler hyperdrive get",
+        "Worker live read-only: 51 calls (/mcp tools/list + tools/call, /debug-search) 10:59-11:12Z",
+        "7 unauthenticated HTTP GETs to staging"
+      ],
+      "db_mutations": "none; before/after 11:01Z vs 11:20Z identical: cira_search_log 142 (max id 148), feedback 13, cira_evaluations 0, empresas 406, chamber_empresa 173, migrations 135; last n8n execution 23163 unchanged",
+      "incidents": "one read-only probe query referenced a non-existent column (cira_eval_invitations.status): no data write, but 1 ERROR line added to staging laravel.log at 2026-11-17 11:12:05Z; one taxonomy_terms query failed on column name and was rerun",
+      "blocked": "credential rotation (not authorized); authenticated download cache check (needs test account + assignment); larger real latency sample (would write cira_search_log or require n8n copy)",
+      "not_done_by_design": "no deploy, no n8n/Worker/prompt/model change, no W1, no DDL, no DB writes, no taxonomy/roles/companies/credentials/cache/kiosk changes, no production traffic, no merge to main, no loops",
+      "next": "STOP until owner/orchestrator review"
+    },
   "task_0032_cira_v1b_and_company_detail": {
     "task_id": "TASK-0032",
     "title": "CIRA: V1b to staging (phase A); company-detail incident for empresa 177 (phase B); W1 not authorized (phase C)",
