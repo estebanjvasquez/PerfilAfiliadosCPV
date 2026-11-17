@@ -1,0 +1,3691 @@
+{
+ "generado": "2026-11-17T11:06:48+00:00",
+ "transaccion_read_only": "on",
+ "sectores": [
+  {
+   "id": 1,
+   "name": "INGENIERÍA Y SERVICIOS INTEGRADOS"
+  },
+  {
+   "id": 2,
+   "name": "SERVICIOS TECNOLÓGICOS"
+  },
+  {
+   "id": 3,
+   "name": "SERVICIOS ASOCIADOS"
+  },
+  {
+   "id": 4,
+   "name": "SERVICIOS A POZOS"
+  },
+  {
+   "id": 5,
+   "name": "OPERADORES"
+  },
+  {
+   "id": 6,
+   "name": "FABRICANTES"
+  },
+  {
+   "id": 8,
+   "name": "SUPLIDORES"
+  },
+  {
+   "id": 9,
+   "name": "CONSTRUCCIÓN"
+  }
+ ],
+ "servicios_x": [
+  {
+   "id": 105,
+   "sectors_id": 9
+  },
+  {
+   "id": 106,
+   "sectors_id": 6
+  },
+  {
+   "id": 107,
+   "sectors_id": 1
+  },
+  {
+   "id": 108,
+   "sectors_id": 5
+  },
+  {
+   "id": 109,
+   "sectors_id": 4
+  },
+  {
+   "id": 110,
+   "sectors_id": 3
+  },
+  {
+   "id": 111,
+   "sectors_id": 2
+  },
+  {
+   "id": 112,
+   "sectors_id": 8
+  }
+ ],
+ "empresas_sin_sector_principal": [
+  {
+   "id": 73,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,2,3,9",
+   "servicios_no_x": 14,
+   "servicios_x": 0
+  },
+  {
+   "id": 75,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,9",
+   "servicios_no_x": 18,
+   "servicios_x": 0
+  },
+  {
+   "id": 76,
+   "sector_secundario_id": 1,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 6,
+   "servicios_x": 0
+  },
+  {
+   "id": 77,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 78,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,6,8,9",
+   "servicios_no_x": 7,
+   "servicios_x": 0
+  },
+  {
+   "id": 81,
+   "sector_secundario_id": 8,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 3,
+   "servicios_x": 0
+  },
+  {
+   "id": 82,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,8,9",
+   "servicios_no_x": 10,
+   "servicios_x": 0
+  },
+  {
+   "id": 83,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2,6,8,9",
+   "servicios_no_x": 4,
+   "servicios_x": 0
+  },
+  {
+   "id": 85,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6,9",
+   "servicios_no_x": 3,
+   "servicios_x": 0
+  },
+  {
+   "id": 86,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 6,
+   "servicios_x": 0
+  },
+  {
+   "id": 88,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,8",
+   "servicios_no_x": 6,
+   "servicios_x": 0
+  },
+  {
+   "id": 90,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 5,
+   "servicios_x": 0
+  },
+  {
+   "id": 92,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,3,4,8,9",
+   "servicios_no_x": 19,
+   "servicios_x": 0
+  },
+  {
+   "id": 95,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 96,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2,3,4,8",
+   "servicios_no_x": 6,
+   "servicios_x": 0
+  },
+  {
+   "id": 100,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6,8",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 103,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 110,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,3,4,8",
+   "servicios_no_x": 6,
+   "servicios_x": 0
+  },
+  {
+   "id": 111,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 112,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,8",
+   "servicios_no_x": 7,
+   "servicios_x": 0
+  },
+  {
+   "id": 115,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,4,8,9",
+   "servicios_no_x": 13,
+   "servicios_x": 0
+  },
+  {
+   "id": 119,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 120,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 122,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,8,9",
+   "servicios_no_x": 20,
+   "servicios_x": 2
+  },
+  {
+   "id": 125,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6,8",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 126,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6,9",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 128,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,2,3,4",
+   "servicios_no_x": 0,
+   "servicios_x": 4
+  },
+  {
+   "id": 131,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 133,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 137,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,8,9",
+   "servicios_no_x": 9,
+   "servicios_x": 0
+  },
+  {
+   "id": 141,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6,8,9",
+   "servicios_no_x": 27,
+   "servicios_x": 0
+  },
+  {
+   "id": 150,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 152,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,4",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 153,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3,6",
+   "servicios_no_x": 4,
+   "servicios_x": 0
+  },
+  {
+   "id": 155,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 8,
+   "servicios_x": 0
+  },
+  {
+   "id": 157,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4,6,8,9",
+   "servicios_no_x": 8,
+   "servicios_x": 0
+  },
+  {
+   "id": 159,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 164,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 165,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 166,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,8",
+   "servicios_no_x": 4,
+   "servicios_x": 0
+  },
+  {
+   "id": 167,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 170,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,3,4,6",
+   "servicios_no_x": 4,
+   "servicios_x": 0
+  },
+  {
+   "id": 171,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 173,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 175,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 177,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,3,5,8",
+   "servicios_no_x": 6,
+   "servicios_x": 0
+  },
+  {
+   "id": 179,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4,8",
+   "servicios_no_x": 8,
+   "servicios_x": 0
+  },
+  {
+   "id": 180,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 182,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4,8",
+   "servicios_no_x": 9,
+   "servicios_x": 0
+  },
+  {
+   "id": 186,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 187,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,2,3,6",
+   "servicios_no_x": 12,
+   "servicios_x": 0
+  },
+  {
+   "id": 189,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 191,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 193,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 4,
+   "servicios_x": 0
+  },
+  {
+   "id": 194,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6,8",
+   "servicios_no_x": 6,
+   "servicios_x": 0
+  },
+  {
+   "id": 197,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 201,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 202,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 207,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3,4,6,8",
+   "servicios_no_x": 9,
+   "servicios_x": 0
+  },
+  {
+   "id": 208,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,9",
+   "servicios_no_x": 10,
+   "servicios_x": 0
+  },
+  {
+   "id": 209,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 210,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6,8",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 213,
+   "sector_secundario_id": 6,
+   "sectores_por_servicio": "1,6,8",
+   "servicios_no_x": 3,
+   "servicios_x": 0
+  },
+  {
+   "id": 215,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 219,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 233,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 235,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 239,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 247,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 248,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 260,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 262,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 264,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 265,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 1
+  },
+  {
+   "id": 268,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 269,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 270,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 273,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 275,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 276,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3,4,6",
+   "servicios_no_x": 2,
+   "servicios_x": 1
+  },
+  {
+   "id": 277,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 279,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 285,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 286,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 287,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 293,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 296,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 298,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 299,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 300,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3,8",
+   "servicios_no_x": 4,
+   "servicios_x": 1
+  },
+  {
+   "id": 303,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 304,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 305,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6,9",
+   "servicios_no_x": 15,
+   "servicios_x": 0
+  },
+  {
+   "id": 307,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 312,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3,4,8",
+   "servicios_no_x": 8,
+   "servicios_x": 0
+  },
+  {
+   "id": 313,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,2,4,8",
+   "servicios_no_x": 7,
+   "servicios_x": 1
+  },
+  {
+   "id": 315,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 316,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 317,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,3,8",
+   "servicios_no_x": 7,
+   "servicios_x": 1
+  },
+  {
+   "id": 318,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 319,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 320,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 321,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 322,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 323,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 324,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 325,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "5",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 326,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3,5",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 328,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 329,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 331,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,2,3,9",
+   "servicios_no_x": 16,
+   "servicios_x": 0
+  },
+  {
+   "id": 332,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3,8",
+   "servicios_no_x": 3,
+   "servicios_x": 1
+  },
+  {
+   "id": 344,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 350,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 354,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 355,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,4,8",
+   "servicios_no_x": 2,
+   "servicios_x": 1
+  },
+  {
+   "id": 356,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2,8",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 360,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 361,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3,8",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 364,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 365,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 366,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 370,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 374,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 376,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 377,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 382,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 383,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2,3,4",
+   "servicios_no_x": 6,
+   "servicios_x": 0
+  },
+  {
+   "id": 388,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 389,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 391,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3,4,8,9",
+   "servicios_no_x": 11,
+   "servicios_x": 0
+  },
+  {
+   "id": 393,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 394,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 395,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 396,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 400,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 401,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "6,8",
+   "servicios_no_x": 2,
+   "servicios_x": 0
+  },
+  {
+   "id": 403,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 404,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 405,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 406,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 407,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,8",
+   "servicios_no_x": 3,
+   "servicios_x": 0
+  },
+  {
+   "id": 409,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 410,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 411,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 413,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 414,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 419,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 422,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 423,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 425,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,8,9",
+   "servicios_no_x": 8,
+   "servicios_x": 0
+  },
+  {
+   "id": 426,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 428,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3,8",
+   "servicios_no_x": 5,
+   "servicios_x": 0
+  },
+  {
+   "id": 429,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 430,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 439,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "2",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 440,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 441,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 442,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 443,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 444,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 445,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 446,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,9",
+   "servicios_no_x": 1,
+   "servicios_x": 1
+  },
+  {
+   "id": 447,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 450,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 451,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,2,3,4,5,6,8,9",
+   "servicios_no_x": 0,
+   "servicios_x": 8
+  },
+  {
+   "id": 453,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 455,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 458,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4,6,8",
+   "servicios_no_x": 4,
+   "servicios_x": 0
+  },
+  {
+   "id": 462,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 463,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 467,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 4,
+   "servicios_x": 0
+  },
+  {
+   "id": 473,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 476,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 477,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 478,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "8",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 479,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 1,
+   "servicios_x": 0
+  },
+  {
+   "id": 480,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,6,8",
+   "servicios_no_x": 3,
+   "servicios_x": 0
+  },
+  {
+   "id": 481,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 482,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 483,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,4,8",
+   "servicios_no_x": 4,
+   "servicios_x": 0
+  },
+  {
+   "id": 484,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 487,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,2,3,4,5,8,9",
+   "servicios_no_x": 25,
+   "servicios_x": 0
+  },
+  {
+   "id": 489,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "9",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 490,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 491,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 492,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "4",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 493,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "3",
+   "servicios_no_x": 0,
+   "servicios_x": 1
+  },
+  {
+   "id": 494,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,2,4,5,6,8",
+   "servicios_no_x": 5,
+   "servicios_x": 1
+  },
+  {
+   "id": 496,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,9",
+   "servicios_no_x": 3,
+   "servicios_x": 0
+  },
+  {
+   "id": 525,
+   "sector_secundario_id": null,
+   "sectores_por_servicio": "1,8,9",
+   "servicios_no_x": 4,
+   "servicios_x": 0
+  }
+ ],
+ "vinculos_x": [
+  {
+   "empresa_id": 101,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 111,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 116,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 119,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 122,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": true,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "baja"
+  },
+  {
+   "empresa_id": 122,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": true,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "baja"
+  },
+  {
+   "empresa_id": 128,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 128,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 128,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 128,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 130,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 131,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 139,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 139,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 150,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 156,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 159,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 161,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 167,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 169,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": 8,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 171,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 174,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 180,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 183,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 183,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 186,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 191,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 192,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 196,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 197,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 198,
+   "sector_id": 4,
+   "sector_principal_id": 4,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 201,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 202,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 206,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 209,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 211,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 215,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 216,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 217,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 219,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 223,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 226,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 227,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 228,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 235,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 239,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 243,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 244,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": 8,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 246,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 247,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 248,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 253,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 254,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 255,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 256,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 257,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 258,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 259,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 260,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 262,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 264,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 265,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": true,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "baja"
+  },
+  {
+   "empresa_id": 268,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 269,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 270,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 273,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 275,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 276,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 277,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 279,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 282,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": true,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "baja"
+  },
+  {
+   "empresa_id": 285,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 286,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 287,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 288,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": 1,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 290,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 292,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 293,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 296,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 298,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 299,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 300,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": true,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "baja"
+  },
+  {
+   "empresa_id": 303,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 304,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 307,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 308,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 309,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 310,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 313,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 314,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 315,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 316,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 317,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": true,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "baja"
+  },
+  {
+   "empresa_id": 318,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 319,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 320,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 321,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 322,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 323,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 324,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 325,
+   "sector_id": 5,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 328,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 329,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 332,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 333,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 335,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 336,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 336,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 339,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 342,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 344,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 350,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 355,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 357,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 360,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 362,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 363,
+   "sector_id": 8,
+   "sector_principal_id": 6,
+   "sector_secundario_id": 8,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 364,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 365,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 366,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 367,
+   "sector_id": 5,
+   "sector_principal_id": 5,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 370,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 371,
+   "sector_id": 4,
+   "sector_principal_id": 4,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 372,
+   "sector_id": 4,
+   "sector_principal_id": 4,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 373,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 374,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 375,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 376,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 377,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 379,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 380,
+   "sector_id": 1,
+   "sector_principal_id": 1,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 381,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 382,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 384,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 386,
+   "sector_id": 4,
+   "sector_principal_id": 4,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 388,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 389,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 394,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 395,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 396,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 398,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 399,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 403,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 408,
+   "sector_id": 4,
+   "sector_principal_id": 4,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 409,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 412,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 413,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 414,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 417,
+   "sector_id": 1,
+   "sector_principal_id": 1,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 418,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 419,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 420,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 421,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 422,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 423,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 424,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 427,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 429,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 430,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 432,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 434,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 435,
+   "sector_id": 4,
+   "sector_principal_id": 4,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 436,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 437,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 438,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 439,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 440,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 441,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 442,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 443,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 444,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 445,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 446,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 447,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 449,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 450,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 451,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 451,
+   "sector_id": 2,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 451,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 451,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 451,
+   "sector_id": 5,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 451,
+   "sector_id": 6,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 451,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 451,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 454,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 455,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 456,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 457,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 460,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 461,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 462,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 463,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 464,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 465,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 466,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 468,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 469,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 470,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 471,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 472,
+   "sector_id": 4,
+   "sector_principal_id": 4,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 473,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 474,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 475,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 476,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 477,
+   "sector_id": 1,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 478,
+   "sector_id": 8,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 481,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 482,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 484,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 485,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 486,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 488,
+   "sector_id": 1,
+   "sector_principal_id": 1,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 489,
+   "sector_id": 9,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 490,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 491,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 492,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 493,
+   "sector_id": 3,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 494,
+   "sector_id": 4,
+   "sector_principal_id": null,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": false,
+   "prioridad": "alta"
+  },
+  {
+   "empresa_id": 495,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 497,
+   "sector_id": 9,
+   "sector_principal_id": 9,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 498,
+   "sector_id": 1,
+   "sector_principal_id": 1,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 499,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 500,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 501,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 502,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 503,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 504,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 505,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 506,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 507,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 508,
+   "sector_id": 1,
+   "sector_principal_id": 1,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 510,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 512,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 513,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": 2,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 514,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 515,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 516,
+   "sector_id": 1,
+   "sector_principal_id": 1,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 517,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 519,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 521,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 527,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 528,
+   "sector_id": 6,
+   "sector_principal_id": 6,
+   "sector_secundario_id": 4,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 529,
+   "sector_id": 1,
+   "sector_principal_id": 1,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 530,
+   "sector_id": 8,
+   "sector_principal_id": 8,
+   "sector_secundario_id": 6,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 531,
+   "sector_id": 1,
+   "sector_principal_id": 1,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 532,
+   "sector_id": 2,
+   "sector_principal_id": 2,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 533,
+   "sector_id": 4,
+   "sector_principal_id": 4,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 534,
+   "sector_id": 1,
+   "sector_principal_id": 1,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  },
+  {
+   "empresa_id": 535,
+   "sector_id": 3,
+   "sector_principal_id": 3,
+   "sector_secundario_id": null,
+   "otro_servicio_en_sector": false,
+   "cubierto_por_sector_declarado": true,
+   "prioridad": "media"
+  }
+ ],
+ "solicitudes_categoria": [
+  {
+   "id": 1,
+   "empresa_id": 451,
+   "justificacion": "NO_ENCUENTRO_CATEGORIA",
+   "request_status": "pending_review",
+   "delivery_status": "failed",
+   "submitted_at": "2026-10-15 08:16:02"
+  },
+  {
+   "id": 2,
+   "empresa_id": 76,
+   "justificacion": "NO_ENCUENTRO_CATEGORIA",
+   "request_status": "pending_review",
+   "delivery_status": "sent",
+   "submitted_at": "2026-11-04 21:52:21"
+  },
+  {
+   "id": 3,
+   "empresa_id": 213,
+   "justificacion": "NO_ENCUENTRO_CATEGORIA",
+   "request_status": "pending_review",
+   "delivery_status": "sent",
+   "submitted_at": "2026-11-06 15:42:56"
+  }
+ ],
+ "empresas_con_nombre_de_camara": [
+  451
+ ],
+ "terminos_diccionario": {
+  "pumping unit": 0,
+  "pump jack": 0,
+  "balancines": 0,
+  "balancin": 1,
+  "balancín": 1
+ },
+ "nota": "terminos_diccionario: segunda ejecucion de la misma consulta con la columna term (la primera fallo por nombre de columna), 2026-11-17 ~11:10Z, READ ONLY"
+}

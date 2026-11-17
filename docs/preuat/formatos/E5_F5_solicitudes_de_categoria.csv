@@ -1,0 +1,4 @@
+﻿solicitud_id;empresa_id;fecha;motivo;estado;aviso_por_correo;RESPUESTA_decision (crear categoría / usar existente / rechazar);RESPUESTA_categoria_o_codigo;RESPUESTA_observaciones
+1;451;2026-10-15;NO_ENCUENTRO_CATEGORIA;pending_review;failed;;;
+2;76;2026-11-04;NO_ENCUENTRO_CATEGORIA;pending_review;sent;;;
+3;213;2026-11-06;NO_ENCUENTRO_CATEGORIA;pending_review;sent;;;

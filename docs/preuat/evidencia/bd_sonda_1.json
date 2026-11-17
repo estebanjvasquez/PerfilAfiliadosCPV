@@ -1,0 +1,280 @@
+// git rev-parse HEAD (servidor): 5e6e3fc0288c02798f355b25aa6a85288ddcdfdb ; lineas de git status --porcelain: 6 (assets publicos generados, ver bd_sonda_2)
+{
+    "generado": "2026-11-17T11:01:56+00:00",
+    "transaccion_read_only": "on",
+    "migraciones": {
+        "total": 135,
+        "ultimo_lote": 64,
+        "ultima": "2026_11_13_130000_create_cira_evaluation_tables"
+    },
+    "empresas_por_status": [
+        {
+            "status_id": 1,
+            "n": 406
+        }
+    ],
+    "empresas_activas_sin_sector_principal": {
+        "n": 191
+    },
+    "empresas_activas_sin_sector_principal_ni_secundario": {
+        "n": 188
+    },
+    "servicios_x": {
+        "servicios": 8
+    },
+    "x_vinculos": {
+        "vinculos": 249,
+        "empresas": 235
+    },
+    "x_unica_pertenencia_al_sector": {
+        "vinculos": 243,
+        "empresas": 230
+    },
+    "x_unica_cubierta_por_sector_declarado": {
+        "vinculos": 124,
+        "empresas": 121
+    },
+    "x_unica_sin_cubrir": {
+        "vinculos": 119,
+        "empresas": 109
+    },
+    "x_unica_sin_cubrir_empresas_sin_sector_declarado": {
+        "vinculos": 119,
+        "empresas": 109
+    },
+    "x_empresas_activas_con_x": {
+        "n": 235
+    },
+    "chamber_empresa": {
+        "filas": 173,
+        "empresas": 92
+    },
+    "conteos": {
+        "cira_eval_campaigns": 1,
+        "cira_eval_invitations": 2,
+        "cira_eval_test_decisions": 0,
+        "cira_evaluations": 0,
+        "cira_search_feedback": 13,
+        "cira_search_log": 142,
+        "empresa_search_documents": 406,
+        "taxonomy_candidate_concept_links": 10,
+        "taxonomy_category_request_analyses": 1,
+        "taxonomy_category_request_delivery_attempts": 3,
+        "taxonomy_category_requests": 3,
+        "taxonomy_concept_relations": 2
+    },
+    "cira_search_log_rango": {
+        "min_id": 7,
+        "max_id": 148,
+        "desde": "2026-11-06 17:34:57.365959+00",
+        "hasta": "2026-11-17 10:23:35.961425+00"
+    },
+    "cira_search_log_columnas": [
+        "id",
+        "created_at",
+        "source",
+        "session_ref",
+        "visitor_ref",
+        "n8n_execution_id",
+        "user_input",
+        "agent_tool",
+        "agent_params",
+        "interpretation",
+        "result_count",
+        "result_empresa_ids",
+        "result_evidence",
+        "engine_version",
+        "response_ms",
+        "error"
+    ],
+    "cira_search_log_por_dia": [
+        {
+            "dia": "2026-11-07",
+            "n": 1
+        },
+        {
+            "dia": "2026-11-09",
+            "n": 48
+        },
+        {
+            "dia": "2026-11-11",
+            "n": 1
+        },
+        {
+            "dia": "2026-11-13",
+            "n": 12
+        },
+        {
+            "dia": "2026-11-14",
+            "n": 2
+        },
+        {
+            "dia": "2026-11-15",
+            "n": 1
+        },
+        {
+            "dia": "2026-11-16",
+            "n": 67
+        },
+        {
+            "dia": "2026-11-17",
+            "n": 8
+        }
+    ],
+    "cira_search_feedback_por_voto": [
+        {
+            "vote": 1,
+            "voter_kind": "staff",
+            "n": 13
+        }
+    ],
+    "solicitudes_categoria_por_estado": [
+        {
+            "request_status": "pending_review",
+            "n": 3
+        }
+    ],
+    "candidatos_concepto_por_estado": [
+        {
+            "status": "context_required",
+            "n": 7
+        },
+        {
+            "status": "published",
+            "n": 3
+        }
+    ],
+    "relaciones_concepto_por_estado": [
+        {
+            "status": "rejected",
+            "n": 2
+        }
+    ],
+    "evaluacion_por_estado": {
+        "cira_evaluations": []
+    },
+    "vistas_public": [
+        {
+            "vista": "ClientsView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "ExperienceView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "FacilityView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "FinanceView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "InventoryView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "MachineryView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "ManagementDetView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "ManagementView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "PresenceView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "ResourceView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "SustainabilityView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "capacityView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        },
+        {
+            "vista": "catalogoView",
+            "opciones": "security_invoker=true",
+            "anon_select": false,
+            "authenticated_select": false
+        }
+    ],
+    "rls_tablas_public": {
+        "con_rls": 92,
+        "total": 92,
+        "anon_select": 88
+    },
+    "permisos_shield_role": {
+        "permisos": 13,
+        "vinculos": 7
+    },
+    "roles": [
+        {
+            "rol": "afiliados",
+            "permisos": 46,
+            "usuarios": 324
+        },
+        {
+            "rol": "filament_user",
+            "permisos": 42,
+            "usuarios": 0
+        },
+        {
+            "rol": "lectura",
+            "permisos": 205,
+            "usuarios": 1
+        },
+        {
+            "rol": "reportes",
+            "permisos": 1,
+            "usuarios": 1
+        },
+        {
+            "rol": "super_admin",
+            "permisos": 471,
+            "usuarios": 4
+        }
+    ],
+    "delete_user_fuera_de_super_admin": [],
+    "contact_empresa_huerfanas": {
+        "n": 2
+    },
+    "usuarios": {
+        "total": 368,
+        "sin_verificar": 21
+    }
+}

@@ -1,0 +1,180 @@
+?? public/css/app/
+?? public/css/filament/filament/
+?? public/css/filament/forms/
+?? public/css/filament/support/
+?? public/js/app/
+?? public/js/filament/
+{
+    "generado": "2026-11-17T11:02:28+00:00",
+    "transaccion_read_only": "on",
+    "response_ms_por_periodo": [
+        {
+            "periodo": "a_antes_V1b",
+            "agent_tool": "get_empresa",
+            "n": 7,
+            "con_ms": 7,
+            "p50": "4361",
+            "p95": "9241.7",
+            "min": 3210,
+            "max": 10538
+        },
+        {
+            "periodo": "a_antes_V1b",
+            "agent_tool": "search_empresas",
+            "n": 97,
+            "con_ms": 97,
+            "p50": "11417",
+            "p95": "16921.6",
+            "min": 7827,
+            "max": 18688
+        },
+        {
+            "periodo": "b_V1b_c6c70402",
+            "agent_tool": "get_empresa",
+            "n": 4,
+            "con_ms": 4,
+            "p50": "3678",
+            "p95": "4130.5",
+            "min": 3053,
+            "max": 4183
+        },
+        {
+            "periodo": "b_V1b_c6c70402",
+            "agent_tool": "search_empresas",
+            "n": 12,
+            "con_ms": 12,
+            "p50": "5305",
+            "p95": "8637.9",
+            "min": 3315,
+            "max": 10300
+        },
+        {
+            "periodo": "c_2d0a1ee8_16nov",
+            "agent_tool": "get_empresa",
+            "n": 6,
+            "con_ms": 6,
+            "p50": "4160",
+            "p95": "5780.5",
+            "min": 2976,
+            "max": 6160
+        },
+        {
+            "periodo": "c_2d0a1ee8_16nov",
+            "agent_tool": "search_empresas",
+            "n": 8,
+            "con_ms": 8,
+            "p50": "6036",
+            "p95": "8542.95",
+            "min": 3755,
+            "max": 8551
+        },
+        {
+            "periodo": "d_2d0a1ee8_17nov",
+            "agent_tool": "get_empresa",
+            "n": 2,
+            "con_ms": 2,
+            "p50": "4936",
+            "p95": "5219.5",
+            "min": 4621,
+            "max": 5251
+        },
+        {
+            "periodo": "d_2d0a1ee8_17nov",
+            "agent_tool": "search_empresas",
+            "n": 6,
+            "con_ms": 6,
+            "p50": "9149",
+            "p95": "12350",
+            "min": 7036,
+            "max": 12690
+        }
+    ],
+    "engine_version_por_periodo": [
+        {
+            "engine_version": "flow zbVLoCdR09IA9yQK TASK-0013-step1-v2+explain+votos | T29-B r1 | worker 8796f292",
+            "n": 14,
+            "min_id": 74,
+            "max_id": 87
+        },
+        {
+            "engine_version": "flow zbVLoCdR09IA9yQK TASK-0013-step1-v2+explain+votos | T30-B r2 | worker 8796f292",
+            "n": 23,
+            "min_id": 88,
+            "max_id": 110
+        },
+        {
+            "engine_version": "flow zbVLoCdR09IA9yQK TASK-0013-step1-v2+explain+votos+T32-v1b | T30-B r2 | worker 8796f292",
+            "n": 16,
+            "min_id": 111,
+            "max_id": 126
+        },
+        {
+            "engine_version": "flow zbVLoCdR09IA9yQK TASK-0013-step1-v2+explain+votos+T32-v1b | T30-B r2 + T32-ficha-id | worker 8ce4e0ff",
+            "n": 22,
+            "min_id": 127,
+            "max_id": 148
+        }
+    ],
+    "source_por_periodo": [
+        {
+            "source": "n8n_chat",
+            "n": 75
+        }
+    ],
+    "politicas_rls_anon_o_public": [],
+    "politicas_rls_total": 0,
+    "permisos_role": [
+        {
+            "name": "create_role",
+            "roles": 1
+        },
+        {
+            "name": "create_shield::role",
+            "roles": 0
+        },
+        {
+            "name": "delete_any_role",
+            "roles": 1
+        },
+        {
+            "name": "delete_any_shield::role",
+            "roles": 0
+        },
+        {
+            "name": "delete_role",
+            "roles": 1
+        },
+        {
+            "name": "delete_shield::role",
+            "roles": 0
+        },
+        {
+            "name": "export_role",
+            "roles": 1
+        },
+        {
+            "name": "update_role",
+            "roles": 1
+        },
+        {
+            "name": "update_shield::role",
+            "roles": 0
+        },
+        {
+            "name": "view_any_role",
+            "roles": 1
+        },
+        {
+            "name": "view_any_shield::role",
+            "roles": 0
+        },
+        {
+            "name": "view_role",
+            "roles": 1
+        },
+        {
+            "name": "view_shield::role",
+            "roles": 0
+        }
+    ]
+}

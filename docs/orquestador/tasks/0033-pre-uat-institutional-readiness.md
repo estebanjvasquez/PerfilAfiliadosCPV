@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | **ASSIGNED** → IN_PROGRESS (2026-11-17 ~11:00Z) |
+| Estado | ~~ASSIGNED~~ → ~~IN_PROGRESS~~ (2026-11-17 ~11:00Z) → **READY_FOR_REVIEW — SIN DEPLOY** (~11:30Z) |
 | Fuente | Issue #2 `6945631895` (estebanjvasquez, 2026-11-17T10:37:07Z): asignación expresa del propietario |
 | Referencia directa | Issue #2 `6945403230` (estebanjvasquez, 2026-11-17T10:27:55Z): UAT manual del propietario de TASK-0032 fases A y B, aceptación funcional en staging con reserva de rendimiento y de relevancia (I.O.E.D./Geohidra en experiencias) |
 | Antecedentes | TASK-0032: fases A y B en staging; aceptación funcional del propietario con reservas (`6945403230`); **no se reabre para implementación**. TASK-0030: aceptación parcial de UX, no APPROVED global. `PENDIENTES_CONSOLIDADO_2026-11-11.md`: corte histórico, no estado vivo |
@@ -50,3 +50,5 @@ Entregar seis documentos/matrices enlazados desde un índice pre-UAT, con eviden
 ## Avance
 
 - 2026-11-17 ~11:00Z: preflight (rama, HEAD `2cdb53d` = remoto, cambios ajenos sin tocar: `AGENTS.md`, `CLAUDE.md`, `PROTOCOL.md`, `SESSION_RESUME.md`, `docs/uat/RESULTADOS_BUSCADOR_LOTE001.xlsx`); Issue #2 sin STOP/HOLD/BLOCKED posteriores; materialización.
+- 2026-11-17 ~11:00–11:20Z: lecturas de solo lectura (SQL `READ ONLY` con rollback, `monitor_check.sh`, API de n8n, `wrangler` status, 51 llamadas de solo lectura al Worker, 7 GET sin sesión); antes y después idénticos (`cira_search_log` 142, votos 13, evaluaciones 0, empresas 406, `chamber_empresa` 173, migraciones 135, n8n `2d0a1ee8`, última ejecución 23163). Incidencia: una consulta fallida dejó 1 línea en el log de Laravel de staging (11:12:05Z).
+- 2026-11-17 ~11:30Z: **READY_FOR_REVIEW — SIN DEPLOY**. Entregables E1–E6 en [`docs/preuat/00_INDICE.md`](../../preuat/00_INDICE.md); resumen en [`audit/TASK0033_PRE_UAT_INSTITUCIONAL.md`](../../../audit/TASK0033_PRE_UAT_INSTITUCIONAL.md). Veredicto E6: **NO-GO** para iniciar la UAT institucional hasta G4–G9 (preparativos y decisiones del propietario; sin trabajo técnico). STOP.

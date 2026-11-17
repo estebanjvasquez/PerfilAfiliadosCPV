@@ -1,0 +1,146 @@
+{
+ "inicio": "2026-11-17T10:55:42.821Z",
+ "tools_list": [
+  {
+   "ms": 341,
+   "status": 200,
+   "bytes": 7395,
+   "at": "2026-11-17T10:55:43.180Z"
+  },
+  {
+   "ms": 379,
+   "status": 200,
+   "bytes": 7395,
+   "at": "2026-11-17T10:55:43.559Z"
+  },
+  {
+   "ms": 61,
+   "status": 200,
+   "bytes": 7395,
+   "at": "2026-11-17T10:55:43.621Z"
+  },
+  {
+   "ms": 74,
+   "status": 200,
+   "bytes": 7395,
+   "at": "2026-11-17T10:55:43.695Z"
+  },
+  {
+   "ms": 72,
+   "status": 200,
+   "bytes": 7395,
+   "at": "2026-11-17T10:55:43.767Z"
+  }
+ ],
+ "casos": [
+  {
+   "id": "perforacion",
+   "tool": "search_empresas",
+   "ms": [
+    4763,
+    3695,
+    999,
+    948,
+    251
+   ],
+   "primera_ms": 4763,
+   "mediana_caliente_ms": 999,
+   "status": [
+    200
+   ],
+   "bytes": 125466,
+   "primera_at": "2026-11-17T10:55:48.530Z"
+  },
+  {
+   "id": "balacin",
+   "tool": "search_empresas",
+   "ms": [
+    2796,
+    2588,
+    197,
+    184,
+    206
+   ],
+   "primera_ms": 2796,
+   "mediana_caliente_ms": 206,
+   "status": [
+    200
+   ],
+   "bytes": 13822,
+   "primera_at": "2026-11-17T10:55:57.219Z"
+  },
+  {
+   "id": "macolla",
+   "tool": "search_empresas",
+   "ms": [
+    1938,
+    1742,
+    154,
+    150,
+    200
+   ],
+   "primera_ms": 1938,
+   "mediana_caliente_ms": 200,
+   "status": [
+    200
+   ],
+   "bytes": 38718,
+   "primera_at": "2026-11-17T10:56:02.333Z"
+  },
+  {
+   "id": "camiones",
+   "tool": "search_empresas",
+   "ms": [
+    1834,
+    1766,
+    182,
+    143,
+    141
+   ],
+   "primera_ms": 1834,
+   "mediana_caliente_ms": 182,
+   "status": [
+    200
+   ],
+   "bytes": 5372,
+   "primera_at": "2026-11-17T10:56:06.414Z"
+  },
+  {
+   "id": "international_offshore",
+   "tool": "search_empresas",
+   "ms": [
+    2012,
+    1903,
+    705,
+    166,
+    148
+   ],
+   "primera_ms": 2012,
+   "mediana_caliente_ms": 705,
+   "status": [
+    200
+   ],
+   "bytes": 7385,
+   "primera_at": "2026-11-17T10:56:10.659Z"
+  },
+  {
+   "id": "ficha_177",
+   "tool": "get_empresa",
+   "ms": [
+    384,
+    361,
+    73,
+    46,
+    54
+   ],
+   "primera_ms": 384,
+   "mediana_caliente_ms": 73,
+   "status": [
+    200
+   ],
+   "bytes": 884,
+   "primera_at": "2026-11-17T10:56:13.964Z"
+  }
+ ],
+ "fin": "2026-11-17T10:56:14.499Z"
+}

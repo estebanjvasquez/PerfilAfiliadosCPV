@@ -1,0 +1,806 @@
+{
+ "generado": "2026-11-17T11:00:13.835Z",
+ "fuentes": {
+  "vivo": "n8n_vivo_2d0a1ee8.json",
+  "aisladas": "docs/cira/task0032/resultados/ejecuciones_*.json"
+ },
+ "vivo_2d0a1ee8": {
+  "uat_propietario_2026_11_17": {
+   "busquedas": {
+    "total_n8n": {
+     "n": 6,
+     "p50": 9974,
+     "p95": 13398,
+     "min": 7763,
+     "max": 13803,
+     "iqr": 2030
+    },
+    "agente": {
+     "n": 6,
+     "p50": 5114,
+     "p95": 7222,
+     "min": 3720,
+     "max": 7635,
+     "iqr": 1489
+    },
+    "modelo": {
+     "n": 6,
+     "p50": 4189,
+     "p95": 6015,
+     "min": 2785,
+     "max": 6450,
+     "iqr": 1281
+    },
+    "agente_sin_modelo": {
+     "n": 6,
+     "p50": 1010,
+     "p95": 1250,
+     "min": 864,
+     "max": 1272,
+     "iqr": 200
+    },
+    "worker": {
+     "n": 6,
+     "p50": 3828,
+     "p95": 5167,
+     "min": 3054,
+     "max": 5334,
+     "iqr": 1220
+    },
+    "registro": {
+     "n": 6,
+     "p50": 562,
+     "p95": 850,
+     "min": 463,
+     "max": 909,
+     "iqr": 132
+    },
+    "memoria_y_aprendizajes": {
+     "n": 6,
+     "p50": 468,
+     "p95": 529,
+     "min": 422,
+     "max": 537,
+     "iqr": 39
+    },
+    "tarjetas": {
+     "n": 6,
+     "p50": 57,
+     "p95": 156,
+     "min": 26,
+     "max": 174,
+     "iqr": 65
+    }
+   },
+   "fichas": {
+    "total_n8n": {
+     "n": 2,
+     "p50": 5656,
+     "p95": 6059,
+     "min": 5208,
+     "max": 6104,
+     "iqr": 448
+    },
+    "agente": {
+     "n": 2,
+     "p50": 4003,
+     "p95": 4521,
+     "min": 3426,
+     "max": 4579,
+     "iqr": 577
+    },
+    "modelo": {
+     "n": 2,
+     "p50": 3008,
+     "p95": 3568,
+     "min": 2385,
+     "max": 3630,
+     "iqr": 623
+    },
+    "agente_sin_modelo": {
+     "n": 2,
+     "p50": 995,
+     "p95": 1036,
+     "min": 949,
+     "max": 1041,
+     "iqr": 46
+    },
+    "worker": {
+     "n": 2,
+     "p50": 625,
+     "p95": 790,
+     "min": 441,
+     "max": 808,
+     "iqr": 183
+    },
+    "registro": {
+     "n": 2,
+     "p50": 586,
+     "p95": 725,
+     "min": 431,
+     "max": 740,
+     "iqr": 155
+    },
+    "memoria_y_aprendizajes": {
+     "n": 2,
+     "p50": 630,
+     "p95": 669,
+     "min": 587,
+     "max": 673,
+     "iqr": 43
+    },
+    "tarjetas": {
+     "n": 2,
+     "p50": 40,
+     "p95": 46,
+     "min": 32,
+     "max": 47,
+     "iqr": 7
+    }
+   },
+   "ejecuciones": [
+    "23163",
+    "23162",
+    "23161",
+    "23160",
+    "23159",
+    "23158",
+    "23157",
+    "23156"
+   ]
+  },
+  "e2e_2026_11_16": {
+   "busquedas": {
+    "total_n8n": {
+     "n": 8,
+     "p50": 6680,
+     "p95": 9407,
+     "min": 4312,
+     "max": 9577,
+     "iqr": 2423
+    },
+    "agente": {
+     "n": 8,
+     "p50": 3998,
+     "p95": 5574,
+     "min": 2197,
+     "max": 5899,
+     "iqr": 1948
+    },
+    "modelo": {
+     "n": 8,
+     "p50": 3021,
+     "p95": 4493,
+     "min": 1772,
+     "max": 4614,
+     "iqr": 1873
+    },
+    "agente_sin_modelo": {
+     "n": 8,
+     "p50": 608,
+     "p95": 1212,
+     "min": 425,
+     "max": 1285,
+     "iqr": 425
+    },
+    "worker": {
+     "n": 8,
+     "p50": 2058,
+     "p95": 3350,
+     "min": 634,
+     "max": 3690,
+     "iqr": 1357
+    },
+    "registro": {
+     "n": 8,
+     "p50": 498,
+     "p95": 684,
+     "min": 442,
+     "max": 700,
+     "iqr": 88
+    },
+    "memoria_y_aprendizajes": {
+     "n": 8,
+     "p50": 167,
+     "p95": 413,
+     "min": 161,
+     "max": 533,
+     "iqr": 9
+    },
+    "tarjetas": {
+     "n": 8,
+     "p50": 28,
+     "p95": 54,
+     "min": 21,
+     "max": 62,
+     "iqr": 9
+    }
+   },
+   "fichas": {
+    "total_n8n": {
+     "n": 6,
+     "p50": 4741,
+     "p95": 6628,
+     "min": 3692,
+     "max": 7017,
+     "iqr": 989
+    },
+    "agente": {
+     "n": 6,
+     "p50": 3448,
+     "p95": 4998,
+     "min": 2707,
+     "max": 5299,
+     "iqr": 922
+    },
+    "modelo": {
+     "n": 6,
+     "p50": 2904,
+     "p95": 3502,
+     "min": 2147,
+     "max": 3571,
+     "iqr": 729
+    },
+    "agente_sin_modelo": {
+     "n": 6,
+     "p50": 587,
+     "p95": 1496,
+     "min": 473,
+     "max": 1728,
+     "iqr": 202
+    },
+    "worker": {
+     "n": 6,
+     "p50": 516,
+     "p95": 631,
+     "min": 159,
+     "max": 635,
+     "iqr": 207
+    },
+    "registro": {
+     "n": 6,
+     "p50": 630,
+     "p95": 738,
+     "min": 418,
+     "max": 745,
+     "iqr": 219
+    },
+    "memoria_y_aprendizajes": {
+     "n": 6,
+     "p50": 165,
+     "p95": 249,
+     "min": 161,
+     "max": 277,
+     "iqr": 3
+    },
+    "tarjetas": {
+     "n": 6,
+     "p50": 20,
+     "p95": 28,
+     "min": 15,
+     "max": 29,
+     "iqr": 6
+    }
+   },
+   "ejecuciones": [
+    "23119",
+    "23118",
+    "23117",
+    "23116",
+    "23115",
+    "23114",
+    "23112",
+    "23111",
+    "23110",
+    "23109",
+    "23108",
+    "23107",
+    "23106",
+    "23104"
+   ]
+  }
+ },
+ "navegador_frente_a_n8n": [
+  {
+   "escenario": "Empresas de perforación",
+   "navegador_ms": 12780,
+   "ejecucion": "23158",
+   "consulta_n8n": "Empresas de perforación",
+   "inicio_n8n": "2026-11-17T09:34:28.796Z",
+   "n8n_ms": 12182,
+   "diferencia_navegador_menos_n8n_ms": 598,
+   "agente_ms": 5605,
+   "modelo_ms": 4620,
+   "worker_ms": 5334,
+   "registro_ms": 504
+  },
+  {
+   "escenario": "Balancín",
+   "navegador_ms": 10740,
+   "ejecucion": "23159",
+   "consulta_n8n": "balacin",
+   "inicio_n8n": "2026-11-17T10:18:27.617Z",
+   "n8n_ms": 9895,
+   "diferencia_navegador_menos_n8n_ms": 845,
+   "agente_ms": 4325,
+   "modelo_ms": 3290,
+   "worker_ms": 4157,
+   "registro_ms": 671
+  },
+  {
+   "escenario": "Macolla",
+   "navegador_ms": 8240,
+   "ejecucion": "23160",
+   "consulta_n8n": "Macolla",
+   "inicio_n8n": "2026-11-17T10:20:31.764Z",
+   "n8n_ms": 7763,
+   "diferencia_navegador_menos_n8n_ms": 477,
+   "agente_ms": 3720,
+   "modelo_ms": 2785,
+   "worker_ms": 3054,
+   "registro_ms": 575
+  },
+  {
+   "escenario": "Camiones de transporte de maquinaria pesada",
+   "navegador_ms": 10740,
+   "ejecucion": "23161",
+   "consulta_n8n": "Camiones de transporte de maquinaria pesada",
+   "inicio_n8n": "2026-11-17T10:22:08.641Z",
+   "n8n_ms": 10053,
+   "diferencia_navegador_menos_n8n_ms": 687,
+   "agente_ms": 5982,
+   "modelo_ms": 4710,
+   "worker_ms": 3259,
+   "registro_ms": 463
+  },
+  {
+   "escenario": "Búsqueda directa de empresa",
+   "navegador_ms": 10080,
+   "ejecucion": "23163",
+   "consulta_n8n": "INTERNATIONAL OFFSHORE",
+   "inicio_n8n": "2026-11-17T10:23:26.694Z",
+   "n8n_ms": 9528,
+   "diferencia_navegador_menos_n8n_ms": 552,
+   "agente_ms": 4622,
+   "modelo_ms": 3758,
+   "worker_ms": 3499,
+   "registro_ms": 909
+  }
+ ],
+ "navegador_resumen": {
+  "navegador": {
+   "n": 5,
+   "p50": 10740,
+   "p95": 12372,
+   "min": 8240,
+   "max": 12780,
+   "iqr": 660
+  },
+  "n8n": {
+   "n": 5,
+   "p50": 9895,
+   "p95": 11756,
+   "min": 7763,
+   "max": 12182,
+   "iqr": 525
+  },
+  "diferencia": {
+   "n": 5,
+   "p50": 598,
+   "p95": 813,
+   "min": 477,
+   "max": 845,
+   "iqr": 135
+  }
+ },
+ "copias_aisladas_task0032": {
+  "V0": {
+   "todas": {
+    "total_n8n": {
+     "n": 72,
+     "p50": 10551,
+     "p95": 14716,
+     "min": 2819,
+     "max": 15627,
+     "iqr": 2747
+    },
+    "agente": {
+     "n": 72,
+     "p50": 7437,
+     "p95": 11070,
+     "min": 2500,
+     "max": 12640,
+     "iqr": 1984
+    },
+    "modelo": {
+     "n": 72,
+     "p50": 4467,
+     "p95": 7757,
+     "min": 1946,
+     "max": 10138,
+     "iqr": 1080
+    },
+    "agente_sin_modelo": {
+     "n": 72,
+     "p50": 2519,
+     "p95": 4622,
+     "min": 426,
+     "max": 5406,
+     "iqr": 1625
+    },
+    "worker": {
+     "n": 69,
+     "p50": 2716,
+     "p95": 4141,
+     "min": 421,
+     "max": 4504,
+     "iqr": 908
+    },
+    "registro": {
+     "n": 18,
+     "p50": 1,
+     "p95": 1,
+     "min": 1,
+     "max": 1,
+     "iqr": 0
+    },
+    "memoria_y_aprendizajes": {
+     "n": 72,
+     "p50": 279,
+     "p95": 417,
+     "min": 159,
+     "max": 473,
+     "iqr": 110
+    },
+    "tarjetas": {
+     "n": 68,
+     "p50": 32,
+     "p95": 87,
+     "min": 18,
+     "max": 162,
+     "iqr": 21
+    }
+   },
+   "worker_por_repeticion": {
+    "rep_1": {
+     "n": 61,
+     "p50": 2688,
+     "p95": 4138,
+     "min": 421,
+     "max": 4504,
+     "iqr": 895
+    },
+    "rep_2": {
+     "n": 4,
+     "p50": 2645,
+     "p95": 3186,
+     "min": 775,
+     "max": 3260,
+     "iqr": 806
+    },
+    "rep_3": {
+     "n": 4,
+     "p50": 3590,
+     "p95": 4364,
+     "min": 2558,
+     "max": 4464,
+     "iqr": 792
+    }
+   },
+   "cliente_menos_n8n_ms": {
+    "n": 72,
+    "p50": 109,
+    "p95": 309,
+    "min": -100,
+    "max": 470,
+    "iqr": 42
+   }
+  },
+  "V1b_r1": {
+   "todas": {
+    "total_n8n": {
+     "n": 72,
+     "p50": 6023,
+     "p95": 8329,
+     "min": 2246,
+     "max": 13261,
+     "iqr": 1179
+    },
+    "agente": {
+     "n": 72,
+     "p50": 3407,
+     "p95": 5208,
+     "min": 2091,
+     "max": 8232,
+     "iqr": 1061
+    },
+    "modelo": {
+     "n": 72,
+     "p50": 2907,
+     "p95": 4694,
+     "min": 1753,
+     "max": 7604,
+     "iqr": 1124
+    },
+    "agente_sin_modelo": {
+     "n": 72,
+     "p50": 489,
+     "p95": 864,
+     "min": 338,
+     "max": 1171,
+     "iqr": 144
+    },
+    "worker": {
+     "n": 70,
+     "p50": 2308,
+     "p95": 3266,
+     "min": 255,
+     "max": 4102,
+     "iqr": 763
+    },
+    "registro": {
+     "n": 22,
+     "p50": 1,
+     "p95": 2,
+     "min": 1,
+     "max": 3,
+     "iqr": 0
+    },
+    "memoria_y_aprendizajes": {
+     "n": 72,
+     "p50": 168,
+     "p95": 318,
+     "min": 159,
+     "max": 503,
+     "iqr": 18
+    },
+    "tarjetas": {
+     "n": 67,
+     "p50": 33,
+     "p95": 105,
+     "min": 17,
+     "max": 177,
+     "iqr": 22
+    }
+   },
+   "worker_por_repeticion": {
+    "rep_1": {
+     "n": 62,
+     "p50": 2336,
+     "p95": 3277,
+     "min": 449,
+     "max": 4102,
+     "iqr": 665
+    },
+    "rep_2": {
+     "n": 4,
+     "p50": 1368,
+     "p95": 3046,
+     "min": 255,
+     "max": 3167,
+     "iqr": 2221
+    },
+    "rep_3": {
+     "n": 4,
+     "p50": 1160,
+     "p95": 2547,
+     "min": 359,
+     "max": 2653,
+     "iqr": 1751
+    }
+   },
+   "cliente_menos_n8n_ms": {
+    "n": 72,
+    "p50": 106,
+    "p95": 247,
+    "min": 28,
+    "max": 317,
+    "iqr": 53
+   }
+  },
+  "V1b_r2": {
+   "todas": {
+    "total_n8n": {
+     "n": 72,
+     "p50": 6451,
+     "p95": 9719,
+     "min": 2910,
+     "max": 14416,
+     "iqr": 1484
+    },
+    "agente": {
+     "n": 72,
+     "p50": 3823,
+     "p95": 7330,
+     "min": 2563,
+     "max": 11645,
+     "iqr": 1385
+    },
+    "modelo": {
+     "n": 72,
+     "p50": 3252,
+     "p95": 5858,
+     "min": 2173,
+     "max": 9209,
+     "iqr": 1353
+    },
+    "agente_sin_modelo": {
+     "n": 72,
+     "p50": 456,
+     "p95": 890,
+     "min": 260,
+     "max": 3202,
+     "iqr": 208
+    },
+    "worker": {
+     "n": 68,
+     "p50": 2233,
+     "p95": 2923,
+     "min": 296,
+     "max": 4221,
+     "iqr": 825
+    },
+    "registro": {
+     "n": 15,
+     "p50": 1,
+     "p95": 1,
+     "min": 1,
+     "max": 1,
+     "iqr": 0
+    },
+    "memoria_y_aprendizajes": {
+     "n": 72,
+     "p50": 163,
+     "p95": 320,
+     "min": 156,
+     "max": 751,
+     "iqr": 12
+    },
+    "tarjetas": {
+     "n": 68,
+     "p50": 25,
+     "p95": 71,
+     "min": 15,
+     "max": 168,
+     "iqr": 16
+    }
+   },
+   "worker_por_repeticion": {
+    "rep_1": {
+     "n": 60,
+     "p50": 2341,
+     "p95": 2962,
+     "min": 457,
+     "max": 4221,
+     "iqr": 575
+    },
+    "rep_2": {
+     "n": 4,
+     "p50": 632,
+     "p95": 844,
+     "min": 552,
+     "max": 877,
+     "iqr": 119
+    },
+    "rep_3": {
+     "n": 4,
+     "p50": 436,
+     "p95": 773,
+     "min": 296,
+     "max": 823,
+     "iqr": 212
+    }
+   },
+   "cliente_menos_n8n_ms": {
+    "n": 72,
+    "p50": 94,
+    "p95": 244,
+    "min": -254,
+    "max": 374,
+    "iqr": 33
+   }
+  },
+  "V1b_r3": {
+   "todas": {
+    "total_n8n": {
+     "n": 72,
+     "p50": 6042,
+     "p95": 7956,
+     "min": 2179,
+     "max": 9855,
+     "iqr": 1171
+    },
+    "agente": {
+     "n": 72,
+     "p50": 3379,
+     "p95": 5143,
+     "min": 2029,
+     "max": 7290,
+     "iqr": 923
+    },
+    "modelo": {
+     "n": 72,
+     "p50": 2916,
+     "p95": 4566,
+     "min": 1692,
+     "max": 6668,
+     "iqr": 886
+    },
+    "agente_sin_modelo": {
+     "n": 72,
+     "p50": 482,
+     "p95": 727,
+     "min": 337,
+     "max": 794,
+     "iqr": 159
+    },
+    "worker": {
+     "n": 70,
+     "p50": 2245,
+     "p95": 3264,
+     "min": 393,
+     "max": 3582,
+     "iqr": 809
+    },
+    "registro": {
+     "n": 13,
+     "p50": 1,
+     "p95": 1,
+     "min": 1,
+     "max": 2,
+     "iqr": 0
+    },
+    "memoria_y_aprendizajes": {
+     "n": 72,
+     "p50": 172,
+     "p95": 239,
+     "min": 164,
+     "max": 394,
+     "iqr": 19
+    },
+    "tarjetas": {
+     "n": 69,
+     "p50": 28,
+     "p95": 65,
+     "min": 16,
+     "max": 135,
+     "iqr": 16
+    }
+   },
+   "worker_por_repeticion": {
+    "rep_1": {
+     "n": 62,
+     "p50": 2289,
+     "p95": 3282,
+     "min": 456,
+     "max": 3582,
+     "iqr": 812
+    },
+    "rep_2": {
+     "n": 4,
+     "p50": 1663,
+     "p95": 2745,
+     "min": 608,
+     "max": 2804,
+     "iqr": 1671
+    },
+    "rep_3": {
+     "n": 4,
+     "p50": 739,
+     "p95": 1213,
+     "min": 393,
+     "max": 1279,
+     "iqr": 370
+    }
+   },
+   "cliente_menos_n8n_ms": {
+    "n": 72,
+    "p50": 93,
+    "p95": 247,
+    "min": 44,
+    "max": 289,
+    "iqr": 25
+   }
+  }
+ }
+}

@@ -1,0 +1,4 @@
+﻿pregunta;opciones;RESPUESTA;ejemplo_o_comentario
+4a Al buscar el nombre de una empresa, aparecen tambien empresas parecidas por servicio?;solo la empresa buscada / tambien las parecidas;;
+4b Empresa con capacidad declarada y experiencia relacionada: en que vista?;solo capacidades / en ambas vistas;;
+4c Empresa sin capacidad declarada pero con experiencia en el tema: aparece en la vista de experiencias?;si / no / solo si se pide;;

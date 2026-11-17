@@ -1,0 +1,128 @@
+[
+ {
+  "frase": "mantenimiento de compresores de gas",
+  "intento": 1,
+  "status": 200,
+  "cliente_ms": 2916,
+  "worker_total_ms": 2430,
+  "senal_sql_mas_lenta_ms": 1741,
+  "estimacion_embedding_y_resto_ms": 689,
+  "senales": {
+   "lexical_experiencia": 483,
+   "fulltext": 550,
+   "lexical_taxonomy": 620,
+   "service": 638,
+   "taxonomy": 934,
+   "experiencia": 1074,
+   "canonical_resolver": 1185,
+   "structured": 1741,
+   "canonical_cpv": 0,
+   "canonical_related": 0
+  }
+ },
+ {
+  "frase": "mantenimiento de compresores de gas",
+  "intento": 2,
+  "status": 200,
+  "cliente_ms": 152,
+  "worker_total_ms": 89,
+  "senal_sql_mas_lenta_ms": 13,
+  "estimacion_embedding_y_resto_ms": 76,
+  "senales": {
+   "lexical_taxonomy": 3,
+   "lexical_experiencia": 3,
+   "fulltext": 3,
+   "service": 3,
+   "experiencia": 4,
+   "canonical_resolver": 8,
+   "taxonomy": 8,
+   "structured": 13,
+   "canonical_cpv": 0,
+   "canonical_related": 0
+  }
+ },
+ {
+  "frase": "alquiler de montacargas",
+  "intento": 1,
+  "status": 200,
+  "cliente_ms": 1315,
+  "worker_total_ms": 1263,
+  "senal_sql_mas_lenta_ms": 853,
+  "estimacion_embedding_y_resto_ms": 410,
+  "senales": {
+   "lexical_taxonomy": 189,
+   "lexical_experiencia": 213,
+   "fulltext": 316,
+   "service": 377,
+   "taxonomy": 406,
+   "experiencia": 416,
+   "canonical_resolver": 452,
+   "structured": 853,
+   "canonical_cpv": 0,
+   "canonical_related": 0
+  }
+ },
+ {
+  "frase": "alquiler de montacargas",
+  "intento": 2,
+  "status": 200,
+  "cliente_ms": 116,
+  "worker_total_ms": 63,
+  "senal_sql_mas_lenta_ms": 8,
+  "estimacion_embedding_y_resto_ms": 55,
+  "senales": {
+   "lexical_experiencia": 2,
+   "fulltext": 2,
+   "lexical_taxonomy": 2,
+   "service": 3,
+   "canonical_resolver": 4,
+   "experiencia": 4,
+   "taxonomy": 4,
+   "structured": 8,
+   "canonical_cpv": 0,
+   "canonical_related": 0
+  }
+ },
+ {
+  "frase": "tratamiento de crudo extrapesado",
+  "intento": 1,
+  "status": 200,
+  "cliente_ms": 1020,
+  "worker_total_ms": 961,
+  "senal_sql_mas_lenta_ms": 725,
+  "estimacion_embedding_y_resto_ms": 236,
+  "senales": {
+   "lexical_experiencia": 179,
+   "fulltext": 183,
+   "lexical_taxonomy": 231,
+   "service": 233,
+   "taxonomy": 378,
+   "experiencia": 392,
+   "canonical_resolver": 616,
+   "structured": 725,
+   "canonical_cpv": 0,
+   "canonical_related": 0
+  }
+ },
+ {
+  "frase": "tratamiento de crudo extrapesado",
+  "intento": 2,
+  "status": 200,
+  "cliente_ms": 135,
+  "worker_total_ms": 67,
+  "senal_sql_mas_lenta_ms": 7,
+  "estimacion_embedding_y_resto_ms": 60,
+  "senales": {
+   "fulltext": 2,
+   "lexical_taxonomy": 2,
+   "lexical_experiencia": 2,
+   "service": 2,
+   "canonical_resolver": 3,
+   "taxonomy": 4,
+   "experiencia": 4,
+   "structured": 7,
+   "canonical_cpv": 0,
+   "canonical_related": 0
+  }
+ }
+]

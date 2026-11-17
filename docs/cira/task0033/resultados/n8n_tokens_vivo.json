@@ -1,0 +1,184 @@
+[
+ {
+  "execution": "23156",
+  "started": "2026-11-17T09:08:31.424Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 198,
+    "promptTokens": 4948,
+    "totalTokens": 5146
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23157",
+  "started": "2026-11-17T09:09:18.441Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 83,
+    "promptTokens": 5035,
+    "totalTokens": 5118
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23158",
+  "started": "2026-11-17T09:34:28.796Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 123,
+    "promptTokens": 4950,
+    "totalTokens": 5073
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23159",
+  "started": "2026-11-17T10:18:27.617Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 80,
+    "promptTokens": 4947,
+    "totalTokens": 5027
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23160",
+  "started": "2026-11-17T10:20:31.764Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 79,
+    "promptTokens": 4947,
+    "totalTokens": 5026
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23161",
+  "started": "2026-11-17T10:22:08.641Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 116,
+    "promptTokens": 4952,
+    "totalTokens": 5068
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23162",
+  "started": "2026-11-17T10:22:26.446Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 221,
+    "promptTokens": 5047,
+    "totalTokens": 5268
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23163",
+  "started": "2026-11-17T10:23:26.694Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 115,
+    "promptTokens": 4951,
+    "totalTokens": 5066
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23106",
+  "started": "2026-11-16T19:13:17.279Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 162,
+    "promptTokens": 5047,
+    "totalTokens": 5209
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23107",
+  "started": "2026-11-16T19:13:26.822Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 142,
+    "promptTokens": 4947,
+    "totalTokens": 5089
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23111",
+  "started": "2026-11-16T19:13:55.902Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 73,
+    "promptTokens": 4947,
+    "totalTokens": 5020
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23112",
+  "started": "2026-11-16T19:14:03.464Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 185,
+    "promptTokens": 4952,
+    "totalTokens": 5137
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23115",
+  "started": "2026-11-16T19:14:21.657Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 247,
+    "promptTokens": 4947,
+    "totalTokens": 5194
+   }
+  ],
+  "mensajes_memoria": null
+ },
+ {
+  "execution": "23117",
+  "started": "2026-11-16T19:14:34.137Z",
+  "llamadas_modelo": 1,
+  "tokens": [
+   {
+    "completionTokens": 115,
+    "promptTokens": 4948,
+    "totalTokens": 5063
+   }
+  ],
+  "mensajes_memoria": null
+ }
+]

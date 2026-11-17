@@ -1,0 +1,40 @@
+{
+ "empresas_sin_sector_principal": 191,
+ "de_ellas_con_solo_servicios_X": 103,
+ "de_ellas_con_sector_secundario": 3,
+ "vinculos_X": 249,
+ "empresas_con_X": 235,
+ "prioridad_alta": {
+  "vinculos": 119,
+  "empresas": 109
+ },
+ "prioridad_media": {
+  "vinculos": 124,
+  "empresas": 121
+ },
+ "prioridad_baja": {
+  "vinculos": 6,
+  "empresas": 5
+ },
+ "X_por_sector": {
+  "INGENIERÍA Y SERVICIOS INTEGRADOS": 23,
+  "SERVICIOS TECNOLÓGICOS": 29,
+  "SERVICIOS ASOCIADOS": 66,
+  "SERVICIOS A POZOS": 19,
+  "OPERADORES": 3,
+  "FABRICANTES": 29,
+  "SUPLIDORES": 47,
+  "CONSTRUCCIÓN": 33
+ },
+ "alta_por_sector": {
+  "INGENIERÍA Y SERVICIOS INTEGRADOS": 13,
+  "SERVICIOS TECNOLÓGICOS": 13,
+  "SERVICIOS ASOCIADOS": 34,
+  "SERVICIOS A POZOS": 11,
+  "OPERADORES": 2,
+  "FABRICANTES": 13,
+  "SUPLIDORES": 18,
+  "CONSTRUCCIÓN": 15
+ },
+ "solicitudes": 3
+}
